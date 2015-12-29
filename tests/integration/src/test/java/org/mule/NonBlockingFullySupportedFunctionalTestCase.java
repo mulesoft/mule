@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
-import org.mule.tck.functional.FlowAssert;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.functional.FlowAssert;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 

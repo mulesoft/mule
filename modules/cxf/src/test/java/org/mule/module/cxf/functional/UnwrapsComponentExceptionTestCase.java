@@ -12,19 +12,15 @@ import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptio
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.cxf.example.HelloWorld;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
 import javax.jws.WebService;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
 {

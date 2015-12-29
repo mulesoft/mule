@@ -9,10 +9,10 @@ package org.mule;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.construct.Flow;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FlowAssert;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.functional.EventCallback;
+import org.mule.functional.functional.FlowAssert;
+import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;

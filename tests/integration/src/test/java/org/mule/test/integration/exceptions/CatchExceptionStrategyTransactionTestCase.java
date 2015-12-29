@@ -19,10 +19,10 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.transaction.Transaction;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.listener.ExceptionListener;
-import org.mule.tck.listener.SystemExceptionListener;
+import org.mule.functional.functional.EventCallback;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.listener.ExceptionListener;
+import org.mule.functional.listener.SystemExceptionListener;
 import org.mule.transaction.TransactionCoordination;
 
 import org.junit.Test;

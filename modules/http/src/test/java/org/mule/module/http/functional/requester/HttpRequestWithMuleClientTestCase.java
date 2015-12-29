@@ -25,7 +25,7 @@ import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.api.requester.HttpRequesterConfigBuilder;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 import org.mule.transport.ssl.api.TlsContextFactory;

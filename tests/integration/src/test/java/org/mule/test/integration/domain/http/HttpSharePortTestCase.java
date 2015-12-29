@@ -12,17 +12,12 @@ import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptio
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.tck.junit4.DomainFunctionalTestCase;
+import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 public class HttpSharePortTestCase extends DomainFunctionalTestCase
 {

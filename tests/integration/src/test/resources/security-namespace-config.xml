@@ -6,9 +6,9 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <spring:bean name="dummySecurityProvider" class="org.mule.tck.security.TestSingleUserSecurityProvider"/>
-    <spring:bean name="dummyEncryptionStrategy" class="org.mule.tck.security.MockEncryptionStrategy"/>
-    <spring:bean name="dummyKeyFactory" class="org.mule.tck.security.MockKeyFactory"/>
+    <spring:bean name="dummySecurityProvider" class="org.mule.functional.security.TestSingleUserSecurityProvider"/>
+    <spring:bean name="dummyEncryptionStrategy" class="org.mule.functional.security.MockEncryptionStrategy"/>
+    <spring:bean name="dummyKeyFactory" class="org.mule.functional.security.MockKeyFactory"/>
 
     <security-manager>
         <custom-security-provider name="dummySecurityProvider" provider-ref="dummySecurityProvider"/>

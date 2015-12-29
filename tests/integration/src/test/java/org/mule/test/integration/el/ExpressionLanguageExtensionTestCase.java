@@ -13,7 +13,7 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.el.mvel.MVELExpressionLanguage;
 import org.mule.expression.DefaultExpressionManager;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 

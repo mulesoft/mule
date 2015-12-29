@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.transport.MessageReceiver;
 import org.mule.construct.AbstractFlowConstruct;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.AbstractConnector;
 
 import org.junit.Test;

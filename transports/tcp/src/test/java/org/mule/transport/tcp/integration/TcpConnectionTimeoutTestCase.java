@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
 import java.util.concurrent.TimeoutException;

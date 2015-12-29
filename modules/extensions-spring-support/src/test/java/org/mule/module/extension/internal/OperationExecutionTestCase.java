@@ -23,9 +23,8 @@ import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.Ricin;
 import org.mule.module.extension.Weapon;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
-import org.mule.tck.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -38,7 +38,7 @@
         <message-chunk-aggregator/>
         <test:component doInboundTransform="false" logMessageDetails="true"/>
         <!--<component> -->
-        <!--<singleton-object class="org.mule.tck.functional.FunctionalTestComponent"> -->
+        <!--<singleton-object class="FunctionalTestComponent"> -->
         <!--<property key="asString" value="false"/> -->
         <!--</singleton-object> -->
         <!--</component> -->

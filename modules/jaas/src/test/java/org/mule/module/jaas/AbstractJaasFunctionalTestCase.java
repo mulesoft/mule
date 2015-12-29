@@ -10,7 +10,7 @@ import org.mule.api.EncryptionStrategy;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.security.MuleCredentials;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;

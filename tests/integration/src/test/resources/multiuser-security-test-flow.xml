@@ -13,7 +13,7 @@
             <encryption-security-filter strategy-ref="PBE"/>
         </inbound-endpoint>
         
-        <component class="org.mule.tck.security.TestSecurityComponent"/>
+        <component class="org.mule.functional.security.TestSecurityComponent"/>
     </flow>
 
 </mule>

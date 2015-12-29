@@ -9,7 +9,7 @@ package org.mule.config.spring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleException;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 public abstract class AbstractInterceptorTestCase extends FunctionalTestCase
 {

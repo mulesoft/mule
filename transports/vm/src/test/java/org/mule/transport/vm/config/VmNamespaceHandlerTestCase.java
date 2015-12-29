@@ -14,7 +14,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.QueueProfile;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.vm.VMConnector;

@@ -39,7 +39,7 @@
                 exchange-pattern="request-response" />
         </composite-source>
 
-        <component class="org.mule.tck.testmodels.services.TestComponent" />
+        <component class="org.mule.functional.testmodels.services.TestComponent" />
     </flow>
 
 </mule>

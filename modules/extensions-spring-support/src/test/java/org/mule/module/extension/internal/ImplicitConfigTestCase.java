@@ -25,7 +25,7 @@ import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.capability.Xml;
 import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.annotation.api.param.Optional;
-import org.mule.tck.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
 import org.junit.Test;
 

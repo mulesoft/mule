@@ -16,7 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.transformer.Transformer;
 import org.mule.expression.RegistryExpressionEvaluator;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 

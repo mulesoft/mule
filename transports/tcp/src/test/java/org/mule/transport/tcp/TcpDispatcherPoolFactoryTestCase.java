@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.transport.Connector;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.ConfigurableKeyedObjectPool;
 import org.mule.transport.ConfigurableKeyedObjectPoolFactory;
 import org.mule.transport.DefaultConfigurableKeyedObjectPool;

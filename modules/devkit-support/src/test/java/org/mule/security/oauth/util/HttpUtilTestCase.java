@@ -15,7 +15,7 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_
 import static org.mule.module.http.api.HttpConstants.HttpStatus.NON_AUTHORITATIVE_INFORMATION;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;

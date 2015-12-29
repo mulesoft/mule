@@ -19,7 +19,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.security.CredentialsNotSetException;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.security.MuleCredentials;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;

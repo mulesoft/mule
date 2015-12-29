@@ -28,7 +28,7 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.source.StartableCompositeMessageSource;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;

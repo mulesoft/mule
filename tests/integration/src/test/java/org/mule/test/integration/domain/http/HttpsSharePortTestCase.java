@@ -7,17 +7,12 @@
 package org.mule.test.integration.domain.http;
 
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.tck.junit4.DomainFunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.integration.domain.http.HttpSharePortTestCase;
 import org.mule.transport.ssl.DefaultTlsContextFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Before;
-import org.junit.runners.Parameterized;
 
 public class HttpsSharePortTestCase extends HttpSharePortTestCase
 {

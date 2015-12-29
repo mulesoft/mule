@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.module.xml.util.XMLTestUtils;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;

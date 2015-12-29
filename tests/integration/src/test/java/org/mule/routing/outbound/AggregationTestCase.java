@@ -24,7 +24,7 @@ import org.mule.routing.EventGroup;
 import org.mule.routing.SimpleCollectionAggregator;
 import org.mule.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.routing.correlation.EventCorrelatorCallback;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;

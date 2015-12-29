@@ -21,7 +21,7 @@ import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.module.xml.transformer.XsltTransformer;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
 
 import java.util.Map;

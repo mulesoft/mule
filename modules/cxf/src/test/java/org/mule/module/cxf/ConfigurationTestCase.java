@@ -8,10 +8,9 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.module.cxf.config.ProxyServiceFactoryBean;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.List;
 

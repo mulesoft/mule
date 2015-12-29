@@ -18,10 +18,10 @@ import org.mule.api.exception.MessageRedeliveredException;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.message.ExceptionMessage;
-import org.mule.tck.exceptions.FunctionalTestException;
-import org.mule.tck.functional.CounterCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.exceptions.FunctionalTestException;
+import org.mule.functional.functional.CounterCallback;
+import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import org.junit.After;

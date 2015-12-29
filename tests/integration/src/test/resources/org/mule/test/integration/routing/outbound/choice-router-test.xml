@@ -24,7 +24,7 @@
         </choice>
 
         <!-- no need to log the exception that's thrown if no when clause matches -->
-        <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
+        <custom-exception-strategy class="org.mule.functional.functional.QuietExceptionStrategy"/>
     </flow>
 
     <flow name="with-default-route">

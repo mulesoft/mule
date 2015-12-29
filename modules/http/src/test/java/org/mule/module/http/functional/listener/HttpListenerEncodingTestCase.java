@@ -9,7 +9,7 @@ package org.mule.module.http.functional.listener;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.nio.charset.Charset;

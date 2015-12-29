@@ -17,7 +17,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.component.ComponentException;
 import org.mule.security.MuleCredentials;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.devkit.ProcessAdapter;
 import org.mule.api.devkit.ProcessTemplate;
 import org.mule.api.store.ObjectStoreManager;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import javax.inject.Inject;
 

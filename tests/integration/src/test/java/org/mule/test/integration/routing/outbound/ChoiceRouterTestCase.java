@@ -23,7 +23,7 @@ import org.mule.routing.ChoiceRouter;
 import org.mule.routing.MessageProcessorFilterPair;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.filters.RegExFilter;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 

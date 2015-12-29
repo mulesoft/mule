@@ -14,7 +14,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 

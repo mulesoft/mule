@@ -7,7 +7,7 @@
 package org.mule.transport.ssl;
 
 import org.mule.api.MuleEventContext;
-import org.mule.tck.functional.EventCallback;
+import org.mule.functional.functional.EventCallback;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;

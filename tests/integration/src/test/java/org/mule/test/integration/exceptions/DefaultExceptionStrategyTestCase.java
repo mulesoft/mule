@@ -13,7 +13,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.exception.CatchMessagingExceptionStrategy;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.HashSet;
 import java.util.Set;

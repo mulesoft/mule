@@ -11,7 +11,7 @@ import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionException;
 import org.mule.execution.TransactionalExecutionTemplate;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransactionFactory;

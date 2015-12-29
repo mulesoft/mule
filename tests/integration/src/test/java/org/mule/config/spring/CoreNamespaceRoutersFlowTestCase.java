@@ -19,7 +19,7 @@ import org.mule.construct.Flow;
 import org.mule.routing.IdempotentMessageFilter;
 import org.mule.routing.IdempotentSecureHashMessageFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.TextFileObjectStore;
 

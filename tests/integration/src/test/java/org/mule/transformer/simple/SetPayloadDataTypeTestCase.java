@@ -11,7 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.transformer.DataType;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.transformer.types.MimeTypes;
 

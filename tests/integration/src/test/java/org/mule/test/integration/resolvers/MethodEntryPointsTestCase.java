@@ -9,12 +9,11 @@ package org.mule.test.integration.resolvers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.model.resolvers.EntryPointNotFoundException;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.ExceptionUtils;
 
 import java.util.HashMap;

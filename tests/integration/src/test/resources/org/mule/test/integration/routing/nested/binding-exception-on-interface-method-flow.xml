@@ -16,7 +16,7 @@
         <component class="org.mule.test.integration.routing.nested.BindingExceptionOnInterfaceMethodTestCase$ExceptionThrowingService" />
             
 		<!-- No need to log the exceptions happening in the component - we know there will be one -->
-        <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
+        <custom-exception-strategy class="org.mule.functional.functional.QuietExceptionStrategy"/>
 	</flow>
 
 	<flow name="InvokerComponent">            

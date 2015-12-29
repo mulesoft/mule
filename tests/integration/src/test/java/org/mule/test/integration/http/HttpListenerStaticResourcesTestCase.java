@@ -17,7 +17,7 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.util.ClassUtils.getClassPathRoot;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.ssl.DefaultTlsContextFactory;

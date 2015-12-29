@@ -15,7 +15,7 @@ import org.mule.module.db.integration.model.DerbyTestDatabase;
 import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.resolver.database.DbConfigResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.DomainFunctionalTestCase;
+import org.mule.functional.junit4.DomainFunctionalTestCase;
 
 import java.sql.SQLException;
 import java.util.Arrays;

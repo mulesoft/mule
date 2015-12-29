@@ -7,7 +7,7 @@
 package org.mule.test.integration.transaction.xa;
 
 import org.mule.api.context.MuleContextAware;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;

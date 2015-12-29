@@ -14,7 +14,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.Connector;
 import org.mule.retry.policies.SimpleRetryPolicyTemplate;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 

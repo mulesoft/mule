@@ -13,8 +13,8 @@ import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.api.MuleEventContext;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.functional.EventCallback;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayInputStream;

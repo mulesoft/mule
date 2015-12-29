@@ -14,8 +14,8 @@ import org.mule.api.MuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.tck.listener.Callback;
-import org.mule.tck.listener.FlowExecutionListener;
+import org.mule.functional.listener.Callback;
+import org.mule.functional.listener.FlowExecutionListener;
 import org.mule.test.infrastructure.deployment.FakeMuleServer;
 
 import java.util.concurrent.atomic.AtomicReference;

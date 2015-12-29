@@ -17,7 +17,7 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.oauth2.internal.OAuthConstants;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 

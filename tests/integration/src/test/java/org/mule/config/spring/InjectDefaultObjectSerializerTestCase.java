@@ -13,7 +13,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.serialization.DefaultObjectSerializer;
 import org.mule.api.serialization.ObjectSerializer;
 import org.mule.serialization.internal.AbstractObjectSerializer;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.io.InputStream;
 import java.util.Arrays;

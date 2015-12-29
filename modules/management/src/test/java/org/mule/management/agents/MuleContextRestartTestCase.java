@@ -8,7 +8,7 @@ package org.mule.management.agents;
 
 import static org.junit.Assert.assertEquals;
 import org.mule.module.management.mbean.MBeanServerFactory;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Set;
 

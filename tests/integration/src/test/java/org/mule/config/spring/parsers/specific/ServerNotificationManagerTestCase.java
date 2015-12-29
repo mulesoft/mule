@@ -22,7 +22,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
 import java.util.Collection;

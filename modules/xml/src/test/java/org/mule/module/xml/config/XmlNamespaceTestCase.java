@@ -23,7 +23,7 @@ import org.mule.module.xml.transformer.JXPathExtractor;
 import org.mule.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
 import org.mule.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
 import org.mule.module.xml.util.NamespaceManager;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 import org.w3c.dom.ls.LSInput;

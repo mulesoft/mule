@@ -16,7 +16,7 @@ import org.mule.construct.Flow;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.request.NtlmProxyConfig;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 

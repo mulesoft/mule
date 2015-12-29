@@ -9,7 +9,7 @@ package org.mule.transport.jms.vendors;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
 import org.mule.util.proxy.TargetInvocationHandler;

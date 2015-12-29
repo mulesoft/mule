@@ -19,7 +19,7 @@ import static org.mule.module.http.internal.listener.grizzly.GrizzlyServerManage
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 

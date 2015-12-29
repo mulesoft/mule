@@ -11,11 +11,11 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.StartException;
 import org.mule.endpoint.DefaultEndpointFactory;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.tck.util.endpoint.InboundEndpointWrapper;
+import org.mule.functional.util.endpoint.InboundEndpointWrapper;
 
 import java.util.concurrent.CountDownLatch;
 

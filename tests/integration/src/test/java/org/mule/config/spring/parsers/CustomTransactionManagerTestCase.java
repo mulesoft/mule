@@ -9,7 +9,7 @@ package org.mule.config.spring.parsers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
 
 import java.lang.reflect.Proxy;

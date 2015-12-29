@@ -38,7 +38,7 @@
     <!-- This component will append " Received" to the message so we know we're getting the correct one -->
     <flow name="pojo4">
         <inbound-endpoint address="jms://pojo4" exchange-pattern="one-way"/>
-        <component class="org.mule.tck.testmodels.services.TestReceiver"/>
+        <component class="org.mule.functional.testmodels.services.TestReceiver"/>
     </flow>
 
 </mule>

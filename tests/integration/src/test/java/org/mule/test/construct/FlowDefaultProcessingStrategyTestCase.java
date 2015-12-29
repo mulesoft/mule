@@ -26,7 +26,7 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageDispatcher;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.vm.VMMessageDispatcher;
 import org.mule.transport.vm.VMMessageDispatcherFactory;
 import org.mule.transport.vm.VMMessageReceiver;

@@ -7,7 +7,7 @@
 package org.mule.transport.vm.functional.transactions;
 
 import org.mule.api.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.util.HashMap;

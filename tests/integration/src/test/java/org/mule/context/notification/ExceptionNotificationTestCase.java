@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNull;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.listener.ExceptionListener;
+import org.mule.functional.listener.ExceptionListener;
 
 public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
 {

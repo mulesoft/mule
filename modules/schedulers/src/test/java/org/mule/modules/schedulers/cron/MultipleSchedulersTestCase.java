@@ -8,7 +8,7 @@
 package org.mule.modules.schedulers.cron;
 
 import org.mule.construct.Flow;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.util.concurrent.Latch;

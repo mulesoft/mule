@@ -13,7 +13,7 @@ import org.mule.api.MuleEvent;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
-import org.mule.tck.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
 import javax.inject.Inject;
 import javax.inject.Named;

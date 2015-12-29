@@ -19,7 +19,7 @@ import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.serialization.ObjectSerializer;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.serialization.internal.JavaObjectSerializer;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.List;

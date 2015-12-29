@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.api.agent.Agent;
 import org.mule.module.management.agent.ConfigurableJMXAuthenticator;
 import org.mule.module.management.agent.JmxApplicationAgent;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Map;
 

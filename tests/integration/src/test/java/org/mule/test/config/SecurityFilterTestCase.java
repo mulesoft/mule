@@ -22,7 +22,7 @@ import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.security.AbstractAuthenticationFilter;
 import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.List;
 

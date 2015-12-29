@@ -18,7 +18,7 @@ import org.mule.module.management.mbean.MuleConfigurationService;
 import org.mule.module.management.mbean.MuleService;
 import org.mule.module.management.mbean.StatisticsService;
 import org.mule.module.management.support.JmxSupport;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.Iterator;

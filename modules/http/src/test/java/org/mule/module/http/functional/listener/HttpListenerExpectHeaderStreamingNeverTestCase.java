@@ -15,7 +15,7 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;

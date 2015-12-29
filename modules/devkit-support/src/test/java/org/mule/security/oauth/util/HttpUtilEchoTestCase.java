@@ -7,7 +7,7 @@
 package org.mule.security.oauth.util;
 
 import static junit.framework.Assert.assertEquals;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.StringUtils;
 

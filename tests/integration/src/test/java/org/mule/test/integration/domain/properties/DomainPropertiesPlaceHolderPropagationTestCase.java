@@ -11,8 +11,8 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.ApplicationContextBuilder;
-import org.mule.tck.junit4.DomainContextBuilder;
+import org.mule.functional.junit4.ApplicationContextBuilder;
+import org.mule.functional.junit4.DomainContextBuilder;
 
 import org.junit.Test;
 

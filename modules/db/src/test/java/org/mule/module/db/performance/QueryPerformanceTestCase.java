@@ -8,7 +8,7 @@
 package org.mule.module.db.performance;
 
 import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Ignore;
 import org.junit.Test;

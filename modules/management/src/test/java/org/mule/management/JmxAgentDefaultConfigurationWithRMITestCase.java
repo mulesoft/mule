@@ -7,7 +7,7 @@
 package org.mule.management;
 
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.net.Socket;

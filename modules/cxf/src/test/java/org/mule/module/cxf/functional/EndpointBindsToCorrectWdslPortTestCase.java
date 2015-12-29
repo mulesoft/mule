@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import org.mule.construct.Flow;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.cxf.endpoint.Server;

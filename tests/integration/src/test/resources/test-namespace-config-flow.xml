@@ -22,7 +22,7 @@
         <test:component enableNotifications="false"
             enableMessageHistory="false">
             <test:return-data>Foo Bar Car Jar</test:return-data>
-            <test:callback class="org.mule.tck.functional.CounterCallback" />
+            <test:callback class="org.mule.functional.functional.CounterCallback" />
         </test:component>
     </flow>
 
@@ -31,7 +31,7 @@
             exceptionToThrow="java.io.IOException" exceptionText="boom">
             <test:return-data file="test-data.txt" />
             <test:callback
-                class="org.mule.tck.functional.ResponseWriterCallback" />
+                class="org.mule.functional.functional.ResponseWriterCallback" />
         </test:component>
     </flow>
 

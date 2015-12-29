@@ -17,7 +17,7 @@ import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.processor.strategy.ThreadPerProcessorProcessingStrategy;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Arrays;

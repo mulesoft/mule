@@ -23,7 +23,7 @@ import org.mule.exception.CatchMessagingExceptionStrategy;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.exception.MessagingExceptionHandlerToSystemAdapter;
 import org.mule.exception.RollbackMessagingExceptionStrategy;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.LinkedList;

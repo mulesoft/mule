@@ -14,7 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.routing.RoutingException;
 import org.mule.message.ExceptionMessage;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.io.ByteArrayInputStream;
 

@@ -18,7 +18,7 @@ import org.mule.config.i18n.Message;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.internal.ValidationExtension;
 import org.mule.extension.validation.internal.ValidationMessages;
-import org.mule.tck.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.util.ExceptionUtils;
 
 abstract class ValidationTestCase extends ExtensionFunctionalTestCase

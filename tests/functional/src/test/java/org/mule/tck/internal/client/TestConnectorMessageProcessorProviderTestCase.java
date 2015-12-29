@@ -20,6 +20,8 @@ import static org.mule.api.client.SimpleOptionsBuilder.newOptions;
 import org.mule.api.MuleContext;
 import org.mule.api.client.SimpleOptionsBuilder;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.functional.client.TestConnectorConfig;
+import org.mule.functional.client.TestConnectorMessageProcessorProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;

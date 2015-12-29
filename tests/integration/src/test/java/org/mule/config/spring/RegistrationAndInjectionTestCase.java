@@ -20,7 +20,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.LifecycleStateAware;
 import org.mule.api.registry.RegistrationException;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import javax.inject.Inject;
 import javax.inject.Named;

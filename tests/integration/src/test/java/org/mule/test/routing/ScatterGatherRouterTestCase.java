@@ -33,8 +33,8 @@ import org.mule.api.transport.DispatchException;
 import org.mule.construct.Flow;
 import org.mule.routing.AggregationStrategy;
 import org.mule.routing.CompositeRoutingException;
-import org.mule.tck.functional.FlowAssert;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.functional.FlowAssert;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
@@ -102,7 +102,7 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     public void routeWithException() throws Exception
     {
         assertRouteException("routeWithException",
-                             EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: org.mule.tck.exceptions.FunctionalTestException: Functional Test Service Exception. Component that caused exception is:",
+                             EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: org.mule.functional.exceptions.FunctionalTestException: Functional Test Service Exception. Component that caused exception is:",
                              "}.");
     }
 
@@ -110,7 +110,7 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     public void routeWithExceptionWithMessage() throws Exception
     {
         assertRouteException("routeWithExceptionWithMessage",
-                             EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: org.mule.tck.exceptions.FunctionalTestException: I'm a message. Component that caused exception is:",
+                             EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: org.mule.functional.exceptions.FunctionalTestException: I'm a message. Component that caused exception is:",
                              "}.");
     }
 
@@ -134,7 +134,7 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     public void routeWithExceptionInSequentialProcessing() throws Exception
     {
         assertRouteException("routeWithExceptionInSequentialProcessing",
-                             EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: org.mule.tck.exceptions.FunctionalTestException: Functional Test Service Exception. Component that caused exception is:",
+                             EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: org.mule.functional.exceptions.FunctionalTestException: Functional Test Service Exception. Component that caused exception is:",
                              "}.");
     }
 

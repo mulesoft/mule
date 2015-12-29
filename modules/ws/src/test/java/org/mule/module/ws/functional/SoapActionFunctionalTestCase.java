@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.construct.Flow;
-import org.mule.tck.functional.EventCallback;
+import org.mule.functional.functional.EventCallback;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

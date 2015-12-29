@@ -18,11 +18,11 @@ import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.construct.Flow;
 import org.mule.endpoint.DefaultEndpointFactory;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.tck.util.endpoint.InboundEndpointWrapper;
+import org.mule.functional.util.endpoint.InboundEndpointWrapper;
 import org.mule.util.concurrent.Latch;
 
 import org.junit.Test;

@@ -22,7 +22,7 @@ import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.execution.TransactionalExecutionTemplate;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.jms.JmsTransactionFactory;

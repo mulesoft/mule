@@ -16,7 +16,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.ResponseOutputStream;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.tcp.protocols.AbstractByteProtocol;
 import org.mule.transport.tcp.protocols.CustomClassLoadingLengthProtocol;
 

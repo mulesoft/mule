@@ -15,7 +15,7 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.exception.AbstractExceptionListener;
 import org.mule.exception.ChoiceMessagingExceptionStrategy;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
 import org.codehaus.jackson.JsonNode;

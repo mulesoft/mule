@@ -45,7 +45,7 @@
         <inbound-endpoint address="test://localhost/test.queue"
             exchange-pattern="one-way" connector-ref="testConnector1" />
 
-        <component class="org.mule.tck.testmodels.services.TestComponent" />
+        <component class="org.mule.functional.testmodels.services.TestComponent" />
     </flow>
 
     <flow name="TestComponent2">
@@ -54,7 +54,7 @@
             exchange-pattern="one-way" connector-ref="testConnector2"
             transformer-refs="XmlToObject" />
 
-        <component class="org.mule.tck.testmodels.services.TestComponent" />
+        <component class="org.mule.functional.testmodels.services.TestComponent" />
     </flow>
 
     <!-- Test uri endpoints for send and receive and Uri endpoints on the 
@@ -63,7 +63,7 @@
 
         <inbound-endpoint ref="testEndpoint" />
 
-        <component class="org.mule.tck.testmodels.services.TestComponent" />
+        <component class="org.mule.functional.testmodels.services.TestComponent" />
 
         <all>
 
@@ -91,7 +91,7 @@
             exchange-pattern="one-way" connector-ref="vmConnector2"
             transformer-refs="ObjectToXml" />
 
-        <component class="org.mule.tck.testmodels.services.TestComponent" />
+        <component class="org.mule.functional.testmodels.services.TestComponent" />
 
 
         <outbound-endpoint address="tcp://localhost:56731"
@@ -105,7 +105,7 @@
         <inbound-endpoint address="vm://some.queue"
             exchange-pattern="one-way" connector-ref="vmConnector2" />
 
-        <component class="org.mule.tck.testmodels.services.TestComponent" />
+        <component class="org.mule.functional.testmodels.services.TestComponent" />
 
 
         <outbound-endpoint ref="server1" />
@@ -114,7 +114,7 @@
     </flow>
 
     <flow name="TestComponent6">
-        <component class="org.mule.tck.testmodels.services.TestComponent" />
+        <component class="org.mule.functional.testmodels.services.TestComponent" />
 
 
         <outbound-endpoint ref="server3" />

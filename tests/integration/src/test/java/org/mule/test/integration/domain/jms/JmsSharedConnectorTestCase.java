@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.tck.junit4.DomainFunctionalTestCase;
+import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;

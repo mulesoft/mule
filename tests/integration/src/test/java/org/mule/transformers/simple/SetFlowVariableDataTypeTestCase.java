@@ -15,7 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.transformer.types.MimeTypes;
 

@@ -17,7 +17,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.transaction.Transaction;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;

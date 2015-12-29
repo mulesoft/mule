@@ -12,9 +12,9 @@ import static org.junit.Assert.assertNull;
 
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
-import org.mule.tck.transformer.NoActionTransformer;
+import org.mule.functional.transformer.NoActionTransformer;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
 

@@ -6,7 +6,7 @@
  */
 package org.mule.transport.jms;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.activemq.broker.BrokerService;

@@ -13,7 +13,7 @@
 
     <flow name="Receiver">
         <inbound-endpoint address="vm://bridge.outbound" exchange-pattern="request-response"/>
-        <component class="org.mule.tck.testmodels.services.TestReceiver"/>
+        <component class="org.mule.functional.testmodels.services.TestReceiver"/>
     </flow>
 
 </mule>

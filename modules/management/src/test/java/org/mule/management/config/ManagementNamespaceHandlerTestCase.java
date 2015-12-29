@@ -19,7 +19,7 @@ import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;
 import org.mule.module.management.agent.Log4jAgent;
 import org.mule.module.management.agent.Mx4jAgent;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestAgent;
 
 import java.util.Collection;

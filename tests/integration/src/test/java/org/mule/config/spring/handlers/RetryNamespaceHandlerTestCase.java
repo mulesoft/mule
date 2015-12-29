@@ -18,7 +18,7 @@ import org.mule.retry.notifiers.ConnectNotifier;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.retry.policies.SimpleRetryPolicyTemplate;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 

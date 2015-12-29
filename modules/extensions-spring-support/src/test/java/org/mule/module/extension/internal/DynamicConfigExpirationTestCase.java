@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.tck.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 

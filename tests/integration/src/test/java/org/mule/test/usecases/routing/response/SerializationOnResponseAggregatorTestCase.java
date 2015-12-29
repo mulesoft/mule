@@ -16,7 +16,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.store.SimpleMemoryObjectStore;
 

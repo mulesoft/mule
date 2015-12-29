@@ -14,7 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.junit4.DomainFunctionalTestCase;
+import org.mule.functional.junit4.DomainFunctionalTestCase;
 
 import org.junit.Test;
 

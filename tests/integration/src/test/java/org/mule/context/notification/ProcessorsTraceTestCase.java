@@ -20,7 +20,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.api.context.notification.ProcessorsTrace;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.ArrayList;

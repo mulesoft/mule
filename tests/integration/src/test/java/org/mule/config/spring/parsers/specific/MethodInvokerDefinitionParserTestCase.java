@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Ignore;
 import org.mule.construct.Flow;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 

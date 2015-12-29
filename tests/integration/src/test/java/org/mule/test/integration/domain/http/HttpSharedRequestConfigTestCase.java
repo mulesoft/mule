@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.module.http.internal.request.DefaultHttpRequester;
-import org.mule.tck.junit4.DomainFunctionalTestCase;
+import org.mule.functional.junit4.DomainFunctionalTestCase;
 
 import org.junit.Test;
 
