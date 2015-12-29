@@ -32,6 +32,22 @@
         <echo-component/>
     </flow>
 
+    <flow name="statusReasonPhraseResponseBuilderWontOverrideFlow">
+        <http:listener config-ref="listenerConfig" path="${statusReasonPhraseResponseBuilderWontOverridePath}">
+            <http:response-builder statusCode="200" reasonPhrase="OK"/>
+        </http:listener>
+        <set-property propertyName="http.status" value="201" />
+        <set-property propertyName="http.reason" value="override value" />
+        <echo-component/>
+    </flow>
+
+    <flow name="reasonPhraseResponseBuilderOverrideFlow">
+        <http:listener config-ref="listenerConfig" path="${reasonPhraseResponseBuilderOverridePath}" />
+        <set-property propertyName="http.status" value="200" />
+        <set-property propertyName="http.reason" value="response success!" />
+        <echo-component/>
+    </flow>
+
     <flow name="headerResponseBuilderFlow">
         <http:listener config-ref="listenerConfig" path="${headerResponseBuilderPath}">
             <http:response-builder>
