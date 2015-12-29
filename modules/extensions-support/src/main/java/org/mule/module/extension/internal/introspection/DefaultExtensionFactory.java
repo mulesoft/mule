@@ -119,6 +119,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         ExtensionModel extensionModel = new ImmutableExtensionModel(declaration.getName(),
                                                                     declaration.getDescription(),
                                                                     declaration.getVersion(),
+                                                                    declaration.getVendor(),
                                                                     sortConfigurations(toConfigurations(declaration.getConfigurations(), extensionModelValueHolder)),
                                                                     alphaSortDescribedList(toOperations(declaration.getOperations())),
                                                                     toConnectionProviders(declaration.getConnectionProviders()),

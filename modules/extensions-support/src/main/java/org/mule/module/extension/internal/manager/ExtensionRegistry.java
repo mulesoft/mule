@@ -9,6 +9,7 @@ package org.mule.module.extension.internal.manager;
 import static java.lang.String.format;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
@@ -35,9 +36,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Hold the state related to registered {@link ExtensionModel extensionModels} and their instances.
- * <p/>
+ * <p>
  * It also provides utility methods and caches to easily locate pieces of such state.
- * <p/>
+ * <p>
  * It acts as a facade of the {@link MuleRegistry}, which is where {@link ConfigurationProvider} are
  * finally stored.
  *
@@ -57,7 +58,7 @@ final class ExtensionRegistry
         }
     });
 
-    private final Map<String, ExtensionModel> extensions = new ConcurrentHashMap<>();
+    private final Map<ExtensionEntityKey, ExtensionModel> extensions = new ConcurrentHashMap<>();
     private final MuleRegistry registry;
 
     /**
@@ -74,11 +75,12 @@ final class ExtensionRegistry
      * Registers the given {@code extension}
      *
      * @param name           the registration name you want for the {@code extension}
+     * @param vendor         the registration vendor name you want for the {@code extension}
      * @param extensionModel a {@link ExtensionModel}
      */
-    void registerExtension(String name, ExtensionModel extensionModel)
+    void registerExtension(String name, String vendor, ExtensionModel extensionModel)
     {
-        extensions.put(name, extensionModel);
+        extensions.put(new ExtensionEntityKey(name, vendor), extensionModel);
     }
 
     /**
@@ -93,9 +95,10 @@ final class ExtensionRegistry
      * @param name the registration name of the {@link ExtensionModel} you want to test
      * @return {@code true} if an {@link ExtensionModel} is registered under {@code name}. {@code false} otherwise
      */
-    boolean containsExtension(String name)
+    boolean containsExtension(String name, String vendor)
     {
-        return extensions.containsKey(name);
+        return extensions.containsKey(new ExtensionEntityKey(name, vendor));
+
     }
 
     /**
@@ -133,7 +136,7 @@ final class ExtensionRegistry
 
     /**
      * Registers the given {@code configurationProvider} in the underlying {@link #registry}.
-     * <p/>
+     * <p>
      * The {@code configurationProvider} is registered under a key matching its
      * {@link ConfigurationProvider#getName()}.
      *
@@ -151,7 +154,7 @@ final class ExtensionRegistry
         catch (RegistrationException e)
         {
             throw new MuleRuntimeException(createStaticMessage(format(
-                    "Found exception while registering configuration provider '%'", configurationProvider.getName()))
+                    "Found exception while registering configuration provider '%s'", configurationProvider.getName()))
                     , e);
         }
 

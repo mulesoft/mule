@@ -105,6 +105,7 @@ public final class AnnotationsBasedDescriber implements Describer
         DeclarationDescriptor declaration = context.getDeclarationDescriptor()
                 .named(extension.name())
                 .onVersion(getVersion(extension))
+                .fromVendor(extension.vendor())
                 .describedAs(extension.description())
                 .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(extensionType));
 

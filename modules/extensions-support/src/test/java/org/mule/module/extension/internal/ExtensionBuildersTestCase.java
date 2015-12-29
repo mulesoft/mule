@@ -46,6 +46,7 @@ import static org.mule.extension.api.introspection.declaration.tck.TestWebServic
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.HAS_NO_ARGS;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.MTOM_DESCRIPTION;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.MTOM_ENABLED;
+import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.MULESOFT;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.OPERATION;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.PASSWORD;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.PASSWORD_DESCRIPTION;
@@ -62,6 +63,7 @@ import static org.mule.extension.api.introspection.declaration.tck.TestWebServic
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WSDL_LOCATION;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WS_CONSUMER;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WS_CONSUMER_DESCRIPTION;
+
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.exception.NoSuchConfigurationException;
@@ -131,6 +133,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         assertThat(extensionModel.getDescription(), equalTo(WS_CONSUMER_DESCRIPTION));
         assertThat(extensionModel.getVersion(), equalTo(VERSION));
         assertThat(extensionModel.getConfigurationModels(), hasSize(1));
+        assertThat(extensionModel.getVendor(), equalTo(MULESOFT));
 
         verify(serviceRegistry).lookupProviders(any(Class.class), any(ClassLoader.class));
     }
@@ -197,6 +200,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         final String alpha = "alpha";
 
         ExtensionModel extensionModel = factory.createFrom(new DeclarationDescriptor().named("test").onVersion("1.0")
+                                                                   .fromVendor("MuleSoft")
                                                                    .withConfig(defaultConfiguration).describedAs(defaultConfiguration).createdWith(mockInstantiator)
                                                                    .withConfig(beta).describedAs(beta).createdWith(mockInstantiator)
                                                                    .withConfig(alpha).describedAs(alpha).createdWith(mockInstantiator));
@@ -219,7 +223,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void nameClashes()
     {
-        factory.createFrom(descriptor.withConfig(CONFIG_NAME).describedAs(""));
+        factory.createFrom(descriptor.withConfig(CONFIG_NAME).createdWith(mock(ConfigurationFactory.class)).describedAs(""));
     }
 
     @Test(expected = IllegalModelDefinitionException.class)
@@ -256,14 +260,33 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void nameWithSpaces()
     {
-        descriptor = new DeclarationDescriptor().named("i have spaces").onVersion("1.0").withConfig("default").getRootDeclaration();
+        descriptor = new DeclarationDescriptor()
+                .named("i have spaces")
+                .onVersion("1.0")
+                .fromVendor("MuleSoft")
+                .withConfig("default")
+                .createdWith(mock(ConfigurationFactory.class))
+                .getRootDeclaration();
+        factory.createFrom(descriptor);
+    }
+
+    @Test(expected = IllegalModelDefinitionException.class)
+    public void nullVendor()
+    {
+        descriptor = new DeclarationDescriptor()
+                .named("IWillExplode")
+                .onVersion("1.2.3")
+                .withConfig("default")
+                .createdWith(mock(ConfigurationFactory.class))
+                .getRootDeclaration();
+
         factory.createFrom(descriptor);
     }
 
     @Test
     public void configlessDescriptor()
     {
-        factory.createFrom(new DeclarationDescriptor().named("noConfigs").onVersion("1.0"));
+        factory.createFrom(new DeclarationDescriptor().named("noConfigs").onVersion("1.0").fromVendor("MuleSoft"));
     }
 
     @Test

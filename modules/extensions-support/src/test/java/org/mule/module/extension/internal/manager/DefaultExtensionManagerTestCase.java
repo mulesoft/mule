@@ -21,6 +21,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
@@ -31,9 +32,9 @@ import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.OperationExecutor;
-import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.config.ExtensionConfig;
 import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
@@ -49,6 +50,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -61,6 +63,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
 {
 
+    private static final String MULESOFT = "MuleSoft";
+    private static final String OTHER_VENDOR = "OtherVendor";
     private ExtensionManager extensionsManager;
 
     private static final String EXTENSION1_NAME = "extension1";
@@ -79,6 +83,9 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
 
     @Mock
     private ExtensionModel extensionModel2;
+
+    @Mock
+    private ExtensionModel extensionModel3WithRepeatedName;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
@@ -122,9 +129,15 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         when(extensionModel1.getName()).thenReturn(EXTENSION1_NAME);
         when(extensionModel1.getConfigurationModels()).thenReturn(asList(extension1ConfigurationModel));
         when(extensionModel2.getName()).thenReturn(EXTENSION2_NAME);
+        when(extensionModel3WithRepeatedName.getName()).thenReturn(EXTENSION2_NAME);
+
+        when(extensionModel1.getVendor()).thenReturn(MULESOFT);
+        when(extensionModel2.getVendor()).thenReturn(MULESOFT);
+        when(extensionModel3WithRepeatedName.getVendor()).thenReturn(OTHER_VENDOR);
 
         when(extensionModel1.getVersion()).thenReturn(EXTENSION1_VERSION);
         when(extensionModel2.getVersion()).thenReturn(EXTENSION2_VERSION);
+        when(extensionModel3WithRepeatedName.getVersion()).thenReturn(EXTENSION2_VERSION);
 
         when(extension1ConfigurationModel.getName()).thenReturn(EXTENSION1_CONFIG_NAME);
         when(extension1ConfigurationModel.getConfigurationFactory().newInstance()).thenReturn(configInstance);
@@ -148,7 +161,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         when(extension1OperationModel.getExecutor()).thenReturn(executor);
 
         classLoader = getClass().getClassLoader();
-        setDiscoverableExtensions(extensionModel1, extensionModel2);
+        setDiscoverableExtensions(extensionModel1, extensionModel2, extensionModel3WithRepeatedName);
 
         when(discoverer.discover(same(classLoader))).thenAnswer(invocation -> getTestExtensions());
 
@@ -262,6 +275,26 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         extensionsManager.getConfiguration(extensionModel1, event);
     }
 
+    @Test
+    public void registerTwoExtensionsWithTheSameNameButDifferentVendor()
+    {
+        setDiscoverableExtensions(extensionModel2, extensionModel3WithRepeatedName);
+        List<ExtensionModel> extensionModels = extensionsManager.discoverExtensions(classLoader);
+        List<String> extensionNameList = extensionModels.stream().map(ExtensionModel::getName).distinct().collect(Collectors.toList());
+        List<String> extensionVendorList = extensionModels.stream().map(ExtensionModel::getVendor).distinct().collect(Collectors.toList());
+
+        assertThat(extensionModels.size(), is(2));
+        assertThat(extensionNameList.size(), is(1));
+        assertThat(extensionVendorList.size(), is(2));
+    }
+
+    @Test
+    public void registerSameExtensionMultipleTimesButOnlyKeepOne()
+    {
+        setDiscoverableExtensions(extensionModel1, extensionModel1, extensionModel1);
+        assertThat(extensionsManager.discoverExtensions(classLoader).size(), is(1));
+    }
+
     private void makeExtension1ConfigurationNotImplicit()
     {
         ParameterModel parameterModel1 = mock(ParameterModel.class);
@@ -276,6 +309,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         return ImmutableList.<ExtensionModel>builder()
                 .add(extensionModel1)
                 .add(extensionModel2)
+                .add(extensionModel3WithRepeatedName)
                 .build();
     }
 
