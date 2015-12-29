@@ -7,7 +7,6 @@
 package org.mule.extension.validation.internal;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
@@ -22,6 +21,7 @@ import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.capability.StudioProvidedEditor;
 import org.mule.extension.annotation.api.capability.Xml;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.api.introspection.ConfigurationModel;
@@ -50,6 +50,7 @@ import java.util.Locale;
 @Operations({CommonValidationOperations.class, CustomValidatorOperation.class, ValidationStrategies.class, NumberValidationOperation.class})
 @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/validation", namespace = "validation", schemaVersion = "3.7")
 @Extensible(alias = "validator-message-processor")
+@StudioProvidedEditor(generated = false)
 public class ValidationExtension extends AbstractAnnotatedObject implements Config, NamedObject, Initialisable, MuleContextAware
 {
 
