@@ -46,7 +46,7 @@ public abstract class ConnectionProviderWrapper<Config, Connection> implements C
     }
 
     @Override
-    public ConnectionHandlingStrategy<Connection> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+    public ConnectionHandlingStrategy<Connection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Config, Connection> handlingStrategyFactory)
     {
         return delegate.getHandlingStrategy(handlingStrategyFactory);
     }

@@ -151,7 +151,7 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         }
 
         @Override
-        public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+        public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Config, ValidatorTestConnection> handlingStrategyFactory)
         {
             return handlingStrategyFactory.cached();
         }
@@ -180,7 +180,7 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         }
 
         @Override
-        public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+        public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Apple, ValidatorTestConnection> handlingStrategyFactory)
         {
             return handlingStrategyFactory.cached();
         }
@@ -203,7 +203,7 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         }
 
         @Override
-        public ConnectionHandlingStrategy<Apple> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+        public ConnectionHandlingStrategy<Apple> getHandlingStrategy(ConnectionHandlingStrategyFactory<Config, Apple> handlingStrategyFactory)
         {
             return handlingStrategyFactory.cached();
         }

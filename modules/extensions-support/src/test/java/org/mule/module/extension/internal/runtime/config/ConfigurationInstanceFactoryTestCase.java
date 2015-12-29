@@ -133,7 +133,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        public ConnectionHandlingStrategy<Banana> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+        public ConnectionHandlingStrategy<Banana> getHandlingStrategy(ConnectionHandlingStrategyFactory<Apple, Banana> handlingStrategyFactory)
         {
             return handlingStrategyFactory.cached();
         }
@@ -155,7 +155,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        public ConnectionHandlingStrategy<Kiwi> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+        public ConnectionHandlingStrategy<Kiwi> getHandlingStrategy(ConnectionHandlingStrategyFactory<TestConfig, Kiwi> handlingStrategyFactory)
         {
             return handlingStrategyFactory.cached();
         }

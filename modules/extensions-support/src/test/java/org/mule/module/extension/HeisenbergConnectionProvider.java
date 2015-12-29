@@ -36,7 +36,7 @@ public class HeisenbergConnectionProvider implements ConnectionProvider<Heisenbe
     }
 
     @Override
-    public ConnectionHandlingStrategy<HeisenbergConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
+    public ConnectionHandlingStrategy<HeisenbergConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<HeisenbergExtension, HeisenbergConnection> handlingStrategyFactory)
     {
         return handlingStrategyFactory.supportsPooling(new PoolingProfile());
     }
