@@ -9,18 +9,22 @@ package org.mule.mule.enricher;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.transformer.types.MimeTypes.JSON;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.RequestContext;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -28,7 +32,9 @@ import org.mule.api.ThreadSafeAccess;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transport.PropertyScope;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.Flow;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
@@ -44,8 +50,9 @@ import org.mule.transformer.types.DataTypeFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 {
@@ -61,6 +68,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
 
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setPayload("test");
@@ -83,6 +91,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
 
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setOutboundProperty("header1", "test");
@@ -106,6 +115,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
 
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setOutboundProperty("header1", "test");
@@ -136,6 +146,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
 
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setOutboundProperty("header1", "test");
@@ -159,6 +170,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
 
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 return null;
@@ -171,6 +183,34 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void testEnrichWithException() throws Exception
+    {
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                throw new MessagingException(CoreMessages.createStaticMessage("Expected"), event);
+            }
+        });
+
+        try
+        {
+            enricher.process(getTestEvent(""));
+            fail("Expected a MessagingException");
+        }
+        catch (MessagingException e)
+        {
+            assertThat(e.getMessage(), is("Expected."));
+        }
+        assertThat(RequestContext.getEvent().getReplyToHandler(), nullValue());
+    }
+
+    @Test
     public void propogateMessage() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
@@ -178,6 +218,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setPayload("enriched");
@@ -204,6 +245,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setPayload("enriched");
@@ -229,6 +271,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setPayload("enriched");
@@ -253,6 +296,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setPayload("enriched");
@@ -274,6 +318,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setOutboundProperty("foo", "bar");
@@ -295,6 +340,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setInvocationProperty("flowFoo", "bar");
@@ -316,6 +362,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getSession().setProperty("sessionFoo", "bar");
@@ -338,6 +385,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getSession().setProperty("sessionFoo", "bar");
@@ -359,6 +407,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[variable:foo]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setPayload("bar");
@@ -380,6 +429,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[sessionVars['foo']]"));
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setPayload("bar");
@@ -461,6 +511,36 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         assertThat(out.getMessage(), is(sameInstance(in.getMessage())));
     }
 
+
+    @Test
+    public void testEnrichWithExceptionNonBlocking() throws Exception
+    {
+        MessageEnricher enricher = new MessageEnricher();
+        enricher.setMuleContext(muleContext);
+        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
+        enricher.setEnrichmentMessageProcessor(new MessageProcessor()
+        {
+
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                throw new MessagingException(CoreMessages.createStaticMessage("Expected"), event);
+            }
+        });
+
+        try
+        {
+            SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
+            enricher.process(createNonBlockingEvent(nullReplyToHandler));
+            fail("Expected a MessagingException");
+        }
+        catch (MessagingException e)
+        {
+            assertThat(e.getMessage(), is("Expected."));
+        }
+        assertThat(RequestContext.getEvent().getReplyToHandler(), instanceOf(ReplyToHandler.class));
+    }
+
     private MuleEvent createNonBlockingEvent(SensingNullReplyToHandler nullReplyToHandler)
     {
         Flow flow = mock(Flow.class);
@@ -506,6 +586,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         enricher.addEnrichExpressionPair(pair);
         enricher.setEnrichmentMessageProcessor(new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
 
