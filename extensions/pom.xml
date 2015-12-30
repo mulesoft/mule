@@ -11,95 +11,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.mule.extensions</groupId>
-    <artifactId>mule-extensions</artifactId>
+    <artifactId>bundled-mule-extensions</artifactId>
     <packaging>pom</packaging>
 
     <name>Mule Extensions</name>
     <description>Mule extensions that augment the core Mule functionality through the Mule Extension API</description>
 
     <modules>
+        <module>bundled-mule-extensions-parent</module>
         <module>file</module>
         <module>ftp</module>
         <module>validation</module>
     </modules>
-    <properties>
-        <mule.version>${project.parent.version}</mule.version>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.mule.extensions</groupId>
-            <artifactId>mule-extensions-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${mule.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-extensions-support</artifactId>
-            <version>${mule.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-extensions-spring-support</artifactId>
-            <version>${mule.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${mule.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core-tests</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency>
-    </dependencies>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>sonatype-repo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.bsc.maven</groupId>
-                <artifactId>maven-processor-plugin</artifactId>
-                <version>2.2.4</version>
-                <executions>
-                    <execution>
-                        <id>process</id>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                        <phase>process-classes</phase>
-                        <configuration>
-                            <outputDirectory>target/classes/META-INF</outputDirectory>
-                            <processors>
-                                <processor>org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor</processor>
-                            </processors>
-                            <options>
-                                <extension.version>${project.version}</extension.version>
-                            </options>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>
