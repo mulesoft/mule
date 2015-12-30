@@ -6,18 +6,14 @@
  */
 package org.mule.module.extension;
 
-import org.mule.extension.annotation.api.Parameter;
-
 import java.util.Calendar;
 import java.util.Date;
 
 public class LifetimeInfo
 {
 
-    @Parameter
     private Date dateOfBirth;
 
-    @Parameter
     private Calendar dateOfDeath;
 
     public Date getDateOfBirth()

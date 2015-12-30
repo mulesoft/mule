@@ -8,15 +8,27 @@ package org.mule.module.extension.internal.util;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.empty;
+import static org.junit.Assert.assertThat;
 import org.mule.extension.api.introspection.DataType;
+import org.mule.module.extension.LifetimeInfo;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.Kiwi;
+import org.mule.util.CollectionUtils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +98,36 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase
     public void getNullFieldDataType() throws Exception
     {
         IntrospectionUtils.getFieldDataType(null);
+    }
+
+    @Test
+    public void getNoAnnotatedExposedPojoFields()
+    {
+        Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(LifetimeInfo.class);
+        assertThat(exposedFields, is(not(empty())));
+        assertThat(exposedFields.size(), is(2));
+        assertField("dateOfBirth", DataType.of(Date.class), exposedFields);
+        assertField("dateOfDeath", DataType.of(Calendar.class), exposedFields);
+    }
+
+    @Test
+    public void getEmptyExposedPojoFields()
+    {
+        Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(FruitBasket.class);
+        assertThat(exposedFields, is(empty()));
+    }
+
+    private void assertField(String name, DataType dt, Collection<Field> fields)
+    {
+        Field field = findField(name, fields);
+        assertThat(field, is(notNullValue()));
+        assertThat(field.getName(), equalTo(name));
+        assertThat(field.getType(), equalTo(dt.getRawType()));
+    }
+
+    private Field findField(String name, Collection<Field> fields)
+    {
+        return (Field) CollectionUtils.find(fields, f -> name.equals(((Field) f).getName()));
     }
 
     private void assertType(DataType type, Class<?> rawType, Class<?>... genericTypes)

@@ -10,6 +10,7 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getParameterName;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
@@ -17,7 +18,6 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getPara
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkArgument;
-
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Configuration;
@@ -25,7 +25,6 @@ import org.mule.extension.annotation.api.Configurations;
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.ExtensionOf;
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.connector.Providers;
@@ -34,6 +33,7 @@ import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDescriptor;
@@ -62,6 +62,7 @@ import com.google.common.collect.ImmutableSet;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -162,7 +163,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareAnnotatedParameters(Class<?> annotatedType, Descriptor descriptor, WithParameters with)
     {
-        declareSingleParameters(annotatedType, with);
+        declareSingleParameters(getParameterFields(annotatedType), with);
         List<ParameterGroup> groups = declareConfigurationParametersGroups(annotatedType, with);
         if (!CollectionUtils.isEmpty(groups) && descriptor instanceof HasModelProperties)
         {
@@ -180,7 +181,7 @@ public final class AnnotationsBasedDescriber implements Describer
             {
                 throw new IllegalModelDefinitionException(String.format("@%s can not be applied along with @%s. Affected field [%s] in [%s].", Optional.class.getSimpleName(), org.mule.extension.annotation.api.ParameterGroup.class.getSimpleName(), field.getName(), annotatedType));
             }
-            Set<ParameterDescriptor> parameters = declareSingleParameters(field.getType(), with);
+            Set<ParameterDescriptor> parameters = declareSingleParameters(getExposedFields(field.getType()), with);
 
             if (!parameters.isEmpty())
             {
@@ -206,11 +207,11 @@ public final class AnnotationsBasedDescriber implements Describer
         return groups;
     }
 
-    private Set<ParameterDescriptor> declareSingleParameters(Class<?> extensionType, WithParameters with)
+    private Set<ParameterDescriptor> declareSingleParameters(Collection<Field> parameterFields, WithParameters with)
     {
         ImmutableSet.Builder<ParameterDescriptor> parameters = ImmutableSet.builder();
 
-        for (Field field : getParameterFields(extensionType))
+        for (Field field : parameterFields)
         {
             Parameter parameter = field.getAnnotation(Parameter.class);
             Optional optional = field.getAnnotation(Optional.class);
@@ -228,7 +229,7 @@ public final class AnnotationsBasedDescriber implements Describer
             }
 
             parameterDescriptor.ofType(dataType);
-            parameterDescriptor.withExpressionSupport(parameter.expressionSupport());
+            parameterDescriptor.withExpressionSupport(parameter != null ? parameter.expressionSupport() : ExpressionSupport.SUPPORTED);
             parameterDescriptor.withModelProperty(MemberNameModelProperty.KEY, new MemberNameModelProperty(field.getName()));
 
             parameters.add(parameterDescriptor);
