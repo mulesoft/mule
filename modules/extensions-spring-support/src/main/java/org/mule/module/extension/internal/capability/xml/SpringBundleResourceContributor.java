@@ -37,7 +37,7 @@ public class SpringBundleResourceContributor implements GenerableResourceContrib
     private void generateSchema(ExtensionModel extensionModel, XmlModelProperty xmlProperty, ResourcesGenerator resourcesGenerator)
     {
         String schema = new SchemaGenerator().generate(extensionModel, xmlProperty);
-        resourcesGenerator.get(getXsdFileName(extensionModel)).getContentBuilder().append(schema);
+        resourcesGenerator.get(getXsdFileName(xmlProperty)).getContentBuilder().append(schema);
     }
 
     private void generateSpringBundle(ExtensionModel extensionModel, XmlModelProperty xmlProperty, ResourcesGenerator resourcesGenerator)
@@ -55,19 +55,19 @@ public class SpringBundleResourceContributor implements GenerableResourceContrib
     private void writeSpringSchemaBundle(ExtensionModel extensionModel, XmlModelProperty xmlProperty, ResourcesGenerator resourcesGenerator)
     {
         StringBuilder builder = resourcesGenerator.get("spring.schemas").getContentBuilder();
-        builder.append(getSpringSchemaBundle(extensionModel, xmlProperty, xmlProperty.getSchemaVersion()));
-        builder.append(getSpringSchemaBundle(extensionModel, xmlProperty, "current"));
+        builder.append(getSpringSchemaBundle(xmlProperty, xmlProperty.getSchemaVersion()));
+        builder.append(getSpringSchemaBundle(xmlProperty, "current"));
     }
 
-    private String getSpringSchemaBundle(ExtensionModel extensionModel, XmlModelProperty xmlProperty, String version)
+    private String getSpringSchemaBundle(XmlModelProperty xmlProperty, String version)
     {
-        String filename = getXsdFileName(extensionModel);
+        String filename = getXsdFileName(xmlProperty);
         return springBundleScape(String.format("%s/%s/%s=META-INF/%s\n", xmlProperty.getSchemaLocation(), version, filename, filename));
     }
 
-    private String getXsdFileName(ExtensionModel extensionModel)
+    private String getXsdFileName(XmlModelProperty xmlModelProperty)
     {
-        return String.format("mule-%s%s", extensionModel.getName(), SchemaConstants.XSD_EXTENSION);
+        return String.format("mule-%s%s", xmlModelProperty.getNamespace(), SchemaConstants.XSD_EXTENSION);
     }
 
 

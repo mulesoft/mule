@@ -64,8 +64,6 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
     {
         super(name, description, modelProperties);
 
-        checkArgument(!name.contains(" "), "Extension name cannot contain spaces");
-
         this.configurations = toMap(configurationModels);
         this.operations = toMap(operationModels);
         this.connectionProviders = immutableList(connectionProviders);

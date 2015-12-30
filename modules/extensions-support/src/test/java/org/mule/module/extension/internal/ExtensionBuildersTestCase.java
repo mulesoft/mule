@@ -257,19 +257,6 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         factory.createFrom(descriptor.withOperation("noReturn").describedAs(""));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nameWithSpaces()
-    {
-        descriptor = new DeclarationDescriptor()
-                .named("i have spaces")
-                .onVersion("1.0")
-                .fromVendor("MuleSoft")
-                .withConfig("default")
-                .createdWith(mock(ConfigurationFactory.class))
-                .getRootDeclaration();
-        factory.createFrom(descriptor);
-    }
-
     @Test(expected = IllegalModelDefinitionException.class)
     public void nullVendor()
     {
