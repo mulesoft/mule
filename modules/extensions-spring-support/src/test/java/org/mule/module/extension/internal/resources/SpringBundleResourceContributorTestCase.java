@@ -59,7 +59,7 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     @Before
     public void before()
     {
-        xmlModelProperty = new ImmutableXmlModelProperty(EXTENSION_VERSION, "test", UNESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION);
+        xmlModelProperty = new ImmutableXmlModelProperty(EXTENSION_VERSION, EXTENSION_NAME, UNESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION);
         when(extensionModel.getModelProperty(XmlModelProperty.KEY)).thenReturn(xmlModelProperty);
 
         generator = new AnnotationProcessorResourceGenerator(mock(ProcessingEnvironment.class), serviceRegistry);
