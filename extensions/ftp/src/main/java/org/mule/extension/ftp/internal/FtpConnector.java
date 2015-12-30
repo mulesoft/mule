@@ -29,7 +29,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-@Extension(name = "ftp", description = "FTP Connector")
+@Extension(name = "FTP Connector", description = "Connector to manipulate Files on a FTP/SFTP server")
 @Operations(StandardFileSystemOperations.class)
 @Providers({FtpConnectionProvider.class})
 @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/ftp", namespace = "ftp", schemaVersion = "4.0")

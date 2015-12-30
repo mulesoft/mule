@@ -46,7 +46,7 @@ import java.util.Locale;
  *
  * @since 3.7.0
  */
-@Extension(name = "validation", description = "Mule Validation Extension")
+@Extension(name = "Validation Module", description = "Allows performing validations and throw an Exception if the validation fails")
 @Operations({CommonValidationOperations.class, CustomValidatorOperation.class, ValidationStrategies.class, NumberValidationOperation.class})
 @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/validation", namespace = "validation", schemaVersion = "3.7")
 @Extensible(alias = "validator-message-processor")
