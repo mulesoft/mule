@@ -73,6 +73,16 @@
 			<version>${project.version}</version>
 			<type>test-jar</type>
 		</dependency>
+
+		<!-- Include all Mule Extensions -->
+		<dependency>
+			<groupId>org.mule.extensions</groupId>
+			<artifactId>mule-extensions-all</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Include all Mule Transports -->
 		<dependency>
 			<groupId>org.mule.transports</groupId>
