@@ -35,7 +35,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-@Extension(name = "file", description = "File Connector")
+@Extension(name = "File Connector", description = "Connector to manipulate files on a locally mounted file system")
 @Operations(StandardFileSystemOperations.class)
 @Providers(LocalFileConnectionProvider.class)
 @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/file", namespace = "file", schemaVersion = "4.0")
