@@ -183,6 +183,7 @@
                 <exclude>org.mule.common:mule-common</exclude>
                 <exclude>org.mule.mvel:mule-mvel2</exclude>
                 <exclude>org.mule:mule-core</exclude>
+                <exclude>org.mule.extensions:mule-extensions-all</exclude>
                 <exclude>org.mule.transports:mule-transports-all</exclude>
                 <exclude>org.mule.transports:mule-transport-jms</exclude>
                 <exclude>org.mule.transports:mule-transport-ssl</exclude>
