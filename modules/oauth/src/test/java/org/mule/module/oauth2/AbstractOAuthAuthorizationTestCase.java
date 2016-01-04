@@ -13,8 +13,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.oauth2.internal.OAuthConstants;
@@ -30,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.codec.binary.Base64;
 import org.junit.Rule;
 
 public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestCase
@@ -162,10 +161,24 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
 
     protected void verifyRequestDoneToTokenUrlForClientCredentials(String scope) throws UnsupportedEncodingException
     {
+        verifyRequestDoneToTokenUrlForClientCredentials(scope, false);
+    }
+
+    protected void verifyRequestDoneToTokenUrlForClientCredentials(String scope, boolean encodeInBody) throws UnsupportedEncodingException
+    {
         final RequestPatternBuilder verification = postRequestedFor(urlEqualTo(TOKEN_PATH))
-                .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "=" + URLEncoder.encode(clientId.getValue(), StandardCharsets.UTF_8.name())))
-                .withRequestBody(containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "=" + URLEncoder.encode(clientSecret.getValue(), StandardCharsets.UTF_8.name())))
                 .withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "=" + URLEncoder.encode(OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS, StandardCharsets.UTF_8.name())));
+        if (encodeInBody == true)
+        {
+            verification
+                    .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "=" + URLEncoder.encode(clientId.getValue(), StandardCharsets.UTF_8.name())))
+                    .withRequestBody(containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "=" + URLEncoder.encode(clientSecret.getValue(), StandardCharsets.UTF_8.name())));
+        }
+        else
+        {
+            verification.
+                    withHeader(HttpHeaders.Names.AUTHORIZATION, containing("Basic " + Base64.encodeBase64String(String.format("%s:%s", clientId.getValue(), clientSecret.getValue()).getBytes())));
+        }
         if (scope != null)
         {
             verification

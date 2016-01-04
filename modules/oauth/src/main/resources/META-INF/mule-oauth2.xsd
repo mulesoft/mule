@@ -244,6 +244,13 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="encodeClientCredentialsInBody" type="mule:substitutableBoolean" use="optional" default="false">
+            <xsd:annotation>
+                <xsd:documentation>
+                    If true, the client id and client secret will be sent in the request body. Otherwise, they will be sent as basic authentication.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="refreshTokenWhen" type="xsd:string" use="optional">
             <xsd:annotation>
                 <xsd:documentation>
