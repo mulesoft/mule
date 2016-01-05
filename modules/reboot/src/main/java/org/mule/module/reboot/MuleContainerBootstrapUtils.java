@@ -134,7 +134,7 @@ public final class MuleContainerBootstrapUtils
 
     //////////////////////////////////////////////////////////////////////////////////////////
     // The following methods are intentionally duplicated from org.mule.util so that
-    // mule-module-boot has no external dependencies at system startup.
+    // mule-module-reboot has no external dependencies at system startup.
     //////////////////////////////////////////////////////////////////////////////////////////
 
     /**

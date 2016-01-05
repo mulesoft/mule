@@ -29,7 +29,7 @@ import org.tanukisoftware.wrapper.WrapperManager;
  */
 public class MuleContainerBootstrap
 {
-    private static final String MULE_MODULE_BOOT_POM_FILE_PATH = "META-INF/maven/org.mule.module/mule-module-boot/pom.properties";
+    private static final String MULE_MODULE_REBOOT_POM_FILE_PATH = "META-INF/maven/org.mule.module/mule-module-reboot/pom.properties";
  
     public static final String CLI_OPTIONS[][] = {
         {"main", "true", "Main Class"},
@@ -102,7 +102,7 @@ public class MuleContainerBootstrap
         InputStream propertiesStream = null;
         try
         {
-            URL mavenPropertiesUrl = MuleContainerBootstrapUtils.getResource(MULE_MODULE_BOOT_POM_FILE_PATH, MuleContainerWrapper.class);
+            URL mavenPropertiesUrl = MuleContainerBootstrapUtils.getResource(MULE_MODULE_REBOOT_POM_FILE_PATH, MuleContainerWrapper.class);
             propertiesStream = mavenPropertiesUrl.openStream();
             
             Properties mavenProperties = new Properties();
