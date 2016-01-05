@@ -19,13 +19,9 @@ import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.module.extension.HeisenbergExtension.AGE;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
-import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
-import static org.mule.module.extension.HeisenbergExtension.NAMESPACE;
-import static org.mule.module.extension.HeisenbergExtension.SCHEMA_LOCATION;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
 import static org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber.DEFAULT_CONNECTION_PROVIDER_NAME;
-
 import org.mule.config.MuleManifest;
 import org.mule.extension.annotation.api.Configuration;
 import org.mule.extension.annotation.api.Configurations;
@@ -194,7 +190,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     {
         assertThat(declaration, is(notNullValue()));
 
-        assertThat(declaration.getName(), is(EXTENSION_NAME));
+        assertThat(declaration.getName(), is(HEISENBERG));
         assertThat(declaration.getDescription(), is(EXTENSION_DESCRIPTION));
         assertThat(declaration.getVersion(), is(EXTENSION_VERSION));
     }
@@ -338,8 +334,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(HeisenbergExtension.class.isAssignableFrom(implementingTypeModelProperty.getType()), is(true));
     }
 
-    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
-    @Xml(schemaLocation = SCHEMA_LOCATION, namespace = NAMESPACE, schemaVersion = SCHEMA_VERSION)
+    @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
+    @Xml(schemaVersion = SCHEMA_VERSION)
     @Configurations(HeisenbergExtension.class)
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
     @Providers(HeisenbergConnectionProvider.class)
@@ -348,8 +344,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     }
 
-    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
-    @Xml(schemaLocation = SCHEMA_LOCATION, namespace = NAMESPACE, schemaVersion = SCHEMA_VERSION)
+    @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
+    @Xml(schemaVersion = SCHEMA_VERSION)
     @Configurations({HeisenbergExtension.class, NamedHeisenbergAlternateConfig.class})
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
     public static class HeisenbergPointerPlusExternalConfig
@@ -364,14 +360,14 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     }
 
-    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
     @Operations({DuplicateConfigOperation.class})
     public static class HeisenbergWithInvalidOperation extends HeisenbergExtension
     {
 
     }
 
-    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
     public static class HeisenbergWithParameterGroupAsOptional extends HeisenbergExtension
     {
 
@@ -381,7 +377,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     }
 
-    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
     public static class HeisenbergWithOperations extends HeisenbergExtension
     {
 

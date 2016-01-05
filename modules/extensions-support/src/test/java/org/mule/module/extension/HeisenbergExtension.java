@@ -8,7 +8,6 @@ package org.mule.module.extension;
 
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
@@ -16,7 +15,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
@@ -33,21 +31,16 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-@Extension(name = HeisenbergExtension.EXTENSION_NAME, description = HeisenbergExtension.EXTENSION_DESCRIPTION)
+@Extension(name = HeisenbergExtension.HEISENBERG, description = HeisenbergExtension.EXTENSION_DESCRIPTION)
 @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
-@Xml(schemaLocation = HeisenbergExtension.SCHEMA_LOCATION, namespace = HeisenbergExtension.NAMESPACE, schemaVersion = HeisenbergExtension.SCHEMA_VERSION)
+@Xml(schemaVersion = HeisenbergExtension.SCHEMA_VERSION)
 @Extensible(alias = "heisenberg-empire")
 @Providers(HeisenbergConnectionProvider.class)
 public class HeisenbergExtension implements Lifecycle, MuleContextAware
 {
-
-    public static final String SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/heisenberg";
-    public static final String NAMESPACE = "heisenberg";
     public static final String SCHEMA_VERSION = "1.0-blue";
-
     public static final String HEISENBERG = "Heisenberg";
     public static final String AGE = "50";
-    public static final String EXTENSION_NAME = "heisenberg";
     public static final String EXTENSION_DESCRIPTION = "My Test Extension just to unit test";
 
     private int initialise = 0;

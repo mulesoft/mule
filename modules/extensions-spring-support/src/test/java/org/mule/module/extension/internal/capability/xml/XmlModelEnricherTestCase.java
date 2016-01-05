@@ -28,19 +28,23 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class XmlModelEnricherTestCase extends AbstractMuleTestCase
 {
 
-    private static final String SCHEMA_VERSION = "SCHEMA_VERSION";
-    private static final String NAMESPACE = "NAMESPACE";
+    private static final String SCHEMA_VERSION = "1.0";
+    private static final String NAMESPACE = "namespace";
     private static final String SCHEMA_LOCATION = "SCHEMA_LOCATION";
+    private static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/%s";
 
-    private static final String EXTENSION_NAME = "extension";
+    private static final String EXTENSION = "Extension";
+    private static final String EXTENSION_NAME = "Xml Model " + EXTENSION;
+    private static final String EXTENSION_HYPHENAZED_NAME = "xml-model";
     private static final String EXTENSION_VERSION = "3.7";
 
     private DeclarationDescriptor declarationDescriptor = new DeclarationDescriptor();
     private ModelEnricher modelEnricher = new XmlModelEnricher();
 
     @Test
-    public void enrich()
+    public void enrichWithCustomValues()
     {
+        declarationDescriptor.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
         XmlModelProperty xmlProperty = enrich(XmlSupport.class);
 
         assertThat(xmlProperty, is(notNullValue()));
@@ -53,12 +57,36 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
     public void enrichWithDefaultValues()
     {
         declarationDescriptor.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
+        XmlModelProperty xmlProperty = enrich(NoXmlSupport.class);
+
+        assertThat(xmlProperty, is(notNullValue()));
+        assertThat(xmlProperty.getSchemaVersion(), is(EXTENSION_VERSION));
+        assertThat(xmlProperty.getNamespace(), is(EXTENSION_HYPHENAZED_NAME));
+        assertThat(xmlProperty.getSchemaLocation(), equalTo(String.format(DEFAULT_SCHEMA_LOCATION_MASK, EXTENSION_HYPHENAZED_NAME)));
+    }
+
+    @Test
+    public void enrichWithCustomNamespaceValue()
+    {
+        declarationDescriptor.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
         XmlModelProperty xmlProperty = enrich(DefaultXmlExtension.class);
 
         assertThat(xmlProperty, is(notNullValue()));
         assertThat(xmlProperty.getSchemaVersion(), is(EXTENSION_VERSION));
         assertThat(xmlProperty.getNamespace(), is(NAMESPACE));
-        assertThat(xmlProperty.getSchemaLocation(), equalTo(String.format(XmlModelEnricher.DEFAULT_SCHEMA_LOCATION_MASK, EXTENSION_NAME)));
+        assertThat(xmlProperty.getSchemaLocation(), equalTo(String.format(DEFAULT_SCHEMA_LOCATION_MASK, NAMESPACE)));
+    }
+
+    @Test
+    public void enrichWithCustomSchemaLocationValue()
+    {
+        declarationDescriptor.named(EXTENSION).onVersion(EXTENSION_VERSION);
+        XmlModelProperty xmlProperty = enrich(CustomSchemaLocationXmlExtension.class);
+
+        assertThat(xmlProperty, is(notNullValue()));
+        assertThat(xmlProperty.getSchemaVersion(), is(EXTENSION_VERSION));
+        assertThat(xmlProperty.getNamespace(), is(EXTENSION.toLowerCase()));
+        assertThat(xmlProperty.getSchemaLocation(), equalTo(SCHEMA_LOCATION));
     }
 
     private XmlModelProperty enrich(Class<?> type)
@@ -76,6 +104,17 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
 
     @Xml(namespace = NAMESPACE)
     private static class DefaultXmlExtension
+    {
+
+    }
+
+    @Xml(schemaLocation = SCHEMA_LOCATION)
+    private static class CustomSchemaLocationXmlExtension
+    {
+
+    }
+
+    private static class NoXmlSupport
     {
 
     }

@@ -6,7 +6,6 @@
  */
 package org.mule.module.extension.internal.capability.xml;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
 import org.mule.extension.annotation.api.capability.Xml;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.Declaration;
@@ -14,6 +13,10 @@ import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescri
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.module.extension.internal.model.AbstractAnnotatedModelEnricher;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.module.extension.internal.util.NameUtils;
+import org.mule.util.StringUtils;
+
+import java.util.function.Supplier;
 
 /**
  * Verifies if the extension is annotated with {@link Xml} and if so, enriches the {@link DeclarationDescriptor}
@@ -29,30 +32,57 @@ import org.mule.module.extension.internal.model.property.ImplementingTypeModelPr
 public final class XmlModelEnricher extends AbstractAnnotatedModelEnricher
 {
 
-    public static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/extension/%s";
+    private static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/%s";
 
     @Override
     public void enrich(DescribingContext describingContext)
     {
         Xml xml = extractAnnotation(describingContext.getDeclarationDescriptor().getDeclaration(), Xml.class);
-        if (xml != null)
-        {
-            DeclarationDescriptor descriptor = describingContext.getDeclarationDescriptor();
-            descriptor.withModelProperty(XmlModelProperty.KEY, createXmlModelProperty(xml, descriptor));
-        }
+        DeclarationDescriptor descriptor = describingContext.getDeclarationDescriptor();
+        descriptor.withModelProperty(XmlModelProperty.KEY, createXmlModelProperty(xml, descriptor));
     }
 
     private XmlModelProperty createXmlModelProperty(Xml xml, DeclarationDescriptor descriptor)
     {
         Declaration declaration = descriptor.getDeclaration();
-        String schemaVersion = isBlank(xml.schemaVersion()) ? declaration.getVersion() : xml.schemaVersion();
-        String schemaLocation = isBlank(xml.schemaLocation()) ? buildDefaultLocation(declaration) : xml.schemaLocation();
-
-        return new ImmutableXmlModelProperty(schemaVersion, xml.namespace(), schemaLocation);
+        String schemaVersion = calculateValue(xml, () -> xml.schemaVersion(), declaration::getVersion);
+        String namespace = calculateValue(xml, () -> xml.namespace(), () -> buildDefaultNamespace(declaration.getName()));
+        String schemaLocation = calculateValue(xml, () -> xml.schemaLocation(), () -> buildDefaultLocation(namespace));
+        return new ImmutableXmlModelProperty(schemaVersion, namespace, schemaLocation);
     }
 
-    private String buildDefaultLocation(Declaration declaration)
+    private String calculateValue(Xml xml, Supplier<String> value, Supplier<String> fallback)
     {
-        return String.format(DEFAULT_SCHEMA_LOCATION_MASK, declaration.getName());
+        if (xml != null)
+        {
+            String result = value.get();
+            if (StringUtils.isNotBlank(result))
+            {
+                return result;
+            }
+        }
+        return fallback.get();
     }
+
+    private String buildDefaultLocation(String namespace)
+    {
+        return String.format(DEFAULT_SCHEMA_LOCATION_MASK, namespace);
+    }
+
+    private String buildDefaultNamespace(String declarationName)
+    {
+        String namespace = StringUtils.deleteWhitespace(declarationName);
+        namespace = removeFromName(namespace, "extension");
+        namespace = removeFromName(namespace, "connector");
+        namespace = removeFromName(namespace, "module");
+        namespace = StringUtils.isBlank(namespace) ? declarationName : namespace;
+        return NameUtils.hyphenize(namespace);
+
+    }
+
+    private String removeFromName(String name, String word)
+    {
+        return StringUtils.removeEndIgnoreCase(name, word);
+    }
+
 }
