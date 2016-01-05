@@ -92,7 +92,6 @@
             <outputDirectory>lib/boot</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
-                <include>org.mule.modules:mule-module-boot</include>
                 <include>org.mule.modules:mule-module-reboot</include>
                 <include>commons-cli:commons-cli</include>
                 <include>tanukisoft:wrapper</include>
@@ -191,7 +190,6 @@
                 <exclude>org.mule.transports:mule-transport-vm</exclude>
                 <exclude>org.mule.modules:mule-modules-all</exclude>
                 <exclude>org.mule.modules:mule-module-annotations</exclude>
-                <exclude>org.mule.modules:mule-module-boot</exclude>
                 <exclude>org.mule.modules:mule-module-builders</exclude>
                 <exclude>org.mule.modules:mule-module-client</exclude>
                 <exclude>org.mule.modules:mule-module-cxf</exclude>
