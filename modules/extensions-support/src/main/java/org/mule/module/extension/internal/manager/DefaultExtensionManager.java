@@ -22,12 +22,12 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.introspection.ExtensionDiscoverer;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.module.extension.internal.config.ExtensionConfig;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
 import org.mule.module.extension.internal.runtime.config.DefaultImplicitConfigurationFactory;
 import org.mule.module.extension.internal.runtime.config.ImplicitConfigurationFactory;
 import org.mule.module.extension.internal.runtime.config.StaticConfigurationProvider;
@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Default implementation of {@link ExtensionManager}. This implementation uses standard Java SPI
  * as a discovery mechanism.
- * <p>
+ * <p/>
  * Although it allows registering {@link ConfigurationProvider} instances through the
  * {@link #registerConfigurationProvider(ConfigurationProvider)} method (and that's still the
  * correct way of registering them), this implementation automatically acknowledges any
