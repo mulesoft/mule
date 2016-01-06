@@ -13,7 +13,7 @@ target/
 *.iml
 *.ipr
 *.iws
-/.idea
+*.idea
 
 # Mac
 .DS_Store
