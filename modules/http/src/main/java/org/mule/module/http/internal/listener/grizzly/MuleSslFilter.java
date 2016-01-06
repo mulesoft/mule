@@ -10,6 +10,7 @@ import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 
 import java.io.IOException;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 
@@ -18,6 +19,8 @@ import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.ssl.SSLConnectionContext;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.ssl.SSLFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Custom SSL filter that configures additional properties in the grizzly context.
@@ -26,6 +29,7 @@ public class MuleSslFilter extends SSLFilter
 {
 
     public static final String SSL_SESSION_ATTRIBUTE_KEY = "muleSslSession";
+    private static final Logger logger = LoggerFactory.getLogger(MuleSslFilter.class);
 
     public MuleSslFilter(SSLEngineConfigurator serverSSLEngineConfigurator, SSLEngineConfigurator clientSSLEngineConfigurator)
     {
@@ -35,10 +39,18 @@ public class MuleSslFilter extends SSLFilter
     @Override
     public NextAction handleRead(FilterChainContext ctx) throws IOException
     {
-        ctx.getAttributes().setAttribute(HTTPS.getScheme(), true);
-        NextAction nextAction = super.handleRead(ctx);
-        ctx.getAttributes().setAttribute(SSL_SESSION_ATTRIBUTE_KEY, getSslSession(ctx));
-        return nextAction;
+        try
+        {
+            ctx.getAttributes().setAttribute(HTTPS.getScheme(), true);
+            NextAction nextAction = super.handleRead(ctx);
+            ctx.getAttributes().setAttribute(SSL_SESSION_ATTRIBUTE_KEY, getSslSession(ctx));
+            return nextAction;
+        }
+        catch (SSLHandshakeException e)
+        {
+            logger.error("SSL handshake error: " + e.getMessage());
+            throw e;
+        }
     }
 
     private SSLSession getSslSession(FilterChainContext ctx) throws SSLPeerUnverifiedException
