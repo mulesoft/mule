@@ -9,7 +9,7 @@ package org.mule.module.extension.internal;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
+import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
@@ -54,7 +54,7 @@ public class HeisenbergDefaultConfigTestCase extends ExtensionFunctionalTestCase
     {
         ExtensionManager extensionManager = muleContext.getExtensionManager();
         ExtensionModel extensionModel = extensionManager.getExtensions().stream().findFirst().get();
-        assertThat(extensionModel.getName(), is(EXTENSION_NAME));
+        assertThat(extensionModel.getName(), is(HEISENBERG));
 
         when(configurationProvider.getName()).thenReturn("secondConfig");
         when(configurationProvider.getModel()).thenReturn(configurationModel);

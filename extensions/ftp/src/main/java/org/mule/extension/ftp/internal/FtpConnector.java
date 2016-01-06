@@ -11,7 +11,6 @@ import org.mule.api.connector.ConnectionManager;
 import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.annotation.api.capability.Xml;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.module.extension.file.api.FileConnectorConfig;
@@ -29,10 +28,9 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-@Extension(name = "FTP Connector", description = "Connector to manipulate Files on a FTP/SFTP server")
+@Extension(name = "Ftp Connector", description = "Connector to manipulate Files on a FTP/SFTP server")
 @Operations(StandardFileSystemOperations.class)
 @Providers({FtpConnectionProvider.class})
-@Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/ftp", namespace = "ftp", schemaVersion = "4.0")
 public class FtpConnector implements FileConnectorConfig
 {
 

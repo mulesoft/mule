@@ -10,9 +10,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
-import static org.mule.module.extension.HeisenbergExtension.EXTENSION_NAME;
-import org.mule.extension.annotation.api.Extension;
+import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.extension.annotation.api.Extensible;
+import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.ExtensionOf;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
@@ -60,7 +60,7 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
         assertThat(modelProperty.getType(), is(sameInstance(propertyType)));
     }
 
-    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
     @Operations(ExtensibleExtensionOperation.class)
     @Extensible
     public static class ExtensibleExtension
@@ -68,14 +68,14 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
 
     }
 
-    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
     @Operations({ClassLevelExtensionOfOperation.class, MethodLevelExtensionOfOperation.class})
     public static class ExtendingExtension
     {
 
     }
 
-    @Extension(name = EXTENSION_NAME, description = EXTENSION_DESCRIPTION)
+    @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
     @Operations({MethodLevelExtensionOfOperation.class, ExtensibleExtensionOperation.class})
     @Extensible
     public static class ExtensibleExtendingExtension
