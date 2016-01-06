@@ -9,11 +9,13 @@ package org.mule.module.extension.internal.manager;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.api.introspection.ExtensionFactory;
+import org.mule.extension.api.introspection.ExtensionDiscoverer;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.module.extension.internal.DefaultDescribingContext;
-import org.mule.module.extension.internal.introspection.ExtensionDiscoverer;
+import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.registry.SpiServiceRegistry;
 import org.mule.util.collection.ImmutableListCollector;
 
 import com.google.common.collect.ImmutableList;
@@ -24,7 +26,7 @@ import java.util.List;
 /**
  * Default implementation of {@link ExtensionDiscoverer}
  *
- * @since 3.7.0
+ * @since 4.0.0
  */
 final class DefaultExtensionDiscoverer implements ExtensionDiscoverer
 {
@@ -32,11 +34,18 @@ final class DefaultExtensionDiscoverer implements ExtensionDiscoverer
     private final ExtensionFactory extensionFactory;
     private final ServiceRegistry serviceRegistry;
 
+    public DefaultExtensionDiscoverer()
+    {
+        this.serviceRegistry = new SpiServiceRegistry();
+        this.extensionFactory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
+    }
+
     public DefaultExtensionDiscoverer(ExtensionFactory extensionFactory, ServiceRegistry serviceRegistry)
     {
         this.extensionFactory = extensionFactory;
         this.serviceRegistry = serviceRegistry;
     }
+
 
     /**
      * {@inheritDoc}
