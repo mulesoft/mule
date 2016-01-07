@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @since 4.0.0
  */
-final class DefaultExtensionDiscoverer implements ExtensionDiscoverer
+public final class DefaultExtensionDiscoverer implements ExtensionDiscoverer
 {
 
     private final ExtensionFactory extensionFactory;
