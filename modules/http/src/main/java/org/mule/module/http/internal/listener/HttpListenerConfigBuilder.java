@@ -11,9 +11,8 @@ import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.listener.HttpListenerConfig;
-import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.module.tls.api.TlsContextFactory;
 import org.mule.util.ObjectNameHelper;
 
 public class HttpListenerConfigBuilder

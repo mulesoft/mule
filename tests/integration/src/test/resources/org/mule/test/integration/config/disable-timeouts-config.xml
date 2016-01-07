@@ -4,14 +4,12 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
        xmlns:http="http://www.mulesoft.org/schema/mule/http"
-       xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
        xmlns:test="http://www.mulesoft.org/schema/mule/test"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-               http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <configuration defaultResponseTimeout="100"/>
@@ -27,18 +25,6 @@
     <flow name="HttpService">
         <http:listener config-ref="listenerConfig" path="service" />
         <test:component waitTime="200" appendString=" processed"/>
-    </flow>
-
-    <!-- TCP socket read timeout -->
-    <flow name="Test1Flow1">
-        <vm:inbound-endpoint path="tcpTimeout" exchange-pattern="request-response"/>
-        <tcp:outbound-endpoint address="tcp://localhost:${port2}" exchange-pattern="request-response"/>
-        <byte-array-to-string-transformer/>
-    </flow>
-
-    <flow name="Test1Flow2">
-        <tcp:inbound-endpoint host="localhost" port="${port2}" exchange-pattern="request-response"/>
-        <test:component waitTime="200" appendString="ho"/>
     </flow>
 
 </mule>

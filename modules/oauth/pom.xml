@@ -30,8 +30,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-ssl</artifactId>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-tls</artifactId>
             <version>${project.version}</version>
         </dependency>
 

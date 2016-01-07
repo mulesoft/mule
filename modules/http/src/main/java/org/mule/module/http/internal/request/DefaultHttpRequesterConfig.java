@@ -28,10 +28,10 @@ import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClient;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClientConfiguration;
-import org.mule.transport.ssl.api.TlsContextFactory;
-import org.mule.transport.ssl.api.TlsContextFactoryBuilder;
-import org.mule.transport.tcp.DefaultTcpClientSocketProperties;
-import org.mule.transport.tcp.TcpClientSocketProperties;
+import org.mule.module.socket.internal.DefaultTcpClientSocketProperties;
+import org.mule.module.tls.api.TlsContextFactory;
+import org.mule.module.tls.api.TlsContextFactoryBuilder;
+import org.mule.module.socket.api.TcpClientSocketProperties;
 import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.net.CookieManager;

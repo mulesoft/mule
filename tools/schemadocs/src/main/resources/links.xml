@@ -152,41 +152,14 @@
 
     <link><item>soap:http-to-soap-request-transformer</item><page>SOAP+Transport</page></link>
 
-    <link><item>ssl:connector</item><page>SSL+Transport</page></link>
-    <link><item>ssl:client</item><page>SSL+Transport</page></link>
-    <link><item>ssl:key-store</item><page>SSL+Transport</page></link>
-    <link><item>ssl:server</item><page>SSL+Transport</page></link>
-    <link><item>ssl:protocol-handler</item><page>SSL+Transport</page></link>
-    <link><item>ssl:inbound-endpoint</item><page>SSL+Transport</page></link>
-    <link><item>ssl:outbound-endpoint</item><page>SSL+Transport</page></link>
-    <link><item>ssl:endpoint</item><page>SSL+Transport</page></link>
-
     <link><item>stdio:connector</item><page>STDIO+Transport</page></link>
     <link><item>stdio:inbound-endpoint</item><page>STDIO+Transport</page></link>
     <link><item>stdio:outbound-endpoint</item><page>STDIO+Transport</page></link>
     <link><item>stdio:endpoint</item><page>STDIO+Transport</page></link>
 
-    <link><item>tcp:connector</item><page>TCP+Transport</page></link>
-    <link><item>tcp:streaming-protocol</item><page>TCP+Transport</page></link>
-    <link><item>tcp:xml-protocol</item><page>TCP+Transport</page></link>
-    <link><item>tcp:xml-eof-protocol</item><page>TCP+Transport</page></link>
-    <link><item>tcp:eof-protocol</item><page>TCP+Transport</page></link>
-    <link><item>tcp:direct-protocol</item><page>TCP+Transport</page></link>
-    <link><item>tcp:safe-protocol</item><page>TCP+Transport</page></link>
-    <link><item>tcp:length-protocol</item><page>TCP+Transport</page></link>
-    <link><item>tcp:custom-protocol</item><page>TCP+Transport</page></link>
-    <link><item>tcp:inbound-endpoint</item><page>TCP+Transport</page></link>
-    <link><item>tcp:outbound-endpoint</item><page>TCP+Transport</page></link>
-    <link><item>tcp:endpoint</item><page>TCP+Transport</page></link>
-
-    <link><item>tls:connector</item><page>TLS+Transport</page></link>
-    <link><item>tls:client</item><page>TLS+Transport</page></link>
     <link><item>tls:key-store</item><page>TLS+Transport</page></link>
-    <link><item>tls:server</item><page>TLS+Transport</page></link>
-    <link><item>tls:protocol-handler</item><page>TLS+Transport</page></link>
-    <link><item>tls:inbound-endpoint</item><page>TLS+Transport</page></link>
-    <link><item>tls:outbound-endpoint</item><page>TLS+Transport</page></link>
-    <link><item>tls:endpoint</item><page>TLS+Transport</page></link>
+    <link><item>tls:trust-store</item><page>TLS+Transport</page></link>
+    <link><item>tls:context</item><page>TLS+Transport</page></link>
 
     <link><item>udp:connector</item><page>UDP+Transport</page></link>
     <link><item>udp:inbound-endpoint</item><page>UDP+Transport</page></link>

@@ -11,14 +11,13 @@ import static org.mule.module.http.internal.request.SuccessStatusCodeValidator.N
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.requester.HttpRequestOperationConfig;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
-import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.module.tls.api.TlsContextFactory;
 import org.mule.util.ObjectNameHelper;
 
 public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequesterBuilder>

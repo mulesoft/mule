@@ -15,8 +15,8 @@ import static org.apache.ws.security.components.crypto.Merlin.LOAD_CA_CERTS;
 import static org.apache.ws.security.components.crypto.Merlin.TRUSTSTORE_FILE;
 import static org.apache.ws.security.components.crypto.Merlin.TRUSTSTORE_PASSWORD;
 import static org.apache.ws.security.components.crypto.Merlin.TRUSTSTORE_TYPE;
-import org.mule.transport.ssl.api.TlsContextKeyStoreConfiguration;
-import org.mule.transport.ssl.api.TlsContextTrustStoreConfiguration;
+import org.mule.module.tls.api.TlsContextKeyStoreConfiguration;
+import org.mule.module.tls.api.TlsContextTrustStoreConfiguration;
 
 import java.util.Properties;
 
