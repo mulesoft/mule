@@ -12,6 +12,7 @@ import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.param.display.Password;
 
 import javax.inject.Inject;
 
@@ -27,6 +28,7 @@ abstract class PetStoreConnectionProvider implements ConnectionProvider<PetStore
     private String username;
 
     @Parameter
+    @Password
     private String password;
 
     @Override

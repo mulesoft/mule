@@ -6,44 +6,48 @@
  */
 package org.mule.module.extension.internal.model.property;
 
-import org.mule.api.NamedObject;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ParameterModel;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 
 /**
- * A custom model property to link a {@link NamedObject} to the actual member in which it was defined.
+ * A custom model property to link a {@link ParameterModel} to the actual member it represents.
  * <p/>
  * The most common use case for this is to support the {@link Parameter#alias()} attribute.
  * For example, consider a {@link ConfigurationModel} parameter which is obtained through
  * inspecting fields in a class. This property allows for the introspection model to list
  * the parameter by a given alias, while this parameter still provides the real name of the field
  * which is going to be needed for further operations
+ * <p/>
+ * Another common use case is to get the field {@link Annotation}s in order to enrich the model with other properties.
  *
  * @since 4.0
  */
-public final class MemberNameModelProperty
+public final class DeclaringMemberModelProperty
 {
 
     /**
      * A unique key that identifies this property type
      */
-    public static final String KEY = MemberNameModelProperty.class.getName();
+    public static final String KEY = DeclaringMemberModelProperty.class.getName();
 
-    private final String name;
+    private final Field declaringField;
 
-    public MemberNameModelProperty(String name)
+    public DeclaringMemberModelProperty(Field declaringField)
     {
-        this.name = name;
+        this.declaringField = declaringField;
     }
 
     /**
-     * The name of the member in which an aliased
-     * object is defined
+     * The field associated to the {@link ParameterModel}
      *
-     * @return a {@link String}
+     * @return a {@link Field}
      */
-    public String getName()
+    public Field getDeclaringField()
     {
-        return name;
+        return declaringField;
     }
 }
