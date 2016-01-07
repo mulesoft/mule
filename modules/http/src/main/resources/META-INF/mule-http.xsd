@@ -3,7 +3,7 @@
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
-            xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+            xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
             targetNamespace="http://www.mulesoft.org/schema/mule/http"
             elementFormDefault="qualified"
@@ -14,8 +14,8 @@
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd" />
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/tls"
                 schemaLocation="http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd" />
-    <xsd:import namespace="http://www.mulesoft.org/schema/mule/tcp"
-                schemaLocation="http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd" />
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/sockets"
+                schemaLocation="http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd" />
 
     <xsd:annotation>
         <xsd:documentation>
@@ -529,7 +529,7 @@
 
                     <xsd:element ref="abstract-http-request-authentication-provider" minOccurs="0"/>
 
-                    <xsd:element ref="tcp:client-socket-properties" minOccurs="0" maxOccurs="1" />
+                    <xsd:element ref="sockets:client-socket-properties" minOccurs="0" maxOccurs="1" />
                     <xsd:element ref="tls:context" minOccurs="0" maxOccurs="1" />
 
                     <xsd:element name="raml-api-configuration" minOccurs="0" maxOccurs="1">

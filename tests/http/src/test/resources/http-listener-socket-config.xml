@@ -2,13 +2,13 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
+               http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <tcp:server-socket-properties name="globalTcpProperties" keepAlive="true" receiveBacklog="1024"
+    <sockets:server-socket-properties name="globalTcpProperties" keepAlive="true" receiveBacklog="1024"
                                   receiveBufferSize="1024" reuseAddress="true" sendBufferSize="1024"
                                   sendTcpNoDelay="true" serverTimeout="1000" linger="1000" />
 
