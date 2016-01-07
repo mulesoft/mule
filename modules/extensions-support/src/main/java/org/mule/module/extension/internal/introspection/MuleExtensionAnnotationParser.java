@@ -23,7 +23,7 @@ import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.extension.api.runtime.ContentMetadata;
 import org.mule.extension.api.runtime.ContentType;
-import org.mule.module.extension.internal.model.property.MemberNameModelProperty;
+import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -70,14 +70,14 @@ public final class MuleExtensionAnnotationParser
 
     public static String getMemberName(BaseDeclaration<?> declaration, String defaultName)
     {
-        MemberNameModelProperty memberNameModelProperty = declaration.getModelProperty(MemberNameModelProperty.KEY);
-        return memberNameModelProperty != null ? memberNameModelProperty.getName() : defaultName;
+        DeclaringMemberModelProperty declaringMemberModelProperty = declaration.getModelProperty(DeclaringMemberModelProperty.KEY);
+        return declaringMemberModelProperty != null ? declaringMemberModelProperty.getDeclaringField().getName() : defaultName;
     }
 
     public static String getMemberName(EnrichableModel enrichableModel, String defaultName)
     {
-        MemberNameModelProperty memberNameModelProperty = enrichableModel.getModelProperty(MemberNameModelProperty.KEY);
-        return memberNameModelProperty != null ? memberNameModelProperty.getName() : defaultName;
+        DeclaringMemberModelProperty declaringMemberModelProperty = enrichableModel.getModelProperty(DeclaringMemberModelProperty.KEY);
+        return declaringMemberModelProperty != null ? declaringMemberModelProperty.getDeclaringField().getName() : defaultName;
     }
 
     static Extension getExtension(Class<?> extensionType)
@@ -171,8 +171,8 @@ public final class MuleExtensionAnnotationParser
     private static boolean shouldAdvertise(DataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations)
     {
         return !(IMPLICIT_ARGUMENT_TYPES.contains(parameterType.getRawType()) ||
-               annotations.containsKey(UseConfig.class) ||
-               annotations.containsKey(Connection.class));
+                 annotations.containsKey(UseConfig.class) ||
+                 annotations.containsKey(Connection.class));
     }
 
     public static List<String> getParamNames(Method method)

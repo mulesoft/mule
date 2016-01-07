@@ -31,6 +31,7 @@ import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.annotation.api.param.UseConfig;
+import org.mule.extension.annotation.api.param.display.Password;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;
@@ -45,12 +46,13 @@ import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarat
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
+import org.mule.extension.api.introspection.property.PasswordModelProperty;
 import org.mule.module.extension.internal.model.property.ConfigTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
+import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
-import org.mule.module.extension.internal.model.property.MemberNameModelProperty;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
@@ -230,7 +232,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
             parameterDescriptor.ofType(dataType);
             parameterDescriptor.withExpressionSupport(parameter != null ? parameter.expressionSupport() : ExpressionSupport.SUPPORTED);
-            parameterDescriptor.withModelProperty(MemberNameModelProperty.KEY, new MemberNameModelProperty(field.getName()));
+            parameterDescriptor.withModelProperty(DeclaringMemberModelProperty.KEY, new DeclaringMemberModelProperty(field));
 
             parameters.add(parameterDescriptor);
         }
@@ -349,6 +351,11 @@ public final class AnnotationsBasedDescriber implements Describer
 
                 parameter.describedAs(EMPTY).ofType(parsedParameter.getType());
                 addTypeRestrictions(parameter, parsedParameter);
+                Password passwordAnnotation = parsedParameter.getAnnotation(Password.class);
+                if (passwordAnnotation != null)
+                {
+                    parameter.withModelProperty(PasswordModelProperty.KEY, new ImmutablePasswordModelProperty());
+                }
             }
 
             Connection connectionAnnotation = parsedParameter.getAnnotation(Connection.class);
