@@ -69,11 +69,12 @@ import static org.mule.extension.api.introspection.declaration.tck.TestWebServic
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WSDL_LOCATION;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WS_CONSUMER;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WS_CONSUMER_DESCRIPTION;
-
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.exception.NoSuchConfigurationException;
 import org.mule.extension.api.exception.NoSuchOperationException;
+import org.mule.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.extension.api.introspection.ConfigurationFactory;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
@@ -234,14 +235,14 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         factory.createFrom(descriptor.withConfig(CONFIG_NAME).createdWith(mock(ConfigurationFactory.class)).describedAs(""));
     }
 
-    @Test(expected = IllegalModelDefinitionException.class)
+    @Test(expected = IllegalParameterModelDefinitionException.class)
     public void operationWithParameterNamedName()
     {
         factory.createFrom(descriptor.withOperation("invalidOperation").describedAs("")
                                    .with().requiredParameter("name").ofType(String.class));
     }
 
-    @Test(expected = IllegalModelDefinitionException.class)
+    @Test(expected = IllegalParameterModelDefinitionException.class)
     public void fixedParameterWithExpressionDefault()
     {
         factory.createFrom(descriptor.withOperation("invalidOperation").describedAs("")
@@ -250,7 +251,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
                                    .defaultingTo("#['hello']"));
     }
 
-    @Test(expected = IllegalModelDefinitionException.class)
+    @Test(expected = IllegalParameterModelDefinitionException.class)
     public void expressionParameterWithFixedValue()
     {
         factory.createFrom(descriptor.withOperation("invalidOperation").describedAs("")
@@ -259,7 +260,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
                                    .defaultingTo("static"));
     }
 
-    @Test(expected = IllegalModelDefinitionException.class)
+    @Test(expected = IllegalOperationModelDefinitionException.class)
     public void operationWithNoReturnType()
     {
         factory.createFrom(descriptor.withOperation("noReturn").describedAs(""));

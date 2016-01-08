@@ -7,18 +7,14 @@
 package org.mule.module.extension.internal.introspection.validation;
 
 import static org.mule.extension.api.introspection.ParameterModel.RESERVED_NAMES;
-
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.DataType;
-import org.mule.extension.api.introspection.Described;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
-import org.mule.extension.api.introspection.ParametrizedModel;
-
-import java.util.List;
 
 /**
  * Validates that all {@link ParameterModel parameters} provided by the {@link ConfigurationModel configurations},
@@ -62,17 +58,17 @@ public final class ParameterModelValidator implements ModelValidator
     {
         if (RESERVED_NAMES.contains(parameterModel.getName()))
         {
-            throw new IllegalModelDefinitionException(String.format("The parameter in the %s [%s] from the extension [%s] cannot have the name ['%s'] since it is a reserved one", ownerModelType, ownerName, extensionName, parameterModel.getName()));
+            throw new IllegalParameterModelDefinitionException(String.format("The parameter in the %s [%s] from the extension [%s] cannot have the name ['%s'] since it is a reserved one", ownerModelType, ownerName, extensionName, parameterModel.getName()));
         }
 
         if (parameterModel.getType() == null)
         {
-            throw new IllegalModelDefinitionException(String.format("The parameter [%s] in the %s [%s] from the extension [%s] must provide a type", parameterModel.getName(), ownerModelType, ownerName, extensionName));
+            throw new IllegalParameterModelDefinitionException(String.format("The parameter [%s] in the %s [%s] from the extension [%s] must provide a type", parameterModel.getName(), ownerModelType, ownerName, extensionName));
         }
 
         if (parameterModel.isRequired() && parameterModel.getDefaultValue() != null)
         {
-            throw new IllegalModelDefinitionException(String.format("The parameter [%s] in the %s [%s] from the extension [%s] is required, and must not provide a default value", parameterModel.getName(), ownerModelType, ownerName, extensionName));
+            throw new IllegalParameterModelDefinitionException(String.format("The parameter [%s] in the %s [%s] from the extension [%s] is required, and must not provide a default value", parameterModel.getName(), ownerModelType, ownerName, extensionName));
         }
     }
 }

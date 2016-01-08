@@ -109,7 +109,7 @@ public final class NameClashModelValidator implements ModelValidator
             if (!accumulator.add(ownerName))
             {
                 throw new IllegalModelDefinitionException(format("Extension '%s' defines more than one %s of name '%s'. Please make sure %s names are unique",
-                                                          extensionModel.getName(), ownerType, ownerName, ownerType));
+                                                                 extensionModel.getName(), ownerType, ownerName, ownerType));
             }
         }
 

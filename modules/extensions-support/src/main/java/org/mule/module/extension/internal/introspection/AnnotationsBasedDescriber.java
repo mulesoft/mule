@@ -39,6 +39,8 @@ import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.annotation.api.param.display.Password;
 import org.mule.extension.annotation.api.param.display.Text;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.ExpressionSupport;
@@ -241,7 +243,7 @@ public final class AnnotationsBasedDescriber implements Describer
             //TODO: MULE-9220
             if (field.isAnnotationPresent(Optional.class))
             {
-                throw new IllegalModelDefinitionException(String.format("@%s can not be applied along with @%s. Affected field [%s] in [%s].", Optional.class.getSimpleName(), org.mule.extension.annotation.api.ParameterGroup.class.getSimpleName(), field.getName(), annotatedType));
+                throw new IllegalParameterModelDefinitionException(String.format("@%s can not be applied along with @%s. Affected field [%s] in [%s].", Optional.class.getSimpleName(), org.mule.extension.annotation.api.ParameterGroup.class.getSimpleName(), field.getName(), annotatedType));
             }
             Set<ParameterDescriptor> parameters = declareSingleParameters(getExposedFields(field.getType()), with);
 
@@ -356,9 +358,9 @@ public final class AnnotationsBasedDescriber implements Describer
         if (providerGenerics.size() != 2)
         {
             //TODO: MULE-9220: Add a syntax validator for this
-            throw new IllegalModelDefinitionException(String.format("Connection provider class '%s' was expected to have 2 generic types " +
-                                                                    "(one for the config type and another for the connection type) but %d were found",
-                                                                    providerClass.getName(), providerGenerics.size()));
+            throw new IllegalConnectionProviderModelDefinitionException(String.format("Connection provider class '%s' was expected to have 2 generic types " +
+                                                                                      "(one for the config type and another for the connection type) but %d were found",
+                                                                                      providerClass.getName(), providerGenerics.size()));
         }
 
         ConnectionProviderDescriptor providerDescriptor = declaration.withConnectionProvider(name)

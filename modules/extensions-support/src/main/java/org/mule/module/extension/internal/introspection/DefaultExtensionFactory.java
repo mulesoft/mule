@@ -15,7 +15,7 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSo
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
-import org.mule.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionFactory;
@@ -251,11 +251,11 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         {
             if (parameter.getExpressionSupport() == NOT_SUPPORTED && isExpression((String) defaultValue))
             {
-                throw new IllegalModelDefinitionException(String.format("Parameter '%s' is marked as not supporting expressions yet it contains one as a default value. Please fix this", parameter.getName()));
+                throw new IllegalParameterModelDefinitionException(String.format("Parameter '%s' is marked as not supporting expressions yet it contains one as a default value. Please fix this", parameter.getName()));
             }
             else if (parameter.getExpressionSupport() == REQUIRED && !isExpression((String) defaultValue))
             {
-                throw new IllegalModelDefinitionException(String.format("Parameter '%s' requires expressions yet it contains a constant as a default value. Please fix this", parameter.getName()));
+                throw new IllegalParameterModelDefinitionException(String.format("Parameter '%s' requires expressions yet it contains a constant as a default value. Please fix this", parameter.getName()));
             }
         }
 

@@ -49,7 +49,7 @@ public final class ContentMetadataModelEnricher extends AbstractAnnotatedModelEn
                         throw new IllegalModelDefinitionException(String.format(
                                 "Operation '%s' of extension '%s' is void yet requires the ability to change the content metadata." +
                                 " Mutating the content metadata requires an operation with a return type.",
-                                operation.getName(),describingContext.getDeclarationDescriptor().getDeclaration().getName()));
+                                operation.getName(), describingContext.getDeclarationDescriptor().getDeclaration().getName()));
                     }
 
                     operation.addParameter(newParameter(MIME_TYPE_PARAMETER_NAME, "The mime type of the payload that this operation outputs."));
