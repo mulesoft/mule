@@ -1,3 +1,4 @@
 org.mule.module.extension.internal.introspection.enricher.ContentMetadataModelEnricher
 org.mule.module.extension.internal.introspection.enricher.ConnectionModelEnricher
 org.mule.module.extension.internal.introspection.enricher.StudioModelEnricher
+org.mule.module.extension.internal.introspection.enricher.PasswordModelEnricher
