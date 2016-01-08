@@ -41,11 +41,11 @@ final class MuleDomainContext extends MuleArtifactContext
     }
 
     @Override
-    protected void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, Object source)
+    protected void registerInjectorProcessor(BeanDefinitionRegistry registry)
     {
-        super.registerAnnotationConfigProcessors(registry, source);
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ContextExclusiveInjectorProcessor.class);
         builder.addConstructorArgValue(this);
         registerPostProcessor(registry, (RootBeanDefinition) builder.getBeanDefinition(), AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME);
     }
+
 }
