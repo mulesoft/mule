@@ -13,8 +13,7 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 
 /**
  * Specialization of {@link AutowiredAnnotationBeanPostProcessor}
- * which acts as a base class for all dependency injection
- * post processors to be used in Mule.
+ * which acts as the default injection post processors to be used in Mule.
  * <p/>
  * Particularly, it overrides {@link #postProcessMergedBeanDefinition(RootBeanDefinition, Class, String)}
  * to be a no-op method. This is because although that method
@@ -24,7 +23,7 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
  *
  * @since 3.7.0
  */
-abstract class MuleInjectorProcessor extends AutowiredAnnotationBeanPostProcessor
+public class MuleInjectorProcessor extends AutowiredAnnotationBeanPostProcessor
 {
 
     /**
