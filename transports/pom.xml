@@ -14,8 +14,6 @@
     <modules>
         <module>all-transports</module>
         <module>jms</module>
-        <module>ssl</module>
-        <module>tcp</module>
         <module>vm</module>
     </modules>
 

@@ -1,0 +1,1 @@
+http\://www.mulesoft.org/schema/mule/sockets=org.mule.module.socket.internal.config.SocketsNamespaceHandler

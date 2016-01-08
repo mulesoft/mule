@@ -19,13 +19,13 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-ssl</artifactId>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-tls</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-tcp</artifactId>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -11,7 +11,7 @@ import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPTION_USER;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENC_PROP_REF_ID;
 import static org.mule.module.ws.security.WSCryptoUtils.createDefaultTrustStoreProperties;
 import static org.mule.module.ws.security.WSCryptoUtils.createTrustStoreProperties;
-import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.module.tls.api.TlsContextFactory;
 
 import java.util.Map;
 import java.util.Properties;

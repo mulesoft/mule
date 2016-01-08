@@ -6,25 +6,6 @@
  */
 package org.mule.test.integration.exceptions;
 
-import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.ssl.DefaultTlsContextFactory;
-
-import java.io.IOException;
-
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.core.Is;
@@ -32,6 +13,24 @@ import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.LocalMuleClient;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.module.tls.DefaultTlsContextFactory;
+
+import javax.jws.WebParam;
+import javax.jws.WebResult;
+import javax.jws.WebService;
+import java.io.IOException;
+
+import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 public class CatchExceptionStrategyTestCase extends FunctionalTestCase
 {
@@ -87,12 +86,6 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     public void testJmsJsonErrorResponse() throws Exception
     {
         testJsonErrorResponse("jms://in");
-    }
-
-    @Test
-    public void testTcpJsonErrorResponse() throws Exception
-    {
-        testJsonErrorResponse(String.format("tcp://localhost:%s", dynamicPort2.getNumber()));
     }
 
     private void testJsonErrorResponse(String endpointUri) throws Exception

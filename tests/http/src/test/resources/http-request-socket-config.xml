@@ -2,20 +2,20 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
+               http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <tcp:client-socket-properties name="globalTcpProperties" connectionTimeout="1000" keepAlive="true"
+    <sockets:client-socket-properties name="globalTcpProperties" connectionTimeout="1000" keepAlive="true"
                                   receiveBufferSize="1024" sendBufferSize="1024"
                                   sendTcpNoDelay="true" timeout="1000" linger="1000" />
 
     <http:request-config name="globalConfig" host="localhost" port="${httpPort}" clientSocketProperties-ref="globalTcpProperties" />
 
     <http:request-config name="nestedConfig" host="localhost" port="${httpPort}" >
-        <tcp:client-socket-properties connectionTimeout="1000" keepAlive="true"
+        <sockets:client-socket-properties connectionTimeout="1000" keepAlive="true"
                                       receiveBufferSize="1024" sendBufferSize="1024"
                                       sendTcpNoDelay="true" timeout="1000" linger="1000" />
     </http:request-config>

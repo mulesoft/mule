@@ -10,8 +10,8 @@ import static org.apache.ws.security.WSPasswordCallback.DECRYPT;
 import static org.apache.ws.security.handler.WSHandlerConstants.DEC_PROP_REF_ID;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPT;
 import static org.mule.module.ws.security.WSCryptoUtils.createKeyStoreProperties;
-import org.mule.transport.ssl.api.TlsContextFactory;
-import org.mule.transport.ssl.api.TlsContextKeyStoreConfiguration;
+import org.mule.module.tls.api.TlsContextFactory;
+import org.mule.module.tls.api.TlsContextKeyStoreConfiguration;
 
 import java.util.Map;
 import java.util.Properties;
