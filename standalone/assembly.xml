@@ -122,8 +122,6 @@
                 <include>org.mule:mule-core</include>
                 <!-- Transports -->
                 <include>org.mule.transports:mule-transport-jms</include>
-                <include>org.mule.transports:mule-transport-ssl</include>
-                <include>org.mule.transports:mule-transport-tcp</include>
                 <include>org.mule.transports:mule-transport-vm</include>
                 <!-- Modules -->
                 <include>org.mule.modules:mule-module-launcher</include>
@@ -149,6 +147,8 @@
                 <include>org.mule.modules:mule-module-spring-config</include>
                 <include>org.mule.modules:mule-module-spring-extras</include>
                 <include>org.mule.modules:mule-module-spring-security</include>
+                <include>org.mule.modules:mule-module-sockets</include>
+                <include>org.mule.modules:mule-module-tls</include>
                 <include>org.mule.modules:mule-module-tomcat</include>
                 <include>org.mule.modules:mule-module-validation</include>
                 <include>org.mule.modules:mule-module-ws</include>
@@ -184,8 +184,6 @@
                 <exclude>org.mule.extensions:mule-extensions-all</exclude>
                 <exclude>org.mule.transports:mule-transports-all</exclude>
                 <exclude>org.mule.transports:mule-transport-jms</exclude>
-                <exclude>org.mule.transports:mule-transport-ssl</exclude>
-                <exclude>org.mule.transports:mule-transport-tcp</exclude>
                 <exclude>org.mule.transports:mule-transport-vm</exclude>
                 <exclude>org.mule.modules:mule-modules-all</exclude>
                 <exclude>org.mule.modules:mule-module-annotations</exclude>
@@ -212,6 +210,8 @@
                 <exclude>org.mule.modules:mule-module-spring-config</exclude>
                 <exclude>org.mule.modules:mule-module-spring-extras</exclude>
                 <exclude>org.mule.modules:mule-module-spring-security</exclude>
+                <exclude>org.mule.modules:mule-module-sockets</exclude>
+                <exclude>org.mule.modules:mule-module-tls</exclude>
                 <exclude>org.mule.modules:mule-module-tomcat</exclude>
                 <exclude>org.mule.modules:mule-module-validation</exclude>
                 <exclude>org.mule.modules:mule-module-ws</exclude>

@@ -147,6 +147,8 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-config-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-extras-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-security-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-sockets-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-tls-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tomcat-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-validation-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-ws-${productVersion}.jar
@@ -154,8 +156,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-008.jar
 /mule-standalone-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-jms-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-transport-ssl-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-transport-tcp-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-vm-${productVersion}.jar
 
 
