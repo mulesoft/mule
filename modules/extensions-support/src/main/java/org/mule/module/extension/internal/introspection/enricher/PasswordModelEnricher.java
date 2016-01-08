@@ -34,7 +34,7 @@ public final class PasswordModelEnricher extends AbstractAnnotatedModelEnricher
         DeclarationDescriptor descriptor = describingContext.getDeclarationDescriptor();
         Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
 
-        //TODO Refactor to use a Parameterizable interface to make this polymorphic
+        //TODO MULE-9083 Refactor to use a Parameterizable interface to make this polymorphic
         declaration.getConfigurations().forEach(parameterProvider ->
                                                         enrichParameters(() -> parameterProvider.getParameters()));
 
