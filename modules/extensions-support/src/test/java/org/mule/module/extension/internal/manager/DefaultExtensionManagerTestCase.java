@@ -33,6 +33,7 @@ import org.mule.extension.api.introspection.ExtensionDiscoverer;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.declaration.fluent.OperationExecutorFactory;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.OperationExecutor;
@@ -106,6 +107,9 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     private ConfigurationInstance<Object> extension1ConfigurationInstance = mock(ConfigurationInstance.class);
 
     @Mock
+    private OperationExecutorFactory executorFactory;
+
+    @Mock
     private OperationExecutor executor;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
@@ -158,7 +162,9 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         when(extension1ConfigurationProvider.getModel()).thenReturn(extension1ConfigurationModel);
         when(extension1ConfigurationProvider.getName()).thenReturn(EXTENSION1_CONFIG_INSTANCE_NAME);
 
-        when(extension1OperationModel.getExecutor()).thenReturn(executor);
+
+        when(extension1OperationModel.getExecutor()).thenReturn(executorFactory);
+        when(executorFactory.createExecutor()).thenReturn(executor);
 
         classLoader = getClass().getClassLoader();
         setDiscoverableExtensions(extensionModel1, extensionModel2, extensionModel3WithRepeatedName);

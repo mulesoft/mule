@@ -15,7 +15,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.api.introspection.DataType;
-import org.mule.module.extension.LifetimeInfo;
+import org.mule.module.extension.model.LifetimeInfo;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;

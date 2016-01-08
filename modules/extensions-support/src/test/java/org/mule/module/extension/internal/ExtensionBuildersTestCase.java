@@ -297,7 +297,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     {
         for (OperationModel operation : extensionModel.getOperationModels())
         {
-            assertThat(operation.getExecutor(), is(instanceOf(Interceptable.class)));
+            assertThat(operation.getExecutor().createExecutor(), is(instanceOf(Interceptable.class)));
         }
     }
 

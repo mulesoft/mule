@@ -8,19 +8,24 @@ package org.mule.util;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.util.ExceptionUtils.containsType;
+import static org.mule.util.ExceptionUtils.extractRootConnectionException;
 import static org.mule.util.ExceptionUtils.getDeepestOccurenceOfType;
 import static org.mule.util.ExceptionUtils.getFullStackTraceWithoutMessages;
 
+import org.mule.api.connection.ConnectionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.junit.Test;
 
@@ -101,5 +106,20 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase
             assertFalse(linesWithoutMessage[i].contains(mainMessage));
             assertFalse(linesWithoutMessage[i].contains(causeMessage));
         }
+    }
+
+
+    @Test
+    public void testExtractRootConnectionException()
+    {
+        final String errorMessage = "Error Message";
+        Exception withConnectionExceptionCause = new Exception(new ConnectionException(errorMessage, new ConnectionException(new NullPointerException())));
+        Optional<ConnectionException> connectionException = extractRootConnectionException(withConnectionExceptionCause);
+        assertThat(connectionException.isPresent(), is(true));
+        assertThat(connectionException.get().getMessage(), is(errorMessage));
+
+        Exception withoutConnectionException = new Exception(new NullPointerException());
+        Optional<ConnectionException> exception = extractRootConnectionException(withoutConnectionException);
+        assertThat(exception.isPresent(), is(false));
     }
 }

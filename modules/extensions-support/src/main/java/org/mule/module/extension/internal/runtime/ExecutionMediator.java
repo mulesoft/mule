@@ -32,5 +32,5 @@ public interface ExecutionMediator
      * @return the operation's result
      * @throws Exception if any exception is encountered
      */
-    Object execute(OperationExecutor executor, OperationContext context) throws Exception;
+    Object execute(OperationExecutor executor, OperationContext context) throws Throwable;
 }

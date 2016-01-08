@@ -9,12 +9,12 @@ package org.mule.module.extension.internal.introspection;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.mule.util.CollectionUtils.immutableList;
 import static org.mule.util.Preconditions.checkArgument;
-
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.exception.NoSuchConfigurationException;
 import org.mule.extension.api.exception.NoSuchOperationException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -39,6 +40,8 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
     private final Map<String, OperationModel> operations;
     private final List<ConnectionProviderModel> connectionProviders;
     private final String vendor;
+    private final Optional<ExceptionEnricherFactory> exceptionEnricherFactory;
+
 
     /**
      * Creates a new instance with the given state
@@ -51,6 +54,7 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
      * @param operationModels     a {@link List} with the extension's {@link OperationModel operationModels}
      * @param connectionProviders a {@link List} with the extension's {@link ConnectionProviderModel connection provider models}
      * @param modelProperties     A {@link Map} of custom properties which extend this model
+     * @param exceptionEnricherFactory    an Optional @{@link ExceptionEnricherFactory} that creates a concrete {@link org.mule.extension.api.introspection.ExceptionEnricher} instance
      * @throws IllegalArgumentException if {@code configurations} or {@link ParameterModel} are {@code null} or contain instances with non unique names, or if {@code name} is blank
      */
     protected ImmutableExtensionModel(String name,
@@ -60,13 +64,14 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
                                       List<ConfigurationModel> configurationModels,
                                       List<OperationModel> operationModels,
                                       List<ConnectionProviderModel> connectionProviders,
-                                      Map<String, Object> modelProperties)
+                                      Map<String, Object> modelProperties,
+                                      Optional<ExceptionEnricherFactory>  exceptionEnricherFactory)
     {
         super(name, description, modelProperties);
-
         this.configurations = toMap(configurationModels);
         this.operations = toMap(operationModels);
         this.connectionProviders = immutableList(connectionProviders);
+        this.exceptionEnricherFactory = exceptionEnricherFactory;
 
         checkArgument(!StringUtils.isBlank(version), "Version cannot be blank");
 
@@ -152,5 +157,11 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
     public String getVendor()
     {
         return vendor;
+    }
+
+    @Override
+    public Optional<ExceptionEnricherFactory> getExceptionEnricherFactory()
+    {
+        return exceptionEnricherFactory;
     }
 }

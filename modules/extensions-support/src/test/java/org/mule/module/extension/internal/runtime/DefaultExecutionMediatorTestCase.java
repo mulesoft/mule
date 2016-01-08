@@ -20,13 +20,16 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mule.extension.api.introspection.ExceptionEnricher;
 import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.extension.api.runtime.RetryRequest;
+import org.mule.module.extension.exception.HeisenbergException;
 import org.mule.module.extension.internal.runtime.config.MutableConfigurationStats;
+import org.mule.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -36,7 +39,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -47,6 +52,8 @@ import org.mockito.verification.VerificationMode;
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
 {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private OperationContext operationContext;
@@ -59,6 +66,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
 
     @Mock(extraInterfaces = Interceptable.class)
     private OperationExecutor operationExecutor;
+
+    @Mock
+    private OperationExecutor operationExceptionExecutor;
 
     @Mock
     private Interceptor configurationInterceptor1;
@@ -75,18 +85,24 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
     @Mock
     private Exception exception;
 
+    @Mock
+    private ExceptionEnricher exceptionEnricher;
+
     private InOrder inOrder;
     private List<Interceptor> orderedInterceptors;
 
-    private ExecutionMediator mediator = new DefaultExecutionMediator();
+    private ExecutionMediator mediator = new DefaultExecutionMediator(new NullExceptionEnricher());
     private final Object result = new Object();
+    private static final String ERROR = "Error";
 
     @Before
     public void before() throws Exception
     {
         when(configurationInstance.getStatistics()).thenReturn(configurationStats);
         when(operationExecutor.execute(operationContext)).thenReturn(result);
+        when(operationExceptionExecutor.execute(operationContext)).thenThrow(exception);
         when(operationContext.getConfiguration()).thenReturn(configurationInstance);
+        when(exceptionEnricher.enrichException(exception)).thenReturn(new HeisenbergException(ERROR));
 
         setInterceptors((Interceptable) configurationInstance, configurationInterceptor1, configurationInterceptor2);
         setInterceptors((Interceptable) operationExecutor, operationInterceptor1, operationInterceptor2);
@@ -94,7 +110,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void interceptorsInvokedOnSuccess() throws Exception
+    public void interceptorsInvokedOnSuccess() throws Throwable
     {
         Object result = mediator.execute(operationExecutor, operationContext);
 
@@ -106,7 +122,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void interceptorsInvokedOnError() throws Exception
+    public void interceptorsInvokedOnError() throws Throwable
     {
         stubException();
         assertException(e -> {
@@ -127,12 +143,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void decoratedException() throws Exception
+    public void decoratedException() throws Throwable
     {
         stubException();
         final Exception decoratedException = mock(Exception.class);
         when(configurationInterceptor2.onError(same(operationContext), any(RetryRequest.class), same(exception))).thenReturn(decoratedException);
-
         assertException(e -> {
             assertThat(e, is(sameInstance(decoratedException)));
             assertAfter(null);
@@ -140,7 +155,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void exceptionOnBefore() throws Exception
+    public void exceptionOnBefore() throws Throwable
     {
         stubExceptionOnBeforeInterceptor();
         assertException(e -> {
@@ -159,28 +174,36 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void configurationStatsOnSuccessfulOperation() throws Exception
+    public void configurationStatsOnSuccessfulOperation() throws Throwable
     {
         mediator.execute(operationExecutor, operationContext);
         assertStatistics();
     }
 
     @Test
-    public void configurationStatsOnFailedOperation() throws Exception
+    public void configurationStatsOnFailedOperation() throws Throwable
     {
         stubException();
         assertException(e -> assertStatistics());
     }
 
     @Test
-    public void configurationStatsOnFailedBeforeInterceptor() throws Exception
+    public void configurationStatsOnFailedBeforeInterceptor() throws Throwable
     {
         stubExceptionOnBeforeInterceptor();
         assertException(e -> assertStatistics());
     }
 
     @Test
-    public void retry() throws Exception
+    public void enrichThrownException() throws Throwable
+    {
+        expectedException.expect(HeisenbergException.class);
+        expectedException.expectMessage(ERROR);
+        new DefaultExecutionMediator(exceptionEnricher).execute(operationExceptionExecutor, operationContext);
+    }
+
+    @Test
+    public void retry() throws Throwable
     {
         stubException();
         Interceptor interceptor = mock(Interceptor.class);
@@ -211,7 +234,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleTestCase
         });
     }
 
-    private void assertException(Consumer<Exception> assertion)
+    private void assertException(Consumer<Throwable> assertion) throws Throwable
     {
         try
         {

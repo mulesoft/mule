@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.empty;
@@ -36,6 +37,7 @@ import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
@@ -43,18 +45,19 @@ import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.module.extension.ExtendedPersonalInfo;
-import org.mule.module.extension.HealthStatus;
 import org.mule.module.extension.HeisenbergConnection;
 import org.mule.module.extension.HeisenbergConnectionProvider;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
-import org.mule.module.extension.KnockeableDoor;
 import org.mule.module.extension.MoneyLaunderingOperation;
-import org.mule.module.extension.Ricin;
-import org.mule.module.extension.Weapon;
+import org.mule.module.extension.exception.CureCancerExceptionEnricher;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.module.extension.model.ExtendedPersonalInfo;
+import org.mule.module.extension.model.HealthStatus;
+import org.mule.module.extension.model.KnockeableDoor;
+import org.mule.module.extension.model.Ricin;
+import org.mule.module.extension.model.Weapon;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.CollectionUtils;
 
@@ -95,6 +98,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String KNOCK = "knock";
     private static final String KNOCK_MANY = "knockMany";
     private static final String CALL_SAUL = "callSaul";
+    private static final String CALL_GUS_FRING = "callGusFring";
+    private static final String CURE_CANCER = "cureCancer";
     private static final String EXTENSION_VERSION = MuleManifest.getProductVersion();
 
     @Before
@@ -197,7 +202,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     private void assertTestModuleOperations(Declaration declaration) throws Exception
     {
-        assertThat(declaration.getOperations(), hasSize(17));
+        assertThat(declaration.getOperations(), hasSize(19));
         assertOperation(declaration, SAY_MY_NAME_OPERATION, "");
         assertOperation(declaration, GET_ENEMY_OPERATION, "");
         assertOperation(declaration, KILL_OPERATION, "");
@@ -213,6 +218,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertOperation(declaration, INJECTED_EXTENSION_MANAGER, "");
         assertOperation(declaration, ALIAS, "");
         assertOperation(declaration, CALL_SAUL, "");
+        assertOperation(declaration, CALL_GUS_FRING, "");
 
         OperationDeclaration operation = getOperation(declaration, SAY_MY_NAME_OPERATION);
         assertThat(operation, is(notNullValue()));
@@ -276,6 +282,17 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         ConnectionTypeModelProperty connectionType = operation.getModelProperty(ConnectionTypeModelProperty.KEY);
         assertThat(connectionType, is(notNullValue()));
         assertThat(connectionType.getConnectionType(), equalTo(HeisenbergConnection.class));
+
+        operation = getOperation(declaration, CURE_CANCER);
+        assertThat(operation.getParameters(), is(empty()));
+        java.util.Optional<ExceptionEnricherFactory> exceptionEnricherFactory = operation.getExceptionEnricherFactory();
+        assertThat(exceptionEnricherFactory.isPresent(), is(true));
+        assertThat(exceptionEnricherFactory.get().createEnricher(), instanceOf(CureCancerExceptionEnricher.class));
+
+        operation = getOperation(declaration, CALL_GUS_FRING);
+        assertThat(operation.getParameters(), is(empty()));
+        java.util.Optional<ExceptionEnricherFactory> exceptionEnricherFactory2 = operation.getExceptionEnricherFactory();
+        assertThat(exceptionEnricherFactory2.isPresent(), is(false));
     }
 
     private void assertTestModuleConnectionProviders(Declaration declaration) throws Exception

@@ -18,10 +18,10 @@ import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 import org.mule.api.MuleEvent;
-import org.mule.module.extension.HealthStatus;
+import org.mule.module.extension.model.HealthStatus;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.KnockeableDoor;
-import org.mule.module.extension.Ricin;
+import org.mule.module.extension.model.KnockeableDoor;
+import org.mule.module.extension.model.Ricin;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
 import java.math.BigDecimal;

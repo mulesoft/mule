@@ -7,9 +7,12 @@
 package org.mule.util;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import org.mule.api.connection.ConnectionException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Optional;
 
 /**
  * Mule exception utilities.
@@ -78,6 +81,41 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
         }
 
         return builder.toString();
+    }
+
+
+
+    /**
+     * Introspects the {@link Throwable} to obtain the first
+     * Connection Exception cause if exists.
+     *
+     * This method handles recursive cause structures
+     * that might otherwise cause infinite loops. If the throwable parameter
+     * is a {@link ConnectionException} the same value will be returned.
+     * If the throwable parameter has a cause of itself,
+     * then an empty value will be returned.
+     *
+     * @param throwable the throwable to get the root cause for
+     * @return an Optional {@link ConnectionException} cause of the <code>Throwable</code>
+     */
+    @SuppressWarnings("unchecked")
+    public static Optional<ConnectionException> extractRootConnectionException(Throwable throwable)
+    {
+        if(throwable != null)
+        {
+            if (isConnectionException(throwable))
+            {
+                return Optional.of((ConnectionException) throwable);
+            }
+            Optional<? extends Throwable> connectionException = Arrays.stream(getThrowables(throwable)).filter(ExceptionUtils::isConnectionException).findFirst();
+            return (Optional<ConnectionException>) connectionException;
+        }
+        return Optional.empty();
+    }
+
+    private static boolean isConnectionException(Throwable throwable)
+    {
+        return throwable instanceof ConnectionException;
     }
 
 }

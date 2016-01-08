@@ -26,6 +26,7 @@ import org.mule.extension.annotation.api.Configurations;
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.ExtensionOf;
+import org.mule.extension.annotation.api.OnException;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.connector.Providers;
@@ -36,6 +37,7 @@ import org.mule.extension.annotation.api.param.display.Password;
 import org.mule.extension.annotation.api.param.display.Text;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDescriptor;
@@ -58,12 +60,14 @@ import org.mule.module.extension.internal.model.property.ImplementingMethodModel
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
+import org.mule.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
 import org.mule.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.CollectionUtils;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -113,8 +117,8 @@ public final class AnnotationsBasedDescriber implements Describer
                 .onVersion(getVersion(extension))
                 .fromVendor(extension.vendor())
                 .describedAs(extension.description())
+                .withExceptionEnricherFactory(getExceptionEnricherFactory(extensionType))
                 .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(extensionType));
-
 
         declareConfigurations(declaration, extensionType);
         declareOperations(declaration, extensionType);
@@ -174,6 +178,16 @@ public final class AnnotationsBasedDescriber implements Describer
         {
             ((HasModelProperties) descriptor).withModelProperty(ParameterGroupModelProperty.KEY, new ParameterGroupModelProperty(groups));
         }
+    }
+
+    private java.util.Optional<ExceptionEnricherFactory> getExceptionEnricherFactory(AnnotatedElement element)
+    {
+        OnException onExceptionAnnotation = element.getAnnotation(OnException.class);
+        if (onExceptionAnnotation != null)
+        {
+            return java.util.Optional.of(new DefaultExceptionEnricherFactory(onExceptionAnnotation.value()));
+        }
+        return java.util.Optional.empty();
     }
 
     private List<ParameterGroup> declareConfigurationParametersGroups(Class<?> annotatedType, WithParameters with)
@@ -263,7 +277,8 @@ public final class AnnotationsBasedDescriber implements Describer
             OperationDescriptor operation = declaration.withOperation(method.getName())
                     .withModelProperty(ImplementingMethodModelProperty.KEY, new ImplementingMethodModelProperty(method))
                     .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(actingClass, method))
-                    .whichReturns(IntrospectionUtils.getMethodReturnType(method));
+                    .whichReturns(IntrospectionUtils.getMethodReturnType(method))
+                    .withExceptionEnricherFactory(getExceptionEnricherFactory(method));
 
             declareOperationParameters(method, operation);
             calculateExtendedTypes(actingClass, method, operation);

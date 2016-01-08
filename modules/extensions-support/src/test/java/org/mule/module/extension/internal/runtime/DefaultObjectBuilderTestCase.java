@@ -14,8 +14,8 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getFiel
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.module.extension.ExtendedPersonalInfo;
-import org.mule.module.extension.LifetimeInfo;
+import org.mule.module.extension.model.ExtendedPersonalInfo;
+import org.mule.module.extension.model.LifetimeInfo;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;

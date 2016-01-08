@@ -4,9 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension;
+package org.mule.module.extension.model;
 
 import org.mule.extension.annotation.api.ParameterGroup;
+import org.mule.module.extension.model.LifetimeInfo;
+import org.mule.module.extension.model.PersonalInfo;
 
 public class ExtendedPersonalInfo extends PersonalInfo
 {
