@@ -128,7 +128,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-client-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-cxf-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-db-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-devkit-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-spring-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-support-${productVersion}-tests.jar
@@ -289,7 +288,6 @@
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-1.jar
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-1-xqj.jar
-/mule-standalone-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/snakeyaml-1.11.jar
 /mule-standalone-${productVersion}/lib/opt/spring-aop-4.1.6.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-beans-4.1.6.RELEASE.jar
