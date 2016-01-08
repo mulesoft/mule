@@ -22,7 +22,7 @@ import org.springframework.context.ApplicationContext;
  *
  * @since 3.7.0
  */
-public final class ContextExclusiveInjectorProcessor extends NoDevkitInjectorProcessor
+public final class ContextExclusiveInjectorProcessor extends SelectiveInjectorProcessor
 {
 
     private ApplicationContext applicationContext;
@@ -42,11 +42,6 @@ public final class ContextExclusiveInjectorProcessor extends NoDevkitInjectorPro
     @Override
     protected boolean shouldInject(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
     {
-        if (super.shouldInject(pvs, pds, bean, beanName))
-        {
-            return applicationContext.containsBean(beanName) || beanName.equals(bean.getClass().getName());
-        }
-
-        return false;
+        return applicationContext.containsBean(beanName) || beanName.equals(bean.getClass().getName());
     }
 }

@@ -51,11 +51,8 @@ If, in the above-listed resources, no-one else has initiated your improvement or
 
 ## Understanding the extension mechanisms
 
-Mule ESB has two different extension mechanisms for writing modules and connectors. Avoiding to add functionality to this project and rather use one of those mechanisms to extend Mule is probably the more favorable option.
-
-It is therefor important to understand those two extension mechanisms. The first and more intuitive mechanism for extensions is the [Anypoint Connector DevKit](https://developer.mulesoft.com/docs/display/current/Anypoint+Connector+DevKit), an annotation based framework for easy construction of extensions. The second choice is to extend mule through the [Extensions](https://developer.mulesoft.com/docs/display/current/Extending) mechanism.
-
-Now we should understand Mule and the enterprise integration domain. At the same time we should  know the different extension mechanisms of Mule.
+For creating new connectors and modules which augment the functionality in this distribution use the Mule SDK, which is conformed
+by the Extensions API, the Extensions Framework and the related tooling.
 
  
 # Setting up the development environment
