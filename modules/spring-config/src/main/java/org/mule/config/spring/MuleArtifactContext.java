@@ -8,10 +8,8 @@ package org.mule.config.spring;
 
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.util.Preconditions.checkArgument;
-import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-
 import org.mule.api.MuleContext;
 import org.mule.config.ConfigResource;
 import org.mule.config.spring.editors.MulePropertyEditorRegistrar;
@@ -19,7 +17,6 @@ import org.mule.config.spring.processors.AnnotatedTransformerObjectPostProcessor
 import org.mule.config.spring.processors.DiscardedOptionalBeanPostProcessor;
 import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
 import org.mule.config.spring.processors.LifecycleStatePostProcessor;
-import org.mule.config.spring.processors.NoDevkitInjectorProcessor;
 import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.registry.MuleRegistryHelper;
@@ -212,16 +209,10 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         return beanDefinitionReader;
     }
 
-    private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, Object source)
+    protected void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, Object source)
     {
         registerAnnotationConfigProcessor(registry, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME, ConfigurationClassPostProcessor.class, source);
         registerAnnotationConfigProcessor(registry, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME, RequiredAnnotationBeanPostProcessor.class, source);
-        registerInjectorProcessor(registry);
-    }
-
-    protected void registerInjectorProcessor(BeanDefinitionRegistry registry)
-    {
-        registerAnnotationConfigProcessor(registry, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME, NoDevkitInjectorProcessor.class, null);
     }
 
     private void registerAnnotationConfigProcessor(BeanDefinitionRegistry registry, String key, Class<?> type, Object source)
