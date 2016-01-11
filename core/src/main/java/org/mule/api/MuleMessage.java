@@ -462,4 +462,18 @@ public interface MuleMessage extends Serializable
      */
     void clearAttachments();
 
+
+    /**
+     * Gets the attributes associated with the MuleMessage.  The {@link Serializable} attributes object is specifc to
+     * the connector that was the source of the current message and is used for obtaining message properties or headers
+     * if applicable plus additional information that provides context for the current message such as file size, file
+     * name and last mofified date for FILE, and orgin ip address, query parameters etc. for HTTP.
+     * <p>
+     * If there are no attributes associated with the current message, for example if the source of the message was not
+     * a connector, then the attributes with be null.
+     *
+     * @return attributes associated with the message, or null if none exist.
+     */
+    Serializable getAttributes();
+
 }
