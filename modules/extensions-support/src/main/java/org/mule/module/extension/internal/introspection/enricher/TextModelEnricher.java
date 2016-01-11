@@ -6,19 +6,19 @@
  */
 package org.mule.module.extension.internal.introspection.enricher;
 
-import org.mule.extension.annotation.api.param.display.Password;
+import org.mule.extension.annotation.api.param.display.Text;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.extension.api.introspection.property.PasswordModelProperty;
-import org.mule.module.extension.internal.introspection.ImmutablePasswordModelProperty;
+import org.mule.extension.api.introspection.property.TextModelProperty;
+import org.mule.module.extension.internal.introspection.ImmutableTextModelProperty;
 
 import java.lang.annotation.Annotation;
 
 /**
- * Enriches a {@link ParameterDeclaration} with a model property which key is {@link PasswordModelProperty#KEY} and the value an instance of {@link PasswordModelProperty} when the associated field is annotated with {@link Password}.
+ * Enriches a {@link ParameterDeclaration} with a model property which key is {@link TextModelProperty#KEY} and the value an instance of {@link TextModelProperty} when the associated field is annotated with {@link Text}.
  *
  * @since 4.0
  */
-public final class PasswordModelEnricher extends AbstractAnnotatedParameterModelEnricher
+public final class TextModelEnricher extends AbstractAnnotatedParameterModelEnricher
 {
 
     /**
@@ -27,7 +27,7 @@ public final class PasswordModelEnricher extends AbstractAnnotatedParameterModel
     @Override
     protected Class<? extends Annotation> getAnnotationClass()
     {
-        return Password.class;
+        return Text.class;
     }
 
     /**
@@ -36,7 +36,7 @@ public final class PasswordModelEnricher extends AbstractAnnotatedParameterModel
     @Override
     protected String getModelPropertyKey(ParameterDeclaration parameterDeclaration)
     {
-        return PasswordModelProperty.KEY;
+        return TextModelProperty.KEY;
     }
 
     /**
@@ -45,6 +45,6 @@ public final class PasswordModelEnricher extends AbstractAnnotatedParameterModel
     @Override
     protected Object getModelProperty(ParameterDeclaration parameterDeclaration)
     {
-        return new ImmutablePasswordModelProperty();
+        return new ImmutableTextModelProperty();
     }
 }
