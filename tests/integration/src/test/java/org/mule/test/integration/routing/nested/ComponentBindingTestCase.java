@@ -32,19 +32,6 @@ public class ComponentBindingTestCase extends FunctionalTestCase
         internalTest("vm://");
     }
 
-    @Test
-    public void testJmsQueueBinding() throws Exception
-    {
-        internalTest("jms://");
-    }
-
-    @Test
-    @Ignore("MULE-6926: flaky test")
-    public void testJmsTopicBinding() throws Exception
-    {
-        internalTest("jms://topic:t");
-    }
-
     private void internalTest(String prefix) throws Exception
     {
         MuleClient client = muleContext.getClient();

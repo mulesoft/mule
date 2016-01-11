@@ -8,6 +8,7 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertThat;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -30,11 +31,11 @@ public class ExceptionStrategyFlowRefTestCase extends FunctionalTestCase
     @Test
     public void testExceptionInFlowCalledWithFlowRef() throws Exception
     {
+        runFlowExpectingException("vmExceptionHandlingBlock");
         LocalMuleClient client = muleContext.getClient();
-        client.send("vm://inExceptionBlock", MESSAGE, null, TIMEOUT);
-        MuleMessage response = client.request("jms://dlq", TIMEOUT);
+        MuleMessage response = client.request("test://dlq", RECEIVE_TIMEOUT);
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.<String>getInboundProperty("mainEs"), Is.is("yes"));
-        assertThat(response.<String>getInboundProperty("flowRefEs"), Is.is("yes"));
+        assertThat(response.<String>getOutboundProperty("mainEs"), Is.is("yes"));
+        assertThat(response.<String>getOutboundProperty("flowRefEs"), Is.is("yes"));
     }
 }

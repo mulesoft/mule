@@ -85,42 +85,4 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + CUSTOM_RESPONSE + VM_RESPONSE)));
     }
 
-    @Test
-    public void testJmsRemoteSync() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://jmsSync", "request", null);
-        assertThat(message, notNullValue());
-
-        assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUT_IN_RESP)));
-    }
-
-    @Test
-    public void testJmsSyncOutboundEndpointResponseTransformer() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://jmsSyncOutboundEndpointResponseTransformer", "request", null);
-        assertThat(message, notNullValue());
-        assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND + CUSTOM_RESPONSE + VM_RESPONSE)));
-    }
-
-    @Test
-    public void testChainedRouterOutboundEndpointResponseTransformer() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://chainedRouterOutboundEndpointResponseTransformer", "request", null);
-        assertThat(message, notNullValue());
-        assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND
-                                                            + VM_OUT_IN_RESP + VM_OUT_IN_RESP + CUSTOM_RESPONSE + CUSTOM_RESPONSE + VM_RESPONSE)));
-    }
-
-    @Test
-    public void testNestedRouterOutboundEndpointResponseTransformer() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://nestedRouterOutboundEndpointResponseTransformer", "request", null);
-        assertThat(message, notNullValue());
-        assertThat(getPayloadAsString(message), is(equalTo("request" + VM_OUTBOUND + VM_INBOUND
-                                                            + VM_OUT_IN_RESP + CUSTOM_RESPONSE + CUSTOM_RESPONSE + VM_RESPONSE)));
-    }
 }

@@ -6,11 +6,13 @@
  */
 package org.mule.functional.junit4;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.fail;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.NonBlockingVoidMuleEvent;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
@@ -263,6 +265,33 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     protected MuleEvent runFlow(String flowName) throws Exception
     {
         return this.runFlow(flowName, (Object) null);
+    }
+
+    /**
+     * Runs the given flow with a default event expecting a failure.
+     * Will fail if there's no failure running the flow.
+     *
+     *
+     * @param flowName the name of the flow to be executed
+     * @return the message exception return by the flow
+     * @throws Exception
+     */
+    protected MessagingException runFlowExpectingException(String flowName) throws Exception
+    {
+        try
+        {
+            this.runFlow(flowName, (Object) null);
+        }
+        catch (MessagingException e)
+        {
+            return e;
+        }
+        catch (Exception e)
+        {
+            fail("Flow exception is not a MessagingException");
+        }
+        fail("Flow executed successfully. Expecting exception");
+        return null;
     }
 
     /**
