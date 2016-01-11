@@ -13,8 +13,8 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.extension.api.introspection.property.PasswordModelProperty;
-import org.mule.module.extension.internal.introspection.enricher.PasswordModelEnricher;
+import org.mule.extension.api.introspection.property.TextModelProperty;
+import org.mule.module.extension.internal.introspection.enricher.TextModelEnricher;
 import org.mule.module.extension.internal.runtime.connector.secure.SecureConnector;
 import org.mule.tck.size.SmallTest;
 
@@ -26,30 +26,35 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class PasswordModelPropertyTestCase extends AbstractAnnotatedParameterModelEnricherTest
+public class TextModelPropertyTestCase extends AbstractAnnotatedParameterModelEnricherTest
 {
 
     @Test
-    public void verifyPasswordPropertyIsPopulatedAtConfig() throws Exception
+    public void verifyTextPropertyIsPopulatedAtConfig() throws Exception
     {
         List<ParameterModel> parameterModels = getExtensionModel().getConfigurationModels().get(0).getParameterModels();
         assertThat(parameterModels, hasSize(2));
-        assertThat(parameterModels.get(1).getModelProperty(PasswordModelProperty.KEY), is(notNullValue()));
-        assertThat(parameterModels.get(0).getModelProperty(PasswordModelProperty.KEY), is(nullValue()));
+        assertThat(parameterModels.get(0).getModelProperty(TextModelProperty.KEY), is(notNullValue()));
+        assertThat(parameterModels.get(1).getModelProperty(TextModelProperty.KEY), is(nullValue()));
 
     }
 
     @Test
-    public void verifyPasswordPropertyIsPopulatedAtProvider() throws Exception
+    public void verifyTextPropertyIsPopulatedAtProvider() throws Exception
     {
-        assertThat(getExtensionModel().getConnectionProviders().get(0).getParameterModels().get(0).getModelProperty(PasswordModelProperty.KEY), is(notNullValue()));
+        List<ParameterModel> parameterModels = getExtensionModel().getConnectionProviders().get(0).getParameterModels();
+        assertThat(parameterModels.get(0).getModelProperty(TextModelProperty.KEY), is(nullValue()));
+        assertThat(parameterModels.get(1).getModelProperty(TextModelProperty.KEY), is(notNullValue()));
     }
 
 
     @Test
-    public void verifyPasswordPropertyIsPopulatedAtMethodParameter() throws Exception
+    public void verifyTextPropertyIsPopulatedAtMethodParameter() throws Exception
     {
-        assertThat(getExtensionModel().getOperationModels().get(0).getParameterModels().get(0).getModelProperty(PasswordModelProperty.KEY), is(notNullValue()));
+        List<ParameterModel> parameterModels = getExtensionModel().getOperationModels().get(0).getParameterModels();
+        assertThat(parameterModels, hasSize(2));
+        assertThat(parameterModels.get(0).getModelProperty(TextModelProperty.KEY), is(nullValue()));
+        assertThat(parameterModels.get(1).getModelProperty(TextModelProperty.KEY), is(notNullValue()));
     }
 
     @Override
@@ -61,6 +66,6 @@ public class PasswordModelPropertyTestCase extends AbstractAnnotatedParameterMod
     @Override
     protected ModelEnricher getModelEnricherUnderTest()
     {
-        return new PasswordModelEnricher();
+        return new TextModelEnricher();
     }
 }

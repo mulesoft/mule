@@ -32,6 +32,7 @@ import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.annotation.api.param.display.Password;
+import org.mule.extension.annotation.api.param.display.Text;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;
@@ -47,6 +48,7 @@ import org.mule.extension.api.introspection.declaration.fluent.ParameterDescript
 import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.extension.api.introspection.property.PasswordModelProperty;
+import org.mule.extension.api.introspection.property.TextModelProperty;
 import org.mule.module.extension.internal.model.property.ConfigTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
@@ -351,11 +353,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
                 parameter.describedAs(EMPTY).ofType(parsedParameter.getType());
                 addTypeRestrictions(parameter, parsedParameter);
-                Password passwordAnnotation = parsedParameter.getAnnotation(Password.class);
-                if (passwordAnnotation != null)
-                {
-                    parameter.withModelProperty(PasswordModelProperty.KEY, new ImmutablePasswordModelProperty());
-                }
+                addModelPropertiesToParameter(parsedParameter, parameter);
             }
 
             Connection connectionAnnotation = parsedParameter.getAnnotation(Connection.class);
@@ -369,6 +367,20 @@ public final class AnnotationsBasedDescriber implements Describer
             {
                 operation.withModelProperty(ConfigTypeModelProperty.KEY, new ConfigTypeModelProperty(parsedParameter.getType().getRawType()));
             }
+        }
+    }
+
+    private void addModelPropertiesToParameter(ParsedParameter parsedParameter, ParameterDescriptor parameter)
+    {
+        Password passwordAnnotation = parsedParameter.getAnnotation(Password.class);
+        if (passwordAnnotation != null)
+        {
+            parameter.withModelProperty(PasswordModelProperty.KEY, new ImmutablePasswordModelProperty());
+        }
+        Text textAnnotation = parsedParameter.getAnnotation(Text.class);
+        if (textAnnotation != null)
+        {
+            parameter.withModelProperty(TextModelProperty.KEY, new ImmutableTextModelProperty());
         }
     }
 

@@ -8,12 +8,13 @@ package org.mule.module.extension.internal.runtime.connector.secure;
 
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.param.display.Password;
+import org.mule.extension.annotation.api.param.display.Text;
 
 public class SecureOperations
 {
 
     @Operation
-    public String dummyOperation(@Password String secureParam)
+    public String dummyOperation(@Password String secureParam, @Text String longText)
     {
         return secureParam;
     }

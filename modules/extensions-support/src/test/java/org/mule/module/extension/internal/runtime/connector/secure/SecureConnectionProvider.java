@@ -12,6 +12,7 @@ import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.param.display.Password;
+import org.mule.extension.annotation.api.param.display.Text;
 
 public class SecureConnectionProvider implements ConnectionProvider<SecureConnector, Object>
 {
@@ -19,6 +20,10 @@ public class SecureConnectionProvider implements ConnectionProvider<SecureConnec
     @Parameter
     @Password
     private String providerPassword;
+
+    @Parameter
+    @Text
+    private String anotherLongText;
 
     @Override
     public Object connect(SecureConnector secureConnector) throws ConnectionException

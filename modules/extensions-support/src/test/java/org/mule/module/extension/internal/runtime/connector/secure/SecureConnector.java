@@ -12,6 +12,7 @@ import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.capability.Xml;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.display.Password;
+import org.mule.extension.annotation.api.param.display.Text;
 
 @Extension(name = "secure", description = "Secure Test connector")
 @Operations(SecureOperations.class)
@@ -21,6 +22,7 @@ public class SecureConnector
 {
 
     @Parameter
+    @Text
     private String plainStringField;
 
     @Parameter
