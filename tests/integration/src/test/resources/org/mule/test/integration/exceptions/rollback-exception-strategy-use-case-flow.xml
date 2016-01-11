@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:https="http://www.mulesoft.org/schema/mule/https"
@@ -12,7 +11,6 @@
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
@@ -23,9 +21,6 @@
     <http:listener-config name="listenerConfig1" host="localhost" port="${port1}"/>
     <http:listener-config name="listenerConfig2" host="localhost" port="${port2}"/>
 
-    <jms:activemq-connector name="activeMq" maxRedelivery="-1"/>
-    <jms:activemq-connector name="activeMqRedelivery" maxRedelivery="${maxRedelivery}"/>
-
 
     <flow name="alwaysRollback">
       <vm:inbound-endpoint path="in">
@@ -35,12 +30,6 @@
       <rollback-exception-strategy/>
     </flow>
 
-    <flow name="alwaysRollbackJmsNoTransaction" processingStrategy="synchronous">
-      <jms:inbound-endpoint queue="in" connector-ref="activeMq"/>
-      <test:component throwException="true"/>
-      <rollback-exception-strategy/>
-    </flow>
-    
     <flow name="rollbackWithComponent">
       <vm:inbound-endpoint path="in5">
           <vm:transaction action="ALWAYS_BEGIN"/>
@@ -71,33 +60,6 @@
 		        </script:component>
             </on-redelivery-attempts-exceeded>
         </rollback-exception-strategy>
-    </flow>
-
-    <flow name="redeliveryExhaustedTransactional">
-       <jms:inbound-endpoint queue="in2" connector-ref="activeMqRedelivery">
-          <jms:transaction action="ALWAYS_BEGIN"/>
-       </jms:inbound-endpoint>
-       <test:component throwException="true"/>
-       <rollback-exception-strategy>
-          <on-redelivery-attempts-exceeded>
-              <jms:jmsmessage-to-object-transformer/>
-              <append-string-transformer message=" consumed successfully"/>
-              <jms:outbound-endpoint queue="dlq" connector-ref="activeMqRedelivery">
-                  <jms:transaction action="ALWAYS_JOIN"/>
-              </jms:outbound-endpoint>
-          </on-redelivery-attempts-exceeded>
-       </rollback-exception-strategy>
-    </flow>
-
-    <flow name="redeliveryExhaustedNoTransaction">
-       <jms:inbound-endpoint queue="in3" connector-ref="activeMq"/>
-       <test:component throwException="true"/>
-       <rollback-exception-strategy maxRedeliveryAttempts="${maxRedelivery}">
-           <on-redelivery-attempts-exceeded>
-               <append-string-transformer message=" consumed successfully"/>
-               <jms:outbound-endpoint queue="dlq" connector-ref="activeMqRedelivery"/>
-           </on-redelivery-attempts-exceeded>
-       </rollback-exception-strategy>
     </flow>
 
     <flow name="httpRollbackOnly">

@@ -13,7 +13,6 @@
 
     <modules>
         <module>all-transports</module>
-        <module>jms</module>
         <module>vm</module>
     </modules>
 
