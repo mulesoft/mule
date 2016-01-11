@@ -9,31 +9,86 @@ package org.mule.transformer.types;
 
 import org.mule.api.transformer.DataType;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
- *  Maintains a value that has an associated {@link DataType}
+ * Maintains a value that has an associated {@link DataType}
  */
-public class TypedValue implements Serializable
+public class TypedValue<T> implements Serializable
 {
 
-    private final Object value;
+    private static final long serialVersionUID = -2533879516750283994L;
 
-    private final DataType<?> dataType;
+    private transient T value;
 
-    public TypedValue(Object value, DataType<?> dataType)
+    // TODO MULE-9279 Make 'final' once MuleMessage is immutable
+    // TODO MULE-9288 DataType should be immutable
+    private DataType<T> dataType;
+
+    public TypedValue(T value, DataType<T> dataType)
     {
         this.value = value;
-        this.dataType = dataType;
+        if (dataType == null)
+        {
+            this.dataType = DataTypeFactory.create((Class<T>) value.getClass());
+        }
+        else
+        {
+            this.dataType = dataType;
+        }
     }
 
+    // TODO MULE-9279 Add generics type once MuleMessage is immutable
     public DataType<?> getDataType()
     {
         return dataType;
     }
 
-    public Object getValue()
+    public T getValue()
     {
         return value;
     }
+
+    // TODO MULE-9279 Remove method once MuleMessage is immutable
+    protected void setDataType(DataType<T> dataType)
+    {
+        this.dataType = dataType;
+    }
+
+    // TODO MULE-9279 Remove method once MuleMessage is immutable
+    protected void setValue(T value)
+    {
+        this.value = value;
+    }
+
+    /**
+     * Performs serialization of the value.  The is external to #writeObject to allow it to be overriden in sub-classes.
+     */
+    protected void serializeValue(ObjectOutputStream out) throws Exception
+    {
+        out.writeObject(value);
+    }
+
+    /**
+     * Performs deserialization of the value.  The is external to #writeObject to allow it to be overriden in sub-classes.
+     */
+    protected void deserializeValue(ObjectInputStream out) throws Exception
+    {
+        value = (T) out.readObject();
+    }
+
+    private void writeObject(ObjectOutputStream out) throws Exception
+    {
+        out.defaultWriteObject();
+        serializeValue(out);
+    }
+
+    private void readObject(ObjectInputStream in) throws Exception
+    {
+        in.defaultReadObject();
+        deserializeValue(in);
+    }
+
 }

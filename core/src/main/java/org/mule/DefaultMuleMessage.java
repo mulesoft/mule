@@ -66,7 +66,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>DefaultMuleMessage</code> is a wrapper that contains a payload and properties
  * associated with the payload.
  */
-public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
+public class DefaultMuleMessage extends TypedValue implements MuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
 {
     private static final String NOT_SET = "<not set>";
 
@@ -80,7 +80,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private String id;
     private String rootId;
 
-    private transient Object payload;
     private transient Object originalPayload;
 
     /**
@@ -111,7 +110,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private transient AtomicReference<Thread> ownerThread = null;
     private transient AtomicBoolean mutable = null;
 
-    private DataType<?> dataType;
+    private Serializable attributes;
 
     private static DataType<?> getMessageDataType(MuleMessage previous, Object payload)
     {
@@ -134,6 +133,47 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         dataType.setEncoding(previous.getDataType().getEncoding());
 
         return dataType;
+    }
+
+    /**
+     * Creates a new message instance with the given value.  The data-type will be generated based on the Java
+     * type of the value provided.
+     *
+     * @param value  the value (or payload) of the message being created.
+     * @param <T> the type of the value
+     * */
+    public <T> DefaultMuleMessage(T value)
+    {
+        this(value, (DataType<T>) null);
+    }
+
+    /**
+     * Creates a new message instance with the given value and data type.
+     *
+     * @param value  the value (or payload) of the message being created.
+     * @param dataType the data type the describes the value.
+     * @param <T> the type of the value
+     */
+    public <T> DefaultMuleMessage(T value, DataType<T> dataType)
+    {
+        this(value, dataType, null);
+    }
+
+    /**
+     * Creates a new message instance with the given value, data type and attributes object
+     *
+     * @param value  the value (or payload) of the message being created.
+     * @param dataType the data type the describes the value.
+     * @param attributes a connector specific object that contains additional attributes related to the message value or
+     *                   it's source.
+     * @param <T> the type of the value
+     */
+    public <T> DefaultMuleMessage(T value, DataType<T> dataType, Serializable attributes)
+    {
+        super(value != null ? value : NullPayload.getInstance(), dataType);
+        id = UUID.getUUID();
+        rootId = id;
+        this.attributes = attributes;
     }
 
     public DefaultMuleMessage(MuleMessage message)
@@ -167,6 +207,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                               Map<String, Object> outboundProperties, Map<String, DataHandler> attachments,
                               MuleContext muleContext, DataType dataType)
     {
+        super(resolveValue(message), dataType);
         id =  UUID.getUUID();
         rootId = id;
 
@@ -174,13 +215,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
         if (message instanceof MuleMessage)
         {
-            MuleMessage muleMessage = (MuleMessage) message;
-            setPayload(muleMessage.getPayload(), dataType);
-            copyMessageProperties(muleMessage);
+            copyMessageProperties((MuleMessage) message);
         }
         else
         {
-            setPayload(message, dataType);
             if (muleContext.getConfiguration().isCacheMessageOriginalPayload())
             {
                 originalPayload = message;
@@ -198,6 +236,15 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         resetAccessControl();
     }
 
+    private static Object resolveValue(Object value)
+    {
+        if (value instanceof MuleMessage)
+        {
+            value = ((MuleMessage) value).getPayload();
+        }
+        return value != null ? value : NullPayload.getInstance();
+    }
+
     public DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext)
     {
         this(message, previous, muleContext, getMessageDataType(previous, message));
@@ -205,21 +252,17 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     public DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext, DataType<?> dataType)
     {
+        super(resolveValue(message), dataType.cloneDataType());
         id = previous.getUniqueId();
         rootId = previous.getMessageRootId();
         setMuleContext(muleContext);
 
-        DataType newDataType  = dataType.cloneDataType();
-
         if (message instanceof MuleMessage)
         {
-            MuleMessage payloadMessage = (MuleMessage) message;
-            setPayload(payloadMessage.getPayload(), newDataType);
-            copyMessageProperties(payloadMessage);
+            copyMessageProperties((MuleMessage) message);
         }
         else
         {
-            setPayload(message, newDataType);
             copyMessagePropertiesContext(previous);
         }
 
@@ -228,7 +271,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             originalPayload = previous.getPayload();
         }
 
-        if (this.dataType.getEncoding() == null)
+        if (getDataType().getEncoding() == null)
         {
             setEncoding(previous.getEncoding());
         }
@@ -450,18 +493,18 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         // updates dataType when encoding is updated using a property instead of using #setEncoding
         if (MuleProperties.MULE_ENCODING_PROPERTY.equals(key))
         {
-            dataType.setEncoding((String) value);
+            getDataType().setEncoding((String) value);
         }
         else if (MuleProperties.CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
         {
             try
             {
                 MimeType mimeType = new MimeType((String) value);
-                dataType.setMimeType(mimeType.getPrimaryType() + "/" + mimeType.getSubType());
+                getDataType().setMimeType(mimeType.getPrimaryType() + "/" + mimeType.getSubType());
                 String encoding = mimeType.getParameter("charset");
                 if (!StringUtils.isEmpty(encoding))
                 {
-                    dataType.setEncoding(encoding);
+                    getDataType().setEncoding(encoding);
                 }
             }
             catch (MimeTypeParseException e)
@@ -957,9 +1000,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(READ);
         String encoding = null;
-        if (dataType != null)
+        if (getDataType() != null)
         {
-            encoding = dataType.getEncoding();
+            encoding = getDataType().getEncoding();
             if (encoding != null)
             {
                 return encoding;
@@ -983,7 +1026,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void setEncoding(String encoding)
     {
         assertAccess(WRITE);
-        dataType.setEncoding(encoding);
+        getDataType().setEncoding(encoding);
     }
 
     /**
@@ -993,7 +1036,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void setMimeType(String mimeType)
     {
         assertAccess(WRITE);
-        dataType.setMimeType(mimeType);
+        getDataType().setMimeType(mimeType);
     }
 
     /**
@@ -1029,7 +1072,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         assertAccess(WRITE);
         properties.clearProperties(scope);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -1040,14 +1083,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         outboundAttachments.clear();
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
     public Object getPayload()
     {
-        return payload;
+        return getValue();
     }
 
     /**
@@ -1074,14 +1116,14 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         if (payload == null)
         {
-            this.payload = NullPayload.getInstance();
+            setValue(NullPayload.getInstance());
         }
         else
         {
-            this.payload = payload;
+            setValue(payload);
         }
 
-        this.dataType = dataType.cloneDataType();
+        setDataType(dataType.cloneDataType());
     }
 
     /**
@@ -1092,9 +1134,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
     }
 
-    void setDataType(DataType<?> dt)
+    @Override
+    protected void setDataType(DataType dt)
     {
-        dataType = dt.cloneDataType();
+        super.setDataType(dt.cloneDataType());
 
         setEncoding(dt == null ? null : dt.getEncoding());
         setMimeType(dt == null ? null : dt.getMimeType());
@@ -1284,18 +1327,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private void writeObject(ObjectOutputStream out) throws Exception
     {
         out.defaultWriteObject();
-        if (payload instanceof Serializable)
-        {
-            out.writeBoolean(true);
-            out.writeObject(payload);
-        }
-        else
-        {
-            out.writeBoolean(false);
-            byte[] serializablePayload = muleContext.getTransformationService().getPayloadAsBytes(this);
-            out.writeInt(serializablePayload.length);
-            new DataOutputStream(out).write(serializablePayload);
-        }
         out.writeObject(serializeAttachments(inboundAttachments));
         out.writeObject(serializeAttachments(outboundAttachments));
 
@@ -1322,6 +1353,40 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return toWrite;
     }
 
+    @Override
+    protected void serializeValue(ObjectOutputStream out) throws Exception
+    {
+        if (getValue() instanceof Serializable)
+        {
+            out.writeBoolean(true);
+            out.writeObject(getValue());
+        }
+        else
+        {
+            out.writeBoolean(false);
+            byte[] valueAsByteArray = muleContext.getTransformationService().getPayloadAsBytes(this);
+            out.writeInt(valueAsByteArray.length);
+            new DataOutputStream(out).write(valueAsByteArray);
+        }
+    }
+
+    @Override
+    protected void deserializeValue(ObjectInputStream in) throws Exception
+    {
+        boolean valueSerialized = in.readBoolean();
+        if (valueSerialized)
+        {
+            setValue(in.readObject());
+        }
+        else
+        {
+            int length = in.readInt();
+            byte[] valueAsByteArray = new byte[length];
+            new DataInputStream(in).readFully(valueAsByteArray);
+            setValue(valueAsByteArray);
+        }
+    }
+
     private Map<String, DataHandler> deserializeAttachments(Map<String, SerializedDataHandler> attachments) throws IOException
     {
         Map<String, DataHandler> toReturn;
@@ -1344,19 +1409,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         in.defaultReadObject();
-
-        boolean payloadWasSerialized = in.readBoolean();
-        if (payloadWasSerialized)
-        {
-            payload = in.readObject();
-        }
-        else
-        {
-            int payloadSize = in.readInt();
-            byte[] serializedPayload = new byte[payloadSize];
-            new DataInputStream(in).readFully(serializedPayload);
-            payload = serializedPayload;
-        }
         inboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>)in.readObject());
         outboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>)in.readObject());
     }
@@ -1384,12 +1436,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             this.outboundAttachments = new HashMap<String, DataHandler>();
         }
-    }
-
-    @Override
-    public DataType<?> getDataType()
-    {
-        return dataType;
     }
 
     @Override
@@ -1522,4 +1568,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return properties.getOrphanFlowVariables();
     }
 
+    @Override
+    public Serializable getAttributes()
+    {
+        return attributes;
+    }
 }
