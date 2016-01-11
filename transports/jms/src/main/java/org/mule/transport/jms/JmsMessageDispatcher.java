@@ -438,7 +438,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                         // TODO MULE-1409 this check will not work for ActiveMQ 4.x,
                         // as they have temp-queue://<destination> and temp-topic://<destination> URIs
                         // Extract to a custom resolver for ActiveMQ4.x
-                        // The code path can be exercised, e.g. by a LoanBrokerESBTestCase
+                        // The code path can be exercised, e.g. by a LoanBrokerMuleTestCase
                         String qtype = reply.substring(0, i);
                         replyToTopic = JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(qtype);
                         reply = reply.substring(i + 1);

@@ -1,6 +1,6 @@
 # Building Mule
 
-[Maven](http://maven.apache.org/) is the build automation tool used in Mule ESB. To modify or add to Mule source code, it's specially relevant to understand the hierarchy of maven projects that represent the Mule source code.  
+[Maven](http://maven.apache.org/) is the build automation tool used in Mule Runtime. To modify or add to Mule source code, it's specially relevant to understand the hierarchy of maven projects that represent the Mule source code.  
 
 To be able to build Mule you will need Maven among other things. Refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file to find the installation instructions and prerequisites necessary to build Mule.
 

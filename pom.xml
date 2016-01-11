@@ -14,12 +14,12 @@
     </organization>
 
     <!-- Project -->
-    <name>Mule ESB</name>
+    <name>Mule Runtime</name>
     <description>
         Mule is the world's most widely used open source Enterprise Service
-        Bus (ESB). Designed to support high-performance, multi-protocol transactions
-        between heterogeneous systems and services, Mule provides the basis for
-        service oriented architecture (SOA).
+        Bus (ESB) implementation. Designed to support high-performance,
+        multi-protocol transactions between heterogeneous systems and services,
+        Mule provides the basis for service oriented architecture (SOA).
     </description>
     <url>http://www.mulesoft.org</url>
     <inceptionYear>2003</inceptionYear>
@@ -29,12 +29,6 @@
             <url>http://www.mulesoft.com/CPAL</url>
         </license>
     </licenses>
-    <mailingLists>
-        <mailingList>
-            <name>developers</name>
-            <post>mule-esb@mulesoft.com</post>
-        </mailingList>
-    </mailingLists>
     <developers>
         <developer>
             <id>rrinaudo</id>
@@ -150,7 +144,6 @@
             instead a module artifact id is erroneously substituted.
          -->
         <productUrl>http://www.mulesoft.org</productUrl>
-        <dev.list>mule-esb@mulesoft.com</dev.list>
 
         <!--
              Use the name of an Eclipse Java execution environment, Eclipse will
@@ -1959,7 +1952,7 @@
                         <manifestEntries>
                             <More-Info>For more information go to ${productUrl}</More-Info>
                             <Support>Get commercial support: ${project.organization.url}/support</Support>
-                            <Description>Mule ESB and Integration Platform</Description>
+                            <Description>Mule Runtime and Integration Platform</Description>
                             <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
                             <Vendor-Url>${project.organization.url}</Vendor-Url>
                             <Product-Url>${productUrl}</Product-Url>
@@ -1967,7 +1960,6 @@
                             <!-- include repository revision from buildnumber plugin -->
                             <Build-Revision>${buildNumber}</Build-Revision>
                             <Build-Date>${timestamp}</Build-Date>
-                            <Dev-List-Email>${dev.list}</Dev-List-Email>
                             <Supported-Jdks>[1.7.0,1.9)</Supported-Jdks>
                             <Recommended-Jdks>[1.7.0_60,1.9)</Recommended-Jdks>
                         </manifestEntries>

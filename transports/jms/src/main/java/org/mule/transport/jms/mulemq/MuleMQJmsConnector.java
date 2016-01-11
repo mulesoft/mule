@@ -414,7 +414,7 @@ public class MuleMQJmsConnector extends JmsConnector
             // TODO : externalize strings
             StringBuilder msg = new StringBuilder("MuleMQJmsConnector.onException() received exception: ");
             msg.append(th.getMessage());
-            msg.append("If using Mule MQ in a cluster Mule ESB will reconnect automatically in a few seconds");
+            msg.append("If using Mule MQ in a cluster Mule Runtime will reconnect automatically in a few seconds");
             // Nothing to do here, log error and return
             logger.warn(msg.toString(),th);
         }
@@ -423,7 +423,7 @@ public class MuleMQJmsConnector extends JmsConnector
             // TODO : externalize strings
             StringBuilder msg = new StringBuilder("MuleMQJmsConnector.onException() received exception: ");
             msg.append(th.getMessage());
-            msg.append("If using Mule MQ in a cluster Mule ESB will reconnect automatically in a few seconds");
+            msg.append("If using Mule MQ in a cluster Mule Runtime will reconnect automatically in a few seconds");
             // Nothing to do here, log message and return
             logger.warn(msg.toString(),th);
         }

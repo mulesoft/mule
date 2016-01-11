@@ -58,7 +58,7 @@ public class UnixController extends Controller
         }
         else
         {
-            throw new MuleControllerException("Mule ESB is not running");
+            throw new MuleControllerException("Mule Runtime is not running");
         }
     }
 

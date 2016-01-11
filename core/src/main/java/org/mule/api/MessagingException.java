@@ -15,7 +15,6 @@ import org.mule.VoidMuleEvent;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
-import org.mule.config.MuleManifest;
 import org.mule.config.i18n.Message;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.WildcardFilter;
@@ -172,8 +171,7 @@ public class MessagingException extends MuleException
         }
         else
         {
-            buf.append("The current MuleMessage is null! Please report this to ").append(
-                MuleManifest.getDevListEmail());
+            buf.append("The current MuleMessage is null!");
             addInfo(PAYLOAD_INFO_KEY, NullPayload.getInstance().toString());
         }
 

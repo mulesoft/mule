@@ -575,7 +575,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
                         + "<soap:Body>"
                         + "<emp:addEmployee xmlns:emp=\"http://employee.example.mule.org/\">"
                         + "<emp:employee>"
-                        + "<emp:division>ESB</emp:division>"
+                        + "<emp:division>Runtime</emp:division>"
                         + "<emp:name>Pepe</emp:name>"
                         + "</emp:employee>"
                         + "</emp:addEmployee>"
@@ -594,7 +594,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
     {
         String body = "<emp:addEmployee xmlns:emp=\"http://employee.example.mule.org/\">"
                                  + "<emp:employee>"
-                                 + "<emp:division>ESB</emp:division>"
+                                 + "<emp:division>Runtime</emp:division>"
                                  + "<emp:name>Pepe</emp:name>"
                                  + "</emp:employee>"
                                  + "</emp:addEmployee>";
@@ -619,7 +619,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
                          + "<soap:Body>"
                          + "<emp:addEmployee xmlns:emp=\"http://employee.example.mule.org/\">"
                          + "<emp:employee>"
-                         + "<emp:division>ESB</emp:division>"
+                         + "<emp:division>Runtime</emp:division>"
                          + "<emp:name>Pepe</emp:name>"
                          + "</emp:employee>"
                          + "</emp:addEmployee>"

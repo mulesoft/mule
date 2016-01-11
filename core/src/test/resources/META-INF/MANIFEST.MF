@@ -12,8 +12,7 @@ Implementation-Vendor-Id: org.mule.patterns
 Implementation-Vendor: MuleSoft, Inc.
 Build-Date: 2012-Apr-13 16:46:57
 Build-Revision: 24242
-Description: Mule ESB and Integration Platform
-Dev-List-Email: mule-esb@mulesoft.com
+Description: Mule Runtime and Integration Platform
 License: CPAL v1.0 http://www.mulesoft.com/CPAL/
 More-Info: For more information go to http://www.mulesoft.org
 Product-Url: http://www.mulesoft.org

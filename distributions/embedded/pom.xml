@@ -64,12 +64,11 @@
                                 <manifestEntries>
                                     <More-Info>For more information go to ${productUrl}</More-Info>
                                     <Support>Get commercial support: ${project.organization.url}/support</Support>
-                                    <Description>Mule ESB and Integration Platform</Description>
+                                    <Description>Mule Runtime and Integration Platform</Description>
                                     <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
                                     <Vendor-Url>${project.organization.url}</Vendor-Url>
                                     <Product-Url>${productUrl}</Product-Url>
                                     <Build-Date>${timestamp}</Build-Date>
-                                    <Dev-List-Email>${dev.list}</Dev-List-Email>
                                     <Supported-Jdks>[1.7.0,1.8)</Supported-Jdks>
                                     <Recommended-Jdks>[1.7.0_60,1.8)</Recommended-Jdks>
                                 </manifestEntries>

@@ -21,7 +21,7 @@
 
 <strings>
     <str id="none"></str>
-    <str id="common.title">Mule ESB and Integration Platform</str>
+    <str id="common.title">Mule Runtime and Integration Platform</str>
     <str id="common.subtitle">JMX Management Console</str>
     <str id="common.tabs.serverview">Server view</str>
     <str id="common.tabs.mbeanview">MBean view</str>
@@ -34,7 +34,7 @@
     <str id="common.serverview.return">Return to server view</str>
     <str id="common.bottom.banner">Built using {0} HttpAdaptor</str>
     <str id="common.mbeanview.return">Return to MBean view</str>
-    <str id="common.logo">Mule ESB and Integration Platform</str>
+    <str id="common.logo">Mule Runtime and Integration Platform</str>
     <str id="common.logo.gif">logo.png</str>
     <str id="common.logo.width">100</str>
     <str id="common.logo.height">50</str>
