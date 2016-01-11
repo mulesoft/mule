@@ -10,6 +10,7 @@ import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import org.mule.AbstractAnnotatedObject;
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -64,6 +65,7 @@ import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.processor.IdempotentRedeliveryPolicy;
 import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
+import org.mule.retry.async.AsynchronousRetryTemplate;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.session.SerializeAndEncodeSessionHandler;
 import org.mule.transaction.TransactionCoordination;
@@ -143,6 +145,8 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     private static final long SCHEDULER_FORCED_SHUTDOWN_TIMEOUT = 5000l;
 
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
+    public static final String DEFAULT_CONTEXT_START_TIMEOUT = "15000";
+    public static final String MULE_CONTEXT_START_TIMEOUT_SYSTEM_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "contextStartTimeout";
 
     /**
      * logger used by this class
@@ -500,11 +504,32 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
                             {
                                 receiver.start();
                             }
+                            else if (retryPolicyTemplate instanceof AsynchronousRetryTemplate)
+                            {
+                                //we must be running on a different thread
+                                String timeout = System.getProperty(MULE_CONTEXT_START_TIMEOUT_SYSTEM_PROPERTY, DEFAULT_CONTEXT_START_TIMEOUT);
+                                if(!muleContext.waitUntilStarted(Integer.valueOf(timeout)))
+                                {
+                                    String errorMessage = "Timeout waiting for mule context to be completely started.";
+                                    logger.error(errorMessage);
+                                    errors.add(new DefaultMuleException(errorMessage));
+                                }
+                                else
+                                {
+                                    receiver.start();
+                                }
+                            }
                         }
                         catch (MuleException e)
                         {
                             logger.error(e);
                             errors.add(e);
+                        }
+                        catch (InterruptedException e)
+                        {
+                            Thread.currentThread().interrupt();
+                            logger.error(e);
+                            errors.add(new DefaultMuleException(e));
                         }
 
                         if (!errors.isEmpty())
