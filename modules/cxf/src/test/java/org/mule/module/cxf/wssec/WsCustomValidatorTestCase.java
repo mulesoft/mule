@@ -6,27 +6,25 @@
  */
 package org.mule.module.cxf.wssec;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Map;
 
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class WsCustomValidatorTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
     protected String getConfigFile()
@@ -38,9 +36,7 @@ public class WsCustomValidatorTestCase extends FunctionalTestCase
     public void testSuccessfulAuthentication() throws Exception
     {
         ClientPasswordCallback.setPassword("secret");
-        MuleMessage request = new DefaultMuleMessage("me", (Map<String,Object>)null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("vm://greetMe", request);
+        MuleMessage received = runFlow("cxfClient", getTestMuleMessage("me")).getMessage();
 
         assertNotNull(received);
         assertEquals("Hello me", getPayloadAsString(received));
@@ -51,13 +47,8 @@ public class WsCustomValidatorTestCase extends FunctionalTestCase
     public void testFailAuthentication() throws Exception
     {
         ClientPasswordCallback.setPassword("wrongPassword");
-        MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("vm://greetMe", request);
-
-        assertNotNull(received);
-        assertNotNull(received.getExceptionPayload());
-        assertTrue(received.getExceptionPayload().getException().getCause() instanceof SOAPFaultException);
-        assertTrue(((SOAPFaultException) received.getExceptionPayload().getException().getCause()).getMessage().contains("The security token could not be authenticated"));
+        expectedException.expectCause(instanceOf(SOAPFaultException.class));
+        expectedException.expectMessage("The security token could not be authenticated");
+        runFlow("cxfClient", getTestMuleMessage("hello"));
     }
 }

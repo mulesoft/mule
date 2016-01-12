@@ -59,8 +59,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
     @Test
     public void testCxfClient() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
-        MuleMessage received = muleContext.getClient().send("vm://helloClient", request);
+        MuleMessage received = runFlow("helloServiceClient", getTestMuleMessage("hello")).getMessage();
         Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
     }
 
@@ -86,8 +85,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
     @Test
     public void testCxfSimpleClient() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
-        MuleMessage received = muleContext.getClient().send("vm://helloClient", request);
+        MuleMessage received = runFlow("helloServiceClient", getTestMuleMessage("hello")).getMessage();
         Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
     }
 

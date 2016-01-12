@@ -10,7 +10,6 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -37,9 +36,7 @@ public class CxfSoapJmsTestCase extends FunctionalTestCase
     @Test
     public void processesSoapJmsMessage() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send("vm://testInput", SAMPLE_REQUEST, null);
+        MuleMessage response = runFlow("dispatcher", getTestMuleMessage(SAMPLE_REQUEST)).getMessage();
 
         assertNotNull("Got a null response", response);
         assertTrue("Got wrong response", getPayloadAsString(response).contains("ns2:sayHiResponse"));

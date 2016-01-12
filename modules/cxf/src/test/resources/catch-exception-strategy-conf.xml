@@ -67,7 +67,6 @@
     </flow>
 
     <flow name="FlowWithClientAndSOAPFaultCatchException" processingStrategy="synchronous">
-        <inbound-endpoint address="vm://testClientSOAPFaultCatchException" exchange-pattern="request-response"/>
         <cxf:jaxws-client serviceClass="org.mule.module.cxf.TestServiceFault" operation="sayHi"/>
         <http:request path="helloFault" config-ref="requestConfig"/>
         <catch-exception-strategy>
@@ -76,7 +75,6 @@
     </flow>
 
     <flow name="FlowWithClientAndSOAPFaultCatchExceptionRedirect" processingStrategy="synchronous">
-        <inbound-endpoint address="vm://testClientSOAPFaultCatchExceptionRedirect" exchange-pattern="request-response"/>
         <cxf:jaxws-client serviceClass="org.mule.module.cxf.TestServiceFault" operation="sayHi"/>
         <http:request path="helloFault" method="POST" config-ref="requestConfig"/>
         <catch-exception-strategy>
@@ -93,7 +91,6 @@
     </flow>
 
     <flow name="FlowWithClientAndTransformerExceptionCatchException" processingStrategy="synchronous">
-        <inbound-endpoint address="vm://testClientTransformerExceptionCatchException" exchange-pattern="request-response"/>
         <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorld" operation="sayHi"/>
         <http:request path="hello" method="POST" config-ref="requestConfig"/>
         <object-to-string-transformer/>

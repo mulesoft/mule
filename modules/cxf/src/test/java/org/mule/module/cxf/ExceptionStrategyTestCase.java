@@ -6,13 +6,13 @@
  */
 package org.mule.module.cxf;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -24,11 +24,10 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
-import org.mule.transport.NullPayload;
 
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -37,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.cxf.interceptor.Fault;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class ExceptionStrategyTestCase extends FunctionalTestCase
 {
@@ -67,7 +67,8 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
-
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
     protected String getConfigFile()
@@ -118,25 +119,17 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testClientWithTransformerExceptionDefaultException() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testClientTransformerExceptionDefaultException", request);
-        assertNotNull(response);
-        assertTrue(response.getExceptionPayload() != null);
-        assertTrue(response.getExceptionPayload().getException() instanceof MessagingException);
-        assertTrue(response.getPayload() instanceof NullPayload);
+        expectedException.expect(MessagingException.class);
+        expectedException.expectMessage("Failed to build message");
+        runFlow("FlowWithClientAndTransformerExceptionDefaultException", getTestMuleMessage("hello"));
     }
 
     @Test
     public void testClientWithFaultDefaultException() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testClientWithFaultDefaultException", request);
-        assertNotNull(response);
-        assertTrue(response.getExceptionPayload() != null);
-        assertTrue(response.getExceptionPayload().getException().getCause() instanceof Fault);
-        assertTrue(response.getPayload() instanceof NullPayload);
+        expectedException.expectCause(instanceOf(Fault.class));
+        expectedException.expectMessage("Failed to route event");
+        runFlow("FlowWithClientWithFaultDefaultException", getTestMuleMessage("hello"));
     }
 
     @Test

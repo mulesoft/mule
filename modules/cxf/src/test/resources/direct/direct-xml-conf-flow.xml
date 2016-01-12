@@ -18,20 +18,17 @@
       returnClass="org.w3c.dom.Document"/>
 
     <flow name="echoService">
-        <inbound-endpoint address="vm://echo" exchange-pattern="request-response">
-            <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent"/>
-        </inbound-endpoint>
+        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent"/>
         <echo-component/>
     </flow>
 
     <flow name="echoWithTransform">
-        <inbound-endpoint address="vm://echoWithTransform" exchange-pattern="request-response"/>
         <message-filter>
             <mule-xml:jaxen-filter pattern="/s:Envelope/s:Body/@foo" expectedValue="bar">
                 <mule-xml:namespace prefix="s" uri="http://schemas.xmlsoap.org/soap/envelope/"/>
             </mule-xml:jaxen-filter>
         </message-filter>
-        <outbound-endpoint address="vm://echo" exchange-pattern="request-response"/>
+        <flow-ref name="echoService"/>
     </flow> 
  
 </mule>

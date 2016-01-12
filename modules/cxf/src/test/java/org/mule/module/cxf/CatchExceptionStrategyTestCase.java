@@ -66,7 +66,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "catch-exception-strategy-flow-conf-httpn.xml";
+        return "catch-exception-strategy-conf.xml";
     }
 
     @Test
@@ -105,9 +105,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testClientWithSOAPFaultCatchException() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testClientSOAPFaultCatchException", request);
+        MuleMessage response = runFlow("FlowWithClientAndSOAPFaultCatchException", getTestMuleMessage("hello")).getMessage();
         assertNotNull(response);
         assertTrue(response.getExceptionPayload() == null);
     }
@@ -115,9 +113,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testClientWithSOAPFaultCatchExceptionRedirect() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testClientSOAPFaultCatchExceptionRedirect", request);
+        MuleMessage response = runFlow("FlowWithClientAndSOAPFaultCatchExceptionRedirect", getTestMuleMessage("TEST")).getMessage();
         assertNotNull(response);
         assertTrue(getPayloadAsString(response).contains("TEST"));
         assertTrue(response.getExceptionPayload() == null);
@@ -126,9 +122,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testClientWithTransformerExceptionCatchException() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testClientTransformerExceptionCatchException", request);
+        MuleMessage response = runFlow("FlowWithClientAndTransformerExceptionCatchException", getTestMuleMessage("hello")).getMessage();
         assertNotNull(response);
         assertTrue(getPayloadAsString(response).contains(" Anonymous"));
     }

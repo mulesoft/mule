@@ -17,8 +17,6 @@
     <http:request-config name="requestConfig" host="localhost" port="${port1}" />
 
     <flow name="cxfClient">
-        <inbound-endpoint address="vm://greetMe" exchange-pattern="request-response"/>
-
         <cxf:jaxws-client clientClass="org.apache.hello_world_soap_http.SOAPService" port="SoapPort"
                           wsdlLocation="classpath:/wsdl/hello_world.wsdl" operation="greetMe">
             <cxf:ws-security>
@@ -51,7 +49,6 @@
     </flow>
 
     <flow name="cxfClientSigned">
-        <inbound-endpoint address="vm://greetMeSigned" exchange-pattern="request-response"/>
         <cxf:jaxws-client clientClass="org.apache.hello_world_soap_http.SOAPService" port="SoapPort"
                           wsdlLocation="classpath:/wsdl/hello_world.wsdl" operation="greetMe">
             <cxf:ws-security>
