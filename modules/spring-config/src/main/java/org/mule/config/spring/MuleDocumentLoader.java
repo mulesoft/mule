@@ -8,11 +8,13 @@ package org.mule.config.spring;
 
 import static org.mule.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
 
+import org.mule.config.spring.parsers.DefaultXmlMetadataAnnotations;
 import org.mule.config.spring.parsers.XmlMetadataAnnotations;
 import org.mule.util.SystemUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.LinkedHashMap;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -52,7 +54,18 @@ final class MuleDocumentLoader implements DocumentLoader
         }
     };
 
-    private DocumentLoader defaultLoader = new DefaultDocumentLoader();
+    private final DocumentLoader defaultLoader = new DefaultDocumentLoader();
+    private final XmlMetadataAnnotationsFactory metadataFactory;
+
+    public MuleDocumentLoader(XmlMetadataAnnotationsFactory metadataFactory)
+    {
+        this.metadataFactory = metadataFactory;
+    }
+
+    public MuleDocumentLoader()
+    {
+        this.metadataFactory = new DefaultXmlMetadataFactory();
+    }
 
     /**
      * Load the {@link Document} at the supplied {@link InputSource} using the standard JAXP-configured XML parser.
@@ -79,8 +92,19 @@ final class MuleDocumentLoader implements DocumentLoader
         SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
         SAXParser saxParser = saxParserFactory.newSAXParser();
         XMLReader documentReader = saxParser.getXMLReader();
-        documentReader.setContentHandler(new XmlMetadataAnnotator(doc));
+        documentReader.setContentHandler(new XmlMetadataAnnotator(doc, metadataFactory));
         return documentReader;
+    }
+
+    private final class DefaultXmlMetadataFactory implements XmlMetadataAnnotationsFactory
+    {
+        @Override
+        public XmlMetadataAnnotations create(Locator locator)
+        {
+            DefaultXmlMetadataAnnotations annotations = new DefaultXmlMetadataAnnotations();
+            annotations.setLineNumber(locator.getLineNumber());
+            return annotations;
+        }
     }
 
     /**
@@ -90,11 +114,13 @@ final class MuleDocumentLoader implements DocumentLoader
     {
         private Locator locator;
         private DomWalkerElement walker;
+        private XmlMetadataAnnotationsFactory metadataFactory;
         private Stack<XmlMetadataAnnotations> annotationsStack = new Stack<>();
 
-        private XmlMetadataAnnotator(Document doc)
+        private XmlMetadataAnnotator(Document doc, XmlMetadataAnnotationsFactory metadataFactory)
         {
             this.walker = new DomWalkerElement(doc.getDocumentElement());
+            this.metadataFactory = metadataFactory;
         }
 
         @Override
@@ -109,8 +135,13 @@ final class MuleDocumentLoader implements DocumentLoader
         {
             walker = walker.walkIn();
 
-            XmlMetadataAnnotations metadataBuilder = new XmlMetadataAnnotations(locator.getLineNumber());
-            metadataBuilder.appendElementStart(qName, atts);
+            XmlMetadataAnnotations metadataBuilder = metadataFactory.create(locator);
+            LinkedHashMap<String, String> attsMap = new LinkedHashMap<>();
+            for (int i = 0; i < atts.getLength(); ++i)
+            {
+                attsMap.put(atts.getQName(i), atts.getValue(i));
+            }
+            metadataBuilder.appendElementStart(qName, attsMap);
             annotationsStack.push(metadataBuilder);
         }
 
