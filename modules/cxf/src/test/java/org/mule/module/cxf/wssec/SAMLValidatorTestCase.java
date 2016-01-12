@@ -8,15 +8,11 @@ package org.mule.module.cxf.wssec;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -40,9 +36,7 @@ public class SAMLValidatorTestCase extends FunctionalTestCase
     @Test
     public void testSAMLUnsignedAssertion() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("me", (Map<String, Object>) null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("vm://greetMe", request);
+        MuleMessage received = runFlow("cxfClient", getTestMuleMessage("me")).getMessage();
 
         assertNotNull(received);
         assertEquals("Hello me", getPayloadAsString(received));
@@ -51,9 +45,7 @@ public class SAMLValidatorTestCase extends FunctionalTestCase
     @Test
     public void testSAMLSignedAssertion() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("me", (Map<String, Object>) null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("vm://greetMeSigned", request);
+        MuleMessage received = runFlow("cxfClientSigned", getTestMuleMessage("me")).getMessage();
 
         assertNotNull(received);
         assertEquals("Hello me", getPayloadAsString(received));

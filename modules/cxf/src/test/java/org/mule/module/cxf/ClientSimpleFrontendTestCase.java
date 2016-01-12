@@ -9,7 +9,6 @@ package org.mule.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -30,8 +29,7 @@ public class ClientSimpleFrontendTestCase extends FunctionalTestCase
     @Test
     public void testEchoWsdl() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://test", "some payload", null);
+        MuleMessage result = runFlow("PopulateData", getTestMuleMessage("some payload")).getMessage();
 
         assertNotNull(result.getPayload());
         assertEquals("Hello some payload", result.getPayload());

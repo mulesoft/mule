@@ -15,7 +15,6 @@
     <http:request-config name="requestConfig" host="localhost" port="${port1}"/>
 
     <flow name="cxfClient">
-        <inbound-endpoint address="vm://greetMe" exchange-pattern="request-response"/>
         <set-variable variableName="originalPayload" value="#[message.payload]" />
         <cxf:jaxws-client clientClass="org.apache.hello_world_soap_http.SOAPService" port="SoapPort"
                           wsdlLocation="classpath:/wsdl/hello_world.wsdl" operation="greetMe">

@@ -8,15 +8,11 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
-
-import java.util.Map;
 
 import javax.xml.ws.Holder;
 
@@ -37,9 +33,7 @@ public class HolderTestCase extends FunctionalTestCase
     @Test
     public void testClientEchoHolder() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("vm://echoClient", request);
+        MuleMessage received = runFlow("echoServiceClient", getTestMuleMessage(TEST_PAYLOAD)).getMessage();
         assertNotNull(received);
         Object[] payload = (Object[])received.getPayload();
         assertEquals("one-response", payload[0]);
@@ -51,9 +45,7 @@ public class HolderTestCase extends FunctionalTestCase
     @Test
     public void testClientProxyEchoHolder() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("vm://echoClientProxy", request);
+        MuleMessage received = runFlow("echoServiceClientProxy", getTestMuleMessage(TEST_PAYLOAD)).getMessage();
         assertNotNull(received);
         Object[] payload = (Object[])received.getPayload();
         assertEquals("one-response", payload[0]);
@@ -64,9 +56,7 @@ public class HolderTestCase extends FunctionalTestCase
     @Test
     public void testClientEcho2Holder() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("vm://echo2Client", request);
+        MuleMessage received = runFlow("echo2ServiceClient", getTestMuleMessage(TEST_PAYLOAD)).getMessage();
         assertNotNull(received);
         Object[] payload = (Object[])received.getPayload();
         assertEquals("one-response", payload[0]);
@@ -77,9 +67,7 @@ public class HolderTestCase extends FunctionalTestCase
     @Test
     public void testClientProxyEcho2Holder() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("vm://echo2ClientProxy", request);
+        MuleMessage received = runFlow("echo2ServiceClientProxy", getTestMuleMessage(TEST_PAYLOAD)).getMessage();
         assertNotNull(received);
         Object[] payload = (Object[])received.getPayload();
         assertEquals("one-response", payload[0]);
@@ -89,9 +77,7 @@ public class HolderTestCase extends FunctionalTestCase
     @Test
     public void testClientEcho3Holder() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("vm://echo3Client", request);
+        MuleMessage received = runFlow("echo3ServiceClient", getTestMuleMessage(TEST_PAYLOAD)).getMessage();
         assertNotNull(received);
         Object[] payload = (Object[])received.getPayload();
         assertEquals(null, payload[0]);
@@ -101,9 +87,7 @@ public class HolderTestCase extends FunctionalTestCase
     @Test
     public void testClientProxyEcho3Holder() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage received = client.send("vm://echo3ClientProxy", request);
+        MuleMessage received = runFlow("echo3ServiceClientProxy", getTestMuleMessage(TEST_PAYLOAD)).getMessage();
         assertNotNull(received);
         Object[] payload = (Object[])received.getPayload();
         assertEquals(null, payload[0]);

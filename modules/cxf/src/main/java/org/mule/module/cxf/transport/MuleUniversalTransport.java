@@ -48,7 +48,6 @@ public class MuleUniversalTransport extends AbstractTransportFactory
         PREFIXES.add("http://");
         PREFIXES.add("https://");
         PREFIXES.add("jms://");
-        PREFIXES.add("vm://");
         PREFIXES.add("tcp://");
     }
 

@@ -40,12 +40,10 @@
             <add-message-property key="FOO"
                                   value="#[header:INBOUND:FOO]" />
         </message-properties-transformer>
-        <outbound-endpoint address="vm://test"
-                           exchange-pattern="request-response" />
+        <flow-ref name="testService"/>
     </flow>
 
     <flow name="testService">
-        <inbound-endpoint address="vm://test" exchange-pattern="request-response"/>
         <test:component appendString=" Received"/>
     </flow>
 </mule>
