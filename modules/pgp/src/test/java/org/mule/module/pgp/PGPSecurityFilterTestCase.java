@@ -6,8 +6,8 @@
  */
 package org.mule.module.pgp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -21,7 +21,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class PGPSecurityFilterTestCase extends FunctionalTestCase
 {
@@ -49,9 +50,9 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         byte[] msg = loadEncryptedMessage();
         Map<String, Object> props = createMessageProperties();
 
-        client.dispatch("vm://echo", new String(msg), props);
+        runFlowAsync("echo", getTestEvent(new DefaultMuleMessage(new String(msg), props, muleContext)));
 
-        MuleMessage message = client.request("vm://output", RECEIVE_TIMEOUT);
+        MuleMessage message = client.request("test://output", RECEIVE_TIMEOUT);
         assertEquals("This is a test message.\r\nThis is another line.\r\n", getPayloadAsString(message));
     }
 
@@ -59,9 +60,9 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
     public void testAuthenticationNotAuthorised() throws Exception
     {
         Map<String, Object> props = createMessageProperties();
-        MuleMessage reply = muleContext.getClient().send("vm://echo", "An unsigned message", props);
-        assertNotNull(reply.getExceptionPayload());
-        ExceptionPayload excPayload = reply.getExceptionPayload();
+        MuleMessage replyMessage = runFlow("echo", getTestEvent(new DefaultMuleMessage("An unsigned message", props, muleContext))).getMessage();
+        assertNotNull(replyMessage.getExceptionPayload());
+        ExceptionPayload excPayload = replyMessage.getExceptionPayload();
         assertEquals(MESSAGE_EXCEPTION, excPayload.getMessage());
     }
 

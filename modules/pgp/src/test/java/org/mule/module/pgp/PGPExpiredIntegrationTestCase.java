@@ -37,9 +37,9 @@ public class PGPExpiredIntegrationTestCase extends FunctionalTestCase
         String payload = "this is a super simple test. Hope it works!!!";
         MuleClient client = muleContext.getClient();
 
-        client.dispatch("vm://in", new DefaultMuleMessage(payload, muleContext));
+        runFlowAsync("pgpEncryptProcessor", payload);
 
-        MuleMessage message = client.request("vm://out", 5000);
+        MuleMessage message = client.request("test://out", 5000);
         assertNull(message);
 
         assertNotNull("flow's exception strategy should have caught an exception", exceptionFromFlow);
