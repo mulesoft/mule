@@ -11,12 +11,11 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.source.MessageSource;
-import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.PropertyScope;
 import org.mule.execution.FlowProcessingPhaseTemplate;
 import org.mule.execution.MessageProcessContext;
@@ -35,6 +34,7 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
 
     private final MessageReceiverType messageReceiver;
     private Object rawMessage;
+    private MuleEvent muleEvent;
 
     public AbstractTransportMessageProcessTemplate(MessageReceiverType messageReceiver)
     {
@@ -43,8 +43,20 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
 
     public MuleEvent getMuleEvent() throws MuleException
     {
-        MuleMessage messageFromSource = createMessageFromSource(getOriginalMessage());
-        return createEventFromMuleMessage(messageFromSource);
+        if (muleEvent == null)
+        {
+            MuleMessage messageFromSource = createMessageFromSource(getOriginalMessage());
+            muleEvent = createEventFromMuleMessage(messageFromSource);
+        }
+        else
+        {
+            MuleMessage message = muleEvent.getMessage();
+            if(message instanceof ThreadSafeAccess)
+            {
+                ((ThreadSafeAccess)message).resetAccessControl();
+            }
+        }
+        return muleEvent;
     }
 
     @Override
