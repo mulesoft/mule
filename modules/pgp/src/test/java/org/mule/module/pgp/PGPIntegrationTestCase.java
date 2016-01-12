@@ -7,7 +7,6 @@
 package org.mule.module.pgp;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -27,10 +26,9 @@ public class PGPIntegrationTestCase extends FunctionalTestCase
     public void testEncryptDecrypt() throws Exception
     {
         String payload = "this is a super simple test. Hope it works!!!";
+        runFlow("pgpEncryptProcessor", payload);
         MuleClient client = muleContext.getClient();
-
-        client.send("vm://in", new DefaultMuleMessage(payload, muleContext));
-        MuleMessage message = client.request("vm://out", 5000);
+        MuleMessage message = client.request("test://out", 5000);
         assertEquals(payload, getPayloadAsString(message));
     }
 }
