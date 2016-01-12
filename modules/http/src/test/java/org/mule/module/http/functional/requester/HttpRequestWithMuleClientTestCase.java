@@ -15,6 +15,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.module.http.api.requester.HttpStreamingType.NEVER;
+import static org.mule.transport.NullPayload.NULL_PAYLOAD_STRING;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -67,7 +69,7 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
     {
         muleContext.getClient().dispatch(getUrl(), getTestMuleMessage());
         final MuleMessage vmMessage = getMessageReceivedByFlow();
-        assertThat(vmMessage.getPayload(), Is.<Object>is(NullPayload.getInstance().toString()));
+        assertThat(vmMessage.getPayload(), Is.<Object> is(NULL_PAYLOAD_STRING));
     }
 
     @Ignore("See MULE-8049")
@@ -113,7 +115,7 @@ public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
     public void sendEnableRedirect() throws Exception
     {
         final MuleMessage response = muleContext.getClient().send(getRedirectUrl(), getTestMuleMessage(NullPayload.class), newOptions().enableFollowsRedirect().build());
-        assertThat(response.getPayloadAsString(), is(NullPayload.getInstance().toString()));
+        assertThat(response.getPayloadAsString(), is(NULL_PAYLOAD_STRING));
     }
 
     @Test

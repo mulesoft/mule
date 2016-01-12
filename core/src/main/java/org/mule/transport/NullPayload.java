@@ -20,6 +20,8 @@ public final class NullPayload implements Serializable
      */
     private static final long serialVersionUID = 3530905899811505080L;
 
+    public static final String NULL_PAYLOAD_STRING = "{NullPayload}";
+
     private static class NullPayloadHolder
     {
         private static final NullPayload instance = new NullPayload();
@@ -43,7 +45,8 @@ public final class NullPayload implements Serializable
     @Override
     public boolean equals(Object obj)
     {
-        return obj instanceof NullPayload;
+        // This is for MEL expressions that check for null.
+        return obj == null || obj instanceof NullPayload;
     }
 
     @Override
@@ -55,7 +58,8 @@ public final class NullPayload implements Serializable
     @Override
     public String toString()
     {
-        return "{NullPayload}";
+        // This is for MEL expressions that check for emptiness.
+        return "";
     }
 
 }

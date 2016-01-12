@@ -13,6 +13,7 @@ import org.mule.api.expression.ExpressionManager;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.TypedValue;
+import org.mule.transport.NullPayload;
 
 import java.util.regex.Pattern;
 
@@ -157,6 +158,16 @@ public class AttributeEvaluator
     {
         final Object value = resolveValue(event);
         if (value == null)
+        {
+            return null;
+        }
+        return value.toString();
+    }
+
+    public String resolveNullableStringValue(MuleEvent event)
+    {
+        final Object value = resolveValue(event);
+        if (value == null || value instanceof NullPayload)
         {
             return null;
         }
