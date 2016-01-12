@@ -49,7 +49,9 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             // MULE-8551 Still need to add support for non-blocking components in excepton strategies.
             if(nonBlocking)
             {
-                event = new DefaultMuleEvent(event.getMessage(), event, true);
+                // Make event synchronous and clear replyToHandler.  Given only HTTP supports non-blocking this will not
+                // affect other replyToHandlers like for example JmsReplyToHandler.
+                event = new DefaultMuleEvent(event, event.getFlowConstruct(), null, null, true);
             }
             event = beforeRouting(exception, event);
             event = route(event, exception);
