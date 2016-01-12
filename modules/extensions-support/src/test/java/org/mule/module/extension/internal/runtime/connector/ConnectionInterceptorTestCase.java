@@ -40,7 +40,7 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase
 {
 
     private static final String USER = "john";
-    private static final String PASSWORD = "Doe";
+    private static final String PASSWORD = "doe";
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private OperationContextAdapter operationContext;

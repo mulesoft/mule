@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
-import static org.mule.module.extension.internal.introspection.ImplicitObjectUtils.buildImplicitResolverSet;
-import static org.mule.module.extension.internal.introspection.ImplicitObjectUtils.getFirstImplicit;
+import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.buildImplicitResolverSet;
+import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;

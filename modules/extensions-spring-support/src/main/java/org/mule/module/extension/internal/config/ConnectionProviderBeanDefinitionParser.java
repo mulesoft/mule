@@ -6,14 +6,17 @@
  */
 package org.mule.module.extension.internal.config;
 
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_POOLING_PROFILE_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_NAMESPACE;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.parseConnectionProviderName;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.toElementDescriptorBeanDefinition;
 import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
+
 import org.mule.api.config.PoolingProfile;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -25,7 +28,7 @@ import org.w3c.dom.Element;
  * Implementation of {@link BaseExtensionBeanDefinitionParser} capable of parsing instances
  * which are compliant with the model defined in a {@link #providerModel}. The outcome of
  * this parser will be a {@link ConnectionProviderModel}.
- * <p>
+ * <p/>
  * It supports simple attributes, pojos, lists/sets of simple attributes, list/sets of beans,
  * and maps of simple attributes.
  *
@@ -34,6 +37,7 @@ import org.w3c.dom.Element;
 final class ConnectionProviderBeanDefinitionParser extends BaseExtensionBeanDefinitionParser
 {
 
+    private static final String POOLING_PROFILE = "poolingProfile";
     private final ConnectionProviderModel providerModel;
 
     public ConnectionProviderBeanDefinitionParser(ConnectionProviderModel providerModel)
@@ -49,15 +53,19 @@ final class ConnectionProviderBeanDefinitionParser extends BaseExtensionBeanDefi
         {
             parseConnectionProviderName(element, builder);
         }
-
         builder.addConstructorArgValue(providerModel);
         builder.addConstructorArgValue(toElementDescriptorBeanDefinition(element));
 
+        //TODO MULE-9266: IT SHOULD HAVE A DEFAULT VALUE
+        if (StringUtils.isNotEmpty(element.getAttribute(DISABLE_VALIDATION)))
+        {
+            builder.addPropertyValue(DISABLE_VALIDATION, element.getAttribute(DISABLE_VALIDATION));
+        }
         for (Element poolingProfileElement : DomUtils.getChildElements(element))
         {
             if (poolingProfileElement.getSchemaTypeInfo().isDerivedFrom(MULE_NAMESPACE, MULE_ABSTRACT_POOLING_PROFILE_TYPE.getLocalPart(), DERIVATION_EXTENSION))
             {
-                builder.addPropertyValue("poolingProfile", getPoolingProfileParser().parse(poolingProfileElement, parserContext));
+                builder.addPropertyValue(POOLING_PROFILE, getPoolingProfileParser().parse(poolingProfileElement, parserContext));
                 break;
             }
         }

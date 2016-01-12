@@ -11,6 +11,7 @@ import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.api.connection.PoolingListener;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.param.display.Password;
@@ -65,6 +66,13 @@ public final class FtpConnectionProvider implements ConnectionProvider<FtpConnec
     public void disconnect(FtpFileSystem ftpFileSystem)
     {
         ftpFileSystem.disconnect();
+    }
+
+    //TODO: MULE-9291 Add the proper connection validation
+    @Override
+    public ConnectionValidationResult validate(FtpFileSystem ftpFileSystem)
+    {
+        return ConnectionValidationResult.success();
     }
 
     /**

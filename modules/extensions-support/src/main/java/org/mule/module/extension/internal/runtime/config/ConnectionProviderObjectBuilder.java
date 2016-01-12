@@ -10,7 +10,9 @@ import org.mule.api.MuleException;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.internal.connection.CachedConnectionProviderWrapper;
 import org.mule.internal.connection.PooledConnectionProviderWrapper;
+import org.mule.module.extension.internal.model.property.ConnectionHandlingTypeModelProperty;
 import org.mule.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -26,6 +28,7 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
 
     private final ConnectionProviderModel providerModel;
     private final PoolingProfile poolingProfile;
+    private boolean disableValidation;
 
     /**
      * Creates a new instances which produces instances based on the given {@code providerModel} and
@@ -36,24 +39,37 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
      */
     public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet)
     {
-        this(providerModel, resolverSet, null);
+        this(providerModel, resolverSet, null, false);
     }
 
-    public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet, PoolingProfile poolingProfile)
+    public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet, PoolingProfile poolingProfile, boolean disableValidation)
     {
         super(providerModel.getConnectionProviderFactory().getObjectType(), providerModel, resolverSet);
         this.providerModel = providerModel;
         this.poolingProfile = poolingProfile;
+        this.disableValidation = disableValidation;
     }
 
     @Override
     public ConnectionProvider build(ResolverSetResult result) throws MuleException
     {
         ConnectionProvider provider = super.build(result);
-        if (poolingProfile != null)
+
+        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
+
+        if (connectionHandlingType != null)
         {
-            provider = new PooledConnectionProviderWrapper(provider, poolingProfile);
+            if (connectionHandlingType.isPooled())
+            {
+                provider = new PooledConnectionProviderWrapper(provider, poolingProfile, disableValidation);
+            }
+
+            if (connectionHandlingType.isCached())
+            {
+                provider = new CachedConnectionProviderWrapper(provider, disableValidation);
+            }
         }
+
 
         return provider;
     }

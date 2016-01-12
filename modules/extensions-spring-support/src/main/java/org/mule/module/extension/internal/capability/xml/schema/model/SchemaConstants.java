@@ -67,4 +67,5 @@ public final class SchemaConstants
     public static final String UNBOUNDED = "unbounded";
     public static final String ATTRIBUTE_NAME_NAME = "name";
     public static final String XSD_EXTENSION = ".xsd";
+    public static final String DISABLE_VALIDATION = "disableValidation";
 }
