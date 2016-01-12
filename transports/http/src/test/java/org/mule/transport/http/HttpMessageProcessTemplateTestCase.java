@@ -9,8 +9,10 @@ package org.mule.transport.http;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +20,7 @@ import org.junit.runner.RunWith;
 
 import org.mockito.Answers;
 import org.mockito.Mock;
+
 import org.mockito.runners.MockitoJUnitRunner;
 
 import org.mule.DefaultMuleMessage;
@@ -135,6 +138,15 @@ public class HttpMessageProcessTemplateTestCase
         assertThat(retMessage.getPayload(), is(notNullValue()));
         assertThat(retMessage.<String>getInboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS), is(equalTo(CLIENT_ADDRESS)));
         assertThat(retMessage.<String>getInboundProperty(MuleProperties.MULE_PROXY_ADDRESS), is(equalTo(PROXY_2_ADDRESS)));
+    }
+
+    @Test
+    public void getMuleEventCachesEvent() throws Exception
+    {
+        HttpMessageProcessTemplate template = new HttpMessageProcessTemplate(messageReceiver, httpServerConnection);
+        template.getMuleEvent();
+        template.getMuleEvent();
+        verify(messageReceiver, times(1)).createMuleMessage(any(), anyString());
     }
 
 }

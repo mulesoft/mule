@@ -6,11 +6,7 @@
  */
 package org.mule.transport;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
+import org.mule.api.*;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.WorkManager;
@@ -35,6 +31,7 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
 
     private final MessageReceiverType messageReceiver;
     private Object rawMessage;
+    private MuleEvent muleEvent;
 
     public AbstractTransportMessageProcessTemplate(MessageReceiverType messageReceiver)
     {
@@ -43,8 +40,20 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
 
     public MuleEvent getMuleEvent() throws MuleException
     {
-        MuleMessage messageFromSource = createMessageFromSource(getOriginalMessage());
-        return createEventFromMuleMessage(messageFromSource);
+        if (muleEvent == null)
+        {
+            MuleMessage messageFromSource = createMessageFromSource(getOriginalMessage());
+            muleEvent = createEventFromMuleMessage(messageFromSource);
+        }
+        else
+        {
+            MuleMessage message = muleEvent.getMessage();
+            if(message instanceof ThreadSafeAccess)
+            {
+                ((ThreadSafeAccess)message).resetAccessControl();
+            }
+        }
+        return muleEvent;
     }
 
     @Override
