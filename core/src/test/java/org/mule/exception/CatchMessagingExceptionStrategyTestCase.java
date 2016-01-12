@@ -7,6 +7,8 @@
 package org.mule.exception;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -14,26 +16,32 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.apache.commons.lang.RandomStringUtils;
-
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.util.StreamCloserService;
+import org.mule.construct.Flow;
+import org.mule.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.tck.MuleTestUtils;
+import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.SensingNullReplyToHandler;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.transaction.TransactionCoordination;
 
-import org.hamcrest.core.Is;
+import java.util.Collections;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +53,7 @@ import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CatchMessagingExceptionStrategyTestCase
+public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContextTestCase
 {
 
     private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
@@ -135,6 +143,33 @@ public class CatchMessagingExceptionStrategyTestCase
         when(mockMuleEvent.getMessage().toString()).thenThrow(new RuntimeException("MuleMessage.toString() should not be called"));
 
         MuleEvent exceptionHandlingResult = exceptionHandlingResult = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
+    }
+
+    @Test
+    public void fallbackToBlocking() throws Exception
+    {
+        SensingNullMessageProcessor sensingNullMessageProcessor = new SensingNullMessageProcessor();
+        catchMessagingExceptionStrategy.setMessageProcessors(Collections.<MessageProcessor>singletonList(sensingNullMessageProcessor));
+        catchMessagingExceptionStrategy.initialise();
+
+        MuleEvent nonBlockingEvent = createNonBlockingTestEvent();
+        MuleEvent exceptionHandlingResult = catchMessagingExceptionStrategy.handleException(mockException, nonBlockingEvent);
+
+        assertThat(sensingNullMessageProcessor.event, is(notNullValue()));
+        assertThat(sensingNullMessageProcessor.event.isAllowNonBlocking(), is(false));
+        assertThat(sensingNullMessageProcessor.event.getReplyToHandler(), is(nullValue()));
+
+        assertThat(exceptionHandlingResult.isAllowNonBlocking(), is(false));
+        assertThat(exceptionHandlingResult.getReplyToHandler(), is(nullValue()));
+    }
+
+    private MuleEvent createNonBlockingTestEvent() throws Exception
+    {
+        Flow flow = MuleTestUtils.getTestFlow(muleContext);
+        flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
+        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, muleContext),
+                                    MessageExchangePattern.REQUEST_RESPONSE,
+                                    new SensingNullReplyToHandler(), flow);
     }
 
     private MessageProcessor createChagingEventMessageProcessor(final MuleEvent lastEventCreated)
