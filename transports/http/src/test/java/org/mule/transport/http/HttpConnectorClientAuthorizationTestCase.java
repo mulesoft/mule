@@ -6,6 +6,27 @@
  */
 package org.mule.transport.http;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.security.Credentials;
+import org.mule.endpoint.MuleEndpointURI;
+import org.mule.security.MuleCredentials;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.util.StringUtils;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -15,24 +36,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.security.Credentials;
-import org.mule.api.transport.Connector;
-import org.mule.endpoint.MuleEndpointURI;
-import org.mule.security.MuleCredentials;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.StringUtils;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContextTestCase
@@ -105,6 +108,31 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
         connector.setupClientAuthorization(mockMuleEvent, mockHttpMethod, mockHttpClient, mockImmutableEndpoint);
 
         verify(mockHttpMethod, atLeast(1)).addRequestHeader(eq(HttpConstants.HEADER_AUTHORIZATION), anyString());
+    }
+
+    /**
+     * If both UserInfo and credentials are present, UserInfo takes precedence.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testWithCredentialsAndUserInfo() throws Exception
+    {
+        Credentials credentials = new MuleCredentials(CREDENTIALS_USER, CREDENTIALS_PASSWORD.toCharArray());
+        URI uri = new URI(URI_WITH_CREDENTIALS);
+
+        when(mockMuleEvent.getCredentials()).thenReturn(credentials);
+        when(mockMuleEvent.getMessageSourceURI()).thenReturn(uri);
+        when(mockMuleEvent.getMessage()).thenReturn(message);
+
+        when(mockImmutableEndpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION)).thenReturn(null);
+        when(mockImmutableEndpoint.getEncoding()).thenReturn(encoding);
+        when(mockImmutableEndpoint.getEndpointURI()).thenReturn(new MuleEndpointURI(URI_WITH_CREDENTIALS, muleContext));
+
+        connector.setupClientAuthorization(mockMuleEvent, mockHttpMethod, mockHttpClient, mockImmutableEndpoint);
+
+        verify(mockHttpMethod, atLeast(1)).addRequestHeader(eq(HttpConstants.HEADER_AUTHORIZATION), anyString());
+        verify(mockHttpClient.getState(), never()).setCredentials(isA(AuthScope.class), isA(org.apache.commons.httpclient.Credentials.class));
     }
 
     @Test
