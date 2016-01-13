@@ -34,7 +34,6 @@
     </flow>
 
     <flow name="cxfMP">
-        <vm:inbound-endpoint path="in-cxf" exchange-pattern="request-response"/>
         <cxf:jaxws-service port="80" serviceClass="org.mule.context.notification.CxfSimpleService"
                            enableMuleSoapHeaders="false"/>
         <logger message="check1"/>
