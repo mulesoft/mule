@@ -15,12 +15,9 @@ import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
 import org.mule.module.xml.filters.IsXmlFilter;
-import org.mule.module.xml.filters.JXPathFilter;
-import org.mule.module.xml.filters.JaxenFilter;
 import org.mule.module.xml.filters.SchemaValidationFilter;
 import org.mule.module.xml.filters.XPathFilter;
 import org.mule.module.xml.transformer.DomDocumentToXml;
-import org.mule.module.xml.transformer.JXPathExtractor;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XPathExtractor;
 import org.mule.module.xml.transformer.XQueryTransformer;
@@ -37,11 +34,6 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
     @Override
     public void init()
     {
-        //Deprecated
-        registerDeprecatedBeanDefinitionParser("jxpath-filter",new FilterDefinitionParser(JXPathFilter.class), "Use an expression-filter for filtering based in a Java Object or the xpath-filter in the case of an XML document");
-        registerDeprecatedBeanDefinitionParser("jaxen-filter", new FilterDefinitionParser(JaxenFilter.class), "Use xpath-filter instead");
-        registerDeprecatedBeanDefinitionParser("jxpath-extractor-transformer", new TransformerMessageProcessorDefinitionParser(JXPathExtractor.class), "Use MEL for extracting information out of a Java Object or the xpath3() MEL function in the case of an XML document");
-
         //Filters
 
         registerBeanDefinitionParser("is-xml-filter", new FilterDefinitionParser(IsXmlFilter.class));

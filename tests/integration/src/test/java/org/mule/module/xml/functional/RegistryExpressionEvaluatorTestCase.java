@@ -69,29 +69,6 @@ public class RegistryExpressionEvaluatorTestCase extends FunctionalTestCase
         o = eval.evaluate("bowlToBasket.returnClass.xname", message);
     }
 
-    @Test
-    public void testGlobalEndpointRegistryLookupWithProperties() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
-        RegistryExpressionEvaluator eval = new RegistryExpressionEvaluator();
-        eval.setMuleContext(muleContext);
-        Object o = eval.evaluate("myendpoint.toString", message);
-        assertNotNull(o);
-        assertTrue(o instanceof String);
-        assertEquals("test://foo", o);
-
-        //This doesn't work yet
-//        o = eval.evaluate("myendpoint.properties", message);
-//        assertNotNull(o);
-//        assertTrue(o instanceof Map);
-//        assertEquals(2, ((Map)o).size());
-//
-//        o = eval.evaluate("myendpoint.properties.foo", message);
-//        assertNotNull(o);
-//        assertEquals("foo-value", o);
-
-    }
-
     @Test(expected = ExpressionRuntimeException.class)
     public void testLookUpbyType() throws Exception
     {

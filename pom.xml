@@ -177,7 +177,6 @@
         <commonsDbUtilsVersion>1.2</commonsDbUtilsVersion>
         <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
         <commonsIoVersion>2.4</commonsIoVersion>
-        <commonsJxpathVersion>1.3</commonsJxpathVersion>
         <commonsLangVersion>2.4</commonsLangVersion>
         <commonsNetVersion>3.3</commonsNetVersion>
         <!-- TODO There is a more modern version of cryptix available:
@@ -238,7 +237,7 @@
         <rhinoVersion>1.7R4</rhinoVersion>
         <rhinoJsr223Version>1.1</rhinoJsr223Version>
         <saajVersion>1.3</saajVersion>
-        <saxonVersion>9.6.0-1</saxonVersion>
+        <saxonVersion>9.7.0-1</saxonVersion>
         <slf4jVersion>1.7.7</slf4jVersion>
         <springOsgiVersion>1.0.2</springOsgiVersion>
         <springVersion>4.1.6.RELEASE</springVersion>
@@ -556,7 +555,7 @@
             <dependency>
                 <groupId>xmlunit</groupId>
                 <artifactId>xmlunit</artifactId>
-                <version>1.5</version>
+                <version>1.6</version>
                 <exclusions>
                     <exclusion>
                         <groupId>xml-apis</groupId>
@@ -837,58 +836,6 @@
                     <exclusion>
                         <groupId>commons-lang</groupId>
                         <artifactId>commons-lang</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>commons-jxpath</groupId>
-                <artifactId>commons-jxpath</artifactId>
-                <version>${commonsJxpathVersion}</version>
-                <exclusions>
-                    <!-- we want newer beanutils via core -->
-                    <exclusion>
-                        <groupId>commons-beanutils</groupId>
-                        <artifactId>commons-beanutils</artifactId>
-                    </exclusion>
-                    <!-- we like slf4j -->
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <!-- no XML -->
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
-                    <!-- totally outdated and wrong too -->
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xerces</artifactId>
-                    </exclusion>
-                    <!-- not required; likely a m1 POM conversion bug -->
-                    <exclusion>
-                        <groupId>ant</groupId>
-                        <artifactId>ant-optional</artifactId>
-                    </exclusion>
-                    <!-- exclude older jdom-b9 -->
-                    <exclusion>
-                        <groupId>jdom</groupId>
-                        <artifactId>jdom</artifactId>
-                    </exclusion>
-                    <!-- exclude older Servlet 2.2 spec jar -->
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                    <!-- exclude older Servlet 2.2 spec jar -->
-                    <exclusion>
-                        <groupId>servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                    <!-- not required either -->
-                    <exclusion>
-                        <groupId>junit</groupId>
-                        <artifactId>junit</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

@@ -25,12 +25,4 @@
         </not-filter>
     </flow>
 
-    <flow name="filter xml for content">
-        <mxml:jxpath-filter pattern="/mule:mule/mule:model/mule:service[2]/@name"
-                            expectedValue="filter xml for content">
-            <mxml:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
-            <mxml:namespace prefix="mule" uri="http://www.mulesoft.org/schema/mule/core"/>
-        </mxml:jxpath-filter>
-    </flow>
-
 </mule>

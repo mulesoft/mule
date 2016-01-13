@@ -41,8 +41,8 @@ public class XQueryFunctionalTestCase extends FunctionalTestCase
         String srcData = IOUtils.getResourceAsString("org/mule/test/integration/xml/cd-catalog.xml", getClass());
         String resultData = IOUtils.getResourceAsString("org/mule/test/integration/xml/cd-catalog-result-with-params.xml", getClass());
 
-        //These are the message roperties that will get passed into the XQuery context
-        Map<String, Object> props = new HashMap<String, Object>();
+        //These are the message properties that will get passed into the XQuery context
+        Map<String, Object> props = new HashMap<>();
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
 

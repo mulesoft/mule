@@ -8,6 +8,7 @@ package org.mule.test.routing;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
@@ -22,8 +23,6 @@ import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -265,32 +264,20 @@ public class ForeachTestCase extends FunctionalTestCase
     @Test
     public void xmlUpdate() throws Exception
     {
-        client.send("vm://input-10", sampleXml, null);
-        FlowAssert.verify("process-order-update");
+        xpath(sampleXml);
     }
 
-    @Test
-    public void xmlUpdateByteArray() throws Exception
-    {
-        byte[] xmlba = sampleXml.getBytes();
-        client.send("vm://input-10", xmlba, null);
-        FlowAssert.verify("process-order-update");
+    private void xpath(Object payload) throws Exception {
+        MuleEvent result = runFlow("process-order-update", getTestEvent(payload));
+        int total = result.getFlowVariable("total");
+        assertThat(total, is(greaterThan(0)));
     }
 
     @Ignore("MULE-9285")
     @Test
-    public void xmlUpdateInputStream() throws Exception
+    public void xmlUpdateByteArray() throws Exception
     {
-        InputStream xmlis = new ByteArrayInputStream(sampleXml.getBytes());
-        client.send("vm://input-10-is", xmlis, null);
-        FlowAssert.verify("process-order-update-is");
-    }
-
-    @Test
-    public void xmlUpdateMel() throws Exception
-    {
-        client.send("vm://input-10-mel", sampleXml, null);
-        FlowAssert.verify("process-order-update-mel");
+        xpath(sampleXml.getBytes());
     }
 
     @Test
@@ -318,7 +305,7 @@ public class ForeachTestCase extends FunctionalTestCase
     @Test
     public void variableScope() throws Exception
     {
-        final Collection<String> payload = new ArrayList<String>();
+        final Collection<String> payload = new ArrayList<>();
         payload.add("pedro");
         payload.add("rodolfo");
         payload.add("roque");

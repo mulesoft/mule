@@ -18,6 +18,7 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 
 import net.sf.saxon.lib.NamespaceConstant;
+import net.sf.saxon.om.NamespaceResolver;
 
 /**
  * Implementation of {@link NamespaceContext} which can be parametrized
@@ -31,7 +32,7 @@ import net.sf.saxon.lib.NamespaceConstant;
  *
  * @since 3.6.0
  */
-final class XPathNamespaceContext implements NamespaceContext
+final class XPathNamespaceContext implements NamespaceContext, NamespaceResolver
 {
 
     private final BiMap<String, String> prefixToNamespaceMap;
@@ -81,6 +82,18 @@ final class XPathNamespaceContext implements NamespaceContext
                 .addAll(prefixToNamespaceMap.inverse().keySet())
                 .build()
                 .iterator();
+    }
+
+    @Override
+    public String getURIForPrefix(String prefix, boolean useDefault)
+    {
+        return getNamespaceURI(prefix);
+    }
+
+    @Override
+    public Iterator<String> iteratePrefixes()
+    {
+        return prefixToNamespaceMap.keySet().iterator();
     }
 
     private void loadDefaultNamespaces(Map<String, String> namespaces)

@@ -7,21 +7,17 @@
 package org.mule.module.xml.config;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.construct.Flow;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.xml.filters.IsXmlFilter;
-import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.logic.NotFilter;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -38,7 +34,7 @@ public class XmlFilterNamespaceHandlerFlowTestCase extends FunctionalTestCase
     {
         Object flow = muleContext.getRegistry().lookupObject("test for xml");
         MessageProcessorChain notXmlSubFlow;
-        List<MessageProcessor> outEndpoints = new ArrayList<MessageProcessor>(2);
+        List<MessageProcessor> outEndpoints = new ArrayList<>(2);
 
         outEndpoints.add(((Flow) flow).getMessageProcessors().get(0));
         notXmlSubFlow = muleContext.getRegistry().lookupObject("notXml");
@@ -50,29 +46,6 @@ public class XmlFilterNamespaceHandlerFlowTestCase extends FunctionalTestCase
         assertTrue(outEndpoints.get(1).getClass().getName(), outEndpoints.get(1) instanceof MessageFilter);
         assertTrue(((MessageFilter) outEndpoints.get(1)).getFilter() instanceof NotFilter);
         assertTrue(((NotFilter) ((MessageFilter) outEndpoints.get(1)).getFilter()).getFilter() instanceof IsXmlFilter);
-
-    }
-
-    @Test
-    public void testJXPathFilter()
-    {
-        Object flow = muleContext.getRegistry().lookupObject("filter xml for content");
-
-        List<MessageProcessor> outEndpoints = new ArrayList<MessageProcessor>(1);
-        outEndpoints.add(((Flow) flow).getMessageProcessors().get(0));
-
-        assertEquals(1, outEndpoints.size());
-        assertTrue(outEndpoints.get(0).getClass().getName(), outEndpoints.get(0) instanceof MessageFilter);
-
-        assertTrue(((MessageFilter) outEndpoints.get(0)).getFilter() instanceof JXPathFilter);
-        JXPathFilter filter = (JXPathFilter) ((MessageFilter) outEndpoints.get(0)).getFilter();
-        assertEquals("filter xml for content", filter.getExpectedValue());
-        assertEquals("/mule:mule/mule:flow[2]/@name", filter.getPattern());
-        assertNotNull(filter.getNamespaces());
-        Map<?, ?> namespaces = filter.getNamespaces();
-        assertEquals(2, namespaces.size());
-        assertEquals("http://www.springframework.org/schema/beans", namespaces.get("spring"));
-        assertTrue(namespaces.get("mule").toString().startsWith("http://www.mulesoft.org/schema/mule/core"));
 
     }
 }

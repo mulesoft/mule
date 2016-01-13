@@ -7,24 +7,19 @@
 package org.mule.module.xml.config;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleException;
 import org.mule.api.transformer.Transformer;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.xml.transformer.AbstractXmlTransformer;
 import org.mule.module.xml.transformer.DomDocumentToXml;
-import org.mule.module.xml.transformer.JXPathExtractor;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.module.xml.transformer.XsltTransformer;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
-
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -40,22 +35,6 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
     public void testDomToXml()
     {
         getAndTestTransformer("domToXml", DomDocumentToXml.class);
-    }
-
-    @Test
-    public void testJXPathExtractor()
-    {
-        JXPathExtractor extractor = (JXPathExtractor) getAndTestTransformer("jxpathExtractor",
-            JXPathExtractor.class);
-        assertEquals("/expression", extractor.getExpression());
-        assertFalse(extractor.isSingleResult());
-        assertEquals(JXPathExtractor.OUTPUT_TYPE_VALUE, extractor.getOutputType());
-        
-        Map ns = extractor.getNamespaces();
-        assertNotNull(ns);
-        
-        assertEquals("http://foo.com", ns.get("foo1"));
-        assertEquals("http://foo.com", ns.get("foo2"));
     }
 
     @Test
@@ -96,15 +75,6 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
     public void testDomToXmlOnEndpoint() throws MuleException
     {
         getAndTestEndpointTransformer("ep1", DomDocumentToXml.class);
-    }
-
-    @Test
-    public void testJXPathExtractorOnEndpoint() throws MuleException
-    {
-        JXPathExtractor extractor = (JXPathExtractor) getAndTestEndpointTransformer("ep2",
-            JXPathExtractor.class);
-        assertEquals("/expression", extractor.getExpression());
-        assertFalse(extractor.isSingleResult());
     }
 
     @Test

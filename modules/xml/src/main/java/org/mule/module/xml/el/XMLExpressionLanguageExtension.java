@@ -20,13 +20,11 @@ public class XMLExpressionLanguageExtension extends org.mule.el.mvel.DataConvers
 
     private MuleContext muleContext;
     private XMLToStringConversionHandler conversionHandler = new XMLToStringConversionHandler();
-    private ExpressionLanguageFunction xpathFunction;
     private ExpressionLanguageFunction xpath3Function;
 
     @Override
     public void initialise() throws InitialisationException
     {
-        xpathFunction = new XPathFunction(muleContext);
         xpath3Function = new XPath3Function(muleContext);
     }
 
@@ -34,7 +32,6 @@ public class XMLExpressionLanguageExtension extends org.mule.el.mvel.DataConvers
     public void configureContext(ExpressionLanguageContext context)
     {
         addConversionHandler(String.class, conversionHandler);
-        context.declareFunction("xpath", xpathFunction);
         context.declareFunction("xpath3", xpath3Function);
     }
 

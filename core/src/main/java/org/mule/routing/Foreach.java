@@ -164,7 +164,6 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         if (collectionExpression != null)
         {
             expressionConfig.setExpression(collectionExpression);
-            checkEvaluator(expressionConfig);
             splitter = new ExpressionSplitter(expressionConfig);
             if (expressionConfig.getEvaluator() != null && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX))
             {
@@ -212,14 +211,6 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     {
         return expression.matches("^xpath\\(.+\\)$") ||
                expression.matches("^xpath3\\(.+\\)$");
-    }
-
-    private void checkEvaluator(ExpressionConfig expressionConfig)
-    {
-        if (expressionConfig.getEvaluator() != null && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX))
-        {
-            expressionConfig.setEvaluator("xpath-branch");
-        }
     }
 
     public void setCollectionExpression(String expression)
