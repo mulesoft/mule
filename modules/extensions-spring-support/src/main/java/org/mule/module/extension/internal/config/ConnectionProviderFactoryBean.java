@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.config;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.PoolingProfile;
@@ -23,7 +24,7 @@ import org.springframework.beans.factory.FactoryBean;
 /**
  * A {@link FactoryBean} which returns a {@link ValueResolver} that yields instances
  * of {@link ConnectionProvider} which are compliant with a {@link ConnectionProviderModel}.
- * <p>
+ * <p/>
  * Subsequent invokations to {@link #getObject()} method
  * returns always the same {@link ValueResolver}.
  *
@@ -36,6 +37,7 @@ public class ConnectionProviderFactoryBean implements FactoryBean<ValueResolver>
     private final ConnectionProviderModel providerModel;
     private ValueResolver<ConnectionProvider> resolver;
     private PoolingProfile poolingProfile = null;
+    private boolean disableValidation = false;
 
     public ConnectionProviderFactoryBean(ConnectionProviderModel providerModel, ElementDescriptor element)
     {
@@ -58,7 +60,7 @@ public class ConnectionProviderFactoryBean implements FactoryBean<ValueResolver>
     {
         if (resolver == null)
         {
-            resolver = new ObjectBuilderValueResolver<>(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile));
+            resolver = new ObjectBuilderValueResolver<>(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile, disableValidation));
         }
 
         return resolver;
@@ -85,5 +87,10 @@ public class ConnectionProviderFactoryBean implements FactoryBean<ValueResolver>
     public void setPoolingProfile(PoolingProfile poolingProfile)
     {
         this.poolingProfile = poolingProfile;
+    }
+
+    public void setDisableValidation(boolean disableValidation)
+    {
+        this.disableValidation = disableValidation;
     }
 }

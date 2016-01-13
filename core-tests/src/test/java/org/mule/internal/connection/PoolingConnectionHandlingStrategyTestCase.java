@@ -13,6 +13,8 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -23,11 +25,14 @@ import static org.mule.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.api.config.PoolingProfile.WHEN_EXHAUSTED_FAIL;
 import static org.mule.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
 import static org.mule.tck.MuleTestUtils.spyInjector;
+
 import org.mule.api.Injector;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionExceptionCode;
 import org.mule.api.connection.ConnectionHandler;
+import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.api.connection.PoolingListener;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -126,10 +131,25 @@ public class PoolingConnectionHandlingStrategyTestCase extends AbstractMuleConte
         verifyThat(Lifecycle::dispose);
     }
 
+    @Test(expected = ConnectionException.class)
+    public void failDueToInvalidConnection() throws ConnectionException
+    {
+        when(connectionProvider.validate(anyVararg())).thenReturn(ConnectionValidationResult.failure("Invalid username or password", ConnectionExceptionCode.INCORRECT_CREDENTIALS, new Exception("401: UNAUTHORIZED")));
+        strategy.getConnectionHandler().getConnection();
+    }
+
+    @Test(expected = ConnectionException.class)
+    public void failDueToNullConnectionValidationResult() throws ConnectionException
+    {
+        when(connectionProvider.validate(anyVararg())).thenReturn(null);
+        strategy.getConnectionHandler().getConnection();
+    }
+
     private void resetConnectionProvider() throws ConnectionException
     {
         ConnectionProvider<Object, Lifecycle> connectionProvider = mock(ConnectionProvider.class);
         when(connectionProvider.connect(config)).thenAnswer(i -> mock(Lifecycle.class));
+        when(connectionProvider.validate(anyObject())).thenReturn(ConnectionValidationResult.success());
         this.connectionProvider = spy(new LifecycleAwareConnectionProviderWrapper<>(connectionProvider, muleContext));
     }
 

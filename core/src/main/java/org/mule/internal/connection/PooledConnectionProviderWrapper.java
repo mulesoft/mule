@@ -10,6 +10,7 @@ import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.api.connection.PoolingListener;
 
 /**
@@ -28,6 +29,7 @@ import org.mule.api.connection.PoolingListener;
 public final class PooledConnectionProviderWrapper<Config, Connection> extends ConnectionProviderWrapper<Config, Connection>
 {
 
+    private final boolean disableValidation;
     private final PoolingProfile poolingProfile;
 
     /**
@@ -36,10 +38,21 @@ public final class PooledConnectionProviderWrapper<Config, Connection> extends C
      * @param delegate       the {@link ConnectionProvider} to be wrapped
      * @param poolingProfile a nullable {@link PoolingProfile}
      */
-    public PooledConnectionProviderWrapper(ConnectionProvider<Config, Connection> delegate, PoolingProfile poolingProfile)
+    public PooledConnectionProviderWrapper(ConnectionProvider<Config, Connection> delegate, PoolingProfile poolingProfile, boolean disableValidation)
     {
         super(delegate);
         this.poolingProfile = poolingProfile;
+        this.disableValidation = disableValidation;
+    }
+
+    @Override
+    public ConnectionValidationResult validate(Connection connection)
+    {
+        if (disableValidation)
+        {
+            return ConnectionValidationResult.success();
+        }
+        return getDelegate().validate(connection);
     }
 
     /**

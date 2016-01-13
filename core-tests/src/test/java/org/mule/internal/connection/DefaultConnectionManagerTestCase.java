@@ -14,11 +14,13 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleContext;
 import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionHandler;
+import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -50,6 +52,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase
     public void before() throws Exception
     {
         when(connectionProvider.connect(config)).thenReturn(connection);
+        when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
         when(connectionProvider.getHandlingStrategy(any(ConnectionHandlingStrategyFactory.class))).thenAnswer(invocation -> {
             ConnectionHandlingStrategyFactory factory = (ConnectionHandlingStrategyFactory) invocation.getArguments()[0];
             return factory.cached();

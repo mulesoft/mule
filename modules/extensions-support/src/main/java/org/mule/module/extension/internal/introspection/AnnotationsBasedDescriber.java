@@ -18,6 +18,7 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getPara
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Configuration;

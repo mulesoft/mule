@@ -12,9 +12,13 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleContext;
-import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionException;
+import org.mule.api.connection.ConnectionExceptionCode;
 import org.mule.api.connection.ConnectionHandler;
+import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -48,6 +52,7 @@ public class CachedConnectionHandlingStrategyTestCase extends AbstractMuleTestCa
     {
         when(connectionProvider.connect(config)).thenReturn(connection);
         connectionStrategy = new CachedConnectionHandlingStrategy<>(config, connectionProvider, muleContext);
+        when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
     }
 
     @Test
@@ -70,5 +75,27 @@ public class CachedConnectionHandlingStrategyTestCase extends AbstractMuleTestCa
         connectionStrategy.close();
         verify(connectionProvider).disconnect(connection);
 
+    }
+
+    @Test
+    public void failDueToInvalidConnection() throws ConnectionException
+    {
+        String errorMessage = "Invalid username or password";
+        when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.failure(errorMessage, ConnectionExceptionCode.INCORRECT_CREDENTIALS, new Exception("401: UNAUTHORIZED")));
+        CachedConnectionHandler connectionHandler = (CachedConnectionHandler) connectionStrategy.getConnectionHandler();
+        ConnectionValidationResult validationResult = connectionHandler.validateConnection(connection);
+
+        assertThat(validationResult.isValid(), is(false));
+        assertThat(validationResult.getMessage(), is(errorMessage));
+    }
+
+    @Test
+    public void failDueToNullConnectionValidationResult() throws ConnectionException
+    {
+        when(connectionProvider.validate(connection)).thenReturn(null);
+        CachedConnectionHandler connectionHandler = (CachedConnectionHandler) connectionStrategy.getConnectionHandler();
+        ConnectionValidationResult validationResult = connectionHandler.validateConnection(connection);
+
+        assertThat(validationResult.isValid(), is(false));
     }
 }

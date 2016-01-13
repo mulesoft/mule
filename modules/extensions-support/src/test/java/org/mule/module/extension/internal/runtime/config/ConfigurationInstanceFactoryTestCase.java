@@ -16,14 +16,14 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleEvent;
-import org.mule.api.config.ConfigurationException;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.extension.api.introspection.ConfigurationModel;
-import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
@@ -133,6 +133,12 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         }
 
         @Override
+        public ConnectionValidationResult validate(Banana banana)
+        {
+            return ConnectionValidationResult.success();
+        }
+
+        @Override
         public ConnectionHandlingStrategy<Banana> getHandlingStrategy(ConnectionHandlingStrategyFactory<Apple, Banana> handlingStrategyFactory)
         {
             return handlingStrategyFactory.cached();
@@ -152,6 +158,12 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         public void disconnect(Kiwi kiwi)
         {
 
+        }
+
+        @Override
+        public ConnectionValidationResult validate(Kiwi kiwi)
+        {
+            return ConnectionValidationResult.success();
         }
 
         @Override

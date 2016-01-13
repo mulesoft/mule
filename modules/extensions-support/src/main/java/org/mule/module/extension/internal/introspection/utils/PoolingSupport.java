@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.capability.xml.schema;
+package org.mule.module.extension.internal.introspection.utils;
 
-enum PoolingSupport
+public enum PoolingSupport
 {
     SUPPORTED,
     REQUIRED,

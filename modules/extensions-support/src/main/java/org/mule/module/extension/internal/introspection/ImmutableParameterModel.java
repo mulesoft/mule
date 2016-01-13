@@ -6,7 +6,6 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ParameterModel;

@@ -14,10 +14,10 @@ import static org.mule.extension.api.introspection.DataQualifier.OPERATION;
 import static org.mule.extension.api.introspection.DataQualifier.POJO;
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
-import static org.mule.module.extension.internal.capability.xml.schema.PoolingSupport.REQUIRED;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_DESCRIPTION_CONFIG;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_CONFIG;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_VALUE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.GROUP_SUFFIX;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
@@ -37,7 +37,8 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.XML_NAMESPACE;
-import static org.mule.module.extension.internal.introspection.ImplicitObjectUtils.getFirstImplicit;
+import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
+import static org.mule.module.extension.internal.introspection.utils.PoolingSupport.REQUIRED;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
@@ -50,6 +51,7 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDyna
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
@@ -87,6 +89,7 @@ import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelEl
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.module.extension.internal.capability.xml.schema.model.Union;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
+import org.mule.module.extension.internal.model.property.ConnectionHandlingTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
@@ -201,22 +204,32 @@ public final class SchemaBuilder
         choice.setMinOccurs(ZERO);
         choice.setMaxOccurs(UNBOUNDED);
 
-        addConnectionProviderPoolingProfile(choice, providerModel);
+        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
+
+        if (connectionHandlingType != null)
+        {
+            if (connectionHandlingType.isPooled() || connectionHandlingType.isCached())
+            {
+                addConnectionProviderPoolingProfile(choice, providerModel);
+                addValidationFlag(providerType);
+            }
+        }
+
         registerParameters(providerType, choice, providerModel.getParameterModels());
         return this;
     }
 
+    private void addValidationFlag(ExtensionType providerType)
+    {
+        providerType.getAttributeOrAttributeGroup().add(createAttribute(DISABLE_VALIDATION, DataType.of(boolean.class), false, ExpressionSupport.NOT_SUPPORTED));
+    }
+
     private void addConnectionProviderPoolingProfile(ExplicitGroup choice, ConnectionProviderModel providerModel)
     {
-        PoolingSupport poolingSupport = SchemaBuilderUtils.getPoolingDefinition(providerModel);
-        if (poolingSupport == PoolingSupport.NOT_SUPPORTED)
-        {
-            return;
-        }
-
+        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
         TopLevelElement objectElement = new TopLevelElement();
 
-        objectElement.setMinOccurs(poolingSupport == REQUIRED ? ONE : ZERO);
+        objectElement.setMinOccurs(connectionHandlingType.getPoolingSupport() == REQUIRED ? ONE : ZERO);
         objectElement.setMaxOccurs("1");
         objectElement.setRef(MULE_POOLING_PROFILE_TYPE);
 

@@ -7,19 +7,25 @@
 package org.mule.internal.connection;
 
 import static org.mule.api.lifecycle.LifecycleUtils.assertNotStopping;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.connection.ConnectionException;
+import org.mule.api.connection.ConnectionExceptionCode;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionValidationResult;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A {@link ConnectionHandlerAdapter} which always returns the same connection (therefore cached),
  * which is not established until {@link #getConnection()} is first invoked.
- * <p>
+ * <p/>
  * This implementation is thread-safe.
  *
  * @param <Config>     the generic type of the config that owns {@code this} managed connection
@@ -28,6 +34,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 final class CachedConnectionHandler<Config, Connection> implements ConnectionHandlerAdapter<Connection>
 {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CachedConnectionHandler.class);
 
     private final Config config;
     private final ConnectionProvider<Config, Connection> connectionProvider;
@@ -53,47 +61,58 @@ final class CachedConnectionHandler<Config, Connection> implements ConnectionHan
     }
 
     /**
-     * On the first invokation to this method, a connection is established using the provided
+     * On the first invocation to this method, a connection is established using the provided
      * {@link #connectionProvider}. That connection is cached and returned.
-     * <p>
-     * Following invokations simply return the same connection.
+     * <p/>
+     * Following invocations simply return the same connection.
      *
      * @return a {@code Connection}
      * @throws ConnectionException   if a {@code Connection} could not be obtained
-     * @throws IllegalStateException if the first invokation is executed while the {@link #muleContext} is stopping or stopped
+     * @throws IllegalStateException if the first invocation is executed while the {@link #muleContext} is stopping or stopped
      */
     @Override
     public Connection getConnection() throws ConnectionException
     {
+        Connection oldConnection;
         readLock.lock();
         try
         {
-            if (connection != null)
+            if (connection != null && validateConnection(connection).isValid())
             {
                 return connection;
             }
+            oldConnection = connection;
         }
         finally
         {
             readLock.unlock();
         }
-
         writeLock.lock();
         try
         {
             //check another thread didn't beat us to it
             if (connection != null)
             {
-                return connection;
+                if (connection != oldConnection)
+                {
+                    return connection;
+                }
+                disconnectAndCleanConnection(connection);
             }
-
-            assertNotStopping(muleContext, "Mule is shutting down... Cannot establish new connections");
-            return connection = connectionProvider.connect(config);
+            connection = createConnection();
+            return connection;
         }
         finally
         {
             writeLock.unlock();
         }
+    }
+
+    private Connection createConnection() throws ConnectionException
+    {
+        assertNotStopping(muleContext, "Mule is shutting down... Cannot establish new connections");
+        connection = connectionProvider.connect(config);
+        return connection;
     }
 
     /**
@@ -109,7 +128,7 @@ final class CachedConnectionHandler<Config, Connection> implements ConnectionHan
     /**
      * Disconnects the wrapped connection and clears the cache
      *
-     * @throws Exception in case of error
+     * @throws MuleException in case of error
      */
     @Override
     public void close() throws MuleException
@@ -126,6 +145,43 @@ final class CachedConnectionHandler<Config, Connection> implements ConnectionHan
         {
             connection = null;
             writeLock.unlock();
+        }
+    }
+
+    protected ConnectionValidationResult validateConnection(Connection connection)
+    {
+        ConnectionValidationResult validationResult = null;
+        try
+        {
+            validationResult = connectionProvider.validate(connection);
+        }
+        catch (Exception e)
+        {
+            validationResult = ConnectionValidationResult.failure("Error validating connection. Unexpected exception was thrown by the extension when validating the connection", ConnectionExceptionCode.UNKNOWN, e);
+        }
+
+        if (validationResult == null)
+        {
+            String errorMessage = "Error validating connection. validate() method from the connection provider can not return a null ConnectionValidationResult";
+            validationResult = ConnectionValidationResult.failure(errorMessage, ConnectionExceptionCode.UNKNOWN, new ConnectionException(errorMessage));
+        }
+
+        return validationResult;
+    }
+
+    private void disconnectAndCleanConnection(Connection connection)
+    {
+        try
+        {
+            connectionProvider.disconnect(connection);
+        }
+        catch (Exception e)
+        {
+            LOGGER.debug("Error disconnecting the extension's connection", e);
+        }
+        finally
+        {
+            this.connection = null;
         }
     }
 }

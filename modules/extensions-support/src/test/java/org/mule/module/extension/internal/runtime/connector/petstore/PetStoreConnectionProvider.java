@@ -8,7 +8,9 @@ package org.mule.module.extension.internal.runtime.connector.petstore;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.connection.ConnectionExceptionCode;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.extension.annotation.api.Parameter;
@@ -43,6 +45,19 @@ abstract class PetStoreConnectionProvider implements ConnectionProvider<PetStore
         if (connection != null)
         {
             connection.disconnect();
+        }
+    }
+
+    @Override
+    public ConnectionValidationResult validate(PetStoreClient connection)
+    {
+        if (connection.getUsername().equals("john") && connection.getPassword().equals("doe"))
+        {
+            return ConnectionValidationResult.success();
+        }
+        else
+        {
+            return ConnectionValidationResult.failure("Invalid credentials", ConnectionExceptionCode.INCORRECT_CREDENTIALS, new Exception("Invalid credentials"));
         }
     }
 

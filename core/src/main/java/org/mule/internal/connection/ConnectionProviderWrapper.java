@@ -7,9 +7,10 @@
 package org.mule.internal.connection;
 
 import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionValidationResult;
 
 /**
  * Base class for wrappers for {@link ConnectionProvider} instances
@@ -37,6 +38,12 @@ public abstract class ConnectionProviderWrapper<Config, Connection> implements C
     public Connection connect(Config config) throws ConnectionException
     {
         return delegate.connect(config);
+    }
+
+    @Override
+    public ConnectionValidationResult validate(Connection connection)
+    {
+        return delegate.validate(connection);
     }
 
     @Override

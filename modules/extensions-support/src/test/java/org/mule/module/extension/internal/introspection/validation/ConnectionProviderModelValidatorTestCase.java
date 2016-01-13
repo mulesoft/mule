@@ -10,6 +10,7 @@ import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Configuration;
 import org.mule.extension.annotation.api.Configurations;
@@ -151,6 +152,12 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         }
 
         @Override
+        public ConnectionValidationResult validate(ValidatorTestConnection validatorTestConnection)
+        {
+            return ConnectionValidationResult.success();
+        }
+
+        @Override
         public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Config, ValidatorTestConnection> handlingStrategyFactory)
         {
             return handlingStrategyFactory.cached();
@@ -180,6 +187,12 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         }
 
         @Override
+        public ConnectionValidationResult validate(ValidatorTestConnection validatorTestConnection)
+        {
+            return ConnectionValidationResult.success();
+        }
+
+        @Override
         public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Apple, ValidatorTestConnection> handlingStrategyFactory)
         {
             return handlingStrategyFactory.cached();
@@ -200,6 +213,12 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         public void disconnect(Apple connection)
         {
 
+        }
+
+        @Override
+        public ConnectionValidationResult validate(Apple apple)
+        {
+            return ConnectionValidationResult.success();
         }
 
         @Override
