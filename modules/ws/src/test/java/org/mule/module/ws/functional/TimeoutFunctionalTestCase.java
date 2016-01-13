@@ -54,9 +54,9 @@ public class TimeoutFunctionalTestCase extends FunctionalTestCase
         flow.process(event);
         serverLatch.release();
 
-        MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
+        MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
 
-        assertThat(message.<String>getInboundProperty("flowVar"), equalTo("testFlowVar"));
-        assertThat(message.<String>getInboundProperty("sessionVar"), equalTo("testSessionVar"));
+        assertThat(message.<String>getOutboundProperty("flowVar"), equalTo("testFlowVar"));
+        assertThat(message.<String>getOutboundProperty("sessionVar"), equalTo("testSessionVar"));
     }
 }

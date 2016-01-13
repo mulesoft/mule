@@ -33,7 +33,7 @@ public class CombinedSecurityFunctionalTestCase extends AbstractWSConsumerFuncti
     @Test
     public void validRequestReturnsExpectedResult() throws Exception
     {
-        assertValidResponse("vm://request");
+        assertValidResponse("request");
     }
 
 

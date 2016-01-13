@@ -22,13 +22,13 @@ public class SignSecurityFunctionalTestCase extends AbstractWSConsumerFunctional
     @Test
     public void requestWithSignatureReturnsExpectedResult() throws Exception
     {
-        assertValidResponse("vm://requestWithSignature");
+        assertValidResponse("requestWithSignature");
     }
 
     @Test
     public void requestWithoutSignatureFails() throws Exception
     {
-        assertSoapFault("vm://requestWithoutSignature", "InvalidSecurity");
+        assertSoapFault("requestWithoutSignature", "InvalidSecurity");
     }
 
 }

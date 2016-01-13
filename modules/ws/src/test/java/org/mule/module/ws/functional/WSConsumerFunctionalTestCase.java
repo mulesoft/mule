@@ -40,21 +40,21 @@ public class WSConsumerFunctionalTestCase extends AbstractWSConsumerFunctionalTe
     @Test
     public void validRequestReturnsExpectedAnswer() throws Exception
     {
-        assertValidResponse("vm://in");
+        assertValidResponse("client");
     }
 
     @Test
     public void invalidRequestFormatReturnsSOAPFault() throws Exception
     {
         String message = "<tns:echo xmlns:tns=\"http://consumer.ws.module.mule.org/\"><invalid>Hello</invalid></tns:echo>";
-        assertSoapFault("vm://in", message, "Client");
+        assertSoapFault("client", message, "Client");
     }
 
     @Test
     public void invalidNamespaceReturnsSOAPFault() throws Exception
     {
         String message = "<tns:echo xmlns:tns=\"http://invalid/\"><text>Hello</text></tns:echo>";
-        assertSoapFault("vm://in", message, "Client");
+        assertSoapFault("client", message, "Client");
     }
 
 }

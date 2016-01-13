@@ -79,6 +79,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
         assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
     }
 
+    @Override
     protected void assertValidResponse(String address, Map<String, Object> properties) throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST, properties, muleContext);
@@ -87,9 +88,10 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
         assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
     }
 
-    protected void assertSoapFault(String address, String message, Map<String, Object> properties, String expectedErrorMessage) throws Exception
+    @Override
+    protected void assertSoapFault(String address, String message, String expectedErrorMessage) throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(message, properties, muleContext);
+        MuleMessage request = new DefaultMuleMessage(message, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         String responsePayload = getPayloadAsString(response);
