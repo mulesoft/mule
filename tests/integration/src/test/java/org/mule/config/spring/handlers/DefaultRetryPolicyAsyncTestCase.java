@@ -15,17 +15,18 @@ import static org.mule.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEM
 
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.Connector;
+import org.mule.retry.async.AsynchronousRetryTemplate;
 import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class DefaultRetryPolicyTestCase extends FunctionalTestCase
+public class DefaultRetryPolicyAsyncTestCase extends FunctionalTestCase
 {
     @Override
     protected String getConfigFile()
     {
-        return "org/mule/config/spring/handlers/default-retry-policy.xml";
+        return "org/mule/config/spring/handlers/default-retry-policy-async.xml";
     }
 
     @Test
@@ -33,8 +34,8 @@ public class DefaultRetryPolicyTestCase extends FunctionalTestCase
     {
         Object obj = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
         assertThat(obj, not(nullValue()));
-        assertThat(obj, instanceOf(SimpleRetryPolicyTemplate.class));
-        assertThat(((SimpleRetryPolicyTemplate) obj).getCount(), is(3));
+        assertThat(obj, instanceOf(AsynchronousRetryTemplate.class));
+        assertThat(((SimpleRetryPolicyTemplate) ((AsynchronousRetryTemplate) obj).getDelegate()).getCount(), is(3));
     }
 
     @Test
@@ -45,8 +46,8 @@ public class DefaultRetryPolicyTestCase extends FunctionalTestCase
 
         RetryPolicyTemplate rpf = c.getRetryPolicyTemplate();
         assertThat(rpf, not(nullValue()));
-        assertThat(rpf, instanceOf(SimpleRetryPolicyTemplate.class));
-        assertThat(((SimpleRetryPolicyTemplate) rpf).getCount(), is(3));
+        assertThat(rpf, instanceOf(AsynchronousRetryTemplate.class));
+        assertThat(((SimpleRetryPolicyTemplate) ((AsynchronousRetryTemplate) rpf).getDelegate()).getCount(), is(3));
         
         assertThat(c.isConnected(), is(true));
         assertThat(c.isStarted(), is(true));
