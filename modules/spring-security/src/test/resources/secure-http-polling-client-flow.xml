@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-
-    <vm:connector name="vmQueue" />
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <http:request-config name="secureRequestConfig" host="localhost" port="${port1}">
         <http:basic-authentication username="marie" password="marie" preemptive="true"/>
@@ -28,8 +25,7 @@
                 <http:success-status-code-validator values="0..599"/>
             </http:request>
         </poll>
-        <outbound-endpoint address="vm://toclient"
-            exchange-pattern="one-way" />
+        <test:queue name="toclient"/>
     </flow>
 
     <flow name="pollingUMO_not_authenticated">
@@ -41,9 +37,7 @@
         <message-properties-transformer scope="outbound">
             <add-message-property key="http.status" value="#[header:INBOUND:http.status]" />
         </message-properties-transformer>
-        <outbound-endpoint address="vm://toclient2"
-            exchange-pattern="one-way" />
-
+        <test:queue name="toclient2"/>
     </flow>
 
 
