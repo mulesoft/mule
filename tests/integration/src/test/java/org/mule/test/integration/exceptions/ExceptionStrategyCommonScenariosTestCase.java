@@ -70,83 +70,6 @@ public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testRoutePayloadBeforeException() throws Exception
-    {
-        final Latch messageProcessedLatch = new Latch();
-        FunctionalTestComponent ftc = getFunctionalTestComponent("LastMessageStateRouting");
-        ftc.setEventCallback(new EventCallback()
-        {
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                messageProcessedLatch.release();
-                throw new RuntimeException();
-            }
-        });
-        LocalMuleClient client = muleContext.getClient();
-        client.dispatch("jms://in1?connector=jmsConnector", MESSAGE_TO_SEND, null);
-        if (!messageProcessedLatch.await(TIMEOUT, TimeUnit.MILLISECONDS))
-        {
-            fail("Message never received by mule");
-        }
-        MuleMessage response = client.request("jms://dead.letter1?connector=jmsConnector", TIMEOUT);
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(getPayloadAsString(response), is(MESSAGE_MODIFIED));
-    }
-
-    @Test
-    public void testRouteOriginalPayload() throws Exception
-    {
-        final Latch messageProcessedLatch = new Latch();
-        FunctionalTestComponent ftc = getFunctionalTestComponent("OriginalMessageRouting");
-        ftc.setEventCallback(new EventCallback()
-        {
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                messageProcessedLatch.release();
-                throw new RuntimeException();
-            }
-        });
-        LocalMuleClient client = muleContext.getClient();
-        client.dispatch("jms://in2?connector=jmsConnector", MESSAGE_TO_SEND, null);
-        if (!messageProcessedLatch.await(TIMEOUT, TimeUnit.MILLISECONDS))
-        {
-            fail("Message never received by mule");
-        }
-        MuleMessage response = client.request("jms://dead.letter2?connector=jmsConnector", TIMEOUT);
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(getPayloadAsString(response), is(MESSAGE_TO_SEND));
-    }
-
-    @Test
-    public void testRouteByExceptionType() throws Exception
-    {
-        final CountDownLatch messageProcessedLatch = new CountDownLatch(3);
-        FunctionalTestComponent ftc = getFunctionalTestComponent("RouteByExceptionType");
-        ftc.setEventCallback(new EventCallback()
-        {
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                messageProcessedLatch.countDown();
-                throw new RuntimeException();
-            }
-        });
-        LocalMuleClient client = muleContext.getClient();
-        client.dispatch("jms://in3?connector=jmsConnector", MESSAGE_TO_SEND, null);
-        if (!messageProcessedLatch.await(TIMEOUT, java.util.concurrent.TimeUnit.MILLISECONDS))
-        {
-            fail("Message never received by mule");
-        }
-        MuleMessage response = client.request("jms://dead.letter3?connector=jmsConnector", TIMEOUT);
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(getPayloadAsString(response), is(MESSAGE_TO_SEND));
-        assertThat(client.request("jms://exceptions?connector=jmsConnector", TIMEOUT), IsNull.<Object>notNullValue());
-        assertThat(client.request("jms://exceptions?connector=jmsConnector", TIMEOUT), IsNull.notNullValue());
-        MuleMessage exceptionResponse = client.request("jms://exceptions?connector=jmsConnector", TIMEOUT);
-        assertThat(exceptionResponse, IsNull.<Object>notNullValue());
-        assertThat(exceptionResponse.getPayload(), instanceOf(ExceptionMessage.class));
-    }
-
-    @Test
     public void testPreservePayloadExceptionStrategy() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
@@ -171,16 +94,6 @@ public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
         catch (Exception e)
         {
             throw e.getCause();
-        }
-    }
-
-    public static class EndMessageProcessor implements MessageProcessor
-    {
-
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            endMessageProcessorExecuted.release();
-            return event;
         }
     }
 
