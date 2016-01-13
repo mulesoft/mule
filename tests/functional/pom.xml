@@ -174,12 +174,6 @@
             <artifactId>mule-tests-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-extensions-support</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-        </dependency>
         <!-- required for ConfigurationBuilders at runtime -->
         <dependency>
             <groupId>org.mule.modules</groupId>

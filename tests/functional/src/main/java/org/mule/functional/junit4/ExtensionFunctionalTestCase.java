@@ -7,13 +7,13 @@
 package org.mule.functional.junit4;
 
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.createManifestFileIfNecessary;
 import static org.mule.util.IOUtils.getResourceAsUrl;
 import static org.springframework.util.ReflectionUtils.findMethod;
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.registry.ServiceRegistry;
+import org.mule.config.MuleManifest;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionFactory;
@@ -33,10 +33,12 @@ import org.mule.util.ArrayUtils;
 import com.google.common.collect.ImmutableList;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
+import java.util.jar.Manifest;
 
 import org.apache.commons.io.FileUtils;
 
@@ -285,5 +287,24 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private File createManifestFileIfNecessary(File targetDirectory) throws IOException
+    {
+        return createManifestFileIfNecessary(targetDirectory, MuleManifest.getManifest());
+    }
+
+    private File createManifestFileIfNecessary(File targetDirectory, Manifest sourceManifest) throws IOException
+    {
+        File manifestFile = new File(targetDirectory.getPath(), "MANIFEST.MF");
+        if (!manifestFile.exists())
+        {
+            Manifest manifest = new Manifest(sourceManifest);
+            try (FileOutputStream fileOutputStream = new FileOutputStream(manifestFile))
+            {
+                manifest.write(fileOutputStream);
+            }
+        }
+        return manifestFile;
     }
 }
