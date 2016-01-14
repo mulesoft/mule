@@ -54,8 +54,7 @@ public class TypedValue<T> implements Serializable
     // TODO MULE-9279 Remove method once MuleMessage is immutable
     protected void setDataType(DataType<T> dataType)
     {
-        // TODO MULE-9288 DataType should be immutable
-        this.dataType = dataType.cloneDataType();
+        this.dataType = dataType;
     }
 
     // TODO MULE-9279 Remove method once MuleMessage is immutable
