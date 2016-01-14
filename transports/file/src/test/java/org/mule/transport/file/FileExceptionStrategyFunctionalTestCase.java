@@ -14,6 +14,8 @@ import static org.junit.Assert.fail;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
+import org.mule.api.exception.RollbackSourceCallback;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.Flow;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
@@ -53,7 +55,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testMoveFile() throws Exception
     {
-        attacheLatchCountdownProcessor("moveFile");
+        attachLatchCountdownProcessor("moveFile");
         inputDir = getFileInsideWorkingDirectory("temp/input-move-file");
         inputFile = createDataFile(inputDir, "test1.txt");
         latch.await(2000l, MILLISECONDS);
@@ -66,7 +68,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testMoveFileWithWorDir() throws Exception
     {
-        attacheLatchCountdownProcessor("moveFileWithWorkDir");
+        attachLatchCountdownProcessor("moveFileWithWorkDir");
         inputDir = getFileInsideWorkingDirectory("temp/input-move-file-wd");
         inputFile = createDataFile(inputDir, "test1.txt");
         latch.await(2000l, MILLISECONDS);
@@ -82,7 +84,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testCopyFile() throws Exception
     {
-        attacheLatchCountdownProcessor("copyFile");
+        attachLatchCountdownProcessor("copyFile");
         inputDir = getFileInsideWorkingDirectory("temp/input-copy-file");
         inputFile = createDataFile(inputDir, "test1.txt");
         latch.await(2000l, MILLISECONDS);
@@ -92,11 +94,10 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
         assertThat(outputFile.exists(), is(false));
     }
 
-
     @Test
     public void testCopyFileWithWorkDir() throws Exception
     {
-        attacheLatchCountdownProcessor("copyFileWithWorkDir");
+        attachLatchCountdownProcessor("copyFileWithWorkDir");
         inputDir = getFileInsideWorkingDirectory("temp/input-copy-file-with-work-directory");
         inputFile = createDataFile(inputDir, "test1.txt");
         latch.await(2000l, MILLISECONDS);
@@ -106,6 +107,18 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
         assertThat(inputFile.exists(), is(false));
         assertThat(outputFile.exists(), is(false));
         assertThat(workDirFile.exists(), is(false));
+    }
+
+    @Test
+    public void inboundDirNotExists() throws Exception
+    {
+        attachLatchCountdownProcessorSystem();
+        inputDir = getFileInsideWorkingDirectory("temp/input-not-exists");
+        inputDir.delete();
+        assertThat(inputDir.exists(), is(false));
+        boolean exceptionHandled = latch.await(2000l, MILLISECONDS);
+
+        assertThat(exceptionHandled, is(true));
     }
 
     @Test
@@ -213,16 +226,36 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
         });
     }
 
-    private void attacheLatchCountdownProcessor(String flowName)
+    private void attachLatchCountdownProcessor(String flowName)
     {
         flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
         DefaultMessagingExceptionStrategy exceptionListener = (DefaultMessagingExceptionStrategy) flow.getExceptionListener();
         exceptionListener.getMessageProcessors().add(new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 latch.countDown();
                 return event;
+            }
+        });
+    }
+
+    private void attachLatchCountdownProcessorSystem()
+    {
+        muleContext.setExceptionListener(new SystemExceptionHandler()
+        {
+
+            @Override
+            public void handleException(Exception exception)
+            {
+                latch.countDown();
+            }
+
+            @Override
+            public void handleException(Exception exception, RollbackSourceCallback rollbackMethod)
+            {
+                latch.countDown();
             }
         });
     }
