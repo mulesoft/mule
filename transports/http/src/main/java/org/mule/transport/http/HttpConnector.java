@@ -507,7 +507,17 @@ public class HttpConnector extends TcpConnector
         httpMethod.setDoAuthentication(true);
         client.getParams().setAuthenticationPreemptive(true);
 
-        if (event != null && event.getCredentials() != null)
+        if (endpoint.getEndpointURI().getUserInfo() != null
+            && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION) == null)
+        {
+            // Add User Creds
+            StringBuilder header = new StringBuilder(128);
+            header.append("Basic ");
+            header.append(new String(Base64.encodeBase64(endpoint.getEndpointURI().getUserInfo().getBytes(
+                    endpoint.getEncoding()))));
+            httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
+        }
+        else if (event != null && event.getCredentials() != null)
         {
             MuleMessage msg = event.getMessage();
             String authScopeHost = msg.getOutboundProperty(HTTP_PREFIX + "auth.scope.host", event.getMessageSourceURI().getHost());
@@ -518,16 +528,6 @@ public class HttpConnector extends TcpConnector
                     new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
                     new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(
                             event.getCredentials().getPassword())));
-        }
-        else if (endpoint.getEndpointURI().getUserInfo() != null
-                 && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION) == null)
-        {
-            // Add User Creds
-            StringBuilder header = new StringBuilder(128);
-            header.append("Basic ");
-            header.append(new String(Base64.encodeBase64(endpoint.getEndpointURI().getUserInfo().getBytes(
-                    endpoint.getEncoding()))));
-            httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
         }
         //TODO MULE-4501 this sohuld be removed and handled only in the ObjectToHttpRequest transformer
         else if (event != null && event.getMessage().getOutboundProperty(HttpConstants.HEADER_AUTHORIZATION) != null &&
