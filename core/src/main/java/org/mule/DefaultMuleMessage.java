@@ -6,7 +6,7 @@
  */
 package org.mule;
 
-import static org.mule.util.SystemUtils.LINE_SEPARATOR;
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
@@ -23,7 +23,6 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.api.transport.PropertyScope;
-import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.ds.ByteArrayDataSource;
 import org.mule.message.ds.StringDataSource;
@@ -605,8 +604,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             }
             else
             {
-                logger.warn("setProperty(key, value) called with null value; removing key: " + key
-                        + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
+                logger.warn("setProperty(key, value) called with null value; removing key: " + key,
                         new Throwable());
                 properties.removeProperty(key);
             }
@@ -615,8 +613,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         else
         {
-            logger.warn("setProperty(key, value) ignored because of null key for object: " + value
-                    + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
+            logger.warn("setProperty(key, value) ignored because of null key for object: " + value,
                     new Throwable());
         }
     }

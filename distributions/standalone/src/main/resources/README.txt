@@ -61,7 +61,7 @@ Running Mule
 Starting with the Examples
 --------------------------
 
-Up-to-date Mule ESB examples can be found in:
+Up-to-date Mule Runtime examples can be found in:
 
 - MuleSoft documentation - http://developer.mulesoft.com/docs
 - Anypoint Studio - downloadable from https://www.mulesoft.com/platform/studio

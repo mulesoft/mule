@@ -8,7 +8,6 @@ package org.mule.exception;
 
 import org.mule.api.MuleContext;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.config.MuleManifest;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.management.stats.ServiceStatistics;
 
@@ -54,7 +53,7 @@ public class DefaultServiceExceptionStrategy extends DefaultMessagingExceptionSt
         if (!(stats instanceof ServiceStatistics))
         {
             //this should never happen, but JIC
-            logger.fatal("The Default Service Exception Strategy has been invoked but there is no current service on the context. Please report this to " + MuleManifest.getDevListEmail());
+            logger.fatal("The Default Service Exception Strategy has been invoked but there is no current service on the context.");
             return null;
         }
         return (ServiceStatistics) stats;
