@@ -10,12 +10,14 @@ import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterizedDeclaration;
 import org.mule.module.extension.internal.model.AbstractAnnotatedModelEnricher;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * A base class to be used to enrich a {@link ParameterDeclaration} when the associated {@link DeclaringMemberModelProperty} has a field that was annotated with a specific {@link Annotation}.
@@ -31,19 +33,15 @@ public abstract class AbstractAnnotatedParameterModelEnricher extends AbstractAn
         DeclarationDescriptor descriptor = describingContext.getDeclarationDescriptor();
         Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
 
-        //TODO MULE-9083 Refactor to use a Parameterizable interface to make this polymorphic
-        declaration.getConfigurations().forEach(parameterProvider ->
-                                                        enrichParameters(parameterProvider.getParameters()));
-
-        declaration.getConnectionProviders().forEach(parameterProvider ->
-                                                             enrichParameters(parameterProvider.getParameters()));
-        declaration.getOperations().forEach(parameterProvider ->
-                                                    enrichParameters(parameterProvider.getParameters()));
+        enrichParameters(declaration.getConfigurations());
+        enrichParameters(declaration.getConnectionProviders());
+        enrichParameters(declaration.getOperations());
     }
 
-    private void enrichParameters(List<ParameterDeclaration> parameters)
+    private void enrichParameters(List<? extends ParameterizedDeclaration> models)
     {
-        parameters.forEach(this::addModelPropertyIfRequired);
+        Stream<ParameterDeclaration> stream = models.stream().flatMap(declaration -> declaration.getParameters().stream());
+        stream.forEach(this::addModelPropertyIfRequired);
     }
 
     /**

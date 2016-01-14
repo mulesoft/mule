@@ -11,6 +11,7 @@ import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.param.Optional;
 
@@ -33,6 +34,12 @@ public class HeisenbergConnectionProvider implements ConnectionProvider<Heisenbe
     public void disconnect(HeisenbergConnection heisenbergConnection)
     {
 
+    }
+
+    @Override
+    public ConnectionValidationResult validate(HeisenbergConnection heisenbergConnection)
+    {
+        return ConnectionValidationResult.success();
     }
 
     @Override

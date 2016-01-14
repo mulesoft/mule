@@ -16,8 +16,11 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getInte
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getSourceName;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Configuration;
@@ -27,6 +30,7 @@ import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.ExtensionOf;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.Sources;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
@@ -45,10 +49,12 @@ import org.mule.extension.api.introspection.declaration.fluent.HasModelPropertie
 import org.mule.extension.api.introspection.declaration.fluent.OperationDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDescriptor;
+import org.mule.extension.api.introspection.declaration.fluent.SourceDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.extension.api.introspection.property.PasswordModelProperty;
 import org.mule.extension.api.introspection.property.TextModelProperty;
+import org.mule.extension.api.runtime.source.Source;
 import org.mule.module.extension.internal.model.property.ConfigTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
@@ -58,6 +64,7 @@ import org.mule.module.extension.internal.model.property.ImplementingTypeModelPr
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
+import org.mule.module.extension.internal.runtime.source.DefaultSourceFactory;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.CollectionUtils;
 
@@ -118,6 +125,7 @@ public final class AnnotationsBasedDescriber implements Describer
         declareConfigurations(declaration, extensionType);
         declareOperations(declaration, extensionType);
         declareConnectionProviders(declaration, extensionType);
+        declareMessageSources(declaration, extensionType);
 
         return declaration;
     }
@@ -143,8 +151,21 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
+    private void declareMessageSources(DeclarationDescriptor declaration, Class<?> extensionType)
+    {
+        Sources sources = extensionType.getAnnotation(Sources.class);
+        if (sources != null)
+        {
+            for (Class<? extends Source> declaringClass : sources.value())
+            {
+                declareMessageSource(declaration, declaringClass);
+            }
+        }
+    }
+
     private void declareConfiguration(DeclarationDescriptor declaration, Class<?> configurationType)
     {
+        //TODO: MULE-9220
         checkArgument(CollectionUtils.isEmpty(getOperationMethods(configurationType)), String.format("Class %s can't declare a configuration and operations at the same time", configurationType.getName()));
 
         ConfigurationDescriptor configuration;
@@ -163,6 +184,29 @@ public final class AnnotationsBasedDescriber implements Describer
                 .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(configurationType));
 
         declareAnnotatedParameters(configurationType, configuration, configuration.with());
+    }
+
+    private void declareMessageSource(DeclarationDescriptor declaration, Class<? extends Source> sourceType)
+    {
+        //TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
+        SourceDescriptor source = declaration.withMessageSource(getSourceName(sourceType));
+
+        List<Class<?>> sourceGenerics = getSuperClassGenerics(sourceType, Source.class);
+
+        if (sourceGenerics.size() != 2)
+        {
+            //TODO: MULE-9220: Add a syntax validator for this
+            throw new IllegalModelDefinitionException(String.format("Message source class '%s' was expected to have 2 generic types " +
+                                                                    "(one for the Payload type and another for the Attributes type) but %d were found",
+                                                                    sourceType.getName(), sourceGenerics.size()));
+        }
+
+        source.sourceCreatedBy(new DefaultSourceFactory(sourceType))
+                .whichReturns(DataType.of(sourceGenerics.get(0)))
+                .withAttributesOfType(DataType.of(sourceGenerics.get(1)))
+                .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(sourceType));
+
+        declareAnnotatedParameters(sourceType, source, source.with());
     }
 
     private void declareAnnotatedParameters(Class<?> annotatedType, Descriptor descriptor, WithParameters with)
@@ -242,7 +286,6 @@ public final class AnnotationsBasedDescriber implements Describer
         return parameters.build();
     }
 
-
     private void declareOperations(DeclarationDescriptor declaration, Class<?> extensionType)
     {
         Operations operations = extensionType.getAnnotation(Operations.class);
@@ -297,6 +340,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
         if (providerGenerics.size() != 2)
         {
+            //TODO: MULE-9220: Add a syntax validator for this
             throw new IllegalModelDefinitionException(String.format("Connection provider class '%s' was expected to have 2 generic types " +
                                                                     "(one for the config type and another for the connection type) but %d were found",
                                                                     providerClass.getName(), providerGenerics.size()));

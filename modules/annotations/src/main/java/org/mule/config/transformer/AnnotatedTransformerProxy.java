@@ -9,7 +9,7 @@ package org.mule.config.transformer;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.expression.ExpressionAnnotationsHelper;
@@ -17,7 +17,7 @@ import org.mule.config.i18n.AnnotationsMessages;
 import org.mule.expression.transformers.ExpressionTransformer;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.SimpleDataType;
+import org.mule.api.metadata.SimpleDataType;
 import org.mule.util.annotation.AnnotationUtils;
 
 import java.lang.reflect.Method;

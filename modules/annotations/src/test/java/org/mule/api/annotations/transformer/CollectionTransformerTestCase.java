@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.api.annotations.ContainsTransformerMethods;
 import org.mule.api.annotations.Transformer;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.config.transformer.AnnotatedTransformerProxy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

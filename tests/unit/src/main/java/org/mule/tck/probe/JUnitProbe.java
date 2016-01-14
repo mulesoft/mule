@@ -6,6 +6,8 @@
  */
 package org.mule.tck.probe;
 
+import org.mule.util.ExceptionUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * for cases in which the {@link #isSatisfied()} method can throw
  * exceptions or will perform JUnit/Hamcrest assertions, which result
  * in {@link java.lang.AssertionError}
- * <p/>
+ * <p>
  * This implementation automatically takes care of catching those exceptions/errors
  * and returning <code>false</code> in that case
  */
@@ -24,6 +26,7 @@ public abstract class JUnitProbe implements Probe
     private static final Logger logger = LoggerFactory.getLogger(JUnitProbe.class);
 
     private AssertionError lastFailure;
+    private Throwable throwable;
 
     /**
      * Invokes {@link #test()} and returns its outcome, provided that it didn't
@@ -44,6 +47,7 @@ public abstract class JUnitProbe implements Probe
         }
         catch (Throwable e)
         {
+            throwable = e;
             logger.debug("Probing failed with exception", e);
             return false;
         }
@@ -60,6 +64,16 @@ public abstract class JUnitProbe implements Probe
     @Override
     public String describeFailure()
     {
-        return lastFailure.getMessage();
+        if (lastFailure != null)
+        {
+            return lastFailure.getMessage();
+        }
+
+        if (throwable != null)
+        {
+            return ExceptionUtils.getFullStackTrace(throwable);
+        }
+
+        return "Condition not met";
     }
 }

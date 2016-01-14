@@ -82,12 +82,6 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
         testJsonErrorResponse("vm://in");
     }
 
-    @Test
-    public void testJmsJsonErrorResponse() throws Exception
-    {
-        testJsonErrorResponse("jms://in");
-    }
-
     private void testJsonErrorResponse(String endpointUri) throws Exception
     {
         LocalMuleClient client = muleContext.getClient();

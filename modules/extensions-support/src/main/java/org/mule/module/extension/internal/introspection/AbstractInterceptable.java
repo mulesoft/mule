@@ -10,7 +10,6 @@ import static org.mule.api.lifecycle.LifecycleUtils.disposeAllIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.safeStopIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
@@ -109,26 +108,6 @@ public abstract class AbstractInterceptable implements Interceptable, Lifecycle
     public void dispose()
     {
         disposeAllIfNeeded(interceptors, LOGGER);
-    }
-
-    /**
-     * Performs dependency injection on all the items in the {@link #interceptors} {@link List}
-     *
-     * @throws InitialisationException if injection on any {@link Interceptor} fails
-     */
-    protected final void injectInterceptors() throws InitialisationException
-    {
-        for (Interceptor interceptor : interceptors)
-        {
-            try
-            {
-                muleContext.getInjector().inject(interceptor);
-            }
-            catch (MuleException e)
-            {
-                throw new InitialisationException(createStaticMessage("Could not inject dependencies into interceptor of type " + interceptor.getClass().getName()), e, this);
-            }
-        }
     }
 
     /**

@@ -118,23 +118,6 @@
     <link><item>https:outbound-endpoint</item><page>HTTPS+Transport</page></link>
     <link><item>https:endpoint</item><page>HTTPS+Transport</page></link>
 
-    <link><item>jms:connector</item><page>JMS+Transport</page></link>
-    <link><item>jms:custom-connector</item><page>JMS+Transport</page></link>
-    <link><item>jms:activemq-connector</item><page>JMS+Transport</page></link>
-    <link><item>jms:activemq-xa-connector</item><page>JMS+Transport</page></link>
-    <link><item>jms:weblogic-connector</item><page>JMS+Transport</page></link>
-    <link><item>jms:websphere-connector</item><page>JMS+Transport</page></link>
-    <link><item>jms:transaction</item><page>JMS+Transport</page></link>
-    <link><item>jms:client-ack-transaction</item><page>JMS+Transport</page></link>
-    <link><item>jms:xa-transaction</item><page>JMS+Transport</page></link>
-    <link><item>jms:jmsmessage-to-object-transformer</item><page>JMS+Transport</page></link>
-    <link><item>jms:object-to-jmsmessage-transformer</item><page>JMS+Transport</page></link>
-    <link><item>jms:inbound-endpoint</item><page>JMS+Transport</page></link>
-    <link><item>jms:outbound-endpoint</item><page>JMS+Transport</page></link>
-    <link><item>jms:endpoint</item><page>JMS+Transport</page></link>
-    <link><item>jms:selector</item><page>JMS+Transport</page></link>
-    <link><item>jms:property-filter</item><page>JMS+Transport</page></link>
-
     <link><item>jnp:connector</item><page>JNP+Transport</page></link>
     <link><item>jnp:inbound-endpoint</item><page>JNP+Transport</page></link>
     <link><item>jnp:outbound-endpoint</item><page>JNP+Transport</page></link>

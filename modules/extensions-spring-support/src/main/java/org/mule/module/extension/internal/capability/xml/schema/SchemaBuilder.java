@@ -14,15 +14,17 @@ import static org.mule.extension.api.introspection.DataQualifier.OPERATION;
 import static org.mule.extension.api.introspection.DataQualifier.POJO;
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
-import static org.mule.module.extension.internal.capability.xml.schema.PoolingSupport.REQUIRED;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_DESCRIPTION_CONFIG;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_CONFIG;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_VALUE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.GROUP_SUFFIX;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT;
@@ -37,7 +39,8 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.XML_NAMESPACE;
-import static org.mule.module.extension.internal.introspection.ImplicitObjectUtils.getFirstImplicit;
+import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
+import static org.mule.module.extension.internal.introspection.utils.PoolingSupport.REQUIRED;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
@@ -50,16 +53,20 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDyna
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.DataQualifier;
 import org.mule.extension.api.introspection.DataQualifierVisitor;
 import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.Described;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.ParametrizedModel;
 import org.mule.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.module.extension.internal.capability.xml.schema.model.ComplexContent;
@@ -87,6 +94,7 @@ import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelEl
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.module.extension.internal.capability.xml.schema.model.Union;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
+import org.mule.module.extension.internal.model.property.ConnectionHandlingTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
@@ -201,22 +209,32 @@ public final class SchemaBuilder
         choice.setMinOccurs(ZERO);
         choice.setMaxOccurs(UNBOUNDED);
 
-        addConnectionProviderPoolingProfile(choice, providerModel);
+        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
+
+        if (connectionHandlingType != null)
+        {
+            if (connectionHandlingType.isPooled() || connectionHandlingType.isCached())
+            {
+                addConnectionProviderPoolingProfile(choice, providerModel);
+                addValidationFlag(providerType);
+            }
+        }
+
         registerParameters(providerType, choice, providerModel.getParameterModels());
         return this;
     }
 
+    private void addValidationFlag(ExtensionType providerType)
+    {
+        providerType.getAttributeOrAttributeGroup().add(createAttribute(DISABLE_VALIDATION, DataType.of(boolean.class), false, ExpressionSupport.NOT_SUPPORTED));
+    }
+
     private void addConnectionProviderPoolingProfile(ExplicitGroup choice, ConnectionProviderModel providerModel)
     {
-        PoolingSupport poolingSupport = SchemaBuilderUtils.getPoolingDefinition(providerModel);
-        if (poolingSupport == PoolingSupport.NOT_SUPPORTED)
-        {
-            return;
-        }
-
+        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
         TopLevelElement objectElement = new TopLevelElement();
 
-        objectElement.setMinOccurs(poolingSupport == REQUIRED ? ONE : ZERO);
+        objectElement.setMinOccurs(connectionHandlingType.getPoolingSupport() == REQUIRED ? ONE : ZERO);
         objectElement.setMaxOccurs("1");
         objectElement.setRef(MULE_POOLING_PROFILE_TYPE);
 
@@ -250,6 +268,15 @@ public final class SchemaBuilder
         String typeName = StringUtils.capitalize(operationModel.getName()) + SchemaConstants.TYPE_SUFFIX;
         registerProcessorElement(operationModel, typeName);
         registerOperationType(typeName, operationModel);
+
+        return this;
+    }
+
+    public SchemaBuilder registerMessageSource(SourceModel sourceModel)
+    {
+        String typeName = StringUtils.capitalize(sourceModel.getName()) + SchemaConstants.TYPE_SUFFIX;
+        registerSourceElement(sourceModel, typeName);
+        registerSourceType(typeName, sourceModel);
 
         return this;
     }
@@ -625,10 +652,20 @@ public final class SchemaBuilder
     private void registerProcessorElement(OperationModel operationModel, String typeName)
     {
         Element element = new TopLevelElement();
-        element.setName(getOperationName(operationModel));
+        element.setName(getElementName(operationModel));
         element.setType(new QName(schema.getTargetNamespace(), typeName));
         element.setAnnotation(createDocAnnotation(operationModel.getDescription()));
         element.setSubstitutionGroup(getOperationSubstitutionGroup(operationModel));
+        schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
+    }
+
+    private void registerSourceElement(SourceModel sourceModel, String typeName)
+    {
+        Element element = new TopLevelElement();
+        element.setName(getElementName(sourceModel));
+        element.setType(new QName(schema.getTargetNamespace(), typeName));
+        element.setAnnotation(createDocAnnotation(sourceModel.getDescription()));
+        element.setSubstitutionGroup(MULE_ABSTRACT_MESSAGE_SOURCE);
         schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
     }
 
@@ -684,9 +721,9 @@ public final class SchemaBuilder
         return name;
     }
 
-    private String getOperationName(OperationModel operationModel)
+    private String getElementName(Described model)
     {
-        return hyphenize(operationModel.getName());
+        return hyphenize(model.getName());
     }
 
     private String getGroupName(String name)
@@ -696,7 +733,16 @@ public final class SchemaBuilder
 
     private void registerOperationType(String name, OperationModel operationModel)
     {
-        final QName base = MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE;
+        registerExecutableType(name, operationModel, MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE);
+    }
+
+    private void registerSourceType(String name, SourceModel sourceModel)
+    {
+        registerExecutableType(name, sourceModel, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE);
+    }
+
+    private void registerExecutableType(String name, ParametrizedModel parametrizedModel, QName base)
+    {
         TopLevelComplexType complexType = new TopLevelComplexType();
         complexType.setName(name);
 
@@ -712,7 +758,7 @@ public final class SchemaBuilder
         final ExplicitGroup all = new ExplicitGroup();
         complexContentExtension.setSequence(all);
 
-        for (final ParameterModel parameterModel : operationModel.getParameterModels())
+        for (final ParameterModel parameterModel : parametrizedModel.getParameterModels())
         {
             DataType parameterType = parameterModel.getType();
             DataQualifier parameterQualifier = parameterType.getQualifier();

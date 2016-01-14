@@ -14,8 +14,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleContext;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -52,6 +54,7 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase
     {
         when(connectionProvider.connect(config)).thenReturn(connection);
         managedConnection = new CachedConnectionHandler<>(config, connectionProvider, muleContext);
+        when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
     }
 
     @Test
@@ -122,6 +125,7 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase
 
         reset(connectionProvider);
         Banana newConnection = new Banana();
+        when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
         when(connectionProvider.connect(config)).thenReturn(newConnection);
 
         getConnection();

@@ -13,7 +13,7 @@ import static org.mule.context.notification.BaseConnectorMessageNotification.MES
 
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
-import org.mule.api.CompletionHandler;
+import org.mule.api.execution.CompletionHandler;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;

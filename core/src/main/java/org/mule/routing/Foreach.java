@@ -16,7 +16,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.expression.ExpressionConfig;
 import org.mule.processor.AbstractMessageProcessorOwner;

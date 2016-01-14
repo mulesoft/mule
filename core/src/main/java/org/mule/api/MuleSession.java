@@ -7,7 +7,7 @@
 package org.mule.api;
 
 import org.mule.api.security.SecurityContext;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transport.SessionHandler;
 
 import java.io.Serializable;

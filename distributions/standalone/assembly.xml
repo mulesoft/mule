@@ -121,7 +121,6 @@
                 <!-- Core -->
                 <include>org.mule:mule-core</include>
                 <!-- Transports -->
-                <include>org.mule.transports:mule-transport-jms</include>
                 <include>org.mule.transports:mule-transport-vm</include>
                 <!-- Modules -->
                 <include>org.mule.modules:mule-module-launcher</include>
@@ -183,7 +182,6 @@
                 <exclude>org.mule:mule-core</exclude>
                 <exclude>org.mule.extensions:mule-extensions-all</exclude>
                 <exclude>org.mule.transports:mule-transports-all</exclude>
-                <exclude>org.mule.transports:mule-transport-jms</exclude>
                 <exclude>org.mule.transports:mule-transport-vm</exclude>
                 <exclude>org.mule.modules:mule-modules-all</exclude>
                 <exclude>org.mule.modules:mule-module-annotations</exclude>

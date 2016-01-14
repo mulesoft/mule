@@ -17,7 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
@@ -66,7 +66,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>DefaultMuleMessage</code> is a wrapper that contains a payload and properties
  * associated with the payload.
  */
-public class DefaultMuleMessage extends TypedValue implements MuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
+public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
 {
     private static final String NOT_SET = "<not set>";
 
@@ -141,10 +141,20 @@ public class DefaultMuleMessage extends TypedValue implements MuleMessage, Threa
      *
      * @param value  the value (or payload) of the message being created.
      * @param <T> the type of the value
-     * */
+     */
     public <T> DefaultMuleMessage(T value)
     {
-        this(value, (DataType<T>) null);
+        this(value, (DataType<T>) null, null, null);
+    }
+
+    /**
+     * @deprecated this is a temporal workaround because the message requires the mule context. As the message
+     * refactor progresses, {@link DefaultMuleMessage(T, DataType)} should be use instead
+     */
+    @Deprecated
+    public <T> DefaultMuleMessage(T value, MuleContext muleContext)
+    {
+        this(value, (DataType<T>) null, null, muleContext);
     }
 
     /**
@@ -156,7 +166,17 @@ public class DefaultMuleMessage extends TypedValue implements MuleMessage, Threa
      */
     public <T> DefaultMuleMessage(T value, DataType<T> dataType)
     {
-        this(value, dataType, null);
+        this(value, dataType, null, null);
+    }
+
+    /**
+     * @deprecated this is a temporal workaround because the message requires the mule context. As the message
+     * refactor progresses, {@link DefaultMuleMessage(T, DataType)} should be use instead
+     */
+    @Deprecated
+    public <T> DefaultMuleMessage(T value, DataType<T> dataType, MuleContext muleContext)
+    {
+        this(value, dataType, null, muleContext);
     }
 
     /**
@@ -170,20 +190,27 @@ public class DefaultMuleMessage extends TypedValue implements MuleMessage, Threa
      */
     public <T> DefaultMuleMessage(T value, DataType<T> dataType, Serializable attributes)
     {
-        super(value != null ? value : NullPayload.getInstance(), dataType);
+        this(value, dataType, attributes, null);
+    }
+
+
+    /**
+     * @deprecated this is a temporal workaround because the message requires the mule context. As the message
+     * refactor progresses, {@link DefaultMuleMessage(T, DataType, Serializable)} should be use instead
+     */
+    @Deprecated
+    public <T> DefaultMuleMessage(T value, DataType<T> dataType, Serializable attributes, MuleContext muleContext)
+    {
+        super(value != null ? value : NullPayload.getInstance(), (DataType<Object>) dataType);
         id = UUID.getUUID();
         rootId = id;
         this.attributes = attributes;
+        this.muleContext = muleContext;
     }
 
     public DefaultMuleMessage(MuleMessage message)
     {
         this(message.getPayload(), message, message.getMuleContext(), getCloningMessageDataType(message));
-    }
-
-    public DefaultMuleMessage(Object message, MuleContext muleContext)
-    {
-        this(message, (Map<String, Object>) null, muleContext);
     }
 
     public DefaultMuleMessage(Object message, Map<String, Object> outboundProperties, MuleContext muleContext)
@@ -1098,7 +1125,7 @@ public class DefaultMuleMessage extends TypedValue implements MuleMessage, Threa
     @Override
     public synchronized void setPayload(Object payload)
     {
-        DataType  newDataType;
+        DataType newDataType;
         if (payload == null || payload instanceof NullPayload)
         {
             newDataType = DataTypeFactory.create(Object.class, null);

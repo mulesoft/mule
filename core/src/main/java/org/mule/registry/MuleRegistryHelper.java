@@ -31,7 +31,7 @@ import org.mule.api.registry.ServiceType;
 import org.mule.api.registry.TransformerResolver;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.transformer.Converter;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;

@@ -9,7 +9,7 @@ package org.mule.module.ws.consumer;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;

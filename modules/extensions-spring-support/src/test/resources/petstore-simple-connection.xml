@@ -6,7 +6,7 @@
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
     <petstore:config name="petstore">
-        <petstore:connection username="john" password="doe" />
+        <petstore:pooled-connection username="john" password="doe" />
         <petstore:pets>
             <petstore:pet value="Lassie" />
             <petstore:pet value="Sapo Pepe" />
@@ -14,12 +14,40 @@
         </petstore:pets>
     </petstore:config>
 
+    <petstore:config name="petstoreInvalidConnectionWithConnectionValidation">
+        <petstore:pooled-connection username="john" password="invalid-password" />
+        <petstore:pets>
+            <petstore:pet value="Lassie" />
+            <petstore:pet value="Sapo Pepe" />
+            <petstore:pet value="My mother's parrot" />
+        </petstore:pets>
+    </petstore:config>
+
+    <petstore:config name="petstoreInvalidConnectionWithDisabledValidation">
+        <petstore:pooled-connection disableValidation="true" username="john" password="invalid-password" />
+        <petstore:pets>
+            <petstore:pet value="Lassie" />
+            <petstore:pet value="Sapo Pepe" />
+            <petstore:pet value="My mother's parrot" />
+        </petstore:pets>
+    </petstore:config>
+
+    <flow name="getPetsWithInvalidConfigAndDisabledValidation">
+        <petstore:get-pets config-ref="petstoreInvalidConnectionWithDisabledValidation" ownerName="john" />
+    </flow>
+
+    <flow name="getPetsWithInvalidConfigWithConnectionValidation">
+        <petstore:get-pets config-ref="petstoreInvalidConnectionWithConnectionValidation" ownerName="john" />
+        <petstore:get-pets config-ref="petstoreInvalidConnectionWithConnectionValidation" ownerName="john" />
+        <petstore:get-pets config-ref="petstoreInvalidConnectionWithConnectionValidation" ownerName="john" />
+    </flow>
+
     <flow name="getPets">
-        <petstore:get-pets ownerName="john" />
+        <petstore:get-pets config-ref="petstore" ownerName="john" />
     </flow>
 
     <flow name="getClient">
-        <petstore:get-client />
+        <petstore:get-client config-ref="petstore" />
     </flow>
 
 

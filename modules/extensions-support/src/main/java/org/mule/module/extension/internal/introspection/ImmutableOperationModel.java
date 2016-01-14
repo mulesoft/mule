@@ -11,7 +11,7 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
-import org.mule.extension.api.introspection.declaration.fluent.OperationExecutorFactory;
+import org.mule.extension.api.runtime.OperationExecutorFactory;
 import org.mule.extension.api.runtime.InterceptorFactory;
 import org.mule.extension.api.runtime.OperationExecutor;
 

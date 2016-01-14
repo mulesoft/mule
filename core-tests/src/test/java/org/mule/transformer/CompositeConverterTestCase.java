@@ -23,7 +23,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.Converter;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.types.MimeTypes;
 

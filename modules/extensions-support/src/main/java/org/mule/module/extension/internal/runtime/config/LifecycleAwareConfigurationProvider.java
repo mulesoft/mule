@@ -75,8 +75,7 @@ public abstract class LifecycleAwareConfigurationProvider<T> implements Configur
             lifecycleManager.fireInitialisePhase((phaseName, object) -> {
                 for (ConfigurationInstance<T> configurationInstance : configurationInstances)
                 {
-                    muleContext.getInjector().inject(configurationInstance);
-                    initialiseConfig(configurationInstance);
+                    initialiseIfNeeded(configurationInstance, muleContext);
                 }
             });
         }
@@ -168,19 +167,6 @@ public abstract class LifecycleAwareConfigurationProvider<T> implements Configur
     public ConfigurationModel getModel()
     {
         return configurationModel;
-    }
-
-    protected void initialiseConfig(ConfigurationInstance<T> config) throws InitialisationException
-    {
-        try
-        {
-            muleContext.getInjector().inject(config);
-            initialiseIfNeeded(config, muleContext);
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
     }
 
     protected void startConfig(ConfigurationInstance<T> config) throws MuleException

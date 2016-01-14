@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
@@ -9,93 +8,11 @@
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <jms:activemq-connector name="jmsConnector" maxRedelivery="3" />
-
-    <jms:activemq-connector name="jmsConnectorNoRedelivery" maxRedelivery="0" />
-
     <http:request-config name="requestConfig" host="localhost" port="${port7}"/>
-
-    <flow name="LastMessageStateRouting">
-        <jms:inbound-endpoint queue="in1" connector-ref="jmsConnector">
-            <jms:transaction action="ALWAYS_BEGIN" />
-        </jms:inbound-endpoint>
-        <append-string-transformer message=" with some text added"/>
-        <test:component/>
-        <jms:outbound-endpoint queue="out" connector-ref="jmsConnector">
-            <jms:transaction action="ALWAYS_JOIN" />
-        </jms:outbound-endpoint>
-        <default-exception-strategy>
-            <commit-transaction exception-pattern="*"/>
-            <processor-chain>
-                <expression-transformer evaluator="groovy" expression="payload.getPayload()"/>
-                <jms:outbound-endpoint queue="dead.letter1" connector-ref="jmsConnector">
-                    <jms:transaction action="ALWAYS_JOIN" />
-                </jms:outbound-endpoint>
-            </processor-chain>
-        </default-exception-strategy>
-    </flow>
-
-    <flow name="OriginalMessageRouting">
-        <jms:inbound-endpoint queue="in2" connector-ref="jmsConnector">
-            <jms:transaction action="ALWAYS_BEGIN" />
-        </jms:inbound-endpoint>
-        <message-properties-transformer scope="session">
-            <add-message-property key="originalMessage" value="#[message:payload]"/>
-        </message-properties-transformer>
-        <append-string-transformer message=" with some text added"/>
-        <test:component/>
-        <jms:outbound-endpoint queue="out" connector-ref="jmsConnector">
-            <jms:transaction action="ALWAYS_JOIN" />
-        </jms:outbound-endpoint>
-        <default-exception-strategy>
-            <commit-transaction exception-pattern="*"/>
-            <processor-chain>
-                <expression-transformer evaluator="header"  expression="SESSION:originalMessage"/>
-                <message-properties-transformer scope="session">
-                    <delete-message-property key="originalMessage"/>
-                </message-properties-transformer>
-                <jms:outbound-endpoint queue="dead.letter2" connector-ref="jmsConnector">
-                    <jms:transaction action="ALWAYS_JOIN" />
-                </jms:outbound-endpoint>
-            </processor-chain>
-        </default-exception-strategy>
-    </flow>
-
-
-
-    <flow name="RouteByExceptionType">
-        <jms:inbound-endpoint queue="in3" connector-ref="jmsConnector">
-            <jms:transaction action="ALWAYS_BEGIN" />
-        </jms:inbound-endpoint>
-        <test:component/>
-        <jms:outbound-endpoint queue="out" connector-ref="jmsConnector">
-            <jms:transaction action="ALWAYS_JOIN" />
-        </jms:outbound-endpoint>
-        <default-exception-strategy>
-            <commit-transaction exception-pattern="org.mule.transport.jms.redelivery.*"/>
-            <choice>
-                <when evaluator="groovy" expression='payload.getException() instanceof org.mule.transport.jms.redelivery.MessageRedeliveredException'>
-                    <expression-transformer evaluator="groovy" expression="payload.getPayload()"/>
-                    <jms:outbound-endpoint queue="dead.letter3" connector-ref="jmsConnector">
-                        <jms:transaction action="ALWAYS_JOIN" />
-                    </jms:outbound-endpoint>
-                </when>
-                <when evaluator="groovy" expression="payload.getException() instanceof org.mule.component.ComponentException">
-                    <jms:outbound-endpoint queue="exceptions" connector-ref="jmsConnector">
-                        <jms:transaction action="NONE"/>
-                    </jms:outbound-endpoint>
-                </when>
-                <otherwise>
-                    <logger/>
-                </otherwise>
-            </choice>
-        </default-exception-strategy>
-    </flow>
 
     <flow name="PreservePayloadExceptionStrategy">
         <vm:inbound-endpoint path="in4" exchange-pattern="request-response"/>

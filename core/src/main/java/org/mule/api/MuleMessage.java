@@ -6,7 +6,7 @@
  */
 package org.mule.api;
 
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transport.PropertyScope;
 
 import java.io.Serializable;
@@ -16,11 +16,10 @@ import java.util.Set;
 import javax.activation.DataHandler;
 
 /**
- * <code>MuleMessage</code> represents a message payload. The Message comprises of
- * the payload itself and properties associated with the payload.
+ * @deprecated use org.mule.api.temp.MuleMessage whenever possible. This class should have dissapeared by the time the mule-api is frozen.
  */
-
-public interface MuleMessage extends Serializable
+@Deprecated
+public interface MuleMessage extends org.mule.api.temp.MuleMessage<Object, Serializable>
 {
 
     /**
@@ -109,11 +108,6 @@ public interface MuleMessage extends Serializable
     Set<String> getInvocationPropertyNames();
     Set<String> getInboundPropertyNames();
     Set<String> getOutboundPropertyNames();
-
-    /**
-     * @return the current message
-     */
-    Object getPayload();
 
     /**
      * gets the unique identifier for the message. It's up to the implementation to
@@ -446,11 +440,6 @@ public interface MuleMessage extends Serializable
     MuleContext getMuleContext();
 
     /**
-     * Returns the data type (if any) associated with the message's payload.
-     */
-    DataType<?> getDataType();
-
-    /**
      * Copy an inbound message to an outbound one, moving all message properties and attachments
      * @return the inbound message
      */
@@ -461,19 +450,4 @@ public interface MuleMessage extends Serializable
      * {@link org.mule.api.transport.PropertyScope#OUTBOUND}.
      */
     void clearAttachments();
-
-
-    /**
-     * Gets the attributes associated with the MuleMessage.  The {@link Serializable} attributes object is specifc to
-     * the connector that was the source of the current message and is used for obtaining message properties or headers
-     * if applicable plus additional information that provides context for the current message such as file size, file
-     * name and last mofified date for FILE, and orgin ip address, query parameters etc. for HTTP.
-     * <p>
-     * If there are no attributes associated with the current message, for example if the source of the message was not
-     * a connector, then the attributes with be null.
-     *
-     * @return attributes associated with the message, or null if none exist.
-     */
-    Serializable getAttributes();
-
 }

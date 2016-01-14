@@ -10,6 +10,7 @@ import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.param.display.Password;
 import org.mule.extension.annotation.api.param.display.Text;
@@ -35,6 +36,12 @@ public class SecureConnectionProvider implements ConnectionProvider<SecureConnec
     public void disconnect(Object o)
     {
 
+    }
+
+    @Override
+    public ConnectionValidationResult validate(Object o)
+    {
+        return ConnectionValidationResult.success();
     }
 
     @Override

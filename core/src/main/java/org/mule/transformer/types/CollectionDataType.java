@@ -6,7 +6,9 @@
  */
 package org.mule.transformer.types;
 
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.ImmutableDataType;
+import org.mule.api.metadata.SimpleDataType;
+import org.mule.api.metadata.DataType;
 import org.mule.util.generics.GenericsUtils;
 import org.mule.util.generics.MethodParameter;
 

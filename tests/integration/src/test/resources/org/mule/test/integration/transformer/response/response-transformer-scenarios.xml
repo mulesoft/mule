@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
     
-
-    <jms:activemq-connector name="jmsConnector"/>
 
     <vm:connector name="default">
         <service-overrides inboundTransformer="org.mule.transformer.simple.InboundAppendTransformer"
@@ -47,52 +43,8 @@
                            responseTransformer-refs="customResponse"/>
     </flow>
 
-    <flow name="JmsSync">
-        <inbound-endpoint address="vm://jmsSync" exchange-pattern="request-response"/>
-        <outbound-endpoint address="jms://echo" exchange-pattern="request-response"/>
-    </flow>
-
-    <flow name="JmsSyncOutboundEndpointResponseTransformer">
-        <inbound-endpoint address="vm://jmsSyncOutboundEndpointResponseTransformer"
-                          exchange-pattern="request-response"/>
-        <outbound-endpoint address="jms://echo" exchange-pattern="request-response"
-                           responseTransformer-refs="customResponse"/>
-    </flow>
-
-    <flow name="ChainedRouterOutboundEndpointResponseTransformer">
-        <inbound-endpoint address="vm://chainedRouterOutboundEndpointResponseTransformer"
-                          exchange-pattern="request-response"/>
-        <outbound-endpoint address="vm://echo" exchange-pattern="request-response"/>
-        <outbound-endpoint address="jms://echo" exchange-pattern="request-response"/>
-        <outbound-endpoint address="vm://echo" exchange-pattern="request-response"
-                           responseTransformer-refs="customResponse"/>
-        <outbound-endpoint address="jms://echo" exchange-pattern="request-response"
-                           responseTransformer-refs="customResponse"/>
-    </flow>
-
-    <flow name="NestedRouterOutboundEndpointResponseTransformer">
-        <inbound-endpoint address="vm://nestedRouterOutboundEndpointResponseTransformer"
-                          exchange-pattern="request-response"/>
-        <component>
-            <singleton-object class="org.mule.test.integration.transformer.response.BindingInterfaceComponent"/>
-            <binding interface="org.mule.test.integration.transformer.response.BindingInterface" method="hello1">
-                <outbound-endpoint address="vm://echo" exchange-pattern="request-response"
-                                   responseTransformer-refs="customResponse"/>
-            </binding>
-            <binding interface="org.mule.test.integration.transformer.response.BindingInterface" method="hello2">
-                <outbound-endpoint address="jms://echo" exchange-pattern="request-response"
-                                   responseTransformer-refs="customResponse"/>
-            </binding>
-        </component>
-    </flow>
-
     <flow name="VmEchoService">
         <inbound-endpoint address="vm://echo" exchange-pattern="request-response"/>
-        <echo-component/>
-    </flow>
-
-    <flow name="JmsEchoService">
-        <inbound-endpoint address="jms://echo" exchange-pattern="request-response"/>
         <echo-component/>
     </flow>
 

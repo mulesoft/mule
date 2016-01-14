@@ -13,7 +13,7 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.TransformerResolver;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ObjectToString;

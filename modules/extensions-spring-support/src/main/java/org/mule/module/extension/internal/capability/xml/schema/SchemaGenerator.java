@@ -49,6 +49,7 @@ public class SchemaGenerator
         extensionModel.getConfigurationModels().forEach(schemaBuilder::registerConfigElement);
         extensionModel.getOperationModels().forEach(schemaBuilder::registerOperation);
         extensionModel.getConnectionProviders().forEach(schemaBuilder::registerConnectionProviderElement);
+        extensionModel.getSourceModels().forEach(schemaBuilder::registerMessageSource);
 
         schemaBuilder.registerEnums();
 

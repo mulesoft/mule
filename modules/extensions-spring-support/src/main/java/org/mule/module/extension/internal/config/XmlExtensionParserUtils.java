@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.config;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_CONFIG;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
@@ -56,6 +57,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
@@ -213,6 +215,7 @@ final class XmlExtensionParserUtils
         builder.addConstructorArgValue(element.getLocalName());
         parseElementDescriptorAttributes(element, builder);
         parseElementDescriptorChilds(element, builder);
+        builder.addConstructorArgValue(element.getParentNode());
 
         return builder.getBeanDefinition();
     }
@@ -303,6 +306,17 @@ final class XmlExtensionParserUtils
         return element.hasAttribute(attributeName)
                ? element.getAttribute(attributeName)
                : defaultValue;
+    }
+
+    static void parseConfigRef(Element element, BeanDefinitionBuilder builder)
+    {
+        String configRef = element.getAttribute(ATTRIBUTE_NAME_CONFIG);
+        if (StringUtils.isBlank(configRef))
+        {
+            configRef = null;
+        }
+
+        builder.addConstructorArgValue(configRef);
     }
 
     private static ValueResolver parseCollectionAsInnerElement(ElementDescriptor collectionElement,

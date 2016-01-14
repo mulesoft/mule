@@ -10,7 +10,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.module.extension.internal.introspection.ImplicitObjectUtils;
+import org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils;
 
 import java.util.List;
 

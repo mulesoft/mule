@@ -11,12 +11,13 @@ import org.mule.api.MuleException;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandler;
+import org.mule.api.connection.ConnectionValidationResult;
 
 /**
  * A {@link ConnectionHandlingStrategyAdapter} which is associated to a {@link #config}.
  * A connection is lazily created and cached, so that the same instance is returned
  * each time the {@link #config} requires a connection.
- * <p>
+ * <p/>
  * When {@link ConnectionHandler#release()} is invoked on the instances returned
  * by {@link #getConnectionHandler()}, the connection is not actually closed. It
  * will only be disconnected when {@link #close()} is called.

@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -24,7 +24,7 @@ import org.mule.tck.size.SmallTest;
 import org.mule.transformer.builder.MockConverterBuilder;
 import org.mule.transformer.builder.MockTransformerBuilder;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.SimpleDataType;
+import org.mule.api.metadata.SimpleDataType;
 
 import org.junit.Before;
 import org.junit.Test;

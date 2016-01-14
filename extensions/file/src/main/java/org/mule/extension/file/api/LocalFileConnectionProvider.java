@@ -9,6 +9,7 @@ package org.mule.extension.file.api;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.module.extension.file.api.FileSystem;
 
 /**
@@ -42,6 +43,12 @@ public final class LocalFileConnectionProvider implements ConnectionProvider<Fil
     public void disconnect(FileSystem localFileSystem)
     {
         // no-op
+    }
+
+    @Override
+    public ConnectionValidationResult validate(FileSystem fileSystem)
+    {
+        return ConnectionValidationResult.success();
     }
 
     /**

@@ -19,7 +19,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;

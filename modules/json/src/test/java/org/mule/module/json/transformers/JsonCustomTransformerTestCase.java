@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.ContainsTransformerMethods;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.transformer.AnnotatedTransformerProxy;
 import org.mule.json.model.EmailAddress;
@@ -23,7 +23,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.CollectionDataType;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.ListDataType;
-import org.mule.transformer.types.SimpleDataType;
+import org.mule.api.metadata.SimpleDataType;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
