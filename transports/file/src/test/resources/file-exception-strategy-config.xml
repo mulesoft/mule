@@ -38,6 +38,11 @@
         <file:outbound-endpoint path=".mule/temp/output-directory" connector-ref="fileConnectorWithWorkDir"/>
     </flow>
 
+    <flow name="inboundDirNotExists">
+        <file:inbound-endpoint path=".mule/temp/input-not-exists" connector-ref="fileConnector"/>
+        <test:component/>
+    </flow>
+
     <flow name="consumeFileWithStreamingAndCatch" processingStrategy="synchronous">
         <file:inbound-endpoint path=".mule/temp/input-streaming-catch" connector-ref="fileConnectorStreaming"/>
         <test:component throwException="true"/>

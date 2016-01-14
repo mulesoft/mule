@@ -670,6 +670,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
      */
     List<File> listFiles() throws MuleException
     {
+        if (!readDirectory.exists())
+        {
+            throw new DefaultMuleException(FileMessages.errorWhileListingFiles());
+        }
+
         try
         {
             List<File> files = new ArrayList<File>();
