@@ -8,12 +8,10 @@ package org.mule.execution;
 
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RESPONSE;
-
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.execution.ExecutionCallback;
 import org.mule.transaction.MuleTransactionConfig;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -62,30 +60,25 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
                                 createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
                                                             (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig() : messageProcessContext.getTransactionConfig()),
                                                             messageProcessContext.getFlowConstruct().getExceptionListener());
-                        MuleEvent response = transactionTemplate.execute(new ExecutionCallback<MuleEvent>()
-                        {
-                            @Override
-                            public MuleEvent process() throws Exception
+                        MuleEvent response = transactionTemplate.execute(() -> {
+                            try
                             {
-                                try
+                                Object message = flowProcessingPhaseTemplate.getOriginalMessage();
+                                if (message == null)
                                 {
-                                    Object message = flowProcessingPhaseTemplate.getOriginalMessage();
-                                    if (message == null)
-                                    {
-                                        return null;
-                                    }
-                                    MuleEvent muleEvent = flowProcessingPhaseTemplate.getMuleEvent();
-                                    muleEvent = flowProcessingPhaseTemplate.beforeRouteEvent(muleEvent);
-                                    muleEvent = flowProcessingPhaseTemplate.routeEvent(muleEvent);
-                                    muleEvent = flowProcessingPhaseTemplate.afterRouteEvent(muleEvent);
-                                    sendResponseIfNeccessary(muleEvent, flowProcessingPhaseTemplate);
-                                    return muleEvent;
+                                    return null;
                                 }
-                                catch (Exception e)
-                                {
-                                    exceptionThrownDuringFlowProcessing.set(e);
-                                    throw e;
-                                }
+                                MuleEvent muleEvent = flowProcessingPhaseTemplate.getMuleEvent();
+                                muleEvent = flowProcessingPhaseTemplate.beforeRouteEvent(muleEvent);
+                                muleEvent = flowProcessingPhaseTemplate.routeEvent(muleEvent);
+                                muleEvent = flowProcessingPhaseTemplate.afterRouteEvent(muleEvent);
+                                sendResponseIfNeccessary(muleEvent, flowProcessingPhaseTemplate);
+                                return muleEvent;
+                            }
+                            catch (Exception e)
+                            {
+                                exceptionThrownDuringFlowProcessing.set(e);
+                                throw e;
                             }
                         });
                         if (exceptionThrownDuringFlowProcessing.get() != null && !(exceptionThrownDuringFlowProcessing.get() instanceof ResponseDispatchException))

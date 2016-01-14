@@ -104,7 +104,6 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
         try
         {
             initStats();
-            inject();
             doInitialise();
         }
         catch (Exception e)
@@ -230,15 +229,5 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
         }
 
         configurationStats = new DefaultMutableConfigurationStats(timeSupplier);
-    }
-
-    private void inject() throws MuleException
-    {
-        muleContext.getInjector().inject(value);
-        if (connectionProvider.isPresent())
-        {
-            muleContext.getInjector().inject(connectionProvider.get());
-        }
-        injectInterceptors();
     }
 }

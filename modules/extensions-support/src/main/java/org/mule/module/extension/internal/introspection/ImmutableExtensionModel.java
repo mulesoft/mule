@@ -9,20 +9,23 @@ package org.mule.module.extension.internal.introspection;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.mule.util.CollectionUtils.immutableList;
 import static org.mule.util.Preconditions.checkArgument;
-
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.exception.NoSuchConfigurationException;
+import org.mule.extension.api.exception.NoSuchMessageSourceException;
 import org.mule.extension.api.exception.NoSuchOperationException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.SourceModel;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -38,6 +41,7 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
     private final Map<String, ConfigurationModel> configurations;
     private final Map<String, OperationModel> operations;
     private final List<ConnectionProviderModel> connectionProviders;
+    private final Map<String, SourceModel> messageSources;
     private final String vendor;
 
     /**
@@ -50,6 +54,7 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
      * @param configurationModels a {@link List} with the extension's {@link ConfigurationModel configurationModels}
      * @param operationModels     a {@link List} with the extension's {@link OperationModel operationModels}
      * @param connectionProviders a {@link List} with the extension's {@link ConnectionProviderModel connection provider models}
+     * @param sourceModels        a {@link List} with the extension's {@link SourceModel message source models}
      * @param modelProperties     A {@link Map} of custom properties which extend this model
      * @throws IllegalArgumentException if {@code configurations} or {@link ParameterModel} are {@code null} or contain instances with non unique names, or if {@code name} is blank
      */
@@ -60,6 +65,7 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
                                       List<ConfigurationModel> configurationModels,
                                       List<OperationModel> operationModels,
                                       List<ConnectionProviderModel> connectionProviders,
+                                      List<SourceModel> sourceModels,
                                       Map<String, Object> modelProperties)
     {
         super(name, description, modelProperties);
@@ -67,6 +73,7 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
         this.configurations = toMap(configurationModels);
         this.operations = toMap(operationModels);
         this.connectionProviders = immutableList(connectionProviders);
+        this.messageSources = toMap(sourceModels);
 
         checkArgument(!StringUtils.isBlank(version), "Version cannot be blank");
 
@@ -94,13 +101,7 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
     @Override
     public ConfigurationModel getConfigurationModel(String name) throws NoSuchConfigurationException
     {
-        ConfigurationModel configurationModel = configurations.get(name);
-        if (configurationModel == null)
-        {
-            throw new NoSuchConfigurationException(this, name);
-        }
-
-        return configurationModel;
+        return findModel(configurations, name, () -> new NoSuchConfigurationException(this, name));
     }
 
     /**
@@ -110,6 +111,18 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
     public List<OperationModel> getOperationModels()
     {
         return ImmutableList.copyOf(operations.values());
+    }
+
+    @Override
+    public List<SourceModel> getSourceModels()
+    {
+        return ImmutableList.copyOf(messageSources.values());
+    }
+
+    @Override
+    public SourceModel getSourceModel(String name) throws NoSuchMessageSourceException
+    {
+        return findModel(messageSources, name, () -> new NoSuchMessageSourceException(this, name));
     }
 
     /**
@@ -127,13 +140,7 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
     @Override
     public OperationModel getOperationModel(String name) throws NoSuchOperationException
     {
-        OperationModel operationModel = operations.get(name);
-        if (operationModel == null)
-        {
-            throw new NoSuchOperationException(this, name);
-        }
-
-        return operationModel;
+        return findModel(operations, name, () -> new NoSuchOperationException(this, name));
     }
 
     /**
@@ -143,6 +150,17 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
     public List<ConnectionProviderModel> getConnectionProviders()
     {
         return connectionProviders;
+    }
+
+    private <T extends EnrichableModel> T findModel(Map<String, T> map, String name, Supplier<RuntimeException> exception)
+    {
+        T model = map.get(name);
+        if (model == null)
+        {
+            throw exception.get();
+        }
+
+        return model;
     }
 
     /**

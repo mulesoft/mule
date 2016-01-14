@@ -7,7 +7,7 @@
 package org.mule.transformer.compression;
 
 import org.mule.api.serialization.SerializationException;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.types.DataTypeFactory;

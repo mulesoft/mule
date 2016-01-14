@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.config;
 
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.setNoRecurseOnDefinition;
+import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_SINGLETON;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -51,7 +52,7 @@ abstract class BaseExtensionBeanDefinitionParser implements BeanDefinitionParser
     public BeanDefinition parse(Element element, ParserContext parserContext)
     {
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(type);
-        builder.setScope(BeanDefinition.SCOPE_SINGLETON);
+        builder.setScope(SCOPE_SINGLETON);
         doParse(builder, element, parserContext);
 
         BeanDefinition definition = builder.getBeanDefinition();

@@ -31,4 +31,9 @@ public class HeisenbergConnection
     {
         return connected;
     }
+
+    public String getSaulPhoneNumber()
+    {
+        return saulPhoneNumber;
+    }
 }

@@ -14,8 +14,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.collections.Predicate;
-
 
 // @ThreadSafe
 public class CollectionUtils extends org.apache.commons.collections.CollectionUtils
@@ -172,22 +170,6 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
         return buf.toString();
     }
 
-    /**
-     * Some code uses null to indicate "unset", which makes appending items complex.
-     */
-    public static List addCreate(List list, Object value)
-    {
-        if (null == list)
-        {
-            return singletonList(value);
-        }
-        else
-        {
-            list.add(value);
-            return list;
-        }
-    }
-
     public static List singletonList(Object value)
     {
         List list = new LinkedList();
@@ -201,13 +183,7 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
         {
             return false;
         }
-        return exists(collection, new Predicate()
-        {
-            public boolean evaluate(Object object)
-            {
-                return object != null && type.isAssignableFrom(object.getClass());
-            }
-        });
+        return exists(collection, object -> object != null && type.isAssignableFrom(object.getClass()));
     }
     
     public static void removeType(Collection<?> collection, final Class<?> type)
@@ -216,13 +192,7 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
         {
             return;
         }
-        filter(collection, new Predicate()
-        {
-            public boolean evaluate(Object object)
-            {
-                return object != null && type.isAssignableFrom(object.getClass());
-            }
-        });
+        filter(collection, object -> object != null && type.isAssignableFrom(object.getClass()));
     }
 
     /**

@@ -17,7 +17,7 @@ import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.el.mvel.datatype.MvelEnricherDataTypePropagator;
 import org.mule.el.mvel.datatype.MvelDataTypeResolver;

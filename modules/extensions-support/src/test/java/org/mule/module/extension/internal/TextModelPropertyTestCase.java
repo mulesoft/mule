@@ -47,7 +47,6 @@ public class TextModelPropertyTestCase extends AbstractAnnotatedParameterModelEn
         assertThat(parameterModels.get(1).getModelProperty(TextModelProperty.KEY), is(notNullValue()));
     }
 
-
     @Test
     public void verifyTextPropertyIsPopulatedAtMethodParameter() throws Exception
     {

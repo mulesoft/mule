@@ -12,7 +12,7 @@ import static org.mule.mvel2.MVEL.compileExpression;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.transformer.types.MimeTypes.JSON;
 import org.mule.api.MuleEvent;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transport.PropertyScope;
 import org.mule.el.mvel.DelegateVariableResolverFactory;
 import org.mule.el.mvel.GlobalVariableResolverFactory;

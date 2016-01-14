@@ -7,7 +7,9 @@
 package org.mule.transformer.types;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
+import org.mule.api.metadata.ImmutableDataType;
+import org.mule.api.metadata.SimpleDataType;
 import org.mule.util.generics.GenericsUtils;
 import org.mule.util.generics.MethodParameter;
 
@@ -28,21 +30,22 @@ import javax.activation.DataSource;
  *
  * @since 3.0
  */
+//TODO: MULE-8946 this should move to Mule API
 public class DataTypeFactory
 {
-    public static final DataType<String> TEXT_STRING = new SimpleDataType<String>(String.class, MimeTypes.TEXT);
-    public static final DataType<String> XML_STRING = new SimpleDataType<String>(String.class, MimeTypes.XML);
-    public static final DataType<String> JSON_STRING = new SimpleDataType<String>(String.class, MimeTypes.APPLICATION_JSON);
-    public static final DataType<String> HTML_STRING = new SimpleDataType<String>(String.class, MimeTypes.HTML);
-    public static final DataType<String> ATOM_STRING = new SimpleDataType<String>(String.class, MimeTypes.ATOM);
-    public static final DataType<String> RSS_STRING = new SimpleDataType<String>(String.class, MimeTypes.RSS);
+    public static final DataType<String> TEXT_STRING = new SimpleDataType<>(String.class, MimeTypes.TEXT);
+    public static final DataType<String> XML_STRING = new SimpleDataType<>(String.class, MimeTypes.XML);
+    public static final DataType<String> JSON_STRING = new SimpleDataType<>(String.class, MimeTypes.APPLICATION_JSON);
+    public static final DataType<String> HTML_STRING = new SimpleDataType<>(String.class, MimeTypes.HTML);
+    public static final DataType<String> ATOM_STRING = new SimpleDataType<>(String.class, MimeTypes.ATOM);
+    public static final DataType<String> RSS_STRING = new SimpleDataType<>(String.class, MimeTypes.RSS);
 
     //Common Java types
-    public static final DataType<String> STRING = new SimpleDataType<String>(String.class);
-    public static final DataType<String> OBJECT = new SimpleDataType<String>(Object.class);
-    public static final DataType<String> BYTE_ARRAY = new SimpleDataType<String>(byte[].class);
-    public static final DataType<String> INPUT_STREAM = new SimpleDataType<String>(InputStream.class);
-    public static final DataType<String> MULE_MESSAGE = new SimpleDataType<String>(MuleMessage.class);
+    public static final DataType<String> STRING = new SimpleDataType<>(String.class);
+    public static final DataType<String> OBJECT = new SimpleDataType<>(Object.class);
+    public static final DataType<String> BYTE_ARRAY = new SimpleDataType<>(byte[].class);
+    public static final DataType<String> INPUT_STREAM = new SimpleDataType<>(InputStream.class);
+    public static final DataType<String> MULE_MESSAGE = new SimpleDataType<>(MuleMessage.class);
 
     public static <T> DataType<T> create(Class<T> type)
     {
@@ -51,7 +54,7 @@ public class DataTypeFactory
 
     public static <T> DataType<T> createImmutable(Class<T> type)
     {
-        return new ImmutableDataType<T>(create(type, MimeTypes.ANY));
+        return new ImmutableDataType<>(create(type, MimeTypes.ANY));
     }
 
     public static <T> DataType<T> createWithEncoding(Class<T> type, String encoding)
@@ -80,10 +83,10 @@ public class DataTypeFactory
         // Special case where proxies are used for testing
         if (isProxyClass(type))
         {
-            return new SimpleDataType<T>(type.getInterfaces()[0], mimeType);
+            return new SimpleDataType<>(type.getInterfaces()[0], mimeType);
         }
 
-        return new SimpleDataType<T>(type, mimeType);
+        return new SimpleDataType<>(type, mimeType);
     }
 
     public static <T> DataType create(Class<? extends Collection> collClass, Class<T> itemType)
@@ -97,9 +100,9 @@ public class DataTypeFactory
     }
 
     /**
-     * Will create a {@link org.mule.api.transformer.DataType} object from an object instance. This method will check
+     * Will create a {@link DataType} object from an object instance. This method will check
      * if the object value is a {@link org.mule.api.MuleMessage} instance and will take the type from the message payload
-     * and check if a mime type is set on the message and used that when constructing the {@link org.mule.api.transformer.DataType}
+     * and check if a mime type is set on the message and used that when constructing the {@link DataType}
      * object.
      *
      * @param value an object instance.  This can be a {@link org.mule.api.MuleMessage}, a collection, a proxy instance or any other

@@ -6,11 +6,14 @@
  */
 package org.mule.api.lifecycle;
 
+import static java.lang.String.format;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.config.i18n.Message;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -66,25 +69,52 @@ public class LifecycleUtils
             ((MuleContextAware) object).setMuleContext(muleContext);
         }
 
+        if (muleContext != null)
+        {
+            try
+            {
+                muleContext.getInjector().inject(object);
+            }
+            catch (MuleException e)
+            {
+                Message message = createStaticMessage(format("Found exception trying to inject object of type '%s' on initialising phase", object.getClass().getName()));
+                if (object instanceof Initialisable)
+                {
+                    throw new InitialisationException(message, e, (Initialisable) object);
+                }
+                throw new MuleRuntimeException(message, e);
+            }
+        }
+
         if (object instanceof Initialisable)
         {
             ((Initialisable) object).initialise();
         }
     }
 
-
     /**
-     * For each item in the {@code objects} collection, it invokes {@link Initialisable#initialise()}
-     * if it implements the {@link Initialisable} interface.
+     * For each item in the {@code objects} collection, it invokes {@link #initialiseIfNeeded(Object)}
      *
      * @param objects the list of objects to be initialised
      * @throws InitialisationException
      */
     public static void initialiseIfNeeded(Collection<? extends Object> objects) throws InitialisationException
     {
+        initialiseIfNeeded(objects, null);
+    }
+
+    /**
+     * For each item in the {@code objects} collection, it invokes {@link #initialiseIfNeeded(Object, MuleContext)}
+     *
+     * @param objects     the list of objects to be initialised
+     * @param muleContext a {@link MuleContext}
+     * @throws InitialisationException
+     */
+    public static void initialiseIfNeeded(Collection<? extends Object> objects, MuleContext muleContext) throws InitialisationException
+    {
         try
         {
-            doApplyPhase(Initialisable.PHASE_NAME, objects, null);
+            doApplyPhase(Initialisable.PHASE_NAME, objects, muleContext, null);
         }
         catch (MuleException e)
         {
@@ -117,7 +147,7 @@ public class LifecycleUtils
      */
     public static void startIfNeeded(Collection<? extends Object> objects) throws MuleException
     {
-        doApplyPhase(Startable.PHASE_NAME, objects, null);
+        doApplyPhase(Startable.PHASE_NAME, objects, null, null);
     }
 
     /**
@@ -129,7 +159,7 @@ public class LifecycleUtils
      */
     public static void stopIfNeeded(Collection<? extends Object> objects) throws MuleException
     {
-        doApplyPhase(Stoppable.PHASE_NAME, objects, null);
+        doApplyPhase(Stoppable.PHASE_NAME, objects, null, null);
     }
 
     /**
@@ -148,7 +178,7 @@ public class LifecycleUtils
     {
         try
         {
-            doApplyPhase(Stoppable.PHASE_NAME, objects, logger);
+            doApplyPhase(Stoppable.PHASE_NAME, objects, null, logger);
         }
         catch (Exception e)
         {
@@ -164,7 +194,11 @@ public class LifecycleUtils
      */
     public static void stopIfNeeded(Object object) throws MuleException
     {
-        doApplyPhase(Stoppable.PHASE_NAME, Arrays.asList(object), null);
+        object = unwrap(object);
+        if (object instanceof Stoppable)
+        {
+            ((Stoppable) object).stop();
+        }
     }
 
     /**
@@ -176,7 +210,18 @@ public class LifecycleUtils
      */
     public static void disposeIfNeeded(Object object, Logger logger)
     {
-        disposeAllIfNeeded(Arrays.asList(object), logger);
+        object = unwrap(object);
+        if (object instanceof Disposable)
+        {
+            try
+            {
+                ((Disposable) object).dispose();
+            }
+            catch (Exception e)
+            {
+                logger.error("Exception found trying to dispose object. Shutdown will continue", e);
+            }
+        }
     }
 
     /**
@@ -193,9 +238,9 @@ public class LifecycleUtils
     {
         try
         {
-            doApplyPhase(Disposable.PHASE_NAME, objects, logger);
+            doApplyPhase(Disposable.PHASE_NAME, objects, null, logger);
         }
-        catch (MuleException e)
+        catch (Exception e)
         {
             logger.error("Exception found trying to dispose object. Shutdown will continue", e);
         }
@@ -217,7 +262,7 @@ public class LifecycleUtils
         }
     }
 
-    private static void doApplyPhase(String phase, Collection<? extends Object> objects, Logger logger) throws MuleException
+    private static void doApplyPhase(String phase, Collection<? extends Object> objects, MuleContext muleContext, Logger logger) throws MuleException
     {
         if (CollectionUtils.isEmpty(objects))
         {
@@ -234,28 +279,28 @@ public class LifecycleUtils
 
             try
             {
-                if (Initialisable.PHASE_NAME.equals(phase) && object instanceof Initialisable)
+                if (Initialisable.PHASE_NAME.equals(phase))
                 {
-                    ((Initialisable) object).initialise();
+                    initialiseIfNeeded(object, muleContext);
                 }
-                else if (Startable.PHASE_NAME.equals(phase) && object instanceof Startable)
+                else if (Startable.PHASE_NAME.equals(phase))
                 {
-                    ((Startable) object).start();
+                    startIfNeeded(object);
                 }
-                else if (Stoppable.PHASE_NAME.equals(phase) && object instanceof Stoppable)
+                else if (Stoppable.PHASE_NAME.equals(phase))
                 {
-                    ((Stoppable) object).stop();
+                    stopIfNeeded(object);
                 }
                 else if (Disposable.PHASE_NAME.equals(phase) && object instanceof Disposable)
                 {
-                    ((Disposable) object).dispose();
+                    disposeIfNeeded(object, logger);
                 }
             }
             catch (MuleException e)
             {
                 if (logger != null)
                 {
-                    logger.error(String.format("Could not apply %s phase on object of class %s", phase, object.getClass().getName()), e);
+                    logger.error(format("Could not apply %s phase on object of class %s", phase, object.getClass().getName()), e);
                 }
                 else
                 {

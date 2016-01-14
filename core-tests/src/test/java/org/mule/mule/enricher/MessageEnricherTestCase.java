@@ -27,7 +27,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.construct.Flow;

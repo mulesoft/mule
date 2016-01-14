@@ -21,17 +21,18 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
-import org.mule.extension.api.runtime.ContentType;
 import org.mule.extension.api.runtime.ContentMetadata;
+import org.mule.extension.api.runtime.ContentType;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
+import org.mule.module.extension.internal.runtime.ExecutionMediator;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.transformer.types.DataTypeFactory;
@@ -67,7 +68,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     private final OperationModel operationModel;
     private final ResolverSet resolverSet;
     private final ExtensionManager extensionManager;
-    private final DefaultExecutionMediator executionMediator = new DefaultExecutionMediator();
+    private final ExecutionMediator executionMediator = new DefaultExecutionMediator();
 
     private MuleContext muleContext;
     private OperationExecutor operationExecutor;
@@ -163,14 +164,6 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     public void initialise() throws InitialisationException
     {
         operationExecutor = operationModel.getExecutor();
-        try
-        {
-            muleContext.getInjector().inject(operationExecutor);
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(createStaticMessage("Could not inject dependencies into operation executor of type " + operationExecutor.getClass().getName()), e, this);
-        }
         initialiseIfNeeded(operationExecutor, muleContext);
     }
 

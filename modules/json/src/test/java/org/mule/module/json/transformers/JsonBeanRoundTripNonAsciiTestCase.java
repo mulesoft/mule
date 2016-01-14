@@ -13,7 +13,7 @@ import org.mule.config.i18n.LocaleMessageHandler;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transformer.types.SimpleDataType;
+import org.mule.api.metadata.SimpleDataType;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;

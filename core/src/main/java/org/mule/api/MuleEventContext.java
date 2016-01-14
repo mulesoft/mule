@@ -10,7 +10,7 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transaction.Transaction;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.TransformerException;
 
 import java.io.OutputStream;

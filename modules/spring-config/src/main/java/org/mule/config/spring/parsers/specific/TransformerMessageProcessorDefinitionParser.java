@@ -7,8 +7,8 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.api.transformer.DataType;
-import org.mule.transformer.types.SimpleDataType;
+import org.mule.api.metadata.DataType;
+import org.mule.api.metadata.SimpleDataType;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValues;

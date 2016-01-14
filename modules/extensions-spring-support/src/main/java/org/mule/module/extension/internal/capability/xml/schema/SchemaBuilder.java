@@ -23,6 +23,8 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT;
@@ -58,10 +60,13 @@ import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.DataQualifier;
 import org.mule.extension.api.introspection.DataQualifierVisitor;
 import org.mule.extension.api.introspection.DataType;
+import org.mule.extension.api.introspection.Described;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.ParametrizedModel;
 import org.mule.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.module.extension.internal.capability.xml.schema.model.ComplexContent;
@@ -263,6 +268,15 @@ public final class SchemaBuilder
         String typeName = StringUtils.capitalize(operationModel.getName()) + SchemaConstants.TYPE_SUFFIX;
         registerProcessorElement(operationModel, typeName);
         registerOperationType(typeName, operationModel);
+
+        return this;
+    }
+
+    public SchemaBuilder registerMessageSource(SourceModel sourceModel)
+    {
+        String typeName = StringUtils.capitalize(sourceModel.getName()) + SchemaConstants.TYPE_SUFFIX;
+        registerSourceElement(sourceModel, typeName);
+        registerSourceType(typeName, sourceModel);
 
         return this;
     }
@@ -638,10 +652,20 @@ public final class SchemaBuilder
     private void registerProcessorElement(OperationModel operationModel, String typeName)
     {
         Element element = new TopLevelElement();
-        element.setName(getOperationName(operationModel));
+        element.setName(getElementName(operationModel));
         element.setType(new QName(schema.getTargetNamespace(), typeName));
         element.setAnnotation(createDocAnnotation(operationModel.getDescription()));
         element.setSubstitutionGroup(getOperationSubstitutionGroup(operationModel));
+        schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
+    }
+
+    private void registerSourceElement(SourceModel sourceModel, String typeName)
+    {
+        Element element = new TopLevelElement();
+        element.setName(getElementName(sourceModel));
+        element.setType(new QName(schema.getTargetNamespace(), typeName));
+        element.setAnnotation(createDocAnnotation(sourceModel.getDescription()));
+        element.setSubstitutionGroup(MULE_ABSTRACT_MESSAGE_SOURCE);
         schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
     }
 
@@ -697,9 +721,9 @@ public final class SchemaBuilder
         return name;
     }
 
-    private String getOperationName(OperationModel operationModel)
+    private String getElementName(Described model)
     {
-        return hyphenize(operationModel.getName());
+        return hyphenize(model.getName());
     }
 
     private String getGroupName(String name)
@@ -709,7 +733,16 @@ public final class SchemaBuilder
 
     private void registerOperationType(String name, OperationModel operationModel)
     {
-        final QName base = MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE;
+        registerExecutableType(name, operationModel, MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE);
+    }
+
+    private void registerSourceType(String name, SourceModel sourceModel)
+    {
+        registerExecutableType(name, sourceModel, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE);
+    }
+
+    private void registerExecutableType(String name, ParametrizedModel parametrizedModel, QName base)
+    {
         TopLevelComplexType complexType = new TopLevelComplexType();
         complexType.setName(name);
 
@@ -725,7 +758,7 @@ public final class SchemaBuilder
         final ExplicitGroup all = new ExplicitGroup();
         complexContentExtension.setSequence(all);
 
-        for (final ParameterModel parameterModel : operationModel.getParameterModels())
+        for (final ParameterModel parameterModel : parametrizedModel.getParameterModels())
         {
             DataType parameterType = parameterModel.getType();
             DataQualifier parameterQualifier = parameterType.getQualifier();

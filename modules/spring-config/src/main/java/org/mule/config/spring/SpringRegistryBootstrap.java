@@ -11,7 +11,7 @@ import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.registry.RegistryProvider;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.bootstrap.AbstractRegistryBootstrap;
 import org.mule.config.bootstrap.BootstrapObjectFactory;

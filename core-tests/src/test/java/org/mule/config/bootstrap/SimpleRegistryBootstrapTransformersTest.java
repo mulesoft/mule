@@ -14,7 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.TransformerResolver;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.builders.DefaultsConfigurationBuilder;

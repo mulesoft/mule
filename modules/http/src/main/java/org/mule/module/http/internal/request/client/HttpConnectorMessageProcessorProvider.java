@@ -8,26 +8,13 @@ package org.mule.module.http.internal.request.client;
 
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.MessageExchangePattern;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.client.AbstractConnectorMessageProcessorProvider;
 import org.mule.api.client.OperationOptions;
 import org.mule.api.client.RequestCacheKey;
-import org.mule.api.connector.ConnectorOperationProvider;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.client.HttpRequestOptions;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Provider for operations of the HTTP module.
