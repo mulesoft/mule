@@ -1123,7 +1123,7 @@ public class DefaultMuleMessage extends TypedValue implements MuleMessage, Threa
             setValue(payload);
         }
 
-        setDataType(dataType.cloneDataType());
+        super.setDataType(dataType.cloneDataType());
     }
 
     /**
