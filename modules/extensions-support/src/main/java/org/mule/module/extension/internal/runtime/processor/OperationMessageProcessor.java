@@ -23,20 +23,24 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.introspection.ExceptionEnricher;
+import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
-import org.mule.extension.api.runtime.ContentType;
 import org.mule.extension.api.runtime.ContentMetadata;
+import org.mule.extension.api.runtime.ContentType;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
+import org.mule.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
+
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +63,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class OperationMessageProcessor implements MessageProcessor, MuleContextAware, Lifecycle
 {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(OperationMessageProcessor.class);
 
     private final ExtensionModel extensionModel;
@@ -67,7 +70,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     private final OperationModel operationModel;
     private final ResolverSet resolverSet;
     private final ExtensionManager extensionManager;
-    private final DefaultExecutionMediator executionMediator = new DefaultExecutionMediator();
+    private final DefaultExecutionMediator executionMediator;
 
     private MuleContext muleContext;
     private OperationExecutor operationExecutor;
@@ -83,6 +86,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         this.configurationProviderName = configurationProviderName;
         this.resolverSet = resolverSet;
         this.extensionManager = extensionManager;
+        this.executionMediator = new DefaultExecutionMediator(getExceptionEnricher());
     }
 
     @Override
@@ -131,20 +135,10 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         {
             return executionMediator.execute(operationExecutor, operationContext);
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
-            throw handledException(e, event);
+            throw new MessagingException(createStaticMessage(e.getMessage()), event, e, this);
         }
-    }
-
-    private MuleException handledException(Exception e, MuleEvent event)
-    {
-        Throwable root = ExceptionUtils.getRootCause(e);
-        if (root == null)
-        {
-            root = e;
-        }
-        return new MessagingException(createStaticMessage(root.getMessage()), event, root, this);
     }
 
     private ConfigurationInstance<Object> getConfiguration(MuleEvent event)
@@ -162,7 +156,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     @Override
     public void initialise() throws InitialisationException
     {
-        operationExecutor = operationModel.getExecutor();
+        operationExecutor = operationModel.getExecutor().createExecutor();
         try
         {
             muleContext.getInjector().inject(operationExecutor);
@@ -172,6 +166,16 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
             throw new InitialisationException(createStaticMessage("Could not inject dependencies into operation executor of type " + operationExecutor.getClass().getName()), e, this);
         }
         initialiseIfNeeded(operationExecutor, muleContext);
+    }
+
+    private ExceptionEnricher getExceptionEnricher()
+    {
+        Optional<ExceptionEnricherFactory> exceptionEnricherFactory = operationModel.getExceptionEnricherFactory();
+        if (!exceptionEnricherFactory.isPresent())
+        {
+            exceptionEnricherFactory = extensionModel.getExceptionEnricherFactory();
+        }
+        return exceptionEnricherFactory.isPresent() ? exceptionEnricherFactory.get().createEnricher() : new NullExceptionEnricher();
     }
 
     @Override

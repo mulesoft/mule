@@ -7,12 +7,12 @@
 package org.mule.module.extension;
 
 import static java.util.stream.Collectors.toList;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
 import org.mule.api.transport.PropertyScope;
 import org.mule.extension.annotation.api.ContentMetadataParameters;
+import org.mule.extension.annotation.api.OnException;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.RestrictedTo;
@@ -22,6 +22,13 @@ import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.runtime.ContentMetadata;
 import org.mule.extension.api.runtime.ContentType;
+import org.mule.module.extension.exception.CureCancerExceptionEnricher;
+import org.mule.module.extension.exception.HealthException;
+import org.mule.module.extension.exception.HeisenbergException;
+import org.mule.module.extension.model.HealthStatus;
+import org.mule.module.extension.model.KnockeableDoor;
+import org.mule.module.extension.model.PersonalInfo;
+import org.mule.module.extension.model.Weapon;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -35,6 +42,8 @@ public class HeisenbergOperations
     private static final String SECRET_PACKAGE = "secretPackage";
     private static final String CONTENT_TYPE = "contentType";
     private static final String METH = "meth";
+    public static final String CURE_CANCER_MESSAGE = "Can't help you, you are going to die";
+    public static final String CALL_GUS_MESSAGE = "You are not allowed to speak with gus.";
 
     @Inject
     private ExtensionManager extensionManager;
@@ -74,6 +83,12 @@ public class HeisenbergOperations
     public String killWithCustomMessage(@Optional(defaultValue = "#[payload]") String victim, String goodbyeMessage)
     {
         return String.format("%s, %s", goodbyeMessage, victim);
+    }
+
+    @Operation
+    public String knock(KnockeableDoor door)
+    {
+        return door.knock();
     }
 
     @Operation
@@ -135,12 +150,6 @@ public class HeisenbergOperations
     }
 
     @Operation
-    public String knock(KnockeableDoor door)
-    {
-        return door.knock();
-    }
-
-    @Operation
     public List<String> knockMany(List<KnockeableDoor> doors)
     {
         return doors.stream().map(KnockeableDoor::knock).collect(toList());
@@ -150,5 +159,18 @@ public class HeisenbergOperations
     public String callSaul(@Connection HeisenbergConnection connection)
     {
         return connection.callSaul();
+    }
+
+    @Operation
+    public String callGusFring() throws HeisenbergException
+    {
+        throw new HeisenbergException(CALL_GUS_MESSAGE);
+    }
+
+    @Operation
+    @OnException(CureCancerExceptionEnricher.class)
+    public String cureCancer() throws HealthException
+    {
+        throw new HealthException(CURE_CANCER_MESSAGE);
     }
 }

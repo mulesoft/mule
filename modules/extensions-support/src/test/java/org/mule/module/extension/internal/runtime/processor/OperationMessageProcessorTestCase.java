@@ -26,11 +26,14 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.declaration.fluent.OperationExecutorFactory;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
+import org.mule.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -38,6 +41,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.nio.charset.Charset;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -66,6 +70,9 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
     @Mock
     private ExtensionManager extensionManager;
 
+    @Mock
+    private OperationExecutorFactory operationExecutorFactory;
+
     @Mock(extraInterfaces = {Lifecycle.class, MuleContextAware.class})
     private OperationExecutor operationExecutor;
 
@@ -87,6 +94,8 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
     @Mock
     private Object configuration;
 
+    @Mock
+    private ExceptionEnricherFactory exceptionEnricherFactory;
 
     private OperationMessageProcessor messageProcessor;
     private String configurationName = CONFIG_NAME;
@@ -96,7 +105,10 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
     {
         configureMockEvent(event);
 
-        when(operationModel.getExecutor()).thenReturn(operationExecutor);
+        when(operationModel.getExecutor()).thenReturn(operationExecutorFactory);
+        when(operationModel.getExceptionEnricherFactory()).thenReturn(Optional.of(exceptionEnricherFactory));
+        when(exceptionEnricherFactory.createEnricher()).thenReturn(new NullExceptionEnricher());
+        when(operationExecutorFactory.createExecutor()).thenReturn(operationExecutor);
         when(resolverSet.resolve(event)).thenReturn(parameters);
 
         when(configurationInstance.getName()).thenReturn(CONFIG_NAME);
@@ -215,7 +227,6 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
         OperationMessageProcessor messageProcessor = new OperationMessageProcessor(extensionModel, operationModel, configurationName, resolverSet, extensionManager);
         messageProcessor.setMuleContext(muleContext);
         messageProcessor.initialise();
-
         return messageProcessor;
     }
 

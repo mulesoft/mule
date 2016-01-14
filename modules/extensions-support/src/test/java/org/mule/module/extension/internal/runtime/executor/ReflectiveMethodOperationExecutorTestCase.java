@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.module.extension.HealthStatus.DEAD;
+import static org.mule.module.extension.model.HealthStatus.DEAD;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.api.MuleEvent;
 import org.mule.api.transformer.DataType;

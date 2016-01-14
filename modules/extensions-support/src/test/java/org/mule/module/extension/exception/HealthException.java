@@ -4,10 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension;
+package org.mule.module.extension.exception;
 
-public interface Weapon
+public class HealthException extends Exception
 {
 
-    String kill();
+    public HealthException(String message)
+    {
+        super(message);
+    }
 }

@@ -15,6 +15,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.annotation.api.OnException;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
@@ -22,6 +23,12 @@ import org.mule.extension.annotation.api.capability.Xml;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.api.ExtensionManager;
+import org.mule.module.extension.exception.HeisenbegExceptionEnricher;
+import org.mule.module.extension.model.ExtendedPersonalInfo;
+import org.mule.module.extension.model.HealthStatus;
+import org.mule.module.extension.model.KnockeableDoor;
+import org.mule.module.extension.model.Ricin;
+import org.mule.module.extension.model.Weapon;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -35,6 +42,7 @@ import javax.inject.Inject;
 @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
 @Xml(schemaVersion = HeisenbergExtension.SCHEMA_VERSION)
 @Extensible(alias = "heisenberg-empire")
+@OnException(HeisenbegExceptionEnricher.class)
 @Providers(HeisenbergConnectionProvider.class)
 public class HeisenbergExtension implements Lifecycle, MuleContextAware
 {

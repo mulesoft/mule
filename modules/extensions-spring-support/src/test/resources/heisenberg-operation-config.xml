@@ -151,9 +151,15 @@
         <heisenberg:kill-with-weapon weapon="#[weapon]"/>
     </flow>
 
-
     <flow name="killWithMultipleWeapons">
         <heisenberg:kill-with-multiples-weapons weaponList="#[weapons]"/>
     </flow>
 
+    <flow name="callGus">
+        <heisenberg:call-gus-fring />
+    </flow>
+
+    <flow name="cureCancer">
+        <heisenberg:cure-cancer />
+    </flow>
 </mule>

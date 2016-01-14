@@ -98,6 +98,10 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
 
             return new PooledConnectionHandler<>(config, connection, pool, poolingListener);
         }
+        catch (ConnectionException e)
+        {
+            throw e;
+        }
         catch (NoSuchElementException e)
         {
             throw new ConnectionException("Connection pool is exhausted");

@@ -10,27 +10,32 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.extension.HealthStatus.DEAD;
+import static org.junit.Assert.fail;
 import static org.mule.module.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
-import static org.mule.module.extension.KnockeableDoor.knock;
-import static org.mule.module.extension.Ricin.RICIN_KILL_MESSAGE;
-
+import static org.mule.module.extension.model.HealthStatus.DEAD;
+import static org.mule.module.extension.model.KnockeableDoor.knock;
+import static org.mule.module.extension.model.Ricin.RICIN_KILL_MESSAGE;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.connection.ConnectionException;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.KnockeableDoor;
-import org.mule.module.extension.Ricin;
-import org.mule.module.extension.Weapon;
-import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.module.extension.HeisenbergExtension;
+import org.mule.module.extension.HeisenbergOperations;
+import org.mule.module.extension.exception.HeisenbergException;
+import org.mule.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.module.extension.model.KnockeableDoor;
+import org.mule.module.extension.model.Ricin;
+import org.mule.module.extension.model.Weapon;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Matchers;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
 {
@@ -40,6 +45,9 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     private static final String METH = "meth";
     private static final String GOODBYE_MESSAGE = "Say hello to my little friend";
     private static final String VICTIM = "Skyler";
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
     protected Class<?>[] getAnnotatedExtensionClasses()
@@ -221,6 +229,35 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     public void operationWhichRequiresConnection() throws Exception
     {
         assertThat(getPayloadAsString(runFlow("callSaul").getMessage()), is("You called " + SAUL_OFFICE_NUMBER));
+    }
+
+    @Test
+    public void extensionWithExceptionEnricher() throws Throwable
+    {
+        expectedException.expect(ConnectionException.class);
+        expectedException.expectMessage(is(HeisenbergOperations.CALL_GUS_MESSAGE));
+        runFlowAndThrowCause("callGus");
+    }
+
+    @Test
+    public void operationWithExceptionEnricher() throws Throwable
+    {
+        expectedException.expect(HeisenbergException.class);
+        expectedException.expectMessage(is(HeisenbergOperations.CURE_CANCER_MESSAGE));
+        runFlowAndThrowCause("cureCancer");
+    }
+
+    private void runFlowAndThrowCause(String callGus) throws Throwable
+    {
+        try
+        {
+            runFlow(callGus);
+            fail("An exception was expected");
+        }
+        catch (MuleException me)
+        {
+            throw me.getCause();
+        }
     }
 
     @Test

@@ -13,7 +13,6 @@ import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORT
 import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
-
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
@@ -123,7 +122,8 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                                                     sortConfigurations(toConfigurations(declaration.getConfigurations(), extensionModelValueHolder)),
                                                                     alphaSortDescribedList(toOperations(declaration.getOperations())),
                                                                     toConnectionProviders(declaration.getConnectionProviders()),
-                                                                    declaration.getModelProperties());
+                                                                    declaration.getModelProperties(),
+                                                                    declaration.getExceptionEnricherFactory());
 
         extensionModelValueHolder.set(extensionModel);
         return extensionModel;
@@ -186,7 +186,8 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                            parameterModels,
                                            declaration.getReturnType(),
                                            declaration.getModelProperties(),
-                                           declaration.getInterceptorFactories());
+                                           declaration.getInterceptorFactories(),
+                                           declaration.getExceptionEnricherFactory());
     }
 
     private List<ConnectionProviderModel> toConnectionProviders(List<ConnectionProviderDeclaration> declarations)
