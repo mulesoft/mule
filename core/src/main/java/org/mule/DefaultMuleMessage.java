@@ -1123,7 +1123,7 @@ public class DefaultMuleMessage extends TypedValue implements MuleMessage, Threa
             setValue(payload);
         }
 
-        setDataType(dataType.cloneDataType());
+        setDataType(dataType);
     }
 
     /**
@@ -1137,10 +1137,8 @@ public class DefaultMuleMessage extends TypedValue implements MuleMessage, Threa
     @Override
     protected void setDataType(DataType dt)
     {
-        super.setDataType(dt.cloneDataType());
-
-        setEncoding(dt == null ? null : dt.getEncoding());
-        setMimeType(dt == null ? null : dt.getMimeType());
+        assertAccess(WRITE);
+        super.setDataType(dt);
     }
 
     //////////////////////////////// ThreadSafeAccess Impl ///////////////////////////////
