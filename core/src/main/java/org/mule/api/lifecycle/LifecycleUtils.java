@@ -8,6 +8,7 @@ package org.mule.api.lifecycle;
 
 import static java.lang.String.format;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -48,7 +49,10 @@ public class LifecycleUtils
      */
     public static void initialiseIfNeeded(Object object) throws InitialisationException
     {
-        initialiseIfNeeded(object, null);
+        if (object instanceof Initialisable)
+        {
+            ((Initialisable) object).initialise();
+        }
     }
 
     /**
@@ -63,33 +67,28 @@ public class LifecycleUtils
      */
     public static void initialiseIfNeeded(Object object, MuleContext muleContext) throws InitialisationException
     {
+        checkArgument(muleContext != null, "muleContext cannot be null");
         object = unwrap(object);
-        if (muleContext != null && object instanceof MuleContextAware)
+        if (object instanceof MuleContextAware)
         {
             ((MuleContextAware) object).setMuleContext(muleContext);
         }
 
-        if (muleContext != null)
+        try
         {
-            try
+            muleContext.getInjector().inject(object);
+        }
+        catch (MuleException e)
+        {
+            Message message = createStaticMessage(format("Found exception trying to inject object of type '%s' on initialising phase", object.getClass().getName()));
+            if (object instanceof Initialisable)
             {
-                muleContext.getInjector().inject(object);
+                throw new InitialisationException(message, e, (Initialisable) object);
             }
-            catch (MuleException e)
-            {
-                Message message = createStaticMessage(format("Found exception trying to inject object of type '%s' on initialising phase", object.getClass().getName()));
-                if (object instanceof Initialisable)
-                {
-                    throw new InitialisationException(message, e, (Initialisable) object);
-                }
-                throw new MuleRuntimeException(message, e);
-            }
+            throw new MuleRuntimeException(message, e);
         }
 
-        if (object instanceof Initialisable)
-        {
-            ((Initialisable) object).initialise();
-        }
+        initialiseIfNeeded(object);
     }
 
     /**

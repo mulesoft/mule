@@ -14,6 +14,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -49,9 +50,12 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
     @Mock
     private ResponseCompletionCallback responseCompletionCallback;
 
-    private ExtensionFlowProcessingTemplate template;
+    @Mock
+    private MessagingException messagingException;
 
-    private Exception exception = new RuntimeException();
+    private RuntimeException runtimeException = new RuntimeException();
+
+    private ExtensionFlowProcessingTemplate template;
 
     @Before
     public void before()
@@ -84,26 +88,26 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
     @Test
     public void failedToSendResponseToClient() throws MuleException
     {
-        doThrow(exception).when(completionHandler).onCompletion(message);
+        doThrow(runtimeException).when(completionHandler).onCompletion(message);
         template.sendResponseToClient(event, responseCompletionCallback);
 
         verify(completionHandler, never()).onFailure(any(Exception.class));
-        verify(responseCompletionCallback).responseSentWithFailure(exception, event);
+        verify(responseCompletionCallback).responseSentWithFailure(runtimeException, event);
     }
 
     @Test
     public void sendFailureResponseToClient() throws Exception
     {
-        template.sendFailureResponseToClient(exception, responseCompletionCallback);
-        verify(completionHandler).onFailure(exception);
+        template.sendFailureResponseToClient(messagingException, responseCompletionCallback);
+        verify(completionHandler).onFailure(messagingException);
         verify(responseCompletionCallback).responseSentSuccessfully();
     }
 
     @Test
     public void failedToSendFailureResponseToClient() throws Exception
     {
-        doThrow(exception).when(completionHandler).onFailure(exception);
-        template.sendFailureResponseToClient(exception, responseCompletionCallback);
-        verify(responseCompletionCallback).responseSentWithFailure(exception, event);
+        doThrow(runtimeException).when(completionHandler).onFailure(messagingException);
+        template.sendFailureResponseToClient(messagingException, responseCompletionCallback);
+        verify(responseCompletionCallback).responseSentWithFailure(runtimeException, event);
     }
 }

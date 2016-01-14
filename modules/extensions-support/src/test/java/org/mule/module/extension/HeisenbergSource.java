@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-@Alias("PushMeth")
+@Alias("ListenPayments")
 public class HeisenbergSource extends Source<Void, Serializable>
 {
     private ScheduledExecutorService executor;

@@ -20,13 +20,13 @@
     </heisenberg:config>
 
     <flow name="source" initialState="stopped">
-        <heisenberg:push-meth initialBatchNumber="0"/>
+        <heisenberg:listen-payments initialBatchNumber="0"/>
 
         <set-payload value="#[java.lang.Long.valueOf('100')]"/>
     </flow>
 
     <flow name="sourceFailed" initialState="stopped">
-        <heisenberg:push-meth initialBatchNumber="0"/>
+        <heisenberg:listen-payments initialBatchNumber="0"/>
 
         <!--invalid expression results in exception-->
         <set-payload value="#[new java.lang.Long.valueOf('100')]"/>

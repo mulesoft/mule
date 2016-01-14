@@ -18,10 +18,13 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
+import static org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider.PASSWORD;
+import static org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider.USER;
 import org.mule.api.connection.ConnectionHandler;
 import org.mule.api.connector.ConnectionManager;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreClient;
+import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
 import org.mule.module.extension.internal.runtime.connector.petstore.SimplePetStoreConnectionProvider;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -38,9 +41,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase
 {
-
-    private static final String USER = "john";
-    private static final String PASSWORD = "doe";
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private OperationContextAdapter operationContext;

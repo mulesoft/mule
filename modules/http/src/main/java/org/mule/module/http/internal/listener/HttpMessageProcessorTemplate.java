@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
-public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessingPhaseTemplate<MessagingException>, ThrottlingPhaseTemplate
+public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessingPhaseTemplate, ThrottlingPhaseTemplate
 {
 
     public static final int MESSAGE_DISCARD_STATUS_CODE = Integer.valueOf(System.getProperty("mule.transport.http.throttling.discardstatuscode","429"));

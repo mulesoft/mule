@@ -57,7 +57,6 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-//TODO: MULE-8946
 public class ExtensionMessageSource implements MessageSource,
         MessageHandler<Object, Serializable>,
         ExceptionCallback<Throwable>,
@@ -96,7 +95,7 @@ public class ExtensionMessageSource implements MessageSource,
     private ExtensionManager extensionManager;
 
     @Override
-    public <E extends Throwable> void handle(MuleMessage<Object, Serializable> message, CompletionHandler<MuleMessage<Object, Serializable>, E> completionHandler)
+    public void handle(MuleMessage<Object, Serializable> message, CompletionHandler<MuleMessage<Object, Serializable>, Exception> completionHandler)
     {
         MuleEvent event = new DefaultMuleEvent((org.mule.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
         messageProcessingManager.processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, completionHandler), createProcessingContext());

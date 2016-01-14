@@ -409,8 +409,8 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PushMethType" substitutionGroup="mule:abstract-message-source" name="push-meth"></xs:element>
-    <xs:complexType name="PushMethType">
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ListenPaymentsType" substitutionGroup="mule:abstract-message-source" name="listen-payments"></xs:element>
+    <xs:complexType name="ListenPaymentsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">

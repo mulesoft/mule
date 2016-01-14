@@ -81,7 +81,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String EXTENDED_CONFIG_NAME = "extendedConfig";
     private static final String EXTENDED_CONFIG_DESCRIPTION = "extendedDescription";
 
-    private static final String SOURCE_NAME = "PushMeth";
+    private static final String SOURCE_NAME = "ListenPayments";
     private static final String SOURCE_PARAMETER = "initialBatchNumber";
 
     private static final String SAY_MY_NAME_OPERATION = "sayMyName";

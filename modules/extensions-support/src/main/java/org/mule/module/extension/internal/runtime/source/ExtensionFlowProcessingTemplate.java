@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime.source;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.execution.CompletionHandler;
@@ -16,17 +17,16 @@ import org.mule.execution.ResponseCompletionCallback;
 
 import java.io.Serializable;
 
-final class ExtensionFlowProcessingTemplate<Payload, Attributes extends Serializable, E extends Throwable>
-        implements AsyncResponseFlowProcessingPhaseTemplate<E>
+final class ExtensionFlowProcessingTemplate<Payload, Attributes extends Serializable> implements AsyncResponseFlowProcessingPhaseTemplate
 {
 
     private final MuleEvent event;
     private final MessageProcessor messageProcessor;
-    private final CompletionHandler<MuleMessage<Payload, Attributes>, E> completionHandler;
+    private final CompletionHandler<MuleMessage<Payload, Attributes>, MessagingException> completionHandler;
 
     ExtensionFlowProcessingTemplate(MuleEvent event,
                                     MessageProcessor messageProcessor,
-                                    CompletionHandler<MuleMessage<Payload, Attributes>, E> completionHandler)
+                                    CompletionHandler<MuleMessage<Payload, Attributes>, MessagingException> completionHandler)
     {
         this.event = event;
         this.messageProcessor = messageProcessor;
@@ -52,7 +52,7 @@ final class ExtensionFlowProcessingTemplate<Payload, Attributes extends Serializ
     }
 
     @Override
-    public void sendFailureResponseToClient(E messagingException, ResponseCompletionCallback responseCompletionCallback) throws MuleException
+    public void sendFailureResponseToClient(MessagingException messagingException, ResponseCompletionCallback responseCompletionCallback) throws MuleException
     {
         runAndNotify(() -> completionHandler.onFailure(messagingException), event, responseCompletionCallback);
     }

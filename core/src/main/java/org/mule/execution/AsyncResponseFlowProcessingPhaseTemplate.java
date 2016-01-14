@@ -6,6 +6,7 @@
  */
 package org.mule.execution;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 
@@ -13,7 +14,7 @@ import org.mule.api.MuleException;
  * Template methods for {@link org.mule.api.source.MessageSource} specific behavior during
  * flow execution.
  */
-public interface AsyncResponseFlowProcessingPhaseTemplate<E extends Throwable> extends MessageProcessTemplate
+public interface AsyncResponseFlowProcessingPhaseTemplate extends MessageProcessTemplate
 {
 
     /**
@@ -49,6 +50,6 @@ public interface AsyncResponseFlowProcessingPhaseTemplate<E extends Throwable> e
      * @param responseCompletionCallback callback to be used for notifying the result of the operation
      * @throws MuleException exception thrown when processing the message to send the response.
      */
-    void sendFailureResponseToClient(E exception, ResponseCompletionCallback responseCompletionCallback) throws MuleException;
+    void sendFailureResponseToClient(MessagingException exception, ResponseCompletionCallback responseCompletionCallback) throws MuleException;
 
 }
