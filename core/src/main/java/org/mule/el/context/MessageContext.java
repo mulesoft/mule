@@ -13,6 +13,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transport.NullPayload;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -132,6 +133,11 @@ public class MessageContext
     public Map<String, DataHandler> getOutboundAttachments()
     {
         return new OutboundAttachmentMapContext(message);
+    }
+
+    public Serializable getAttributes()
+    {
+        return message.getAttributes();
     }
 
     @Override
