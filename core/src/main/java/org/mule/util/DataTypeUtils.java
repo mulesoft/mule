@@ -7,7 +7,7 @@
 
 package org.mule.util;
 
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 
 /**
  * Provides utilities to manage {@link DataType}

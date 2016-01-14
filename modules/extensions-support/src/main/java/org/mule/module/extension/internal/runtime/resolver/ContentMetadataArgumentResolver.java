@@ -10,7 +10,7 @@ import static org.mule.module.extension.internal.ExtensionProperties.CONTENT_MET
 import static org.mule.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.extension.api.runtime.ContentMetadata;
 import org.mule.extension.api.runtime.ContentType;
 import org.mule.extension.api.runtime.FixedContextMetadata;

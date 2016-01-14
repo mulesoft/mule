@@ -19,6 +19,7 @@ import org.mule.extension.annotation.api.OnException;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
+import org.mule.extension.annotation.api.Sources;
 import org.mule.extension.annotation.api.capability.Xml;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Optional;
@@ -44,6 +45,7 @@ import javax.inject.Inject;
 @Extensible(alias = "heisenberg-empire")
 @OnException(HeisenbegExceptionEnricher.class)
 @Providers(HeisenbergConnectionProvider.class)
+@Sources(HeisenbergSource.class)
 public class HeisenbergExtension implements Lifecycle, MuleContextAware
 {
     public static final String SCHEMA_VERSION = "1.0-blue";

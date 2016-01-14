@@ -17,7 +17,7 @@ import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.MuleManifest;
 import org.mule.context.notification.ListenerSubscriptionPair;

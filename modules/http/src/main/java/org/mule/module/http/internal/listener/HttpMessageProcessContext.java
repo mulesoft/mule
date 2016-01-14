@@ -31,7 +31,7 @@ public class HttpMessageProcessContext implements MessageProcessContext
     @Override
     public boolean supportsAsynchronousProcessing()
     {
-        return true;
+        return false;
     }
 
     @Override

@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleContext;
 import org.mule.api.registry.MuleRegistry;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;

@@ -9,7 +9,7 @@ package org.mule.module.extension.internal;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
 import java.nio.charset.Charset;

@@ -18,8 +18,10 @@ import org.mule.extension.annotation.api.param.display.Password;
 
 import javax.inject.Inject;
 
-abstract class PetStoreConnectionProvider implements ConnectionProvider<PetStoreConnector, PetStoreClient>, Lifecycle
+public abstract class PetStoreConnectionProvider implements ConnectionProvider<PetStoreConnector, PetStoreClient>, Lifecycle
 {
+    public static final String USER = "john";
+    public  static final String PASSWORD = "doe";
 
     private int initialise, start, stop, dispose = 0;
 

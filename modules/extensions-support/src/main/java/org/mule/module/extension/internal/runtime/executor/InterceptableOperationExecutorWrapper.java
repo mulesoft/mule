@@ -10,7 +10,6 @@ import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.extension.api.runtime.Interceptor;
@@ -70,15 +69,6 @@ public final class InterceptableOperationExecutorWrapper extends AbstractInterce
     @Override
     public void initialise() throws InitialisationException
     {
-        try
-        {
-            muleContext.getInjector().inject(delegate);
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(createStaticMessage("Could not inject executor of type " + delegate.getClass().getName()), e, this);
-        }
-        injectInterceptors();
         initialiseIfNeeded(delegate, muleContext);
         super.initialise();
     }

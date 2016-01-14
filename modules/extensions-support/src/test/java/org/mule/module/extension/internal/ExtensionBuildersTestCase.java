@@ -42,8 +42,11 @@ import static org.mule.extension.api.introspection.declaration.tck.TestWebServic
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.CONNECTION_PROVIDER_DESCRIPTION;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.CONNECTION_PROVIDER_NAME;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.CONSUMER;
+import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.DEFAULT_PORT;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.GO_GET_THEM_TIGER;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.HAS_NO_ARGS;
+import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.LISTENER;
+import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.LISTEN_DESCRIPTION;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.MTOM_DESCRIPTION;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.MTOM_ENABLED;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.MULESOFT;
@@ -51,12 +54,15 @@ import static org.mule.extension.api.introspection.declaration.tck.TestWebServic
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.PASSWORD;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.PASSWORD_DESCRIPTION;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.PORT;
+import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.PORT_DESCRIPTION;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.SERVICE;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.SERVICE_ADDRESS;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.SERVICE_NAME;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.SERVICE_PORT;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.THE_OPERATION_TO_USE;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.URI_TO_FIND_THE_WSDL;
+import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.URL;
+import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.URL_DESCRIPTION;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.USERNAME;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.USERNAME_DESCRIPTION;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.VERSION;
@@ -79,6 +85,7 @@ import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
@@ -88,6 +95,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -316,6 +324,23 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         List<ParameterModel> parameters = connectionProvider.getParameterModels();
         assertParameter(parameters.get(0), USERNAME, USERNAME_DESCRIPTION, SUPPORTED, true, of(String.class), STRING, null);
         assertParameter(parameters.get(1), PASSWORD, PASSWORD_DESCRIPTION, SUPPORTED, true, of(String.class), STRING, null);
+    }
+
+    @Test
+    public void messageSources()
+    {
+        assertThat(extensionModel.getSourceModels(), hasSize(1));
+        SourceModel sourceModel = extensionModel.getSourceModels().get(0);
+        assertThat(sourceModel, is(notNullValue()));
+        assertThat(sourceModel.getName(), is(LISTENER));
+        assertThat(sourceModel.getDescription(), is(LISTEN_DESCRIPTION));
+        assertThat(sourceModel.getSourceFactory().createSource(), is(sameInstance(reference.getSource())));
+        assertThat(sourceModel.getReturnType().getRawType(), is(equalTo(InputStream.class)));
+        assertThat(sourceModel.getAttributesType().getRawType(), is(equalTo(Serializable.class)));
+
+        List<ParameterModel> parameters = sourceModel.getParameterModels();
+        assertParameter(parameters.get(0), URL, URL_DESCRIPTION, SUPPORTED, true, of(String.class), STRING, null);
+        assertParameter(parameters.get(1), PORT, PORT_DESCRIPTION, SUPPORTED, false, of(Integer.class), INTEGER, DEFAULT_PORT);
     }
 
     private void assertDescribingContext(ModelEnricher modelEnricher)

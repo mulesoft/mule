@@ -17,7 +17,7 @@ import org.mule.MessageExchangePattern;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
-import org.mule.api.CompletionHandler;
+import org.mule.api.execution.CompletionHandler;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.construct.Flow;

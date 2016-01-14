@@ -10,7 +10,7 @@ import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.api.introspection.declaration.fluent.OperationExecutorFactory;
+import org.mule.extension.api.runtime.OperationExecutorFactory;
 import org.mule.extension.api.runtime.OperationExecutor;
 
 import java.lang.reflect.Method;

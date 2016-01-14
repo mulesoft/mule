@@ -6,10 +6,10 @@
  */
 package org.mule.module.extension.internal.config;
 
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_CONFIG;
-import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.setNoRecurseOnDefinition;
+import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.parseConfigRef;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.toElementDescriptorBeanDefinition;
-import org.mule.api.config.MuleProperties;
+import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_SINGLETON;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.factories.PollingMessageSourceFactoryBean;
@@ -41,13 +41,13 @@ import org.w3c.dom.Element;
 /**
  * A {@link BeanDefinitionParser} to parse message processors
  * which execute operations implemented through the extensions API.
- * <p/>
+ * <p>
  * It defines an {@link OperationMessageProcessorFactoryBean} which in turn builds
  * the actual {@link MessageProcessor}
  *
  * @since 3.7.0
  */
-final class OperationBeanDefinitionParser implements BeanDefinitionParser
+final class OperationBeanDefinitionParser extends BaseExtensionBeanDefinitionParser
 {
 
     private final ExtensionModel extensionModel;
@@ -55,27 +55,23 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
 
     OperationBeanDefinitionParser(ExtensionModel extensionModel, OperationModel operationModel)
     {
+        super(OperationMessageProcessorFactoryBean.class);
         this.extensionModel = extensionModel;
         this.operationModel = operationModel;
     }
 
     @Override
-    public BeanDefinition parse(Element element, ParserContext parserContext)
+    protected void doParse(BeanDefinitionBuilder builder, Element element, ParserContext parserContext)
     {
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(OperationMessageProcessorFactoryBean.class);
-        builder.setScope(BeanDefinition.SCOPE_PROTOTYPE);
         parseConfigRef(element, builder);
-        builder.addConstructorArgValue(extensionModel);
-        builder.addConstructorArgValue(operationModel);
-        builder.addConstructorArgValue(toElementDescriptorBeanDefinition(element));
-        builder.addConstructorArgValue(parseNestedOperations(element, parserContext));
-        builder.addConstructorArgReference(MuleProperties.OBJECT_MULE_CONTEXT);
 
-        BeanDefinition definition = builder.getBeanDefinition();
-        setNoRecurseOnDefinition(definition);
-        attachProcessorDefinition(parserContext, definition);
+        builder.addConstructorArgValue(extensionModel)
+                .addConstructorArgValue(operationModel)
+                .addConstructorArgValue(toElementDescriptorBeanDefinition(element))
+                .addConstructorArgValue(parseNestedOperations(element, parserContext))
+                .addConstructorArgReference(OBJECT_MULE_CONTEXT);
 
-        return definition;
+        attachProcessorDefinition(parserContext, builder.getBeanDefinition());
     }
 
     private ManagedMap<String, ManagedList<MessageProcessor>> parseNestedOperations(final Element element, final ParserContext parserContext)
@@ -109,18 +105,6 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
         return nestedOperations;
     }
 
-    private void parseConfigRef(Element element, BeanDefinitionBuilder builder)
-    {
-        String configRef = element.getAttribute(ATTRIBUTE_NAME_CONFIG);
-        if (StringUtils.isBlank(configRef))
-        {
-            configRef = null;
-        }
-
-        builder.addConstructorArgValue(configRef);
-    }
-
-
     private String generateChildBeanName(Element element)
     {
         String id = SpringXMLUtils.getNameOrId(element);
@@ -145,7 +129,7 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
         element.setAttribute("name", childBeanName);
 
         builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
-        builder.setScope(BeanDefinition.SCOPE_SINGLETON);
+        builder.setScope(SCOPE_SINGLETON);
 
         ManagedList<MessageProcessor> processors = (ManagedList) parserContext.getDelegate().parseListElement(element, builder.getBeanDefinition());
         parserContext.getRegistry().removeBeanDefinition(generateChildBeanName(element));
@@ -183,12 +167,5 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
                 listMessageProcessors.add(definition);
             }
         }
-    }
-
-    private void attachSourceDefinition(ParserContext parserContext, BeanDefinition definition)
-    {
-        MutablePropertyValues propertyValues = parserContext.getContainingBeanDefinition()
-                .getPropertyValues();
-        propertyValues.addPropertyValue("messageSource", definition);
     }
 }

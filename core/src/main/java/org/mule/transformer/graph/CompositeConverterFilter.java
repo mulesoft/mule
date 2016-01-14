@@ -7,7 +7,7 @@
 package org.mule.transformer.graph;
 
 import org.mule.api.transformer.Converter;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -9,7 +9,7 @@ package org.mule.module.http.internal.request.grizzly;
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
-import org.mule.api.CompletionHandler;
+import org.mule.api.execution.CompletionHandler;
 import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;

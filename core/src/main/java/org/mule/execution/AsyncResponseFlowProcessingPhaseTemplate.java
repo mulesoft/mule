@@ -32,13 +32,6 @@ public interface AsyncResponseFlowProcessingPhaseTemplate extends MessageProcess
     MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException;
 
     /**
-     * Call when the processing of the message through the flow fails in an exception strategy
-     *
-     * @param exception
-     */
-    void afterFailureProcessingFlow(Exception exception);
-
-    /**
      * Template method to send a response after processing the message.
      * <p/>
      * This method is executed within the flow so if it fails it will trigger the exception strategy.
@@ -53,10 +46,10 @@ public interface AsyncResponseFlowProcessingPhaseTemplate extends MessageProcess
 
     /**
      *
-     * @param messagingException exception thrown during the flow execution.
+     * @param exception exception thrown during the flow execution.
      * @param responseCompletionCallback callback to be used for notifying the result of the operation
      * @throws MuleException exception thrown when processing the message to send the response.
      */
-    void sendFailureResponseToClient(MessagingException messagingException, ResponseCompletionCallback responseCompletionCallback) throws MuleException;
+    void sendFailureResponseToClient(MessagingException exception, ResponseCompletionCallback responseCompletionCallback) throws MuleException;
 
 }

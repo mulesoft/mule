@@ -62,8 +62,7 @@ public final class ContentMetadataModelEnricher extends AbstractAnnotatedModelEn
 
     private ParameterDeclaration newParameter(String name, String description)
     {
-        ParameterDeclaration parameter = new ParameterDeclaration();
-        parameter.setName(name);
+        ParameterDeclaration parameter = new ParameterDeclaration(name);
         parameter.setRequired(false);
         parameter.setExpressionSupport(SUPPORTED);
         parameter.setType(DataType.of(String.class));

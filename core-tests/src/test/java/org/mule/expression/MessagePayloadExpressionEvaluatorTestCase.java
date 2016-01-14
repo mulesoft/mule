@@ -17,7 +17,7 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.transformer.types.MimeTypes.ANY;
 import static org.mule.transformer.types.MimeTypes.JSON;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.TypedValue;

@@ -94,6 +94,7 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
             registerConfigurations(extensionModel);
             registerOperations(extensionModel);
             registerConnectionProviders(extensionModel);
+            registerMessageSources(extensionModel);
 
             handledExtensions.put(namespace, extensionModel);
         }
@@ -116,6 +117,11 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
     private void registerConnectionProviders(ExtensionModel extensionModel)
     {
         extensionModel.getConnectionProviders().forEach(providerModel -> registerParser(providerModel.getName(), new ConnectionProviderBeanDefinitionParser(providerModel)));
+    }
+
+    private void registerMessageSources(ExtensionModel extensionModel)
+    {
+        extensionModel.getSourceModels().forEach(sourceModel -> registerParser(hyphenize(sourceModel.getName()), new SourceBeanDefinitionParser(extensionModel, sourceModel)));
     }
 
     private void registerTopLevelParameters(ExtensionModel extensionModel)

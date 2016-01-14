@@ -18,7 +18,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.el.ExpressionLanguageContext;
 import org.mule.api.el.ExpressionLanguageFunction;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transport.OutputHandler;
 import org.mule.el.context.MessageContext;
 import org.mule.el.mvel.MVELExpressionLanguageContext;
