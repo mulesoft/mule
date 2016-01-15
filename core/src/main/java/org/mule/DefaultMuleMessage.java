@@ -6,7 +6,7 @@
  */
 package org.mule;
 
-import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.util.SystemUtils.LINE_SEPARATOR;
 
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
