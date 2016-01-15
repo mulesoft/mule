@@ -99,6 +99,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     private Map<String, KnockeableDoor> candidateDoors;
 
     @Parameter
+    @Optional(defaultValue = "CANCER")
     private HealthStatus initialHealth;
 
     @Parameter(alias = "finalHealth")

@@ -62,7 +62,7 @@ public class HeisenbergOperations
     }
 
     @Operation
-    public String getEnemy(@UseConfig HeisenbergExtension config, int index, ContentMetadata contentMetadata)
+    public String getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index, ContentMetadata contentMetadata)
     {
         if (contentMetadata.isOutputModifiable())
         {
@@ -172,5 +172,11 @@ public class HeisenbergOperations
     public String cureCancer() throws HealthException
     {
         throw new HealthException(CURE_CANCER_MESSAGE);
+    }
+
+    @Operation
+    public String getSaulPhone(@Connection HeisenbergConnection connection)
+    {
+        return connection.getSaulPhoneNumber();
     }
 }

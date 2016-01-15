@@ -21,7 +21,6 @@
                        dateOfDeath="2011-09-07T00:00:00-05:00"
                        money="1000000"
                        recipe="recipes"
-                       initialHealth="CANCER"
                        finalHealth="CANCER"
                        candidateDoors="candidateDoors">
         <heisenberg:enemies>
@@ -29,7 +28,7 @@
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
         <heisenberg:ricin-packs>
-            <heisenberg:ricin-pack microgramsPerKilo="22">
+            <heisenberg:ricin-pack>
                 <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
             </heisenberg:ricin-pack>
         </heisenberg:ricin-packs>
@@ -48,6 +47,10 @@
 
     <flow name="getFixedEnemy">
         <heisenberg:get-enemy index="0"/>
+    </flow>
+
+    <flow name="getDefaultEnemy">
+        <heisenberg:get-enemy />
     </flow>
 
     <flow name="expressionEnemy">
@@ -161,5 +164,9 @@
 
     <flow name="cureCancer">
         <heisenberg:cure-cancer />
+    </flow>
+
+    <flow name="getSaulNumber">
+        <heisenberg:get-saul-phone />
     </flow>
 </mule>
