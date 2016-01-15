@@ -202,10 +202,26 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     @Deprecated
     public <T> DefaultMuleMessage(T value, DataType<T> dataType, Serializable attributes, MuleContext muleContext)
     {
-        super(value != null ? value : NullPayload.getInstance(), (DataType<Object>) dataType);
+        super(resolveValue(value), (DataType<Object>) dataType);
         id = UUID.getUUID();
         rootId = id;
         this.attributes = attributes;
+        setMuleContext(muleContext);
+
+        if (value instanceof MuleMessage)
+        {
+            copyMessageProperties((MuleMessage) value);
+        }
+        else
+        {
+            if (muleContext.getConfiguration().isCacheMessageOriginalPayload())
+            {
+                originalPayload = value;
+            }
+        }
+
+        resetAccessControl();
+
         this.muleContext = muleContext;
     }
 

@@ -280,7 +280,14 @@ public class LifecycleUtils
             {
                 if (Initialisable.PHASE_NAME.equals(phase))
                 {
-                    initialiseIfNeeded(object, muleContext);
+                    if (muleContext != null)
+                    {
+                        initialiseIfNeeded(object, muleContext);
+                    }
+                    else
+                    {
+                        initialiseIfNeeded(object);
+                    }
                 }
                 else if (Startable.PHASE_NAME.equals(phase))
                 {
