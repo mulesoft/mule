@@ -25,7 +25,7 @@ public class GroovyScriptFlowFunctionalTestCase extends GroovyScriptServiceFunct
     public void inlineScriptAddProperty() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        testFlow("inlineScriptMutateProperty", event);
+        testFlow("inlineScriptAddProperty", event);
     }
 
     @Test
@@ -67,8 +67,17 @@ public class GroovyScriptFlowFunctionalTestCase extends GroovyScriptServiceFunct
     }
 
     @Override
+    protected String[] getConfigFiles()
+    {
+        return new String[] {
+                "groovy-component-config-flow.xml",
+                "groovy-component-config.xml"
+        };
+    }
+
+    @Override
     protected String getConfigFile()
     {
-        return "groovy-component-config-flow.xml";
+        return null;
     }
 }

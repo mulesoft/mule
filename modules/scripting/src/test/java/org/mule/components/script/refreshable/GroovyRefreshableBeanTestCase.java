@@ -31,7 +31,7 @@ public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCa
     @Test
     public void testFirstOnCallRefresh() throws Exception
     {
-        runScriptTest(ON_CALL_RECEIVED, NAME_CALLABLE, "vm://groovy_refresh_callable", PAYLOAD, RECEIVED);
+        runScriptTest(ON_CALL_RECEIVED, NAME_CALLABLE, "GroovyUMO_Callable", PAYLOAD, RECEIVED);
     }
     
     @Test
@@ -43,31 +43,31 @@ public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCa
     @Test
     public void testSecondOnCallRefresh() throws Exception
     {
-        runScriptTest(ON_CALL_RECEIVED2, NAME_CALLABLE, "vm://groovy_refresh_callable", PAYLOAD, RECEIVED2);
+        runScriptTest(ON_CALL_RECEIVED2, NAME_CALLABLE, "GroovyUMO_Callable", PAYLOAD, RECEIVED2);
     }
 
     @Test
     public void testFirstPojoRefresh() throws Exception
     {
-        runScriptTest(RECEIVE_RECEIVED, NAME_BEAN, "vm://groovy_refresh_bean", PAYLOAD, RECEIVED);
+        runScriptTest(RECEIVE_RECEIVED, NAME_BEAN, "GroovyUMO_Bean", PAYLOAD, RECEIVED);
     }
     
     @Test
     public void testSecondPojoRefresh() throws Exception
     {
-        runScriptTest(RECEIVE_RECEIVED2, NAME_BEAN, "vm://groovy_refresh_bean", PAYLOAD, RECEIVED2);
+        runScriptTest(RECEIVE_RECEIVED2, NAME_BEAN, "GroovyUMO_Bean", PAYLOAD, RECEIVED2);
     }
     
     @Test
     public void testFirstChangeInterfaces() throws Exception
     {
-        runScriptTest(ON_CALL_RECEIVED, NAME_CHANGE_INTERFACE, "vm://groovy_refresh_changeInterfaces", PAYLOAD, RECEIVED);
+        runScriptTest(ON_CALL_RECEIVED, NAME_CHANGE_INTERFACE, "GroovyUMO_ChangeIntefaces", PAYLOAD, RECEIVED);
     }
     
     @Test
     public void testSecondChangeInterfaces() throws Exception
     {
-        runScriptTest(RECEIVE_RECEIVED2, NAME_CHANGE_INTERFACE, "vm://groovy_refresh_changeInterfaces", PAYLOAD, RECEIVED2);
+        runScriptTest(RECEIVE_RECEIVED2, NAME_CHANGE_INTERFACE, "GroovyUMO_ChangeIntefaces", PAYLOAD, RECEIVED2);
     }
 
 }

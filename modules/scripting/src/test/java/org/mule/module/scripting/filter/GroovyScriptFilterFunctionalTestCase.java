@@ -36,13 +36,13 @@ public class GroovyScriptFilterFunctionalTestCase extends FunctionalTestCase
     public void testFilterScript() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://in1", "hello", null);
-        MuleMessage response = client.request("vm://out1", RECEIVE_TIMEOUT);
+        runFlowAsync("filterService", "hello");
+        MuleMessage response = client.request("test://filterServiceTestOut", RECEIVE_TIMEOUT);
         assertNotNull(response);
         assertEquals("hello", response.getPayload());
 
-        client.dispatch("vm://in1", "1", null);
-        response = client.request("vm://out1", RECEIVE_TIMEOUT);
+        runFlowAsync("filterService", "1");
+        response = client.request("test://filterServiceTestOut", RECEIVE_TIMEOUT);
         assertNull(response);
     }
 }

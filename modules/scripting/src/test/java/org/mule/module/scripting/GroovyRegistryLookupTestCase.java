@@ -8,9 +8,7 @@ package org.mule.module.scripting;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -34,8 +32,7 @@ public class GroovyRegistryLookupTestCase extends FunctionalTestCase
     @Test
     public void testBindingCallout() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://test", "", null);
+        MuleMessage response = runFlow("sayHello", "").getMessage();
         assertNotNull(response);
         assertEquals("hello", getPayloadAsString(response));
     }
