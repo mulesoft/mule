@@ -13,7 +13,7 @@ import org.mule.extension.api.introspection.ExceptionEnricher;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
-import org.mule.extension.api.introspection.declaration.fluent.OperationExecutorFactory;
+import org.mule.extension.api.runtime.OperationExecutorFactory;
 import org.mule.extension.api.runtime.InterceptorFactory;
 
 import java.util.List;

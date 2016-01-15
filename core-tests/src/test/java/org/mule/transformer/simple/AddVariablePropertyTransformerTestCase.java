@@ -20,7 +20,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -28,7 +28,7 @@ import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.MimeTypes;
-import org.mule.transformer.types.SimpleDataType;
+import org.mule.api.metadata.SimpleDataType;
 import org.mule.transformer.types.TypedValue;
 
 import java.util.Arrays;

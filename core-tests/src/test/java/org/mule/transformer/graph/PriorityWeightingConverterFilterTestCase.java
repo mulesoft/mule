@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.api.registry.ResolverException;
 import org.mule.api.transformer.Converter;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.builder.MockConverterBuilder;

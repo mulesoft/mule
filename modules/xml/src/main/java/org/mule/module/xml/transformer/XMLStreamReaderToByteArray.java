@@ -6,7 +6,7 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.transformer.types.DataTypeFactory;
 
 import javax.xml.stream.XMLStreamReader;

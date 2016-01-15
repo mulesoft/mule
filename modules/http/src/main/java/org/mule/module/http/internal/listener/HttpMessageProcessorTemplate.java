@@ -73,12 +73,6 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
     }
 
     @Override
-    public void afterFailureProcessingFlow(Exception exception)
-    {
-
-    }
-
-    @Override
     public void sendResponseToClient(MuleEvent muleEvent, ResponseCompletionCallback responseCompletationCallback) throws MuleException
     {
         try

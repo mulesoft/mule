@@ -8,7 +8,7 @@ package org.mule.module.extension.file.api;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleEvent;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;

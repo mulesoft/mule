@@ -19,9 +19,9 @@ import org.mule.api.construct.Pipeline;
 import org.mule.api.context.notification.FlowCallStack;
 import org.mule.api.context.notification.ProcessorsTrace;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.metadata.DataType;
 import org.mule.api.processor.ProcessingDescriptor;
 import org.mule.api.security.Credentials;
-import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
@@ -988,12 +988,12 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
             // ignore
         }
     }
-    
+
     /**
      * Used to fetch the {@link #flowConstruct} after deserealization since its a
      * transient value. This is not part of the public API and should only be used
      * internally for serialization/deserialization
-     * 
+     *
      * @param serviceName the name of the service
      */
     public void setTransientServiceName(Object serviceName)

@@ -8,7 +8,7 @@ package org.mule.tck;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.CompletionHandler;
+import org.mule.api.execution.CompletionHandler;
 import org.mule.util.concurrent.Latch;
 
 public class SensingNullCompletionHandler implements CompletionHandler<MuleEvent, MessagingException>

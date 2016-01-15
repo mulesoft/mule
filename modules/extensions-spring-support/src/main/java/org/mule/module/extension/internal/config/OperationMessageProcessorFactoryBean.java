@@ -74,7 +74,7 @@ public class OperationMessageProcessorFactoryBean implements FactoryBean<Operati
     }
 
     /**
-     * @return {@value false}
+     * @return {@code false}
      */
     @Override
     public boolean isSingleton()

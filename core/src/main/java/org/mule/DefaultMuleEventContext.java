@@ -16,7 +16,7 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transaction.Transaction;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;

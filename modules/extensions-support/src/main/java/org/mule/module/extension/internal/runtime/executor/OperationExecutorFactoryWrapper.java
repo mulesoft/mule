@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime.executor;
 
-import org.mule.extension.api.introspection.declaration.fluent.OperationExecutorFactory;
+import org.mule.extension.api.runtime.OperationExecutorFactory;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.OperationExecutor;
 

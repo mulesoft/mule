@@ -11,7 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.api.transformer.DataType.STRING_DATA_TYPE;
+import static org.mule.api.metadata.DataType.STRING_DATA_TYPE;
 import static org.mule.mvel2.MVEL.compileExpression;
 import org.mule.api.MuleMessage;
 import org.mule.el.mvel.MVELExpressionLanguage;

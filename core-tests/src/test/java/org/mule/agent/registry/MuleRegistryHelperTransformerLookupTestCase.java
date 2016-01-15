@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.registry.TransformerResolver;
 import org.mule.api.transformer.Converter;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;

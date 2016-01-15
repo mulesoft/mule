@@ -6,7 +6,7 @@
  */
 package org.mule;
 
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 
 import java.util.List;

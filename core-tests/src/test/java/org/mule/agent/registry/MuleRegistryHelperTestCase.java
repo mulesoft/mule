@@ -14,7 +14,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleException;
-import org.mule.api.registry.MuleRegistry;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -23,7 +22,7 @@ import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.builder.MockConverterBuilder;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.SimpleDataType;
+import org.mule.api.metadata.SimpleDataType;
 import org.mule.util.Predicate;
 
 import java.util.List;

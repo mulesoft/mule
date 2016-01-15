@@ -7,7 +7,7 @@
 package org.mule.module.json;
 
 import org.mule.api.MuleContext;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;

@@ -19,7 +19,7 @@ import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
 import org.mule.api.NestedProcessor;
-import org.mule.api.connection.ConnectionProvider;
+import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
@@ -31,7 +31,7 @@ import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.internal.connection.ConnectionProviderWrapper;
+import org.mule.extension.api.runtime.source.Source;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -43,6 +43,8 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -201,28 +203,27 @@ public class IntrospectionUtils
         return Arrays.stream(interfaceType.getGenerics()).map(ResolvableType::getRawClass).collect(toList());
     }
 
-    public static <Config> Class<Config> getConfigType(ConnectionProvider<Config, ?> connectionProvider)
-    {
-        connectionProvider = unwrap(connectionProvider);
-        List<Class<?>> generics = getInterfaceGenerics(connectionProvider.getClass(), ConnectionProvider.class);
-        return (Class<Config>) generics.get(0);
-    }
 
-    public static <Connection> Class<Connection> getConnectionType(ConnectionProvider<?, Connection> connectionProvider)
+    public static List<Class<?>> getSuperClassGenerics(Class<?> type, Class<?> superClass)
     {
-        connectionProvider = unwrap(connectionProvider);
-        List<Class<?>> generics = getInterfaceGenerics(connectionProvider.getClass(), ConnectionProvider.class);
-        return (Class<Connection>) generics.get(1);
-    }
+        Class<?> searchClass = type;
 
-    private static <Config, Connection> ConnectionProvider<Config, Connection> unwrap(ConnectionProvider<Config, Connection> connectionProvider)
-    {
-        while (connectionProvider instanceof ConnectionProviderWrapper)
+        while (!Object.class.equals(searchClass))
         {
-            connectionProvider = ((ConnectionProviderWrapper<Config, Connection>) connectionProvider).getDelegate();
+            if (searchClass.getSuperclass().equals(superClass))
+            {
+                Type superType = searchClass.getGenericSuperclass();
+                if (superType instanceof ParameterizedType)
+                {
+                    return Arrays.stream(((ParameterizedType) superType).getActualTypeArguments())
+                            .map(generic -> (Class<?>) generic)
+                            .collect(toList());
+                }
+            }
+            searchClass = searchClass.getSuperclass();
         }
 
-        return connectionProvider;
+        throw new IllegalArgumentException(String.format("Class '%s' does not extend the '%s' class", type.getName(), superClass.getName()));
     }
 
     private static boolean isOperation(Class<?> rawClass)
@@ -336,4 +337,16 @@ public class IntrospectionUtils
         String alias = parameter != null ? parameter.alias() : EMPTY;
         return StringUtils.isEmpty(alias) ? field.getName() : alias;
     }
+
+    public static String getSourceName(Class<? extends Source> sourceType)
+    {
+        Alias alias = sourceType.getAnnotation(Alias.class);
+        if (alias != null)
+        {
+            return alias.value();
+        }
+
+        return sourceType.getSimpleName();
+    }
+
 }

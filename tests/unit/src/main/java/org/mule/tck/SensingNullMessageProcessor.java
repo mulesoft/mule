@@ -9,7 +9,7 @@ package org.mule.tck;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
-import org.mule.api.CompletionHandler;
+import org.mule.api.execution.CompletionHandler;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;

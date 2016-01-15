@@ -20,8 +20,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.metadata.DataType;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transformer.DataType;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExceptionEnricher;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
@@ -34,8 +34,8 @@ import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
-import org.mule.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.StringUtils;
@@ -63,6 +63,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class OperationMessageProcessor implements MessageProcessor, MuleContextAware, Lifecycle
 {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OperationMessageProcessor.class);
 
     private final ExtensionModel extensionModel;
@@ -157,14 +158,6 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     public void initialise() throws InitialisationException
     {
         operationExecutor = operationModel.getExecutor().createExecutor();
-        try
-        {
-            muleContext.getInjector().inject(operationExecutor);
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(createStaticMessage("Could not inject dependencies into operation executor of type " + operationExecutor.getClass().getName()), e, this);
-        }
         initialiseIfNeeded(operationExecutor, muleContext);
     }
 

@@ -31,6 +31,7 @@ import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
+import org.mule.extension.annotation.api.Sources;
 import org.mule.extension.annotation.api.capability.Xml;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Optional;
@@ -45,10 +46,12 @@ import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.module.extension.HeisenbergConnection;
 import org.mule.module.extension.HeisenbergConnectionProvider;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
+import org.mule.module.extension.HeisenbergSource;
 import org.mule.module.extension.MoneyLaunderingOperation;
 import org.mule.module.extension.exception.CureCancerExceptionEnricher;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
@@ -80,6 +83,9 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     private static final String EXTENDED_CONFIG_NAME = "extendedConfig";
     private static final String EXTENDED_CONFIG_DESCRIPTION = "extendedDescription";
+
+    private static final String SOURCE_NAME = "ListenPayments";
+    private static final String SOURCE_PARAMETER = "initialBatchNumber";
 
     private static final String SAY_MY_NAME_OPERATION = "sayMyName";
     private static final String GET_ENEMY_OPERATION = "getEnemy";
@@ -119,6 +125,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertTestModuleConfiguration(declaration);
         assertTestModuleOperations(declaration);
         assertTestModuleConnectionProviders(declaration);
+        assertTestModuleMessageSource(declaration);
         assertModelProperties(declaration);
     }
 
@@ -310,11 +317,25 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(typeModelProperty.getType(), equalTo(HeisenbergConnectionProvider.class));
     }
 
+    private void assertTestModuleMessageSource(Declaration declaration) throws Exception
+    {
+        assertThat(declaration.getConnectionProviders(), hasSize(1));
+        SourceDeclaration source = declaration.getMessageSources().get(0);
+        assertThat(source.getName(), is(SOURCE_NAME));
+
+        List<ParameterDeclaration> parameters = source.getParameters();
+        assertThat(parameters, hasSize(1));
+
+        assertParameter(parameters, SOURCE_PARAMETER, "", DataType.of(int.class), true, SUPPORTED, null);
+        ImplementingTypeModelProperty typeModelProperty = source.getModelProperty(ImplementingTypeModelProperty.KEY);
+        assertThat(typeModelProperty, is(notNullValue()));
+        assertThat(typeModelProperty.getType(), equalTo(HeisenbergSource.class));
+    }
+
     private void assertOperation(Declaration declaration,
                                  String operationName,
                                  String operationDescription) throws Exception
     {
-
         OperationDeclaration operation = getOperation(declaration, operationName);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getDescription(), equalTo(operationDescription));
@@ -356,6 +377,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     @Configurations(HeisenbergExtension.class)
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
     @Providers(HeisenbergConnectionProvider.class)
+    @Sources(HeisenbergSource.class)
     public static class HeisenbergPointer extends HeisenbergExtension
     {
 

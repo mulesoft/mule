@@ -20,6 +20,7 @@ import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
@@ -27,11 +28,12 @@ import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDecl
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.OperationExecutorFactory;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.runtime.Interceptor;
+import org.mule.extension.api.runtime.OperationExecutorFactory;
 import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.introspection.validation.ConfigurationModelValidator;
 import org.mule.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
@@ -122,6 +124,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                                                     sortConfigurations(toConfigurations(declaration.getConfigurations(), extensionModelValueHolder)),
                                                                     alphaSortDescribedList(toOperations(declaration.getOperations())),
                                                                     toConnectionProviders(declaration.getConnectionProviders()),
+                                                                    alphaSortDescribedList(toMessageSources(declaration.getMessageSources())),
                                                                     declaration.getModelProperties(),
                                                                     declaration.getExceptionEnricherFactory());
 
@@ -166,6 +169,25 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                                toParameters(declaration.getParameters()),
                                                declaration.getModelProperties(),
                                                declaration.getInterceptorFactories());
+    }
+
+    private List<SourceModel> toMessageSources(List<SourceDeclaration> declarations)
+    {
+        return declarations.stream()
+                .map(declaration -> toMessageSource(declaration))
+                .collect(toList());
+    }
+
+    private SourceModel toMessageSource(SourceDeclaration declaration)
+    {
+        return new ImmutableSourceModel(declaration.getName(),
+                                        declaration.getDescription(),
+                                        toParameters(declaration.getParameters()),
+                                        declaration.getReturnType(),
+                                        declaration.getAttributesType(),
+                                        declaration.getSourceFactory(),
+                                        declaration.getModelProperties(),
+                                        declaration.getInterceptorFactories());
     }
 
     private List<OperationModel> toOperations(List<OperationDeclaration> declarations)

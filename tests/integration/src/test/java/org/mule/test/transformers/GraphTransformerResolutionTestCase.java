@@ -14,7 +14,7 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.SimpleDataType;
+import org.mule.api.metadata.SimpleDataType;
 
 import org.junit.Test;
 

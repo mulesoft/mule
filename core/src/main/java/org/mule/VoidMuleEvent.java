@@ -17,7 +17,7 @@ import org.mule.api.context.notification.ProcessorsTrace;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.Credentials;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.management.stats.ProcessingTime;

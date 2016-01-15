@@ -11,8 +11,6 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 import java.lang.reflect.Field;
 
-import org.springframework.util.ReflectionUtils;
-
 /**
  * An implementation of {@link ValueSetter} for assigning
  * the value of a single, non grouped {@link ParameterModel}
@@ -29,21 +27,17 @@ public final class SingleValueSetter implements ValueSetter
      */
     private final ParameterModel parameterModel;
 
-    /**
-     * The {@link Field} in which the value is to be assigned
-     */
-    private final Field field;
+    private final FieldSetter<Object, Object> fieldSetter;
 
     public SingleValueSetter(ParameterModel parameterModel, Field field)
     {
         this.parameterModel = parameterModel;
-        this.field = field;
-        field.setAccessible(true);
+        this.fieldSetter = new FieldSetter<>(field);
     }
 
     /**
-     * Invokes {@link #field} over {@code target}, obtaining the value
-     * from {@code result}
+     * Sets the {@code resolverSetResult} value for the {@link #parameterModel}
+     * into the {@link Field} supplied in the constructor
      *
      * @param target the object on which the value is being set
      * @param resolverSetResult a {@link ResolverSetResult} containing the value that corresponds to {@code parameter}
@@ -51,6 +45,6 @@ public final class SingleValueSetter implements ValueSetter
     @Override
     public void set(Object target, ResolverSetResult resolverSetResult)
     {
-        ReflectionUtils.setField(field, target, resolverSetResult.get(parameterModel));
+        fieldSetter.set(target, resolverSetResult.get(parameterModel));
     }
 }

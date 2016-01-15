@@ -7,7 +7,7 @@
 package org.mule.config.transformer;
 
 import org.mule.api.MuleContext;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 
 /**
  * Used by the transformer proxy to find or create context objects such as JAXB to be passed into a transform method

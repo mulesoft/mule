@@ -8,7 +8,7 @@ package org.mule.config.transformer;
 
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.Disposable;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.transformer.types.CollectionDataType;
 import org.mule.util.annotation.AnnotationUtils;
 

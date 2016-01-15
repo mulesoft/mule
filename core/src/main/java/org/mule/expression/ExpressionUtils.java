@@ -11,7 +11,7 @@ import static org.mule.expression.ExpressionConstants.DELIM;
 import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.api.transformer.DataType;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.filters.WildcardFilter;

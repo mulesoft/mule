@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
+import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -168,7 +169,7 @@ public final class DynamicConfigurationProvider<T> extends LifecycleAwareConfigu
         {
             if (lifecycleManager.isPhaseComplete(Initialisable.PHASE_NAME))
             {
-                initialiseConfig(configuration);
+                initialiseIfNeeded(configuration, muleContext);
             }
 
             if (lifecycleManager.isPhaseComplete(Startable.PHASE_NAME))
