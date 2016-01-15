@@ -12,6 +12,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -25,6 +26,7 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.Flow;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -693,7 +695,18 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         // the listFiles calls above may actually return null (check the JDK code).
         if (files == null)
         {
-            return;
+            if (!readDirectory.exists())
+            {
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage("Directory '%s' does not exist", currentDirectory.getPath()));
+            }
+            else if (!readDirectory.isDirectory())
+            {
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage("'%s' is not a directory", currentDirectory.getPath()));
+            }
+            else
+            {
+                return;
+            }
         }
 
         for (File file : files)
