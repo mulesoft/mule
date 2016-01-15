@@ -13,7 +13,7 @@
         <tls:trust-store path="trustStore" password="mulepassword"/>
     </tls:context>
 
-    <http:request-config name="requestConfig1" protocol="HTTPS" host="localhost" port="${port1}" tlsContext-ref="tlsClientContext" />
+    <http:request-config name="requestConfig1" protocol="${protocol}" host="localhost" port="${port1}" tlsContext-ref="tlsClientContext" />
     <!--Forces TLSv1 and TLSv1.2 with a cipher suite for each-->
     <http:request-config name="requestConfig2" protocol="HTTPS" host="localhost" port="${port2}">
         <tls:context enabledProtocols="TLSv1, TLSv1.2" enabledCipherSuites="TLS_DHE_DSS_WITH_AES_128_CBC_SHA256, ${cipherSuites}">
@@ -33,7 +33,7 @@
     </tls:context>
 
     <!--Forces TLSv1-->
-    <http:listener-config name="listenerConfig1" protocol="HTTPS" host="localhost" port="${port1}">
+    <http:listener-config name="listenerConfig1" protocol="${protocol}" host="localhost" port="${port1}">
         <tls:context enabledProtocols="TLSv1">
             <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
         </tls:context>
