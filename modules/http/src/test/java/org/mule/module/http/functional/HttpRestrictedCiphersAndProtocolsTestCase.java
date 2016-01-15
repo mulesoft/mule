@@ -42,6 +42,8 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends FunctionalTestCas
     public ExpectedException expectedException = ExpectedException.none();
     @Rule
     public SystemProperty cipherSuites = new SystemProperty("cipherSuites", "TLS_DHE_DSS_WITH_AES_128_CBC_SHA");
+    @Rule
+    public SystemProperty protocol = new SystemProperty("protocol", "HTTPS");
 
     private HttpRequestOptionsBuilder optionsBuilder = HttpRequestOptionsBuilder.newOptions().method(POST.name());
     private DefaultTlsContextFactory tlsContextFactory;
