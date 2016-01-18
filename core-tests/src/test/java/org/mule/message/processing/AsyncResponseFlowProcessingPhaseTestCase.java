@@ -138,7 +138,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
     @Test
     public void runPhaseWithMessagingExceptionThrown() throws Exception
     {
-        when(mockContext.supportsAsynchronousProcessing()).thenReturn(true);
+        when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
         doThrow(mockMessagingException).when(mockTemplate).routeEvent(any(MuleEvent.class));
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
         verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));

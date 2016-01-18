@@ -49,6 +49,7 @@ public class LifecycleUtils
      */
     public static void initialiseIfNeeded(Object object) throws InitialisationException
     {
+        object = unwrap(object);
         if (object instanceof Initialisable)
         {
             ((Initialisable) object).initialise();
@@ -57,35 +58,69 @@ public class LifecycleUtils
 
     /**
      * The same as {@link #initialiseIfNeeded(Object)}, only that before checking
-     * for {@code object} being {@link Initialisable}, it also checks if it implements
-     * {@link MuleContextAware}, in which case it will invoke {@link MuleContextAware#setMuleContext(MuleContext)}
-     * with the given {@code muleContext}
+     * for {@code object} being {@link Initialisable}, it uses the given {@code muleContext}
+     * to perform further initialization.
+     * <p>
+     * It  checks if the {@code object} implements {@link MuleContextAware}, in which case it will
+     * invoke {@link MuleContextAware#setMuleContext(MuleContext)} with the given {@code muleContext}.
      *
      * @param object      the object you're trying to initialise
      * @param muleContext a {@link MuleContext}
      * @throws InitialisationException
+     * @throws IllegalArgumentException if {@code MuleContext} is {@code null}
      */
     public static void initialiseIfNeeded(Object object, MuleContext muleContext) throws InitialisationException
     {
+        initialiseIfNeeded(object, false, muleContext);
+    }
+
+    /**
+     * The same as {@link #initialiseIfNeeded(Object)}, only that before checking
+     * for {@code object} being {@link Initialisable}, it uses the given {@code muleContext}
+     * to perform further initialization.
+     * <p>
+     * It  checks if the {@code object} implements {@link MuleContextAware}, in which case it will
+     * invoke {@link MuleContextAware#setMuleContext(MuleContext)} with the given {@code muleContext}.
+     * <p>
+     * Also depending on the value of the {@code inject} argument, it will perform dependency injection on the
+     * {@code object}
+     *
+     * @param object      the object you're trying to initialise
+     * @param inject      whether it should perform dependency injection on the {@code object} before actually initialising it
+     * @param muleContext a {@link MuleContext}
+     * @throws InitialisationException
+     * @throws IllegalArgumentException if {@code MuleContext} is {@code null}
+     */
+    public static void initialiseIfNeeded(Object object, boolean inject, MuleContext muleContext) throws InitialisationException
+    {
         checkArgument(muleContext != null, "muleContext cannot be null");
         object = unwrap(object);
+
+        if (object == null)
+        {
+            return;
+        }
+
         if (object instanceof MuleContextAware)
         {
             ((MuleContextAware) object).setMuleContext(muleContext);
         }
 
-        try
+        if (inject)
         {
-            muleContext.getInjector().inject(object);
-        }
-        catch (MuleException e)
-        {
-            Message message = createStaticMessage(format("Found exception trying to inject object of type '%s' on initialising phase", object.getClass().getName()));
-            if (object instanceof Initialisable)
+            try
             {
-                throw new InitialisationException(message, e, (Initialisable) object);
+                muleContext.getInjector().inject(object);
             }
-            throw new MuleRuntimeException(message, e);
+            catch (MuleException e)
+            {
+                Message message = createStaticMessage(format("Found exception trying to inject object of type '%s' on initialising phase", object.getClass().getName()));
+                if (object instanceof Initialisable)
+                {
+                    throw new InitialisationException(message, e, (Initialisable) object);
+                }
+                throw new MuleRuntimeException(message, e);
+            }
         }
 
         initialiseIfNeeded(object);

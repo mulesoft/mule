@@ -69,7 +69,7 @@ public final class InterceptableOperationExecutorWrapper extends AbstractInterce
     @Override
     public void initialise() throws InitialisationException
     {
-        initialiseIfNeeded(delegate, muleContext);
+        initialiseIfNeeded(delegate, true, muleContext);
         super.initialise();
     }
 

@@ -8,6 +8,7 @@ package org.mule.registry;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -33,7 +34,7 @@ import org.junit.Test;
 public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase
 {
 
-    private MuleContext muleContext = mock(MuleContext.class);
+    private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
 
     public static class A

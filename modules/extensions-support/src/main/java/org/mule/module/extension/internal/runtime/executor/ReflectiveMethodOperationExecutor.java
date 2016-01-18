@@ -11,7 +11,6 @@ import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -89,17 +88,7 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
     @Override
     public void initialise() throws InitialisationException
     {
-        try
-        {
-            muleContext.getInjector().inject(executorDelegate);
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(
-                    createStaticMessage("Could not perform dependency injection on operation class " + executorDelegate.getClass().getName()), e, this);
-        }
-
-        initialiseIfNeeded(executorDelegate);
+        initialiseIfNeeded(executorDelegate, true, muleContext);
     }
 
     @Override

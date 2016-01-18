@@ -68,7 +68,7 @@ public abstract class AbstractInterceptable implements Interceptable, Lifecycle
     {
         for (Interceptor interceptor : interceptors)
         {
-            initialiseIfNeeded(interceptor, muleContext);
+            initialiseIfNeeded(interceptor, true, muleContext);
         }
     }
 

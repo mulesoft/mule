@@ -164,11 +164,11 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
     {
         if (connectionProvider.isPresent())
         {
-            initialiseIfNeeded(connectionProvider, muleContext);
+            initialiseIfNeeded(connectionProvider, true, muleContext);
             connectionManager.bind(value, connectionProvider.get());
         }
 
-        initialiseIfNeeded(value, muleContext);
+        initialiseIfNeeded(value, true, muleContext);
 
         super.initialise();
     }
