@@ -2,11 +2,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
            http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+           http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <script:script name="myScript" engine="groovy">
         return "$payload Received"
@@ -16,31 +16,27 @@
         <description>
             This example demonstrates how to configure a Groovy Script component with an in-line script.
         </description>
-        <inbound-endpoint address="vm://in1" exchange-pattern="one-way"/>
         <script:component>
             <script:script engine="groovy">
                 return "$payload Received"
             </script:script>
         </script:component>
-        <outbound-endpoint address="vm://out1" exchange-pattern="one-way"/>
+        <test:queue name="inlineScriptTestOut"/>
     </flow>
 
     <flow name="fileBasedScript">
-        <inbound-endpoint address="vm://in2" exchange-pattern="one-way"/>
         <script:component>
             <script:script file="simple-script.groovy"/>
         </script:component>
-        <outbound-endpoint address="vm://out2" exchange-pattern="one-way"/>
+        <test:queue name="fileBasedScriptTestOut"/>
     </flow>
 
     <flow name="referencedScript">
-        <inbound-endpoint address="vm://in3" exchange-pattern="one-way"/>
         <script:component script-ref="myScript"/>
-        <outbound-endpoint address="vm://out3" exchange-pattern="one-way"/>
+        <test:queue name="referencedScriptTestOut"/>
     </flow>
 
     <flow name="scriptVariables">
-        <inbound-endpoint address="vm://in4" exchange-pattern="one-way"/>
         <script:component>
             <script:script engine="groovy">
                 <property key="prop1" value="Received"/>
@@ -50,7 +46,7 @@
                 </script:text>
             </script:script>
         </script:component>
-        <outbound-endpoint address="vm://out4" exchange-pattern="one-way"/>
+        <test:queue name="scriptVariablesTestOut"/>
     </flow>
 </mule>
         <!--// END SNIPPET: full-config -->

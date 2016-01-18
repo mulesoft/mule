@@ -28,8 +28,8 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
     public void testInlineScript() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://in1", "Important Message", null);
-        MuleMessage response = client.request("vm://out1", RECEIVE_TIMEOUT);
+        runFlowAsync("inlineScript", "Important Message");
+        MuleMessage response = client.request("test://inlineScriptTestOut", RECEIVE_TIMEOUT);
         assertNotNull(response);
         assertEquals("Important Message Received", getPayloadAsString(response));
     }
@@ -39,8 +39,8 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
     public void testFileBasedScript() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://in2", "Important Message", null);
-        MuleMessage response = client.request("vm://out2", RECEIVE_TIMEOUT);
+        runFlowAsync("fileBasedScript", "Important Message");
+        MuleMessage response = client.request("test://fileBasedScriptTestOut", RECEIVE_TIMEOUT);
         assertNotNull(response);
         assertEquals("Important Message Received", getPayloadAsString(response));
     }
@@ -49,8 +49,8 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
     public void testReferencedScript() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://in3", "Important Message", null);
-        MuleMessage response = client.request("vm://out3", RECEIVE_TIMEOUT);
+        runFlowAsync("referencedScript", "Important Message");
+        MuleMessage response = client.request("test://referencedScriptTestOut", RECEIVE_TIMEOUT);
         assertNotNull(response);
         assertEquals("Important Message Received", getPayloadAsString(response));
     }
@@ -60,8 +60,8 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase
     public void testScriptVariables() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://in4", "Important Message", null);
-        MuleMessage response = client.request("vm://out4", RECEIVE_TIMEOUT);
+        runFlowAsync("scriptVariables", "Important Message");
+        MuleMessage response = client.request("test://scriptVariablesTestOut", RECEIVE_TIMEOUT);
         assertNotNull(response);
         assertEquals("Important Message Received A-OK", getPayloadAsString(response));
     }

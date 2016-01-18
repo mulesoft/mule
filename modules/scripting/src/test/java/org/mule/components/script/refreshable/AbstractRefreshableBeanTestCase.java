@@ -9,7 +9,6 @@ package org.mule.components.script.refreshable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
@@ -39,14 +38,13 @@ public abstract class AbstractRefreshableBeanTestCase extends FunctionalTestCase
 
     // this is a bit of a messy hack.  if it fails check you don't have more than one copy
     // of the files on your classpath
-    protected void runScriptTest(String script, String name, String endpoint, String payload, String result) throws Exception
+    protected void runScriptTest(String script, String name, String flowName, String payload, String result) throws Exception
     {
         // we overwrite the existing resource on the classpath...
         writeScript(script, nameToPath(name));
         Thread.sleep(WAIT_TIME); // wait for bean to refresh
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage m = client.send(endpoint, payload, null);
+        MuleMessage m = runFlow(flowName, payload).getMessage();
         assertNotNull(m);
         assertEquals(payload + result, getPayloadAsString(m));
     }

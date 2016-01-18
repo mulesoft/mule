@@ -48,21 +48,18 @@
                                  refreshableBean-ref="groovy_class_changeInterfaces" methodName="receive"/>
 
     <flow name="GroovyUMO_Callable">
-        <inbound-endpoint address="vm://groovy_refresh_callable" exchange-pattern="request-response"/>
         <component>
             <spring-object bean="groovyRefreshableCallable"/>
         </component>
     </flow>
 
     <flow name="GroovyUMO_Bean">
-        <inbound-endpoint address="vm://groovy_refresh_bean" exchange-pattern="request-response"/>
         <component>
             <spring-object bean="groovyRefreshableBean"/>
         </component>
     </flow>
 
     <flow name="GroovyUMO_ChangeIntefaces">
-        <inbound-endpoint address="vm://groovy_refresh_changeInterfaces" exchange-pattern="request-response"/>
         <component>
             <spring-object bean="groovyRefreshableBeanChangeInterfaces"/>
         </component>
