@@ -235,7 +235,7 @@ public class ExtensionMessageSource implements MessageSource,
         source.setFlowConstruct(flowConstruct);
         source.setSourceContext(new ImmutableSourceContext(this, this, fetchConfigurationInstance()));
 
-        initialiseIfNeeded(source, muleContext);
+        initialiseIfNeeded(source, true, muleContext);
     }
 
     //TODO: MULE-9320

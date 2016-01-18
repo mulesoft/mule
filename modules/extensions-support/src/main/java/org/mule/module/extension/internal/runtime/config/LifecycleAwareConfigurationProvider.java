@@ -75,7 +75,7 @@ public abstract class LifecycleAwareConfigurationProvider<T> implements Configur
             lifecycleManager.fireInitialisePhase((phaseName, object) -> {
                 for (ConfigurationInstance<T> configurationInstance : configurationInstances)
                 {
-                    initialiseIfNeeded(configurationInstance, muleContext);
+                    initialiseIfNeeded(configurationInstance, true, muleContext);
                 }
             });
         }

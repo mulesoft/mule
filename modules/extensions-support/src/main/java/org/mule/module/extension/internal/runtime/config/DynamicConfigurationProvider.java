@@ -169,7 +169,7 @@ public final class DynamicConfigurationProvider<T> extends LifecycleAwareConfigu
         {
             if (lifecycleManager.isPhaseComplete(Initialisable.PHASE_NAME))
             {
-                initialiseIfNeeded(configuration, muleContext);
+                initialiseIfNeeded(configuration, true, muleContext);
             }
 
             if (lifecycleManager.isPhaseComplete(Startable.PHASE_NAME))

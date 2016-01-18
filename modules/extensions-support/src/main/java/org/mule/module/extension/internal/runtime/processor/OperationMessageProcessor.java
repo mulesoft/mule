@@ -158,7 +158,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     public void initialise() throws InitialisationException
     {
         operationExecutor = operationModel.getExecutor().createExecutor();
-        initialiseIfNeeded(operationExecutor, muleContext);
+        initialiseIfNeeded(operationExecutor, true, muleContext);
     }
 
     private ExceptionEnricher getExceptionEnricher()

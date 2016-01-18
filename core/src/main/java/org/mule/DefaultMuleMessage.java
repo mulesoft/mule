@@ -6,7 +6,6 @@
  */
 package org.mule;
 
-import static org.mule.api.metadata.DataType.OBJECT_DATA_TYPE;
 import static org.mule.api.transport.PropertyScope.INBOUND;
 import static org.mule.api.transport.PropertyScope.INVOCATION;
 import static org.mule.api.transport.PropertyScope.OUTBOUND;
@@ -145,7 +144,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
      */
     public <T> DefaultMuleMessage(T value)
     {
-        this(value, OBJECT_DATA_TYPE, null, null);
+        this(value, (DataType<T>) null, null, null);
     }
 
     /**
@@ -155,7 +154,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     @Deprecated
     public <T> DefaultMuleMessage(T value, MuleContext muleContext)
     {
-        this(value, OBJECT_DATA_TYPE, null, muleContext);
+        this(value, (DataType<T>) null, null, muleContext);
     }
 
     /**
@@ -194,7 +193,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         this(value, dataType, attributes, null);
     }
 
-
     /**
      * @deprecated this is a temporal workaround because the message requires the mule context. As the message
      * refactor progresses, {@link DefaultMuleMessage(T, DataType, Serializable)} should be use instead
@@ -202,7 +200,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     @Deprecated
     public <T> DefaultMuleMessage(T value, DataType<T> dataType, Serializable attributes, MuleContext muleContext)
     {
-        super(resolveValue(value), (DataType<Object>) dataType);
+        super(resolveValue(value), resolveDataType(value, dataType, muleContext));
         id = UUID.getUUID();
         rootId = id;
         this.attributes = attributes;
@@ -287,6 +285,11 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
             value = ((MuleMessage) value).getPayload();
         }
         return value != null ? value : NullPayload.getInstance();
+    }
+
+    private static DataType resolveDataType(Object value, DataType dataType, MuleContext muleContext)
+    {
+        return dataType != null ? dataType : createDefaultDataType(value, muleContext);
     }
 
     public DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext)
@@ -1578,7 +1581,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         newMessage.setEncoding(currentMessage.getEncoding());
         return newMessage;
     }
-    
+
     void setSessionProperties(Map<String, TypedValue> sessionProperties)
     {
         properties.sessionMap = sessionProperties;

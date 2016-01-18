@@ -41,7 +41,7 @@ public class VMUsersDefaultObjectSerializerTestCase extends FunctionalTestCase
         objectSerializer = new JavaObjectSerializer();
         try
         {
-            LifecycleUtils.initialiseIfNeeded(objectSerializer, muleContext);
+            LifecycleUtils.initialiseIfNeeded(objectSerializer);
         }
         catch (Exception e)
         {
