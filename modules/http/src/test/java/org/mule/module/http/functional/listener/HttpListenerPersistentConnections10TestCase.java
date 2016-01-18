@@ -42,8 +42,7 @@ public class HttpListenerPersistentConnections10TestCase extends HttpListenerPer
     @Test
     public void persistentCloseHeaderCheckHeader() throws Exception
     {
-        // For some reason, as opposed to 3.8.x
-        assertThat(performRequest(persistentPortCloseHeader.getNumber(), getHttpVersion(), false), is(KEEP_ALIVE));
+        assertThat(performRequest(persistentPortCloseHeader.getNumber(), getHttpVersion(), false), is(CLOSE));
     }
 
     @Test
