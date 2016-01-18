@@ -99,6 +99,21 @@ public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testDefaultAnnotationsInNotAnnotatedObject()
+    {
+        FlowConstruct flow = muleContext.getRegistry().lookupFlowConstruct("NotAnnotatedBridge");
+        assertThat(flow, not(nullValue()));
+        assertThat(getDocName(flow), is(nullValue()));
+        assertThat(getDocDescription(flow), is(nullValue()));
+        assertThat(getSourceFile(flow), is("annotations.xml"));
+        assertThat(getSourceFileLine(flow), is(23));
+        assertThat(getSourceElement(flow), is("<flow name=\"NotAnnotatedBridge\">" + SystemUtils.LINE_SEPARATOR +
+                                              "<inbound-endpoint ref=\"notAnnotatedIn\"></inbound-endpoint>" + SystemUtils.LINE_SEPARATOR +
+                                              "<echo-component></echo-component>" + SystemUtils.LINE_SEPARATOR +
+                                              "</flow>"));
+    }
+
+    @Test
     public void testJavaComponentAnnotations()
     {
         DefaultJavaComponent echo = muleContext.getRegistry().lookupByType(DefaultJavaComponent.class).values().iterator().next();
@@ -130,15 +145,22 @@ public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
     {
         OutboundEndpoint out = muleContext.getRegistry().lookupByType(OutboundEndpoint.class).values().iterator().next();
         assertThat(out, not(nullValue()));
-        assertThat(getDocName(out), is("outbound vm endpoint"));
-        assertThat(getDocDescription(out), is("Accepts outbound messages"));
-        assertThat(getSourceFile(out), is("annotations-config.xml"));
-        assertThat(getSourceFileLine(out), is(22));
-        assertThat(getSourceElement(out), is("<endpoint name=\"out\" address=\"vm://out\" exchange-pattern=\"request-response\" doc:name=\"outbound vm endpoint\">" + SystemUtils.LINE_SEPARATOR +
-                                             "<annotations>" + SystemUtils.LINE_SEPARATOR +
-                                             "<doc:description>Accepts outbound messages</doc:description>" + SystemUtils.LINE_SEPARATOR +
-                                             "</annotations>" + SystemUtils.LINE_SEPARATOR +
-                                             "</endpoint>"));
+        assertThat(getDocName(out), is(nullValue()));
+        assertThat(getDocDescription(out), is(nullValue()));
+        assertThat(getSourceFile(out), is("annotations.xml"));
+        assertThat(getSourceFileLine(out), is(18));
+        assertThat(getSourceElement(out), is("<outbound-endpoint ref=\"out\"></outbound-endpoint>"));
+    }
+
+    @Test
+    public void testInsideSpringBeansAnnotations()
+    {
+        Transformer stb = muleContext.getRegistry().lookupTransformer("ManziTransformer");
+        assertThat(stb, not(nullValue()));
+        assertThat(getDocName(stb), is("manzi-transformer"));
+        assertThat(getSourceFile(stb), is("annotations-config.xml"));
+        assertThat(getSourceFileLine(stb), is(30));
+        assertThat(getSourceElement(stb), is("<append-string-transformer message=\"Manzi\" name=\"ManziTransformer\" doc:name=\"manzi-transformer\"></append-string-transformer>"));
     }
 
     protected String getDocName(Object obj)

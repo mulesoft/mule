@@ -18,4 +18,11 @@
         <outbound-endpoint ref="out"/>
     </flow>
 
+    <endpoint name="notAnnotatedIn" address="vm://notAnnotatedIn" exchange-pattern="request-response"/>
+
+    <flow name="NotAnnotatedBridge">
+        <inbound-endpoint ref="notAnnotatedIn"/>
+        <echo-component/>
+    </flow>
+
 </mule>
