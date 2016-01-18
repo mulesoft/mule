@@ -29,6 +29,7 @@ import org.mule.module.extension.model.KnockeableDoor;
 import org.mule.module.extension.model.Ricin;
 import org.mule.module.extension.model.Weapon;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,10 +43,11 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
 {
 
     private static final String GUSTAVO_FRING = "Gustavo Fring";
-    private static final String SECRET_PACKAGE = "secretPackage";
-    private static final String METH = "meth";
+    private static final BigDecimal MONEY = BigDecimal.valueOf(1000000);
     private static final String GOODBYE_MESSAGE = "Say hello to my little friend";
     private static final String VICTIM = "Skyler";
+    public static final String HEISENBERG = "heisenberg";
+    public static final long PAYMENT = 100;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -74,7 +76,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
         MuleEvent originalEvent = getTestEvent(EMPTY);
         MuleEvent responseEvent = runFlow("die", originalEvent);
         assertThat(responseEvent.getMessageAsString(), is(EMPTY));
-        assertThat(getConfig("heisenberg").getEndingHealth(), is(DEAD));
+        assertThat(getConfig(HEISENBERG).getEndingHealth(), is(DEAD));
     }
 
     @Test
@@ -104,17 +106,15 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void operationWithInjectedEvent() throws Exception
     {
-        MuleEvent event = getTestEvent(EMPTY);
-        event = runFlow("hideInEvent", event);
-        assertThat((String) event.getFlowVariable(SECRET_PACKAGE), is(METH));
+        runFlow("collectFromEvent", getTestEvent(Long.valueOf(PAYMENT)));
+        assertThat(getConfig(HEISENBERG).getMoney(), is(MONEY.add(BigDecimal.valueOf(PAYMENT))));
     }
 
     @Test
     public void operationWithInjectedMessage() throws Exception
     {
-        MuleEvent event = getTestEvent(EMPTY);
-        runFlow("hideInMessage", event);
-        assertThat((String) event.getMessage().getInvocationProperty(SECRET_PACKAGE), is(METH));
+        runFlow("collectFromMessage", getTestEvent(Long.valueOf(PAYMENT)));
+        assertThat(getConfig(HEISENBERG).getMoney(), is(MONEY.add(BigDecimal.valueOf(PAYMENT))));
     }
 
     @Test

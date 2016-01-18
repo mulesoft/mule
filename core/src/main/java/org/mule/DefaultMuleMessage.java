@@ -158,6 +158,19 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     }
 
     /**
+     * Creates a new message instance with the given value and attributes object
+     *
+     * @param value  the value (or payload) of the message being created.
+     * @param attributes a connector specific object that contains additional attributes related to the message value or
+     *                   it's source.
+     * @param <T> the type of the value
+     */
+    public <T> DefaultMuleMessage(T value, Serializable attributes)
+    {
+        this(value, (DataType<T>) null, attributes, null);
+    }
+
+    /**
      * Creates a new message instance with the given value and data type.
      *
      * @param value  the value (or payload) of the message being created.
@@ -212,15 +225,13 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         }
         else
         {
-            if (muleContext.getConfiguration().isCacheMessageOriginalPayload())
+            if (muleContext != null && muleContext.getConfiguration().isCacheMessageOriginalPayload())
             {
                 originalPayload = value;
             }
         }
 
         resetAccessControl();
-
-        this.muleContext = muleContext;
     }
 
     public DefaultMuleMessage(MuleMessage message)
@@ -417,10 +428,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
 
     public void setMuleContext(MuleContext context)
     {
-        if (context == null)
-        {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("muleContext").getMessage());
-        }
         muleContext = context;
     }
 

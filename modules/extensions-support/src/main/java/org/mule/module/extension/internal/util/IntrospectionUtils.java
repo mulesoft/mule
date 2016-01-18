@@ -291,8 +291,16 @@ public class IntrospectionUtils
 
     public static boolean isVoid(Method method)
     {
-        Class<?> returnType = method.getReturnType();
-        return returnType.equals(void.class) || returnType.equals(Void.class);
+        return isVoid(method.getReturnType());
+    }
+
+    public static boolean isVoid(OperationModel operationModel)
+    {
+        return isVoid(operationModel.getReturnType().getRawType());
+    }
+
+    private static boolean isVoid(Class<?> type) {
+        return type.equals(void.class) || type.equals(Void.class);
     }
 
     public static Collection<Field> getParameterFields(Class<?> extensionType)

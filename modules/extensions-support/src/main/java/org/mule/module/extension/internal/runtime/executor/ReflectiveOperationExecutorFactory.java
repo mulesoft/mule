@@ -7,11 +7,10 @@
 package org.mule.module.extension.internal.runtime.executor;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.api.runtime.OperationExecutorFactory;
 import org.mule.extension.api.runtime.OperationExecutor;
+import org.mule.extension.api.runtime.OperationExecutorFactory;
 
 import java.lang.reflect.Method;
 
@@ -27,7 +26,6 @@ public final class ReflectiveOperationExecutorFactory<T> implements OperationExe
 
     private final Class<T> implementationClass;
     private final Method operationMethod;
-    private final ReturnDelegate returnDelegate;
 
     public ReflectiveOperationExecutorFactory(Class<T> implementationClass, Method operationMethod)
     {
@@ -36,7 +34,7 @@ public final class ReflectiveOperationExecutorFactory<T> implements OperationExe
 
         this.implementationClass = implementationClass;
         this.operationMethod = operationMethod;
-        returnDelegate = isVoid(operationMethod) ? VoidReturnDelegate.INSTANCE : ValueReturnDelegate.INSTANCE;
+
     }
 
     @Override
@@ -52,6 +50,6 @@ public final class ReflectiveOperationExecutorFactory<T> implements OperationExe
             throw new MuleRuntimeException(createStaticMessage("Could not create instance of operation class " + implementationClass.getName()), e);
         }
 
-        return new ReflectiveMethodOperationExecutor(operationMethod, delegate, returnDelegate);
+        return new ReflectiveMethodOperationExecutor(operationMethod, delegate);
     }
 }

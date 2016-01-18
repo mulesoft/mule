@@ -217,32 +217,32 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetPaymentFromEventType" substitutionGroup="heisenberg-empire" name="get-payment-from-event"></xs:element>
+    <xs:complexType name="GetPaymentFromEventType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetPaymentFromMessageType" substitutionGroup="heisenberg-empire" name="get-payment-from-message"></xs:element>
+    <xs:complexType name="GetPaymentFromMessageType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetSaulPhoneType" substitutionGroup="heisenberg-empire" name="get-saul-phone"></xs:element>
     <xs:complexType name="GetSaulPhoneType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="HideMethInEventType" substitutionGroup="heisenberg-empire" name="hide-meth-in-event"></xs:element>
-    <xs:complexType name="HideMethInEventType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="HideMethInMessageType" substitutionGroup="heisenberg-empire" name="hide-meth-in-message"></xs:element>
-    <xs:complexType name="HideMethInMessageType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
