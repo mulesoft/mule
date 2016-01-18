@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection.validation;
 
+import org.mule.api.MuleEvent;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.extension.api.introspection.ExtensionModel;
@@ -13,7 +14,10 @@ import org.mule.extension.api.introspection.OperationModel;
 
 /**
  * Validates that all {@link OperationModel operations} specify
- * a return type
+ * a valid return type.
+ * <p>
+ * A return type is considered valid when it's not {@code null} and
+ * not a {@link MuleEvent}
  *
  * @since 4.0
  */
@@ -27,9 +31,27 @@ public class OperationReturnTypeModelValidator implements ModelValidator
         {
             if (operationModel.getReturnType() == null)
             {
-                throw new IllegalOperationModelDefinitionException(String.format("Operation '%s' in Extension '%s' is missing a return type",
-                                                                                 operationModel.getName(), model.getName()));
+                throw missingReturnTypeException(model, operationModel);
+            }
+
+            Class<?> returnType = operationModel.getReturnType().getRawType();
+            if (returnType == null)
+            {
+                throw missingReturnTypeException(model, operationModel);
+            }
+
+            if (MuleEvent.class.isAssignableFrom(returnType))
+            {
+                throw new IllegalOperationModelDefinitionException(String.format("Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are " +
+                                                                 "not allowed to return objects of that type",
+                                                                 operationModel.getName(), model.getName(), MuleEvent.class.getName()));
             }
         }
+    }
+
+    private IllegalModelDefinitionException missingReturnTypeException(ExtensionModel model, OperationModel operationModel)
+    {
+        throw new IllegalOperationModelDefinitionException(String.format("Operation '%s' in Extension '%s' is missing a return type",
+                                                                         operationModel.getName(), model.getName()));
     }
 }

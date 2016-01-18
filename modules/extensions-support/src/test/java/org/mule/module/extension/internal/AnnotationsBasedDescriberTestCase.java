@@ -93,8 +93,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String KILL_CUSTOM_OPERATION = "killWithCustomMessage";
     private static final String KILL_WITH_WEAPON = "killWithWeapon";
     private static final String KILL_WITH_MULTIPLES_WEAPONS = "killWithMultiplesWeapons";
-    private static final String HIDE_METH_IN_EVENT_OPERATION = "hideMethInEvent";
-    private static final String HIDE_METH_IN_MESSAGE_OPERATION = "hideMethInMessage";
+    private static final String GET_PAYMENT_FROM_EVENT_OPERATION = "getPaymentFromEvent";
+    private static final String GET_PAYMENT_FROM_MESSAGE_OPERATION = "getPaymentFromMessage";
     private static final String DIE = "die";
     private static final String KILL_MANY = "killMany";
     private static final String KILL_ONE = "killOne";
@@ -217,8 +217,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertOperation(declaration, KILL_CUSTOM_OPERATION, "");
         assertOperation(declaration, KILL_WITH_WEAPON, "");
         assertOperation(declaration, KILL_WITH_MULTIPLES_WEAPONS, "");
-        assertOperation(declaration, HIDE_METH_IN_EVENT_OPERATION, "");
-        assertOperation(declaration, HIDE_METH_IN_MESSAGE_OPERATION, "");
+        assertOperation(declaration, GET_PAYMENT_FROM_EVENT_OPERATION, "");
+        assertOperation(declaration, GET_PAYMENT_FROM_MESSAGE_OPERATION, "");
         assertOperation(declaration, DIE, "");
         assertOperation(declaration, KILL_MANY, "");
         assertOperation(declaration, KILL_ONE, "");
@@ -260,11 +260,11 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(operation.getParameters(), "victim", "", DataType.of(String.class), false, SUPPORTED, "#[payload]");
         assertParameter(operation.getParameters(), "goodbyeMessage", "", DataType.of(String.class), true, SUPPORTED, null);
 
-        operation = getOperation(declaration, HIDE_METH_IN_EVENT_OPERATION);
+        operation = getOperation(declaration, GET_PAYMENT_FROM_EVENT_OPERATION);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters().isEmpty(), is(true));
 
-        operation = getOperation(declaration, HIDE_METH_IN_MESSAGE_OPERATION);
+        operation = getOperation(declaration, GET_PAYMENT_FROM_MESSAGE_OPERATION);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters().isEmpty(), is(true));
 

@@ -10,7 +10,7 @@ import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.toMap;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.UseConfig;

@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.api.MuleEvent;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
@@ -50,9 +51,16 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
     }
 
     @Test(expected = IllegalOperationModelDefinitionException.class)
-    public void invalid()
+    public void nullReturnType()
     {
         when(operationModel.getReturnType()).thenReturn(null);
+        validator.validate(extensionModel);
+    }
+
+    @Test(expected = IllegalOperationModelDefinitionException.class)
+    public void muleEventReturnType()
+    {
+        when(operationModel.getReturnType()).thenReturn(DataType.of(MuleEvent.class));
         validator.validate(extensionModel);
     }
 }
