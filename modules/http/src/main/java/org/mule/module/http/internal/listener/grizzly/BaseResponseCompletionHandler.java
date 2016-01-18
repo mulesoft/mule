@@ -8,6 +8,7 @@ package org.mule.module.http.internal.listener.grizzly;
 
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
+
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 
@@ -37,15 +38,10 @@ public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandl
             }
         }
         HttpResponsePacket httpResponsePacket = responsePacketBuilder.build();
+        httpResponsePacket.setProtocol(sourceRequest.getProtocol());
         if (httpResponse.getHeaderValue(HttpHeaders.Names.TRANSFER_ENCODING) != null)
         {
             httpResponsePacket.setChunked(true);
-        }
-        else
-        {
-            // Workaround GRIZZLY-1811 by explicity setting chunking 'false' so that chunking isn't incorrectly used for
-            // sending a response with content-length when 'Expect: Continue' is used.
-            httpResponsePacket.setChunked(false);
         }
 
         if (CLOSE.equalsIgnoreCase(httpResponsePacket.getHeader(CONNECTION)))
