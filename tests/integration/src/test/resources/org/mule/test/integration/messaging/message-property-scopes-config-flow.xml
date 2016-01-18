@@ -1,45 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm" 
       xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
     <spring:bean name="date" class="java.util.Date"/>
 
-    <message-properties-transformer name="SetSessionProperty" scope="session">
-        <add-message-property key="testProperty" value-ref="date"/>
-    </message-properties-transformer>
-
-    <message-properties-transformer name="SetInvocationProperty" scope="invocation">
-        <add-message-property key="testProperty" value-ref="date"/>
-    </message-properties-transformer>
-
-    <custom-transformer name="RetrieveProperty" class="org.mule.test.integration.message.RetrievePropertyTransformer">
-        <spring:property name="property" value="testProperty"/>
-    </custom-transformer>
-
     <flow name="InService1">
-        <vm:inbound-endpoint path="in1" transformer-refs="SetSessionProperty" exchange-pattern="request-response"/>
-        <vm:outbound-endpoint path="middle" exchange-pattern="request-response">
-            <message-properties-transformer>
-                <!-- 2 issues here: * Use MPT's copy/propagate simplified syntax * Session props should probably be propagated 
-                    automatically? -->
-                <add-message-property key="testProperty" value="#[sessionVars.testProperty]"/>
-            </message-properties-transformer>
-        </vm:outbound-endpoint>
+        <message-properties-transformer name="SetSessionProperty" scope="session">
+            <add-message-property key="testProperty" value-ref="date"/>
+        </message-properties-transformer>
+        <message-properties-transformer>
+            <!-- 2 issues here: * Use MPT's copy/propagate simplified syntax * Session props should probably be propagated 
+                automatically? -->
+            <add-message-property key="testProperty" value="#[sessionVars.testProperty]"/>
+        </message-properties-transformer>
+        <flow-ref name="InService2"/>
     </flow>
 
     <flow name="InService2">
-        <vm:inbound-endpoint path="in2" transformer-refs="SetInvocationProperty" exchange-pattern="request-response"/>
-        <vm:outbound-endpoint path="middle" exchange-pattern="request-response"/>
+        <message-properties-transformer name="SetInvocationProperty" scope="invocation">
+            <add-message-property key="testProperty" value-ref="date"/>
+        </message-properties-transformer>
+        <flow-ref name="ResponseService"/>
     </flow>
 
     <flow name="ResponseService">
-        <vm:inbound-endpoint path="middle" transformer-refs="RetrieveProperty" exchange-pattern="request-response"/>
+        <custom-transformer name="RetrieveProperty" class="org.mule.test.integration.message.RetrievePropertyTransformer">
+            <spring:property name="property" value="testProperty"/>
+        </custom-transformer>
         <echo-component/>
     </flow>
 

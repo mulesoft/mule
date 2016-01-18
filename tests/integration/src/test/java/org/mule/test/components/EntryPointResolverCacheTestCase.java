@@ -6,15 +6,14 @@
  */
 package org.mule.test.components;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.message.DefaultExceptionPayload;
-import org.mule.functional.junit4.FunctionalTestCase;
 
-import java.util.HashMap;
+import org.mule.api.MuleMessage;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.message.DefaultExceptionPayload;
 
 import org.junit.Test;
 
@@ -33,19 +32,18 @@ public class EntryPointResolverCacheTestCase extends FunctionalTestCase
     @Test
     public void testCache() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
         MuleMessage response = null;
-        HashMap<String, Object> propertyMap = new HashMap<String, Object>();
-        propertyMap.put("method", "retrieveReferenceData");
 
-        response = client.send("refOneInbound", "a request", propertyMap);
+        response = flowRunner("refServiceOne").withPayload("a request")
+                                              .withInboundProperty("method", "retrieveReferenceData")
+                                              .run()
+                                              .getMessage();
         Object payload = response.getPayload();
 
-        assertTrue("should be a string", payload instanceof String);
-        assertEquals("ServiceOne", payload);
+        assertThat(payload, instanceOf(String.class));
+        assertThat(payload, is("ServiceOne"));
 
-        response = client.send("refTwoInbound", "another request", propertyMap);
+        response = flowRunner("refServiceTwo").withPayload("another request").withInboundProperty("method", "retrieveReferenceData").run().getMessage();
         payload = response.getPayload();
         if ((payload == null) || (response.getExceptionPayload() != null))
         {
@@ -59,8 +57,8 @@ public class EntryPointResolverCacheTestCase extends FunctionalTestCase
                 fail(exPld.toString());
             }
         }
-        assertTrue("should be a string", payload instanceof String);
-        assertEquals("ServiceTwo", payload);
+        assertThat(payload, instanceOf(String.class));
+        assertThat(payload, is("ServiceTwo"));
 
     }
 

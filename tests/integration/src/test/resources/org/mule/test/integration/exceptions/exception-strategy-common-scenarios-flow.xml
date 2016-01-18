@@ -1,47 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <http:request-config name="requestConfig" host="localhost" port="${port7}"/>
 
     <flow name="PreservePayloadExceptionStrategy">
-        <vm:inbound-endpoint path="in4" exchange-pattern="request-response"/>
         <append-string-transformer message=" with some text added"/>
         <test:component throwException="true"/>
         <custom-exception-strategy class="org.mule.test.integration.exceptions.ExceptionStrategyCommonScenariosTestCase$PreservePayloadExceptionStrategy">
             <logger/>
         </custom-exception-strategy>
-    </flow>
-
-    <flow name="StopFlowBasedOnExceptionType">
-        <vm:inbound-endpoint path="in5" exchange-pattern="request-response"/>
-        <http:request path="/" responseTimeout="5" config-ref="requestConfig">
-            <!--<http:success-status-code-validator values="0..599"/>-->
-        </http:request>
-        <default-exception-strategy>
-            <choice>
-                <when expression="#[exception.getCause() instanceof java.net.ConnectException]">
-                    <script:component>
-                        <script:script engine="groovy">
-                            flowConstruct.stop();
-                        </script:script>
-                    </script:component>
-                </when>
-                <otherwise>
-                    <logger/>
-                </otherwise>
-            </choice>
-        </default-exception-strategy>
     </flow>
 
 </mule>

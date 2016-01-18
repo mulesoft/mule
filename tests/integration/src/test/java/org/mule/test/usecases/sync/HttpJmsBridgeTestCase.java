@@ -6,10 +6,12 @@
  */
 package org.mule.test.usecases.sync;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -46,9 +48,9 @@ public class HttpJmsBridgeTestCase extends FunctionalTestCase
 
         client.dispatch(String.format("http://localhost:%d/in", httpPort.getNumber()), new DefaultMuleMessage(payload, headers, muleContext), newOptions().method(POST.name()).build());
 
-        MuleMessage msg = client.request("vm://out", 10000);
+        MuleMessage msg = client.request("test://out", RECEIVE_TIMEOUT);
         assertNotNull(msg);
-        assertEquals(payload, getPayloadAsString(msg));
-        assertEquals("value", msg.getInboundProperty(customHeader));
+        assertThat(getPayloadAsString(msg), is(payload));
+        assertThat(msg.getInboundProperty(customHeader), is("value"));
     }
 }

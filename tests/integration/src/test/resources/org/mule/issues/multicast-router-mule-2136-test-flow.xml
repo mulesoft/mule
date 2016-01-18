@@ -3,44 +3,36 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans" 
       xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-
-    <vm:connector name="default"/>
-    <vm:connector name="queue"/>
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <mxml:object-to-xml-transformer name="objectToXml"/>
     <mxml:xml-to-object-transformer name="xmlToObject"/>
 
-    <vm:endpoint name="xml-in" path="xml-in" connector-ref="default" exchange-pattern="one-way"/>
-    <vm:endpoint name="object-in" address="vm://object-in" connector-ref="default" exchange-pattern="one-way"/>
-    <vm:endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue" exchange-pattern="one-way"/>
-    <vm:endpoint name="object-out" path="object-out" connector-ref="queue" exchange-pattern="one-way"/>
-    <vm:endpoint name="object-xml-out" address="vm://object-xml-out" connector-ref="queue" exchange-pattern="one-way"/>
-
     <flow name="xml to ...">
-        <inbound-endpoint ref="xml-in"/>
         <all>
-            <vm:outbound-endpoint ref="xml-object-out">
+            <processor-chain>
                 <transformer ref="xmlToObject"/>
-            </vm:outbound-endpoint>
+                <test:queue name="xml-object-out"/>
+            </processor-chain>
         </all>
     </flow>
 
     <flow name="object to xml">
-        <inbound-endpoint ref="object-in"/>
         <all>
-            <vm:outbound-endpoint ref="object-out"/>
-            <vm:outbound-endpoint ref="object-xml-out">
+            <test:queue name="object-out"/>
+            <processor-chain>
                 <transformer ref="objectToXml"/>
-            </vm:outbound-endpoint>
-            <vm:outbound-endpoint ref="xml-in">
+                <test:queue name="object-xml-out"/>
+            </processor-chain>
+            <processor-chain>
                 <transformer ref="objectToXml"/>
-            </vm:outbound-endpoint>
+                <flow-ref name="xml to ..."/>
+            </processor-chain>
         </all>
     </flow>
 

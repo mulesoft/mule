@@ -2,11 +2,9 @@
 
 <mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <spring:beans>
@@ -14,7 +12,6 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
     </spring:beans>
 
     <flow name="withSplitterAggregatorTest">
-        <vm:inbound-endpoint path="splitter" exchange-pattern="request-response"/>
         <set-payload value="#[{1,2}]"/>
         <collection-splitter/>
         <until-successful maxRetries="2" objectStore-ref="objectStore" millisBetweenRetries="2000">
@@ -34,7 +31,6 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 
 
     <flow name="simpleTest">
-        <vm:inbound-endpoint path="simple" exchange-pattern="request-response"/>
         <until-successful maxRetries="2" objectStore-ref="objectStore" millisBetweenRetries="2000">
             <processor-chain>
                 <expression-component><![CDATA[throw new Exception("error");]]></expression-component>
@@ -50,7 +46,6 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
     </flow>
 
     <flow name="noRetriesSplitterAggregatorTest">
-        <vm:inbound-endpoint path="noRetriesSplitter" exchange-pattern="request-response"/>
         <set-payload value="#[{1,2}]"/>
         <collection-splitter/>
         <until-successful maxRetries="0" objectStore-ref="objectStore" millisBetweenRetries="2000">
@@ -69,7 +64,6 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
     </flow>
 
     <flow name="noRetriesSimpleTest">
-        <vm:inbound-endpoint path="noRetries" exchange-pattern="request-response"/>
         <until-successful maxRetries="0" objectStore-ref="objectStore" millisBetweenRetries="2000">
             <processor-chain>
                 <expression-component><![CDATA[throw new Exception("error");]]></expression-component>

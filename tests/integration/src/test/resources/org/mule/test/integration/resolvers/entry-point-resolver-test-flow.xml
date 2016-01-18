@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans" 
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <spring:bean name="target" class="org.mule.test.integration.resolvers.Target"/>
 
     <flow name="Array2">
-        <vm:inbound-endpoint path="array2" exchange-pattern="request-response"/>
         <component>
             <array-entry-point-resolver/>
             <spring-object bean="target"/>
@@ -19,7 +16,6 @@
     </flow>
 
     <flow name="Callable2">
-        <vm:inbound-endpoint path="callable2" exchange-pattern="request-response"/>
         <component>
             <callable-entry-point-resolver/>
             <spring-object bean="target"/>
@@ -27,7 +23,6 @@
     </flow>
 
     <flow name="Custom2">
-        <vm:inbound-endpoint path="custom2" exchange-pattern="request-response"/>
         <component>
             <custom-entry-point-resolver class="org.mule.test.integration.resolvers.CustomEntryPointResolver"/>
             <spring-object bean="target"/>
@@ -35,7 +30,6 @@
     </flow>
 
     <flow name="Method2">
-        <vm:inbound-endpoint path="method2" exchange-pattern="request-response"/>
         <component>
             <method-entry-point-resolver>
                 <include-entry-point method="methodString"/>
@@ -45,8 +39,7 @@
         </component>
     </flow>
 
-    <flow name="NoArgs2">
-        <vm:inbound-endpoint path="no-arguments2" exchange-pattern="request-response"/>
+    <flow name="NoArguments2">
         <component>
             <no-arguments-entry-point-resolver/>
             <spring-object bean="target"/>
@@ -54,7 +47,6 @@
     </flow>
 
     <flow name="Property2">
-        <vm:inbound-endpoint path="property2" exchange-pattern="request-response"/>
         <component>
             <property-entry-point-resolver property="propertyName"/>
             <spring-object bean="target"/>
@@ -62,7 +54,6 @@
     </flow>
 
     <flow name="Reflection2">
-        <vm:inbound-endpoint path="reflection2" exchange-pattern="request-response"/>
         <component>
             <reflection-entry-point-resolver/>
             <spring-object bean="target"/>
@@ -70,7 +61,6 @@
     </flow>
 
     <flow name="Legacy2">
-        <vm:inbound-endpoint path="legacy2" exchange-pattern="request-response"/>
         <component>
             <legacy-entry-point-resolver-set/>
             <spring-object bean="target"/>

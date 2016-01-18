@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans" 
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <endpoint name="testqueue" address="test://queue"/>
 
     <flow name="component1">
-        <vm:inbound-endpoint path="component1" exchange-pattern="request-response"/>
         <component class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyComponent"/>
-        <vm:outbound-endpoint path="component2" exchange-pattern="request-response">
-            <custom-transformer class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyTransformer"/>
-        </vm:outbound-endpoint>
+
+        <custom-transformer class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyTransformer"/>
+        <test:queue name="queue"/>
     </flow>
 
     <flow name="component2">
-        <vm:inbound-endpoint path="component2" exchange-pattern="request-response"/>
+        <inbound-endpoint ref="testqueue" exchange-pattern="request-response"/>
         <component class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyComponent"/>
     </flow>
 

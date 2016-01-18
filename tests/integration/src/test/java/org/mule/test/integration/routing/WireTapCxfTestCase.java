@@ -14,21 +14,14 @@ import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptio
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.functional.functional.FunctionalTestNotificationListener;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.concurrent.Latch;
-
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 public class WireTapCxfTestCase extends FunctionalTestCase
 {
-    private static final Latch tapLatch = new Latch();
-
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
@@ -36,21 +29,6 @@ public class WireTapCxfTestCase extends FunctionalTestCase
     protected String getConfigFile()
     {
         return "org/mule/test/integration/routing/wire-tap-cxf-flow.xml";
-    }
-
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-
-        muleContext.registerListener(new FunctionalTestNotificationListener()
-        {
-            @Override
-            public void onNotification(ServerNotification notification)
-            {
-                tapLatch.release();
-            }
-        });
     }
 
     @Test
@@ -68,6 +46,6 @@ public class WireTapCxfTestCase extends FunctionalTestCase
         assertTrue(responseString.contains("echoResponse"));
         assertFalse(responseString.contains("soap:Fault"));
 
-        assertTrue(tapLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertNotNull(client.request("test://wireTapped", RECEIVE_TIMEOUT));
     }
 }

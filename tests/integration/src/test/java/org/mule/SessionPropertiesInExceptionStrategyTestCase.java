@@ -11,8 +11,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.api.transport.PropertyScope.SESSION;
+
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
@@ -32,14 +32,12 @@ public class SessionPropertiesInExceptionStrategyTestCase extends FunctionalTest
     @Test
     public void sessionPropertyIsNotLost() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
         List<String> list = new ArrayList<String>();
         list.add("one");
         list.add("two");
         list.add("three");
 
-        MuleMessage result = client.send("vm://testInput", list, null);
+        MuleMessage result = flowRunner("test").withPayload(list).run().getMessage();
 
         assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);

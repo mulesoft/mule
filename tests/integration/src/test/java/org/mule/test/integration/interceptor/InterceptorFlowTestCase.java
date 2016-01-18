@@ -20,14 +20,14 @@ public class InterceptorFlowTestCase extends FunctionalTestCase
     @Test
     public void testDefaultJavaComponentShortcut() throws Exception
     {
+        flowRunner("interceptorFlow").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
         MuleClient client = muleContext.getClient();
-        client.dispatch("in", "hello world", null);
-        MuleMessage message = client.request("out", 3000);
+        MuleMessage message = client.request("test://out", 3000);
         assertNotNull(message);
         String payload = (String)message.getPayload();
         assertNotNull(payload);
         //note that there is an exclamation mark on the end that was added by the interceptor
-        assertEquals("hello world!", payload);
+        assertEquals(TEST_PAYLOAD + "!", payload);
     }
 
     @Override

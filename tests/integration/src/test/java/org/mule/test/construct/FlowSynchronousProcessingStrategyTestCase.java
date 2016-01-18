@@ -6,10 +6,11 @@
  */
 package org.mule.test.construct;
 
-import static org.junit.Assert.assertNull;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.api.transport.PropertyScope;
 
 public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase
 {
@@ -20,38 +21,10 @@ public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProces
     }
 
     @Override
-    public void testDispatchToOneWayInbound() throws Exception
+    public void oneWay() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://oneway-in", "a", null);
-
-        MuleMessage result = client.request("vm://oneway-out", RECEIVE_TIMEOUT);
-
-        assertAllProcessingInRecieverThread(result);
+        flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
+        MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+        assertThat(message.getProperty(PROCESSOR_THREAD, PropertyScope.OUTBOUND), is(Thread.currentThread().getName()));
     }
-
-    @Override
-    public void testSendToOneWayInbound() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://oneway-in", "a", null);
-
-        assertNull(response);
-
-        MuleMessage result = client.request("vm://oneway-out", RECEIVE_TIMEOUT);
-
-        assertAllProcessingInClientThread(result);
-    }
-
-    @Override
-    public void testDispatchToOneWayOutboundTxOnly() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://oneway-outboundtx-in", "a", null);
-
-        MuleMessage result = client.request("vm://oneway-outboundtx-out", RECEIVE_TIMEOUT);
-
-        assertAllProcessingInRecieverThread(result);
-    }
-
 }

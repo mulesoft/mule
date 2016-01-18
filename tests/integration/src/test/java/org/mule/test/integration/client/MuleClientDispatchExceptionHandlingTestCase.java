@@ -9,7 +9,6 @@ package org.mule.test.integration.client;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.DefaultMuleException;
@@ -26,9 +25,7 @@ import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 /**
@@ -38,10 +35,8 @@ import org.junit.Test;
  */
 public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestCase
 {
-    private static final Log logger = LogFactory.getLog(MuleClientDispatchExceptionHandlingTestCase.class);
-
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+    @ClassRule
+    public static DynamicPort port = new DynamicPort("port");
 
     // These attributes need to be accessed from JavaComponent and MessageProcessor static classes therefore
     // they are declared as static
@@ -69,31 +64,31 @@ public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestC
     @Test
     public void testCatchExceptionThrowFromJavaComponentToJavaComponent() throws Exception
     {
-        doSendMessageToEndpoint("vm://catchExceptionJavaComponentToJavaComponent");
+        doSendMessageToEndpoint("catchExceptionJavaComponentToJavaComponent");
     }
 
     @Test
     public void tesCatchExceptionThrowFromJavaComponentToMessageProcessor() throws Exception
     {
-        doSendMessageToEndpoint("vm://catchExceptionJavaComponentToMessageProcessor");
+        doSendMessageToEndpoint("catchExceptionJavaComponentToMessageProcessor");
     }
 
     @Test
     public void testCatchExceptionThrowFromMessageProcessorToJavaComponent() throws Exception
     {
-        doSendMessageToEndpoint("vm://catchExceptionMessageProcessorToJavaComponent");
+        doSendMessageToEndpoint("catchExceptionMessageProcessorToJavaComponent");
     }
 
     @Test
     public void tesCatchExceptionThrowFromMessageProcessorToMessageProcessor() throws Exception
     {
-        doSendMessageToEndpoint("vm://catchExceptionMessageProcessorToMessageProcessor");
+        doSendMessageToEndpoint("catchExceptionMessageProcessorToMessageProcessor");
     }
 
     @Test
     public void testCatchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow() throws Exception
     {
-        doSendMessageToEndpoint("vm://catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow");
+        doSendMessageToEndpoint("catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow");
     }
 
     private void doSendMessageToEndpoint(String endpoint) throws Exception
@@ -104,7 +99,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestC
         isSameMessage = true;
 
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage result = client.send(endpoint, getTestMuleMessage("Original Message"));
+        MuleMessage result = client.send(getUrl(endpoint), getTestMuleMessage("Original Message"));
 
         boolean innerFlowCalled = innerFlowLatch.await(3, TimeUnit.SECONDS);
         assertThat(innerFlowCalled, is(true));
@@ -115,6 +110,11 @@ public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestC
         assertThat(eventPropagated, is(true));
 
         assertThat(result, notNullValue(MuleMessage.class));
+    }
+
+    private static String getUrl(String endpoint)
+    {
+        return String.format("http://localhost:%s/%s", port.getValue(), endpoint);
     }
 
     // Just a simple JavaComponent used in catch-exception-strategy block
@@ -157,7 +157,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestC
             eventFromMainFlow = RequestContext.getEvent();
             messageFromMainFlow = eventFromMainFlow.getMessage();
 
-            eventContext.getMuleContext().getClient().dispatch("vm://vminnertest", new DefaultMuleMessage("payload", eventContext.getMuleContext()));
+            eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), new DefaultMuleMessage("payload", eventContext.getMuleContext()));
 
             throw new Exception("expected exception!");
         }
@@ -172,7 +172,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestC
             messageFromMainFlow = eventFromMainFlow.getMessage();
 
             eventContext.sendEvent(new DefaultMuleMessage("payload", eventContext.getMuleContext()),
-                                   "vm://vminnerrequestresponsetest");
+                                   getUrl("innerrequestresponsetest"));
 
             throw new Exception("expected exception!");
         }
@@ -186,7 +186,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestC
             eventFromMainFlow = RequestContext.getEvent();
             messageFromMainFlow = eventFromMainFlow.getMessage();
 
-            event.getMuleContext().getClient().dispatch("vm://vminnertest",
+            event.getMuleContext().getClient().dispatch(getUrl("innertest"),
                                                         new DefaultMuleMessage("payload", event.getMuleContext()));
 
             throw new DefaultMuleException("expected exception!");

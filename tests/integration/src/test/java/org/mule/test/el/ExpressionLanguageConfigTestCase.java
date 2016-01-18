@@ -7,6 +7,7 @@
 package org.mule.test.el;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.expression.ExpressionManager;
@@ -101,7 +102,7 @@ public class ExpressionLanguageConfigTestCase extends FunctionalTestCase
     @Test
     public void testExpressionLanguageExecuteElement() throws Exception
     {
-        testFlow("flow", getTestEvent("foo"));
+        flowRunner("flow").withPayload("foo").run();
     }
 
 }

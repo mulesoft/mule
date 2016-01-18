@@ -1,46 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xmlns:http="http://www.mulesoft.org/schema/mule/http"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
-    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
     http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-    http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-    http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+    http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
     
-    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
-
     <flow name="SearchWebServiceBridge">
-        <http:listener path="searchin" config-ref="listenerConfig"/>
-        <request-reply timeout="0">
-                <vm:outbound-endpoint path="request-channel" exchange-pattern="one-way"/>
-            <vm:inbound-endpoint path="back-channel" exchange-pattern="one-way"/>
-        </request-reply>
+        <flow-ref name="RequestFlow"/>
     </flow>
     
     <flow name="RequestFlow">
-        <vm:inbound-endpoint path="request-channel" exchange-pattern="one-way"/>
         <test:component throwException="true"/>
-        <vm:outbound-endpoint path="response-channel" exchange-pattern="one-way"/>
         <default-exception-strategy>
-            <vm:outbound-endpoint path="exception-channel" exchange-pattern="one-way"/>
+            <async>
+                <flow-ref name="ExceptionFlow"/>
+            </async>
         </default-exception-strategy>
     </flow>
     
-    <flow name="ResponseFlow">
-        <vm:inbound-endpoint path="response-channel" exchange-pattern="one-way"/>
-        <vm:outbound-endpoint path="back-channel" exchange-pattern="one-way"/>            
-    </flow>
-    
     <flow name="ExceptionFlow">
-        <vm:inbound-endpoint path="exception-channel" exchange-pattern="one-way"/>
-        <vm:outbound-endpoint path="back-channel" exchange-pattern="one-way"/>            
+        <test:queue name="back-channel"/>            
     </flow>
 
 </mule>

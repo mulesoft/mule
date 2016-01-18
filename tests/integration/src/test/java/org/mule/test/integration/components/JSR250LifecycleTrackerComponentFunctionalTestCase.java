@@ -8,9 +8,9 @@ package org.mule.test.integration.components;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.client.MuleClient;
-import org.mule.lifecycle.JSR250LifecycleTrackerComponent;
+import org.mule.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.lifecycle.JSR250LifecycleTrackerComponent;
 import org.mule.transport.NullPayload;
 
 import org.junit.Test;
@@ -88,9 +88,9 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends Functiona
 
     private JSR250LifecycleTrackerComponent exerciseComponent(final String serviceName) throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        final JSR250LifecycleTrackerComponent ltc = (JSR250LifecycleTrackerComponent) client.send(
-                "vm://" + serviceName + ".In", getTestMuleMessage(NullPayload.getInstance())).getPayload();
+
+        final MuleMessage message = flowRunner(serviceName).withPayload(getTestMuleMessage(NullPayload.getInstance())).run().getMessage();
+        final JSR250LifecycleTrackerComponent ltc = (JSR250LifecycleTrackerComponent) message.getPayload();
 
         assertNotNull(ltc);
         return ltc;

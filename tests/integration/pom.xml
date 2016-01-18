@@ -83,14 +83,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Include all Mule Transports -->
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transports-all</artifactId>
-			<version>${project.version}</version>
-			<type>pom</type>
-			<scope>test</scope>
-		</dependency>
 		<!-- Test jars -->
 		<!-- some tests reference cxf test classes -->
 		<dependency>

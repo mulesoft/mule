@@ -7,15 +7,26 @@
 package org.mule.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.client.MuleClient;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.source.CompositeMessageSource;
+import org.mule.api.source.MessageSource;
+import org.mule.component.ComponentException;
+import org.mule.construct.Flow;
 import org.mule.context.notification.Node;
 import org.mule.context.notification.RestrictedNode;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+
 public class MessageProcessorNotificationTestCase extends AbstractMessageProcessorNotificationTestCase
 {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
     protected String getConfigFile()
@@ -27,36 +38,32 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     public void doTest() throws Exception
     {
         List<String> testList = Arrays.asList("test", "with", "collection");
+        assertNotNull(flowRunner("singleMP").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("processorChain").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("customProcessor").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("choice").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("scatterGather").withPayload(TEST_PAYLOAD).run());
 
-        MuleClient client = muleContext.getClient();
-        assertNotNull(client.send("vm://in-single", "test", null));
-        assertNotNull(client.send("vm://in-processorChain", "test", null));
-        assertNotNull(client.send("vm://customProcessor", "test", null));
-        assertNotNull(client.send("vm://in-choice", "test", null));
-        assertNotNull(client.send("vm://in-scatterGather", "test", null));
-
-        assertNotNull(client.send("vm://in-foreach", "test", null));
-        assertNotNull(client.send("vm://in-enricher", "test", null));
-        //assertNotNull(client.send("vm://in-async", "test", null));
-        assertNotNull(client.send("vm://in-filter", "test", null));
-        assertNotNull(client.send("vm://idem-msg-filter", "test", null));
-        assertNotNull(client.send("vm://idem-sh-msg-filter", "test", null));
-        assertNotNull(client.send("vm://in-subflow", "test", null));
-        assertNotNull(client.send("vm://in-catch", "test", null));
-        assertNotNull(client.send("vm://in-rollback", "test", null));
-        assertNotNull(client.send("vm://in-choice-es", "test", null));
-        assertNotNull(client.send("vm://request-reply", "test", null));
-        assertNotNull(client.send("vm://cs1", "test", null));
-        assertNotNull(client.send("vm://cs2", "test", null));
-        assertNotNull(client.send("vm://cs3", "test", null));
-        assertNotNull(client.send("vm://cs4", "test" , null));
-        assertNotNull(client.send("vm://fsucc", "test", null));
-        assertNotNull(client.send("vm://round-robin", "test", null));
-        assertNotNull(client.send("vm://recipient-list", "recipient", null));
-        assertNotNull(client.send("vm://collection-agg", testList, null));
-        assertNotNull(client.send("vm://custom-agg", testList, null));
-        assertNotNull(client.send("vm://chunk-agg", "test", null));
-        assertNotNull(client.send("vm://wire-tap", "test", null));
+        assertNotNull(flowRunner("foreach").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("enricher").withPayload(TEST_PAYLOAD).run());
+        //assertNotNull(runFlow("in-async", TEST_PAYLOAD));
+        assertNotNull(flowRunner("filters").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("idempotent-msg-filter").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("idempotent-secure-hash-msg-filter").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("subflow").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("catch-es").withPayload(TEST_PAYLOAD).run());
+        expectedException.expect(ComponentException.class);
+        flowRunner("rollback-es").withPayload(TEST_PAYLOAD).run();
+        assertNotNull(flowRunner("choice-es").withPayload(TEST_PAYLOAD).run());
+        CompositeMessageSource composite = (CompositeMessageSource) ((Flow) muleContext.getRegistry().lookupFlowConstruct("composite-source")).getMessageSource();
+        assertNotNull(((TestMessageSource) composite.getSources().get(0)).fireEvent(getTestEvent(TEST_PAYLOAD)));
+        assertNotNull(((TestMessageSource) composite.getSources().get(1)).fireEvent(getTestEvent(TEST_PAYLOAD)));
+        assertNotNull(flowRunner("first-successful").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("round-robin").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("collectionAggregator").withPayload(testList).run());
+        assertNotNull(flowRunner("customAggregator").withPayload(testList).run());
+        assertNotNull(flowRunner("chunkAggregator").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("wire-tap").withPayload(TEST_PAYLOAD).run());
     }
 
     @Override
@@ -84,11 +91,11 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
                 // scatter-gather
                 .serial(pre()) // scatter-gather
                 .serial(new Node()
-                    .parallel(pre() // route 1 chain
-                        .serial(prePost()) // route 1 first logger
-                        .serial(prePost()) // route 1 second logger
-                        .serial(post())) // route 1 chain
-                    .parallel(prePost())) // route 0 logger
+                                .parallel(pre() // route 1 chain
+                                                  .serial(prePost()) // route 1 first logger
+                                                  .serial(prePost()) // route 1 second logger
+                                                  .serial(post())) // route 1 chain
+                                .parallel(prePost())) // route 0 logger
                 .serial(post()) // scatter-gather
 
                 //foreach
@@ -147,17 +154,9 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
                 .serial(prePost())
                 .serial(prePost())
 
-                //request-reply
-                .serial(pre())
-                .serial(prePost())
-                .serial(post())
-                .serial(prePost())
-
                 //composite-source
-                .serial(prePost()) //call throw cs1
                 .serial(prePost())
                 .serial(prePost())
-                .serial(prePost()) //call throw cs4
 
                 //first-successful
                 .serial(prePost())
@@ -166,10 +165,6 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
                 //round-robin
                 .serial(prePost())
                 .serial(prePost())
-
-                //recipient-list
-                .serial(prePost())  //send message to the requested endpoint
-                .serial(prePost())  //log message
 
                 //collection-aggregator
                 .serial(pre())      //open Splitter, unpacks three messages
@@ -215,4 +210,23 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     public void validateSpecification(RestrictedNode spec) throws Exception
     {
     }
+
+    public static class TestMessageSource implements MessageSource
+    {
+
+        private MessageProcessor listener;
+
+        MuleEvent fireEvent(MuleEvent event) throws MuleException
+        {
+            return listener.process(event);
+        }
+
+        @Override
+        public void setListener(MessageProcessor listener)
+        {
+            this.listener = listener;
+        }
+
+    }
+
 }

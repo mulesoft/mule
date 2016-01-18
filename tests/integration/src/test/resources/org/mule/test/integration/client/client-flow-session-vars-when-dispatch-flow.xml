@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
@@ -9,18 +8,17 @@
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-           http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+           http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <vm:connector name="vmQueues"/>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
 
     <flow name="innerFlow">
-        <vm:inbound-endpoint exchange-pattern="one-way" path="vminnertest"/>
+        <http:listener path="innertest" config-ref="listenerConfig"/>
         <logger level="INFO"/>
     </flow>
 
     <flow name="innerFlowRequestResponse">
-        <vm:inbound-endpoint exchange-pattern="one-way" path="vminnerrequestresponsetest"/>
+        <http:listener path="innerrequestresponsetest" config-ref="listenerConfig"/>
         <logger level="INFO"/>
     </flow>
 
@@ -30,7 +28,7 @@
     </spring:beans>
 
     <flow name="flowVarsFlowUsingProcessor">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="flowVarsFlowUsingProcessor"/>
+        <http:listener path="flowVarsFlowUsingProcessor" config-ref="listenerConfig"/>
         <set-variable variableName="team" value="Sales"/>
         <processor ref="myProcessor"/>
         <set-variable variableName="ammount" value="100"/>
@@ -39,7 +37,7 @@
     </flow>
 
     <flow name="sessionVarsFlowUsingProcessor">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="sessionVarsFlowUsingProcessor"/>
+        <http:listener path="sessionVarsFlowUsingProcessor" config-ref="listenerConfig"/>
         <set-session-variable variableName="team" value="Sales"/>
         <processor ref="myProcessor"/>
         <set-session-variable variableName="ammount" value="100"/>
@@ -48,7 +46,7 @@
     </flow>
 
     <flow name="flowVarsFlowUsingJavaComponent">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="flowVarsFlowUsingJavaComponent"/>
+        <http:listener path="flowVarsFlowUsingJavaComponent" config-ref="listenerConfig"/>
         <set-variable variableName="team" value="Sales"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchWithoutLosingVariablesTestCase$JavaComponentDispatchFlowUsingNewMuleClient"/>
         <set-variable variableName="ammount" value="100"/>
@@ -57,7 +55,7 @@
     </flow>
 
     <flow name="sessionVarsFlowUsingJavaComponent">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="sessionVarsFlowUsingJavaComponent"/>
+        <http:listener path="sessionVarsFlowUsingJavaComponent" config-ref="listenerConfig"/>
         <set-session-variable variableName="team" value="Sales"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchWithoutLosingVariablesTestCase$JavaComponentDispatchFlowUsingNewMuleClient"/>
         <set-session-variable variableName="ammount" value="100"/>
@@ -66,7 +64,7 @@
     </flow>
 
     <flow name="sessionVarsFlowUsingJavaComponentRequestResponse">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="sessionVarsFlowUsingJavaComponentRequestResponse"/>
+        <http:listener path="sessionVarsFlowUsingJavaComponentRequestResponse" config-ref="listenerConfig"/>
         <set-session-variable variableName="team" value="Sales"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchWithoutLosingVariablesTestCase$JavaComponentSendFlowUsingNewMuleClient"/>
         <set-session-variable variableName="ammount" value="100"/>

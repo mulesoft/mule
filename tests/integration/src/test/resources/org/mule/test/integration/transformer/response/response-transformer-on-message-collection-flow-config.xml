@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
           http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
           http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
-
-    <vm:connector name="vm"/>
 
     <scripting:transformer name="fooTransformer">
         <scripting:script engine="groovy">
@@ -21,23 +17,20 @@
     </scripting:transformer>
 
     <flow name="Distributor">
-        <vm:inbound-endpoint path="testInput" exchange-pattern="request-response"
-                             responseTransformer-refs="fooTransformer"/>
         <all>
-            <vm:outbound-endpoint path="queue1" exchange-pattern="request-response"/>
-            <vm:outbound-endpoint path="queue2" exchange-pattern="request-response"/>
+            <flow-ref name="One"/>
+            <flow-ref name="Two"/>
         </all>
+        <transformer ref="fooTransformer"/>
     </flow>
 
     <flow name="One">
-        <vm:inbound-endpoint path="queue1" exchange-pattern="request-response"/>
         <test:component>
             <test:return-data>Received in #[mule:context.serviceName]</test:return-data>
         </test:component>
     </flow>
 
     <flow name="Two">
-        <vm:inbound-endpoint path="queue2" exchange-pattern="request-response"/>
         <test:component>
             <test:return-data>Received in #[mule:context.serviceName]</test:return-data>
         </test:component>

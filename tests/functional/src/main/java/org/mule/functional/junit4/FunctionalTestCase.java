@@ -49,7 +49,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
-import org.junit.Assert;
+
+import junit.framework.Assert;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The
@@ -213,25 +214,30 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     }
 
     /**
-     * Tests the given flow with a one-way message exchange pattern
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Tests the given flow with a one-way message exchange pattern
      * 
      * @param flowName the name of the flow to be executed
      * @throws Exception
      */
+    @Deprecated
     protected void testFlow(String flowName) throws Exception
     {
         testFlow(flowName, getTestEvent("data", MessageExchangePattern.ONE_WAY));
     }
 
     /**
-     * Looks up the given flow in the registry and processes it with the given event.
-     * A flow asserting is then executed by calling {@link
-     * FlowAssert#verify(String)}
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Looks up the given flow in the registry and processes it with the given event. A flow asserting is
+     *             then executed by calling {@link FlowAssert#verify(String)}
      * 
      * @param flowName the name of the flow to be executed
      * @param event the event ot execute with
      * @throws Exception
      */
+    @Deprecated
     protected void testFlow(String flowName, MuleEvent event) throws Exception
     {
         Flow flow = this.lookupFlowConstruct(flowName);
@@ -240,10 +246,25 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     }
 
     /**
-     * Runs the given flow before ensuring all assertions defined in the flow configuration were met.
+     * Initializes a builder to construct an event and the running context to run it through a flow.
+     * 
+     * @param flowName
+     * @return the {@link FlowRunner}
+     */
+    protected FlowRunner flowRunner(String flowName)
+    {
+        return new FlowRunner(muleContext, flowName);
+    }
+
+    /**
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Runs the given flow before ensuring all assertions defined in the flow configuration were met.
+     * 
      * @param flowName the flow to test
      * @throws Exception
      */
+    @Deprecated
     protected void testFlowNonBlocking(String flowName) throws Exception
     {
         runFlowNonBlocking(flowName);
@@ -251,10 +272,14 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     }
 
     /**
-     * Runs the given flow before ensuring all assertions defined in the flow configuration were met.
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Runs the given flow before ensuring all assertions defined in the flow configuration were met.
+     * 
      * @param flowName the flow to test
      * @throws Exception
      */
+    @Deprecated
     protected void testFlowNonBlocking(String flowName, MuleEvent event) throws Exception
     {
         runFlowNonBlocking(flowName, event);
@@ -270,11 +295,13 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      */
     protected MuleEvent runFlow(String flowName) throws Exception
     {
-        return this.runFlow(flowName, (Object) null);
+        return flowRunner(flowName).run();
     }
 
     /**
-     * Runs the given flow with a default event inside a transaction
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Runs the given flow with a default event inside a transaction
      * 
      * @param flowName the name of the flow to be executed
      * @param action See {@link TransactionConfig} constants
@@ -282,13 +309,16 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
+    @Deprecated
     protected MuleEvent runTransactionalFlow(String flowName, byte action, TransactionFactory factory) throws Exception
     {
         return runTransactionalFlow(flowName, (Object) null, action, factory);
     }
 
     /**
-     * Runs the given flow with a default event inside a transaction
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Runs the given flow with a default event inside a transaction
      * 
      * @param flowName the name of the flow to be executed
      * @param payload the payload to use in the message
@@ -297,6 +327,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
+    @Deprecated
     protected <T> MuleEvent runTransactionalFlow(String flowName, T payload, byte action, TransactionFactory factory) throws Exception
     {
         MuleTransactionConfig transactionConfig = new MuleTransactionConfig(action);
@@ -315,8 +346,40 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     }
 
     /**
-     * Runs the given flow with a default event inside a transaction expecting a failure. Will fail if there's no
-     * failure running the flow.
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Runs the given flow asynchronously with a default event inside a transaction
+     * 
+     * @param flowName the name of the flow to be executed
+     * @param payload the payload to use in the message
+     * @param action See {@link TransactionConfig} constants
+     * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
+     * @throws Exception
+     */
+    @Deprecated
+    protected <T> void runTransactionalFlowAsync(String flowName, T payload, byte action, TransactionFactory factory) throws Exception
+    {
+        MuleTransactionConfig transactionConfig = new MuleTransactionConfig(action);
+        transactionConfig.setFactory(factory);
+
+        ExecutionTemplate<MuleEvent> executionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
+
+        executionTemplate.execute(new ExecutionCallback<MuleEvent>()
+        {
+            @Override
+            public MuleEvent process() throws Exception
+            {
+                runFlowAsync(flowName, payload);
+                return null;
+            }
+        });
+    }
+
+    /**
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Runs the given flow with a default event inside a transaction expecting a failure. Will fail if
+     *             there's no failure running the flow.
      *
      * @param flowName the name of the flow to be executed
      * @param action See {@link TransactionConfig} constants
@@ -324,14 +387,17 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      * @return the message exception return by the flow
      * @throws Exception
      */
+    @Deprecated
     protected MessagingException runTransactionalFlowExpectingException(String flowName, byte action, TransactionFactory factory) throws Exception
     {
         return runTransactionalFlowExpectingException(flowName, (Object) null, action, factory);
     }
 
     /**
-     * Runs the given flow with a default event inside a transaction expecting a failure. Will fail if there's no
-     * failure running the flow.
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Runs the given flow with a default event inside a transaction expecting a failure. Will fail if
+     *             there's no failure running the flow.
      *
      * @param flowName the name of the flow to be executed
      * @param payload the payload to use in the message
@@ -340,6 +406,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      * @return the message exception return by the flow
      * @throws Exception
      */
+    @Deprecated
     protected <T> MessagingException runTransactionalFlowExpectingException(String flowName, T payload, byte action, TransactionFactory factory) throws Exception
     {
         try
@@ -355,12 +422,16 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     }
 
     /**
-     * Runs the given flow with a default event expecting a failure. Will fail if there's no failure running the flow.
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Runs the given flow with a default event expecting a failure. Will fail if there's no failure running
+     *             the flow.
      *
      * @param flowName the name of the flow to be executed
      * @return the message exception return by the flow
      * @throws Exception
      */
+    @Deprecated
     protected MessagingException runFlowExpectingException(String flowName) throws Exception
     {
         try
@@ -376,12 +447,15 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     }
 
     /**
-     * Runs the given non blocking flow with a default event
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Runs the given non blocking flow with a default event
      *
      * @param flowName the name of the flow to be executed
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
+    @Deprecated
     protected MuleEvent runFlowNonBlocking(String flowName) throws Exception
     {
         Flow flow = this.lookupFlowConstruct(flowName);
@@ -389,12 +463,15 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     }
 
     /**
-     * Runs the given non blocking flow with a default event
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Runs the given non blocking flow with a default event
      *
      * @param flowName the name of the flow to be executed
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
+    @Deprecated
     protected MuleEvent runFlowNonBlocking(String flowName, MuleEvent event) throws Exception
     {
         Flow flow = this.lookupFlowConstruct(flowName);
@@ -416,53 +493,85 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     }
 
     /**
-     * Executes the given flow with a default message carrying the payload
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Executes the given flow with a default message carrying the payload
      * 
      * @param flowName the name of the flow to be executed
      * @param payload the payload to use in the message
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
+    @Deprecated
     protected <T> MuleEvent runFlow(String flowName, T payload) throws Exception
     {
         return runFlow(flowName, getTestEvent(payload));
     }
 
     /**
-     * Executes the given flow with the given {@code event}
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Executes the given flow with a default message carrying the payload
+     * 
+     * @param flowName the name of the flow to be executed
+     * @param payload the payload to use in the message
+     * @param inboundProperties inbound properties for the message.
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    @Deprecated
+    protected <T> MuleEvent runFlow(String flowName, T payload, Map<String, Object> inboundProperties) throws Exception
+    {
+        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, Collections.emptyMap(), Collections.emptyMap(), muleContext);
+        final DefaultMuleEvent muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, null);
+
+        return runFlow(flowName, muleEvent);
+    }
+
+    /**
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Executes the given flow with the given {@code event}
      *
      * @param flowName the name of the flow to be executed
      * @param event the event which we'll use to execute the flow
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
-    protected MuleEvent runFlow(String flowName, MuleEvent event) throws Exception {
+    @Deprecated
+    protected MuleEvent runFlow(String flowName, MuleEvent event) throws Exception
+    {
         Flow flow = lookupFlowConstruct(flowName);
         return flow.process(event);
     }
 
     /**
-     * Run the flow specified by name and assert equality on the expected output
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Run the flow specified by name and assert equality on the expected output
      * 
      * @param flowName The name of the flow to run
      * @param expect The expected output
      */
+    @Deprecated
     protected <T> void runFlowAndExpect(String flowName, T expect) throws Exception
     {
         Assert.assertEquals(expect, this.runFlow(flowName).getMessage().getPayload());
     }
 
     /**
-     * Runs the given flow and asserts for property name in the outbound scope to
-     * match the expected value
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Runs the given flow and asserts for property name in the outbound scope to match the expected value
      * 
      * @param flowName the name of the flow to be executed
      * @param propertyName the name of the property to test
      * @param expect the expected value
      * @throws Exception
      */
+    @Deprecated
     protected <T> void runFlowAndExpectProperty(String flowName, String propertyName, T expect)
-        throws Exception
+            throws Exception
     {
         Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = getTestEvent(null);
@@ -472,37 +581,44 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     }
 
     /**
-     * Run the flow specified by name using the specified payload and assert equality
-     * on the expected output
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Run the flow specified by name using the specified payload and assert equality on the expected output
      * 
      * @param flowName The name of the flow to run
      * @param expect The expected output
      * @param payload The payload of the input event
      */
+    @Deprecated
     protected <T, U> void runFlowWithPayloadAndExpect(String flowName, T expect, U payload) throws Exception
     {
         Assert.assertEquals(expect, this.runFlow(flowName, payload).getMessage().getPayload());
     }
 
     /**
-     * Executes the given flow asynchronously with a default message carrying the payload.
-     * <p/>
-     * NOTE: flow must be configured with asycnrhonous processing strategy.
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Executes the given flow asynchronously with a default message carrying the payload.
+     *             <p/>
+     *             NOTE: flow must be configured with asycnrhonous processing strategy.
      *
      * @param flowName the name of the flow to be executed
      * @param payload the payload to use in the message
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
+    @Deprecated
     protected <T> void runFlowAsync(String flowName, T payload) throws Exception
     {
         runFlowAsync(flowName, payload, null);
     }
 
     /**
-     * Executes the given flow asynchronously with a default message carrying the payload.
-     * <p/>
-     * NOTE: flow must be configured with asynchronous processing strategy.
+     * @deprecated MULE-9373
+     *             <p/>
+     *             Executes the given flow asynchronously with a default message carrying the payload.
+     *             <p/>
+     *             NOTE: flow must be configured with asynchronous processing strategy.
      *
      * @param flowName the name of the flow to be executed
      * @param payload the payload to use in the message
@@ -510,6 +626,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
+    @Deprecated
     protected <T> void runFlowAsync(String flowName, T payload, Map<String, Object> inboundProperties) throws Exception
     {
         final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, Collections.emptyMap(), Collections.emptyMap(), muleContext);
@@ -557,5 +674,4 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
             scheduler.schedule();
         }
     }
-
 }

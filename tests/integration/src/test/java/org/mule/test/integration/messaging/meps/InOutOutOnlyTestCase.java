@@ -6,21 +6,19 @@
  */
 package org.mule.test.integration.messaging.meps;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Test;
 
 public class InOutOutOnlyTestCase extends FunctionalTestCase
 {
-    public static final long TIMEOUT = 3000;
-
     @Override
     protected String getConfigFile()
     {
@@ -31,23 +29,25 @@ public class InOutOutOnlyTestCase extends FunctionalTestCase
     public void testExchange() throws Exception
     {
         MuleClient client = muleContext.getClient();
+        FlowRunner baseRunner = flowRunner("In-Out_Out-Only-Service").withPayload("some data");
 
-        MuleMessage result = client.send("inboundEndpoint", "some data", null);
+        MuleMessage result = baseRunner.run().getMessage();
         assertNotNull(result);
-        assertEquals("foo header not received", getPayloadAsString(result));
+        assertThat(getPayloadAsString(result), is("foo header not received"));
 
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put("foo", "bar");
-        result = client.send("inboundEndpoint", "some data", props);
+        baseRunner.reset();
+        result = baseRunner.withInboundProperty("foo", "bar")
+                           .run()
+                           .getMessage();
         assertNotNull(result);
-        assertEquals("foo header received", getPayloadAsString(result));
+        assertThat(getPayloadAsString(result), is("foo header received"));
 
-        result = client.request("receivedEndpoint", TIMEOUT);
+        result = client.request("test://received", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals("foo header received", getPayloadAsString(result));
+        assertThat(getPayloadAsString(result), is("foo header received"));
 
-        result = client.request("notReceivedEndpoint", TIMEOUT);
+        result = client.request("test://notReceived", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals("foo header not received", getPayloadAsString(result));
+        assertThat(getPayloadAsString(result), is("foo header not received"));
     }
 }

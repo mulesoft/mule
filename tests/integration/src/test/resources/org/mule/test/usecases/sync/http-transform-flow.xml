@@ -2,21 +2,17 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans" 
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:xm="http://www.mulesoft.org/schema/mule/xml" 
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <http:listener-config name="listenerConfig1" host="localhost" port="${port1}"/>
     <http:listener-config name="listenerConfig2" host="localhost" port="${port2}"/>
     <http:request-config name="requestConfig" host="localhost" port="${port2}"/>
-
-    <endpoint name="vmEndpoint" address="vm://LocalService" exchange-pattern="request-response"/>
 
     <byte-array-to-string-transformer name="ByteArrayToString"/>
     <byte-array-to-serializable-transformer name="ByteArrayToSerializable"/>
@@ -44,7 +40,6 @@
     </flow>
 
     <flow name="LocalService">
-        <inbound-endpoint ref="vmEndpoint"/>
         <transformer ref="SerializableToByteArray"/>
         <http:request path="RemoteService" config-ref="requestConfig" method="POST"/>
     </flow>

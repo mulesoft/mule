@@ -17,6 +17,7 @@ import org.mule.api.processor.MessageProcessor;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: MULE-9307 re-write junits for rollback exception strategy
 public class RollbackMessagingExceptionStrategy extends TemplateMessagingExceptionStrategy
 {
     private RedeliveryExceeded redeliveryExceeded;

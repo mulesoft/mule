@@ -6,13 +6,10 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsNull;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -20,17 +17,22 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.io.IOException;
 
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
-import java.io.IOException;
 
-import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 public class CatchExceptionStrategyTestCase extends FunctionalTestCase
 {
@@ -77,9 +79,9 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testVmJsonErrorResponse() throws Exception
+    public void testJsonErrorResponse() throws Exception
     {
-        testJsonErrorResponse("vm://in");
+        assertResponse(flowRunner("continueProcessingActualMessage").withPayload(getTestMuleMessage(JSON_REQUEST)).run().getMessage());
     }
 
     private void testJsonErrorResponse(String endpointUri) throws Exception
@@ -87,6 +89,11 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
         final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).responseTimeout(TIMEOUT).build();
         MuleMessage response = client.send(endpointUri, getTestMuleMessage(JSON_REQUEST), httpRequestOptions);
+        assertResponse(response);
+    }
+
+    private void assertResponse(MuleMessage response) throws Exception
+    {
         assertThat(response, IsNull.<Object>notNullValue());
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();
@@ -97,13 +104,11 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
 
     public static final String MESSAGE = "some message";
     public static final String MESSAGE_EXPECTED = "some message consumed successfully";
-    
+
 	@Test
 	public void testCatchWithComponent() throws Exception
 	{
-	    LocalMuleClient client = muleContext.getClient();
-	    client.dispatch("vm://in2","some message",null);
-        MuleMessage result = client.send("vm://in2", MESSAGE, null, TIMEOUT);
+        MuleMessage result = flowRunner("catchWithComponent").withPayload(getTestMuleMessage(MESSAGE)).run().getMessage();
         assertThat(result,IsNull.<Object>notNullValue());
         assertThat(getPayloadAsString(result), Is.is(MESSAGE + " Caught"));
 	}
@@ -111,9 +116,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFullyDefinedCatchExceptionStrategyWithComponent() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage result = null;
-        result = client.send("vm://in3", MESSAGE, null, TIMEOUT);
+        MuleMessage result = flowRunner("fullyDefinedCatchExceptionStrategyWithComponent").withPayload(getTestMuleMessage(MESSAGE)).run().getMessage();
         assertThat(result,IsNull.<Object>notNullValue());
         assertThat(getPayloadAsString(result), Is.is(MESSAGE + " apt1 apt2 groovified"));
     }

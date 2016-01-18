@@ -13,14 +13,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ExceptionStrategyNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.ExceptionStrategyNotification;
-import org.mule.message.ExceptionMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.message.ExceptionMessage;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -70,13 +71,13 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
     @Test
     public void testExceptionStrategyFromComponent() throws Exception
     {
-        assertQueueIsEmpty("vm://error.queue");
+        assertQueueIsEmpty("test://error.queue");
 
-        client.send("vm://component.in", "test", null);
+        flowRunner("mycomponent").withPayload(getTestMuleMessage("test")).asynchronously().run();
 
-        assertQueueIsEmpty("vm://component.out");
+        assertQueueIsEmpty("test://component.out");
 
-        MuleMessage message = client.request("vm://error.queue", 2000);
+        MuleMessage message = client.request("test://error.queue", 2000);
         assertNotNull(message);
         Object payload = message.getPayload();
         assertTrue(payload instanceof ExceptionMessage);

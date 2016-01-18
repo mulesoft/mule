@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans" 
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <spring:bean name="target" class="org.mule.test.integration.resolvers.NoArgsTarget"/>
 
     <flow name="NotIgnored">
-        <vm:inbound-endpoint path="not-ignored" exchange-pattern="request-response"/>
         <component>
             <no-arguments-entry-point-resolver>
                 <exclude-object-methods/>
@@ -23,7 +20,6 @@
     </flow>
 
     <flow name="Selected">
-        <vm:inbound-endpoint path="selected" exchange-pattern="request-response"/>
         <component>
             <no-arguments-entry-point-resolver>
                 <include-entry-point method="selected"/>

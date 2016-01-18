@@ -6,16 +6,14 @@
  */
 package org.mule.test.integration.exceptions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -24,6 +22,9 @@ import org.junit.runners.Parameterized.Parameters;
 public class ExceptionAfterAggregationTestCase extends FunctionalTestCase
 {
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     private final String configResources;
 
     @Parameters
@@ -31,7 +32,7 @@ public class ExceptionAfterAggregationTestCase extends FunctionalTestCase
     {
         return Arrays.asList(new Object[][] {
                 {"exception-after-aggregation-test-config-simple.xml"},
-                {"exception-after-aggregation-test-config.xml"}});
+        });
     }
 
     public ExceptionAfterAggregationTestCase(String configResources)
@@ -40,6 +41,7 @@ public class ExceptionAfterAggregationTestCase extends FunctionalTestCase
         this.configResources = configResources;
     }
 
+    @Override
     protected String getConfigResources()
     {
         return configResources;
@@ -48,10 +50,7 @@ public class ExceptionAfterAggregationTestCase extends FunctionalTestCase
     @Test
     public void testReceiveCorrectExceptionAfterAggregation() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://in", "some data", null);
-        assertNotNull(result);
-        assertNotNull(result.getExceptionPayload());
-        assertEquals("Ad hoc message exception", result.getExceptionPayload().getMessage());
+        expectedException.expectMessage("Ad hoc message exception");
+        flowRunner("main").withPayload(getTestMuleMessage("some data")).run();
     }
 }

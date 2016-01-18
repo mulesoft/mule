@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.message.DefaultExceptionPayload;
@@ -45,31 +44,30 @@ public class UntilSuccessfulExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void usingSimpleSetUp() throws Exception
     {
-        testHandlingOfFailures("vm://simple");
+        testHandlingOfFailures("simpleTest");
     }
 
     @Test
     public void usingSimpleSetUpAndNoRetries() throws Exception
     {
-        testHandlingOfFailures("vm://noRetries");
+        testHandlingOfFailures("noRetriesSimpleTest");
     }
 
     @Test
     public void usingSplitterAggregator() throws Exception
     {
-        testHandlingOfFailures("vm://splitter");
+        testHandlingOfFailures("withSplitterAggregatorTest");
     }
 
     @Test
     public void usingSplitterAggregatorAndNoRetries() throws Exception
     {
-        testHandlingOfFailures("vm://noRetriesSplitter");
+        testHandlingOfFailures("noRetriesSplitterAggregatorTest");
     }
 
     private void testHandlingOfFailures(String entryPoint) throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(entryPoint, getTestMuleMessage());
+        MuleMessage response = flowRunner(entryPoint).withPayload(getTestMuleMessage()).run().getMessage();
         assertThat(response.getExceptionPayload(), is(nullValue()));
         assertThat(getPayloadAsString(response), is("ok"));
     }

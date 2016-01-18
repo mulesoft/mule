@@ -1,53 +1,42 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
-          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
 
     <flow name="Service1">
-        <vm:inbound-endpoint path="Service1.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service2">
-        <vm:inbound-endpoint path="Service2.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service3">
-        <vm:inbound-endpoint path="Service3.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service4">
-        <vm:inbound-endpoint path="Service4.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service5">
-        <vm:inbound-endpoint path="Service5.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service6">
-        <vm:inbound-endpoint path="Service6.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service7">
-        <vm:inbound-endpoint path="Service7.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service8">
-        <vm:inbound-endpoint path="Service8.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service9">
-        <vm:inbound-endpoint path="Service9.in"/>
         <async processingStrategy="Service9ProcessingStrategy">
             <collection-aggregator timeout="60000" failOnTimeout="false"/>
         </async>
@@ -58,37 +47,30 @@
         threadWaitTimeout="500" />
     
     <flow name="Service10">
-        <vm:inbound-endpoint path="Service10.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service11">
-        <vm:inbound-endpoint path="Service11.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service12">
-        <vm:inbound-endpoint path="Service12.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service13">
-        <vm:inbound-endpoint path="Service13.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service14">
-        <vm:inbound-endpoint path="Service14.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service15">
-        <vm:inbound-endpoint path="Service15.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 
     <flow name="Service16">
-        <vm:inbound-endpoint path="Service16.in"/>
         <collection-aggregator timeout="60000" failOnTimeout="false"/>
     </flow>
 

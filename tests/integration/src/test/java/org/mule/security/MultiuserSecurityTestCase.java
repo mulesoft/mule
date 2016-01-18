@@ -8,9 +8,9 @@ package org.mule.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.functional.junit4.FunctionalTestCase;
 
@@ -43,45 +43,39 @@ public class MultiuserSecurityTestCase extends FunctionalTestCase
     @Test
     public void testMultipleAuthentications() throws Exception
     {
-        MuleClient client = muleContext.getClient();
         MuleMessage reply;
-        Map<String, Object> props;
 
-        EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
-
-        props = new HashMap<String, Object>();
-        props.put(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader("marie", "marie", "PBE", strategy));
-        reply = client.send("vm://test", "Data1", props);
+        reply = getResponse("Data1", "marie");
         assertNotNull(reply);
         assertEquals("user = marie, logins = 1, color = bright red", reply.getPayload());
 
-        props = new HashMap<String, Object>();
-        props.put(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader("stan", "stan", "PBE", strategy));
-        reply = client.send("vm://test", "Data2", props);
+        reply = getResponse("Data2", "stan");
         assertNotNull(reply);
         assertEquals("user = stan, logins = 1, color = metallic blue", reply.getPayload());
 
-        props = new HashMap<String, Object>();
-        props.put(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader("cindy", "cindy", "PBE", strategy));
-        reply = client.send("vm://test", "Data3", props);
+        reply = getResponse("Data3", "cindy");
         assertEquals("user = cindy, logins = 1, color = dark violet", reply.getPayload());
 
-        props = new HashMap<String, Object>();
-        props.put(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader("marie", "marie", "PBE", strategy));
-        reply = client.send("vm://test", "Data4", props);
+        reply = getResponse("Data4", "marie");
         assertNotNull(reply);
         assertEquals("user = marie, logins = 2, color = bright red", reply.getPayload());
 
-        props = new HashMap<String, Object>();
-        props.put(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader("marie", "marie", "PBE", strategy));
-        reply = client.send("vm://test", "Data4", props);
+        reply = getResponse("Data4", "marie");
         assertNotNull(reply);
         assertEquals("user = marie, logins = 3, color = bright red", reply.getPayload());
 
-        props = new HashMap<String, Object>();
-        props.put(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader("stan", "stan", "PBE", strategy));
-        reply = client.send("vm://test", "Data2", props);
+        reply = getResponse("Data2", "stan");
         assertNotNull(reply);
         assertEquals("user = stan, logins = 2, color = metallic blue", reply.getPayload());
+    }
+
+    public MuleMessage getResponse(String data, String user) throws Exception
+    {
+        EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
+
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(user, user, "PBE", strategy));
+
+        return flowRunner("testService").withPayload(new DefaultMuleMessage(data, props, null, null, muleContext)).run().getMessage();
     }
 }

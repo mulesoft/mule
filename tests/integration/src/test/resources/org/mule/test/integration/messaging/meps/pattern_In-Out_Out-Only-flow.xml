@@ -2,18 +2,12 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <!--// START SNIPPET: full-config -->
     <description>
@@ -21,38 +15,28 @@
         be router via the service outbound routers.
     </description>
 
-     <vm:connector name="vmConnector"/>
-
-    <vm:endpoint path="test.inbound" name="inboundEndpoint" exchange-pattern="request-response"/>
-    <vm:endpoint path="test.header.received" name="receivedEndpoint" exchange-pattern="one-way"/>
-    <vm:endpoint path="test.header.notreceived" name="notReceivedEndpoint" exchange-pattern="one-way"/>
-
-    
-        <flow name="In-Out_Out-Only-Service">
-            
-            <vm:inbound-endpoint ref="inboundEndpoint"/>
-            
-            <!-- Note: auto formating this file might break the test if the script's indentation is not preserved. -->
-            <script:component>
-                <script:script engine="groovy">
-                    if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND)!=null)
-                        return "foo header received"
-                    else
-                        return "foo header not received"
-                </script:script>
-            </script:component>            
-            
-            <vm:outbound-endpoint ref="receivedEndpoint">
-                <mule:wildcard-filter pattern="* header received" />
-            </vm:outbound-endpoint>
-            
-            <vm:outbound-endpoint ref="notReceivedEndpoint">
-                <mule:wildcard-filter pattern="* header not received" />
-            </vm:outbound-endpoint>
-            
-            <mule:echo-component />
-                       
-        </flow>
+    <flow name="In-Out_Out-Only-Service">
+        <!-- Note: auto formating this file might break the test if the script's indentation is not preserved. -->
+        <script:component>
+            <script:script engine="groovy">
+                if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND)!=null)
+                    return "foo header received"
+                else
+                    return "foo header not received"
+            </script:script>
+        </script:component>            
+        
+        <async>
+            <mule:wildcard-filter pattern="* header received" />
+            <test:queue name="received"/>
+        </async>
+        <async>
+            <mule:wildcard-filter pattern="* header not received" />
+            <test:queue name="notReceived"/>
+        </async>
+        
+        <mule:echo-component />
+    </flow>
     
     <!--// END SNIPPET: full-config -->
 </mule>

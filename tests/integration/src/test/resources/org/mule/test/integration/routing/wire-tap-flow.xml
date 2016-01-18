@@ -10,34 +10,21 @@
 
     <flow name="Receiver">
 
-        <inbound-endpoint address="vm://inbound.channel"
-            exchange-pattern="one-way" />
-            
         <wire-tap>
-            <outbound-endpoint address="vm://tapped.channel1"
-                exchange-pattern="one-way" />
+            <flow-ref name="TappedReceiver1"/>
         </wire-tap>
         <wire-tap>
-            <outbound-endpoint address="vm://tapped.channel2"
-                exchange-pattern="one-way" />
+            <flow-ref name="TappedReceiver2"/>
         </wire-tap>
         
         <test:component />
     </flow>
 
     <flow name="TappedReceiver1">
-
-        <inbound-endpoint address="vm://tapped.channel1"
-            exchange-pattern="one-way" />
-
         <test:component />
     </flow>
 
     <flow name="TappedReceiver2">
-
-        <inbound-endpoint address="vm://tapped.channel2"
-            exchange-pattern="one-way" />
-
         <test:component />
     </flow>
 

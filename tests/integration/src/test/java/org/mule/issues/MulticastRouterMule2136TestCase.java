@@ -6,9 +6,11 @@
  */
 package org.mule.issues;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -36,36 +38,37 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
         return "org/mule/issues/multicast-router-mule-2136-test-flow.xml";
     }
 
-    protected MuleClient sendObject() throws MuleException
+    protected void sendObject() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("object-in", new Parent(new Child()), null);
-        return client;
+        flowRunner("object to xml").withPayload(new Parent(new Child())).asynchronously().run();
     }
 
     @Test
-    public void testObjectOut() throws MuleException, InterruptedException
+    public void testObjectOut() throws Exception
     {
-        request(sendObject(), "object-out", Parent.class);
+        sendObject();
+        request("test://object-out", Parent.class);
         // wait a while, otherwise we pull down everything while it is still running
         Thread.sleep(3000);
     }
 
     @Test
-    public void testObjectXmlOut() throws MuleException
+    public void testObjectXmlOut() throws Exception
     {
-        String xml = (String) request(sendObject(), "object-xml-out", String.class);
-        assertEquals(SERIALIZED, xml);
+        sendObject();
+        String xml = (String) request("test://object-xml-out", String.class);
+        assertThat(xml, is(SERIALIZED));
     }
 
     @Test
-    public void testXmlObjectOut() throws MuleException
+    public void testXmlObjectOut() throws Exception
     {
-        request(sendObject(), "xml-object-out", Parent.class);
+        sendObject();
+        request("test://xml-object-out", Parent.class);
     }
 
     @Test
-    public void testStress() throws MuleException
+    public void testStress() throws Exception
     {
         int tenth = TEST_COUNT / 10;
         for (int i = 0; i < TEST_COUNT; i++)
@@ -76,8 +79,10 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
             // otherwise we get
             // OutOfMemoryExceptions during stress tests when these results build up
             // in queue.
-            request(muleContext.getClient(), "xml-object-out", Parent.class);
+            request("test://xml-object-out", Parent.class);
+            request("test://object-out", Parent.class);
 
+            logger.error("Iteration " + i);
             if (i % tenth == 0)
             {
                 logger.info("Iteration " + i);
@@ -85,16 +90,15 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
         }
     }
 
-    protected Object request(MuleClient client, String endpoint, Class<?> clazz) throws MuleException
+    protected Object request(String endpoint, Class<?> clazz) throws MuleException
     {
+        MuleClient client = muleContext.getClient();
+
         MuleMessage message = client.request(endpoint, TIMEOUT * 2);
         assertNotNull(message);
         assertNotNull(message.getPayload());
 
-        Class<?> payloadClass = message.getPayload().getClass();
-        String assertionMessage = String.format("expected payload of type %1s but was %2s", clazz.getName(),
-            payloadClass);
-        assertTrue(assertionMessage, clazz.isAssignableFrom(payloadClass));
+        assertThat(message.getPayload(), instanceOf(clazz));
         return message.getPayload();
     }
 

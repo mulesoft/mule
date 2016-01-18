@@ -7,7 +7,7 @@
 package org.mule.test.integration.messaging.meps;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.api.client.MuleClient;
+
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -30,8 +30,6 @@ public class InOnlyTestCase extends FunctionalTestCase
     @Test
     public void testExchange() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
         final Latch latch = new Latch();
         muleContext.registerListener(new FunctionalTestNotificationListener()
         {
@@ -42,7 +40,7 @@ public class InOnlyTestCase extends FunctionalTestCase
             }
         });
 
-        client.dispatch("inboundEndpoint", "some data", null);
+        flowRunner("In-Only-Service").withPayload(getTestMuleMessage()).asynchronously().run();
         assertTrue(latch.await(TIMEOUT, TimeUnit.MILLISECONDS));
     }
 }

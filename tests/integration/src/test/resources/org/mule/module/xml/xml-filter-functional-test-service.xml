@@ -3,20 +3,10 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-
-    <vm:connector name="default"/>
-    <vm:connector name="queue"/>
-
-    <vm:endpoint name="in" address="vm://in" connector-ref="default" exchange-pattern="one-way"/>
-    <vm:endpoint name="notxml" path="notxml" connector-ref="queue" exchange-pattern="one-way"/>
-    <endpoint name="self" address="vm://self" connector-ref="queue" exchange-pattern="one-way"/>
-    <endpoint name="other" address="vm://other" connector-ref="queue" exchange-pattern="one-way"/>
+       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
 
     <flow name="test for xml">
         <mxml:is-xml-filter/>

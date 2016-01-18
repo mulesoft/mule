@@ -3,42 +3,24 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <!-- use a persistent object store to pinpoint any MuleEvent de/serialization issue -->
     <spring:bean id="objectStore" class="org.mule.util.store.PartitionedPersistentObjectStore" />
 
-    <vm:endpoint name="dlqChannel" path="dlq" />
-
     <custom-processor name="dlq-mp" class="org.mule.test.routing.UntilSuccessfulTestCase$CustomMP"/>
 
     <flow name="minimal-config">
-        <vm:inbound-endpoint path="input-1" exchange-pattern="one-way"/>
         <!-- with this configuration, the response from target MP won't be considered an error (no failureExpression) -->
         <until-successful objectStore-ref="objectStore">
             <flow-ref name="target-mp" />
         </until-successful>
     </flow>
 
-    <flow name="full-config">
-        <vm:inbound-endpoint path="input-2" exchange-pattern="request-response"/>
-        <until-successful objectStore-ref="objectStore"
-                          ackExpression="#['ACK']"
-                          failureExpression="#[regex('(?i).*error')]"
-                          maxRetries="2"
-                          secondsBetweenRetries="1"
-                          deadLetterQueue-ref="dlqChannel">
-            <flow-ref name="target-mp" />
-        </until-successful>
-    </flow>
-
     <flow name="full-config-with-mp">
-        <vm:inbound-endpoint path="input-2MP" exchange-pattern="request-response"/>
         <until-successful objectStore-ref="objectStore"
                           ackExpression="#['ACK']"
                           failureExpression="#[regex('(?i).*error')]"
@@ -50,12 +32,11 @@
     </flow>
 
     <flow name="retry-endpoint-config">
-        <vm:inbound-endpoint path="input-3" exchange-pattern="one-way"/>
         <until-successful objectStore-ref="objectStore"
                           failureExpression="#[regex('(?i).*error]')"
                           maxRetries="2"
                           secondsBetweenRetries="1">
-            <vm:outbound-endpoint path="target-flow" exchange-pattern="request-response" />
+            <flow-ref name="target-flow"/>
         </until-successful>
     </flow>
 
@@ -64,13 +45,7 @@
     </flow>
 
     <flow name="target-flow">
-        <vm:inbound-endpoint path="target-flow" exchange-pattern="request-response" />
         <flow-ref name="target-mp" />
-    </flow>
-
-    <flow name="dlq-processor">
-        <inbound-endpoint ref="dlqChannel" />
-        <test:component />
     </flow>
 
     <flow name="synchronous">

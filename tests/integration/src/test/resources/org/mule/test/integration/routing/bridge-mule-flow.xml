@@ -7,12 +7,10 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="bridge">
-        <inbound-endpoint address="vm://bridge.inbound" exchange-pattern="request-response"/>
-        <outbound-endpoint address="vm://bridge.outbound" exchange-pattern="request-response"/>
+        <flow-ref name="Receiver"/>
     </flow>
 
     <flow name="Receiver">
-        <inbound-endpoint address="vm://bridge.outbound" exchange-pattern="request-response"/>
         <component class="org.mule.functional.testmodels.services.TestReceiver"/>
     </flow>
 

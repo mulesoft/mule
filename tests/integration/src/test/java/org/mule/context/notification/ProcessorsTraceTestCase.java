@@ -13,8 +13,6 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.api.config.MuleProperties.MULE_FLOW_TRACE;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.notification.MessageProcessorNotificationListener;
@@ -91,7 +89,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void flowStatic() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowStatic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowStatic").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -103,7 +101,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void subFlowStatic() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowStatic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowStatic").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -115,7 +113,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void flowDynamic() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowDynamic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowDynamic").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -127,7 +125,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void subFlowDynamic() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowDynamic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowDynamic").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -139,7 +137,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void secondFlowStatic() throws Exception
     {
-        muleContext.getClient().send("vm://in-secondFlowStatic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("secondFlowStatic").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -153,7 +151,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void secondSubFlowStatic() throws Exception
     {
-        muleContext.getClient().send("vm://in-secondSubFlowStatic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("secondSubFlowStatic").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -167,7 +165,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void secondFlowDynamic() throws Exception
     {
-        muleContext.getClient().send("vm://in-secondFlowDynamic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("secondFlowDynamic").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -181,7 +179,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void secondSubFlowDynamic() throws Exception
     {
-        muleContext.getClient().send("vm://in-secondSubFlowDynamic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("secondSubFlowDynamic").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -195,7 +193,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void flowStaticWithAsync() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowStaticWithAsync", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowStaticWithAsync").withPayload(TEST_PAYLOAD).run();
 
         ProcessorsTraceAsyncAsserter.latch.await(1, TimeUnit.SECONDS);
 
@@ -210,7 +208,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void subFlowStaticWithAsync() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowStaticWithAsync", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowStaticWithAsync").withPayload(TEST_PAYLOAD).run();
 
         ProcessorsTraceAsyncAsserter.latch.await(1, TimeUnit.SECONDS);
 
@@ -225,7 +223,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void flowDynamicWithAsync() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowDynamicWithAsync", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowDynamicWithAsync").withPayload(TEST_PAYLOAD).run();
 
         ProcessorsTraceAsyncAsserter.latch.await(1, TimeUnit.SECONDS);
 
@@ -240,7 +238,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void subFlowDynamicWithAsync() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowDynamicWithAsync", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowDynamicWithAsync").withPayload(TEST_PAYLOAD).run();
 
         ProcessorsTraceAsyncAsserter.latch.await(1, TimeUnit.SECONDS);
 
@@ -255,7 +253,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void flowStaticWithEnricher() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowStaticWithEnricher", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowStaticWithEnricher").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -268,7 +266,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void subFlowStaticWithEnricher() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowStaticWithEnricher", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowStaticWithEnricher").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -280,7 +278,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void flowDynamicWithEnricher() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowDynamicWithEnricher", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowDynamicWithEnricher").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -293,7 +291,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void subFlowDynamicWithEnricher() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowDynamicWithEnricher", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowDynamicWithEnricher").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -306,7 +304,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void flowStaticWithChoice() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowStaticWithChoice", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowStaticWithChoice").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -319,7 +317,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void subFlowStaticWithChoice() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowStaticWithChoice", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowStaticWithChoice").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -332,7 +330,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void flowDynamicWithChoice() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowDynamicWithChoice", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowDynamicWithChoice").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -345,7 +343,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void subFlowDynamicWithChoice() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowDynamicWithChoice", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowDynamicWithChoice").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -358,7 +356,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void flowStaticWithScatterGather() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowStaticWithScatterGather", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowStaticWithScatterGather").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -372,7 +370,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void subFlowStaticWithScatterGather() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowStaticWithScatterGather", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowStaticWithScatterGather").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -387,7 +385,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void flowDynamicWithScatterGather() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowDynamicWithScatterGather", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowDynamicWithScatterGather").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -401,7 +399,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void subFlowDynamicWithScatterGather() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowDynamicWithScatterGather", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowDynamicWithScatterGather").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -415,7 +413,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void flowStaticWithScatterGatherChain() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowStaticWithScatterGatherChain", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowStaticWithScatterGatherChain").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -431,7 +429,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void subFlowStaticWithScatterGatherChain() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowStaticWithScatterGatherChain", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowStaticWithScatterGatherChain").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -446,7 +444,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void flowDynamicWithScatterGatherChain() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowDynamicWithScatterGatherChain", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowDynamicWithScatterGatherChain").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
@@ -461,7 +459,7 @@ public class ProcessorsTraceTestCase extends FunctionalTestCase
     @Test
     public void subFlowDynamicWithScatterGatherChain() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowDynamicWithScatterGatherChain", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowDynamicWithScatterGatherChain").withPayload(TEST_PAYLOAD).run();
 
         assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 

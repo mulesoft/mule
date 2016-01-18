@@ -6,15 +6,17 @@
  */
 package org.mule.test.integration.messaging.meps;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import org.mule.api.MuleMessage;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+
+import org.mule.api.MessagingException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.NoReceiverForEndpointException;
+import org.mule.config.ExceptionHelper;
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * see MULE-4512
@@ -31,56 +33,21 @@ public class SynchronousResponseExceptionTestCase extends FunctionalTestCase
     @Test
     public void testComponentException() throws Exception
     {
-        MuleMessage message = muleContext.getClient().send("vm://in1", "request", null);
-        assertNotNull(message);
-        assertNotNull(message.getExceptionPayload());
-        assertEquals(FunctionalTestException.class, message.getExceptionPayload()
-            .getRootException()
-            .getClass());
+        MessagingException e = flowRunner("ComponentException").withPayload("request").runExpectingException();
+        assertThat(ExceptionHelper.getRootException(e), instanceOf(FunctionalTestException.class));
     }
 
     @Test
-    public void testOutboundRoutingException() throws Exception
+    public void testFlowRefInvalidException() throws Exception
     {
-        MuleMessage message = muleContext.getClient().send("vm://in2", "request", null);
-        assertNotNull(message);
-        assertNotNull(message.getExceptionPayload());
-        assertEquals(NoReceiverForEndpointException.class, message.getExceptionPayload()
-            .getRootException()
-            .getClass());
+        MessagingException e = flowRunner("FlowRefInvalidException").withPayload("request").runExpectingException();
+        assertThat(ExceptionHelper.getRootException(e), instanceOf(NoSuchBeanDefinitionException.class));
     }
 
     @Test
-    public void testInboundTransformerException() throws Exception
+    public void testTransformerException() throws Exception
     {
-        MuleMessage message = muleContext.getClient().send("vm://in3", "request", null);
-        assertNotNull(message);
-        assertNotNull(message.getExceptionPayload());
-        assertEquals(TransformerException.class, message.getExceptionPayload()
-            .getRootException()
-            .getClass());
-    }
-
-    @Test
-    public void testOutboundTransformerException() throws Exception
-    {
-        MuleMessage message = muleContext.getClient().send("vm://in4", "request", null);
-        assertNotNull(message);
-        assertNotNull(message.getExceptionPayload());
-        assertEquals(TransformerException.class, message.getExceptionPayload()
-            .getRootException()
-            .getClass());
-    }
-
-    @Test
-    public void testResponseTransformerException() throws Exception
-    {
-        MuleMessage message = muleContext.getClient().send("vm://in5", "request", null);
-        assertNotNull(message);
-        assertNotNull(message.getExceptionPayload());
-        assertEquals(TransformerException.class, message.getExceptionPayload()
-            .getRootException()
-            .getClass());
-
+        MessagingException e = flowRunner("TransformerException").withPayload("request").runExpectingException();
+        assertThat(ExceptionHelper.getRootException(e), instanceOf(TransformerException.class));
     }
 }

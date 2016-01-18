@@ -20,12 +20,12 @@ public class NoArgsEntryPointResolverTestCase extends AbstractEntryPointResolver
     @Test
     public void testIgnored() throws Exception
     {
-        doTest("not-ignored", new Object(), "notIgnored");
+        doTest("NotIgnored", new Object(), "notIgnored");
     }
 
     @Test
     public void testSelected() throws Exception
     {
-        doTest("selected", new Object(), "selected");
+        doTest("Selected", new Object(), "selected");
     }
 }

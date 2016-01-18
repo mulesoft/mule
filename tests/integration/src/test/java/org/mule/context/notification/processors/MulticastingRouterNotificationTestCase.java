@@ -7,7 +7,6 @@
 package org.mule.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.client.MuleClient;
 import org.mule.context.notification.Node;
 import org.mule.context.notification.RestrictedNode;
 
@@ -26,11 +25,10 @@ public class MulticastingRouterNotificationTestCase extends AbstractMessageProce
     @Override
     public void doTest() throws Exception
     {
-        List<String> testList = Arrays.asList("test");
-        MuleClient client = muleContext.getClient();
-        assertNotNull(client.send("vm://in-all", "test", null));
-        assertNotNull(client.send("vm://in-all2", testList, null));
-        assertNotNull(client.send("vm://in-all3", "test", null));
+        List<String> testList = Arrays.asList(TEST_PAYLOAD);
+        assertNotNull(flowRunner("all").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("all2").withPayload(testList).run());
+        assertNotNull(flowRunner("all3").withPayload(TEST_PAYLOAD).run());
     }
 
 

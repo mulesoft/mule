@@ -6,10 +6,8 @@
  */
 package org.mule.test.integration.exceptions;
 
-import static java.lang.String.format;
 import static org.junit.Assert.assertNotNull;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
+
 import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -35,8 +33,7 @@ public class AsyncExceptionHandlingTestCase extends FunctionalTestCase
     public void testAsyncExceptionHandlingTestCase() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        DefaultMuleMessage msg1 = new DefaultMuleMessage("Hello World", muleContext);
-        MuleMessage response1 = client.send(format("http://localhost:%s/searchin", dynamicPort1.getNumber()), msg1, 300000);
-        assertNotNull(response1);
+        flowRunner("SearchWebServiceBridge").runExpectingException();
+        assertNotNull(client.request("test://back-channel", RECEIVE_TIMEOUT));
     }
 }

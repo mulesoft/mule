@@ -50,7 +50,7 @@ public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
         String timestamp = converter.toString(new Date(System.currentTimeMillis()));
         String input = "<test-bean><createDate>" + timestamp + "</createDate></test-bean>";
 
-        runFlowAsync(FLOW_NAME, input);
+        flowRunner(FLOW_NAME).withPayload(input).asynchronously().run();
 
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
     }

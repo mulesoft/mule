@@ -2,18 +2,12 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <!--// START SNIPPET: full-config -->
     <description>
@@ -21,17 +15,7 @@
         result.
     </description>
 
-    <vm:connector name="vmConnector"/>
-
-    <vm:endpoint path="test.inbound" name="inboundEndpoint" exchange-pattern="one-way"/>
-    <vm:endpoint path="test.header.received" name="receivedEndpoint" exchange-pattern="one-way"/>
-    <vm:endpoint path="test.header.notreceived" name="notReceivedEndpoint" exchange-pattern="one-way"/>
-
-    
     <flow name="In-Only_Optional-Out--Service">
-        
-        <vm:inbound-endpoint ref="inboundEndpoint"/>
-        
         <script:component>
             <script:script engine="groovy">
                 if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND))
@@ -41,16 +25,16 @@
             </script:script>
         </script:component>
         
-        <vm:outbound-endpoint ref="receivedEndpoint">
+        <logger level="ERROR" message="#[payload]"/>
+        
+        <async>
             <mule:wildcard-filter pattern="* header received"/>
-        </vm:outbound-endpoint>
-        
-        <vm:outbound-endpoint ref="notReceivedEndpoint">
+            <test:queue name="received"/>
+        </async>
+        <async>
             <mule:wildcard-filter pattern="* header not received"/>
-        
-        </vm:outbound-endpoint>
-        
-                
+            <test:queue name="notReceived"/>
+        </async>
     </flow>
     
     <!--// END SNIPPET: full-config -->

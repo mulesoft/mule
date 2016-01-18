@@ -1,55 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans" 
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-
-    <vm:connector name="vm"/>
-
-    <vm:connector name="vmExceptionThrowingReceiver">
-        <service-overrides messageReceiver="org.mule.test.integration.streaming.ExceptionThrowingVMMessageReceiver"/>
-    </vm:connector>
-
-    <vm:connector name="vmExceptionThrowingDispatcher">
-        <service-overrides dispatcherFactory="org.mule.test.integration.streaming.ExceptionThrowingVMMessageDispatcherFactory"/>
-    </vm:connector>
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="echo">
-        <vm:inbound-endpoint path="inEcho" exchange-pattern="one-way" connector-ref="vm"/>
         <test:component throwException="true"/>
     </flow>
 
-    <flow name="dispatcherExceptionBridge">
-        <vm:inbound-endpoint path="dispatcherExceptionBridge" exchange-pattern="one-way"
-                             connector-ref="vm"/>
-        <outbound-endpoint address="vm://out" exchange-pattern="one-way" connector-ref="vmExceptionThrowingDispatcher"/>
-    </flow>
-
-    <flow name="receiverExceptionBridge">
-        <vm:inbound-endpoint path="receiverExceptionBridge" exchange-pattern="one-way"
-                             connector-ref="vmExceptionThrowingReceiver"/>
-        <outbound-endpoint address="vm://out" exchange-pattern="one-way" connector-ref="vm"/>
-    </flow>
-
     <flow name="inboundFilterExceptionBridge">
-        <vm:inbound-endpoint path="inboundFilterExceptionBridge" exchange-pattern="one-way"
-                             connector-ref="vm">
-            <custom-filter class="org.mule.test.integration.streaming.ExceptionThrowingFilter"/>
-        </vm:inbound-endpoint>
-        <outbound-endpoint address="vm://out" exchange-pattern="one-way" connector-ref="vm"/>
-    </flow>
-
-    <flow name="inboundRouterExceptionBridge">
-        <vm:inbound-endpoint path="inboundRouterExceptionBridge" exchange-pattern="one-way"
-                             connector-ref="vm"/>
-        <custom-processor class="org.mule.test.integration.exceptions.ExceptionThrowingInboundRouter"/>
-        <outbound-endpoint address="vm://out" exchange-pattern="one-way" connector-ref="vm"/>
+        <custom-filter class="org.mule.test.integration.streaming.ExceptionThrowingFilter"/>
     </flow>
 
 </mule>

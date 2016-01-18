@@ -16,11 +16,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
+
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -30,11 +26,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.AggregationContext;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.transport.DispatchException;
-import org.mule.construct.Flow;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.routing.AggregationStrategy;
 import org.mule.routing.CompositeRoutingException;
-import org.mule.functional.functional.FlowAssert;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
@@ -68,34 +62,29 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     @Test
     public void minimalConfiguration() throws Exception
     {
-        this.testFlow("minimalConfig", getTestEvent(""));
+        flowRunner("minimalConfig").withPayload("").run();
     }
 
     @Test(expected = MessagingException.class)
     public void consumablePayload() throws Exception
     {
-        this.testFlow("minimalConfig", getTestEvent(new ByteArrayInputStream("hello world".getBytes())));
+        flowRunner("minimalConfig").withPayload(new ByteArrayInputStream("hello world".getBytes())).run();
     }
 
     @Test
     public void timeout() throws Exception
     {
-        try
-        {
-            this.runFlow("timeout");
-            fail("Was expecting a timeout");
-        }
-        catch (CompositeRoutingException e)
-        {
-            MuleEvent response = e.getEvent();
-            ExceptionPayload ep = response.getMessage().getExceptionPayload();
-            assertThat(ep, is(notNullValue()));
-            assertThat(e, sameInstance(ep.getException()));
+        MessagingException e = flowRunner("timeout").runExpectingException();
+        assertThat(e, instanceOf(CompositeRoutingException.class));
 
-            Map<Integer, Throwable> exceptions = e.getExceptions();
-            assertThat(1, is(exceptions.size()));
-            assertThat(exceptions.get(2), instanceOf(ResponseTimeoutException.class));
-        }
+        MuleEvent response = e.getEvent();
+        ExceptionPayload ep = response.getMessage().getExceptionPayload();
+        assertThat(ep, is(notNullValue()));
+        assertThat(e, sameInstance(ep.getException()));
+
+        Map<Integer, Throwable> exceptions = ((CompositeRoutingException) e).getExceptions();
+        assertThat(1, is(exceptions.size()));
+        assertThat(exceptions.get(2), instanceOf(ResponseTimeoutException.class));
     }
 
     @Test
@@ -140,128 +129,109 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
 
     private void assertRouteException(String flow, String exceptionMessageStart, String exceptionMessageEnd) throws Exception
     {
-        try
-        {
-            this.runFlow(flow);
-            fail("Was expecting a failure");
-        }
-        catch (CompositeRoutingException e)
-        {
-            MuleEvent response = e.getEvent();
-            ExceptionPayload ep = response.getMessage().getExceptionPayload();
-            assertThat(ep, is(notNullValue()));
-            assertThat(e, sameInstance(ep.getException()));
-            
-            assertThat(e.getMessage(), startsWith(exceptionMessageStart));
-            assertThat(e.getMessage(), endsWith(exceptionMessageEnd));
+        MessagingException e = flowRunner(flow).runExpectingException();
+        assertThat(e, instanceOf(CompositeRoutingException.class));
 
-            Map<Integer, Throwable> exceptions = e.getExceptions();
-            assertThat(1, is(exceptions.size()));
-            assertThat(exceptions.get(1), instanceOf(DispatchException.class));
-        }
+        MuleEvent response = e.getEvent();
+        ExceptionPayload ep = response.getMessage().getExceptionPayload();
+        assertThat(ep, is(notNullValue()));
+        assertThat(e, sameInstance(ep.getException()));
+
+        assertThat(e.getMessage(), startsWith(exceptionMessageStart));
+        assertThat(e.getMessage(), endsWith(exceptionMessageEnd));
+
+        Map<Integer, Throwable> exceptions = ((CompositeRoutingException) e).getExceptions();
+        assertThat(1, is(exceptions.size()));
+        assertThat(exceptions.get(1), instanceOf(DispatchException.class));
     }
 
     @Test
     public void customMergeStrategyByName() throws Exception
     {
-        this.testFlow("customMergeStrategyByName", getTestEvent(""));
+        flowRunner("customMergeStrategyByName").withPayload("").run();
     }
 
     @Test
     public void customMergeStrategyByRef() throws Exception
     {
-        this.testFlow("customMergeStrategyByRef", getTestEvent(""));
+        flowRunner("customMergeStrategyByRef").withPayload("").run();
     }
 
     @Test
     public void sequentialProcessing() throws Exception
     {
-        this.runFlow("sequentialProcessing", "");
+        flowRunner("sequentialProcessing").withPayload("").runAndVerify("customThreadingProfile");
         assertThat(capturedThreads, hasSize(1));
-        FlowAssert.verify("customThreadingProfile");
     }
 
     @Test
     public void requestResponseInboundEndpoint() throws Exception
     {
-        muleContext.getClient().send("vm://requestResponseInboundEndpoint", getTestEvent("").getMessage());
-        FlowAssert.verify("requestResponseInboundEndpoint");
+        flowRunner("requestResponseInboundEndpoint").withPayload("");
     }
 
     @Test
     public void oneWayInboundEndpoint() throws Exception
     {
-        muleContext.getClient().send("vm://oneWayInboundEndpoint", getTestEvent("").getMessage());
-        FlowAssert.verify("oneWayInboundEndpoint");
+        flowRunner("oneWayInboundEndpoint").withPayload("").asynchronously().run();
     }
 
     @Test
     public void routesWithForeachAndInboundEndpoint() throws Exception
     {
         final String[] payload = new String[] {"apple", "banana", "orange"};
-        muleContext.getClient().send("vm://routesWithForeachAndInboundEndpoint", getTestEvent(Arrays.asList(payload)).getMessage());
-        FlowAssert.verify("routesWithForeachAndInboundEndpoint");
+        flowRunner("routesWithForeachAndInboundEndpoint").withPayload(Arrays.asList(payload)).run();
     }
 
     @Test
     public void exceptionStrategy() throws Exception
     {
-        this.testFlow("exceptionStrategy", getTestEvent(""));
+        flowRunner("exceptionStrategy").withPayload("").run();
     }
 
     @Test
     public void failedEventInAggregationStrategy() throws Exception
     {
-        runFlow("failedEventInAggregationStrategy", getTestEvent(""));
+        flowRunner("failedEventInAggregationStrategy").withPayload("").run();
     }
 
     @Test
     public void failingMergeStrategy() throws Exception
     {
-        try
-        {
-            this.runFlow("failingMergeStrategy", getTestEvent(""));
-            fail("Was expecting a exception");
-        }
-        catch (MessagingException e)
-        {
-            assertThat(e.getCause(), instanceOf(UnsupportedOperationException.class));
-        }
+        MessagingException e = flowRunner("failingMergeStrategy").withPayload("").runExpectingException();
+        assertThat(e.getCause(), instanceOf(UnsupportedOperationException.class));
     }
 
     @Test
     public void messageProperties() throws Exception
     {
-        this.testFlow("messageProperties", getTestEvent(""));
+        flowRunner("messageProperties").withPayload("").run();
     }
 
     @Test
     public void oneWayRouteWithSingleResponse() throws Exception
     {
-        muleContext.getClient().send("vm://oneWayRouteWithSingleResponse", getTestEvent("").getMessage());
-        FlowAssert.verify("oneWayRouteWithSingleResponse");
+        flowRunner("oneWayRouteWithSingleResponse").withPayload("").run();
     }
 
     @Test
     public void oneWayRouteWithMultipleResponses() throws Exception
     {
-        muleContext.getClient().send("vm://oneWayRouteWithMultipleResponses", getTestEvent("").getMessage());
-        FlowAssert.verify("oneWayRouteWithMultipleResponses");
+        flowRunner("oneWayRouteWithMultipleResponses").withPayload("").run();
     }
 
     @Test
     public void expressionFilterRoute() throws Exception
     {
-        muleContext.getClient().send("vm://expressionFilterRoute", getTestEvent("").getMessage());
-        FlowAssert.verify("expressionFilterRoute");
+        flowRunner("expressionFilterRoute").withPayload("").run();
     }
 
     @Test
     public void doesThreading() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("latch", new Latch());
-        testFlow("doesThreading", event);
+        // MuleEvent event = getTestEvent("");
+        // event.setFlowVariable("latch", new Latch());
+        flowRunner("doesThreading").withPayload("").withFlowVariable("latch", new Latch()).run();
 
         assertThat(capturedThreads, hasSize(3));
     }
@@ -269,25 +239,22 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     @Test
     public void oneWayRoutesOnly() throws Exception
     {
-        muleContext.getClient().send("vm://oneWayRoutesOnly", getTestEvent("").getMessage());
-        FlowAssert.verify("oneWayRoutesOnly");
+        flowRunner("oneWayRoutesOnly").withPayload("").run();
     }
 
     @Test
     public void setsVariablesAfterRouting() throws Exception
     {
-        runFlow("setsVariablesAfterRouting");
-        FlowAssert.verify("setsVariablesAfterRouting");
+        flowRunner("setsVariablesAfterRouting").run();
     }
 
     @Test
     public void returnsCorrectDataType() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage(TEST_PAYLOAD, muleContext);
-        message.setOutboundProperty("Content-Type", "application/json");
-
-        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, mock(Flow.class));
-        MuleMessage response = runFlow("dataType", event).getMessage();
+        MuleMessage response = flowRunner("dataType").withPayload(TEST_PAYLOAD)
+                                                     .withOutboundProperty("Content-Type", "application/json")
+                                                     .run()
+                                                     .getMessage();
 
         assertThat(response.getPayload(), is(Matchers.instanceOf(List.class)));
         assertThat(((List<MuleMessage>) response.getPayload()).size(), is(3));

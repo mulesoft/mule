@@ -10,7 +10,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
@@ -28,9 +27,7 @@ public class ComponentReturningNullFlowTestCase extends FunctionalTestCase
     @Test
     public void testNullReturnStopsFlow() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-
-        MuleMessage msg = client.send("vm://in", "test data", null);
+        MuleMessage msg = flowRunner("StopFlowService").withPayload(TEST_PAYLOAD).run().getMessage();
         assertNotNull(msg);
         final String payload = getPayloadAsString(msg);
         assertNotNull(payload);

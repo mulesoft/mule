@@ -8,8 +8,8 @@ package org.mule.test.integration.transformer.response;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.List;
@@ -28,8 +28,7 @@ public class ResponseTransformerOnMessageCollectionTestCase extends FunctionalTe
     @Test
     public void transformedDataIsNotLost() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testInput", TEST_MESSAGE, null);
+        MuleMessage response = flowRunner("Distributor").withPayload(TEST_MESSAGE).run().getMessage();
 
         assertEquals("foo", response.getPayload());
         assertFalse(response.getPayload() instanceof List);

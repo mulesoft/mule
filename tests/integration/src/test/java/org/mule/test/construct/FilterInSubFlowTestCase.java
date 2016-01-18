@@ -7,10 +7,7 @@
 package org.mule.test.construct;
 
 import static org.junit.Assert.assertEquals;
-
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
+import org.mule.api.MuleEvent;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -24,18 +21,16 @@ public class FilterInSubFlowTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void filterOnFlow() throws MuleException
+    public void filterOnFlow() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testFlow", "TEST", null);
+        MuleEvent response = flowRunner("flowWithFilter").withPayload("TEST").run();
         assertEquals(null, response);
     }
 
     @Test
-    public void filterOnSubFlow() throws MuleException
+    public void filterOnSubFlow() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testSubFlow", "TEST", null);
+        MuleEvent response = flowRunner("flowWithSubFlowWithFilter").withPayload("TEST").run();
         assertEquals(null, response);
     }
 }

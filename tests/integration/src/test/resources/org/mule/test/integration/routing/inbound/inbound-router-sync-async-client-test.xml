@@ -1,30 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
          http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-         http://www.mulesoft.org/schema/mule/vm   http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <description>
         Junit test: for MuleSupport Portal: Case 00001692
     </description>
 
-    <vm:connector name="VMQueue">
-        <vm:queue-profile maxOutstandingMessages="10">
-            <default-persistent-queue-store/>
-        </vm:queue-profile>
-    </vm:connector>
-
     <scripting:script engine="groovy" name="testComponent">
         <scripting:text>
-            if(message.getProperty("messageType").equals("sync"))
+            if(message.getInboundProperty("messageType").equals("sync"))
             {
-                return message.getPayloadAsString() + " OK"
+                return "OK"
             }
-            else if(message.getProperty("messageType").equals("async"))
+            else if(message.getInboundProperty("messageType").equals("async"))
             {
-                return message.getPayloadAsString() + "'s Response sent to asyncResponse"
+                return "Response sent to asyncResponse"
             }
 
             return null
@@ -32,17 +26,17 @@
     </scripting:script>
 
     <flow name="SyncAsync">
-        <vm:inbound-endpoint path="singleSyncAsyncEntry" exchange-pattern="request-response"/>
-        <message-property-filter pattern="messageType=sync"/>
-        <vm:outbound-endpoint path="async" exchange-pattern="one-way"/>
+        <async>
+            <flow-ref name="AsyncRequest"/>
+        </async>
+        <message-property-filter scope="inbound" pattern="messageType=sync"/>
         <scripting:component script-ref="testComponent"/>
     </flow>
 
     <flow name="AsyncRequest">
-        <vm:inbound-endpoint path="async" exchange-pattern="one-way"/>
-        <message-property-filter pattern="messageType=async"/>
+        <message-property-filter scope="inbound" pattern="messageType=async"/>
         <scripting:component script-ref="testComponent"/>
-        <vm:outbound-endpoint path="asyncResponse" exchange-pattern="one-way"/>
+        <test:queue name="asyncResponse"/>
     </flow>
 
 </mule>

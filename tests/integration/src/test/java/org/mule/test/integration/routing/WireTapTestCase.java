@@ -7,7 +7,6 @@
 package org.mule.test.integration.routing;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -51,8 +50,7 @@ public class WireTapTestCase extends FunctionalTestCase
                 }
             }
         });
-        MuleClient client = muleContext.getClient();
-        client.send("vm://inbound.channel", "test", null);
+        flowRunner("Receiver").withPayload(TEST_PAYLOAD).run();
         assertTrue(receiverLatch.await(3L, TimeUnit.SECONDS));
         assertTrue(tappedReceiver1Latch.await(1L, TimeUnit.SECONDS));
         assertTrue(tappedReceiver2Latch.await(1L, TimeUnit.SECONDS));

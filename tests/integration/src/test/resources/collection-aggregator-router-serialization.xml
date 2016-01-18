@@ -2,19 +2,14 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <vm:connector name="queue"/>
-
     <flow name="splitter">
-        <vm:inbound-endpoint path="splitter" exchange-pattern="one-way"/>
         <collection-splitter/>
         <test:component/>
         <collection-aggregator timeout="2000" failOnTimeout="false" persistentStores="false"/>
-        <vm:outbound-endpoint path="out" exchange-pattern="one-way" connector-ref="queue"/>
+        <test:queue name="out"/>
     </flow>
 
 </mule>

@@ -20,7 +20,7 @@ public class ClassInterceptorTestCase extends AbstractInterceptorTestCase
     @Test
     public void testInterceptor() throws Exception
     {
-        runFlowAsync("service", MESSAGE);
+        flowRunner("service").withPayload(MESSAGE).asynchronously().run();
 
         assertMessageIntercepted();
     }

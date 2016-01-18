@@ -32,10 +32,10 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage msgSync = client.send("vm://test.before.sync.in", "message", null);
+        MuleMessage msgSync = flowRunner("test-async-block-before-outbound").withPayload("message").run().getMessage();
 
-        MuleMessage msgAsync = client.request("vm://test.before.async.out", RECEIVE_TIMEOUT);
-        MuleMessage msgOut = client.request("vm://test.before.out", RECEIVE_TIMEOUT);
+        MuleMessage msgAsync = client.request("test://test.before.async.out", RECEIVE_TIMEOUT);
+        MuleMessage msgOut = client.request("test://test.before.out", RECEIVE_TIMEOUT);
 
         assertCorrectThreads(msgSync, msgAsync, msgOut);
 
@@ -46,10 +46,10 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage msgSync = client.send("vm://test.after.sync.in", "message", null);
+        MuleMessage msgSync = flowRunner("test-async-block-after-outbound").withPayload("message").run().getMessage();
 
-        MuleMessage msgAsync = client.request("vm://test.after.async.out", RECEIVE_TIMEOUT);
-        MuleMessage msgOut = client.request("vm://test.after.out", RECEIVE_TIMEOUT);
+        MuleMessage msgAsync = client.request("test://test.after.async.out", RECEIVE_TIMEOUT);
+        MuleMessage msgOut = client.request("test://test.after.out", RECEIVE_TIMEOUT);
 
         assertCorrectThreads(msgSync, msgAsync, msgOut);
     }
@@ -63,11 +63,11 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends FunctionalTestCase
         assertEquals((Object) msgSync.getInboundProperty("request-response-thread"),
             msgOut.getInboundProperty("request-response-thread"));
 
-        assertTrue(!msgAsync.getInboundProperty("async-thread").
-            equals(msgSync.getInboundProperty("request-response-thread")));
+        assertTrue(!msgAsync.getOutboundProperty("async-thread").
+            equals(msgSync.getOutboundProperty("request-response-thread")));
 
-        assertTrue(!msgAsync.getInboundProperty("async-thread").
-            equals(msgOut.getInboundProperty("request-response-thread")));
+        assertTrue(!msgAsync.getOutboundProperty("async-thread").
+            equals(msgOut.getOutboundProperty("request-response-thread")));
     }
 
     public static class ThreadSensingMessageProcessor implements MessageProcessor

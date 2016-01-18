@@ -9,9 +9,7 @@
     
     <flow name="testService">
         
-        <inbound-endpoint address="vm://test" exchange-pattern="request-response">
-            <encryption-security-filter strategy-ref="PBE"/>
-        </inbound-endpoint>
+        <encryption-security-filter strategy-ref="PBE"/>
         
         <component class="org.mule.functional.security.TestSecurityComponent"/>
     </flow>

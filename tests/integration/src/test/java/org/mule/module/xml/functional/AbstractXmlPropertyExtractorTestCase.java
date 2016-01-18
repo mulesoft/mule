@@ -6,30 +6,24 @@
  */
 package org.mule.module.xml.functional;
 
-import static org.junit.Assert.assertFalse;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
+import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.transport.NullPayload;
 
 import org.junit.Test;
 
 public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTestCase
 {
 
-    public AbstractXmlPropertyExtractorTestCase(boolean matchSingle)
-    {
-        this.matchSingle = matchSingle;
-    }
-
     @Override
     protected String getConfigFile()
     {
         return  "org/mule/module/xml/property-extractor-test.xml";
     }
-
-    private boolean matchSingle = true;
 
     protected abstract Object getMatchMessage() throws Exception;
 
@@ -38,27 +32,16 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
     @Test
     public void testMatch() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://in", getMatchMessage(), null);
-        MuleMessage message = client.request("vm://match1", RECEIVE_TIMEOUT);
+        MuleMessage message = flowRunner("test").withPayload(getMatchMessage()).run().getMessage();
 
         assertNotNull(message);
-        assertFalse(message.getPayload() instanceof NullPayload);
-        if(!matchSingle)
-        {
-            message = client.request("vm://match2", RECEIVE_TIMEOUT);
-            assertNotNull(message);
-            assertFalse(message.getPayload() instanceof NullPayload);
-        }
+        assertThat(message.getPayload(), is("match"));
     }
 
     @Test
     public void testError() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://in", getErrorMessage(), null);
-        MuleMessage message = client.request("vm://error", RECEIVE_TIMEOUT);
-        assertNotNull(message);
-        assertFalse(message.getPayload() instanceof NullPayload);
+        MessagingException e = flowRunner("test").withPayload(getErrorMessage()).runExpectingException();
+        assertThat(e.getMessage(), is("Execution of the expression \"payload.childBean.value\" failed. (org.mule.api.expression.ExpressionRuntimeException)."));
     }
 }

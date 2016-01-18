@@ -2,31 +2,26 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+            ">
 
     <flow name="InputService">
-        <vm:inbound-endpoint path="in-custom-strategy" exchange-pattern="request-response"/>
-        <vm:outbound-endpoint path="badService" exchange-pattern="request-response"/>
+        <flow-ref name="ExceptionService" />
     </flow>
 
     <flow name="InputService2">
-        <vm:inbound-endpoint path="in-default-strategy" exchange-pattern="request-response"/>
-        <vm:outbound-endpoint path="badService2" exchange-pattern="request-response"/>
+        <flow-ref name="ExceptionService2"/>
     </flow>
 
 
     <flow name="ExceptionService">
-        <vm:inbound-endpoint path="badService" exchange-pattern="request-response"/>
         <test:component throwException="true"/>
-        <custom-exception-strategy class="org.mule.test.integration.exceptions.TestExceptionStrategy"/>
+        <custom-exception-strategy class="org.mule.test.integration.exceptions.ExceptionStrategyReturnMessageTestCase$TestExceptionStrategy"/>
     </flow>
 
     <flow name="ExceptionService2">
-        <vm:inbound-endpoint path="badService2" exchange-pattern="request-response"/>
         <test:component throwException="true"/>
     </flow>
 

@@ -31,7 +31,7 @@ public class SetPropertyDataTypeTestCase extends FunctionalTestCase
     @Test
     public void setsPropertyDataType() throws Exception
     {
-        final MuleEvent muleEvent = runFlow("main", TEST_MESSAGE);
+        final MuleEvent muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
 
         MuleMessage response = muleEvent.getMessage();
         DataType dataType = response.getPropertyDataType("testProperty", PropertyScope.OUTBOUND);

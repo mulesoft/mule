@@ -34,30 +34,30 @@ public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
     public void handleWorkRejectedWithExceptionStrategy() throws Exception
     {
         FlowExecutionListener flowExecutionListener = new FlowExecutionListener("limitedThreadsFlow", muleContext).setTimeoutInMillis(5000).setNumberOfExecutionsRequired(3);
-        testThirdMessageSendToExceptionStrategy("vm://flow1.in", flowExecutionListener);
+        testThirdMessageSendToExceptionStrategy("limitedThreadsFlow", flowExecutionListener);
     }
 
     @Test
     public void handleQueueFullWithExceptionStrategy() throws Exception
     {
         FlowExecutionListener flowExecutionListener = new FlowExecutionListener("limitedQueueFlow", muleContext).setTimeoutInMillis(5000).setNumberOfExecutionsRequired(3);
-        testThirdMessageSendToExceptionStrategy("vm://flow2.in", flowExecutionListener);
+        testThirdMessageSendToExceptionStrategy("limitedQueueFlow", flowExecutionListener);
     }
 
-    protected void testThirdMessageSendToExceptionStrategy(String inUrl, FlowExecutionListener flowExecutionListener) throws Exception
+    protected void testThirdMessageSendToExceptionStrategy(String flowName, FlowExecutionListener flowExecutionListener) throws Exception
     {
         // Send 3 messages
         MuleClient client = muleContext.getClient();
         int nrMessages = 3;
         for (int i = 0; i < nrMessages; i++)
         {
-            client.dispatch(inUrl, TEST_MESSAGE + i, null);
+            flowRunner(flowName).withPayload(TEST_MESSAGE + i).asynchronously().run();
         }
         flowExecutionListener.waitUntilFlowIsComplete();
         // Receive 2 messages
         for (int i = 0; i < 2; i++)
         {
-            MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+            MuleMessage result = client.request("test://out", RECEIVE_TIMEOUT);
             assertThat(result, is(notNullValue()));
             assertThat(result.getExceptionPayload(), is(nullValue()));
             assertThat(result.getPayload(), not(instanceOf(NullPayload.class)));
@@ -65,10 +65,10 @@ public class SedaStageWorkRejectionTestCase extends FunctionalTestCase
         }
 
         // Third message doesn't arrive
-        assertThat(client.request("vm://out", RECEIVE_TIMEOUT / 5), is(nullValue()));
+        assertThat(client.request("test://out", RECEIVE_TIMEOUT / 5), is(nullValue()));
 
         // Third message was routed via exception strategy
-        MuleMessage result = client.request("vm://exception", RECEIVE_TIMEOUT);
+        MuleMessage result = client.request("test://exception", RECEIVE_TIMEOUT);
         assertThat(result, is(notNullValue()));
     }
 }

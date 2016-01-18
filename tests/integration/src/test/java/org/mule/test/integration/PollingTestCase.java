@@ -32,9 +32,9 @@ public class PollingTestCase extends FunctionalTestCase
     private static List<String> eventIds;
 
     @Override
-    protected void doSetUp() throws Exception
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        super.doSetUp();
+        super.doSetUpBeforeMuleContextCreation();
         foo = new ArrayList<String>();
         bar = new ArrayList<String>();
         events = new ArrayList<MuleEvent>();
@@ -59,7 +59,7 @@ public class PollingTestCase extends FunctionalTestCase
             assertTrue(foo.size() > 0);
             for (String s: foo)
             {
-                assertEquals(s, "foo");
+                assertEquals("foo", s);
             }
         }
         synchronized (bar)
@@ -67,7 +67,7 @@ public class PollingTestCase extends FunctionalTestCase
             assertTrue(bar.size() > 0);
             for (String s: bar)
             {
-                assertEquals(s, "bar");
+                assertEquals("bar", s);
             }
         }
 

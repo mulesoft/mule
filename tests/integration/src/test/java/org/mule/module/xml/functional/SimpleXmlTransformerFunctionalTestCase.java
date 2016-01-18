@@ -6,17 +6,17 @@
  */
 package org.mule.module.xml.functional;
 
-import static org.junit.Assert.assertEquals;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
-import org.custommonkey.xmlunit.XMLAssert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class SimpleXmlTransformerFunctionalTestCase extends FunctionalTestCase
@@ -34,33 +34,32 @@ public class SimpleXmlTransformerFunctionalTestCase extends FunctionalTestCase
         return "org/mule/module/xml/simple-xml-transformer-functional-test-flow.xml";
     }
 
-    @Ignore("flaky test")
     @Test
     public void testXmlOut() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("xml-in", SERIALIZED, null);
-        Parent parent = (Parent) request(client, "xml-object-out", Parent.class);
+        flowRunner("xml to object").withPayload(SERIALIZED).asynchronously().run();
+        Parent parent = (Parent) request(client, "test://xml-object-out", Parent.class);
         assertNotNull(parent);
         assertNotNull(parent.getChild());
-        assertEquals("theChild", parent.getChild().getName());
+        assertThat(parent.getChild().getName(), is("theChild"));
     }
 
     @Test
     public void testObjectXmlOut() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("object-in", new Parent(new Child("theChild")), null);
-        String xml = (String) request(client, "object-xml-out", String.class);
-        XMLAssert.assertXMLEqual(SERIALIZED, xml);
+        flowRunner("object to xml").withPayload(new Parent(new Child("theChild"))).asynchronously().run();
+        String xml = (String) request(client, "test://object-xml-out", String.class);
+        assertXMLEqual(SERIALIZED, xml);
     }
 
     protected Object request(MuleClient client, String endpoint, Class<?> clazz) throws MuleException
     {
-        MuleMessage message = client.request(endpoint, 3000);
+        MuleMessage message = client.request(endpoint, RECEIVE_TIMEOUT);
         assertNotNull(message);
         assertNotNull(message.getPayload());
-        assertTrue(message.getPayload().getClass().getName(), clazz.isAssignableFrom(message.getPayload().getClass()));
+        assertThat(message.getPayload().getClass().getName(), message.getPayload(), instanceOf(clazz));
         return message.getPayload();
     }
 

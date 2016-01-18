@@ -6,17 +6,16 @@
  */
 package org.mule.test.integration.config;
 
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import org.junit.Rule;
+import org.junit.Test;
 
 public class DisableTimeoutsConfigTestCase extends FunctionalTestCase
 {
@@ -38,8 +37,7 @@ public class DisableTimeoutsConfigTestCase extends FunctionalTestCase
     @Test
     public void httpOutboundEndpointResponseTimeout() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://httpTimeout", "hi", null);
+        MuleMessage result = flowRunner("HttpTimeout").withPayload("hi").run().getMessage();
         assertNotNull(result);
         assertNull(result.getExceptionPayload());
     }

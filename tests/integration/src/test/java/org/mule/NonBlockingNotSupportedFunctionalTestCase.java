@@ -8,10 +8,10 @@ package org.mule;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.construct.Flow;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
@@ -31,85 +31,85 @@ public class NonBlockingNotSupportedFunctionalTestCase extends FunctionalTestCas
     @Test
     public void syncFlow() throws Exception
     {
-        testFlowNonBlocking("syncFlow");
+        flowRunner("syncFlow").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
     @Test
     public void catchExceptionStrategy() throws Exception
     {
-        testFlowNonBlocking("catchExceptionStrategy");
+        flowRunner("catchExceptionStrategy").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
     @Test
     public void splitter() throws Exception
     {
-        testFlowNonBlocking("splitter", getTestEvent(new String[] {"1", "2", "3"}));
+        flowRunner("splitter").withPayload(new String[] {"1", "2", "3"}).nonBlocking().run();
     }
 
     @Test
     public void untilSuccessful() throws Exception
     {
-        testFlowNonBlocking("untilSuccessful");
+        flowRunner("untilSuccessful").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
     @Test
     public void scatterGather() throws Exception
     {
-        testFlowNonBlocking("scatterGather");
+        flowRunner("scatterGather").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
     @Test
     public void all() throws Exception
     {
-        testFlowNonBlocking("all");
+        flowRunner("all").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
     @Test
     public void firstSuccessful() throws Exception
     {
-        testFlowNonBlocking("firstSuccessful");
+        flowRunner("firstSuccessful").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
     @Test
     public void roundRobin() throws Exception
     {
-        testFlowNonBlocking("roundRobin");
+        flowRunner("roundRobin").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
     @Test
     public void requestReply() throws Exception
     {
-        testFlowNonBlocking("requestReply");
+        flowRunner("requestReply").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
     @Test
     public void aggregator() throws Exception
     {
-        Flow flow = lookupFlowConstruct("aggregator");
         String correlationId = "id";
         int correlationGroupSize = 3;
 
-        MuleMessage message1 = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        FlowRunner runner = flowRunner("aggregator").withPayload(TEST_MESSAGE).nonBlocking();
+        MuleMessage message1 = runner.buildEvent().getMessage();
         message1.setCorrelationId(correlationId);
         message1.setCorrelationGroupSize(correlationGroupSize);
         message1.setCorrelationSequence(1);
-        runFlowNonBlocking("aggregator", new DefaultMuleEvent(message1, MessageExchangePattern.REQUEST_RESPONSE, flow));
+        runner.runNoVerify();
 
-        MuleMessage message2 = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        runner.reset();
+        MuleMessage message2 = runner.buildEvent().getMessage();
         message2.setCorrelationId(correlationId);
         message2.setCorrelationGroupSize(correlationGroupSize);
         message2.setCorrelationSequence(2);
         message2.setMessageRootId(message1.getMessageRootId());
-        runFlowNonBlocking("aggregator", new DefaultMuleEvent(message2, MessageExchangePattern.REQUEST_RESPONSE, flow));
+        runner.runNoVerify();
 
-        MuleMessage message3 = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        runner.reset();
+        MuleMessage message3 = runner.buildEvent().getMessage();
         message3.setCorrelationId(correlationId);
         message3.setCorrelationGroupSize(correlationGroupSize);
         message3.setCorrelationSequence(3);
         message3.setMessageRootId(message1.getMessageRootId());
-        runFlowNonBlocking("aggregator", new DefaultMuleEvent(message3, MessageExchangePattern.REQUEST_RESPONSE, flow));
-
-        FlowAssert.verify("aggregator");
+        runner.run();
     }
 
     @Test
@@ -131,7 +131,7 @@ public class NonBlockingNotSupportedFunctionalTestCase extends FunctionalTestCas
     @Test
     public void transactional() throws Exception
     {
-        testFlowNonBlocking("transactional");
+        flowRunner("transactional").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
 }

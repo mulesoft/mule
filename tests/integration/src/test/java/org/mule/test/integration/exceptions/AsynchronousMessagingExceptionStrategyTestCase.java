@@ -7,10 +7,6 @@
 package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import org.mule.api.MuleMessage;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,65 +21,30 @@ public class AsynchronousMessagingExceptionStrategyTestCase extends AbstractExce
     }
     
     @Test
-    public void testInboundTransformer() throws Exception
+    public void testTransformerException() throws Exception
     {
-        client.dispatch("vm://in1", TEST_MESSAGE, null);
+        flowRunner("TransformerException").withPayload(getTestMuleMessage()).asynchronously().run();
         latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
         assertEquals(1, serviceExceptionCounter.get());
         assertEquals(0, systemExceptionCounter.get());
     }
 
     @Test
-    public void testInboundResponseTransformer() throws Exception
+    public void testScriptComponentException() throws Exception
     {
-        client.dispatch("vm://in2", TEST_MESSAGE, null);
-        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-        // No exception expected because response transformer is not applied for an asynchronous endpoint
-        assertEquals(0, serviceExceptionCounter.get());
-        assertEquals(0, systemExceptionCounter.get());
-    }
-    
-    @Test
-    public void testOutboundTransformer() throws Exception
-    {
-        client.dispatch("vm://in3", TEST_MESSAGE, null);
-        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertEquals(1, serviceExceptionCounter.get());
-        assertEquals(0, systemExceptionCounter.get());
-        MuleMessage response = client.request("vm://out3", 500);
-        assertNull(response);
-    }
-    
-    @Test
-    public void testOutboundResponseTransformer() throws Exception
-    {
-        client.dispatch("vm://in4", TEST_MESSAGE, null);
-        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-        // No exception expected because response transformer is not applied for an asynchronous endpoint
-        assertEquals(0, serviceExceptionCounter.get());
-        assertEquals(0, systemExceptionCounter.get());
-        MuleMessage response = client.request("vm://out4", 500);
-        assertNotNull(response);
-    }
-    
-    @Test
-    public void testComponent() throws Exception
-    {
-        client.dispatch("vm://in5", TEST_MESSAGE, null);
+        flowRunner("ScriptComponentException").withPayload(getTestMuleMessage()).asynchronously().run();
         latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
         assertEquals(1, serviceExceptionCounter.get());
         assertEquals(0, systemExceptionCounter.get());
     }
 
     @Test
-    public void testRouter() throws Exception
+    public void testCustomProcessorException() throws Exception
     {
-        client.dispatch("vm://in7", TEST_MESSAGE, null);
+        flowRunner("CustomProcessorException").withPayload(getTestMuleMessage()).asynchronously().run();
         latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
         assertEquals(1, serviceExceptionCounter.get());
         assertEquals(0, systemExceptionCounter.get());
-        MuleMessage response = client.request("vm://out7", 500);
-        assertNull(response);
     }
 }
 

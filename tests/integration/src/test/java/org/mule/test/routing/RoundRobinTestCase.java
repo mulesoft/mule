@@ -8,7 +8,6 @@ package org.mule.test.routing;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -53,7 +52,7 @@ public class RoundRobinTestCase extends FunctionalTestCase
         for (int i = 0, j = 0; i < NUMBER_OF_WRITERS * NUMBER_OF_MESSAGES; i++)
         {
             // Message should be disrtibuted uniformly among endpoints
-            String path = "vm://output" + j;
+            String path = "test://output" + j;
             MuleMessage msg = client.request(path, 0);
             assertNotNull(msg);
             logger.debug(path + ": " + getPayloadAsString(msg));
@@ -77,9 +76,9 @@ public class RoundRobinTestCase extends FunctionalTestCase
             {
                 try
                 {
-                    client.send("vm://input", "Writer " + id + " Message " + i, null);
+                    flowRunner("test-router").withPayload("Writer " + id + " Message " + i).run();
                 }
-                catch (MuleException ex)
+                catch (Exception ex)
                 {
                     logger.info("Unexpected exception dispatching message", ex);
                 }

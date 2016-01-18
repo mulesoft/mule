@@ -3,27 +3,23 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <flow name="flow1">
-        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
         <message-properties-transformer scope="session">
             <add-message-property key="foo" value="foo"/>
         </message-properties-transformer>
         <all>
-            <vm:outbound-endpoint path="flow3" exchange-pattern="request-response"/>
-            <vm:outbound-endpoint path="flow2" exchange-pattern="request-response"/>
+            <flow-ref name="flow2"/>
+            <flow-ref name="flow3"/>
         </all>
         <logger level="WARN"/>
     </flow>
 
     <flow name="flow2">
-        <vm:inbound-endpoint path="flow2" exchange-pattern="request-response"/>
         <message-properties-transformer scope="session">
             <add-message-property key="bar" value="bar"/>
         </message-properties-transformer>
@@ -34,7 +30,6 @@
     </flow>
 
     <flow name="flow3">
-        <vm:inbound-endpoint path="flow3" exchange-pattern="request-response"/>
         <message-properties-transformer scope="session">
             <add-message-property key="baz" value="baz"/>
         </message-properties-transformer>

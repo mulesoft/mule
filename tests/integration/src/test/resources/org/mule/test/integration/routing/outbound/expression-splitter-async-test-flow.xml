@@ -1,41 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-
-    <vm:connector name="vm"/>
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="Distributor">
-        <vm:inbound-endpoint path="distributor.queue" exchange-pattern="one-way"/>
         <!-- FruitBowl.getFruit() List -->
         <splitter expression="#[payload.fruit]"/>
-        <vm:outbound-endpoint path="service1.queue" exchange-pattern="one-way">
+        <async>
             <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Apple"/>
-        </vm:outbound-endpoint>
-        <vm:outbound-endpoint path="service2.queue" exchange-pattern="one-way">
+            <flow-ref name="ServiceOne"/>
+        </async>
+        <async>
             <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Banana"/>
-        </vm:outbound-endpoint>
-        <vm:outbound-endpoint path="service3.queue" exchange-pattern="one-way">
+            <flow-ref name="ServiceTwo"/>
+        </async>
+        <async>
             <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Orange"/>
-        </vm:outbound-endpoint>
+            <flow-ref name="ServiceThree"/>
+        </async>
     </flow>
 
     <flow name="ServiceOne">
-        <vm:inbound-endpoint path="service1.queue" exchange-pattern="one-way"/>
         <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Apple]"/>
     </flow>
 
     <flow name="ServiceTwo">
-        <vm:inbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
         <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Banana]"/>
     </flow>
 
     <flow name="ServiceThree">
-        <vm:inbound-endpoint path="service3.queue" exchange-pattern="one-way"/>
         <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Orange]"/>
     </flow>
 

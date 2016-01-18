@@ -6,9 +6,6 @@
  */
 package org.mule.test.integration.routing.outbound;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -33,10 +30,7 @@ public class ExpressionSplitterAsyncTestCase extends FunctionalTestCase
         FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());
         fruitBowl.addFruit(new Orange());
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage request = new DefaultMuleMessage(fruitBowl, muleContext);
-
-        client.dispatch("vm://distributor.queue", request);
+        flowRunner("Distributor").withPayload(fruitBowl).asynchronously().run();
 
         FlowAssert.verify();
     }

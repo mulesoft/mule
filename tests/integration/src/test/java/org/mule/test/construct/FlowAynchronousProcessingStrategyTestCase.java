@@ -6,21 +6,16 @@
  */
 package org.mule.test.construct;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.mule.api.MessagingException;
 
-import org.junit.Ignore;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.transaction.TransactionCoordination;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
-@Ignore
 public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase
 {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Override
     protected String getConfigFile()
     {
@@ -28,141 +23,30 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
     }
 
     @Override
-    public void testDispatchToOneWayInboundTxOnly() throws Exception
+    public void requestResponse() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://oneway-inboundtx-in", "a", null);
-        MuleMessage result = client.request("vm://dead-letter-queue", RECEIVE_TIMEOUT);
-        assertNotNull(result);
+        setUpExpectedException();
+        super.requestResponse();
     }
 
     @Override
-    public void testDispatchToOneWayTx() throws Exception
+    public void requestResponseTransacted() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://onewaytx-in", "a", null);
-
-        assertNull(client.request("vm://onewaytx-out", RECEIVE_TIMEOUT));
-
-        // TODO Assert exception strategy was called
-
+        setUpExpectedException();
+        super.requestResponseTransacted();
     }
 
     @Override
-    public void testSendToOneWayTx() throws Exception
+    public void oneWayTransacted() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
-        try
-        {
-            client.send("vm://oneway-tx-in", "a", null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            TransactionCoordination.getInstance().getTransaction().rollback();
-        }
+        setUpExpectedException();
+        super.oneWayTransacted();
     }
 
-    @Override
-    public void testSendRequestResponseInbound() throws Exception
+    private void setUpExpectedException()
     {
-        MuleClient client = muleContext.getClient();
-        try
-        {
-            client.send("vm://requestresponse-in", "a", null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-        }
-    }
-
-    @Override
-    public void testDispatchToRequestResponseInboundOneWayOutbound() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-
-        client.dispatch("vm://requestresponse-oneway-in", "a", null);
-
-        // Message never gets to reciever as receiver is not polling the queue
-        assertNull(client.request("vm://requestresponse-oneway-out", RECEIVE_TIMEOUT));
-
-        // TODO Assert exception strategy was called
-
-    }
-
-    @Override
-    public void testSendToRequestResponseInboundOneWayOutbound() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-
-        try
-        {
-            client.send("vm://requestresponse-oneway-in", "a", null);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-        }
-    }
-
-    @Override
-    protected void assertAllProcessingInClientThread(MuleMessage result)
-    {
-        assertSync(result);
-        assertEquals(Thread.currentThread().getName(), result.getInboundProperty("receiver-thread"));
-    }
-
-    @Override
-    protected void assertAllProcessingInRecieverThread(MuleMessage result)
-    {
-        assertSync(result);
-        assertTrue(((String) result.getInboundProperty("receiver-thread")).startsWith("vm.receiver"));
-    }
-
-    @Override
-    protected void assertSync(MuleMessage result)
-    {
-        assertNotNull(result);
-
-        String receiverThread = result.getInboundProperty("receiver-thread");
-        String flowThread = result.getInboundProperty("processor-thread");
-        String dispatcherThread = result.getInboundProperty("dispatcher-thread");
-
-        assertEquals(receiverThread, flowThread);
-        assertEquals(flowThread, dispatcherThread);
-    }
-
-    @Override
-    protected void assertAllProcessingAsync(MuleMessage result)
-    {
-        assertNotNull(result);
-
-        String receiverThread = result.getInboundProperty("receiver-thread");
-        String flowThread = result.getInboundProperty("processor-thread");
-        String dispatcherThread = result.getInboundProperty("dispatcher-thread");
-
-        assertTrue(receiverThread.startsWith("vm.receiver"));
-        assertFalse(receiverThread.equals(flowThread));
-        assertFalse(flowThread.equals(dispatcherThread));
-        assertFalse(receiverThread.equals(dispatcherThread));
-    }
-
-    @Override
-    public void testRequestResponseInboundFailingOneWayOutbound() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-
-        try
-        {
-            client.send("vm://requestresponse-failingoneway-in", "a", null);
-            fail("exception expected");
-        }
-        catch (Exception e)
-        {
-
-        }
+        expectedException.expect(MessagingException.class);
+        expectedException.expectMessage("Unable to process a synchronous event asynchronously");
     }
 
 }

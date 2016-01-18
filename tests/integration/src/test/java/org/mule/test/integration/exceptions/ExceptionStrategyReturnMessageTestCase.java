@@ -10,8 +10,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.component.ComponentException;
+import org.mule.exception.AbstractMessagingExceptionStrategy;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
@@ -28,22 +31,21 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
     @Test
     public void testReturnPayloadDefaultStrategy() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage msg = client.send("vm://in-default-strategy", "Test Message", null);
-
-        assertNotNull(msg);
-        assertNotNull(msg.getExceptionPayload());
-        assertEquals("Functional Test Service Exception", msg.getExceptionPayload().getMessage());
-
-        assertNotNull(msg.getPayload());
-        assertTrue(msg.getPayload() instanceof NullPayload);
+        try
+        {
+            flowRunner("InputService2").withPayload(getTestMuleMessage("Test Message")).run();
+        }
+        catch(ComponentException e)
+        {
+            assertNotNull(e.getEvent().getMessage().getPayload());
+            assertTrue(e.getEvent().getMessage().getPayload() instanceof NullPayload);
+        }
     }
 
     @Test
     public void testReturnPayloadCustomStrategy() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage msg = client.send("vm://in-custom-strategy", "Test Message", null);
+        MuleMessage msg = flowRunner("InputService").withPayload(getTestMuleMessage("Test Message")).run().getMessage();
 
         assertNotNull(msg);
         assertNotNull(msg.getExceptionPayload());
@@ -52,4 +54,21 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
         assertNotNull(msg.getPayload());
         assertEquals("Ka-boom!", msg.getPayload());
     }
+
+    public static class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
+    {
+        @Override
+        public MuleEvent handleException(Exception exception, MuleEvent event)
+        {
+            MuleEvent result = super.handleException(exception, event);
+            result.getMessage().setPayload("Ka-boom!");
+            if (exception instanceof MessagingException)
+            {
+                ((MessagingException)exception).setHandled(true);
+            }
+
+            return result;
+        }
+    }
+
 }

@@ -6,10 +6,10 @@
  */
 package org.mule.test.transformers;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.api.transformer.TransformerException;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
@@ -34,50 +34,44 @@ public class ImplicitTransformationTestCase extends FunctionalTestCase
     public void testImplicitInputStreamToStringConversion() throws Exception
     {
         InputStream inputStream = new StringInputStream("TEST");
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://stringInput", inputStream, null);
-        assertEquals("TSET", response.getPayload());
+        MuleMessage response = flowRunner("StringEchoService").withPayload(inputStream).run().getMessage();
+        assertThat(response.getPayload(), is("TSET"));
     }
 
     @Test
     public void testImplicitByteArrayToStringConversion() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://stringInput",  "TEST".getBytes(), null);
-        assertEquals("TSET", response.getPayload());
+        MuleMessage response = flowRunner("StringEchoService").withPayload("TEST".getBytes()).run().getMessage();
+        assertThat(response.getPayload(), is("TSET"));
     }
 
     @Test
     public void testImplicitInputStreamToByteArrayConversion() throws Exception
     {
         InputStream inputStream = new StringInputStream("TEST");
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://byteArrayInput", inputStream, null);
-        assertEquals("TSET", response.getPayload());
+        MuleMessage response = flowRunner("ByteArrayEchoService").withPayload(inputStream).run().getMessage();
+        assertThat(response.getPayload(), is("TSET"));
     }
 
     @Test
     public void testImplicitStringToByteArrayConversion() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://byteArrayInput",  "TEST", null);
-        assertEquals("TSET", response.getPayload());
+        MuleMessage response = flowRunner("ByteArrayEchoService").withPayload("TEST").run().getMessage();
+        assertThat(response.getPayload(), is("TSET"));
     }
 
     @Test
     public void testImplicitStringToInputStreamConversion() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://inputStreamInput", "TEST", null);
-        assertEquals("TSET", response.getPayload());
+        MuleMessage response = flowRunner("InputStreamEchoService").withPayload("TEST").run().getMessage();
+        assertThat(response.getPayload(), is("TSET"));
     }
 
     @Test
     public void testImplicitByteArrayToInputStreamConversion() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://inputStreamInput",  "TEST".getBytes(), null);
-        assertEquals("TSET", response.getPayload());
+        MuleMessage response = flowRunner("InputStreamEchoService").withPayload("TEST".getBytes()).run().getMessage();
+        assertThat(response.getPayload(), is("TSET"));
     }
 
     public static class TestStringTransformer extends AbstractTransformer

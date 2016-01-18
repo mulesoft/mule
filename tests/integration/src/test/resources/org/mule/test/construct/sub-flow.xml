@@ -1,55 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="ProcessorChainViaProcessorRef">
-        <vm:inbound-endpoint path="ProcessorChainViaProcessorRef" exchange-pattern="request-response"/>
         <append-string-transformer message="1"/>
         <processor ref="chain"/>
         <append-string-transformer message="2"/>
     </flow>
 
     <flow name="ProcessorChainViaFlowRef">
-        <vm:inbound-endpoint path="ProcessorChainViaFlowRef" exchange-pattern="request-response"/>
         <append-string-transformer message="1"/>
         <flow-ref name="chain"/>
         <append-string-transformer message="2"/>
     </flow>
 
     <flow name="SubFlowViaProcessorRef">
-        <vm:inbound-endpoint path="SubFlowViaProcessorRef" exchange-pattern="request-response"/>
         <append-string-transformer message="1"/>
         <processor ref="sub-flow"/>
         <append-string-transformer message="2"/>
     </flow>
 
     <flow name="SubFlowViaFlowRef">
-        <vm:inbound-endpoint path="SubFlowViaFlowRef" exchange-pattern="request-response"/>
         <append-string-transformer message="1"/>
         <flow-ref name="sub-flow"/>
         <append-string-transformer message="2"/>
     </flow>
 
     <flow name="FlowViaFlowRef">
-        <vm:inbound-endpoint path="FlowViaFlowRef" exchange-pattern="request-response"/>
         <append-string-transformer message="1"/>
         <flow-ref name="childFlow"/>
         <append-string-transformer message="2"/>
     </flow>
 
     <flow name="ServiceViaFlowRef">
-        <vm:inbound-endpoint path="ServiceViaFlowRef" exchange-pattern="request-response"/>
         <append-string-transformer message="1"/>
         <flow-ref name="service"/>
         <append-string-transformer message="2"/>
     </flow>
 
     <flow name="flowWithsubFlowWithComponent">
-        <vm:inbound-endpoint path="flowWithsubFlowWithComponent" exchange-pattern="request-response"/>
         <flow-ref name="subFlowWithComponent"/>
     </flow>
 
@@ -58,29 +49,21 @@
     </processor-chain>
 
     <flow name="flowWithSameSubFlowTwice">
-        <vm:inbound-endpoint path="flowWithSameSubFlowTwice"
-                             exchange-pattern="request-response"/>
         <flow-ref name="sub-flow"/>
         <flow-ref name="sub-flow"/>
     </flow>
 
     <flow name="flowWithSameSubFlowSingletonTwice">
-        <vm:inbound-endpoint path="flowWithSameSubFlowSingletonTwice"
-                             exchange-pattern="request-response"/>
         <flow-ref name="sub-flow-singleton"/>
         <flow-ref name="sub-flow-singleton"/>
     </flow>
 
     <flow name="flowWithSameGlobalChainTwice">
-        <vm:inbound-endpoint path="flowWithSameGlobalChainTwice"
-                             exchange-pattern="request-response"/>
         <flow-ref name="chain"/>
         <flow-ref name="chain"/>
     </flow>
 
     <flow name="flowWithSameGlobalChainSingletonTwice">
-        <vm:inbound-endpoint path="flowWithSameGlobalChainSingletonTwice"
-                             exchange-pattern="request-response"/>
         <flow-ref name="chain-singleton"/>
         <flow-ref name="chain-singleton"/>
     </flow>
@@ -132,7 +115,6 @@
     </sub-flow>
 
     <flow name="service">
-        <inbound-endpoint address="vm://null"/>
         <test:component appendString="xyz"/>
     </flow>
 

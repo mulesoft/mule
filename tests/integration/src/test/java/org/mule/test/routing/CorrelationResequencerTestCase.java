@@ -8,8 +8,8 @@ package org.mule.test.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEventContext;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -35,7 +35,7 @@ public class CorrelationResequencerTestCase extends FunctionalTestCase
     {
         super.doSetUp();
 
-        FunctionalTestComponent testComponent = getFunctionalTestComponent("test validator");
+        FunctionalTestComponent testComponent = getFunctionalTestComponent("sorted");
         testComponent.setEventCallback(new EventCallback()
         {
             @Override
@@ -49,12 +49,11 @@ public class CorrelationResequencerTestCase extends FunctionalTestCase
     @Test
     public void testResequencer() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://splitter", Arrays.asList("a", "b", "c", "d", "e", "f"), null);
+        flowRunner("splitter").withPayload(Arrays.asList("a", "b", "c", "d", "e", "f")).asynchronously().run();
 
-        FunctionalTestComponent resequencer = getFunctionalTestComponent("test validator");
+        FunctionalTestComponent resequencer = getFunctionalTestComponent("sorted");
 
-        assertTrue(receiveLatch.await(30, TimeUnit.SECONDS));
+        assertTrue(receiveLatch.await(3000, TimeUnit.SECONDS));
 
         assertEquals("Wrong number of messages received.", 6, resequencer.getReceivedMessagesCount());
         assertEquals("Sequence wasn't reordered.", "a", resequencer.getReceivedMessage(1));

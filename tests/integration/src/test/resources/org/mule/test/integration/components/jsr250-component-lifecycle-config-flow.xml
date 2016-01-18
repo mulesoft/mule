@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans" 
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
     <flow name="MulePrototypeService">
-        <vm:inbound-endpoint path="MulePrototypeService.In" exchange-pattern="request-response"/>
         <component>
             <prototype-object class="org.mule.lifecycle.JSR250LifecycleTrackerComponent">
                 <property key="property" value="mps"/>
@@ -18,7 +15,6 @@
     </flow>
 
     <flow name="MulePooledPrototypeService">
-        <vm:inbound-endpoint path="MulePooledPrototypeService.In" exchange-pattern="request-response"/>
         <pooled-component>
             <prototype-object class="org.mule.lifecycle.JSR250LifecycleTrackerComponent">
                 <property key="property" value="mpps"/>
@@ -28,7 +24,6 @@
     </flow>
 
     <flow name="MulePooledSingletonService">
-        <vm:inbound-endpoint path="MulePooledSingletonService.In" exchange-pattern="request-response"/>
         <pooled-component>
             <singleton-object class="org.mule.lifecycle.JSR250LifecycleTrackerComponent">
                 <property key="property" value="mpps"/>
@@ -38,7 +33,6 @@
     </flow>
 
     <flow name="MuleSingletonService">
-        <vm:inbound-endpoint path="MuleSingletonService.In" exchange-pattern="request-response"/>
         <component>
             <singleton-object class="org.mule.lifecycle.JSR250LifecycleTrackerComponent">
                 <property key="property" value="mss"/>

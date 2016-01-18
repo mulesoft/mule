@@ -9,6 +9,7 @@ package org.mule.test.routing;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
@@ -38,7 +39,9 @@ public class ForEachSessionVarTestCase extends FunctionalTestCase
         Collection<String> expectedArray = new ArrayList<>();
         expectedArray.add("Hello World A");
         expectedArray.add("Hello World B");
-        muleContext.getClient().send("vm://in", getTestMuleMessage());
+        
+        flowRunner("test-foreachFlow1").withPayload(getTestMuleMessage()).run();
+        
         //propierty should exist in the session and the message
         assertThat(event.getSession().<Collection<String>>getProperty(MY_SESSION_LIST), is(expectedArray));
         assertThat(event.getMessage().<Collection<String>>getProperty(MY_SESSION_LIST, PropertyScope.SESSION), is(expectedArray));

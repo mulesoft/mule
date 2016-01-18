@@ -42,28 +42,28 @@ public class RegexFilterTestCase extends FunctionalTestCase
     @Test
     public void matchesUsingDefaultPayload() throws Exception
     {
-        MuleEvent event = runFlow("default-payload-value", "run with the mules");
+        MuleEvent event = flowRunner("default-payload-value").withPayload("run with the mules").run();
         assertThat(event, is(notNullValue()));
     }
 
     @Test
     public void notMatchesUsingDefaultPayload() throws Exception
     {
-        MuleEvent event = runFlow("default-payload-value", "run with the zebras");
+        MuleEvent event = flowRunner("default-payload-value").withPayload("run with the zebras").run();
         assertThat(event, is(nullValue()));
     }
 
     @Test
     public void matchesConfiguringValue() throws Exception
     {
-        MuleEvent event = runFlow("matches-configuring-value", payloadMap);
+        MuleEvent event = flowRunner("matches-configuring-value").withPayload(payloadMap).run();
         assertThat(event, is(notNullValue()));
     }
 
     @Test
     public void notMatchesConfiguringValue() throws Exception
     {
-        MuleEvent event = runFlow("not-matches-configuring-value", payloadMap);
+        MuleEvent event = flowRunner("not-matches-configuring-value").withPayload(payloadMap).run();
         assertThat(event, is(nullValue()));
     }
 
@@ -71,7 +71,7 @@ public class RegexFilterTestCase extends FunctionalTestCase
     public void notMatchesConfiguringNonStringValue() throws Exception
     {
         payloadMap.remove("goodValue");
-        MuleEvent event = runFlow("not-matches-configuring-non-string-value", payloadMap);
+        MuleEvent event = flowRunner("not-matches-configuring-non-string-value").withPayload(payloadMap).run();
         assertThat(event, is(nullValue()));
     }
 

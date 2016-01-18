@@ -2,17 +2,17 @@
 
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <endpoint name="queue" address="test://queue"/>
 
     <flow name="main">
-        <vm:inbound-endpoint path="testIn" exchange-pattern="request-response">
+        <inbound-endpoint ref="queue" exchange-pattern="request-response">
             <xa-transaction action="ALWAYS_BEGIN" timeout="5000"/>
-        </vm:inbound-endpoint>
+        </inbound-endpoint>
 
         <echo-component/>
     </flow>

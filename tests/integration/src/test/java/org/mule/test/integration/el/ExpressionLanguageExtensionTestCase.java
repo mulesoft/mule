@@ -31,7 +31,7 @@ public class ExpressionLanguageExtensionTestCase extends FunctionalTestCase
         ExpressionLanguage originalExpressionLanguage = ((DefaultExpressionManager) muleContext.getExpressionManager()).getExpressionLanguage();
 
         LocalMuleClient client = muleContext.getClient();
-        client.send("vm://testInput", TEST_MESSAGE, null);
+        flowRunner("createsExpressionLanguage").withPayload(TEST_MESSAGE).run();
 
         ExpressionLanguage newExpressionLanguage = ((DefaultExpressionManager) muleContext.getExpressionManager()).getExpressionLanguage();
 

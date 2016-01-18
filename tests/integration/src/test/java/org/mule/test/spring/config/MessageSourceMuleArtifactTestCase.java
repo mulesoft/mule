@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 
 public class MessageSourceMuleArtifactTestCase extends AbstractMuleTestCase
 {
-    private static final String VM_SCHEMA_URL = "http://www.mulesoft.org/schema/mule/vm";
+    private static final String TEST_SCHEMA_URL = "http://www.mulesoft.org/schema/mule/test";
 
     @Test
     public void createsMessageSourceArtifact() throws MuleArtifactFactoryException, DocumentException
@@ -41,9 +41,9 @@ public class MessageSourceMuleArtifactTestCase extends AbstractMuleTestCase
         map.put("test", "test1");
         when(callback.getEnvironmentProperties()).thenReturn(map);
         when(callback.getPropertyPlaceholders()).thenReturn(new Element[] {});
-        when(callback.getSchemaLocation(VM_SCHEMA_URL)).thenReturn("http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd");
-        Element element = createElement("inbound-endpoint", VM_SCHEMA_URL, "vm");
-        element.setAttribute("path", "/test");
+        when(callback.getSchemaLocation(TEST_SCHEMA_URL)).thenReturn("http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd");
+        Element element = createElement("component", TEST_SCHEMA_URL, "test");
+        element.setAttribute("throwException", "true");
 
         MuleArtifact artifact = factory.getArtifactForMessageProcessor(element, callback);
 

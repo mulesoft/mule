@@ -7,8 +7,8 @@
 package org.mule.test.integration.resolvers;
 
 import static org.junit.Assert.assertEquals;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Map;
@@ -16,15 +16,15 @@ import java.util.Map;
 public abstract class AbstractEntryPointResolverTestCase extends FunctionalTestCase
 {
 
-    protected void doTest(String path, Object payload, String result) throws Exception
+    protected void doTest(String flowName, Object payload, String result) throws Exception
     {
-        doTest(path, payload, result, null);
+        doTest(flowName, payload, result, null);
     }
 
-    protected void doTest(String path, Object payload, String result, Map properties) throws Exception
+    protected void doTest(String flowName, Object payload, String result, Map properties) throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://" + path, payload, properties);
+        MuleMessage message = new DefaultMuleMessage(payload, properties, null, null, muleContext);
+        MuleMessage response = flowRunner(flowName).withPayload(message).run().getMessage();
         assertEquals(result, getPayloadAsString(response));
     }
 }

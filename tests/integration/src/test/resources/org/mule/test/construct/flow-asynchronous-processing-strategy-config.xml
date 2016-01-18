@@ -1,75 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xsi:schemaLocation="
+      xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
 
-    <vm:connector name="vm">
-        <service-overrides
-            dispatcherFactory="org.mule.test.construct.FlowDefaultProcessingStrategyTestCase$ThreadSensingVMMessageDispatcherFactory"
-            messageReceiver="org.mule.test.construct.FlowDefaultProcessingStrategyTestCase$ThreadSensingVMMessageReceiver" />
-    </vm:connector>
-
     <custom-processor name="threadSensingProcessor"
-        class="org.mule.test.construct.FlowDefaultProcessingStrategyTestCase$ThreadSensingMessageProcessor" />
+                      class="org.mule.test.construct.FlowDefaultProcessingStrategyTestCase$ThreadSensingMessageProcessor" />
 
 
-    <flow name="OneWay" processingStrategy="asynchronous">
-        <vm:inbound-endpoint path="oneway-in" />
-        <processor ref="threadSensingProcessor" />
-        <vm:outbound-endpoint path="oneway-out" />
-    </flow>
-
-    <flow name="OneWayTx" processingStrategy="asynchronous">
-        <vm:inbound-endpoint path="oneway-tx-in" exchange-pattern="one-way">
-            <vm:transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-        <processor ref="threadSensingProcessor" />
-        <vm:outbound-endpoint path="oneway-tx-out" exchange-pattern="one-way">
-            <vm:transaction action="JOIN_IF_POSSIBLE"/>
-        </vm:outbound-endpoint>
-    </flow>
-    
-    <flow name="OneWayOutboundTx" processingStrategy="asynchronous">
-        <vm:inbound-endpoint path="oneway-outboundtx-in" exchange-pattern="one-way"/>
-        <processor ref="threadSensingProcessor" />
-        <vm:outbound-endpoint path="oneway-outboundtx-out" exchange-pattern="one-way">
-            <vm:transaction action="JOIN_IF_POSSIBLE" />
-        </vm:outbound-endpoint>
-    </flow>
-    
-    <flow name="OneWayInboundTx" processingStrategy="asynchronous">
-        <vm:inbound-endpoint path="oneway-inboundtx-in" exchange-pattern="one-way">
-            <vm:transaction action="ALWAYS_BEGIN" />
-        </vm:inbound-endpoint>
-        <processor ref="threadSensingProcessor" />
-        <vm:outbound-endpoint path="oneway-inboundtx-out" exchange-pattern="one-way"/>
-        <default-exception-strategy >
-            <commit-transaction exception-pattern="*"/>
-            <vm:outbound-endpoint path="dead-letter-queue"/>
-        </default-exception-strategy>
-    </flow>
-    
-    <flow name="RequestResponse" processingStrategy="asynchronous">
-        <vm:inbound-endpoint path="requestresponse-in" exchange-pattern="request-response" />
-        <processor ref="threadSensingProcessor" />
-    </flow>
-
-    <flow name="RequestResponseOneWayOutbound" processingStrategy="asynchronous">
-        <vm:inbound-endpoint path="requestresponse-oneway-in" exchange-pattern="request-response" />
-        <processor ref="threadSensingProcessor" />
-        <vm:outbound-endpoint path="requestresponse-oneway-out" exchange-pattern="one-way" />
-    </flow>
-
-    <flow name="RequestResponseFailingOneWayOutbound" processingStrategy="asynchronous">
-        <vm:inbound-endpoint path="requestresponse-failingoneway-in" exchange-pattern="request-response" />
-        <processor ref="threadSensingProcessor" />
-        <outbound-endpoint address="test://AlwaysFail" exchange-pattern="one-way" />
+    <flow name="Flow" processingStrategy="asynchronous">
+        <processor ref="threadSensingProcessor"/>
+        <test:queue name="out"/>
     </flow>
 
 </mule>

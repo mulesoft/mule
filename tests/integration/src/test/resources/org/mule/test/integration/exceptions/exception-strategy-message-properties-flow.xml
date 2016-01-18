@@ -1,23 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <vm:connector name="vmQueues"/>
-
     <flow name="inbound">
-        <vm:inbound-endpoint path="in"/>
         <test:component throwException="true"/>
-        <default-exception-strategy>
-            <vm:outbound-endpoint path="error" exchange-pattern="one-way">
-                <message-properties-transformer scope="outbound">
-                    <add-message-property key="foo" value="#[message.inboundProperties.foo]" />
-                </message-properties-transformer>
-            </vm:outbound-endpoint>
-        </default-exception-strategy>
+        <catch-exception-strategy>
+            <message-properties-transformer scope="outbound">
+                <add-message-property key="prop" value="#[message.inboundProperties.foo]" />
+            </message-properties-transformer>
+            <test:queue name="out"/>
+        </catch-exception-strategy>
     </flow>
 
 </mule>

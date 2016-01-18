@@ -1,78 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:mule="http://www.mulesoft.org/schema/mule/core"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <custom-transformer name="validateResponse"
         class="org.mule.functional.transformer.ValidateResponse" />
 
-
     <flow name="ComponentException">
-
-        <vm:inbound-endpoint exchange-pattern="request-response"
-            path="in1" />
-
         <!-- Component throws an exception -->
         <test:component throwException="true" />
     </flow>
 
-    <flow name="OutboundRoutingException">
-
-        <vm:inbound-endpoint exchange-pattern="request-response"
-            path="in2" />
-
-
-        <!-- Router throws an exception -->
-        <outbound-endpoint address="vm://service999"
-            exchange-pattern="request-response" />
-
+    <flow name="FlowRefInvalidException">
+        <flow-ref name="#['service999']"/>
     </flow>
 
-    <flow name="InboundTransformerException">
-
+    <flow name="TransformerException">
         <!-- Transformer throws an exception -->
-        <vm:inbound-endpoint exchange-pattern="request-response"
-            path="in3" transformer-refs="validateResponse" />
-
+        <transformer ref="validateResponse" />
         <test:component />
     </flow>
-
-    <flow name="OutboundTransformerException">
-
-        <vm:inbound-endpoint exchange-pattern="request-response"
-            path="in4" />
-
-
-        <!-- Transformer throws an exception -->
-        <outbound-endpoint address="vm://service1"
-            exchange-pattern="request-response" transformer-refs="validateResponse" />
-
-    </flow>
-
-    <flow name="ResponseTransformerException">
-
-        <vm:inbound-endpoint exchange-pattern="request-response"
-            path="in5" />
-
-
-        <!-- Response transformer throws an exception -->
-        <outbound-endpoint address="vm://service1"
-            exchange-pattern="request-response"
-            responseTransformer-refs="validateResponse" />
-
-
-    </flow>
-
-    <flow name="Service1">
-
-        <inbound-endpoint exchange-pattern="request-response"
-            address="vm://service1" />
-
-        <echo-component />
-    </flow>
-
 </mule>

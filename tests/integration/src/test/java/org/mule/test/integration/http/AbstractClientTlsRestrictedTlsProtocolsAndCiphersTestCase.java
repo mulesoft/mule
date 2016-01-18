@@ -115,7 +115,7 @@ public abstract class AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase 
 
         try
         {
-            runFlow("requestFlow", TEST_MESSAGE);
+            flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
         }
         finally
         {

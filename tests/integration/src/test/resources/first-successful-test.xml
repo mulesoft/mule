@@ -3,15 +3,12 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="test-router">
-        <vm:inbound-endpoint path="input" exchange-pattern="request-response"/>
         <first-successful>
             <processor-chain>
                 <message-filter throwOnUnaccepted="true">
@@ -35,7 +32,6 @@
     </flow>
 
     <flow name="test-router2">
-        <vm:inbound-endpoint path="input2" exchange-pattern="request-response" />
         <first-successful failureExpression="#[payload.contains('is a number')]">
             <test:component appendString=" is a number" />
             <test:component appendString=" is a string" />
@@ -43,7 +39,6 @@
     </flow>
 
     <flow name="test-router3">
-        <vm:inbound-endpoint path="input3" exchange-pattern="request-response" />
         <first-successful failureExpression="#[payload.contains('is a ')]">
             <test:component appendString=" is a number" />
             <test:component appendString=" is a string" />
@@ -51,15 +46,13 @@
     </flow>
 
     <flow name="test-router4">
-        <vm:inbound-endpoint path="input4.in" />
         <first-successful>
             <outbound-endpoint address="test://AlwaysFail"/>
-            <vm:outbound-endpoint path="handler4.in" />
+            <flow-ref name="test-router4-handler"/>
         </first-successful>
     </flow>
 
     <flow name="test-router4-handler">
-        <vm:inbound-endpoint path="handler4.in"/>
-        <vm:outbound-endpoint path="output4.out"/>
+        <test:queue name="output4.out"/>
     </flow>
 </mule>

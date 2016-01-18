@@ -46,9 +46,9 @@ public class AggregationTimeoutTestCase extends FunctionalTestCase
         try
         {
             LocalMuleClient client = muleContext.getClient();
-            client.dispatch("vm://testIn", inputData, null);
+            flowRunner("main").withPayload(inputData).asynchronously().run();
 
-            MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+            MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
             assertThat(response.getPayload(), instanceOf(List.class));
 
             List<String> payloads = ((List<MuleMessage>) response.getPayload()).stream().map(m -> (String) m

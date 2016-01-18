@@ -1,36 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm" 
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-
-    <vm:connector name="vm"/>
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="Distributor">
-        <vm:inbound-endpoint path="distributor.queue" exchange-pattern="request-response"/>
         <all>
-            <vm:outbound-endpoint path="service1.queue" exchange-pattern="request-response"/>
-            <vm:outbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
-            <vm:outbound-endpoint path="service3.queue" exchange-pattern="request-response"/>
+            <flow-ref name="ServiceOne"/>
+            <async>
+                <flow-ref name="ServiceTwo"/>
+            </async>
+            <flow-ref name="ServiceThree"/>
         </all>
     </flow>
 
     <flow name="ServiceOne">
-        <vm:inbound-endpoint path="service1.queue" exchange-pattern="request-response"/>
         <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Fruit]"/>
     </flow>
 
     <flow name="ServiceTwo">
-        <vm:inbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
         <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Fruit]"/>
     </flow>
 
     <flow name="ServiceThree">
-        <vm:inbound-endpoint path="service3.queue" exchange-pattern="request-response"/>
         <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Fruit]"/>
     </flow>
 

@@ -9,12 +9,11 @@ package org.mule.test.integration.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.client.MuleClient;
-import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.functional.functional.FunctionalTestNotification;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.listener.FlowExecutionListener;
 import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
@@ -96,21 +95,11 @@ public class MessageChunkingTestCase extends FunctionalTestCase
 
         // Listen to Message Notifications on the Chunking receiver so we can
         // determine how many message parts have been received
-        muleContext.registerListener(new EndpointMessageNotificationListener<EndpointMessageNotification>()
-        {
-            @Override
-            public void onNotification(EndpointMessageNotification notification)
-            {
-                if (notification.getAction() == EndpointMessageNotification.MESSAGE_RECEIVED)
-                {
-                    messagePartsCount.getAndIncrement();
-                }
-                assertEquals("ChunkingObjectReceiver", notification.getResourceIdentifier());
-            }
-        }, "ChunkingObjectReceiver");
+        FlowExecutionListener flowExecutionListener = new FlowExecutionListener("ChunkingObjectReceiver", muleContext);
+        flowExecutionListener.addListener(source -> messagePartsCount.getAndIncrement());
 
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://inbound.object.channel", simpleSerializableObject, null);
+        flowRunner("ObjectReceiver").withPayload(simpleSerializableObject).asynchronously().run();
         // Wait for the message to be received and tested (in the listener above)
         assertTrue(chunkingReceiverLatch.await(20L, TimeUnit.SECONDS));
         // Ensure we processed expected number of message parts
@@ -141,21 +130,9 @@ public class MessageChunkingTestCase extends FunctionalTestCase
 
         // Listen to Message Notifications on the Chunking receiver so we can
         // determine how many message parts have been received
-        muleContext.registerListener(new EndpointMessageNotificationListener<EndpointMessageNotification>()
-        {
-            @Override
-            public void onNotification(EndpointMessageNotification notification)
-            {
-                if (notification.getAction() == EndpointMessageNotification.MESSAGE_RECEIVED)
-                {
-                    messagePartsCount.getAndIncrement();
-                }
-                assertEquals("ChunkingReceiver", notification.getResourceIdentifier());
-            }
-        }, "ChunkingReceiver");
-
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://inbound.channel", data, null);
+        FlowExecutionListener flowExecutionListener = new FlowExecutionListener("ChunkingReceiver", muleContext);
+        flowExecutionListener.addListener(source -> messagePartsCount.getAndIncrement());
+        flowRunner("Receiver").withPayload(data).asynchronously().run();
         // Wait for the message to be received and tested (in the listener above)
         assertTrue(chunkingReceiverLatch.await(20L, TimeUnit.SECONDS));
         // Ensure we processed expected number of message parts

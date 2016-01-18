@@ -2,10 +2,8 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
 
     <mxml:dom-to-xml-transformer
             ignoreBadInput="true"
@@ -53,47 +51,4 @@
         </mxml:xslt-text>
         <mxml:context-property key="bar" value="#[header:foo]"/>
     </mxml:xslt-transformer>
-
-    <!-- Check transformer elements canbe embedded in endpoint config -->
-    <endpoint name="ep1" address="vm://1" exchange-pattern="one-way">
-        <mxml:dom-to-xml-transformer/>
-    </endpoint>
-
-    <endpoint name="ep3" address="vm://3" exchange-pattern="one-way">
-        <mxml:object-to-xml-transformer acceptMuleMessage="true"/>
-    </endpoint>
-
-    <endpoint name="ep4" address="vm://4" exchange-pattern="one-way">
-        <mxml:xml-to-dom-transformer/>
-    </endpoint>
-
-    <endpoint name="ep5" address="vm://5" exchange-pattern="one-way">
-        <mxml:xml-to-object-transformer/>
-    </endpoint>
-
-    <endpoint name="ep6" address="vm://6" exchange-pattern="one-way">
-        <mxml:xslt-transformer
-                ignoreBadInput="true"
-                returnClass="java.lang.Object"
-                name="xslt2"
-                outputEncoding="foo"
-                maxActiveTransformers="10"
-                maxIdleTransformers="10"
-                transformerFactoryClass="org.mule.module.xml.config.CustomXsltTransformerFactory">
-            <mxml:xslt-text>
-                <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-                    <!-- test for this string in test -->
-                    <!-- Whenever you match any node or any attribute -->
-                    <xsl:template match="node()|@*">
-                        <!-- Copy the current node -->
-                        <xsl:copy>
-                            <!-- Including any attributes it has and any child nodes -->
-                            <xsl:apply-templates select="@*|node()"/>
-                        </xsl:copy>
-                    </xsl:template>
-                </xsl:stylesheet>
-            </mxml:xslt-text>
-            <mxml:context-property key="bar" value="#[header:foo]"/>
-        </mxml:xslt-transformer>
-    </endpoint>
 </mule>

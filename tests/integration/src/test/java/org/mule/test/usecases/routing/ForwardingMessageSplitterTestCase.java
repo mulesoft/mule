@@ -6,8 +6,10 @@
  */
 package org.mule.test.usecases.routing;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -35,16 +37,16 @@ public class ForwardingMessageSplitterTestCase extends FunctionalTestCase
         payload.add("hello");
         payload.add(new Integer(3));
         payload.add(new Exception());
-        client.send("vm://in.queue", payload, null);
-        MuleMessage m = client.request("vm://component.1", 2000);
+        flowRunner("forwardingSplitter").withPayload(payload).asynchronously().run();
+        MuleMessage m = client.request("test://component.1", RECEIVE_TIMEOUT);
         assertNotNull(m);
-        assertTrue(m.getPayload() instanceof String);
-        m = client.request("vm://component.2", 2000);
+        assertThat(m.getPayload(), instanceOf(String.class));
+        m = client.request("test://component.2", RECEIVE_TIMEOUT);
         assertNotNull(m);
-        assertTrue(m.getPayload() instanceof Integer);
+        assertThat(m.getPayload(), instanceOf(Integer.class));
 
-        m = client.request("vm://error.queue", 2000);
+        m = client.request("test://error.queue", RECEIVE_TIMEOUT);
         assertNotNull(m);
-        assertTrue(m.getPayload() instanceof Exception);
+        assertThat(m.getPayload(), instanceOf(Exception.class));
     }
 }

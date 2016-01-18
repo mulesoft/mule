@@ -3,21 +3,16 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-
-    <vm:endpoint path="foo" exchange-pattern="request-response" name="foo"/>
+               ">
 
     <spring:beans>
         <spring:bean class="org.mule.test.integration.watermark.WatermarkPollingTestCase$PollStopper"/>
     </spring:beans>
 
-
     <flow name="echo">
-        <inbound-endpoint ref="foo"/>
         <static-component>
             <return-data>foo</return-data>
         </static-component>
@@ -36,7 +31,7 @@
         <poll frequency="1000">
             <processor-chain>
                 <set-payload value="pollWithoutWatermark"/>
-                <outbound-endpoint ref="foo"/>
+                <flow-ref name="echo"/>
             </processor-chain>
         </poll>
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
@@ -45,7 +40,7 @@
     <flow name="nameNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test1" default-expression="#['noKey']"/>
-            <outbound-endpoint ref="foo"/>
+            <flow-ref name="echo"/>
         </poll>
         <logger message="Executed With watermark"/>
     </flow>
@@ -53,7 +48,7 @@
     <flow name="changeWatermarkWihtNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test2" default-expression="#['noKey']"/>
-            <outbound-endpoint ref="foo"/>
+            <flow-ref name="echo"/>
         </poll>
         <set-variable variableName="test2" value="keyPresent"/>
         <logger level="ERROR" message="Executed With watermark #[test2]"/>
@@ -63,7 +58,7 @@
     <flow name="usingWatermarkFlow" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test3" default-expression="#['noKey']"/>
-            <outbound-endpoint ref="foo"/>
+            <flow-ref name="echo"/>
         </poll>
         <set-payload value="#[test3]"/>
         <set-variable variableName="test3" value="keyPresent"/>
@@ -74,7 +69,7 @@
     <flow name="usingWatermarkFlowWithNullValue" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="testNull" default-expression="#[null]" update-expression="#['noWatermark']"/>
-            <outbound-endpoint ref="foo"/>
+            <flow-ref name="echo"/>
         </poll>
         <choice>
             <when expression="#[testNull != null]">
@@ -91,7 +86,7 @@
     <flow name="usingWatermarkFlowWithNullUpdateValue" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="testUpdateAsNull" default-expression="#['defaultValue']" update-expression="#[null]"/>
-            <outbound-endpoint ref="foo"/>
+            <flow-ref name="echo"/>
         </poll>
 
         <set-payload value="#[testUpdateAsNull]"/>
@@ -101,7 +96,7 @@
     <flow name="watermarkWithKeyAsAnExpression" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="#['test4']" default-expression="#['noKey']"/>
-            <outbound-endpoint ref="foo"/>
+            <flow-ref name="echo"/>
         </poll>
         <set-variable variableName="test4" value="keyPresent"/>
     </flow>
@@ -110,7 +105,7 @@
     <flow name="watermarkWithUpdateExpression" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test5" default-expression="#['noKey']" update-expression="#[payload]"/>
-            <outbound-endpoint ref="foo"/>
+            <flow-ref name="echo"/>
         </poll>
         <set-payload value="#['valueUpdated']"/>
         <set-variable variableName="test5" value="keyPresent"/>
@@ -121,7 +116,7 @@
     <flow name="watermarkWithAnnotations" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test6" default-expression="#['noKey']" doc:name="watermark"/>
-            <outbound-endpoint ref="foo"/>
+            <flow-ref name="echo"/>
         </poll>
         <set-payload value="#['valueUpdated']"/>
     </flow>
@@ -129,7 +124,7 @@
     <flow name="watermarkWithAsyncProcessing">
         <poll frequency="1000">
             <watermark variable="test6" default-expression="#['noKey']"/>
-            <outbound-endpoint ref="foo"/>
+            <flow-ref name="echo"/>
         </poll>
         <set-payload value="#['valueUpdated']"/>
         <set-variable variableName="test6" value="keyPresent"/>
@@ -139,7 +134,7 @@
     <flow name="watermarkWithObjectStore" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test8" default-expression="#['noKey']" update-expression="#[payload]" object-store-ref="_defaultInMemoryObjectStore"/>
-            <outbound-endpoint ref="foo"/>
+            <flow-ref name="echo"/>
         </poll>
         <set-payload value="#['valueUpdated']"/>
         <set-variable variableName="test8" value="keyPresent"/>
@@ -149,7 +144,7 @@
     <flow name="failingFlowWithWatermark" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test6" default-expression="#['noKey']" update-expression="#[payload]"/>
-            <outbound-endpoint ref="foo"/>
+            <flow-ref name="echo"/>
         </poll>
         <set-payload value="#['valueUpdated']"/>
         <set-payload value="#[sing:valueU]"/>
@@ -160,7 +155,7 @@
     <flow name="failingFlowCachedExceptionWatermark" processingStrategy="synchronous">
         <poll frequency="1000">
             <watermark variable="test7" default-expression="#['noKey']"/>
-            <outbound-endpoint ref="foo"/>
+            <flow-ref name="echo"/>
         </poll>
         <set-payload value="#[sing:valueU]"/>
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>

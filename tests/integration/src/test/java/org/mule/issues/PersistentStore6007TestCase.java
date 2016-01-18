@@ -65,7 +65,7 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
         PersistentObjectStore.addEvents(muleContext);
         muleContext.start();
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://input", "Hello", null);
+        MuleMessage result = flowRunner("input").withPayload("Hello").run().getMessage();
         assertEquals("Hello", result.getPayload());
         assertTrue(latch.await(5000, TimeUnit.MILLISECONDS));
     }

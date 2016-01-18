@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
@@ -13,47 +15,23 @@
 
         <echo-component />
 
-        <request-reply>
-            <outbound-endpoint address="vm://getReportW10"
-                exchange-pattern="one-way">
-                    <message-properties-transformer scope="outbound">
-                        <delete-message-property key="MULE_REPLYTO"/>
-                    </message-properties-transformer>
-                </outbound-endpoint>
-            <inbound-endpoint address="vm://W10Response"
-                exchange-pattern="one-way" />
-        </request-reply>
-
-
+        <message-properties-transformer scope="outbound">
+            <delete-message-property key="MULE_REPLYTO"/>
+        </message-properties-transformer>
+        <flow-ref name="W10Report"/>
     </flow>
 
     <flow name="W10Report">
-
-        <inbound-endpoint address="vm://getReportW10"
-                          exchange-pattern="one-way" >
-        </inbound-endpoint>
-
         <echo-component />
-
-        <outbound-endpoint address="vm://getFO"
-            exchange-pattern="one-way" />
+        <flow-ref name="W10FO"/>
     </flow>
 
     <flow name="W10FO">
-
-        <inbound-endpoint address="vm://getFO"
-            exchange-pattern="one-way">
-            <byte-array-to-string-transformer />
-        </inbound-endpoint>
+        <byte-array-to-string-transformer />
 
         <component class="org.mule.functional.testmodels.services.TestReceiver" />
 
-        <all>
-            <outbound-endpoint address="vm://someOtherQueue"
-                exchange-pattern="one-way" />
-            <outbound-endpoint address="vm://W10Response"
-                exchange-pattern="one-way" />
-        </all>
+        <test:queue name="someOtherQueue" />
 
     </flow>
 

@@ -16,7 +16,7 @@ public class RetrievePropertyTransformer extends AbstractMessageTransformer
     @Override
     public Object transformMessage(MuleEvent event, String encoding)
     {
-        Object storedProperty = event.getMessage().getInboundProperty(property);
+        Object storedProperty = event.getMessage().getOutboundProperty(property);
         return storedProperty != null ? storedProperty.getClass().getName() : null;
     }
 

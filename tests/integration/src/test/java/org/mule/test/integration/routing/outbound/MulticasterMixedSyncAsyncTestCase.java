@@ -10,8 +10,8 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -32,9 +32,9 @@ public class MulticasterMixedSyncAsyncTestCase extends FunctionalTestCase
     @Test
     public void testMixedMulticast() throws Exception
     {
-        MuleClient client = muleContext.getClient();
         Apple apple = new Apple();
-        MuleMessage result = client.send("vm://distributor.queue", apple, null);
+
+        MuleMessage result = flowRunner("Distributor").withPayload(apple).run().getMessage();
 
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof List);

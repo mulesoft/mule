@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
         xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <processor-chain name="composite1">
         <description>Composite thats appands 'ayz'</description>
@@ -18,7 +17,6 @@
     </processor-chain>
 
     <flow name="flow">
-        <vm:inbound-endpoint path="in" exchange-pattern="request-response" />
         <append-string-transformer message="1" />
         <append-string-transformer message="2" />
         <processor ref="composite1" />
@@ -33,60 +31,53 @@
 
     <flow name="flow2">
         <composite-source>
-            <vm:inbound-endpoint path="in2" exchange-pattern="request-response" />
-            <vm:inbound-endpoint path="in3" exchange-pattern="request-response" />
+            <custom-source class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$TestSimpleMessageSource"/>
+            <custom-source class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$TestSimpleMessageSource"/>
         </composite-source>
         <append-string-transformer message="1" />
         <processor ref="composite1" />
     </flow>
     
     <flow name="synchronousFlow" processingStrategy="synchronous">
-        <vm:inbound-endpoint path="synchronous" exchange-pattern="one-way"/>
         <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
-        <vm:outbound-endpoint path="synchronous-out" exchange-pattern="one-way"/>
+        <test:queue name="synchronous-out"/>
     </flow>    
 
     <flow name="asynchronousFlow" processingStrategy="asynchronous">
-        <vm:inbound-endpoint path="asynchronous" exchange-pattern="one-way"/>
         <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
-        <vm:outbound-endpoint path="asynchronous-out" exchange-pattern="one-way"/>
+        <test:queue name="asynchronous-out"/>
     </flow>    
 
     <flow name="queuedAsynchronousFlow" processingStrategy="queued-asynchronous">
-        <vm:inbound-endpoint path="queued-asynchronous" exchange-pattern="one-way"/>
         <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
-        <vm:outbound-endpoint path="queued-asynchronous-out" exchange-pattern="one-way"/>
+        <test:queue name="queued-asynchronous-out"/>
     </flow>    
 
     <flow name="asynchronousAsync" processingStrategy="synchronous">
-        <vm:inbound-endpoint path="asynchronous-async" exchange-pattern="one-way"/>
         <async processingStrategy="asynchronous">
             <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
-            <vm:outbound-endpoint path="asynchronous-async-out" exchange-pattern="one-way"/>
+            <test:queue name="asynchronous-async-out"/>
         </async>
     </flow>    
 
     <flow name="queuedAsynchronousAsync" processingStrategy="synchronous">
-        <vm:inbound-endpoint path="queued-asynchronous-async" exchange-pattern="one-way"/>
         <async processingStrategy="queued-asynchronous">
             <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
-            <vm:outbound-endpoint path="queued-asynchronous-async-out" exchange-pattern="one-way"/>
+            <test:queue name="queued-asynchronous-async-out"/>
         </async>
     </flow>    
 
     <flow name="inout">
-        <vm:inbound-endpoint path="inout-in" exchange-pattern="one-way" />
-        <vm:outbound-endpoint path="inout-out" exchange-pattern="one-way" />
+        <echo-component/>
+        <test:queue name="inout-out"/>
     </flow>
 
     <flow name="inout-append">
-        <vm:inbound-endpoint path="inout-append-in" exchange-pattern="one-way" />
         <append-string-transformer message="inout" />
-        <vm:outbound-endpoint path="inout-append-out" exchange-pattern="one-way" />
+        <test:queue name="inout-append-out"/>
     </flow>
 
     <flow name="split-aggregate">
-        <vm:inbound-endpoint path="split-aggregate-in" exchange-pattern="request-response" />
         <splitter expression="#[payload.fruit]" enableCorrelation="ALWAYS" />
         <script:transformer>
             <script:script engine="groovy">
@@ -95,16 +86,14 @@
             </script:script>
         </script:transformer>
         <collection-aggregator />
-        <vm:outbound-endpoint path="split-aggregate-out" exchange-pattern="one-way" />
+        <test:queue name="split-aggregate-out"/>
     </flow>
     
     <flow name="split-no-parts">
-        <vm:inbound-endpoint path="split-no-parts-in" exchange-pattern="request-response" />
         <splitter expression="#[xpath3('//Order/item', payload, 'NODESET')]" enableCorrelation="ALWAYS" />
     </flow>
 
     <flow name="split-aggregate-singleton-list">
-        <vm:inbound-endpoint path="split-aggregate-singleton-list-in" exchange-pattern="one-way" />
         <collection-splitter />
         <script:transformer>
             <script:script engine="groovy">
@@ -113,11 +102,10 @@
             </script:script>
         </script:transformer>
         <collection-aggregator />
-        <vm:outbound-endpoint path="split-aggregate-singleton-list-out" exchange-pattern="one-way" />
+        <test:queue name="split-aggregate-singleton-list-out"/>
     </flow>
 
     <flow name="split-aggregate-list">
-        <vm:inbound-endpoint path="split-aggregate-list-in" exchange-pattern="one-way" />
         <collection-splitter />
         <script:transformer>
             <script:script engine="groovy">
@@ -126,12 +114,11 @@
             </script:script>
         </script:transformer>
         <collection-aggregator />
-        <vm:outbound-endpoint path="split-aggregate-list-out" exchange-pattern="one-way" />
+        <test:queue name="split-aggregate-list-out"/>
     </flow>
 
 
     <flow name="split-aggregate-response-singleton-list">
-        <vm:inbound-endpoint path="split-aggregate-response-singleton-list-in" exchange-pattern="request-response" />
         <collection-splitter />
         <script:transformer>
             <script:script engine="groovy">
@@ -143,7 +130,6 @@
     </flow>
 
     <flow name="split-aggregate-response-list">
-        <vm:inbound-endpoint path="split-aggregate-response-list-in" exchange-pattern="request-response" />
         <collection-splitter />
         <script:transformer>
             <script:script engine="groovy">
@@ -153,8 +139,7 @@
         </script:transformer>
     </flow>
 
-    <flow name="split-map">
-        <vm:inbound-endpoint path="split-aggregate-map-in" exchange-pattern="request-response" />
+    <flow name="split-aggregate-map">
         <map-splitter enableCorrelation="IF_NOT_SET" />
         <script:transformer>
             <script:script engine="groovy">
@@ -165,7 +150,6 @@
     </flow>
 
     <flow name="split-filter-aggregate">
-        <vm:inbound-endpoint path="split-filter-aggregate-in" exchange-pattern="one-way" />
         <splitter expression="#[payload.fruit]" enableCorrelation="ALWAYS" />
         <message-filter throwOnUnaccepted="false">
             <not-filter>
@@ -176,38 +160,34 @@
             </not-filter>
         </message-filter>
         <collection-aggregator failOnTimeout="false" timeout="1000" />
-        <vm:outbound-endpoint path="split-filter-aggregate-out" exchange-pattern="one-way" />
+        <test:queue name="split-filter-aggregate-out"/>
     </flow>
     
     <flow name="message-chunk-split-aggregate">
-        <vm:inbound-endpoint path="message-chunk-split-aggregate-in" exchange-pattern="one-way" />
         <message-chunk-splitter messageSize="20" enableCorrelation="ALWAYS"/>
         <message-chunk-aggregator />
-        <vm:outbound-endpoint path="message-chunk-split-aggregate-out" exchange-pattern="one-way" />
+        <test:queue name="message-chunk-split-aggregate-out"/>
     </flow>
 
-    <flow name="component">
-        <vm:inbound-endpoint path="components" exchange-pattern="request-response" />
+    <flow name="components">
         <echo-component/>
         <test:component appendString="test"/>
     </flow>
 
     <flow name="wiretap">
-        <vm:inbound-endpoint path="wiretap-in" exchange-pattern="one-way" />
         <append-string-transformer message="in" />
         <wire-tap>
             <processor-chain>
                 <append-string-transformer message="tap" />
-                <vm:outbound-endpoint path="wiretap-tap" exchange-pattern="one-way" />
+                <test:queue name="wiretap-tap"/>
             </processor-chain>
             <payload-type-filter expectedType="java.lang.String"/>
         </wire-tap>
         <append-string-transformer message="out" />
-        <vm:outbound-endpoint path="wiretap-out" exchange-pattern="one-way" />
+        <test:queue name="wiretap-out"/>
     </flow>
 
     <flow name="response">
-        <vm:inbound-endpoint path="response" exchange-pattern="request-response" />
         <append-string-transformer message="a" />
         <response>
             <append-string-transformer message="i" />
@@ -230,81 +210,57 @@
     </flow>
 
     <flow name="async-oneway">
-        <vm:inbound-endpoint path="async-oneway-in" exchange-pattern="one-way" />
         <append-string-transformer message="a" />
         <async processingStrategy="asynchronous">
             <append-string-transformer message="b" />
-            <vm:outbound-endpoint path="async-async-oneway-out" exchange-pattern="one-way" />
+            <test:queue name="async-async-oneway-out"/>
         </async>    
         <append-string-transformer message="c" />    
-        <vm:outbound-endpoint path="async-oneway-out" exchange-pattern="one-way" />
+        <test:queue name="async-oneway-out"/>
     </flow>
 
     <flow name="async-seda-oneway">
-        <vm:inbound-endpoint path="async-seda-oneway-in" exchange-pattern="one-way" />
         <append-string-transformer message="a" />
         <async>
             <append-string-transformer message="b" />
-            <vm:outbound-endpoint path="async-async-seda-oneway-out" exchange-pattern="one-way" />
+            <test:queue name="async-async-seda-oneway-out"/>
         </async>    
         <append-string-transformer message="c" />    
-        <vm:outbound-endpoint path="async-seda-oneway-out" exchange-pattern="one-way" />
+        <test:queue name="async-seda-oneway-out"/>
     </flow>
 
     <flow name="async-requestresponse">
-        <vm:inbound-endpoint path="async-requestresponse-in" exchange-pattern="request-response" />
         <append-string-transformer message="a" />
         <async>
             <append-string-transformer message="b" />
-            <vm:outbound-endpoint path="async-async-requestresponse-out" exchange-pattern="one-way" />
+            <test:queue name="async-async-requestresponse-out"/>
         </async>    
         <append-string-transformer message="c" />    
-        <vm:outbound-endpoint path="async-requestresponse-out" exchange-pattern="one-way" />
+        <test:queue name="async-requestresponse-out"/>
     </flow>
 
     <flow name="async-tx">
-        <vm:inbound-endpoint path="async-tx-in" exchange-pattern="request-response">
-            <vm:transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
         <append-string-transformer message="a" />
         <async>
             <append-string-transformer message="b" />
-            <vm:outbound-endpoint path="async-async-tx-out" exchange-pattern="request-response" />
+            <test:queue name="async-async-tx-out"/>
         </async>    
         <append-string-transformer message="c" />    
-        <vm:outbound-endpoint path="async-tx-out" exchange-pattern="request-response" />
+        <test:queue name="async-tx-out"/>
     </flow>
     
     <flow name="multicaster">
-        <vm:inbound-endpoint path="multicaster-in" exchange-pattern="request-response"/>
         <all enableCorrelation="ALWAYS">
-            <vm:outbound-endpoint path="multicaster-out1" exchange-pattern="one-way" />
-            <vm:outbound-endpoint path="multicaster-out2" exchange-pattern="one-way" />
+            <test:queue name="multicaster-out1"/>
+            <test:queue name="multicaster-out2"/>
             <processor-chain>
                 <test:component/>
-                <vm:outbound-endpoint path="multicaster-out3" exchange-pattern="one-way" />
+                <test:queue name="multicaster-out3"/>
             </processor-chain>
         </all>    
     </flow>
-    
-    <flow name="recipient-list">
-        <vm:inbound-endpoint path="recipient-list-in" exchange-pattern="request-response"/>
-        <message-properties-transformer>
-            <add-message-properties>
-                <spring:entry key="myRecipients">
-                    <spring:list>
-                        <spring:value>vm://recipient-list-out1</spring:value>
-                        <spring:value>vm://recipient-list-out2</spring:value>
-                        <spring:value>vm://recipient-list-out3</spring:value>
-                    </spring:list>
-                </spring:entry>
-            </add-message-properties>
-        </message-properties-transformer>
-        <recipient-list enableCorrelation="ALWAYS" expression="#[message.outboundProperties.myRecipients]"/>
-    </flow>
 
-    <flow name="loan-broker">
-        <vm:inbound-endpoint path="choice2-in" exchange-pattern="request-response"/>
+    <flow name="choice2">
         <choice>
             <when expression="payload=='foo'">
                 <append-string-transformer message=" Hello" />
@@ -321,40 +277,33 @@
     </flow>
     
     <flow name="flow-ref">
-        <vm:inbound-endpoint path="flow-ref-in" exchange-pattern="request-response"/>
         <flow-ref name="flow"/>
         <flow-ref name="flow"/>
     </flow>
 
     <flow name="invoke">
-        <vm:inbound-endpoint path="invoke-in" exchange-pattern="request-response"/>
         <invoke object-ref="appender" method="transform" methodArguments="#[payload]"/>
     </flow>
 
     <flow name="invoke2">
-        <vm:inbound-endpoint path="invoke2-in" exchange-pattern="request-response"/>
         <invoke object-ref="appender" method="transform" methodArguments="#[message.inboundProperties.one]"/>
     </flow>
     
     <flow name="invoke3">
-        <vm:inbound-endpoint path="invoke3-in" exchange-pattern="request-response"/>
         <processor ref="invokeme"/>
     </flow>
 
     <flow name="invoke4">
-        <vm:inbound-endpoint path="invoke4-in" exchange-pattern="request-response"/>
         <processor ref="invokeme-noargs"/>
     </flow>
 
-    <flow name="enrichWithAttributes">
-        <vm:inbound-endpoint path="enrich-in" exchange-pattern="request-response" />
+    <flow name="enrich">
         <enricher target="#[message.outboundProperties.helloHeader]" source="#[payload]">
             <append-string-transformer message="Hello" />
         </enricher>
     </flow>
 
-    <flow name="enrichWithElements">
-        <vm:inbound-endpoint path="enrich2-in" exchange-pattern="request-response" />
+    <flow name="enrich2">
         <enricher>
             <append-string-transformer message="Hello" />
             <enrich target="#[message.outboundProperties.helloHeader]" />
@@ -363,15 +312,13 @@
     </flow>
     
     <!-- MULE-5544 -->
-    <flow name="enrichUsingComponent">
-        <vm:inbound-endpoint path="enrichcomponent-in" exchange-pattern="request-response" />
+    <flow name="enrichcomponent">
         <enricher target="#[message.outboundProperties.echoHeader]" source="#[payload]">
             <echo-component/>
         </enricher>
     </flow>
 
-    <flow name="enrichUsingComponent2">
-        <vm:inbound-endpoint path="enrichcomponent2-in" exchange-pattern="request-response" />
+    <flow name="enrichcomponent2">
         <enricher target="#[message.outboundProperties.echoHeader]" source="#[payload]">
             <processor-chain>
                 <echo-component/>
@@ -392,14 +339,12 @@
         <spring:constructor-arg value="recieved"/>
     </spring:bean>
 
-    <flow name="loggerMessage">
-        <vm:inbound-endpoint path="loggermessage-in" exchange-pattern="request-response"/>
+    <flow name="loggermessage">
         <append-string-transformer message=" Hello foo" />
         <logger level="ERROR" category="mycategory"/>
     </flow>
 
-    <flow name="loggerHeader">
-        <vm:inbound-endpoint path="loggerheader-in" exchange-pattern="request-response"/>
+    <flow name="loggerheader">
         <logger message="Ths is my header value: #[message.inboundProperties.toLog]" level="ERROR" category="mycategory"/>
     </flow>
 
@@ -408,7 +353,7 @@
             <append-string-transformer message=" Hello foo" />
         </poll>
         <append-string-transformer message="out" />
-        <vm:outbound-endpoint path="poll-out"/>
+        <test:queue name="poll-out"/>
     </flow>
 
     <flow name="poll2">
@@ -416,11 +361,10 @@
             <flow-ref name="pollappend"/>
         </poll>
         <append-string-transformer message="out" />
-        <vm:outbound-endpoint path="poll2-out"/>
+        <test:queue name="poll2-out"/>
     </flow>
 
-    <flow name="messageFilterSubFlow">
-        <vm:inbound-endpoint path="messagefiltersubflow-in" exchange-pattern="one-way"/>
+    <flow name="messagefiltersubflow">
         <message-filter onUnaccepted="invokedByMessageFilter">
             <expression-filter expression="#[false]"/>
         </message-filter>
@@ -431,11 +375,10 @@
     </sub-flow>
 
     <sub-flow name="invokedByMessageFilter">
-        <vm:outbound-endpoint path="messagefiltersubflow-out" exchange-pattern="one-way"/>
+        <test:queue name="messagefiltersubflow-out"/>
     </sub-flow>
 
     <flow name="customRouter">
-        <vm:inbound-endpoint path="customRouter-in" exchange-pattern="request-response"/>
         <custom-router class="org.mule.routing.outbound.MulticastingRouter">
             <append-string-transformer message="a" />
             <append-string-transformer message="b" />

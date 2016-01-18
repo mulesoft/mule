@@ -2,46 +2,43 @@
 <mule
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="http://www.mulesoft.org/schema/mule/core"
-        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+        xmlns:test="http://www.mulesoft.org/schema/mule/test"
         xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
         xsi:schemaLocation="
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+		http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
 		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
     <configuration shutdownTimeout="${contextShutdownTimeout}" />
 
     <flow name="staticComponentFlow">
-        <vm:inbound-endpoint path="staticComponent" exchange-pattern="one-way" />
 
         <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
         <static-component>
             <return-data>staticComponentResponse</return-data>
         </static-component>
 
-        <vm:outbound-endpoint path="response" exchange-pattern="one-way" />
+        <test:queue name="response"/>
     </flow>
 
     <flow name="scriptComponentFlow">
-        <vm:inbound-endpoint path="scriptComponent" exchange-pattern="one-way" />
 
         <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
         <script:component>
             <script:script engine="groovy">return &quot;scriptComponentResponse&quot;;</script:script>
         </script:component>
 
-        <vm:outbound-endpoint path="response" exchange-pattern="one-way" />
+        <test:queue name="response"/>
     </flow>
 
     <flow name="expressionTransformerFlow">
-        <vm:inbound-endpoint path="expressionTransformer" exchange-pattern="one-way" />
 
         <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
         <expression-transformer>
             <return-argument expression="return &quot;expressionTransformerResponse&quot;;" />
         </expression-transformer>
 
-        <vm:outbound-endpoint path="response" exchange-pattern="one-way" />
+        <test:queue name="response"/>
     </flow>
 
 </mule>
