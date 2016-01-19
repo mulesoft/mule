@@ -106,6 +106,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String CALL_SAUL = "callSaul";
     private static final String CALL_GUS_FRING = "callGusFring";
     private static final String CURE_CANCER = "cureCancer";
+    private static final String GET_SAUL_PHONE = "getSaulPhone";
     private static final String EXTENSION_VERSION = MuleManifest.getProductVersion();
 
     @Before
@@ -191,7 +192,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(parameters, "ricinPacks", "", DataType.of(Set.class, Ricin.class), false, SUPPORTED, null);
         assertParameter(parameters, "nextDoor", "", DataType.of(KnockeableDoor.class), false, SUPPORTED, null);
         assertParameter(parameters, "candidateDoors", "", DataType.of(Map.class, String.class, KnockeableDoor.class), false, SUPPORTED, null);
-        assertParameter(parameters, "initialHealth", "", DataType.of(HealthStatus.class), true, SUPPORTED, null);
+        assertParameter(parameters, "initialHealth", "", DataType.of(HealthStatus.class), false, SUPPORTED, "CANCER");
         assertParameter(parameters, "finalHealth", "", DataType.of(HealthStatus.class), true, SUPPORTED, null);
         assertParameter(parameters, "labAddress", "", DataType.of(String.class), false, REQUIRED, null);
         assertParameter(parameters, "firstEndevour", "", DataType.of(String.class), false, NOT_SUPPORTED, null);
@@ -209,7 +210,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     private void assertTestModuleOperations(Declaration declaration) throws Exception
     {
-        assertThat(declaration.getOperations(), hasSize(19));
+        assertThat(declaration.getOperations(), hasSize(20));
         assertOperation(declaration, SAY_MY_NAME_OPERATION, "");
         assertOperation(declaration, GET_ENEMY_OPERATION, "");
         assertOperation(declaration, KILL_OPERATION, "");
@@ -226,6 +227,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertOperation(declaration, ALIAS, "");
         assertOperation(declaration, CALL_SAUL, "");
         assertOperation(declaration, CALL_GUS_FRING, "");
+        assertOperation(declaration, GET_SAUL_PHONE, "");
 
         OperationDeclaration operation = getOperation(declaration, SAY_MY_NAME_OPERATION);
         assertThat(operation, is(notNullValue()));
@@ -234,7 +236,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         operation = getOperation(declaration, GET_ENEMY_OPERATION);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(1));
-        assertParameter(operation.getParameters(), "index", "", DataType.of(int.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "index", "", DataType.of(int.class), false, SUPPORTED, "0");
 
         operation = getOperation(declaration, KILL_OPERATION);
         assertThat(operation, is(notNullValue()));

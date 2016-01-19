@@ -20,6 +20,7 @@ import org.mule.api.MuleException;
 import org.mule.api.connection.ConnectionException;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.module.extension.HeisenbergConnectionProvider;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
 import org.mule.module.extension.exception.HeisenbergException;
@@ -80,6 +81,12 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     public void operationWithFixedParameter() throws Exception
     {
         runFlowAndExpect("getFixedEnemy", GUSTAVO_FRING);
+    }
+
+    @Test
+    public void operationWithDefaulValueParameter() throws Exception
+    {
+        runFlowAndExpect("getDefaultEnemy", GUSTAVO_FRING);
     }
 
     @Test
@@ -270,6 +277,14 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
 
         event = runFlow("killWithWeapon", event);
         assertThat(event.getMessageAsString(), is(RICIN_KILL_MESSAGE));
+    }
+
+
+    @Test
+    public void connectionProviderDefaultValueSaulPhoneNumber() throws Exception
+    {
+        MuleEvent getSaulNumber = runFlow("getSaulNumber");
+        assertThat(getSaulNumber.getMessage().getPayload(), is(HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER));
     }
 
     @Test

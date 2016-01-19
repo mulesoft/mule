@@ -42,6 +42,7 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
 import static org.mule.module.extension.internal.introspection.utils.PoolingSupport.REQUIRED;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getDefaultValue;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
@@ -381,6 +382,7 @@ public final class SchemaBuilder
             final String name = getAlias(field);
             final DataType fieldType = getFieldDataType(field);
             final boolean required = isRequired(field);
+            final Object defaultValue = getDefaultValue(field);
             final ExpressionSupport expressionSupport = getExpressionSupport(field);
 
             fieldType.getQualifier().accept(new AbstractDataQualifierVisitor()
@@ -401,7 +403,7 @@ public final class SchemaBuilder
                 @Override
                 protected void defaultOperation()
                 {
-                    Attribute attribute = createAttribute(name, fieldType, required, expressionSupport);
+                    Attribute attribute = createAttribute(name, EMPTY, fieldType, defaultValue, required, expressionSupport);
                     extension.getAttributeOrAttributeGroup().add(attribute);
                 }
             });
@@ -534,20 +536,30 @@ public final class SchemaBuilder
 
     private Attribute createAttribute(ParameterModel parameterModel, boolean required)
     {
-        return createAttribute(parameterModel.getName(), parameterModel.getDescription(), parameterModel.getType(), required, parameterModel.getExpressionSupport());
+        return createAttribute(parameterModel.getName(),
+                               parameterModel.getDescription(),
+                               parameterModel.getType(),
+                               parameterModel.getDefaultValue(),
+                               required,
+                               parameterModel.getExpressionSupport());
     }
 
     private Attribute createAttribute(String name, DataType type, boolean required, ExpressionSupport expressionSupport)
     {
-        return createAttribute(name, EMPTY, type, required, expressionSupport);
+        return createAttribute(name, EMPTY, type, null, required, expressionSupport);
     }
 
 
-    private Attribute createAttribute(final String name, String description, final DataType type, boolean required, final ExpressionSupport expressionSupport)
+    private Attribute createAttribute(final String name, String description, final DataType type, Object defaultValue, boolean required, final ExpressionSupport expressionSupport)
     {
         final Attribute attribute = new Attribute();
         attribute.setUse(required ? SchemaConstants.USE_REQUIRED : SchemaConstants.USE_OPTIONAL);
         attribute.setAnnotation(createDocAnnotation(description));
+
+        if (defaultValue instanceof String && StringUtils.isNotBlank(defaultValue.toString()))
+        {
+            attribute.setDefault(defaultValue.toString());
+        }
 
         type.getQualifier().accept(new AbstractDataQualifierVisitor()
         {
