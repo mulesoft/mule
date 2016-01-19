@@ -12,7 +12,7 @@ import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.param.UseConfig;
-import org.mule.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.module.extension.internal.DefaultDescribingContext;
@@ -37,7 +37,7 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase
         validate(ValidExtension.class);
     }
 
-    @Test(expected = IllegalModelDefinitionException.class)
+    @Test(expected = IllegalConfigurationModelDefinitionException.class)
     public void invalidConfigurationTypesForOperations() throws Exception
     {
         validate(InvalidExtension.class);

@@ -7,10 +7,10 @@
 package org.mule.module.extension.internal.introspection.validation;
 
 import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionValidationResult;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Configuration;
 import org.mule.extension.annotation.api.Configurations;
@@ -19,6 +19,7 @@ import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Connection;
+import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
@@ -51,13 +52,13 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         validate(InvalidConnectedOperationTestConnector.class);
     }
 
-    @Test(expected = IllegalModelDefinitionException.class)
+    @Test(expected = IllegalConnectionProviderModelDefinitionException.class)
     public void invalidConfigConnectionProviderTestConnector()
     {
         validate(InvalidConfigConnectionProviderTestConnector.class);
     }
 
-    @Test(expected = IllegalModelDefinitionException.class)
+    @Test(expected = IllegalConnectionProviderModelDefinitionException.class)
     public void invalidConnectionTypeProviderTestConnector()
     {
         validate(InvalidConnectionTypeProviderTestConnector.class);

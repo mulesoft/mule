@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.introspection.validation;
 
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 
@@ -26,8 +27,8 @@ public class OperationReturnTypeModelValidator implements ModelValidator
         {
             if (operationModel.getReturnType() == null)
             {
-                throw new IllegalModelDefinitionException(String.format("Operation '%s' in Extension '%s' is missing a return type",
-                                                                        operationModel.getName(), model.getName()));
+                throw new IllegalOperationModelDefinitionException(String.format("Operation '%s' in Extension '%s' is missing a return type",
+                                                                                 operationModel.getName(), model.getName()));
             }
         }
     }

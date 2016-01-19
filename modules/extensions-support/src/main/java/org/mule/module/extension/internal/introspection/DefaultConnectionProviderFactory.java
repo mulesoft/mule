@@ -10,6 +10,7 @@ import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ConnectionProviderFactory;
 
@@ -37,7 +38,7 @@ final class DefaultConnectionProviderFactory<Config, Connection> implements Conn
     {
         if (!ConnectionProvider.class.isAssignableFrom(providerClass))
         {
-            throw new IllegalModelDefinitionException(String.format(
+            throw new IllegalConnectionProviderModelDefinitionException(String.format(
                     "Class '%s' was specified as a connection provider but it doesn't implement the '%s' interface",
                     providerClass.getName(), ConnectionProvider.class.getName()));
         }

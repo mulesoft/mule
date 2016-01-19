@@ -51,16 +51,16 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
     /**
      * Creates a new instance with the given state
      *
-     * @param name                the extension's name. Cannot be blank
-     * @param description         the extension's description
-     * @param version             the extension's version
-     * @param vendor              the extension's vendor name
-     * @param configurationModels a {@link List} with the extension's {@link ConfigurationModel configurationModels}
-     * @param operationModels     a {@link List} with the extension's {@link OperationModel operationModels}
-     * @param connectionProviders a {@link List} with the extension's {@link ConnectionProviderModel connection provider models}
-     * @param sourceModels        a {@link List} with the extension's {@link SourceModel message source models}
-     * @param modelProperties     A {@link Map} of custom properties which extend this model
-     * @param exceptionEnricherFactory    an Optional @{@link ExceptionEnricherFactory} that creates a concrete {@link org.mule.extension.api.introspection.ExceptionEnricher} instance
+     * @param name                     the extension's name. Cannot be blank
+     * @param description              the extension's description
+     * @param version                  the extension's version
+     * @param vendor                   the extension's vendor name
+     * @param configurationModels      a {@link List} with the extension's {@link ConfigurationModel configurationModels}
+     * @param operationModels          a {@link List} with the extension's {@link OperationModel operationModels}
+     * @param connectionProviders      a {@link List} with the extension's {@link ConnectionProviderModel connection provider models}
+     * @param sourceModels             a {@link List} with the extension's {@link SourceModel message source models}
+     * @param modelProperties          A {@link Map} of custom properties which extend this model
+     * @param exceptionEnricherFactory an Optional @{@link ExceptionEnricherFactory} that creates a concrete {@link org.mule.extension.api.introspection.ExceptionEnricher} instance
      * @throws IllegalArgumentException if {@code configurations} or {@link ParameterModel} are {@code null} or contain instances with non unique names, or if {@code name} is blank
      */
     protected ImmutableExtensionModel(String name,
@@ -72,7 +72,7 @@ final class ImmutableExtensionModel extends AbstractImmutableModel implements Ex
                                       List<ConnectionProviderModel> connectionProviders,
                                       List<SourceModel> sourceModels,
                                       Map<String, Object> modelProperties,
-                                      Optional<ExceptionEnricherFactory>  exceptionEnricherFactory)
+                                      Optional<ExceptionEnricherFactory> exceptionEnricherFactory)
     {
         super(name, description, modelProperties);
         this.configurations = toMap(configurationModels);
