@@ -30,6 +30,7 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
         addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION);
     }
 
+    @Override
     protected Class getBeanClass(Element element)
     {
         try
@@ -44,6 +45,7 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
         }
     }
 
+    @Override
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
         preProcess(element);
@@ -65,6 +67,14 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
         return (AbstractBeanDefinition) beanAssembler.getTarget();
     }
 
+    @Override
+    protected void processMetadataAnnotations(Element element, ParserContext context, BeanDefinitionBuilder builder)
+    {
+        // Nothing to do
+        // We don't want annotations from inner elements to override the annotations from its parent element.
+    }
+
+    @Override
     protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
         // by default the name matches the "real" bean

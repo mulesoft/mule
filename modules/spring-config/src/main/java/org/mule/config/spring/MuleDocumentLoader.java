@@ -45,12 +45,15 @@ import org.xml.sax.helpers.DefaultHandler;
 final class MuleDocumentLoader implements DocumentLoader
 {
 
-    private static final UserDataHandler NULL_DATA_HANDLER = new UserDataHandler()
+    private static final UserDataHandler COPY_METADATA_ANNOTATIONS_DATA_HANDLER = new UserDataHandler()
     {
         @Override
         public void handle(short operation, String key, Object data, Node src, Node dst)
         {
-            // Nothing to do.
+            if (operation == NODE_IMPORTED || operation == NODE_CLONED)
+            {
+                dst.setUserData(METADATA_ANNOTATIONS_KEY, src.getUserData(METADATA_ANNOTATIONS_KEY), this);
+            }
         }
     };
 
@@ -162,7 +165,7 @@ final class MuleDocumentLoader implements DocumentLoader
                 annotationsStack.peek().appendElementBody(SystemUtils.LINE_SEPARATOR + metadataAnnotations.getElementString() + SystemUtils.LINE_SEPARATOR);
             }
 
-            walker.getParentNode().setUserData(METADATA_ANNOTATIONS_KEY, metadataAnnotations, NULL_DATA_HANDLER);
+            walker.getParentNode().setUserData(METADATA_ANNOTATIONS_KEY, metadataAnnotations, COPY_METADATA_ANNOTATIONS_DATA_HANDLER);
             walker = walker.walkOut();
         }
     }

@@ -25,4 +25,10 @@
         </annotations>
     </endpoint>
 
+    <spring:beans>
+        <mule>
+            <append-string-transformer message="Manzi" name="ManziTransformer" doc:name="manzi-transformer"/>
+        </mule>
+    </spring:beans>
+
 </mule>

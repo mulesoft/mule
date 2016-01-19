@@ -9,6 +9,7 @@ package org.mule.config.spring.parsers;
 import static org.mule.api.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
 import static org.mule.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
 
+import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Disposable;
@@ -24,6 +25,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.XMLUtils;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -410,6 +412,9 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder)
     {
         BeanAssembler assembler = getBeanAssembler(element, builder);
+
+        processMetadataAnnotations(element, context, builder);
+
         NamedNodeMap attributes = element.getAttributes();
         for (int x = 0; x < attributes.getLength(); x++)
         {
@@ -417,17 +422,25 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
             processProperty(attribute, assembler);
         }
 
-        Map<QName, Object> annotations = (Map<QName, Object>) builder.getBeanDefinition().getPropertyValues().get("annotations");
-        if (annotations != null)
+        postProcess(getParserContext(), assembler, element);
+    }
+
+    protected void processMetadataAnnotations(Element element, ParserContext context, BeanDefinitionBuilder builder)
+    {
+        // Ensure we have a placeholder for internally generated annotations, even if the XML config doesn't have any
+        // defined for this element.
+        if (AnnotatedObject.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass()))
         {
+            Map<QName, Object> annotations = new HashMap<QName, Object>();
+
             Resource readerResource = context.getReaderContext().getResource();
 
             XmlMetadataAnnotations elementMetadata = (XmlMetadataAnnotations) element.getUserData(METADATA_ANNOTATIONS_KEY);
             addMetadataAnnotationsFromXml(annotations, readerResource.getFilename() != null ? readerResource.getFilename() : readerResource.getDescription(),
                     elementMetadata.getLineNumber(), elementMetadata.getElementString());
-        }
 
-        postProcess(getParserContext(), assembler, element);
+            builder.getBeanDefinition().getPropertyValues().addPropertyValue(AnnotatedObject.PROPERTY_NAME, annotations);
+        }
     }
 
     @Override
