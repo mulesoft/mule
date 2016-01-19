@@ -20,10 +20,35 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class StatementStreamingResultSetCloser extends AbstractStreamingResultSetCloser
 {
-
     private final ConcurrentHashMap<DbConnection, Set<ResultSet>> connectionResultSets = new ConcurrentHashMap<DbConnection, Set<ResultSet>>();
 
     private final ConcurrentHashMap<DbConnection, Object> connectionLocks = new ConcurrentHashMap<DbConnection, Object>();
+
+    /**
+     * Closes all tracked {@link ResultSet}s for the passed {@code connection}.
+     * 
+     * @param connection
+     */
+    public void closeResultSets(DbConnection connection)
+    {
+        Object connectionLock = getConnectionLock(connection);
+
+        synchronized (connectionLock)
+        {
+            checkValidConnectionLock(connection, connectionLock);
+
+            Set<ResultSet> resultSets = connectionResultSets.get(connection);
+            if (resultSets != null)
+            {
+                for (ResultSet resultSet : resultSets)
+                {
+                    super.close(connection, resultSet);
+                }
+            }
+
+            releaseResources(connection, connectionLock);
+        }
+    }
 
     @Override
     public void close(DbConnection connection, ResultSet resultSet)

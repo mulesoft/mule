@@ -30,7 +30,7 @@ public class SelectProcessorDefinitionParser extends AbstractResultSetHandlerPro
 
         executorFactoryBean.addConstructorArgValue(parseStatementFactory(element));
 
-        executorFactoryBean.addConstructorArgValue(resultSetHandler);
+        executorFactoryBean.addConstructorArgReference(resultSetHandlerBeanName);
 
 
         return executorFactoryBean.getBeanDefinition();

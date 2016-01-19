@@ -7,11 +7,13 @@
 
 package org.mule.module.db.internal.config.processor;
 
-import org.mule.module.db.internal.result.row.InsensitiveMapRowHandler;
+import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+
 import org.mule.module.db.internal.result.resultset.IteratorResultSetHandler;
 import org.mule.module.db.internal.result.resultset.ListResultSetHandler;
-import org.mule.module.db.internal.result.resultset.ResultSetHandler;
+import org.mule.module.db.internal.result.row.InsensitiveMapRowHandler;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -19,11 +21,12 @@ import org.w3c.dom.Element;
 public abstract class AbstractResultSetHandlerProcessorDefinitionParser extends AbstractSingleQueryProcessorDefinitionParser
 {
 
-    protected ResultSetHandler resultSetHandler;
+    protected String resultSetHandlerBeanName;
 
     @Override
     protected void doParseElement(Element element, ParserContext context, BeanDefinitionBuilder builder)
     {
+        resultSetHandlerBeanName = getBeanName(element) + ".resultSetHandler";
         super.doParseElement(element, context, builder);
         builder.addConstructorArgValue(streaming);
     }
@@ -35,13 +38,19 @@ public abstract class AbstractResultSetHandlerProcessorDefinitionParser extends 
 
         InsensitiveMapRowHandler recordHandler = new InsensitiveMapRowHandler();
 
+        BeanDefinition beanDefinition;
         if (Boolean.parseBoolean(streamingValue))
         {
-            resultSetHandler = new IteratorResultSetHandler(recordHandler);
+            beanDefinition = genericBeanDefinition(IteratorResultSetHandler.class)
+                                                  .addConstructorArgValue(recordHandler)
+                                                  .addConstructorArgReference("db.statementStreamingResultSetCloser")
+                                                  .getBeanDefinition();
         }
         else
         {
-            resultSetHandler = new ListResultSetHandler(recordHandler);
+            beanDefinition = genericBeanDefinition(ListResultSetHandler.class).addConstructorArgValue(recordHandler).getBeanDefinition();
         }
+
+        getRegistry().registerBeanDefinition(resultSetHandlerBeanName, beanDefinition);
     }
 }
