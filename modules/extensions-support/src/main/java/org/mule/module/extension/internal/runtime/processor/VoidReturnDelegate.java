@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.executor;
+package org.mule.module.extension.internal.runtime.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.extension.api.runtime.OperationContext;
@@ -38,8 +38,8 @@ final class VoidReturnDelegate implements ReturnDelegate
      * @return {@link OperationContextAdapter#getEvent()}
      */
     @Override
-    public Object asReturnValue(Object value, OperationContext operationContext)
+    public MuleEvent asReturnValue(Object value, OperationContextAdapter operationContext)
     {
-        return ((OperationContextAdapter) operationContext).getEvent();
+        return operationContext.getEvent();
     }
 }

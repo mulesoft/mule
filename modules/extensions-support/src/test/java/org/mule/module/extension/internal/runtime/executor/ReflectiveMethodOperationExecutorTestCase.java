@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.runtime.executor;
 
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -15,10 +16,9 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.module.extension.model.HealthStatus.DEAD;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
+import static org.mule.module.extension.model.HealthStatus.DEAD;
 import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.extension.api.ExtensionManager;
@@ -28,7 +28,6 @@ import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ContentMetadata;
-import org.mule.extension.api.runtime.ContentType;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
@@ -100,7 +99,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     public void operationWithReturnValueAndWithoutParameters() throws Exception
     {
         Method method = ClassUtils.getMethod(HeisenbergOperations.class, "sayMyName", new Class<?>[] {HeisenbergExtension.class, ContentMetadata.class});
-        executor = new ReflectiveMethodOperationExecutor(method, operations, ValueReturnDelegate.INSTANCE);
+        executor = new ReflectiveMethodOperationExecutor(method, operations);
         assertResult(executor.execute(operationContext), HEISENBERG);
     }
 
@@ -126,9 +125,9 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     public void voidOperationWithoutParameters() throws Exception
     {
         Method method = ClassUtils.getMethod(HeisenbergOperations.class, "die", new Class<?>[] {HeisenbergExtension.class});
-        executor = new ReflectiveMethodOperationExecutor(method, operations, VoidReturnDelegate.INSTANCE);
+        executor = new ReflectiveMethodOperationExecutor(method, operations);
 
-        assertSameInstance(executor.execute(operationContext), muleEvent);
+        assertThat(executor.execute(operationContext), is(nullValue()));
         assertThat(config.getEndingHealth(), is(DEAD));
     }
 
@@ -141,7 +140,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
         init();
 
         Method method = ClassUtils.getMethod(HeisenbergOperations.class, "getEnemy", new Class<?>[] {HeisenbergExtension.class, int.class, ContentMetadata.class});
-        executor = new ReflectiveMethodOperationExecutor(method, operations, ValueReturnDelegate.INSTANCE);
+        executor = new ReflectiveMethodOperationExecutor(method, operations);
 
         assertResult(executor.execute(operationContext), "Hank");
     }
@@ -149,10 +148,9 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     @Test
     public void voidWithArguments() throws Exception
     {
-        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "hideMethInEvent", new Class<?>[] {MuleEvent.class, ContentType.class});
-        executor = new ReflectiveMethodOperationExecutor(method, operations, VoidReturnDelegate.INSTANCE);
-        assertSameInstance(executor.execute(operationContext), muleEvent);
-        verify(muleEvent).setFlowVariable("secretPackage", "meth");
+        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "die", new Class<?>[] {HeisenbergExtension.class});
+        executor = new ReflectiveMethodOperationExecutor(method, operations);
+        assertThat(executor.execute(operationContext), is(nullValue()));
     }
 
     private void initHeisenberg()
@@ -166,10 +164,5 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     private void assertResult(Object value, Object expected) throws Exception
     {
         assertThat(value, is(expected));
-    }
-
-    private void assertSameInstance(Object value, Object expected) throws Exception
-    {
-        assertThat(value, is(sameInstance(expected)));
     }
 }

@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import static org.mule.api.transport.PropertyScope.SESSION;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -40,23 +39,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 {
 
     public static final String FOO_PROPERTY = "foo";
-
-    //
-    // corner cases/errors
-    //
-    @Test
-    public void testConstructorWithNoMuleContext()
-    {
-        try
-        {
-            new DefaultMuleMessage(TEST_MESSAGE, (MuleContext) null);
-            fail("DefaultMuleMessage must fail when created with null MuleContext");
-        }
-        catch (IllegalArgumentException iae)
-        {
-            // this one was expected
-        }
-    }
 
     @Test
     public void testConstructorWithNullPayload()

@@ -57,12 +57,12 @@
         <heisenberg:get-enemy index="#[flowVars['enemy']]"/>
     </flow>
 
-    <flow name="hideInEvent">
-        <heisenberg:hide-meth-in-event/>
+    <flow name="collectFromEvent">
+        <heisenberg:get-payment-from-event/>
     </flow>
 
-    <flow name="hideInMessage">
-        <heisenberg:hide-meth-in-message/>
+    <flow name="collectFromMessage">
+        <heisenberg:get-payment-from-message/>
     </flow>
 
     <flow name="killFromPayload">

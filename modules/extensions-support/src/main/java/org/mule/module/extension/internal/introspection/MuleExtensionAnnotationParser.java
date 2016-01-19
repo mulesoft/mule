@@ -52,6 +52,7 @@ public final class MuleExtensionAnnotationParser
 
     private static final Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()
             .add(MuleEvent.class)
+            .add(org.mule.api.temporary.MuleMessage.class)
             .add(MuleMessage.class)
             .add(ContentMetadata.class)
             .add(ContentType.class)
