@@ -95,20 +95,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             transformed = transformPayloadIfNeeded(message);
         }
         message.setInvocationProperty(parentMessageProp, message);
-        try
-        {
-            ownedMessageProcessor.process(event);
-        }
-        catch (MessagingException e)
-        {
-            if (splitter.equals(e.getFailingMessageProcessor())
-                || filter.equals(e.getFailingMessageProcessor()))
-            {
-                // Make sure the context information for the exception is relative to the ForEach.
-                e.getInfo().remove(INFO_LOCATION_KEY);
-                throw new MessagingException(event, e, this);
-            }
-        }
+        doProcess(event);
         if (transformed)
         {
             transformBack(message);
@@ -130,6 +117,28 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             event.removeFlowVariable(parentMessageProp);
         }
         return event;
+    }
+
+    protected void doProcess(MuleEvent event) throws MuleException, MessagingException
+    {
+        try
+        {
+            ownedMessageProcessor.process(event);
+        }
+        catch (MessagingException e)
+        {
+            if (splitter.equals(e.getFailingMessageProcessor())
+                || filter.equals(e.getFailingMessageProcessor()))
+            {
+                // Make sure the context information for the exception is relative to the ForEach.
+                e.getInfo().remove(INFO_LOCATION_KEY);
+                throw new MessagingException(event, e, this);
+            }
+            else
+            {
+                throw e;
+            }
+        }
     }
 
     private boolean transformPayloadIfNeeded(MuleMessage message) throws TransformerException
