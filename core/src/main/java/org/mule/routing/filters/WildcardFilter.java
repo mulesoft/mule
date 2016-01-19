@@ -11,6 +11,7 @@ import static org.mule.util.ClassUtils.hash;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.ObjectFilter;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
@@ -48,7 +49,8 @@ public class WildcardFilter implements Filter, ObjectFilter
     {
         try
         {
-            return accept(message.getMuleContext().getTransformationService().getPayloadAsString(message));
+            return accept(message.getMuleContext().getTransformationService().transform(message, DataTypeFactory
+                    .STRING).getPayload());
         }
         catch (Exception e)
         {

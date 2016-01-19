@@ -10,6 +10,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.expression.AbstractExpressionEvaluator;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.NumberUtils;
 
 import java.util.ArrayList;
@@ -91,7 +92,7 @@ public class JsonExpressionEvaluator extends AbstractExpressionEvaluator
         
         try
         {
-            String json = message.getMuleContext().getTransformationService().getPayloadAsString(message);
+            String json = (String) message.getMuleContext().getTransformationService().transform(message, DataTypeFactory.STRING).getPayload();
             JsonData data = new JsonData(json);
             try
             {

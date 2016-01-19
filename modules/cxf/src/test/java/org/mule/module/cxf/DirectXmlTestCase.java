@@ -21,6 +21,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -47,6 +48,7 @@ public class DirectXmlTestCase extends FunctionalTestCase
         test(xml);
     }
 
+    @Ignore("MULE-9285")
     @Test
     public void testInputStreamWithXslt() throws Exception
     {

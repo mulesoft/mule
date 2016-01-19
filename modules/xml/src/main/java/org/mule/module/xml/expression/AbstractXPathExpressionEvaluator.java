@@ -160,7 +160,7 @@ public abstract class AbstractXPathExpressionEvaluator extends AbstractExpressio
         //we need to convert to a Dom if its an XML string
         if(!(payload instanceof Node || payload instanceof org.dom4j.Node))
         {
-            payload = muleContext.getTransformationService().getPayload(message, DataTypeFactory.create(Document.class));
+            payload = muleContext.getTransformationService().transform(message, DataTypeFactory.create(Document.class)).getPayload();
         }
         return payload;
     }

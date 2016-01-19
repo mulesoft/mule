@@ -1416,7 +1416,8 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         else
         {
             out.writeBoolean(false);
-            byte[] valueAsByteArray = muleContext.getTransformationService().getPayloadAsBytes(this);
+            byte[] valueAsByteArray = (byte[]) muleContext.getTransformationService().transform(this, DataTypeFactory
+                    .BYTE_ARRAY).getPayload();
             out.writeInt(valueAsByteArray.length);
             new DataOutputStream(out).write(valueAsByteArray);
         }

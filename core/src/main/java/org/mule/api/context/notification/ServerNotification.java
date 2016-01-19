@@ -152,11 +152,6 @@ public abstract class ServerNotification extends EventObject implements MuleCont
                + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
     }
 
-    protected String getPayloadToString()
-    {
-        return source.toString();
-    }
-
     public String getType()
     {
         return TYPE_INFO;

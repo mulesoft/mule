@@ -95,16 +95,18 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
          assertTrue(latch.await(1000L, TimeUnit.MILLISECONDS));
          String cxfOperationName = testCxfEventCallback.getCxfOperationName();
          assertEquals(soapOperation, cxfOperationName);
-         assertTrue(getPayloadAsString(response).contains("<new:parameter1"));
-         assertTrue(getPayloadAsString(response).contains("hello world"));
+         String payload = getPayloadAsString(response);
+         assertTrue(payload.contains("<new:parameter1"));
+         assertTrue(payload.contains("hello world"));
 
          soapOperation = "EchoOperation2";
          response = executeSoap11Call(msgEchoOperation2, soapOperation);
          assertTrue(latch.await(1000L, TimeUnit.MILLISECONDS));
          cxfOperationName = testCxfEventCallback.getCxfOperationName();
          assertEquals(soapOperation, cxfOperationName);
-         assertTrue(getPayloadAsString(response).contains("<new:parameter2"));
-         assertTrue(getPayloadAsString(response).contains("hello world"));
+         payload = getPayloadAsString(response);
+         assertTrue(payload.contains("<new:parameter2"));
+         assertTrue(payload.contains("hello world"));
     }
 
     @Test
@@ -134,16 +136,18 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
          assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
          String cxfOperationName = testCxfEventCallback.getCxfOperationName();
          assertEquals(soapOperation, cxfOperationName);
-         assertTrue(getPayloadAsString(response).contains("<new:parameter1"));
-         assertTrue(getPayloadAsString(response).contains("hello world"));
+         String payload = getPayloadAsString(response);
+         assertTrue(payload.contains("<new:parameter1"));
+         assertTrue(payload.contains("hello world"));
 
          soapOperation = "EchoOperation2";
          response = executeSoap12Call(msgEchoOperation2, soapOperation);
          assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
          cxfOperationName = testCxfEventCallback.getCxfOperationName();
          assertEquals(soapOperation, cxfOperationName);
-         assertTrue(getPayloadAsString(response).contains("<new:parameter2"));
-         assertTrue(getPayloadAsString(response).contains("hello world"));
+         payload = getPayloadAsString(response);
+         assertTrue(payload.contains("<new:parameter2"));
+         assertTrue(payload.contains("hello world"));
     }
 
     private MuleMessage executeSoap11Call(String msgString, String soapAction) throws MuleException

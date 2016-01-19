@@ -10,7 +10,6 @@ package org.mule.api;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.abbreviate;
 import static org.mule.util.ClassUtils.isConsumable;
-
 import org.mule.VoidMuleEvent;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.DefaultMuleConfiguration;
@@ -19,6 +18,7 @@ import org.mule.config.MuleManifest;
 import org.mule.config.i18n.Message;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
 import java.io.IOException;
@@ -161,7 +161,8 @@ public class MessagingException extends MuleException
                 {
                     try
                     {
-                        addInfo(PAYLOAD_INFO_KEY, muleMessage.getMuleContext().getTransformationService().getPayloadAsString(muleMessage));
+                        addInfo(PAYLOAD_INFO_KEY, muleMessage.getMuleContext().getTransformationService().transform
+                                (muleMessage, DataTypeFactory.STRING).getPayload());
                     }
                     catch (Exception e)
                     {

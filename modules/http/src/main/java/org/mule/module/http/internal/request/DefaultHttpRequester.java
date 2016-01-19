@@ -10,7 +10,6 @@ import static java.lang.Integer.MAX_VALUE;
 import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.execution.CompletionHandler;
@@ -445,7 +444,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         {
             try
             {
-                muleContext.getTransformationService().getPayloadAsBytes(event.getMessage());
+                event.getMessageAsBytes();
             }
             catch (Exception e)
             {

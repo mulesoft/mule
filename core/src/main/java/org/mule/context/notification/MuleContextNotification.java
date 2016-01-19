@@ -76,12 +76,6 @@ public class MuleContextNotification extends ServerNotification implements Block
     }
 
     @Override
-    protected String getPayloadToString()
-    {
-        return ((MuleContext) source).getConfiguration().getId();
-    }
-
-    @Override
     public String toString()
     {
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier

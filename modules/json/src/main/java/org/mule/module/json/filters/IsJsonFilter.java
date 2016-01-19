@@ -8,6 +8,7 @@ package org.mule.module.json.filters;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
@@ -44,7 +45,7 @@ public class IsJsonFilter implements Filter
         }
         try
         {
-            return accept(obj.getMuleContext().getTransformationService().getPayloadAsString(obj));
+            return accept(obj.getMuleContext().getTransformationService().transform(obj, DataTypeFactory.STRING).getPayload());
         }
         catch (Exception e)
         {

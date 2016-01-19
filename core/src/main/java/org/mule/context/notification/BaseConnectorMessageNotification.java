@@ -63,19 +63,6 @@ public abstract class BaseConnectorMessageNotification extends ServerNotificatio
 
 
     @Override
-    protected String getPayloadToString()
-    {
-        try
-        {
-            return muleContext.getTransformationService().getPayloadAsString((MuleMessage) source);
-        }
-        catch (Exception e)
-        {
-            return source.toString();
-        }
-    }
-
-    @Override
     public String toString()
     {
         return EVENT_NAME

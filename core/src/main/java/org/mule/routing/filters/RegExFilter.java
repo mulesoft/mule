@@ -7,7 +7,6 @@
 package org.mule.routing.filters;
 
 import static org.mule.util.ClassUtils.hash;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -18,6 +17,7 @@ import org.mule.api.routing.filter.ObjectFilter;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ByteArrayToObject;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
 import org.mule.util.ClassUtils;
 
@@ -87,7 +87,7 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
             }
             else
             {
-                return accept(muleContext.getTransformationService().getPayloadAsString(message));
+                return accept(muleContext.getTransformationService().transform(message, DataTypeFactory.STRING).getPayload());
             }
         }
         catch (Exception e)

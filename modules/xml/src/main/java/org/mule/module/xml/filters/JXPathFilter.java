@@ -19,6 +19,7 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.util.XMLUtils;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -108,7 +109,7 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
         {
             try
             {
-                return accept(muleContext.getTransformationService().getPayloadAsString(obj));
+                return accept(muleContext.getTransformationService().transform(obj, DataTypeFactory.STRING).getPayload());
             }
             catch (Exception e)
             {

@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -276,6 +277,7 @@ public class ForeachTestCase extends FunctionalTestCase
         FlowAssert.verify("process-order-update");
     }
 
+    @Ignore("MULE-9285")
     @Test
     public void xmlUpdateInputStream() throws Exception
     {

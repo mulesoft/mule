@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class XPath1FallbackFunctionTestCase extends FunctionalTestCase
@@ -48,6 +49,7 @@ public class XPath1FallbackFunctionTestCase extends FunctionalTestCase
         this.assertTitleElements((List<Element>) event.getMessage().getPayload());
     }
 
+    @Ignore("MULE-9285")
     @Test
     public void getTitlesFromStream() throws Exception
     {

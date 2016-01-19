@@ -17,6 +17,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionExecutor;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.el.context.MessageContext;
 import org.mule.el.mvel.MVELExpressionExecutor;
@@ -220,10 +221,11 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
     protected void addMessageToContextWithPayload(String payload) throws TransformerException
     {
         MuleMessage message = mock(MuleMessage.class);
-        MuleContext muleContext = mock((MuleContext.class));
+        MuleMessage transformedMessage = mock(MuleMessage.class);
+        when(transformedMessage.getPayload()).thenReturn(payload);
         TransformationService transformationService = mock(TransformationService.class);
         when(muleContext.getTransformationService()).thenReturn(transformationService);
-        when(transformationService.getPayload(any(MuleMessage.class), any(Class.class))).thenReturn(payload);
+        when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenReturn(transformedMessage);
         context.addFinalVariable("message", new MessageContext(message, muleContext));
     }
 

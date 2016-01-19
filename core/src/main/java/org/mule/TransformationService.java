@@ -6,12 +6,14 @@
  */
 package org.mule;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.mule.util.ClassUtils.isConsumable;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.Converter;
 import org.mule.api.metadata.DataType;
+import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -57,7 +59,7 @@ public class TransformationService
      */
     public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event, final List<? extends Transformer> transformers) throws MuleException
     {
-        return applyTransformers(message, event, transformers, null);
+        return applyAllTransformers(message, event, transformers);
     }
 
     /**
@@ -72,58 +74,7 @@ public class TransformationService
      */
     public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event, final Transformer... transformers) throws MuleException
     {
-        return applyTransformers(message, event, Arrays.asList(transformers), null);
-    }
-
-    /**
-     * Applies a list of transformers returning the result of the transformation as a new message instance. If the list
-     * of transformers is empty or transformation would be redundant then the same message instances will be returned.
-     *
-     * @param event the event being processed
-     * @param transformers the transformers to apply to the message payload
-     * @param outputType the required output type for this transformation. By adding this parameter some additional
-     * transformations will occur on the message payload to ensure that the final payload is of the specified type.
-     * If no transformers can be found in the registry that can transform from the return type of the transformation
-     * list to the outputType and exception will be thrown
-     * @return the result of transformation
-     * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
-     * are incompatible with the message payload
-     */
-    public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event, final List<? extends
-            Transformer> transformers, Class<?> outputType) throws MuleException
-    {
-        MuleMessage result = message;
-        if (!transformers.isEmpty())
-        {
-            result = applyAllTransformers(message, event, transformers);
-        }
-
-        if (null != outputType && !result.getPayload().getClass().isAssignableFrom(outputType))
-        {
-            result = new DefaultMuleMessage(getPayload(result, DataTypeFactory.create(outputType)), result, muleContext);
-        }
-        return result;
-    }
-
-
-    /**
-     * Attempts to obtain the payload of this message with the desired Class type. This will
-     * try and resolve a transformer that can do this transformation. If a transformer cannot be found
-     * an exception is thrown.  Any transformers added to the registry will be checked for compatibility.
-     * <p/>
-     * If the existing payload is consumable (i.e. can't be read twice) then the existing payload of the message will be
-     * replaced with a byte[] representation as part of this operations.
-     *
-     * @param outputType the desired return type
-     * @return The converted payload of this message. Note that this method will not alter the payload of this
-     * message *unless* the payload is an InputStream in which case the stream will be read and the payload will become
-     * the fully read stream.
-     * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
-     * payload
-     */
-    public <T> Object getPayload(MuleMessage message, Class<T> outputType) throws TransformerException
-    {
-        return getPayload(message, DataTypeFactory.create(outputType), message.getEncoding());
+        return applyAllTransformers(message, event, Arrays.asList(transformers));
     }
 
     /**
@@ -135,63 +86,18 @@ public class TransformationService
      * replaced with a byte[] representation as part of this operations.
      * <p/>
      *
-     * @param outputType the desired return type
+     * @param outputDataType the desired return type
      * @return The converted payload of this message. Note that this method will not alter the payload of this
      * message *unless* the payload is an InputStream in which case the stream will be read and the payload will become
      * the fully read stream.
      * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
      * payload
      */
-    public <T> T getPayload(MuleMessage message, DataType<T> outputType) throws TransformerException
+    public <T> MuleMessage transform(MuleMessage message, DataType<T> outputDataType) throws TransformerException
     {
-        return getPayload(message, outputType, message.getEncoding());
-    }
-
-    /**
-     * Obtains a {@link String} representation of the message payload. If encoding is required it will use the encoding
-     * set on the message.
-     * <p/>
-     * If the existing payload is consumable (i.e. can't be read twice) then the existing payload of the message will be
-     * replaced with a byte[] representation as part of this operations.
-     *
-     * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
-     *
-     */
-    public String getPayloadAsString(MuleMessage message) throws Exception
-    {
-        return getPayloadAsString(message, message.getEncoding());
-    }
-
-    /**
-     * Obtains a {@link String} representation of the message payload.
-     * <p/>
-     * If the existing payload is consumable (i.e. can't be read twice) then the existing payload of the message will be
-     * replaced with a byte[] representation as part of this operations.
-     *
-     * @param encoding The encoding to use when transforming the message (if
-     *            necessary). The parameter is used when converting from a byte array
-     * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
-     */
-    public String getPayloadAsString(MuleMessage message, String encoding) throws Exception
-    {
-        return getPayload(message, DataType.STRING_DATA_TYPE, encoding);
-    }
-
-    /**
-     * Obtains a byte[] representation of the message payload.
-     * <p/>
-     * If the existing payload is consumable (i.e. can't be read twice) then the existing payload of the message will be
-     * replaced with a byte[] representation as part of this operations.
-     *
-     * @return byte array of the message
-     * @throws Exception Implemetation may throw an endpoint specific exception
-     *
-     */
-    public byte[] getPayloadAsBytes(MuleMessage message) throws Exception
-    {
-        return getPayload(message, DataType.BYTE_ARRAY_DATA_TYPE, message.getEncoding());
+        checkNotNull(message, "Message cannot be null");
+        checkNotNull(outputDataType, "DataType cannot be null");
+        return new DefaultMuleMessage(getPayload(message, outputDataType, message.getEncoding()), message, muleContext);
     }
 
     /**
@@ -210,22 +116,27 @@ public class TransformationService
     /**
      * Obtains a {@link String} representation of the message payload for logging without throwing exception.
      * If encoding is required it will use the encoding set on the message.
-     * <p/>
-     * If the existing payload is consumable (i.e. can't be read twice) then the existing payload of the message will be
-     * replaced with a byte[] representation as part of this operations.
+     * <p>
+     * If the existing payload is consumable (i.e. can't be read twice) or an exception occurs during transformation
+     * then the an exeption won't be thrown but rather a description of the payload type will be returned.
      *
-     * @return message payload as a String
+     * @return message payload as a String or message with the payload type if payload can't be converted to a String
      */
     public String getPayloadForLogging(MuleMessage message, String encoding)
     {
-        try
+        Class type = message.getPayload().getClass();
+        if (!isConsumable(type))
         {
-            return getPayloadAsString(message, encoding);
+            try
+            {
+                return getPayload(message, DataType.STRING_DATA_TYPE, encoding);
+            }
+            catch (TransformerException e)
+            {
+                return "Payload could not be converted to a String. Payload type is " + type;
+            }
         }
-        catch (Exception e)
-        {
-            return "[Message could not be converted to a String]";
-        }
+        return "Payload is a stream of type: " + type;
     }
 
     private MuleMessage applyAllTransformers(final MuleMessage message, final MuleEvent event, final List<? extends Transformer> transformers) throws MuleException
@@ -425,16 +336,6 @@ public class TransformationService
         if (!resultType.getType().isAssignableFrom(result.getClass()))
         {
             throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(resultType, result));
-        }
-
-        // TODO MULE-9142 Seems to me that if the payload is consumable, then the new value should be set on the message
-        // before throwing the previous exception
-
-        // If the payload is a stream and we've consumed it, then we should set the payload on the
-        // message. This is the only time this method will alter the payload on the message
-        if (((DefaultMuleMessage) message).isPayloadConsumed(source.getType()))
-        {
-            message.setPayload(result, message.getDataType());
         }
 
         return (T) result;

@@ -162,7 +162,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
             //This will perform any additional transformation from the source type to the method parameter type
             try
             {
-                firstArg = muleContext.getTransformationService().getPayload(message, DataTypeFactory.create(transformMethod.getParameterTypes()[0]));
+                firstArg = muleContext.getTransformationService().transform(message, DataTypeFactory.create(transformMethod.getParameterTypes()[0])).getPayload();
             }
             catch (TransformerException e)
             {

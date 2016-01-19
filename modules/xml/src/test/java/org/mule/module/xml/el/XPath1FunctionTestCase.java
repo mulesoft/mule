@@ -22,6 +22,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.tree.DefaultAttribute;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class XPath1FunctionTestCase extends AbstractELTestCase
@@ -40,6 +41,7 @@ public class XPath1FunctionTestCase extends AbstractELTestCase
         assertEquals(DefaultAttribute.class, evaluate("xpath('/root/@foo')", message).getClass());
     }
 
+    @Ignore("MULE-9285")
     @Test
     public void xpathFunctionStream() throws Exception
     {

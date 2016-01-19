@@ -187,7 +187,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             {
                 try
                 {
-                    ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(muleContext.getTransformationService().getPayloadAsBytes(event.getMessage()));
+                    ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessageAsBytes());
                     resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding(event), byteArrayHttpEntity);
                     httpEntity = byteArrayHttpEntity;
                 }

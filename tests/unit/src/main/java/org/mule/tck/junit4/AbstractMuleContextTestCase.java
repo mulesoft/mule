@@ -40,6 +40,7 @@ import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.TestingWorkListener;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -616,7 +617,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      */
     protected String getPayloadAsString(MuleMessage message) throws Exception
     {
-        return muleContext.getTransformationService().getPayloadAsString(message);
+        return getPayload(message, DataTypeFactory.STRING);
     }
 
     /**
@@ -628,7 +629,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      */
     protected byte[] getPayloadAsBytes(MuleMessage message) throws Exception
     {
-        return muleContext.getTransformationService().getPayloadAsBytes(message);
+        return getPayload(message, DataTypeFactory.BYTE_ARRAY);
     }
 
     /**
@@ -641,7 +642,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      */
     protected <T> T getPayload(MuleMessage message, DataType<T> dataType) throws Exception
     {
-        return muleContext.getTransformationService().getPayload(message, dataType);
+        return (T) muleContext.getTransformationService().transform(message, dataType).getPayload();
     }
 
     /**
@@ -652,9 +653,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      * @return representation of the message payload of the required class
      * @throws Exception if there is an unexpected error obtaining the payload representation
      */
-    protected <T> T getPayload(MuleMessage message, Class clazz) throws Exception
+    protected <T> T getPayload(MuleMessage message, Class<T> clazz) throws Exception
     {
-        return (T) muleContext.getTransformationService().getPayload(message, clazz);
+        return getPayload(message, DataTypeFactory.create(clazz));
     }
 
 }
