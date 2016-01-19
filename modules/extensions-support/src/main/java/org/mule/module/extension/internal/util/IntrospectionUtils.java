@@ -289,12 +289,6 @@ public class IntrospectionUtils
         return parameter != null ? parameter.expressionSupport() : SUPPORTED;
     }
 
-    public static Object getDefaultValue(AccessibleObject object)
-    {
-        Optional optional = object.getAnnotation(Optional.class);
-        return optional != null ? optional.defaultValue() : null;
-    }
-
     public static boolean isVoid(Method method)
     {
         Class<?> returnType = method.getReturnType();

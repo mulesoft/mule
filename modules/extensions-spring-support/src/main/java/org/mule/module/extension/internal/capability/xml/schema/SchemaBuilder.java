@@ -42,7 +42,6 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
 import static org.mule.module.extension.internal.introspection.utils.PoolingSupport.REQUIRED;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getDefaultValue;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
@@ -50,11 +49,11 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.isIgnor
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isRequired;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getConnectedOperations;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDynamicParameters;
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
-
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
@@ -64,10 +63,10 @@ import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.Described;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.ParametrizedModel;
+import org.mule.extension.api.introspection.SourceModel;
 import org.mule.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.module.extension.internal.capability.xml.schema.model.ComplexContent;

@@ -41,6 +41,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
@@ -226,6 +227,22 @@ public class MuleExtensionUtils
         return property != null ? (Class<T>) property.getType() : null;
     }
 
+    /**
+     * Returns the default value associated with the given annotation.
+     * <p>
+     * The reason for this method to be instead of simply using
+     * {@link Optional#defaultValue()} is a limitation on the Java
+     * language to have an annotation which defaults to a {@code null}
+     * value. For that reason, this method tests the default value
+     * for equality against the {@link Optional#NULL}. If such test
+     * is positive, then {@code null} is returned.
+     * <p>
+     * If a {@code null} {@code optional} is supplied, then this method
+     * returns {@code null}
+     *
+     * @param optional a nullable annotation
+     * @return the default value associated to the annotation or {@code null}
+     */
     public static String getDefaultValue(Optional optional)
     {
         if (optional == null)
@@ -235,6 +252,25 @@ public class MuleExtensionUtils
 
         String defaultValue = optional.defaultValue();
         return Optional.NULL.equals(defaultValue) ? null : defaultValue;
+    }
+
+    /**
+     * Tests the given {@code object} to be annotated with {@link Optional}.
+     * <p>
+     * If the annotation is present, then a default value is extracted
+     * by the rules of {@link #getDefaultValue(Optional)}. Otherwise,
+     * {@code null} is returned.
+     * <p>
+     * Notice that a {@code null} return value doesn't necessarily mean
+     * that the annotation is not present. It could well be that {@code null}
+     * happens to be the default value.
+     *
+     * @param object an object potentially annotated with {@link Optional}
+     * @return A default value or {@code null}
+     */
+    public static Object getDefaultValue(AccessibleObject object)
+    {
+        return getDefaultValue(object.getAnnotation(Optional.class));
     }
 
     public static MuleEvent getInitialiserEvent(MuleContext muleContext)
