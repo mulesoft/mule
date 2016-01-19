@@ -11,16 +11,14 @@ import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.module.extension.internal.ExtensionProperties.CONTENT_METADATA;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.metadata.DataType;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExceptionEnricher;
@@ -28,16 +26,14 @@ import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
-import org.mule.extension.api.runtime.ContentMetadata;
-import org.mule.extension.api.runtime.ContentType;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
+import org.mule.module.extension.internal.runtime.ExecutionMediator;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.StringUtils;
 
 import java.util.Optional;
@@ -71,8 +67,9 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     private final OperationModel operationModel;
     private final ResolverSet resolverSet;
     private final ExtensionManager extensionManager;
-    private final DefaultExecutionMediator executionMediator;
+    private final ExecutionMediator executionMediator;
 
+    private ReturnDelegate returnDelegate;
     private MuleContext muleContext;
     private OperationExecutor operationExecutor;
 
@@ -97,37 +94,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         OperationContextAdapter operationContext = createOperationContext(configuration, event);
         Object result = executeOperation(operationContext, event);
 
-        return configureResponseEvent(operationContext, result, event);
-    }
-
-    private MuleEvent configureResponseEvent(OperationContextAdapter operationContext, Object result, MuleEvent event)
-    {
-        if (result instanceof MuleEvent)
-        {
-            event = (MuleEvent) result;
-        }
-        else if (result instanceof MuleMessage)
-        {
-            event.setMessage((MuleMessage) result);
-        }
-        else
-        {
-            event.getMessage().setPayload(result);
-        }
-
-        ContentMetadata contentMetadata = operationContext.getVariable(CONTENT_METADATA);
-        if (contentMetadata != null)
-        {
-            final ContentType contentType = contentMetadata.getOutputContentType();
-            final MuleMessage message = event.getMessage();
-            final Object payload = message.getPayload();
-            final DataType<?> dataType = DataTypeFactory.createWithEncoding(payload.getClass(), contentType.getEncoding().name());
-            dataType.setMimeType(contentType.getMimeType());
-
-            message.setPayload(message.getPayload(), dataType);
-        }
-
-        return event;
+        return returnDelegate.asReturnValue(result, operationContext);
     }
 
     private Object executeOperation(OperationContext operationContext, MuleEvent event) throws MuleException
@@ -157,6 +124,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     @Override
     public void initialise() throws InitialisationException
     {
+        returnDelegate = isVoid(operationModel) ? VoidReturnDelegate.INSTANCE : new ValueReturnDelegate(muleContext);
         operationExecutor = operationModel.getExecutor().createExecutor();
         initialiseIfNeeded(operationExecutor, true, muleContext);
     }

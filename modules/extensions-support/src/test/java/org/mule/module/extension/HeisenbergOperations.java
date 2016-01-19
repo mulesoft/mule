@@ -8,9 +8,8 @@ package org.mule.module.extension;
 
 import static java.util.stream.Collectors.toList;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
-import org.mule.api.transport.PropertyScope;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.annotation.api.ContentMetadataParameters;
 import org.mule.extension.annotation.api.OnException;
 import org.mule.extension.annotation.api.Operation;
@@ -30,6 +29,8 @@ import org.mule.module.extension.model.KnockeableDoor;
 import org.mule.module.extension.model.PersonalInfo;
 import org.mule.module.extension.model.Weapon;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -131,10 +132,11 @@ public class HeisenbergOperations
     }
 
     @Operation
-    public void hideMethInEvent(MuleEvent event, ContentType contentType)
+    public void getPaymentFromEvent(@UseConfig HeisenbergExtension config, MuleEvent event, ContentType contentType)
     {
-        event.setFlowVariable(SECRET_PACKAGE, METH);
         event.setFlowVariable(CONTENT_TYPE, contentType);
+        Long payment = (Long) event.getMessage().getPayload();
+        config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
     }
 
     @Operation
@@ -144,9 +146,10 @@ public class HeisenbergOperations
     }
 
     @Operation
-    public void hideMethInMessage(MuleMessage message)
+    public void getPaymentFromMessage(@UseConfig HeisenbergExtension config, MuleMessage<Long, Serializable> message)
     {
-        message.setProperty(SECRET_PACKAGE, METH, PropertyScope.INVOCATION);
+        Long payment = message.getPayload();
+        config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
     }
 
     @Operation

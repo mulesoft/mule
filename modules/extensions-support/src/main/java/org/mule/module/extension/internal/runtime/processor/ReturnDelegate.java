@@ -4,16 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.executor;
+package org.mule.module.extension.internal.runtime.processor;
 
-import org.mule.extension.api.runtime.OperationContext;
+import org.mule.api.MuleEvent;
 import org.mule.extension.api.runtime.OperationExecutor;
+import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 
 /**
  * A delegate interface to decouple a {@link OperationExecutor}'s return value
- * from the format in which it is to be handed off
+ * from the format in which it is to be handed back into the pipeline
  *
- * @since 3.7.0
+ * @since 4.0
  */
 interface ReturnDelegate
 {
@@ -22,8 +23,8 @@ interface ReturnDelegate
      * Adapts the {@code value} to another format
      *
      * @param value            the value to be returned
-     * @param operationContext the {@link OperationContext} on which the operation was executed
-     * @return an adapted value
+     * @param operationContext the {@link OperationContextAdapter} on which the operation was executed
+     * @return a {@link MuleEvent} carrying the operation's result
      */
-    Object asReturnValue(Object value, OperationContext operationContext);
+    MuleEvent asReturnValue(Object value, OperationContextAdapter operationContext);
 }

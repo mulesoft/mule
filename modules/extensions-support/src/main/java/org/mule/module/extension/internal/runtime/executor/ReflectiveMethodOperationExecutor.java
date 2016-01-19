@@ -56,16 +56,14 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
 
     private final Method operationMethod;
     private final Object executorDelegate;
-    private final ReturnDelegate returnDelegate;
     private final ArgumentResolverDelegate argumentResolverDelegate;
 
     private MuleContext muleContext;
 
-    ReflectiveMethodOperationExecutor(Method operationMethod, Object executorDelegate, ReturnDelegate returnDelegate)
+    ReflectiveMethodOperationExecutor(Method operationMethod, Object executorDelegate)
     {
         this.operationMethod = operationMethod;
         this.executorDelegate = executorDelegate;
-        this.returnDelegate = returnDelegate;
         argumentResolverDelegate = isEmpty(operationMethod.getParameterTypes()) ? NO_ARGS_DELEGATE : new MethodArgumentResolverDelegate(operationMethod);
     }
 
@@ -75,8 +73,7 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
     @Override
     public Object execute(OperationContext operationContext) throws Exception
     {
-        Object result = invokeMethod(operationMethod, executorDelegate, getParameterValues(operationContext));
-        return returnDelegate.asReturnValue(result, operationContext);
+        return invokeMethod(operationMethod, executorDelegate, getParameterValues(operationContext));
     }
 
     private Object[] getParameterValues(OperationContext operationContext)
