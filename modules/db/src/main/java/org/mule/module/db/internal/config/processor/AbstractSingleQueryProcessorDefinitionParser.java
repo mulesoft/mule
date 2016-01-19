@@ -45,6 +45,7 @@ public abstract class AbstractSingleQueryProcessorDefinitionParser extends Abstr
         parseExecutorFactory(element, builder);
         parseTransactionalAction(element, builder);
         parseMetadataProvider(element, builder);
+        configureStatementResultSetCloser(builder);
     }
 
     protected void createQueryResolverBeanDefinition(BeanDefinition sqlParamResolver)

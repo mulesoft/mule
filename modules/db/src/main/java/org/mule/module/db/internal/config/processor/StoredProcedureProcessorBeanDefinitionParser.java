@@ -51,7 +51,7 @@ public class StoredProcedureProcessorBeanDefinitionParser extends AbstractResult
         {
             statementResultHandlerBean = BeanDefinitionBuilder.genericBeanDefinition(EagerStatementResultHandler.class);
         }
-        statementResultHandlerBean.addConstructorArgValue(resultSetHandler);
+        statementResultHandlerBean.addConstructorArgReference(resultSetHandlerBeanName);
 
         executorFactoryBean.addConstructorArgValue(statementResultHandlerBean.getBeanDefinition());
 
