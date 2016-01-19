@@ -19,16 +19,16 @@ import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.common.Result;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.OperationMetaDataEnabled;
+import org.mule.module.db.internal.domain.connection.DbConnection;
+import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
 import org.mule.module.db.internal.domain.query.QueryType;
-import org.mule.module.db.internal.domain.database.DbConfig;
-import org.mule.module.db.internal.domain.connection.DbConnection;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
-
-import org.mule.module.db.internal.metadata.QueryMetadataProvider;
-import org.mule.module.db.internal.metadata.NullMetadataProvider;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.module.db.internal.metadata.NullMetadataProvider;
+import org.mule.module.db.internal.metadata.QueryMetadataProvider;
+import org.mule.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.module.db.internal.result.statement.StatementStreamingResultSetCloser;
+import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.util.StringUtils;
 
 import java.sql.SQLException;
@@ -45,6 +45,7 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
     private QueryMetadataProvider queryMetadataProvider = new NullMetadataProvider();
     private String source;
     private String target;
+    private StatementStreamingResultSetCloser streamingResultSetCloser;
 
     public AbstractDbMessageProcessor(DbConfigResolver dbConfigResolver, TransactionalAction transactionalAction)
     {
@@ -90,6 +91,8 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
         }
         catch (SQLException e)
         {
+            // Close all other streaming ResultSets that remain open from the current connection.
+            streamingResultSetCloser.closeResultSets(connection);
             throw new MessagingException(muleEvent, e);
         }
         finally
@@ -166,6 +169,11 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
     public void setTarget(String target)
     {
         this.target = target;
+    }
+
+    public void setStatementStreamingResultSetCloser(StatementStreamingResultSetCloser streamingResultSetCloser)
+    {
+        this.streamingResultSetCloser = streamingResultSetCloser;
     }
 
     protected void validateQueryType(QueryTemplate queryTemplate)
