@@ -9,6 +9,7 @@ package org.mule.module.db.integration.select;
 
 import static java.lang.Boolean.FALSE;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -71,7 +72,7 @@ public class SelectStreamingExceptionTestCase extends AbstractDbIntegrationTestC
             }
             catch (MessagingException e)
             {
-                assertThat("Iteration " + i, e.getMessage(), is("Table/View 'NOT_EXISTS' does not exist. (java.sql.SQLSyntaxErrorException)."));
+                assertThat("Iteration " + i, e.getMessage(), startsWith("Table/View 'NOT_EXISTS' does not exist. (java.sql.SQLSyntaxErrorException)."));
             }
         }
     }
