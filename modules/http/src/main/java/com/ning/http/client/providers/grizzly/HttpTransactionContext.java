@@ -12,15 +12,14 @@
  */
 package com.ning.http.client.providers.grizzly;
 
-import com.ning.http.client.ProxyServer;
 import com.ning.http.client.providers.grizzly.events.GracefulCloseEvent;
 import com.ning.http.client.AsyncHandler;
+import com.ning.http.client.ProxyServer;
 import com.ning.http.client.Request;
 import com.ning.http.client.uri.Uri;
 import com.ning.http.client.ws.WebSocket;
 import com.ning.http.util.AsyncHttpProviderUtils;
 import com.ning.http.util.ProxyUtils;
-
 import java.io.IOException;
 import org.glassfish.grizzly.CloseListener;
 import org.glassfish.grizzly.CloseType;
@@ -112,6 +111,7 @@ public final class HttpTransactionContext {
         final HttpTransactionContext httpTxContext = currentTransaction(httpCtx);
         if (httpTxContext != null) {
             httpCtx.getCloseable().removeCloseListener(httpTxContext.listener);
+            REQUEST_STATE_ATTR.remove(httpCtx);
         }
 
         return httpTxContext;
