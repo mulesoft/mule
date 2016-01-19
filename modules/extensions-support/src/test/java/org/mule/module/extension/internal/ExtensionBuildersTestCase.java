@@ -69,12 +69,11 @@ import static org.mule.extension.api.introspection.declaration.tck.TestWebServic
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WSDL_LOCATION;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WS_CONSUMER;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WS_CONSUMER_DESCRIPTION;
+import static org.mule.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
 import org.mule.api.registry.ServiceRegistry;
+import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.exception.NoSuchConfigurationException;
 import org.mule.extension.api.exception.NoSuchOperationException;
-import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
-import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.extension.api.introspection.ConfigurationFactory;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
@@ -91,6 +90,8 @@ import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference;
+import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -249,6 +250,13 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
                                    .with().optionalParameter("fixed").ofType(String.class)
                                    .withExpressionSupport(NOT_SUPPORTED)
                                    .defaultingTo("#['hello']"));
+    }
+
+    @Test(expected = IllegalOperationModelDefinitionException.class)
+    public void operationWithParameterNamedTarget()
+    {
+        factory.createFrom(descriptor.withOperation("invalidOperation").describedAs("")
+                                   .with().optionalParameter(TARGET_ATTRIBUTE).ofType(String.class));
     }
 
     @Test(expected = IllegalParameterModelDefinitionException.class)

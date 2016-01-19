@@ -6,7 +6,9 @@
  */
 package org.mule.module.extension.internal.config;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
 import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
@@ -18,6 +20,7 @@ import org.mule.extension.api.introspection.OperationModel;
 import org.mule.module.extension.internal.runtime.processor.OperationMessageProcessor;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.util.ObjectNameHelper;
+import org.mule.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -38,6 +41,7 @@ public class OperationMessageProcessorFactoryBean implements FactoryBean<Operati
     private final ElementDescriptor element;
     private final ExtensionManager extensionManager;
     private final Map<String, List<MessageProcessor>> nestedOperations;
+    private final String target;
 
     public OperationMessageProcessorFactoryBean(String configurationProviderName,
                                                 ExtensionModel extensionModel,
@@ -54,14 +58,20 @@ public class OperationMessageProcessorFactoryBean implements FactoryBean<Operati
         this.nestedOperations = nestedOperations;
 
         registerNestedProcessors(nestedOperations, muleContext);
-
+        target = getTarget(element);
     }
 
     @Override
     public OperationMessageProcessor getObject() throws Exception
     {
         ResolverSet resolverSet = getResolverSet(element, operationModel.getParameterModels(), nestedOperations);
-        return new OperationMessageProcessor(extensionModel, operationModel, configurationProviderName, resolverSet, extensionManager);
+        return new OperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target, resolverSet, extensionManager);
+    }
+
+    private String getTarget(ElementDescriptor element)
+    {
+        String target = element.getAttribute(TARGET_ATTRIBUTE);
+        return StringUtils.isBlank(target) ? EMPTY : target;
     }
 
     /**

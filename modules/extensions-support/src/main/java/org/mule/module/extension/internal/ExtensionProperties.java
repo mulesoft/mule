@@ -7,6 +7,8 @@
 package org.mule.module.extension.internal;
 
 import static org.mule.api.config.MuleProperties.PROPERTY_PREFIX;
+import org.mule.api.MuleEvent;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.runtime.ContentMetadata;
 import org.mule.extension.api.runtime.ContentType;
 
@@ -47,4 +49,11 @@ public class ExtensionProperties
      */
     public static final String ENCODING_PARAMETER_NAME = "outputEncoding";
 
+    /**
+     * The name of a synthetic parameter that's automatically added to all non void operations. The meaning
+     * of it is requesting the runtime to place the resulting {@link MuleMessage} on a flowVar pointed
+     * by this parameter instead of replacing the message carried by the {@link MuleEvent} that's travelling
+     * through the pipeline
+     */
+    public static final String TARGET_ATTRIBUTE = "target";
 }

@@ -6,18 +6,10 @@
  */
 package org.mule.module.extension.internal.runtime.processor;
 
-import static org.mule.module.extension.internal.ExtensionProperties.CONTENT_METADATA;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
-import org.mule.extension.api.runtime.ContentMetadata;
-import org.mule.extension.api.runtime.ContentType;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.transformer.types.DataTypeFactory;
-
-import java.io.Serializable;
 
 /**
  * An implementation of {@link ReturnDelegate} which allows
@@ -26,19 +18,15 @@ import java.io.Serializable;
  *
  * @since 4.0
  */
-final class ValueReturnDelegate implements ReturnDelegate
+final class ValueReturnDelegate extends AbstractReturnDelegate
 {
 
-    private final MuleContext muleContext;
-
     /**
-     * Creates a new instance
-     *
-     * @param muleContext the {@link MuleContext} of the owning application
+     * {@inheritDoc}
      */
     ValueReturnDelegate(MuleContext muleContext)
     {
-        this.muleContext = muleContext;
+        super(muleContext);
     }
 
     /**
@@ -59,44 +47,10 @@ final class ValueReturnDelegate implements ReturnDelegate
     public MuleEvent asReturnValue(Object value, OperationContextAdapter operationContext)
     {
         MuleEvent event = operationContext.getEvent();
-        if (value instanceof MuleMessage)
-        {
-            event.setMessage(merge(event.getMessage(), (MuleMessage) value));
-        }
-        else
-        {
-            event.getMessage().setPayload(value);
-        }
-
-        ContentMetadata contentMetadata = operationContext.getVariable(CONTENT_METADATA);
-        if (contentMetadata != null)
-        {
-            final ContentType contentType = contentMetadata.getOutputContentType();
-            final MuleMessage message = event.getMessage();
-            final Object payload = message.getPayload();
-            final DataType<?> dataType = DataTypeFactory.createWithEncoding(payload.getClass(), contentType.getEncoding().name());
-            dataType.setMimeType(contentType.getMimeType());
-
-            ((DefaultMuleMessage) message).setPayload(message.getPayload(), dataType);
-        }
+        event.setMessage((org.mule.api.MuleMessage) toMessage(value, operationContext));
 
         return event;
     }
 
-    private DefaultMuleMessage merge(MuleMessage originalMessage, MuleMessage resultMessage)
-    {
-        DataType dataType = resultMessage.getDataType();
-        if (dataType == null)
-        {
-            dataType = originalMessage.getDataType();
-        }
 
-        Serializable attributes = resultMessage.getAttributes();
-        if (attributes == null)
-        {
-            attributes = originalMessage.getAttributes();
-        }
-
-        return new DefaultMuleMessage(resultMessage.getPayload(), dataType, attributes, muleContext);
-    }
 }

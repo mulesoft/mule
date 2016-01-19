@@ -14,7 +14,7 @@
     <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
 
     <heisenberg:config name="heisenberg"
-                       myName="Heisenberg"
+                       myName="heisenberg"
                        age="50"
                        cancer="true"
                        dateOfBirth="1959-09-07T00:00:00"
@@ -41,8 +41,12 @@
         <heisenberg:say-my-name/>
     </flow>
 
+    <flow name="sayMyNameOnTarget">
+        <heisenberg:say-my-name target="myFace" />
+    </flow>
+
     <flow name="die">
-        <heisenberg:die/>
+        <heisenberg:die />
     </flow>
 
     <flow name="getFixedEnemy">

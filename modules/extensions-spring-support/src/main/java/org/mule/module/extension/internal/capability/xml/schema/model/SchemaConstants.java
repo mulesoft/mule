@@ -7,6 +7,8 @@
 
 package org.mule.module.extension.internal.capability.xml.schema.model;
 
+import org.mule.module.extension.internal.ExtensionProperties;
+
 import javax.xml.namespace.QName;
 
 public final class SchemaConstants
@@ -61,8 +63,8 @@ public final class SchemaConstants
     // ATTRIBUTES
     public static final String USE_REQUIRED = "required";
     public static final String USE_OPTIONAL = "optional";
-    public static final String ATTRIBUTE_NAME_CONFIG = "config-ref";
-    public static final String ATTRIBUTE_DESCRIPTION_CONFIG = "Specify which configuration to use for this invocation.";
+    public static final String CONFIG_ATTRIBUTE = "config-ref";
+    public static final String CONFIG_ATTRIBUTE_DESCRIPTION = "Specify which configuration to use for this invocation.";
     public static final String ATTRIBUTE_NAME_VALUE = "value";
     public static final String ENUM_TYPE_SUFFIX = "EnumType";
     public static final String TYPE_SUFFIX = "Type";
@@ -70,4 +72,9 @@ public final class SchemaConstants
     public static final String ATTRIBUTE_NAME_NAME = "name";
     public static final String XSD_EXTENSION = ".xsd";
     public static final String DISABLE_VALIDATION = "disableValidation";
+
+    /**
+     * Human friendly description for {@link ExtensionProperties#TARGET_ATTRIBUTE}
+     */
+    public static final String TARGET_ATTRIBUTE_DESCRIPTION = "The name of a variable on which the operation's output will be placed";
 }
