@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <vm:connector name="vmQueues"/>
+
+    <flow name="innerFlow">
+        <vm:inbound-endpoint exchange-pattern="one-way" path="vminnertest"/>
+        <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$InnerFlowCountDownProcessor"/>
+    </flow>
+
+    <flow name="innerFlowRequestResponse">
+        <vm:inbound-endpoint exchange-pattern="request-response" path="vminnerrequestresponsetest"/>
+        <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$InnerFlowCountDownProcessor"/>
+    </flow>
+
+    <flow name="catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow">
+        <vm:inbound-endpoint exchange-pattern="request-response" path="catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow"/>
+        <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$SendInnerFlowThrowExceptionJavaComponent"/>
+        <catch-exception-strategy>
+            <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$AssertEventComponent"/>
+            <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="catchExceptionJavaComponentToJavaComponent">
+        <vm:inbound-endpoint exchange-pattern="request-response" path="catchExceptionJavaComponentToJavaComponent"/>
+        <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$DispatchInnerFlowThrowExceptionJavaComponent"/>
+        <catch-exception-strategy>
+            <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$AssertEventComponent"/>
+            <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="catchExceptionJavaComponentToMessageProcessor">
+        <vm:inbound-endpoint exchange-pattern="request-response" path="catchExceptionJavaComponentToMessageProcessor"/>
+        <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$DispatchInnerFlowThrowExceptionJavaComponent"/>
+        <catch-exception-strategy>
+            <processor ref="assertEventProcessor"/>
+            <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <spring:beans>
+        <spring:bean id="myProcessor"
+                     class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$DispatchInnerFlowThrowExceptionMessageProcessor"/>
+        <spring:bean id="assertEventProcessor"
+                     class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$AssertEventProcessor"/>
+    </spring:beans>
+
+    <flow name="catchExceptionMessageProcessorToJavaComponent">
+        <vm:inbound-endpoint exchange-pattern="request-response" path="catchExceptionMessageProcessorToJavaComponent"/>
+        <processor ref="myProcessor"/>
+        <catch-exception-strategy>
+            <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$AssertEventComponent"/>
+            <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="catchExceptionMessageProcessorToMessageProcessor">
+        <vm:inbound-endpoint exchange-pattern="request-response" path="catchExceptionMessageProcessorToMessageProcessor"/>
+        <processor ref="myProcessor"/>
+        <catch-exception-strategy>
+            <processor ref="assertEventProcessor"/>
+            <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$ExecutionCountDownProcessor"/>
+        </catch-exception-strategy>
+    </flow>
+</mule>
