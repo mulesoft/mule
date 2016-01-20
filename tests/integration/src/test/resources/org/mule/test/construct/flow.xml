@@ -87,7 +87,7 @@
 
     <flow name="split-aggregate">
         <vm:inbound-endpoint path="split-aggregate-in" exchange-pattern="request-response" />
-        <splitter evaluator="bean" expression="fruit" enableCorrelation="ALWAYS" />
+        <splitter expression="#[payload.fruit]" enableCorrelation="ALWAYS" />
         <script:transformer>
             <script:script engine="groovy">
                 ((org.mule.tck.testmodels.fruit.Fruit)payload).bite();
@@ -100,7 +100,7 @@
     
     <flow name="split-no-parts">
         <vm:inbound-endpoint path="split-no-parts-in" exchange-pattern="request-response" />
-        <splitter evaluator="xpath" expression="//Order/item" enableCorrelation="ALWAYS" />
+        <splitter expression="#[xpath3('//Order/item', payload, 'NODESET')]" enableCorrelation="ALWAYS" />
     </flow>
 
     <flow name="split-aggregate-singleton-list">
@@ -166,7 +166,7 @@
 
     <flow name="split-filter-aggregate">
         <vm:inbound-endpoint path="split-filter-aggregate-in" exchange-pattern="one-way" />
-        <splitter expression="#[bean:fruit]" enableCorrelation="ALWAYS" />
+        <splitter expression="#[payload.fruit]" enableCorrelation="ALWAYS" />
         <message-filter throwOnUnaccepted="false">
             <not-filter>
                 <or-filter>

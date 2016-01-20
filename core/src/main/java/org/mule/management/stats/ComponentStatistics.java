@@ -156,7 +156,7 @@ public class ComponentStatistics implements Statistics
         {
             maxExecutionTime = effectiveTotal;
         }
-        averageExecutionTime = Math.round(totalExecTime / executedEvent);
+        averageExecutionTime = executedEvent > 0 ? Math.round(totalExecTime / executedEvent) : 0;
     }
 
     /**

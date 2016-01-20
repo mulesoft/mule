@@ -12,7 +12,6 @@ import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
@@ -45,11 +44,8 @@ public class XSLTWikiDocsTestCase extends FunctionalTestCase
         String resultData = IOUtils.getResourceAsString(
                 "org/mule/test/integration/xml/cd-catalog-result-with-params.xml", getClass());
 
-        //Create a new Mule Client
-        MuleClient client = muleContext.getClient();
-
         //These are the message roperties that will get passed into the XQuery context
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
 

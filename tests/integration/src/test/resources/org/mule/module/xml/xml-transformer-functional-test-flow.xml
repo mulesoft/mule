@@ -13,8 +13,6 @@
     <mxml:dom-to-xml-transformer name="domToXml"/>
     <mxml:xml-to-dom-transformer name="xmlToDom" returnClass="org.w3c.dom.Document"/>
 
-    <mxml:jxpath-extractor-transformer name="jxpath" expression="count(//parent)"/>
-
     <mxml:object-to-xml-transformer name="objectToXml"/>
     <mxml:xml-to-object-transformer name="xmlToObject"/>
 <!--// END SNIPPET: xml-transformers1 -->
@@ -63,8 +61,6 @@
         exchange-pattern="one-way"/>
     <vm:endpoint name="xml-xslt-out-string" path="xml-xslt-out-string"
         exchange-pattern="one-way"/>
-    <vm:endpoint name="xml-jxpath-out" path="xml-jxpath-out"
-        exchange-pattern="one-way"/>
     <vm:endpoint name="xml-dom-out" path="xml-dom-out"
         exchange-pattern="one-way"/>
     <vm:endpoint name="xml-object-out" path="xml-object-out"
@@ -89,9 +85,6 @@
             <vm:outbound-endpoint ref="xml-xslt-out-string">
                 <transformer ref="xslt-string"/>
             </vm:outbound-endpoint>
-            <outbound-endpoint ref="xml-jxpath-out">
-                <transformer ref="jxpath"/>
-            </outbound-endpoint>
             <outbound-endpoint ref="xml-dom-out">
                 <transformer ref="xmlToDom "/>
             </outbound-endpoint>

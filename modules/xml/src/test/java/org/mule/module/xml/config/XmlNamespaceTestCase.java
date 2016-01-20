@@ -10,20 +10,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.Transformer;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.jaxb.model.Person;
-import org.mule.module.xml.filters.JXPathFilter;
-import org.mule.module.xml.filters.JaxenFilter;
 import org.mule.module.xml.filters.SchemaValidationFilter;
-import org.mule.module.xml.transformer.JXPathExtractor;
 import org.mule.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
 import org.mule.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
 import org.mule.module.xml.util.NamespaceManager;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 import org.w3c.dom.ls.LSInput;
@@ -52,46 +46,6 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         assertNotNull(manager);
         assertTrue(manager.isIncludeConfigNamespaces());
         assertEquals(5, manager.getNamespaces().size());
-    }
-
-    @Test
-    public void testJXPathFilterConfig() throws Exception
-    {
-        EndpointBuilder epb = muleContext.getRegistry().lookupEndpointBuilder("test.ep1");
-
-        InboundEndpoint ep = epb.buildInboundEndpoint();
-        assertNotNull(ep.getFilter());
-        assertTrue(ep.getFilter() instanceof JXPathFilter);
-        JXPathFilter filter = (JXPathFilter)ep.getFilter();
-        filter.initialise();
-        assertEquals("/bar:foo/bar:bar", filter.getPattern());
-        assertEquals(6, filter.getNamespaces().size());
-        assertEquals("http://bar.com", filter.getNamespaces().get("bar"));
-    }
-
-    @Test
-    public void testJaxenFilterConfig() throws Exception
-    {
-        EndpointBuilder epb = muleContext.getRegistry().lookupEndpointBuilder("test.ep2");
-
-        InboundEndpoint ep = epb.buildInboundEndpoint();
-        assertNotNull(ep.getFilter());
-        assertTrue(ep.getFilter() instanceof JaxenFilter);
-        JaxenFilter filter = (JaxenFilter)ep.getFilter();
-        assertEquals("/car:foo/car:bar", filter.getPattern());
-        assertEquals(6, filter.getNamespaces().size());
-        assertEquals("http://car.com", filter.getNamespaces().get("car"));
-    }
-
-    @Test
-    public void testJXPathExtractor() throws Exception
-    {
-        JXPathExtractor transformer = (JXPathExtractor) lookupTransformer("jxpath-extractor");
-        transformer.initialise();
-        assertNotNull(transformer.getNamespaces());
-        assertEquals(6, transformer.getNamespaces().size());
-        assertNotNull(transformer.getNamespaces().get("foo"));
-        assertNotNull(transformer.getNamespaces().get("bar"));
     }
 
     @Test
