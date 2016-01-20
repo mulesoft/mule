@@ -10,6 +10,7 @@ package org.mule.processor.chain;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
@@ -48,7 +49,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.ObjectUtils;
-import org.junit.After;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,7 +77,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         builder.chain(new AppendingMP("1"), new AppendingMP("2"), new AppendingMP("3"));
         assertEquals("0123", builder.build().process(getTestEventUsingFlow("0")).getMessage().getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     /*
@@ -112,7 +112,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 
         // mp3
         assertNull(mp3.event);
-        assertThat(RequestContext.getEvent(), is(nullValue()));
+        assertThat(RequestContext.getEvent(), equalTo(nullmp.event));
     }
 
     /*
@@ -147,16 +147,17 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         assertNotSame(mp3.event, mp2.resultEvent);
         assertEquals(mp2.resultEvent.getMessage().getPayload(), mp3.event.getMessage().getPayload());
         assertEquals(mp3.event.getMessage().getPayload(), "012");
-        assertThat(RequestContext.getEvent(), not(nullValue()));
+        assertThat(RequestContext.getEvent(), equalTo(mp3.event));
     }
 
     @Test
     public void testMPChainWithNullReturnAtEnd() throws MuleException, Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-        builder.chain(new AppendingMP("1"), new AppendingMP("2"), new AppendingMP("3"), new ReturnNullMP());
+        ReturnNullMP returnNullMP = new ReturnNullMP();
+        builder.chain(new AppendingMP("1"), new AppendingMP("2"), new AppendingMP("3"), returnNullMP);
         assertNull(builder.build().process(getTestEventUsingFlow("0")));
-        assertThat(RequestContext.getEvent(), is(nullValue()));
+        assertThat(RequestContext.getEvent(), equalTo(returnNullMP.event));
     }
 
     @Test
@@ -182,7 +183,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         });
         builder.chain(new AppendingMP("3"));
         assertEquals("0123", builder.build().process(getTestEventUsingFlow("0")).getMessage().getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -193,7 +193,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             new AppendingInterceptingMP("3"));
         assertEquals("0before1before2before3after3after2after1",
             builder.build().process(getTestEventUsingFlow("0")).getMessage().getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -207,7 +206,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             new ReturnNullInterceptongMP(), lastMP);
         assertNull(builder.build().process(getTestEventUsingFlow("0")));
         assertFalse(lastMP.invoked);
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -221,7 +219,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             new ReturnNullInterceptongMP(), lastMP);
         assertNull(builder.build().process(getTestEventUsingFlow("0")));
         assertFalse(lastMP.invoked);
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -234,7 +231,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             .process(getTestEventUsingFlow("0"))
             .getMessage()
             .getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -245,7 +241,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         builder.chain(new AppendingInterceptingMP("1"), new ReturnNullInterceptongMP(), new AppendingMP("2"),
             new AppendingMP("3"), new AppendingInterceptingMP("4"), new AppendingMP("5"));
         assertNull(builder.build().process(getTestEventUsingFlow("0")));
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -268,7 +263,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         builder.chain(new AppendingInterceptingMP("1"), new AppendingMP("2"), new ReturnNullInterceptongMP(),
             new AppendingMP("3"), new AppendingInterceptingMP("4"), new AppendingMP("5"));
         assertNull(builder.build().process(getTestEventUsingFlow("0")));
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -295,7 +289,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         builder.chain(new AppendingInterceptingMP("1"), new ReturnNullMP(), new AppendingMP("2"),
             new AppendingMP("3"), new AppendingInterceptingMP("4"), new AppendingMP("5"));
         assertNull(builder.build().process(getTestEventUsingFlow("0")));
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -322,7 +315,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         builder.chain(new AppendingInterceptingMP("1"), new AppendingMP("2"), new ReturnNullMP(),
             new AppendingMP("3"), new AppendingInterceptingMP("4"), new AppendingMP("5"));
         assertNull(builder.build().process(getTestEventUsingFlow("0")));
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -337,7 +329,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             .process(getTestEventUsingFlow("0"))
             .getMessage()
             .getPayload());
-        assertThat(RequestContext.getEvent(), not(nullValue()));
     }
 
     @Test
@@ -349,7 +340,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         builder.chain(new AppendingInterceptingMP("1"), new AppendingMP("2"), new AppendingMP("3"),
             new ReturnNullMP(), new AppendingInterceptingMP("4"), new AppendingMP("5"));
         assertNull(builder.build().process(getTestEventUsingFlow("0")));
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -364,7 +354,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             .process(getTestEventUsingFlow("0"))
             .getMessage()
             .getPayload());
-        assertThat(RequestContext.getEvent(), not(nullValue()));
     }
 
     @Test
@@ -375,7 +364,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         builder.chain(new AppendingInterceptingMP("1"), new AppendingMP("2"), new AppendingMP("3"),
             new AppendingInterceptingMP("4"), new AppendingMP("5"), new ReturnNullMP());
         assertNull(builder.build().process(getTestEventUsingFlow("0")));
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -389,8 +377,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             .process(getTestEventUsingFlow("0"))
             .getMessage()
             .getPayload());
-        
-        assertThat(RequestContext.getEvent(), not(nullValue()));
     }
 
     @Test
@@ -401,7 +387,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             new DefaultMessageProcessorChainBuilder().chain(new AppendingMP("a"), new AppendingMP("b"))
                 .build(), new AppendingMP("2"));
         assertEquals("01ab2", builder.build().process(getTestEventUsingFlow("0")).getMessage().getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -413,7 +398,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             new DefaultMessageProcessorChainBuilder().chain(new AppendingMP("a"), new ReturnNullMP(),
                 new AppendingMP("b")).build(), new ReturnNullMP(), new AppendingMP("2"));
         assertNull(builder.build().process(getTestEventUsingFlow("0")));
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -425,7 +409,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             new DefaultMessageProcessorChainBuilder().chain(new AppendingMP("a"), new ReturnVoidMP(),
                 new AppendingMP("b")).build(), new ReturnVoidMP(), new AppendingMP("2"));
         assertEquals("01ab2", builder.build().process(getTestEventUsingFlow("0")).getMessage().getPayload());
-        assertThat(RequestContext.getEvent(), not(nullValue()));
     }
 
     @Test
@@ -437,7 +420,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             new DefaultMessageProcessorChainBuilder().chain(new AppendingMP("a"), new AppendingMP("b"),
                 new ReturnNullMP()).build(), new AppendingMP("2"));
         assertNull(builder.build().process(getTestEventUsingFlow("0")));
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -467,7 +449,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             }
         }, new AppendingMP("2"));
         assertNull("012", builder.build().process(getTestEventUsingFlow("0")));
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -498,7 +479,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
                 new AppendingInterceptingMP("b")).build(), new AppendingInterceptingMP("2"));
         assertEquals("0before1beforeabeforebafterbafterabefore2after2after1",
             builder.build().process(getTestEventUsingFlow("0")).getMessage().getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -511,7 +491,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
                 new ReturnNullInterceptongMP(), new AppendingInterceptingMP("b")).build(),
             new AppendingInterceptingMP("2"));
         assertNull(builder.build().process(getTestEventUsingFlow("0")));
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -527,7 +506,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             .process(getTestEventUsingFlow("0"))
             .getMessage()
             .getPayload());
-        assertThat(RequestContext.getEvent(), not(nullValue()));
     }
 
     @Test
@@ -542,7 +520,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             .process(getTestEventUsingFlow("0"))
             .getMessage()
             .getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -555,7 +532,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             .process(getTestEventUsingFlow("0"))
             .getMessage()
             .getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     /**
@@ -574,7 +550,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             .process(getTestEventUsingFlow("0"))
             .getMessage()
             .getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -592,7 +567,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         ((Lifecycle) chain).dispose();
         assertLifecycle(mp1);
         assertLifecycle(mp2);
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -615,7 +589,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         assertLifecycle(mp2);
         assertLifecycle(mpa);
         assertLifecycle(mpb);
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -623,9 +596,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         builder.chain(new TestNonIntercepting(), new TestNonIntercepting(), new TestNonIntercepting());
-        MuleEvent restul = builder.build().process(getTestEventUsingFlow(""));
+        MuleEvent event = getTestEventUsingFlow("");
+        MuleEvent restul = builder.build().process(event);
         assertEquals("MessageProcessorMessageProcessorMessageProcessor", restul.getMessage().getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -636,7 +609,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         MuleEvent restul = builder.build().process(getTestEventUsingFlow(""));
         assertEquals("InterceptingMessageProcessorInterceptingMessageProcessorInterceptingMessageProcessor",
             restul.getMessage().getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -649,7 +621,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         assertEquals(
             "InterceptingMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessor",
             restul.getMessage().getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -662,7 +633,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         assertEquals(
             "InterceptingMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessor",
             restul.getMessage().getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -675,7 +645,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         assertEquals(
             "MessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor",
             restul.getMessage().getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -688,7 +657,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         assertEquals(
             "MessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor",
             restul.getMessage().getPayload());
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -705,7 +673,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().chain(mp).build();
         MuleEvent response = chain.process(event);
         assertNull(response);
-        assertThat(RequestContext.getEvent(), is(nullValue()));
     }
 
     @Test
@@ -722,7 +689,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().chain(mp).build();
         MuleEvent response = chain.process(event);
         assertSame(event, response);
-        assertThat(RequestContext.getEvent(), not(nullValue()));
+        assertThat(RequestContext.getEvent(), equalTo(response));
     }
 
     static class TestNonIntercepting implements MessageProcessor

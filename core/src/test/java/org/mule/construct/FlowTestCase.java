@@ -6,18 +6,14 @@
  */
 package org.mule.construct;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.MessageExchangePattern;
-import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
@@ -79,10 +75,8 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
     {
         flow.initialise();
         flow.start();
-        assertThat(RequestContext.getEvent(), is(nullValue()));
         MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello",
             MessageExchangePattern.ONE_WAY, muleContext));
-        assertThat(RequestContext.getEvent(), is(nullValue()));
         Thread.sleep(50);
 
         assertNull(response);
@@ -98,10 +92,8 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
         flow.initialise();
         flow.start();
         
-        assertThat(RequestContext.getEvent(), is(nullValue()));
         MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello",
             REQUEST_RESPONSE, muleContext));
-        assertThat(RequestContext.getEvent(), is(nullValue()));
 
         assertEquals("helloabcdef", response.getMessageAsString());
         assertEquals(Thread.currentThread(), response.getMessage().getOutboundProperty("thread"));

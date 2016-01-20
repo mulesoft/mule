@@ -75,3 +75,4 @@ MULE-8430: in previous versions of Mule, domain home folders where created relat
 MULE-8645: jasper-jdt-6.0.29 is not included anymore on Mule distributions because of some detected vulnerabilities. In case this artifact is needed, when using drools for example, then manually add it on <MULE_HOME>/lib/opt
 MULE-9020: BouncyCastle was upgraded to version 1.50.
      Note: DESede algorithm now requires keys of 16 or 24 bytes unlike the prior version which required 16 or 22 bytes.
+MULE-9306: Losing flow and session variables when using MuleClient to dispatch/send an event. Exception strategy not caching exceptions after using MuleClient on a JavaComponent.
