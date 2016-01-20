@@ -6,7 +6,10 @@
  */
 package org.mule.routing;
 
+import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
+
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -60,6 +63,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     private List<MessageProcessor> messageProcessors;
     private MessageProcessor ownedMessageProcessor;
     private AbstractMessageSequenceSplitter splitter;
+    private MessageFilter filter;
     private String collectionExpression;
     private ExpressionConfig expressionConfig = new ExpressionConfig();
     private int batchSize;
@@ -91,7 +95,20 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             transformed = transformPayloadIfNeeded(message);
         }
         message.setInvocationProperty(parentMessageProp, message);
-        ownedMessageProcessor.process(event);
+        try
+        {
+            ownedMessageProcessor.process(event);
+        }
+        catch (MessagingException e)
+        {
+            if (splitter.equals(e.getFailingMessageProcessor())
+                || filter.equals(e.getFailingMessageProcessor()))
+            {
+                // Make sure the context information for the exception is relative to the ForEach.
+                e.getInfo().remove(INFO_LOCATION_KEY);
+                throw new MessagingException(event, e, this);
+            }
+        }
         if (transformed)
         {
             transformBack(message);
@@ -183,7 +200,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         splitter.setCounterVariableName(counterVariableName);
         splitter.setMuleContext(muleContext);
         messageProcessors.add(0, splitter);
-        messageProcessors.add(new MessageFilter(new Filter()
+        filter = new MessageFilter(new Filter()
         {
 
             @Override
@@ -191,7 +208,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             {
                 return false;
             }
-        }));
+        });
+        messageProcessors.add(filter);
         messageProcessorInitialized = true;
 
         try
