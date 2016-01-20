@@ -44,7 +44,7 @@ public class XSLTWikiDocsTestCase extends FunctionalTestCase
         String resultData = IOUtils.getResourceAsString(
                 "org/mule/test/integration/xml/cd-catalog-result-with-params.xml", getClass());
 
-        //These are the message roperties that will get passed into the XQuery context
+        //These are the message properties that will get passed into the XQuery context
         Map<String, Object> props = new HashMap<>();
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
@@ -57,6 +57,10 @@ public class XSLTWikiDocsTestCase extends FunctionalTestCase
         assertNull(message.getExceptionPayload());
         //Compare results
 
-        assertTrue(XMLUnit.compareXML(getPayloadAsString(message), resultData).similar());
+        String result = getPayloadAsString(message);
+        // remove namespace information so that it doesn't interferes with XMLUnit test
+        result = result.replaceAll("xmlns=\"http://www.mulesoft.org/schema/mule/core\"", "");
+
+        assertTrue(XMLUnit.compareXML(result, resultData).similar());
     }
 }
