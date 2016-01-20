@@ -9,8 +9,10 @@ package org.mule.module.extension.internal.runtime.config;
 import org.mule.api.MuleException;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.internal.connection.CachedConnectionProviderWrapper;
+import org.mule.internal.connection.ConnectionManagerAdapter;
 import org.mule.internal.connection.PooledConnectionProviderWrapper;
 import org.mule.module.extension.internal.model.property.ConnectionHandlingTypeModelProperty;
 import org.mule.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
@@ -29,25 +31,31 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
     private final ConnectionProviderModel providerModel;
     private final PoolingProfile poolingProfile;
     private boolean disableValidation;
+    private RetryPolicyTemplate retryPolicyTemplate;
+    private final ConnectionManagerAdapter connectionManager;
 
     /**
      * Creates a new instances which produces instances based on the given {@code providerModel} and
      * {@code resolverSet}
      *
-     * @param providerModel the {@link ConnectionProviderModel} which describes the instances to be produced
-     * @param resolverSet   a {@link ResolverSet} to populate the values
+     * @param providerModel     the {@link ConnectionProviderModel} which describes the instances to be produced
+     * @param resolverSet       a {@link ResolverSet} to populate the values
+     * @param connectionManager a {@link ConnectionManagerAdapter} to obtain the default {@link RetryPolicyTemplate} in case
+     *                          of none is provided
      */
-    public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet)
+    public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet, ConnectionManagerAdapter connectionManager)
     {
-        this(providerModel, resolverSet, null, false);
+        this(providerModel, resolverSet, null, false, null, connectionManager);
     }
 
-    public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet, PoolingProfile poolingProfile, boolean disableValidation)
+    public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet, PoolingProfile poolingProfile, boolean disableValidation, RetryPolicyTemplate retryPolicyTemplate, ConnectionManagerAdapter connectionManager)
     {
         super(providerModel.getConnectionProviderFactory().getObjectType(), providerModel, resolverSet);
         this.providerModel = providerModel;
         this.poolingProfile = poolingProfile;
         this.disableValidation = disableValidation;
+        this.retryPolicyTemplate = retryPolicyTemplate;
+        this.connectionManager = connectionManager;
     }
 
     @Override
@@ -56,20 +64,23 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
         ConnectionProvider provider = super.build(result);
 
         ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
+        if (retryPolicyTemplate == null)
+        {
+            retryPolicyTemplate = connectionManager.getDefaultRetryPolicyTemplate();
+        }
 
         if (connectionHandlingType != null)
         {
             if (connectionHandlingType.isPooled())
             {
-                provider = new PooledConnectionProviderWrapper(provider, poolingProfile, disableValidation);
+                provider = new PooledConnectionProviderWrapper(provider, poolingProfile, disableValidation, retryPolicyTemplate);
             }
 
             if (connectionHandlingType.isCached())
             {
-                provider = new CachedConnectionProviderWrapper(provider, disableValidation);
+                provider = new CachedConnectionProviderWrapper(provider, disableValidation, retryPolicyTemplate);
             }
         }
-
 
         return provider;
     }

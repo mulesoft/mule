@@ -13,18 +13,24 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.connector.ConnectionManager;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.internal.connection.ConnectionManagerAdapter;
 import org.mule.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.retry.policies.AbstractPolicyTemplate;
+
+import javax.inject.Inject;
 
 import org.springframework.beans.factory.FactoryBean;
 
 /**
  * A {@link FactoryBean} which returns a {@link ValueResolver} that yields instances
  * of {@link ConnectionProvider} which are compliant with a {@link ConnectionProviderModel}.
- * <p/>
+ * <p>
  * Subsequent invokations to {@link #getObject()} method
  * returns always the same {@link ValueResolver}.
  *
@@ -38,6 +44,10 @@ public class ConnectionProviderFactoryBean implements FactoryBean<ValueResolver>
     private ValueResolver<ConnectionProvider> resolver;
     private PoolingProfile poolingProfile = null;
     private boolean disableValidation = false;
+    private RetryPolicyTemplate retryPolicyTemplate;
+
+    @Inject
+    private ConnectionManagerAdapter connectionManager;
 
     public ConnectionProviderFactoryBean(ConnectionProviderModel providerModel, ElementDescriptor element)
     {
@@ -60,7 +70,7 @@ public class ConnectionProviderFactoryBean implements FactoryBean<ValueResolver>
     {
         if (resolver == null)
         {
-            resolver = new ObjectBuilderValueResolver<>(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile, disableValidation));
+            resolver = new ObjectBuilderValueResolver<>(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile, disableValidation, retryPolicyTemplate, connectionManager));
         }
 
         return resolver;
@@ -92,5 +102,10 @@ public class ConnectionProviderFactoryBean implements FactoryBean<ValueResolver>
     public void setDisableValidation(boolean disableValidation)
     {
         this.disableValidation = disableValidation;
+    }
+
+    public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
+    {
+        this.retryPolicyTemplate = retryPolicyTemplate;
     }
 }

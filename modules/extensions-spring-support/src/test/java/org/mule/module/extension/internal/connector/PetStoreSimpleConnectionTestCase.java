@@ -9,6 +9,7 @@ package org.mule.module.extension.internal.connector;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
+import org.junit.Test;
 
 public class PetStoreSimpleConnectionTestCase extends PetStoreConnectionTestCase
 {
@@ -20,5 +21,4 @@ public class PetStoreSimpleConnectionTestCase extends PetStoreConnectionTestCase
     {
         return "petstore-simple-connection.xml";
     }
-
 }

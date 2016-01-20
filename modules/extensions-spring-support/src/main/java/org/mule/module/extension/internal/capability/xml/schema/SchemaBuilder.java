@@ -20,6 +20,7 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.CONFIG_ATTRIBUTE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION_DESCRIPTION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.GROUP_SUFFIX;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
@@ -27,6 +28,7 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT;
@@ -44,7 +46,6 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.TYPE_SUFFIX;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.XML_NAMESPACE;
 import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
-import static org.mule.module.extension.internal.introspection.utils.PoolingSupport.REQUIRED;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
@@ -59,6 +60,7 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDyna
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
@@ -210,9 +212,7 @@ public final class SchemaBuilder
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(providerElement);
 
-        final ExplicitGroup choice = new ExplicitGroup();
-        choice.setMinOccurs(ZERO);
-        choice.setMaxOccurs(UNBOUNDED);
+        final ExplicitGroup sequence = new ExplicitGroup();
 
         ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
 
@@ -220,18 +220,22 @@ public final class SchemaBuilder
         {
             if (connectionHandlingType.isPooled() || connectionHandlingType.isCached())
             {
-                addConnectionProviderPoolingProfile(choice, providerModel);
                 addValidationFlag(providerType);
+                addConnectionProviderRetryPolicy(sequence);
+            }
+            if (connectionHandlingType.isPooled())
+            {
+                addConnectionProviderPoolingProfile(sequence, providerModel);
             }
         }
 
-        registerParameters(providerType, choice, providerModel.getParameterModels());
+        registerParameters(providerType, sequence, providerModel.getParameterModels());
         return this;
     }
 
     private void addValidationFlag(ExtensionType providerType)
     {
-        providerType.getAttributeOrAttributeGroup().add(createAttribute(DISABLE_VALIDATION, DataType.of(boolean.class), false, NOT_SUPPORTED));
+        providerType.getAttributeOrAttributeGroup().add(createAttribute(DISABLE_VALIDATION, DISABLE_VALIDATION_DESCRIPTION, DataType.of(boolean.class), "false", false, ExpressionSupport.NOT_SUPPORTED));
     }
 
     private void addConnectionProviderPoolingProfile(ExplicitGroup choice, ConnectionProviderModel providerModel)
@@ -239,11 +243,21 @@ public final class SchemaBuilder
         ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
         TopLevelElement objectElement = new TopLevelElement();
 
-        objectElement.setMinOccurs(connectionHandlingType.getPoolingSupport() == REQUIRED ? ONE : ZERO);
+        objectElement.setMinOccurs(ZERO);
         objectElement.setMaxOccurs("1");
         objectElement.setRef(MULE_POOLING_PROFILE_TYPE);
 
         choice.getParticle().add(objectFactory.createElement(objectElement));
+    }
+
+    private void addConnectionProviderRetryPolicy(ExplicitGroup choice)
+    {
+        TopLevelElement providerElementRetry = new TopLevelElement();
+        providerElementRetry.setMinOccurs(ZERO);
+        providerElementRetry.setMaxOccurs("1");
+        providerElementRetry.setRef(MULE_ABSTRACT_RECONNECTION_STRATEGY);
+
+        choice.getParticle().add(objectFactory.createElement(providerElementRetry));
     }
 
     public SchemaBuilder registerConfigElement(final ConfigurationModel configurationModel)
@@ -317,16 +331,16 @@ public final class SchemaBuilder
         }
     }
 
-    private void registerParameters(ExtensionType type, ExplicitGroup choice, Collection<ParameterModel> parameterModels)
+    private void registerParameters(ExtensionType type, ExplicitGroup sequence, Collection<ParameterModel> parameterModels)
     {
         for (final ParameterModel parameterModel : parameterModels)
         {
-            parameterModel.getType().getQualifier().accept(getParameterDeclarationVisitor(type, choice, parameterModel));
+            parameterModel.getType().getQualifier().accept(getParameterDeclarationVisitor(type, sequence, parameterModel));
         }
 
-        if (!choice.getParticle().isEmpty())
+        if (!sequence.getParticle().isEmpty())
         {
-            type.setChoice(choice);
+            type.setSequence(sequence);
         }
     }
 

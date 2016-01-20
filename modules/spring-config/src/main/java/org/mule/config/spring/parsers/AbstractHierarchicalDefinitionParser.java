@@ -22,7 +22,7 @@ import org.w3c.dom.Element;
  * This definition parser introduces the notion of Hierarchical processing to nested XML elements. Definition
  * parsers that extend this can refer to parent beans.  It does not assume that the parser is restricted
  * to a single property.
- *
+ * <p>
  * Calling classes must set the registry at the start of processing.
  *
  * @see org.mule.config.spring.parsers.generic.ChildDefinitionParser
@@ -47,6 +47,11 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
         return ((Element) element.getParentNode()).getAttribute(ATTRIBUTE_NAME);
     }
 
+    protected Element getParentElement(Element element)
+    {
+        return ((Element) element.getParentNode());
+    }
+
     public BeanDefinition getParentBeanDefinition(Element element)
     {
         if (null != forcedParent)
@@ -68,7 +73,7 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
      * The bean assembler gives more reliable/automatic processing of collections, maps, etc.
      *
      * @param element The current element
-     * @param bean The bean being constructed
+     * @param bean    The bean being constructed
      * @return An assembler that includes Mule-specific construction logic
      */
     protected BeanAssembler getBeanAssembler(Element element, BeanDefinitionBuilder bean)
@@ -82,9 +87,9 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
      * Provide access to bean assembler from non-hierarchical case.  Legacy support for
      * "mixed" definition parsers.
      *
-     * @deprecated
      * @param element
      * @param bean
+     * @deprecated
      */
     protected BeanAssembler getOrphanBeanAssembler(Element element, BeanDefinitionBuilder bean)
     {
@@ -108,5 +113,4 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
         super.postProcess(context, assembler, element);
         forcedParent = null;
     }
-    
 }

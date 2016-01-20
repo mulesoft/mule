@@ -6,6 +6,8 @@
  */
 package org.mule.processor.chain;
 
+import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -52,6 +54,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     protected String name;
     protected List<MessageProcessor> processors;
     protected FlowConstruct flowConstruct;
+    private MuleContext context;
 
     public AbstractMessageProcessorChain(String name, List<MessageProcessor> processors)
     {
@@ -82,10 +85,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         for (MessageProcessor processor : processors)
         {
             // MULE-5002 TODO review MP Lifecycle
-            if (processor instanceof Initialisable /* && !(processor instanceof Transformer) */)
-            {
-                ((Initialisable) processor).initialise();
-            }
+            initialiseIfNeeded(processor, true, context);
         }
     }
 
@@ -233,7 +233,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     @Override
     public void setMuleContext(MuleContext context)
     {
-
+        this.context = context;
         for (MessageProcessor processor : processors)
         {
             if (processor instanceof MuleContextAware)

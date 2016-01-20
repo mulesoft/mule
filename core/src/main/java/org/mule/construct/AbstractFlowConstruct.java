@@ -6,6 +6,11 @@
  */
 package org.mule.construct;
 
+import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -16,14 +21,10 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleState;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.source.MessageSource;
@@ -35,8 +36,8 @@ import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract implementation of {@link FlowConstruct} that:
@@ -49,7 +50,7 @@ import org.apache.commons.logging.LogFactory;
  *  <li>Allows an {@link ExceptionListener} to be set.
  * </ul>
  * Implementations of <code>AbstractFlowConstuct</code> should implement
- * {@link #validateConstruct()} validate the resulting construct. Validation may 
+ * {@link #validateConstruct()} validate the resulting construct. Validation may
  * include validation of the type of attributes of the {@link MessageSource}.
  * <p/>
  * Implementations may also implement {@link #doInitialise()}, {@link #doStart()},
@@ -58,7 +59,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject implements FlowConstruct, Lifecycle
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractFlowConstruct.class);
 
     protected String name;
     protected MessagingExceptionHandler exceptionListener;
@@ -72,7 +73,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
      */
     public static final String INITIAL_STATE_STOPPED = "stopped";
     public static final String INITIAL_STATE_STARTED = "started";
-    
+
     /**
      * Determines the initial state of this flow when the mule starts. Can be
      * 'stopped' or 'started' (default)
@@ -124,10 +125,10 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
             lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<FlowConstruct>());
             lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<FlowConstruct>());
 
-            logger.info("Flow " + name + " has not been started (initial state = 'stopped')");
+            LOGGER.info("Flow " + name + " has not been started (initial state = 'stopped')");
             return;
         }
-        
+
         lifecycleManager.fireStartPhase(new LifecycleCallback<FlowConstruct>()
         {
             public void onTransition(String phaseName, FlowConstruct object) throws MuleException
@@ -170,7 +171,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
         }
         catch (MuleException e)
         {
-            logger.error("Failed to stop service: " + name, e);
+            LOGGER.error("Failed to stop service: " + name, e);
         }
     }
 
@@ -203,7 +204,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
     {
         this.exceptionListener = exceptionListener;
     }
-    
+
     public String getInitialState()
     {
         return initialState;
@@ -212,7 +213,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
     public void setInitialState(String initialState)
     {
         this.initialState = initialState;
-    }    
+    }
 
     public LifecycleState getLifecycleState()
     {
@@ -238,7 +239,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
     {
         this.messageInfoMapping = messageInfoMapping;
     }
-    
+
     protected void doInitialise() throws MuleException
     {
         configureStatistics();
@@ -268,7 +269,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
 
     /**
      * Validates configured flow construct
-     * 
+     *
      * @throws FlowConstructInvalidException if the flow construct does not pass
      *             validation
      */
@@ -312,34 +313,22 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
 
     protected void initialiseIfInitialisable(Object candidate) throws InitialisationException
     {
-        if (candidate instanceof Initialisable)
-        {
-            ((Initialisable) candidate).initialise();
-        }
+        initialiseIfNeeded(candidate, true, muleContext);
     }
 
     protected void startIfStartable(Object candidate) throws MuleException
     {
-        if (candidate instanceof Startable)
-        {
-            ((Startable) candidate).start();
-        }
+        startIfNeeded(candidate);
     }
 
     protected void stopIfStoppable(Object candidate) throws MuleException
     {
-        if (candidate instanceof Stoppable)
-        {
-            ((Stoppable) candidate).stop();
-        }
+        stopIfNeeded(candidate);
     }
 
     protected void disposeIfDisposable(Object candidate)
     {
-        if (candidate instanceof Disposable)
-        {
-            ((Disposable) candidate).dispose();
-        }
+        disposeIfNeeded(candidate, LOGGER);
     }
 
     /**

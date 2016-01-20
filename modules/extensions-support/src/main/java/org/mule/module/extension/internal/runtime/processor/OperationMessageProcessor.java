@@ -12,6 +12,7 @@ import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -28,6 +29,7 @@ import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
+import org.mule.internal.connection.ConnectionManagerAdapter;
 import org.mule.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.module.extension.internal.runtime.ExecutionMediator;
@@ -37,6 +39,8 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.util.StringUtils;
 
 import java.util.Optional;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,12 +71,15 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     private final OperationModel operationModel;
     private final ResolverSet resolverSet;
     private final ExtensionManager extensionManager;
-    private final ExecutionMediator executionMediator;
     private final String target;
 
+    private ExecutionMediator executionMediator;
     private ReturnDelegate returnDelegate;
     private MuleContext muleContext;
     private OperationExecutor operationExecutor;
+
+    @Inject
+    private ConnectionManagerAdapter connectionManager;
 
     public OperationMessageProcessor(ExtensionModel extensionModel,
                                      OperationModel operationModel,
@@ -87,7 +94,6 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         this.resolverSet = resolverSet;
         this.extensionManager = extensionManager;
         this.target = target;
-        this.executionMediator = new DefaultExecutionMediator(getExceptionEnricher());
     }
 
     @Override
@@ -118,7 +124,6 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
                                                               : extensionManager.getConfiguration(configurationProviderName, event);
     }
 
-
     private OperationContextAdapter createOperationContext(ConfigurationInstance<Object> configuration, MuleEvent event) throws MuleException
     {
         return new DefaultOperationContext(configuration, resolverSet.resolve(event), operationModel, event);
@@ -129,6 +134,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     {
         returnDelegate = createReturnDelegate();
         operationExecutor = operationModel.getExecutor().createExecutor();
+        executionMediator = new DefaultExecutionMediator(getExceptionEnricher(), connectionManager);
         initialiseIfNeeded(operationExecutor, true, muleContext);
     }
 
@@ -175,4 +181,5 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     {
         this.muleContext = muleContext;
     }
+
 }

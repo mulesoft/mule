@@ -11,6 +11,7 @@ import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.util.Preconditions.checkState;
+
 import org.mule.api.MuleException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connector.ConnectionManager;

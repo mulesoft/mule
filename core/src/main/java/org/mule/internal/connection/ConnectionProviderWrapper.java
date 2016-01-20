@@ -11,6 +11,8 @@ import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionValidationResult;
+import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.retry.policies.NoRetryPolicyTemplate;
 
 /**
  * Base class for wrappers for {@link ConnectionProvider} instances
@@ -40,6 +42,12 @@ public abstract class ConnectionProviderWrapper<Config, Connection> implements C
         return delegate.connect(config);
     }
 
+    /**
+     * Delegates the connection validation to the delegated {@link ConnectionProvider}
+     *
+     * @param connection a non {@code null} {@link Connection}.
+     * @return the {@link ConnectionValidationResult} returned by the delegated {@link ConnectionProvider}
+     */
     @Override
     public ConnectionValidationResult validate(Connection connection)
     {
@@ -62,4 +70,9 @@ public abstract class ConnectionProviderWrapper<Config, Connection> implements C
     {
         return delegate;
     }
+
+    /**
+     * @return a {@link RetryPolicyTemplate}
+     */
+    public abstract RetryPolicyTemplate getRetryPolicyTemplate();
 }
