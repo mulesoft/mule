@@ -43,3 +43,4 @@ MULE-8663: jython was updated to version 2.5.3 because of a vulnerability issue 
 MULE-8899: groovy was updated to version 2.4.4 because of a vulnerability issue found on 1.8.6 version. If this introduces any compatibility issue with existing scripts, you can update them or manually downgrade the groovy library.
 MULE-9020: BouncyCastle was upgraded to version 1.50.
     Note: DESede algorithm now requires keys of 16 or 24 bytes unlike the prior version which required 16 or 22 bytes.
+MULE-9306: Losing flow and session variables when using MuleClient to dispatch/send an event. Exception strategy not caching exceptions after using MuleClient on a JavaComponent.

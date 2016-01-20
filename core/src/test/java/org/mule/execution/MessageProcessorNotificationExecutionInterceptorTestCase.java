@@ -7,20 +7,27 @@
 package org.mule.execution;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
+import org.mule.OptimizedRequestContext;
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
@@ -37,6 +44,7 @@ import org.mockito.stubbing.Answer;
 @RunWith(MockitoJUnitRunner.class)
 public class MessageProcessorNotificationExecutionInterceptorTestCase extends AbstractMuleTestCase
 {
+
     @Mock
     private ServerNotificationManager mockNotificationManager;
     @Mock
@@ -47,8 +55,16 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     private Pipeline mockPipeline;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleEvent mockMuleEvent;
+
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private MuleEvent mockMuleEventPreviousExecution;
+
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleEvent mockResultMuleEvent;
+
+    @Mock
+    private ReplyToHandler mockReplyToHandler;
+
     @Mock
     private MessagingException mockMessagingException;
     private MessageProcessorNotificationExecutionInterceptor messageProcessorNotificationExecutionInterceptor;
@@ -115,7 +131,40 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
         assertThat(result, is(mockResultMuleEvent));
         assertThat(serverNotifications.size(),Is.is(0));
     }
-    
+
+    /**
+     * Validates that event to be processed is set to RequestContext for those cases whenever a messageProcessor
+     * modifies the RC during its execution.
+     */
+    @Test
+    public void requestContextSetBeforeProcessingEvent() throws MuleException
+    {
+        final List<ServerNotification> serverNotifications = new ArrayList<ServerNotification>();
+        Mockito.when(mockMessageProcessor.process(mockMuleEvent)).thenReturn(mockResultMuleEvent);
+        Mockito.when(mockMuleEvent.getMuleContext().getNotificationManager()).thenReturn(mockNotificationManager);
+        Mockito.when(mockNextInterceptor.execute(mockMessageProcessor, mockMuleEvent)).thenReturn(mockResultMuleEvent);
+        Mockito.when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
+        Mockito.doAnswer(new Answer<Object>()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                serverNotifications.add((ServerNotification) invocationOnMock.getArguments()[0]);
+                return null;
+            }
+        }).when(mockNotificationManager).fireNotification(Mockito.any(ServerNotification.class));
+
+        OptimizedRequestContext.unsafeSetEvent(mockMuleEventPreviousExecution);
+
+        MuleEvent result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
+
+        assertThat(result, is(mockResultMuleEvent));
+        assertThat(serverNotifications.size(), Is.is(0));
+
+        assertThat(RequestContext.getEvent(), is(mockMuleEvent));
+        assertThat(RequestContext.getEvent(), not(mockMuleEventPreviousExecution));
+    }
+
     @Test
     public void testExecutionFailure() throws MuleException
     {

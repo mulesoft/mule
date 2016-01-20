@@ -421,7 +421,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
     protected ExecutionTemplate<MuleEvent> createExecutionTemplate()
     {
-        return TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(endpoint.getMuleContext(), endpoint.getTransactionConfig());
+        return TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(endpoint.getMuleContext(), endpoint.getTransactionConfig(),
+                                                                                       flowConstruct.getExceptionListener());
     }
 
     /**

@@ -6,6 +6,7 @@
  */
 package org.mule.execution;
 
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -44,6 +45,9 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
             fireNotification(notificationManager, event.getFlowConstruct(), event, messageProcessor,
                              null, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
         }
+
+        // Update RequestContext ThreadLocal in case if previous processor modified it
+        OptimizedRequestContext.unsafeSetEvent(event);
 
         MuleEvent result = null;
         MessagingException exceptionThrown = null;
