@@ -2,7 +2,6 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
@@ -10,7 +9,6 @@
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
@@ -40,17 +38,14 @@
                         service="TestService" port="TestPort" name="configNoKey" />
 
     <flow name="requestEncryptedWithValidKey">
-        <inbound-endpoint address="vm://requestEncryptedWithValidKey" exchange-pattern="request-response"/>
         <ws:consumer operation="echo" config-ref="configValidKey" />
     </flow>
 
     <flow name="requestEncryptedWithInvalidKey">
-        <inbound-endpoint address="vm://requestEncryptedWithInvalidKey" exchange-pattern="request-response"/>
         <ws:consumer operation="echo" config-ref="configInvalidKey" />
     </flow>
 
     <flow name="requestNotEncrypted">
-        <inbound-endpoint address="vm://requestNotEncrypted" exchange-pattern="request-response"/>
         <ws:consumer operation="echo" config-ref="configNoKey" />
     </flow>
 

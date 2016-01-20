@@ -29,25 +29,25 @@ public class VerifySignatureSecurityFunctionalTestCase extends AbstractWSConsume
     @Test
     public void responseWithValidSignatureReturnsExpectedResult() throws Exception
     {
-        assertValidResponse("vm://responseWithValidSignature");
+        assertValidResponse("responseWithValidSignature");
     }
 
     @Test
     public void responseWithInvalidSignatureFails() throws Exception
     {
-        assertSoapFault("vm://responseWithInvalidSignature", "FailedCheck");
+        assertSoapFault("responseWithInvalidSignature", "FailedCheck");
     }
 
     @Test
     public void responseWithoutSignatureFails() throws Exception
     {
-        assertSoapFault("vm://responseWithoutSignature", "InvalidSecurity");
+        assertSoapFault("responseWithoutSignature", "InvalidSecurity");
     }
 
     @Test
     public void responseWithInvalidSignatureDefaultCertificatesFails() throws Exception
     {
-        assertSoapFault("vm://responseWithInvalidSignatureDefaultCertificates", "FailedCheck");
+        assertSoapFault("responseWithInvalidSignatureDefaultCertificates", "FailedCheck");
     }
 
     public static class ServerPasswordCallback implements CallbackHandler

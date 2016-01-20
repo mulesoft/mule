@@ -7,6 +7,8 @@
 package org.mule.module.ws.functional;
 
 
+import org.mule.DefaultMuleMessage;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,25 +28,25 @@ public class DynamicAddressFunctionalTestCase extends AbstractWSConsumerFunction
     {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("pathInboundProperty", "services/Test");
-        assertValidResponse("vm://clientInboundProperty", properties);
+        assertValidResponse("clientInboundProperty", new DefaultMuleMessage(ECHO_REQUEST, properties, null, null, muleContext));
     }
 
     @Test
     public void returnsExpectedResponseWhenValidPathIsProvidedOutboundProperty() throws Exception
     {
-        assertValidResponse("vm://clientOutboundProperty", new HashMap<String, Object>());
+        assertValidResponse("clientOutboundProperty", new HashMap<String, Object>());
     }
 
     @Test
     public void returnsExpectedResponseWhenValidPathIsProvidedFlowVar() throws Exception
     {
-        assertValidResponse("vm://clientFlowVar", new HashMap<String, Object>());
+        assertValidResponse("clientFlowVar", new HashMap<String, Object>());
     }
 
     @Test
     public void returnsExpectedResponseWhenValidPathIsProvidedSessionVar() throws Exception
     {
-        assertValidResponse("vm://clientSessionVar", new HashMap<String, Object>());
+        assertValidResponse("clientSessionVar", new HashMap<String, Object>());
     }
 
     @Test
@@ -52,12 +54,12 @@ public class DynamicAddressFunctionalTestCase extends AbstractWSConsumerFunction
     {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("clientInboundProperty", "invalid");
-        assertSoapFault("vm://clientInboundProperty", ECHO_REQUEST, properties, "Client");
+        assertSoapFault("clientInboundProperty", ECHO_REQUEST, properties, "Client");
     }
 
     @Test
     public void failsWhenNoPathIsDefined() throws Exception
     {
-        assertSoapFault("vm://clientInboundProperty", ECHO_REQUEST, "Client");
+        assertSoapFault("clientInboundProperty", ECHO_REQUEST, "Client");
     }
 }

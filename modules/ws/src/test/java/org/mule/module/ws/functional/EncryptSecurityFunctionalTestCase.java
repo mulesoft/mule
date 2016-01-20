@@ -29,19 +29,19 @@ public class EncryptSecurityFunctionalTestCase extends AbstractWSConsumerFunctio
     @Test
     public void requestEncryptedWithValidKeyReturnsExpectedResult() throws Exception
     {
-        assertValidResponse("vm://requestEncryptedWithValidKey");
+        assertValidResponse("requestEncryptedWithValidKey");
     }
 
     @Test
     public void requestEncryptedWithInvalidKeyFails() throws Exception
     {
-        assertSoapFault("vm://requestEncryptedWithInvalidKey", "Client");
+        assertSoapFault("requestEncryptedWithInvalidKey", "Client");
     }
 
     @Test
     public void requestNotEncryptedFails() throws Exception
     {
-        assertSoapFault("vm://requestNotEncrypted", "InvalidSecurity");
+        assertSoapFault("requestNotEncrypted", "InvalidSecurity");
     }
 
 

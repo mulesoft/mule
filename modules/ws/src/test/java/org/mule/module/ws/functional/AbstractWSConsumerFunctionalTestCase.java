@@ -8,23 +8,26 @@ package org.mule.module.ws.functional;
 
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-import static org.junit.Assert.assertEquals;
+import static org.mule.module.ws.functional.SoapFaultCodeMatcher.hasFaultCode;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.module.ws.consumer.SoapFaultException;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.module.ws.consumer.SoapFaultException;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.NullPayload;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTestCase
 {
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port");
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     protected static final String ECHO_REQUEST = "<tns:echo xmlns:tns=\"http://consumer.ws.module.mule.org/\">" +
                                                  "<text>Hello</text></tns:echo>";
@@ -33,35 +36,38 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
                                                            "<ns2:echoResponse xmlns:ns2=\"http://consumer.ws.module.mule.org/\">" +
                                                            "<text>Hello</text></ns2:echoResponse>";
 
-
-    protected void assertValidResponse(String address) throws Exception
+    protected void assertValidResponse(String flowName) throws Exception
     {
-        assertValidResponse(address, null);
+        assertValidResponse(flowName, Collections.emptyMap());
     }
 
-    protected void assertValidResponse(String address, Map<String, Object> properties) throws Exception
+    protected void assertValidResponse(String flowName, Map<String, Object> properties) throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(address, ECHO_REQUEST, properties);
+        MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST, properties, muleContext);
+        assertValidResponse(flowName, request);
+    }
+
+    protected void assertValidResponse(String flowName, MuleMessage message) throws Exception
+    {
+        MuleMessage response = runFlow(flowName, message).getMessage();
         assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
     }
 
-    protected void assertSoapFault(String address, String expectedFaultCode) throws Exception
+    protected void assertSoapFault(String flowName, String expectedFaultCode) throws Exception
     {
-        assertSoapFault(address, ECHO_REQUEST, expectedFaultCode);
+        assertSoapFault(flowName, ECHO_REQUEST, expectedFaultCode);
     }
 
-    protected void assertSoapFault(String address, String message, String expectedFaultCode) throws Exception
+    protected void assertSoapFault(String flowName, String message, String expectedFaultCode) throws Exception
     {
-        assertSoapFault(address, message, null, expectedFaultCode);
+        assertSoapFault(flowName, message, null, expectedFaultCode);
     }
 
-    protected void assertSoapFault(String address, String message, Map<String, Object> properties, String expectedFaultCode) throws Exception
+    protected void assertSoapFault(String flowName, String message, Map<String, Object> properties, String expectedFaultCode) throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(address, message, properties);
-        assertEquals(NullPayload.getInstance(), response.getPayload());
-        SoapFaultException exception = (SoapFaultException) response.getExceptionPayload().getException();
-        assertEquals(expectedFaultCode, exception.getFaultCode().getLocalPart());
+        expectedException.expect(SoapFaultException.class);
+        expectedException.expect(hasFaultCode(expectedFaultCode));
+        runFlow(flowName, new DefaultMuleMessage(message, properties, muleContext)).getMessage();
     }
+
 }

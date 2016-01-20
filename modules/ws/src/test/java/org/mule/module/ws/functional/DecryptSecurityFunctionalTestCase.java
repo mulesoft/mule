@@ -22,19 +22,19 @@ public class DecryptSecurityFunctionalTestCase extends AbstractWSConsumerFunctio
     @Test
     public void responseDecryptedWithValidKeyReturnsExpectedResult() throws Exception
     {
-        assertValidResponse("vm://responseValidKey");
+        assertValidResponse("responseValidKey");
     }
 
     @Test
     public void responseDecryptedWithInvalidKeyFails() throws Exception
     {
-        assertSoapFault("vm://responseInvalidKey", "Client");
+        assertSoapFault("responseInvalidKey", "Client");
     }
 
     @Test
     public void responseNotEncryptedFailsToDecrypt() throws Exception
     {
-        assertSoapFault("vm://responseNoEncryption", "InvalidSecurity");
+        assertSoapFault("responseNoEncryption", "InvalidSecurity");
     }
 
 

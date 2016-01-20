@@ -24,6 +24,6 @@ public class ImportedWsdlTypesFunctionalTestCase extends AbstractWSConsumerFunct
     @Test
     public void resolvesTypesFromImportedWsdl() throws Exception
     {
-        assertValidResponse("vm://in");
+        assertValidResponse("client");
     }
 }

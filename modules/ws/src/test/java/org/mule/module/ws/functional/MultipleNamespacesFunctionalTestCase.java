@@ -8,7 +8,6 @@ package org.mule.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
@@ -34,8 +33,7 @@ public class MultipleNamespacesFunctionalTestCase extends AbstractWSConsumerFunc
     @Test
     public void validRequestReturnsExpectedAnswer() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://in", ECHO_REQUEST, null);
+        MuleMessage response = runFlow("client", ECHO_REQUEST).getMessage();
 
         XMLUnit.setIgnoreWhitespace(true);
         assertXMLEqual(EXPECTED_RESPONSE, getPayloadAsString(response));

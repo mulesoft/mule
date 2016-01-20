@@ -20,13 +20,13 @@ public class TimestampSecurityFunctionalTestCase extends AbstractWSConsumerFunct
     @Test
     public void requestWithTimestampReturnsExpectedResult() throws Exception
     {
-        assertValidResponse("vm://clientWithTimestamp");
+        assertValidResponse("clientWithTimestamp");
     }
 
     @Test
     public void requestWithoutTimestampFail() throws Exception
     {
-        assertSoapFault("vm://clientWithoutTimestamp", "InvalidSecurity");
+        assertSoapFault("clientWithoutTimestamp", "InvalidSecurity");
     }
 
 }

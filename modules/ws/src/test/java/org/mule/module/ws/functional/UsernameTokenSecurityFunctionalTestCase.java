@@ -38,25 +38,25 @@ public class UsernameTokenSecurityFunctionalTestCase extends AbstractWSConsumerF
     @Test
     public void requestWithValidCredentialsTextReturnsExpectedResult() throws Exception
     {
-        assertValidResponse("vm://clientWithValidCredentialsText");
+        assertValidResponse("clientWithValidCredentialsText");
     }
 
     @Test
     public void requestWithValidCredentialsDigestReturnsExpectedResult() throws Exception
     {
-        assertValidResponse("vm://clientWithValidCredentialsDigest");
+        assertValidResponse("clientWithValidCredentialsDigest");
     }
 
     @Test
     public void requestWithInvalidCredentialsReturnsFault() throws Exception
     {
-        assertSoapFault("vm://clientWithInvalidCredentials", "FailedAuthentication");
+        assertSoapFault("clientWithInvalidCredentials", "FailedAuthentication");
     }
 
     @Test
     public void requestWithoutCredentialsReturnsFault() throws Exception
     {
-        assertSoapFault("vm://clientWithoutCredentials", "InvalidSecurity");
+        assertSoapFault("clientWithoutCredentials", "InvalidSecurity");
     }
 
 
