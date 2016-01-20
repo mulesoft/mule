@@ -42,10 +42,10 @@ public class DataTypeFactory
 
     //Common Java types
     public static final DataType<String> STRING = new SimpleDataType<>(String.class);
-    public static final DataType<String> OBJECT = new SimpleDataType<>(Object.class);
-    public static final DataType<String> BYTE_ARRAY = new SimpleDataType<>(byte[].class);
-    public static final DataType<String> INPUT_STREAM = new SimpleDataType<>(InputStream.class);
-    public static final DataType<String> MULE_MESSAGE = new SimpleDataType<>(MuleMessage.class);
+    public static final DataType<Object> OBJECT = new SimpleDataType<>(Object.class);
+    public static final DataType<byte[]> BYTE_ARRAY = new SimpleDataType<>(byte[].class);
+    public static final DataType<InputStream> INPUT_STREAM = new SimpleDataType<>(InputStream.class);
+    public static final DataType<MuleMessage> MULE_MESSAGE = new SimpleDataType<>(MuleMessage.class);
 
     public static <T> DataType<T> create(Class<T> type)
     {

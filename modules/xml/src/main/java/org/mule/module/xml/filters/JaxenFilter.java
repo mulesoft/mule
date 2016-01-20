@@ -115,7 +115,7 @@ public class JaxenFilter implements Filter, MuleContextAware
             {
                 try
                 {
-                    return accept(muleContext.getTransformationService().getPayload(obj, DataTypeFactory.create(org.w3c.dom.Document.class)));
+                    return accept(muleContext.getTransformationService().transform(obj, DataTypeFactory.create(org.w3c.dom.Document.class)).getPayload());
                 }
                 catch (Exception e)
                 {

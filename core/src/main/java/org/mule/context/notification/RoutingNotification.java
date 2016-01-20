@@ -39,19 +39,6 @@ public class RoutingNotification extends ServerNotification
     }
 
     @Override
-    protected String getPayloadToString()
-    {
-        try
-        {
-            return muleContext.getTransformationService().getPayloadAsString((MuleMessage)source);
-        }
-        catch (Exception e)
-        {
-            return source.toString();
-        }
-    }
-
-    @Override
     public String getType()
     {
         if (action == MISSED_ASYNC_REPLY)

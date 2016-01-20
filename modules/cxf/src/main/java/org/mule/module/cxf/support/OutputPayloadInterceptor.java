@@ -88,7 +88,7 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
                     }
                     else
                     {
-                        o = muleMsg.getMuleContext().getTransformationService().getPayload(muleMsg, DataTypeFactory.create(XMLStreamReader.class));
+                        o = muleMsg.getMuleContext().getTransformationService().transform(muleMsg, DataTypeFactory.create(XMLStreamReader.class)).getPayload();
                     }
     
                     objs.add(o);

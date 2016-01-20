@@ -8,7 +8,10 @@ package org.mule.module.oauth2.internal;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.expression.ExpressionManager;
+import org.mule.api.transformer.TransformerException;
 import org.mule.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.util.ClassUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,8 +52,13 @@ public class TokenResponseProcessor
         this.retrieveRefreshToken = retrieveRefreshToken;
     }
 
-    public void process(final MuleEvent muleEvent)
+    public void process(final MuleEvent muleEvent) throws TransformerException
     {
+        if (ClassUtils.isConsumable(muleEvent.getMessage().getPayload().getClass()))
+        {
+            muleEvent.setMessage(muleEvent.getMuleContext().getTransformationService().transform(muleEvent.getMessage(),
+                                                                                                 DataTypeFactory.STRING));
+        }
         accessToken = expressionManager.parse(tokenResponseConfiguration.getAccessToken(), muleEvent);
         accessToken = isEmpty(accessToken) ? null : accessToken;
         if (accessToken == null)

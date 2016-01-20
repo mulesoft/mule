@@ -171,7 +171,7 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
         String url = format("http://localhost:%d/", port3.getNumber());
         executeRequest(url, false);
         assertThat(OK.getStatusCode(), is(responseCode));
-        assertThat(getPayloadAsString(response), is(INDEX_HTML_CONTENT));
+        assertThat(payload, is(INDEX_HTML_CONTENT));
     }
 
     @Test

@@ -11,6 +11,7 @@ import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -118,7 +119,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase
      */
     protected String getPayloadAsString(MuleMessage message, MuleContext muleContext) throws Exception
     {
-        return muleContext.getTransformationService().getPayloadAsString(message);
+        return (String) muleContext.getTransformationService().transform(message, DataTypeFactory.STRING).getPayload();
     }
 
 }

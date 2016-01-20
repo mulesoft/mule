@@ -11,6 +11,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
 import java.io.Serializable;
@@ -100,14 +101,37 @@ public class MessageContext
         }
     }
 
+    /**
+     * Obtains the payload of the current message transformed to the given #type.
+     * <p/>
+     * <b>Note:</b> If this current payload is a stream this operation will read the stream making it unreadable for
+     * further processing.  To avoid this transform the message prior to use of this expression.
+     * TODO MULE-9285
+     *
+     * @param type the java type the payload is to be transformed to
+     * @return the transformed payload
+     * @throws TransformerException
+     */
     public <T> T payloadAs(Class<T> type) throws TransformerException
     {
-        return (T) muleContext.getTransformationService().getPayload(message, type);
+        return (T) muleContext.getTransformationService().transform(message, DataTypeFactory.create(type)).getPayload();
     }
 
-    public <T> T payloadAs(DataType<T> dt) throws TransformerException
+    /**
+     * Obtains the payload of the current message transformed to the given #dataType.
+     * <p/>
+     * <b>Note:</b> If this current payload is a stream this operation will read the stream making it unreadable for
+     * further processing.  To avoid this transform the message prior to use of this expression.
+     * TODO MULE-9285
+     *
+     * @param dataType the DatType to transform the current message payload to
+     * @param <T> the java type the payload is to be transformed to
+     * @return the transformed payload
+     * @throws TransformerException if there is an error during transformation
+     */
+    public <T> T payloadAs(DataType<T> dataType) throws TransformerException
     {
-        return muleContext.getTransformationService().getPayload(message,dt);
+        return (T) muleContext.getTransformationService().transform(message, dataType).getPayload();
     }
 
     public void setPayload(Object payload)

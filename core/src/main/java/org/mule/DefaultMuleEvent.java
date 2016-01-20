@@ -6,6 +6,7 @@
  */
 package org.mule;
 
+import static org.mule.util.ClassUtils.isConsumable;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -581,7 +582,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     {
         try
         {
-            return getMuleContext().getTransformationService().getPayloadAsBytes(message);
+            return transformMessage(DataTypeFactory.BYTE_ARRAY);
         }
         catch (Exception e)
         {
@@ -592,10 +593,9 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     @Override
-    @SuppressWarnings("cast")
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
-        return (T) transformMessage(DataTypeFactory.create(outputType));
+        return transformMessage(DataTypeFactory.create(outputType));
     }
 
     @Override
@@ -605,7 +605,13 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         {
             throw new TransformerException(CoreMessages.objectIsNull("outputType"));
         }
-        return getMuleContext().getTransformationService().getPayload(message, outputType);
+
+        MuleMessage transformedMessage = getMuleContext().getTransformationService().transform(message, outputType);
+        if (isConsumable(message.getPayload().getClass()))
+        {
+            setMessage(transformedMessage);
+        }
+        return (T) transformedMessage.getPayload();
     }
 
     /**
@@ -619,7 +625,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public String transformMessageToString() throws TransformerException
     {
-        return (String) transformMessage(DataTypeFactory.createWithEncoding(String.class, getEncoding()));
+        return transformMessage(DataTypeFactory.createWithEncoding(String.class, getEncoding()));
     }
 
     @Override
@@ -640,12 +646,18 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     {
         try
         {
-            return getMuleContext().getTransformationService().getPayloadAsString(message, encoding);
+            MuleMessage transformedMessage = getMuleContext().getTransformationService().transform(message,
+                                                                                                   DataTypeFactory.createWithEncoding(String.class, encoding));
+            if (isConsumable(message.getPayload().getClass()))
+            {
+                setMessage(transformedMessage);
+            }
+
+            return (String) transformedMessage.getPayload();
         }
         catch (Exception e)
         {
-            throw new DefaultMuleException(CoreMessages.cannotReadPayloadAsString(message.getClass()
-                .getName()), e);
+            throw new DefaultMuleException(CoreMessages.cannotReadPayloadAsString(message.getClass().getName()), e);
         }
     }
 

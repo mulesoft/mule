@@ -74,8 +74,7 @@ public class MessageFilterTestCase extends FunctionalTestCase
         {
             try
             {
-                MuleMessage msg = event.getMessage();
-                String payload = event.getMuleContext().getTransformationService().getPayloadAsString(msg);
+                String payload = event.getMessageAsString();
                 rejectMesage = payload + "(rejected!-1)";
                 return null;
             }
@@ -98,8 +97,7 @@ public class MessageFilterTestCase extends FunctionalTestCase
         {
             try
             {
-                MuleMessage msg = event.getMessage();
-                String payload = event.getMuleContext().getTransformationService().getPayloadAsString(msg);
+                String payload = event.getMessageAsString();
                 rejectMesage = payload + "(rejected!-2)";
                 return null;
             }

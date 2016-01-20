@@ -12,6 +12,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
@@ -139,22 +140,22 @@ public class MessageContextTestCase extends AbstractELTestCase
     public void payloadAsType() throws Exception
     {
         MuleMessage mockMessage = mock(MuleMessage.class);
+        MuleMessage transformedMessage = mock(MuleMessage.class, RETURNS_DEEP_STUBS);
         TransformationService transformationService = mock(TransformationService.class);
         muleContext.setTransformationService(transformationService);
-        Banana b = new Banana();
-        when(transformationService.getPayload(any(MuleMessage.class), any(Class.class))).thenReturn(b);
-        assertSame(b, evaluate("message.payloadAs(org.mule.tck.testmodels.fruit.Banana)", mockMessage));
+        when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenReturn(transformedMessage);
+        assertSame(transformedMessage.getPayload(), evaluate("message.payloadAs(org.mule.tck.testmodels.fruit.Banana)", mockMessage));
     }
 
     @Test
     public void payloadAsDataType() throws Exception
     {
         MuleMessage mockMessage = mock(MuleMessage.class);
+        MuleMessage transformedMessage = mock(MuleMessage.class, RETURNS_DEEP_STUBS);
         TransformationService transformationService = mock(TransformationService.class);
         muleContext.setTransformationService(transformationService);
-        Banana b = new Banana();
-        when(transformationService.getPayload(any(MuleMessage.class), any(DataType.class))).thenReturn(b);
-        assertSame(b,
+        when(transformationService.transform(mockMessage, DataTypeFactory.STRING)).thenReturn(transformedMessage);
+        assertSame(transformedMessage.getPayload(),
             evaluate("message.payloadAs(org.mule.transformer.types.DataTypeFactory.STRING)", mockMessage));
     }
 

@@ -89,13 +89,19 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         boolean transformed = false;
         if (xpathCollection)
         {
-            transformed = transformPayloadIfNeeded(message);
+            MuleMessage transformedMessage = transformPayloadIfNeeded(message);
+            if (transformedMessage != message)
+            {
+                transformed = true;
+                message = transformedMessage;
+                event.setMessage(transformedMessage);
+            }
         }
         message.setInvocationProperty(parentMessageProp, message);
         ownedRootMessageProcessor.process(event);
         if (transformed)
         {
-            transformBack(message);
+            event.setMessage(transformBack(message));
         }
         if (previousCounterVar != null)
         {
@@ -116,20 +122,22 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         return event;
     }
 
-    private boolean transformPayloadIfNeeded(MuleMessage message) throws TransformerException
+    private MuleMessage transformPayloadIfNeeded(MuleMessage message) throws TransformerException
     {
         Object payload = message.getPayload();
         if (payload instanceof Document || payload.getClass().getName().startsWith("org.dom4j."))
         {
-            return false;
+            return message;
         }
-        message.setPayload(muleContext.getTransformationService().getPayload(message, DataTypeFactory.create(Document.class)));
-        return true;
+        else
+        {
+            return muleContext.getTransformationService().transform(message, DataTypeFactory.create(Document.class));
+        }
     }
 
-    private void transformBack(MuleMessage message) throws TransformerException
+    private MuleMessage transformBack(MuleMessage message) throws TransformerException
     {
-        message.setPayload(muleContext.getTransformationService().getPayload(message, DataType.STRING_DATA_TYPE));
+        return  muleContext.getTransformationService().transform(message, DataType.STRING_DATA_TYPE);
     }
 
     @Override

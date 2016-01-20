@@ -301,7 +301,7 @@ public class MuleUniversalConduit extends AbstractConduit
 
             // If we have a result, send it back to CXF
             MuleMessage result = resEvent.getMessage();
-            InputStream is = getResponseBody(m, result);
+            InputStream is = getResponseBody(m, resEvent);
             if (is != null)
             {
                 Message inMessage = new MessageImpl();
@@ -326,19 +326,19 @@ public class MuleUniversalConduit extends AbstractConduit
         m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
     }
 
-    protected InputStream getResponseBody(Message m, MuleMessage result) throws TransformerException, IOException
+    protected InputStream getResponseBody(Message m, MuleEvent result) throws TransformerException, IOException
     {
         boolean response = result != null
-                           && !NullPayload.getInstance().equals(result.getPayload())
+                           && !NullPayload.getInstance().equals(result.getMessage().getPayload())
                            && !isOneway(m.getExchange());
 
         if (response)
         {
             // Sometimes there may not actually be a body, in which case
             // we want to act appropriately. E.g. one way invocations over a proxy
-            InputStream is = result.getMuleContext().getTransformationService().getPayload(result, DataTypeFactory.create(InputStream.class));
+            InputStream is = (InputStream) result.getMuleContext().getTransformationService().transform(result.getMessage(), DataTypeFactory.create(InputStream.class)).getPayload();
             PushbackInputStream pb = new PushbackInputStream(is);
-            result.setPayload(pb, DataTypeFactory.XML_STRING);
+            result.setMessage(new DefaultMuleMessage(pb, result.getMessage(), result.getMuleContext(), DataTypeFactory.XML_STRING));
 
             int b = pb.read();
             if (b != -1)

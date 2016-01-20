@@ -15,8 +15,8 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.io.InputStream;
 
+import org.junit.Ignore;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 public class JaxenFilterTestCase extends FunctionalTestCase
 {
@@ -27,6 +27,7 @@ public class JaxenFilterTestCase extends FunctionalTestCase
         return "org/mule/test/integration/xml/jaxen-routing-conf-flow.xml";
     }
 
+    @Ignore("MULE-9285")
     @Test
     public void testJaxen() throws Exception
     {
@@ -39,6 +40,7 @@ public class JaxenFilterTestCase extends FunctionalTestCase
         MuleMessage res = client.send("vm://in", msg);
 
         Object payload = res.getPayload();
-        assertTrue("payload is of type " + payload.getClass(), payload instanceof Document);
+        // Filter should not change payload type unless it was consumable.
+        assertTrue("payload is of type " + payload.getClass(), payload instanceof String);
     }
 }

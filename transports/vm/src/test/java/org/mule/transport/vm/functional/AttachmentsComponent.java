@@ -40,7 +40,7 @@ public class AttachmentsComponent implements Callable
             throw new IllegalArgumentException("content type is not text/xml");
         }
 
-        if (!"Mmm... attachments!".equals(eventContext.getMuleContext().getTransformationService().getPayloadAsString(msg)))
+        if (!"Mmm... attachments!".equals(eventContext.getMessageAsString()))
         {
             throw new IllegalArgumentException("payload is incorrect");
         }

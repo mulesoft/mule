@@ -17,6 +17,7 @@ import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.security.AbstractEndpointSecurityFilter;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 
 public class CustomSecurityFilter extends AbstractEndpointSecurityFilter
 {
@@ -51,7 +52,7 @@ public class CustomSecurityFilter extends AbstractEndpointSecurityFilter
     {
         try
         {
-            return event.getMuleContext().getTransformationService().getPayloadAsString(event.getMessage()).equals(FunctionalTestCase.TEST_MESSAGE);
+            return event.getMuleContext().getTransformationService().transform(event.getMessage(), DataTypeFactory.STRING).getPayload().equals(FunctionalTestCase.TEST_MESSAGE);
         }
         catch (Exception e)
         {

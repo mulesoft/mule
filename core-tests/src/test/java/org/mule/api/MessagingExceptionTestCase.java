@@ -20,11 +20,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.api.MessagingException.PAYLOAD_INFO_KEY;
+import org.mule.DefaultMuleMessage;
 import org.mule.TransformationService;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.MessageProcessorPathResolver;
 import org.mule.api.execution.LocationExecutionContextProvider;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -32,6 +34,7 @@ import org.mule.exception.MessagingExceptionLocationProvider;
 import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -346,7 +349,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
         when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
         when(muleMessage.getPayload()).thenReturn(payload);
         when(muleMessage.getMuleContext()).thenReturn(mockContext);
-        when(transformationService.getPayloadAsString(muleMessage)).thenReturn(value);
+        when(transformationService.transform(muleMessage, DataTypeFactory.STRING)).thenReturn(new DefaultMuleMessage(value, muleContext));
         when(testEvent.getMessage()).thenReturn(muleMessage);
         MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message), testEvent);
 
@@ -366,7 +369,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
 
         assertThat((String) e.getInfo().get(PAYLOAD_INFO_KEY), containsString(ByteArrayInputStream.class.getName() + "@"));
 
-        verify(transformationService, never()).getPayloadAsString(muleMessage);
+        verify(transformationService, never()).transform(muleMessage, DataTypeFactory.STRING);
     }
 
     @Test
@@ -381,11 +384,11 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
         // This has to be done this way since mockito doesn't allow to verify toString()
         when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
         when(muleMessage.getPayload()).thenReturn(payload);
-        when(transformationService.getPayloadAsString(muleMessage)).thenThrow(new Exception("exception thrown"));
+        when(transformationService.transform(muleMessage, DataTypeFactory.STRING)).thenThrow(new TransformerException(CoreMessages.createStaticMessage("exception thrown")));
         when(testEvent.getMessage()).thenReturn(muleMessage);
         MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message), testEvent);
 
-        assertThat((String) e.getInfo().get(PAYLOAD_INFO_KEY), is(Exception.class.getName() + " while getting payload: exception thrown"));
+        assertThat(e.getInfo().get(PAYLOAD_INFO_KEY), is(TransformerException.class.getName() + " while getting payload: exception thrown"));
     }
 
     @Test
@@ -402,7 +405,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
         assertThat(e.getInfo().get(PAYLOAD_INFO_KEY), nullValue());
 
         verify(muleMessage, never()).getPayload();
-        verify(transformationService, never()).getPayloadAsString(muleMessage);
+        verify(transformationService, never()).transform(muleMessage, DataTypeFactory.STRING);
     }
 
     private static final class FailAnswer implements Answer<String>

@@ -19,6 +19,7 @@ import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.transformer.types.DataTypeFactory;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class AppAndDomainLifecycleTestCase extends AbstractMuleTestCase
             firstAppContext.stop();
             MuleMessage response = secondAppContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/service/helloWorld", new DefaultMuleMessage("test", firstAppContext));
             assertThat(response, notNullValue());
-            assertThat(secondAppContext.getTransformationService().getPayloadAsString(response), is("hello world"));
+            assertThat(secondAppContext.getTransformationService().transform(response, DataTypeFactory.STRING).getPayload(), is("hello world"));
             assertThat((domainContext.getRegistry().<DefaultHttpListenerConfig>get("sharedListenerConfig")).isStarted(), is(true));
         }
         finally

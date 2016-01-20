@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
+import org.mule.DefaultMuleMessage;
 import org.mule.TransformationService;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
@@ -30,6 +31,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.metadata.DataType;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.retry.RetryPolicyExhaustedException;
@@ -115,7 +117,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         configureExceptionStrategyToReleaseLatchWhenExecuted();
         configureDLQToReleaseLatchWhenExecuted();
         when(muleContext.getTransformationService()).thenReturn(transformationService);
-        when(transformationService.getPayloadAsBytes(any(MuleMessage.class))).thenAnswer(invocation -> invocation.getArguments()[0].toString().getBytes());
+        when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenAnswer
+                (invocation -> new DefaultMuleMessage(invocation.getArguments()[0].toString().getBytes(), muleContext));
     }
 
     @Test(expected = InitialisationException.class)

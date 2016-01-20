@@ -35,7 +35,7 @@ public class MuleEventLogger
         logger.error("Message content is " + muleEvent.getMessage());
         try
         {
-            String payloadAsString = muleEvent.getMuleContext().getTransformationService().getPayloadAsString(muleEvent.getMessage());
+            String payloadAsString = muleEvent.getMuleContext().getTransformationService().getPayloadForLogging(muleEvent.getMessage());
             logger.error("Message payload is " + (isEmpty(payloadAsString) ? "EMPTY CONTENT" : payloadAsString));
         }
         catch (Exception e)

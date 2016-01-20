@@ -230,7 +230,7 @@ public class MuleEventToHttpRequest
             {
                 try
                 {
-                    return new InputStreamHttpEntity(new ByteArrayInputStream(muleContext.getTransformationService().getPayloadAsBytes(muleEvent.getMessage())));
+                    return new InputStreamHttpEntity(new ByteArrayInputStream(muleEvent.getMessageAsBytes()));
                 }
                 catch (Exception e)
                 {
@@ -255,7 +255,7 @@ public class MuleEventToHttpRequest
 
             try
             {
-                return new ByteArrayHttpEntity(muleContext.getTransformationService().getPayloadAsBytes(muleEvent.getMessage()));
+                return new ByteArrayHttpEntity(muleEvent.getMessageAsBytes());
             }
             catch (Exception e)
             {

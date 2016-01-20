@@ -36,12 +36,6 @@ public class ConnectionNotification extends ServerNotification
     }
 
     @Override
-    protected String getPayloadToString()
-    {
-        return source.toString();
-    }
-
-    @Override
     public String getType()
     {
         if (action == CONNECTION_DISCONNECTED)

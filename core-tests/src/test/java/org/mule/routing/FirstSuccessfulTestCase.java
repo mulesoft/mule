@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -188,7 +187,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
             try
             {
                 DefaultMuleMessage msg;
-                String payload = muleContext.getTransformationService().getPayloadAsString(event.getMessage());
+                String payload = event.getMessageAsString();
                 if (payload.indexOf(rejectIfMatches) >= 0)
                 {
                     throw new DefaultMuleException("Saw " + rejectIfMatches);
