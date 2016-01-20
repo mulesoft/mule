@@ -33,6 +33,7 @@ import java.io.Serializable;
 public class MessagingException extends MuleException
 {
     public static final String PAYLOAD_INFO_KEY = "Payload";
+    public static final String PAYLOAD_TYPE_INFO_KEY = "Payload Type";
 
     /**
      * Serial version
@@ -158,6 +159,7 @@ public class MessagingException extends MuleException
                 }
                 else
                 {
+                    addInfo(PAYLOAD_TYPE_INFO_KEY, muleMessage.getPayload().getClass().getName());
                     try
                     {
                         addInfo(PAYLOAD_INFO_KEY, muleMessage.getPayloadAsString());
