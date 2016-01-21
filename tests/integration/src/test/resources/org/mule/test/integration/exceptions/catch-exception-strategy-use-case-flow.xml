@@ -23,7 +23,7 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
     <https:connector name="httpsConnector">
-        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <https:tls-key-store path="ssltest-keystore.jks" keyPassword="changeit" storePassword="changeit"/>
     </https:connector>
 
     <jms:activemq-connector name="activeMq"/>

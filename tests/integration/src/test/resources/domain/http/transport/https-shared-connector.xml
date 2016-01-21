@@ -7,9 +7,9 @@
                http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd">
 
     <https:connector name="sharedHttpConnector">
-        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
-        <https:tls-key-store path="clientKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
-        <https:tls-server path="trustStore" storePassword="mulepassword"/>
+        <https:tls-client path="ssltest-keystore.jks" storePassword="changeit"/>
+        <https:tls-key-store path="ssltest-keystore.jks" keyPassword="changeit" storePassword="changeit"/>
+        <https:tls-server path="ssltest-cacerts.jks" storePassword="changeit"/>
     </https:connector>
 
 </mule-domain>
