@@ -15,9 +15,9 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Prober;
+import org.mule.tck.util.sftp.SftpServer;
 import org.mule.transport.sftp.LatchDownExceptionListener;
 import org.mule.transport.sftp.SftpClient;
-import org.mule.transport.sftp.util.SftpServer;
 
 import java.io.IOException;
 import java.util.Arrays;
