@@ -5,6 +5,7 @@ The following is a list of changes you have to execute to migrate from Mule Runt
 Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for more details.
 
 Migration changes from 3.7.x to 3.8.x
+MULE-9337: TLSv1 is no longer listed as an enabled protocol, by default only TLSv1.1 and TLSv1.2 will be enabled. If you wish to use TLSv1 you can edit the TLS configuration file (tls-default.conf) and add it back to the enabled protocols entry.
 MULE-9334: When an SQLException occurs while executing a query, all ResultSets from that DB connection (i.e.: multiple queries in the same transaction) that remain open will be closed.
 MULE-9324: When using a File inbound endpoint to poll a directory, an exception will be thrown if the directory to be polled doesn't exist. That exception will be handled by the System Exception Strategy.
 MULE-9204: The default authentication method for a token request when using the oauth client credentials grant type will now be basic auth (using client id as user and client secret as password).
