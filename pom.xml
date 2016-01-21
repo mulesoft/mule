@@ -135,7 +135,6 @@
         <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <mavenCompilerVersion>3.1</mavenCompilerVersion>
-        <additionalSurefireArgs></additionalSurefireArgs>
         
         <!--
             The above project.url will not be picked up in the manifest,
@@ -1669,7 +1668,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
-                        <argLine>-Xms64m -Xmx512m @{additionalSurefireArgs}</argLine>
+                        <argLine>-Xms64m -Xmx512m</argLine>
                         <excludes>
                             <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
                             <exclude>**/Abstract*.*</exclude>
