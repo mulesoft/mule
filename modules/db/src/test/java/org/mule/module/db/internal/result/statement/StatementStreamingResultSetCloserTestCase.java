@@ -9,6 +9,7 @@ package org.mule.module.db.internal.result.statement;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
