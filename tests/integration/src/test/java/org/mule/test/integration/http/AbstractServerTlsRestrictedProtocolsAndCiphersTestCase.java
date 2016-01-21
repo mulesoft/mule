@@ -37,11 +37,11 @@ public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase ext
     @Rule
     public DynamicPort httpsPort = new DynamicPort("port");
 
-    private static final String SERVER_CIPHER_SUITE_ENABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
-    private static final String SERVER_CIPHER_SUITE_DISABLED = "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA";
+    private static final String SERVER_CIPHER_SUITE_ENABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA256";
+    private static final String SERVER_CIPHER_SUITE_DISABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
 
-    private static final String SERVER_PROTOCOL_ENABLED = "TLSv1";
-    private static final String SERVER_PROTOCOL_DISABLED = "SSLv3";
+    private static final String SERVER_PROTOCOL_ENABLED = "TLSv1.2";
+    private static final String SERVER_PROTOCOL_DISABLED = "TLSv1";
 
     @BeforeClass
     public static void createTlsPropertiesFile() throws Exception

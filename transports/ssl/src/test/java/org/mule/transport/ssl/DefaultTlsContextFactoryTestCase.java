@@ -54,7 +54,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase
 
     public static String getFileEnabledProtocols()
     {
-        return "TLSv1, TLSv1.2";
+        return "TLSv1.1, TLSv1.2";
     }
 
     public static String getFileEnabledCipherSuites()
@@ -88,7 +88,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase
     {
         DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
         tlsContextFactory.setEnabledCipherSuites("TLS_DHE_DSS_WITH_AES_128_CBC_SHA");
-        tlsContextFactory.setEnabledProtocols("TLSv1");
+        tlsContextFactory.setEnabledProtocols("TLSv1.1");
         tlsContextFactory.initialise();
 
         String[] enabledCipherSuites = tlsContextFactory.getEnabledCipherSuites();
@@ -97,14 +97,14 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase
 
         String[] enabledProtocols = tlsContextFactory.getEnabledProtocols();
         assertThat(enabledProtocols.length, is(1));
-        assertThat(enabledProtocols, is(arrayContaining("TLSv1")));
+        assertThat(enabledProtocols, is(arrayContaining("TLSv1.1")));
     }
 
     @Test
     public void failIfProtocolsDoNotMatchConfigFile() throws Exception
     {
         DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
-        tlsContextFactory.setEnabledProtocols("TLSv1.1,SSLv3");
+        tlsContextFactory.setEnabledProtocols("TLSv1,SSLv3");
         expectedException.expect(InitialisationException.class);
         expectedException.expectMessage(containsString("protocols are invalid"));
         tlsContextFactory.initialise();
