@@ -124,7 +124,6 @@
                 <include>org.mule.transports:mule-transport-vm</include>
                 <!-- Modules -->
                 <include>org.mule.modules:mule-module-launcher</include>
-                <include>org.mule.modules:mule-module-annotations</include>
                 <include>org.mule.modules:mule-module-builders</include>
                 <include>org.mule.modules:mule-module-client</include>
                 <include>org.mule.modules:mule-module-cxf</include>
@@ -184,7 +183,6 @@
                 <exclude>org.mule.transports:mule-transports-all</exclude>
                 <exclude>org.mule.transports:mule-transport-vm</exclude>
                 <exclude>org.mule.modules:mule-modules-all</exclude>
-                <exclude>org.mule.modules:mule-module-annotations</exclude>
                 <exclude>org.mule.modules:mule-module-builders</exclude>
                 <exclude>org.mule.modules:mule-module-client</exclude>
                 <exclude>org.mule.modules:mule-module-cxf</exclude>
