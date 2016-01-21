@@ -48,7 +48,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Make sure we are using the same version as Hibernate -->
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr</artifactId>

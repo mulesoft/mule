@@ -5,6 +5,7 @@ The following is a list of changes you have to execute to migrate from Mule Runt
 Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for more details.
 
 Migration changes from 3.7.x to 3.8.x
+MULE-9149: mule-module-jbpm was removed from standalone and embedded CE distributions. Following libraries were also removed as they are not required anymore: hibernate-commons-annotations-3.2.0.Final.jar, hibernate-core-3.6.0.Final.jar, hibernate-jpa-2.0-api-1.0.0.Final.jar, jbpm-api-4.4.jar, jbpm-jpdl-4.4.jar, jbpm-log-4.4.jar, jbpm-pvm-4.4.jar, juel-engine-2.1.0.jar, juel-impl-2.2.1.jar, livetribe-jsr223-2.0.5.jar
 MULE-9337: TLSv1 is no longer listed as an enabled protocol, by default only TLSv1.1 and TLSv1.2 will be enabled. If you wish to use TLSv1 you can edit the TLS configuration file (tls-default.conf) and add it back to the enabled protocols entry.
 MULE-9334: When an SQLException occurs while executing a query, all ResultSets from that DB connection (i.e.: multiple queries in the same transaction) that remain open will be closed.
 MULE-9324: When using a File inbound endpoint to poll a directory, an exception will be thrown if the directory to be polled doesn't exist. That exception will be handled by the System Exception Strategy.
