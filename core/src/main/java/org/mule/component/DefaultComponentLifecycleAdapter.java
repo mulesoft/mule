@@ -9,7 +9,6 @@ package org.mule.component;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 
 import org.mule.DefaultMuleEventContext;
-import org.mule.RequestContext;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -339,7 +338,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         {
             if (componentObject == null)
             {
-                throw new ComponentException(createStaticMessage("componentObject is null"), RequestContext.getEvent(), component);
+                throw new ComponentException(createStaticMessage("componentObject is null"), event, component);
             }
             // Use the overriding entrypoint resolver if one is set
             if (component.getEntryPointResolverSet() != null)
@@ -353,7 +352,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         }
         catch (Exception e)
         {
-            throw new ComponentException(createStaticMessage("%s: %s", e.getClass().getName(), e.getMessage()), RequestContext.getEvent(), component, e);
+            throw new ComponentException(createStaticMessage("%s: %s", e.getClass().getName(), e.getMessage()), event, component, e);
         }
 
         return result;
