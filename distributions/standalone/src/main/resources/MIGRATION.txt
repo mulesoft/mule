@@ -4,6 +4,9 @@ MIGRATION GUIDE
 The following is a list of changes you have to execute to migrate from Mule ESB Community edition version 3.4.x to version 3.5.0.
 Please check http://www.mulesoft.org/documentation/display/current/Mule+Release+Notes for more details.
 
+Migration changes from 3.5.0 to 3.5.x
+MULE-9337: TLSv1 is no longer listed as an enabled protocol, by default only TLSv1.1 and TLSv1.2 will be enabled. If you wish to use TLSv1 you can edit the TLS configuration file (tls-default.conf) and add it back to the enabled protocols entry. This will be necessary if using Java 6.
+
 MULE-6968: In the previous version, requests to "/" were only received by an HTTP endpoint when no path was defined, and rejected if path was set to "" or "/". Now requests are received by the endpoint in any of the three cases.
 MULE-7013: keepSendSocketOpen attribute in the HTTP/S connector is deprecated. It is inherited from TCP Connector but has no effect on outbound HTTP connections and will be removed in the future.
 MULE-7023: The keep-alive attribute in inbound and outbound HTTP/S endpoints is renamed to keepAlive.
