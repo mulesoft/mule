@@ -25,9 +25,9 @@
        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
 
     <https:connector name="httpsConnector">
-        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
-        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
-        <https:tls-server path="trustStore" storePassword="mulepassword"/>
+        <https:tls-client path="ssltest-keystore.jks" storePassword="changeit"/>
+        <https:tls-key-store path="ssltest-keystore.jks" keyPassword="changeit" storePassword="changeit"/>
+        <https:tls-server path="ssltest-cacerts.jks" storePassword="changeit"/>
     </https:connector>
 
     <jms:activemq-connector name="activeMq"/>
