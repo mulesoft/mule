@@ -31,7 +31,7 @@ import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.sftp.util.SftpServer;
+import org.mule.tck.util.sftp.SftpServer;
 import org.mule.transport.sftp.util.ValueHolder;
 import org.mule.util.StringMessageUtils;
 
