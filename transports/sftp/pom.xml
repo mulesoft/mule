@@ -15,6 +15,8 @@
     <properties>
         <skipExportTests>false</skipExportTests>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
+        <!-- https://mina.apache.org/mina-project/faq.html#i-get-outofmemoryerror-or-response-timeout-and-connection-reset-under-heavy-load -->
+        <additionalSurefireArgs>-XX:MaxDirectMemorySize=64M</additionalSurefireArgs>
     </properties>
 
     <build>
@@ -91,12 +93,6 @@
             <version>${sshCoreVersion}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>${bouncycastleVersion}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <profiles>
@@ -108,18 +104,12 @@
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <systemProperties>
-                                <property>
-                                    <name>mule.test.timeoutSecs</name>
-                                    <value>300</value>
-                                </property>
-                                <property>
-                                    <!-- Always pooling for ALL tests! (simple
-                                        way to ensure that all tests works with pooling) -->
-                                    <name>mule.sftp.transport.maxConnectionPoolSize</name>
-                                    <value>3</value>
-                                </property>
-                            </systemProperties>
+                            <systemPropertyVariables>
+                                <mule.test.timeoutSecs>300</mule.test.timeoutSecs>
+                                <!-- Always pooling for ALL tests! (simple
+                                    way to ensure that all tests works with pooling) -->
+                                <mule.sftp.transport.maxConnectionPoolSize>3</mule.sftp.transport.maxConnectionPoolSize>
+                            </systemPropertyVariables>
                             <excludes>
                                 <!-- These test cases test the pooling functionality,
                                     and since the tests uses another settings than the above (overridden) settings

@@ -143,7 +143,8 @@
         <gmavenPluginVersion>1.4</gmavenPluginVersion>
         <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
-
+        <additionalSurefireArgs></additionalSurefireArgs>
+        
         <!--
             The above project.url will not be picked up in the manifest,
             instead a module artifact id is erroneously substituted.
@@ -241,7 +242,7 @@
         <!-- see http://www.springsource.com/security/cve-2010-1622 -->
         <springVersion>3.2.13.RELEASE</springVersion>
         <springSecurityVersion>3.1.0.RELEASE</springSecurityVersion>
-        <sshCoreVersion>0.6.0</sshCoreVersion>
+        <sshCoreVersion>1.0.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <staxApiVersion>3.1.4</staxApiVersion>
         <staxonVersion>1.2</staxonVersion>
@@ -1624,7 +1625,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
-                        <argLine>-Xms64m -Xmx512m</argLine>
+                        <argLine>-Xms64m -Xmx512m @{additionalSurefireArgs}</argLine>
                         <excludes>
                             <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
                             <exclude>**/Abstract*.*</exclude>
