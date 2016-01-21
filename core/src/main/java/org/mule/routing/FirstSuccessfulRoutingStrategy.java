@@ -45,7 +45,7 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy
         }
         else
         {
-            failureExpressionFilter = new ExpressionFilter("exception-type:");
+            failureExpressionFilter = new ExpressionFilter("exception != null");
         }
         failureExpressionFilter.setMuleContext(muleContext);
     }

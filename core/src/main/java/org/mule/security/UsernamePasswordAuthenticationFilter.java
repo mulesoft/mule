@@ -26,8 +26,8 @@ import org.mule.config.i18n.CoreMessages;
  */
 public class UsernamePasswordAuthenticationFilter extends AbstractAuthenticationFilter
 {
-    private String username = "#[header:inbound:username]";
-    private String password = "#[header:inbound:password]";
+    private String username = "#[message.inboundProperties.username]";
+    private String password = "#[message.inboundProperties.password]";
 
     public UsernamePasswordAuthenticationFilter()
     {

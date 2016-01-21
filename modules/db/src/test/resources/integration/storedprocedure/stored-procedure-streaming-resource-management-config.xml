@@ -23,7 +23,7 @@
 
                 <set-payload value="#[results]"/>
             </processor-chain>
-            <enrich target="#[variable:results]"/>
+            <enrich target="#[flowVars.results]"/>
         </enricher>
 
         <set-property propertyName="processedResults" value="#[results]"/>

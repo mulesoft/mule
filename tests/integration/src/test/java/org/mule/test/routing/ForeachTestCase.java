@@ -17,7 +17,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -311,10 +310,9 @@ public class ForeachTestCase extends FunctionalTestCase
         payload.add("roque");
         MuleMessage parent = new DefaultMuleMessage(payload, muleContext);
 
-        MuleMessage result = client.send("vm://input-13", parent);
-        assertTrue("Counter variable should not be visible outside foreach scope.",
-                result.getExceptionPayload() != null &&
-                result.getExceptionPayload().getException().getCause() instanceof RequiredValueException);
+        client.send("vm://input-13", parent);
+
+        FlowAssert.verify("counter-scope");
     }
 
     @Test

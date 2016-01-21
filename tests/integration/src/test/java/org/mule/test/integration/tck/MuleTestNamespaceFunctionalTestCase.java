@@ -56,7 +56,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://service3", "foo", null);
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
-        assertEquals("foo received in testService3", getPayloadAsString(message));
+        assertEquals("foo received", getPayloadAsString(message));
     }
 
     @Test

@@ -17,7 +17,7 @@
     <flow name="Distributor">
         <vm:inbound-endpoint path="distributor.queue" exchange-pattern="one-way"/>
         <echo-component/>
-        <recipient-list evaluator="headers-list" expression="INBOUND:recipient1,INBOUND:recipient2,INBOUND:recipient3"/>
+        <recipient-list expression="#[[message.inboundProperties.recipient1,message.inboundProperties.recipient2,message.inboundProperties.recipient3]]"/>
     </flow>
 
     <flow name="ServiceOne">

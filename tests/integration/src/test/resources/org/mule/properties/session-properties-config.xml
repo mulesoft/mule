@@ -19,7 +19,7 @@
     </message-properties-transformer>
 
     <flow name="A" processingStrategy="synchronous">
-        <expression-transformer evaluator="header" expression="SESSION:key" />
+        <expression-transformer expression="sessionVars.key" />
     </flow>
 
     <flow name="B" processingStrategy="synchronous">
@@ -150,7 +150,7 @@
         <processor ref="addP1" />
         <test:component throwException="true"/>
         <default-exception-strategy>
-            <test:assert expression="#[header:SESSION:P1]" />
+            <test:assert expression="#[sessionVars.P1]" />
         </default-exception-strategy>
     </flow>
 
@@ -158,7 +158,7 @@
         <processor ref="addP1" />
         <test:component throwException="true"/>
         <catch-exception-strategy>
-            <test:assert expression="#[header:SESSION:P1]" />
+            <test:assert expression="#[sessionVars.P1]" />
         </catch-exception-strategy>
     </flow>
             

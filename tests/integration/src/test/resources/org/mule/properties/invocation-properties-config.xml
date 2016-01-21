@@ -97,7 +97,7 @@
         <processor ref="addP3" />
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
-        <test:assert expression="#[header:INVOCATION:P3]" />
+        <test:assert expression="#[flowVars.P3]" />
     </flow>
 
     <flow name="VMRequestResponseEndpointFlowMidFlow">
@@ -126,31 +126,31 @@
         <flow-ref name="FlowRef-1" />
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
-        <test:assert expression="#[header:INVOCATION:P4]" />
+        <test:assert expression="#[flowVars.P4]" />
         <flow-ref name="FlowRef-2" />
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
         <test:assert expression="#[flowVars['P3'] == null]" />
-        <test:assert expression="#[header:INVOCATION:P4]" message="I failed" />
+        <test:assert expression="#[flowVars.P4]" message="I failed" />
     </flow>
     <flow name="FlowRef-1" processingStrategy="synchronous">
         <test:assert expression="#[P1]" />
         <processor ref="addP2" />
         <flow-ref name="FlowRef-3" />
-        <test:assert expression="#[header:INVOCATION:P4]" message="I failed" />
+        <test:assert expression="#[flowVars.P4]" message="I failed" />
     </flow>
     <flow name="FlowRef-2" processingStrategy="queued-asynchronous">
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
         <processor ref="addP3" />
         <flow-ref name="FlowRef-3" />
-        <test:assert expression="#[header:INVOCATION:P4]" />
+        <test:assert expression="#[flowVars.P4]" />
     </flow>
     <flow name="FlowRef-3" processingStrategy="synchronous">
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
         <processor ref="addP4" />
-        <test:assert expression="#[header:INVOCATION:P4]" />
+        <test:assert expression="#[flowVars.P4]" />
     </flow>
     <flow name="OverwriteInFlowRef">
         <processor ref="addP1" />
@@ -173,8 +173,8 @@
         <flow-ref name="SubFlowRef-2" />
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
-        <test:assert expression="#[header:INVOCATION:P3]" />
-        <test:assert expression="#[header:INVOCATION:P4]" />
+        <test:assert expression="#[flowVars.P3]" />
+        <test:assert expression="#[flowVars.P4]" />
     </flow>
     <sub-flow name="SubFlowRef-1">
         <test:assert expression="#[P1]" />
@@ -185,12 +185,12 @@
         <test:assert expression="#[P2]" />
         <processor ref="addP3" />
         <flow-ref name="SubFlowRef-3" />
-        <test:assert expression="#[header:INVOCATION:P4]" />
+        <test:assert expression="#[flowVars.P4]" />
     </sub-flow>
     <sub-flow name="SubFlowRef-3">
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
-        <test:assert expression="#[header:INVOCATION:P3]" />
+        <test:assert expression="#[flowVars.P3]" />
         <processor ref="addP4" />
     </sub-flow>
     <flow name="OverwriteInSubFlowRef">
@@ -244,13 +244,13 @@
     <flow name="propagationThroughEnricher">
         <processor ref="addP1" />
         <test:assert expression="#[P1]" />
-        <enricher target="#[variable:test]">
+        <enricher target="#[flowVars.test]">
             <test:assert expression="#[P1]" />
         </enricher>
         <test:assert expression="#[P1]" />
     </flow>
     <flow name="propertyAddedInEnricherNotAddedinFlow">
-        <enricher target="#[variable:test]">
+        <enricher target="#[flowVars.test]">
             <flow-ref name="Enricher2-2" />
         </enricher>
         <test:assert expression="#[flowVars['P1'] == null]" />
@@ -387,8 +387,8 @@
         <default-exception-strategy>
            <processor-chain>
                <processor-chain>
-                   <test:assert expression="#[header:INVOCATION:P1]" />
-                   <test:assert expression="#[header:INVOCATION:P2]" />
+                   <test:assert expression="#[flowVars.P1]" />
+                   <test:assert expression="#[flowVars.P2]" />
                </processor-chain>
             </processor-chain>
         </default-exception-strategy>

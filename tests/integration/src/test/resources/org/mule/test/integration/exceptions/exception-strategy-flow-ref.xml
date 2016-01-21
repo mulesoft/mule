@@ -14,7 +14,7 @@
                     <add-message-property key="mainEs" value="yes"/>
                 </message-properties-transformer>
                 <message-properties-transformer scope="outbound">
-                    <add-message-property key="flowRefEs" value="#[header:SESSION:flowRefEs]" />
+                    <add-message-property key="flowRefEs" value="#[sessionVars.flowRefEs]" />
                 </message-properties-transformer>
                 <test:queue name="dlq"/>
             </processor-chain>

@@ -19,7 +19,7 @@
         <vm:outbound-endpoint path="out" exchange-pattern="one-way">
             <message-properties-transformer>
                 <!-- TODO this should be replaced with enhanced MPT: copy-property syntax -->
-                <add-message-property key="X-Custom-Header" value="#[header:INBOUND:X-Custom-Header]"/>
+                <add-message-property key="X-Custom-Header" value="#[message.inboundProperties['X-Custom-Header']]"/>
             </message-properties-transformer>
         </vm:outbound-endpoint>
     </flow>

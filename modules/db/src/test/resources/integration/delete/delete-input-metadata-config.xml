@@ -14,7 +14,7 @@
     <flow name="deleteMetadataNotSupportedValueParams">
         <db:delete config-ref="dbConfig">
             <db:parameterized-query>DELETE FROM PLANET WHERE position = #[payload.position] and name =
-                #[header:OUTBOUND:name]
+                #[message.outboundProperties.name]
             </db:parameterized-query>
         </db:delete>
     </flow>

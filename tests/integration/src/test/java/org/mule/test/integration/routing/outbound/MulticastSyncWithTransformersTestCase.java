@@ -12,9 +12,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 
@@ -34,20 +36,25 @@ public class MulticastSyncWithTransformersTestCase extends FunctionalTestCase
     @Test
     public void testSyncMulticast() throws Exception
     {
-        FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());
-        fruitBowl.addFruit(new Orange());
+        Apple apple = new Apple();
+        Banana banana = new Banana();
+        Orange orange = new Orange();
+        FruitBowl fruitBowl = new FruitBowl(apple, banana);
+        fruitBowl.addFruit(orange);
 
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://distributor.queue", fruitBowl, null);
 
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof List);
-        List<String> results = ((List<MuleMessage>) result.getPayload()).stream().map(msg -> (String) msg.getPayload
+        List<Fruit> results = ((List<MuleMessage>) result.getPayload()).stream().map(msg -> (Fruit) msg.getPayload
                 ()).collect(toList());
         assertEquals(3, results.size());
 
-        assertTrue(results.contains("Apple Received"));
-        assertTrue(results.contains("Banana Received"));
-        assertTrue(results.contains("Orange Received"));
+        assertTrue(results.contains(apple));
+        assertTrue(results.contains(banana));
+        assertTrue(results.contains(orange));
+
+        FlowAssert.verify();
     }
 }

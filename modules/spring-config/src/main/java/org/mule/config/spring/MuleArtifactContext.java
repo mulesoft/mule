@@ -15,7 +15,6 @@ import org.mule.api.MuleContext;
 import org.mule.config.ConfigResource;
 import org.mule.config.spring.editors.MulePropertyEditorRegistrar;
 import org.mule.config.spring.processors.DiscardedOptionalBeanPostProcessor;
-import org.mule.config.spring.processors.ExpressionEnricherPostProcessor;
 import org.mule.config.spring.processors.LifecycleStatePostProcessor;
 import org.mule.config.spring.processors.MuleInjectorProcessor;
 import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
@@ -121,9 +120,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 
         addBeanPostProcessors(beanFactory,
                               new MuleContextPostProcessor(muleContext),
-                              new ExpressionEvaluatorPostProcessor(muleContext),
                               new GlobalNamePostProcessor(),
-                              new ExpressionEnricherPostProcessor(muleContext),
                               new PostRegistrationActionsPostProcessor(this, (MuleRegistryHelper) muleContext.getRegistry()),
                               new DiscardedOptionalBeanPostProcessor(optionalObjectsController, (DefaultListableBeanFactory) beanFactory),
                               new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState())

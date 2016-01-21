@@ -14,7 +14,7 @@
     <flow name="insertBulkMetadataNotSupportedValueParams">
         <db:insert config-ref="dbConfig" bulkMode="true">
             <db:parameterized-query>INSERT INTO PLANET(POSITION, NAME) VALUES (#[payload.position],
-                #[header:OUTBOUND:name])
+                #[message.outboundProperties.name])
             </db:parameterized-query>
         </db:insert>
     </flow>

@@ -15,7 +15,7 @@
         <vm:inbound-endpoint path="async" exchange-pattern="one-way"/>
         <custom-filter class="org.mule.test.filters.FilterCounter"/>
         <message-properties-transformer scope="outbound">
-            <add-message-property key="pass" value="#[header:INBOUND:pass]" />
+            <add-message-property key="pass" value="#[message.inboundProperties.pass]" />
         </message-properties-transformer>
         <vm:outbound-endpoint path="asyncResponse" exchange-pattern="one-way"/>
     </flow>

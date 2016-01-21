@@ -1012,11 +1012,6 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 250, name);
     }
 
-    public static Message expressionEvaluatorNotRegistered(String key)
-    {
-        return factory.createMessage(BUNDLE_PATH, 251, key);
-    }
-
     public static Message objectAlreadyExists(String key)
     {
         return factory.createMessage(BUNDLE_PATH, 252, key);
@@ -1084,9 +1079,9 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 261);
     }
 
-    public static Message expressionEvaluatorReturnedNull(String name, String expr)
+    public static Message expressionReturnedNull(String expr)
     {
-        return factory.createMessage(BUNDLE_PATH, 263, name, expr);
+        return factory.createMessage(BUNDLE_PATH, 263, expr);
     }
 
     public static Message expressionInvalidForProperty(String property, String expr)

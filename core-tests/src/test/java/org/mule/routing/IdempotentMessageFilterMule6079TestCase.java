@@ -55,7 +55,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
 
         objectStore = new RaceConditionEnforcingObjectStore(cdl);
         idempotentMessageFilter = new IdempotentMessageFilter();
-        idempotentMessageFilter.setIdExpression("#[header:id]");
+        idempotentMessageFilter.setIdExpression("#[message.inboundProperties.id]");
         idempotentMessageFilter.setFlowConstruct(flow);
         idempotentMessageFilter.setThrowOnUnaccepted(false);
         idempotentMessageFilter.setStorePrefix("foo");

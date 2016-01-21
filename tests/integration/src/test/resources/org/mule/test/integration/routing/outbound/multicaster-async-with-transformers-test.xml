@@ -17,17 +17,17 @@
         <all>
             <vm:outbound-endpoint path="service1.queue" exchange-pattern="one-way">
                 <expression-transformer>
-                    <return-argument evaluator="groovy" expression="payload.fruit[0]"/>
+                    <return-argument expression="payload.fruit[0]"/>
                 </expression-transformer>
             </vm:outbound-endpoint>
             <vm:outbound-endpoint path="service2.queue" exchange-pattern="one-way">
                 <expression-transformer>
-                    <return-argument evaluator="groovy" expression="payload.fruit[1]"/>
+                    <return-argument expression="payload.fruit[1]"/>
                 </expression-transformer>
             </vm:outbound-endpoint>
             <vm:outbound-endpoint path="service3.queue" exchange-pattern="one-way">
                 <expression-transformer>
-                    <return-argument evaluator="groovy" expression="payload.fruit[2]"/>
+                    <return-argument expression="payload.fruit[2]"/>
                 </expression-transformer>
             </vm:outbound-endpoint>
         </all>

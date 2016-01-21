@@ -6,20 +6,15 @@
  */
 package org.mule.test.integration.routing.outbound;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Test;
 
@@ -43,25 +38,6 @@ public class ExpressionSplitterAsyncTestCase extends FunctionalTestCase
 
         client.dispatch("vm://distributor.queue", request);
 
-        List<Object> results = new ArrayList<Object>(3);
-
-        MuleMessage result = client.request("vm://collector.queue", 5000);
-        assertNotNull(result);
-        assertEquals(request.getMessageRootId(), result.getMessageRootId());
-        results.add(result.getPayload());
-
-        result = client.request("vm://collector.queue", 3000);
-        assertNotNull(result);
-        assertEquals(request.getMessageRootId(), result.getMessageRootId());
-        results.add(result.getPayload());
-
-        result = client.request("vm://collector.queue", 3000);
-        assertNotNull(result);
-        assertEquals(request.getMessageRootId(), result.getMessageRootId());
-        results.add(result.getPayload());
-
-        assertTrue(results.contains("Apple Received in ServiceOne"));
-        assertTrue(results.contains("Banana Received in ServiceTwo"));
-        assertTrue(results.contains("Orange Received in ServiceThree"));
+        FlowAssert.verify();
     }
 }

@@ -18,7 +18,7 @@
             <add-message-property key="queueName" value="step2"/>
         </message-properties-transformer>
         <request-reply timeout="5000">
-            <vm:outbound-endpoint path="#[header:OUTBOUND:queueName]" exchange-pattern="one-way"/>
+            <vm:outbound-endpoint path="#[message.outboundProperties.queueName]" exchange-pattern="one-way"/>
             <vm:inbound-endpoint path="reply" exchange-pattern="one-way"/>
         </request-reply>
     </flow>

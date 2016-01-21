@@ -35,7 +35,7 @@
             </http:request>
         </poll>
         <message-properties-transformer scope="outbound">
-            <add-message-property key="http.status" value="#[header:INBOUND:http.status]" />
+            <add-message-property key="http.status" value="#[message.inboundProperties['http.status']]" />
         </message-properties-transformer>
         <test:queue name="toclient2"/>
     </flow>

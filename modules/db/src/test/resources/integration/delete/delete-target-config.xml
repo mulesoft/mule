@@ -12,7 +12,7 @@
     </flow>
 
     <flow name="deleteCustomTarget">
-        <db:delete config-ref="dbConfig" target="#[header:OUTBOUND:updateCount]">
+        <db:delete config-ref="dbConfig" target="#[message.outboundProperties.updateCount]">
             <db:parameterized-query>DELETE FROM PLANET WHERE name = 'Venus'</db:parameterized-query>
         </db:delete>
     </flow>

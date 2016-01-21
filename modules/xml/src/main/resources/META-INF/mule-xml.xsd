@@ -407,7 +407,7 @@
 
     <xsd:element name="xslt-transformer" type="xsltTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
-            <xsd:documentation>The XSLT transformer uses XSLT to transform the message payload. Transformation objects are pooled for better performance. You can set transformation context properties on the transformer and can pull these properties from the message using Expression Evaluators.
+            <xsd:documentation>The XSLT transformer uses XSLT to transform the message payload. Transformation objects are pooled for better performance. You can set transformation context properties on the transformer and can pull these properties from the message using an Expression.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -424,7 +424,7 @@
                     </xsd:element>
                     <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>A property that wil be made available to the transform context. Expression Evaluators can be used to grab these properties from the message at runtime.
+                            <xsd:documentation>A property that wil be made available to the transform context. An expression can be used to grab these properties from the message at runtime.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -465,7 +465,7 @@
 
     <xsd:element name="xquery-transformer" type="xqueryTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
-            <xsd:documentation>An Xml transformer uses XQuery to transform the message payload. Transformation objects are pooled for better performance. You can set transformation context properties on the transformer and can pull these properties from the message using Expression Evaluators.
+            <xsd:documentation>An Xml transformer uses XQuery to transform the message payload. Transformation objects are pooled for better performance. You can set transformation context properties on the transformer and can pull these properties from the message using an expression.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -476,7 +476,7 @@
                 <xsd:sequence>
                     <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>A property that wil be made available to the XQuery transform context. Expression Evaluators can be used to grab these properties from the message at runtime.
+                            <xsd:documentation>A property that wil be made available to the XQuery transform context. An expression can be used to grab these properties from the message at runtime.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>

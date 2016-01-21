@@ -8,11 +8,11 @@
 
     <expression-transformer name="testTransformer">
         <return-argument expression="#[message.payloadAs(org.mule.tck.testmodels.fruit.FruitBasket)]" optional="false"/>
-        <return-argument evaluator="headers" expression="foo,bar?" optional="true"/>
+        <return-argument expression="#[['foo' : message.outboundProperties.foo, 'bar' : message.outboundProperties.bar]]" optional="true"/>
     </expression-transformer>
 
     <expression-transformer name="testTransformer2">
-        <return-argument expression="#[[message.outboundProperties['foo'],message.outboundProperties['bar']]]" optional="false"/>
+        <return-argument expression="#[[message.outboundProperties['foo'], message.outboundProperties['bar']]]" optional="false"/>
     </expression-transformer>
 
     <bean-builder-transformer name="testTransformer3" beanClass="org.mule.tck.testmodels.fruit.Orange">
@@ -21,8 +21,6 @@
         <bean-property property-name="radius" expression="#[message.outboundProperties['RADIUS']]"/>
     </bean-builder-transformer>
     
-    
     <expression-transformer name="testTransformer4" expression="#[[message.outboundProperties['foo'],message.outboundProperties['bar']]]"/>
-    
 
 </mule>

@@ -15,7 +15,7 @@
         <message-properties-transformer
             scope="outbound">
             <add-message-property key="foo"
-                value="#[header:INBOUND:foo]" />
+                value="#[message.inboundProperties.foo]" />
         </message-properties-transformer>
         <echo-component />
     </flow>
@@ -31,13 +31,13 @@
             <message-properties-transformer
                 scope="outbound">
                 <add-message-property key="foo2"
-                    value="#[header:INBOUND:foo]" />
+                    value="#[message.inboundProperties.foo]" />
             </message-properties-transformer>
             <response>
                 <message-properties-transformer
                     scope="outbound">
                     <add-message-property key="foo4"
-                        value="#[header:INBOUND:foo3]" />
+                        value="#[message.inboundProperties.foo3]" />
                 </message-properties-transformer>
             </response>
         </outbound-endpoint>
@@ -54,7 +54,7 @@
             <message-properties-transformer
                 scope="outbound">
                 <add-message-property key="foo3"
-                    value="#[header:INBOUND:foo2]" />
+                    value="#[message.inboundProperties.foo2]" />
             </message-properties-transformer>
         </inbound-endpoint>
 
@@ -68,7 +68,7 @@
         <message-properties-transformer
                 scope="outbound">
             <add-message-property key="foo2"
-                                  value="#[header:INBOUND:foo]" />
+                                  value="#[message.inboundProperties.foo]" />
         </message-properties-transformer>
         <outbound-endpoint address="vm://queueOut" exchange-pattern="one-way"/>
     </flow>
@@ -80,7 +80,7 @@
         <message-properties-transformer
                 scope="outbound">
             <add-message-property key="foo2"
-                                  value="#[header:INBOUND:foo]" />
+                                  value="#[message.inboundProperties.foo]" />
         </message-properties-transformer>        
         <outbound-endpoint address="vm://rrQueueOut" exchange-pattern="one-way"/>
     </flow>

@@ -14,7 +14,7 @@
         <default-exception-strategy>
             <vm:outbound-endpoint path="error" exchange-pattern="one-way">
                 <message-properties-transformer scope="outbound">
-                    <add-message-property key="foo" value="#[header:INBOUND:foo]" />
+                    <add-message-property key="foo" value="#[message.inboundProperties.foo]" />
                 </message-properties-transformer>
             </vm:outbound-endpoint>
         </default-exception-strategy>

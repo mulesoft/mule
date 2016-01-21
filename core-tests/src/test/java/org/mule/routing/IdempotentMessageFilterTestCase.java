@@ -33,7 +33,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
         InboundEndpoint endpoint1 = getTestInboundEndpoint("Test1Provider", "test://Test1Provider?exchangePattern=one-way");
 
         IdempotentMessageFilter ir = new IdempotentMessageFilter();
-        ir.setIdExpression("#[header:id]");
+        ir.setIdExpression("#[message.inboundProperties.id]");
         ir.setFlowConstruct(flow);
         ir.setThrowOnUnaccepted(false);
         ir.setStorePrefix("foo");

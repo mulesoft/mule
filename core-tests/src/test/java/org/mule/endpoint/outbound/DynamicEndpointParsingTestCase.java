@@ -10,17 +10,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.expression.RequiredValueException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transport.DispatchException;
 import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -38,7 +34,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextTestCase
     @Test
     public void testDynamicEventMessageSourceURIUntouched() throws Exception
     {
-        OutboundEndpoint endpoint = createRequestResponseEndpoint("test://localhost:#[header:port]");
+        OutboundEndpoint endpoint = createRequestResponseEndpoint("test://localhost:#[message.outboundProperties.port]");
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
         MuleEvent event = getTestEvent("test");
@@ -49,50 +45,29 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextTestCase
         assertEquals("test://test", response.getMessageSourceURI().toString());
     }
 
-    @Test
-    public void testMissingExpressionResult() throws Exception
-    {
-        OutboundEndpoint endpoint = createRequestResponseEndpoint("test://#[header:host]:#[header:port]");
-
-        assertTrue(endpoint instanceof DynamicOutboundEndpoint);
-
-        MuleEvent event = getTestEvent("test");
-        event.getMessage().setOutboundProperty("port", 12345);
-
-        try
-        {
-            endpoint.process(event);
-            fail("A required header is missing on the message");
-        }
-        catch (DispatchException expected)
-        {
-            assertTrue(expected.getCause() instanceof RequiredValueException);
-        }
-    }
-
     @Test(expected = MalformedEndpointException.class)
     public void testExpressionInSchemeIsForbidden() throws Exception
     {
-        createRequestResponseEndpoint("#[header:scheme]://#[header:host]:#[header:port]");
+        createRequestResponseEndpoint("#[message.outboundProperties.scheme]://#[message.outboundProperties.host]:#[message.outboundProperties:port]");
     }
 
     @Test(expected = MalformedEndpointException.class)
     public void testMalformedExpressionInUriIsDetected() throws Exception
     {
-        createRequestResponseEndpoint("test://#[header:host:#[header:port]");
+        createRequestResponseEndpoint("test://#[message.outboundProperties.host:#[message.outboundProperties.port]");
     }
 
     @Test(expected = MalformedEndpointException.class)
     public void testDynamicInboundEndpointNotAllowed() throws Exception
     {
-        EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://#[header:host]:#[header:port]", muleContext);
+        EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://#[message.outboundProperties.host]:#[message.outboundProperties.port]", muleContext);
         endpointBuilder.buildInboundEndpoint();
     }
 
     @Test
     public void testMEPOverridingInUri() throws Exception
     {
-        OutboundEndpoint endpoint = createEndpoint("test://#[header:host]:#[header:port]", MessageExchangePattern.ONE_WAY);
+        OutboundEndpoint endpoint = createEndpoint("test://#[message.outboundProperties.host]:#[message.outboundProperties.port]", MessageExchangePattern.ONE_WAY);
 
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
@@ -104,7 +79,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextTestCase
         assertSame(VoidMuleEvent.getInstance(), response);
 
         // Now test set on the endpoint
-        endpoint = createRequestResponseEndpoint("test://#[header:host]:#[header:port]?exchangePattern=REQUEST_RESPONSE");
+        endpoint = createRequestResponseEndpoint("test://#[message.outboundProperties.host]:#[message.outboundProperties.port]?exchangePattern=REQUEST_RESPONSE");
 
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 

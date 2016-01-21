@@ -300,17 +300,17 @@
                 </spring:entry>
             </add-message-properties>
         </message-properties-transformer>
-        <recipient-list enableCorrelation="ALWAYS" evaluator="header" expression="myRecipients"/>
+        <recipient-list enableCorrelation="ALWAYS" expression="#[message.outboundProperties.myRecipients]"/>
     </flow>
 
     <flow name="loan-broker">
         <vm:inbound-endpoint path="choice2-in" exchange-pattern="request-response"/>
         <choice>
-            <when expression="payload=='foo'" evaluator="groovy">
+            <when expression="payload=='foo'">
                 <append-string-transformer message=" Hello" />
                 <append-string-transformer message=" foo" />
             </when>
-            <when expression="#[groovy:payload=='bar']">
+            <when expression="#[payload=='bar']">
                 <append-string-transformer message=" Hello bar" />
             </when>
             <otherwise>
@@ -333,7 +333,7 @@
 
     <flow name="invoke2">
         <vm:inbound-endpoint path="invoke2-in" exchange-pattern="request-response"/>
-        <invoke object-ref="appender" method="transform" methodArguments="#[header:INBOUND:one]"/>
+        <invoke object-ref="appender" method="transform" methodArguments="#[message.inboundProperties.one]"/>
     </flow>
     
     <flow name="invoke3">
@@ -348,7 +348,7 @@
 
     <flow name="enrichWithAttributes">
         <vm:inbound-endpoint path="enrich-in" exchange-pattern="request-response" />
-        <enricher target="#[header:OUTBOUND:helloHeader]" source="#[payload]">
+        <enricher target="#[message.outboundProperties.helloHeader]" source="#[payload]">
             <append-string-transformer message="Hello" />
         </enricher>
     </flow>
@@ -357,22 +357,22 @@
         <vm:inbound-endpoint path="enrich2-in" exchange-pattern="request-response" />
         <enricher>
             <append-string-transformer message="Hello" />
-            <enrich target="#[header:OUTBOUND:helloHeader]" />
-            <enrich target="#[header:OUTBOUND:helloHeader2]" source="#[payload]" />
+            <enrich target="#[message.outboundProperties.helloHeader]" />
+            <enrich target="#[message.outboundProperties.helloHeader2]" source="#[payload]" />
         </enricher>
     </flow>
     
     <!-- MULE-5544 -->
     <flow name="enrichUsingComponent">
         <vm:inbound-endpoint path="enrichcomponent-in" exchange-pattern="request-response" />
-        <enricher target="#[header:OUTBOUND:echoHeader]" source="#[payload]">
+        <enricher target="#[message.outboundProperties.echoHeader]" source="#[payload]">
             <echo-component/>
         </enricher>
     </flow>
 
     <flow name="enrichUsingComponent2">
         <vm:inbound-endpoint path="enrichcomponent2-in" exchange-pattern="request-response" />
-        <enricher target="#[header:OUTBOUND:echoHeader]" source="#[payload]">
+        <enricher target="#[message.outboundProperties.echoHeader]" source="#[payload]">
             <processor-chain>
                 <echo-component/>
             </processor-chain>
@@ -380,7 +380,7 @@
     </flow>
 
 
-    <invoke name="invokeme" object-ref="pojo" method="method" methodArguments="#[string:Account] ,    #[groovy:payload]"
+    <invoke name="invokeme" object-ref="pojo" method="method" methodArguments="#['Account'] ,    #[payload]"
         methodArgumentTypes="java.lang.String, java.lang.String" />
 
     <invoke name="invokeme-noargs" object-ref="pojo" method="method"/>
@@ -400,7 +400,7 @@
 
     <flow name="loggerHeader">
         <vm:inbound-endpoint path="loggerheader-in" exchange-pattern="request-response"/>
-        <logger message="Ths is my header value: #[header:INBOUND:toLog]" level="ERROR" category="mycategory"/>
+        <logger message="Ths is my header value: #[message.inboundProperties.toLog]" level="ERROR" category="mycategory"/>
     </flow>
 
     <flow name="poll">
@@ -422,7 +422,7 @@
     <flow name="messageFilterSubFlow">
         <vm:inbound-endpoint path="messagefiltersubflow-in" exchange-pattern="one-way"/>
         <message-filter onUnaccepted="invokedByMessageFilter">
-            <expression-filter expression="false" evaluator="groovy"/>
+            <expression-filter expression="#[false]"/>
         </message-filter>
     </flow>
      

@@ -38,7 +38,7 @@
 
         <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
         <expression-transformer>
-            <return-argument expression="return &quot;expressionTransformerResponse&quot;;" evaluator="groovy" />
+            <return-argument expression="return &quot;expressionTransformerResponse&quot;;" />
         </expression-transformer>
 
         <vm:outbound-endpoint path="response" exchange-pattern="one-way" />

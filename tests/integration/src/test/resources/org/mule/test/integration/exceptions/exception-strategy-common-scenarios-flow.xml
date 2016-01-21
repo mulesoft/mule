@@ -30,7 +30,7 @@
         </http:request>
         <default-exception-strategy>
             <choice>
-                <when evaluator="groovy" expression="payload.getException().getCause() instanceof java.net.ConnectException">
+                <when expression="#[exception.getCause() instanceof java.net.ConnectException]">
                     <script:component>
                         <script:script engine="groovy">
                             flowConstruct.stop();

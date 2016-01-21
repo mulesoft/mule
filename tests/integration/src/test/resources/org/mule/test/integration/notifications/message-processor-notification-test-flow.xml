@@ -186,10 +186,10 @@
         <vm:inbound-endpoint path="in-enricher" exchange-pattern="request-response"/>
         <enricher>
             <append-string-transformer message="Hello"/>
-            <enrich target="#[header:OUTBOUND:helloHeader]"/>
-            <enrich target="#[header:OUTBOUND:helloHeader2]"/>
+            <enrich target="#[message.outboundProperties.helloHeader]"/>
+            <enrich target="#[message.outboundProperties.helloHeader2]"/>
         </enricher>
-        <enricher target="#[header:OUTBOUND:echoHeader]" source="#[payload]">
+        <enricher target="#[message.outboundProperties.echoHeader]" source="#[payload]">
             <processor-chain>
                 <echo-component/>
                 <echo-component/>
@@ -363,7 +363,7 @@
 
     <flow name="recipient-list">
         <vm:inbound-endpoint path="recipient-list" exchange-pattern="request-response"/>
-        <recipient-list enableCorrelation="ALWAYS" evaluator="payload" expression=""/>
+        <recipient-list enableCorrelation="ALWAYS" expression="#[payload]"/>
         <logger level="INFO"/>
     </flow>
 

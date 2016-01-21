@@ -10,7 +10,7 @@
             <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
         </db:select>
 
-        <db:update config-ref="dbConfig" target="#[header:OUTBOUND:updateCounts]" bulkMode="true">
+        <db:update config-ref="dbConfig" target="#[message.outboundProperties.updateCounts]" bulkMode="true">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=#[payload.position]
             </db:parameterized-query>
         </db:update>

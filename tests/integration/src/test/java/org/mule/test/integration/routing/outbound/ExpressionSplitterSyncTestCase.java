@@ -6,12 +6,12 @@
  */
 package org.mule.test.integration.routing.outbound;
 
-import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -42,12 +42,8 @@ public class ExpressionSplitterSyncTestCase extends FunctionalTestCase
 
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof List);
-        List<String> results = ((List<MuleMessage>) result.getPayload()).stream().map(msg -> (String) msg.getPayload
-                ()).collect(toList());
-        assertEquals(3, results.size());
+        assertEquals(3, ((List) result.getPayload()).size());
 
-        assertTrue(results.contains("Apple Received in ServiceOne"));
-        assertTrue(results.contains("Banana Received in ServiceTwo"));
-        assertTrue(results.contains("Orange Received in ServiceThree"));
+        FlowAssert.verify();
     }
 }

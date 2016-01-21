@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="insertCustomTarget">
-        <db:insert config-ref="dbConfig" target="#[header:OUTBOUND:updateCount]">
+        <db:insert config-ref="dbConfig" target="#[message.outboundProperties.updateCount]">
             <db:parameterized-query>INSERT INTO PLANET(POSITION, NAME) VALUES (777, 'Pluto')</db:parameterized-query>
         </db:insert>
     </flow>

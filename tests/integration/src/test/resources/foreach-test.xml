@@ -40,7 +40,7 @@
 
     <flow name="minimal-config-expression">
         <vm:inbound-endpoint path="input-3" exchange-pattern="request-response"/>
-        <foreach collection="#[header:INBOUND:names]">
+        <foreach collection="#[message.inboundProperties.names]">
             <test:component/>
             <vm:outbound-endpoint path="out"/>
         </foreach>
@@ -59,11 +59,11 @@
         <foreach rootMessageVariableName="parent">
             <test:component/>
             <message-properties-transformer scope="invocation">
-                <add-message-property key="parent2" value="#[variable:parent]"/>
+                <add-message-property key="parent2" value="#[flowVars.parent]"/>
             </message-properties-transformer>
         </foreach>
         <message-properties-transformer scope="outbound">
-            <add-message-property key="parent" value="#[variable:parent2]"/>
+            <add-message-property key="parent" value="#[flowVars.parent2]"/>
         </message-properties-transformer>
     </flow>
 
@@ -72,11 +72,11 @@
         <foreach counterVariableName="index">
             <test:component/>
             <message-properties-transformer scope="session">
-            	<add-message-property key="msg-last-index" value="#[variable:index]"/>
+            	<add-message-property key="msg-last-index" value="#[flowVars.index]"/>
             </message-properties-transformer>
         </foreach>
         <message-properties-transformer scope="outbound">
-        	<add-message-property key="msg-last-index" value="#[header:SESSION:msg-last-index]"/>
+        	<add-message-property key="msg-last-index" value="#[sessionVars['msg-last-index']]"/>
         </message-properties-transformer>
     </flow>
 
@@ -95,7 +95,7 @@
             <test:assert expression="#[message.inboundProperties['out']=='out'+counter]" />
             <set-variable variableName="totalMessages" value="#[counter]"/>
         </foreach>
-        <logger level="WARN" message="variable:totalMessages: #[variable:totalMessages]"/>
+        <logger level="WARN" message="variable:totalMessages: #[flowVars.totalMessages]"/>
         <test:assert expression="#[totalMessages==10]" />
     </flow>
 
@@ -104,25 +104,25 @@
         <foreach>
             <test:component/>
             <message-properties-transformer scope="invocation">
-            	<add-message-property key="totalMessages" value="#[variable:counter]"/>
+            	<add-message-property key="totalMessages" value="#[flowVars.counter]"/>
             </message-properties-transformer>
         </foreach>
         <message-properties-transformer scope="outbound">
-        	<add-message-property key="totalMessages" value="#[variable:totalMessages]"/>
+        	<add-message-property key="totalMessages" value="#[flowVars.totalMessages]"/>
         </message-properties-transformer>
-        <test:assert expression="#[groovy:totalMessages == 2]" />
+        <test:assert expression="#[totalMessages == 2]" />
     </flow>
 
     <flow name="map-expression-config">
         <vm:inbound-endpoint path="input-9" exchange-pattern="request-response"/>
-        <foreach collection="#[header:INBOUND:names]">
+        <foreach collection="#[message.inboundProperties.names]">
             <test:component/>
             <message-properties-transformer scope="invocation">
-            	<add-message-property key="totalMessages" value="#[variable:counter]"/>
+            	<add-message-property key="totalMessages" value="#[flowVars.counter]"/>
             </message-properties-transformer>
         </foreach>
         <message-properties-transformer scope="outbound">
-        	<add-message-property key="totalMessages" value="#[variable:totalMessages]"/>
+        	<add-message-property key="totalMessages" value="#[flowVars.totalMessages]"/>
         </message-properties-transformer>
     </flow>
 
@@ -135,8 +135,8 @@
     <flow name="process-json-update">
         <vm:inbound-endpoint path="input-11" exchange-pattern="request-response"/>
         <json:json-to-object-transformer returnClass="java.util.Map"/>
-        <test:assert expression="#[groovy:payload.order.items.size() == 2]" />
-        <foreach collection="#[groovy:payload.order.items]">
+        <test:assert expression="#[payload.order.items.size() == 2]" />
+        <foreach collection="#[payload.order.items]">
             <script:component>
                 <script:script engine="groovy">
                     <![CDATA[
@@ -147,8 +147,8 @@
                 </script:script>
             </script:component>
         </foreach>
-        <test:assert expression="#[groovy:payload instanceof Map]" />
-        <test:assert expression="#[groovy:payload.order.items.size() == 4]" />
+        <test:assert expression="#[payload is Map]" />
+        <test:assert expression="#[payload.order.items.size() == 4]" />
     </flow>
 
     <flow name="array-expression-config">
@@ -165,7 +165,7 @@
                 </script:script>
             </script:component>
         </foreach>
-        <test:assert expression="#[groovy:message.getInvocationProperty('loops') == '3']" />
+        <test:assert expression="#[flowVars.loops == '3']" />
     </flow>
 
     <flow name="counter-scope">
@@ -173,29 +173,25 @@
         <foreach>
             <test:component/>
         </foreach>
-        <message-properties-transformer scope="outbound">
-            <add-message-property key="msg-scope-variable" value="#[variable:counter]"/>
-        </message-properties-transformer>
+        <test:assert expression="#[flowVars.counter == null]"/>
     </flow>
-
-
 
     <flow name="counter-two-foreach-independence">
         <vm:inbound-endpoint path="input-14" exchange-pattern="request-response"/>
         <foreach>
             <test:component/>
             <message-properties-transformer scope="invocation">
-                <add-message-property key="totalMessages" value="#[variable:counter]"/>
+                <add-message-property key="totalMessages" value="#[flowVars.counter]"/>
             </message-properties-transformer>
         </foreach>
         <foreach>
             <test:component/>
             <message-properties-transformer scope="invocation">
-                <add-message-property key="totalMessages" value="#[variable:counter]"/>
+                <add-message-property key="totalMessages" value="#[flowVars.counter]"/>
             </message-properties-transformer>
         </foreach>
         <message-properties-transformer scope="outbound">
-            <add-message-property key="msg-total-messages" value="#[variable:totalMessages]"/>
+            <add-message-property key="msg-total-messages" value="#[flowVars.totalMessages]"/>
         </message-properties-transformer>
     </flow>
 
@@ -215,12 +211,12 @@
             <foreach>
                 <test:component/>
                 <message-properties-transformer scope="outbound">
-                    <add-message-property key="j" value="#[variable:counter]"/>
+                    <add-message-property key="j" value="#[flowVars.counter]"/>
                 </message-properties-transformer>
                 <vm:outbound-endpoint path="out"/>
             </foreach>
             <message-properties-transformer scope="outbound">
-                <add-message-property key="i" value="#[variable:counter]"/>
+                <add-message-property key="i" value="#[flowVars.counter]"/>
             </message-properties-transformer>
             <vm:outbound-endpoint path="out"/>
         </foreach>

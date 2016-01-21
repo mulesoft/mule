@@ -126,7 +126,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
         }
         else
         {
-            failureExpressionFilter = new ExpressionFilter("exception-type:");
+            failureExpressionFilter = new ExpressionFilter("exception != null");
         }
         failureExpressionFilter.setMuleContext(muleContext);
 

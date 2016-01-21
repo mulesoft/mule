@@ -244,7 +244,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         when(endpointBuilder.buildOutboundEndpoint()).thenReturn(prototypeEndpoint);
         when(endpointBuilder.clone()).thenReturn(staticEndpointBuilder);
 
-        DynamicOutboundEndpoint dynamicOutboundEndpoint = new DynamicOutboundEndpoint(endpointBuilder, new DynamicURIBuilder(new URIBuilder("test://localhost:#[header:port]", muleContext)));
+        DynamicOutboundEndpoint dynamicOutboundEndpoint = new DynamicOutboundEndpoint(endpointBuilder, new DynamicURIBuilder(new URIBuilder("test://localhost:#[message.outboundProperties.port]", muleContext)));
 
         testOutboundEvent = createTestOutboundEvent();
         dynamicOutboundEndpoint.process(testOutboundEvent);
@@ -331,7 +331,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
                                                       TransactionConfig txConfig) throws Exception
     {
 
-        return createTestOutboundEndpoint("test://localhost:#[header:port]", filter, securityFilter, in, response,
+        return createTestOutboundEndpoint("test://localhost:#[message.outboundProperties.port]", filter, securityFilter, in, response,
                                           exchangePattern, txConfig);
     }
 
