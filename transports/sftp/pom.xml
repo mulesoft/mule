@@ -15,8 +15,6 @@
     <properties>
         <skipExportTests>false</skipExportTests>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
-        <!-- https://mina.apache.org/mina-project/faq.html#i-get-outofmemoryerror-or-response-timeout-and-connection-reset-under-heavy-load -->
-        <additionalSurefireArgs>-XX:MaxDirectMemorySize=64M</additionalSurefireArgs>
     </properties>
 
     <build>
@@ -43,6 +41,13 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Xms64m -Xmx512m -XX:MaxDirectMemorySize=64M</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>
