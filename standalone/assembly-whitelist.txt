@@ -138,7 +138,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-http-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jaas-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jbossts-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-jbpm-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jersey-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-json-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-launcher-${productVersion}.jar
@@ -195,7 +194,7 @@
 /mule-standalone-${productVersion}/lib/opt/annotations-api-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/ant-1.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/ant-launcher-1.7.0.jar
-/mule-standalone-${productVersion}/lib/opt/antlr-3.1.1.jar
+/mule-standalone-${productVersion}/lib/opt/antlr-3.5.jar
 /mule-standalone-${productVersion}/lib/opt/antlr-runtime-3.5.jar
 /mule-standalone-${productVersion}/lib/opt/aopalliance-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/asm-3.3.1.jar
@@ -273,9 +272,6 @@
 /mule-standalone-${productVersion}/lib/opt/guava-18.0.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-core-1.3.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-library-1.3.jar
-/mule-standalone-${productVersion}/lib/opt/hibernate-commons-annotations-3.2.0.Final.jar
-/mule-standalone-${productVersion}/lib/opt/hibernate-core-3.6.0.Final.jar
-/mule-standalone-${productVersion}/lib/opt/hibernate-jpa-2.0-api-1.0.0.Final.jar
 /mule-standalone-${productVersion}/lib/opt/hk2-api-2.3.0-b05.jar
 /mule-standalone-${productVersion}/lib/opt/hk2-locator-2.3.0-b05.jar
 /mule-standalone-${productVersion}/lib/opt/hk2-utils-2.3.0-b05.jar
@@ -300,10 +296,6 @@
 /mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jboss-logging-3.0.0.Beta5.jar
 /mule-standalone-${productVersion}/lib/opt/jbossjta-4.15.0.Final.jar
-/mule-standalone-${productVersion}/lib/opt/jbpm-api-4.4.jar
-/mule-standalone-${productVersion}/lib/opt/jbpm-jpdl-4.4.jar
-/mule-standalone-${productVersion}/lib/opt/jbpm-log-4.4.jar
-/mule-standalone-${productVersion}/lib/opt/jbpm-pvm-4.4.jar
 /mule-standalone-${productVersion}/lib/opt/jcifs-1.3.3.jar
 /mule-standalone-${productVersion}/lib/opt/jcodings-1.0.10.jar
 /mule-standalone-${productVersion}/lib/opt/jdom-1.1.3.jar
@@ -353,13 +345,10 @@
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.6.jar
 /mule-standalone-${productVersion}/lib/opt/json-20140107.jar
 /mule-standalone-${productVersion}/lib/opt/jsp-api-6.0.44.jar
-/mule-standalone-${productVersion}/lib/opt/juel-engine-2.1.0.jar
-/mule-standalone-${productVersion}/lib/opt/juel-impl-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/juli-6.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/jzlib-1.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/libphonenumber-6.2.jar
-/mule-standalone-${productVersion}/lib/opt/livetribe-jsr223-2.0.5.jar
 /mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mailapi-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mchange-commons-java-0.2.9.jar
@@ -402,6 +391,7 @@
 /mule-standalone-${productVersion}/lib/opt/spring-ldap-core-2.0.2.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-tx-4.1.6.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-web-4.1.6.RELEASE.jar
+/mule-standalone-${productVersion}/lib/opt/ST4-4.0.7.jar
 /mule-standalone-${productVersion}/lib/opt/stax-api-1.0-2.jar
 /mule-standalone-${productVersion}/lib/opt/stax-utils-20080702.jar
 /mule-standalone-${productVersion}/lib/opt/stax2-api-3.1.4.jar
