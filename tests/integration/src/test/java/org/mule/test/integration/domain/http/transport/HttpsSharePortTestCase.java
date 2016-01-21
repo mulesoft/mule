@@ -34,8 +34,8 @@ public class HttpsSharePortTestCase extends HttpSharePortTestCase
         tlsContextFactory = new DefaultTlsContextFactory();
 
         // Configure trust store in the client with the certificate of the server.
-        tlsContextFactory.setTrustStorePath("trustStore");
-        tlsContextFactory.setTrustStorePassword("mulepassword");
+        tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
+        tlsContextFactory.setTrustStorePassword("changeit");
     }
 
     @Parameterized.Parameters
