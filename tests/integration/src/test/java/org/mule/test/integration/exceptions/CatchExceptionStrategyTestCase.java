@@ -70,8 +70,8 @@ public class CatchExceptionStrategyTestCase extends AbstractServiceAndFlowTestCa
         tlsContextFactory = new DefaultTlsContextFactory();
 
         // Configure trust store in the client with the certificate of the server.
-        tlsContextFactory.setTrustStorePath("trustStore");
-        tlsContextFactory.setTrustStorePassword("mulepassword");
+        tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
+        tlsContextFactory.setTrustStorePassword("changeit");
     }
 
     @Test
