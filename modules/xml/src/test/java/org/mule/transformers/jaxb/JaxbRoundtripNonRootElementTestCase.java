@@ -10,8 +10,8 @@ import org.mule.api.transformer.Transformer;
 import org.mule.jaxb.model.Person;
 import org.mule.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.transformer.types.DataTypeFactory;
+
 import org.w3c.dom.Document;
 
 public class JaxbRoundtripNonRootElementTestCase extends JaxbRoundtripTestCase

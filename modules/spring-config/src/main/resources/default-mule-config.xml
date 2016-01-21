@@ -8,8 +8,6 @@
 
     <spring:beans>
 
-        <spring:bean name="_muleTransformerAnnotationProcessor" class="org.mule.config.spring.processors.TransformerAnnotatedBeanProcessor"/>
-
         <spring:bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>
 
         <spring:bean name="_muleMessageProcessingManager" class="org.mule.execution.MuleMessageProcessingManager"/>
