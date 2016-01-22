@@ -33,8 +33,11 @@ public class MulticastAsyncWithTransformersTestCase extends FunctionalTestCase
     @Test
     public void testSyncMulticast() throws Exception
     {
-        FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());
-        fruitBowl.addFruit(new Orange());
+        Apple apple = new Apple();
+        Banana banana = new Banana();
+        Orange orange = new Orange();
+        FruitBowl fruitBowl = new FruitBowl(apple, banana);
+        fruitBowl.addFruit(orange);
 
         MuleClient client = muleContext.getClient();
         client.dispatch("vm://distributor.queue", fruitBowl, null);
@@ -54,8 +57,8 @@ public class MulticastAsyncWithTransformersTestCase extends FunctionalTestCase
         assertNotNull(result);
         results.add(result.getPayload());
 
-        assertTrue(results.contains("Apple Received"));
-        assertTrue(results.contains("Banana Received"));
-        assertTrue(results.contains("Orange Received"));
+        assertTrue(results.contains(apple));
+        assertTrue(results.contains(banana));
+        assertTrue(results.contains(orange));
     }
 }

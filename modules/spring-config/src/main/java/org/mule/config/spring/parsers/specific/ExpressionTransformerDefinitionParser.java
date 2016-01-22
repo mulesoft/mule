@@ -37,9 +37,7 @@ public class ExpressionTransformerDefinitionParser extends ParentContextDefiniti
                 "return-argument")).registerPreProcessor(
             new CheckExclusiveAttributesAndChildren(new String[]{"expression"},
                 new String[]{"return-argument"}))
-            .addIgnored("evaluator")
-            .addIgnored("expression")
-            .addIgnored("custom-evaluator");
+            .addIgnored("expression");
     }
 
     protected static void addExpressionArgumentFromAttributes(Element element, BeanDefinitionBuilder builder)
@@ -52,10 +50,6 @@ public class ExpressionTransformerDefinitionParser extends ParentContextDefiniti
             objectFactoryBeanDefinition.getPropertyValues().addPropertyValue("optional", false);
             GenericBeanDefinition objectFactoryBeanDefinition2 = new GenericBeanDefinition();
             objectFactoryBeanDefinition2.setBeanClass(ExpressionConfig.class);
-            objectFactoryBeanDefinition2.getPropertyValues().addPropertyValue("evaluator",
-                element.getAttribute("evaluator"));
-            objectFactoryBeanDefinition2.getPropertyValues().addPropertyValue("customEvaluator",
-                element.getAttribute("custom-evaluator"));
             objectFactoryBeanDefinition2.getPropertyValues().addPropertyValue("expression",
                 element.getAttribute("expression"));
             objectFactoryBeanDefinition.getPropertyValues().addPropertyValue("expressionConfig",

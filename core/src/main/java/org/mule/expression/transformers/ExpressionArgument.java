@@ -113,8 +113,7 @@ public class ExpressionArgument implements MuleContextAware
         try
         {
             Thread.currentThread().setContextClassLoader(expressionEvaluationClassLoader);
-            result = muleContext.getExpressionManager().evaluate(getExpression(), getEvaluator(), message,
-                !isOptional());
+            result = muleContext.getExpressionManager().evaluate(getExpression(), message, !isOptional());
         }
         finally
         {
@@ -156,26 +155,6 @@ public class ExpressionArgument implements MuleContextAware
     public void setExpression(String expression)
     {
         expressionConfig.setExpression(expression);
-    }
-
-    public String getEvaluator()
-    {
-        return expressionConfig.getEvaluator();
-    }
-    
-    public void setEvaluator(String evaluator)
-    {
-        expressionConfig.setEvaluator(evaluator);
-    }
-
-    public void setCustomEvaluator(String evaluator)
-    {
-        expressionConfig.setCustomEvaluator(evaluator);
-    }
-
-    public String getCustomEvaluator()
-    {
-        return expressionConfig.getCustomEvaluator();
     }
 
     public Class<?> getReturnClass()

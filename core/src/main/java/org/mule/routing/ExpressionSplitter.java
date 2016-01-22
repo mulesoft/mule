@@ -47,7 +47,6 @@ public class ExpressionSplitter extends AbstractSplitter
     public ExpressionSplitter(ExpressionConfig config)
     {
         this.config = config;
-        setEvaluator(config.getEvaluator());
     }
 
     public void initialise() throws InitialisationException
@@ -110,26 +109,6 @@ public class ExpressionSplitter extends AbstractSplitter
             logger.info("The expression does not evaluate to a type that can be split: " + result.getClass().getName());
             return Collections.<MuleMessage> singletonList(new DefaultMuleMessage(result, muleContext));
         }
-    }
-
-    public String getCustomEvaluator()
-    {
-        return config.getCustomEvaluator();
-    }
-
-    public void setCustomEvaluator(String customEvaluator)
-    {
-        config.setCustomEvaluator(customEvaluator);
-    }
-
-    public String getEvaluator()
-    {
-        return config.getEvaluator();
-    }
-
-    public void setEvaluator(String evaluator)
-    {
-        config.setEvaluator(evaluator);
     }
 
     public String getExpression()

@@ -17,17 +17,17 @@
         <all>
             <vm:outbound-endpoint path="service1.queue" exchange-pattern="request-response">
                 <expression-transformer>
-                    <return-argument evaluator="groovy" expression="payload.fruit[0]"/>
+                    <return-argument expression="payload.fruit[0]"/>
                 </expression-transformer>
             </vm:outbound-endpoint>
             <vm:outbound-endpoint path="service2.queue" exchange-pattern="request-response">
                 <expression-transformer>
-                    <return-argument evaluator="groovy" expression="payload.fruit[1]"/>
+                    <return-argument expression="payload.fruit[1]"/>
                 </expression-transformer>
             </vm:outbound-endpoint>
             <vm:outbound-endpoint path="service3.queue" exchange-pattern="request-response">
                 <expression-transformer>
-                    <return-argument evaluator="groovy" expression="payload.fruit[2]"/>
+                    <return-argument expression="payload.fruit[2]"/>
                 </expression-transformer>
             </vm:outbound-endpoint>
         </all>
@@ -35,23 +35,17 @@
 
     <flow name="ServiceOne">
         <vm:inbound-endpoint path="service1.queue" exchange-pattern="request-response"/>
-        <test:component>
-            <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
-        </test:component>
+        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Fruit]"/>
     </flow>
 
     <flow name="ServiceTwo">
         <vm:inbound-endpoint path="service2.queue" exchange-pattern="request-response"/>
-        <test:component>
-            <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
-        </test:component>
+        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Fruit]"/>
     </flow>
 
     <flow name="ServiceThree">
         <vm:inbound-endpoint path="service3.queue" exchange-pattern="request-response"/>
-        <test:component>
-            <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
-        </test:component>
+        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Fruit]"/>
     </flow>
 
 </mule>

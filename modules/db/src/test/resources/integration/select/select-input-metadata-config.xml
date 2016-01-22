@@ -14,7 +14,7 @@
     <flow name="selectMetadataNotSupportedValueParams">
         <db:select config-ref="dbConfig">
             <db:parameterized-query>select * from PLANET where id = #[payload.id] and name =
-                #[header:OUTBOUND:updateCount]
+                #[message.outboundProperties.updateCount]
             </db:parameterized-query>
         </db:select>
     </flow>

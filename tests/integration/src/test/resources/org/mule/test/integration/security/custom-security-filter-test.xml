@@ -32,7 +32,7 @@
     <flow name="test">
         <inbound-endpoint address="vm://test" exchange-pattern="request-response"/>
         <custom-security-filter class="org.mule.security.UsernamePasswordAuthenticationFilter">
-            <spring:property name="password" value="#[header:inbound:pass]"/>
+            <spring:property name="password" value="#[message.inboundProperties.pass]"/>
         </custom-security-filter>
         <component class="org.mule.component.simple.EchoComponent"/>
     </flow>

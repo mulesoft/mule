@@ -42,16 +42,6 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean<Messag
         ((ExpressionFilter) filter).setExpression(expression);
     }
 
-    public void setEvaluator(String evaluator)
-    {
-        ((ExpressionFilter) filter).setEvaluator(evaluator);
-    }
-
-    public void setCustomEvaluator(String customEvaluator)
-    {
-        ((ExpressionFilter) filter).setCustomEvaluator(customEvaluator);
-    }
-
     @Override
     public MessageProcessorFilterPair getObject() throws Exception
     {

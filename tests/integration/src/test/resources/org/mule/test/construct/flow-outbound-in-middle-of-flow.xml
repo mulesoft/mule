@@ -11,13 +11,11 @@
 
         <vm:outbound-endpoint path="test.out.1" />
 
-        <expression-transformer evaluator="groovy"
-            expression="payload.replaceAll('hello', 'bye')" />
+        <expression-transformer expression="payload.replaceAll('hello', 'bye')" />
 
         <vm:outbound-endpoint path="test.out.2" />
         
-        <expression-transformer evaluator="groovy"
-            expression="payload.replaceAll('bye', '').reverse()" />
+        <expression-transformer expression="payload.replaceAll('bye', '').reverse()" />
             
         <vm:outbound-endpoint path="test.out.3" />
 

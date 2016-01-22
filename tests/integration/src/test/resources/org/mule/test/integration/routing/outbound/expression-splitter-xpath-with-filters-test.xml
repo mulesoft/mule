@@ -18,15 +18,15 @@
         <vm:inbound-endpoint path="distributor.queue" exchange-pattern="request-response">
             <mulexml:xml-to-dom-transformer returnClass="org.dom4j.Document"/>
         </vm:inbound-endpoint>
-        <splitter evaluator="xpath" expression="/Foo/Bar/*">
+        <splitter expression="xpath('/Foo/Bar/*'">
             <vm:outbound-endpoint path="service1.queue" exchange-pattern="one-way">
-                <expression-filter evaluator="xpath" expression="/ = 'One'"/>
+                <expression-filter expression="xpath('/ = 'One'')"/>
             </vm:outbound-endpoint>
             <vm:outbound-endpoint path="service2.queue" exchange-pattern="one-way">
-                <expression-filter evaluator="xpath" expression="/ = 'Two'"/>
+                <expression-filter expression="xpath('/ = 'Two'')"/>
             </vm:outbound-endpoint>
             <vm:outbound-endpoint path="service3.queue" exchange-pattern="one-way">
-                <expression-filter evaluator="xpath" expression="/ = 'Three'"/>
+                <expression-filter expression="xpath('/ = 'Three'')"/>
             </vm:outbound-endpoint>
         </splitter>
     </flow>

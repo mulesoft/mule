@@ -20,7 +20,7 @@
         <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
         <http:request config-ref="requestConfig" path="/hello" method="POST" />
         <message-properties-transformer scope="outbound">
-            <add-message-property key="contentType" value="#[header:INBOUND:content-type]"/>
+            <add-message-property key="contentType" value="#[message.inboundProperties['content-type']]"/>
         </message-properties-transformer>
     </flow>
 

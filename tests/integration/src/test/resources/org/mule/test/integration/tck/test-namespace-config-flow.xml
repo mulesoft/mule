@@ -37,7 +37,7 @@
             exchange-pattern="request-response" />
 
         <test:component enableMessageHistory="false"
-            appendString=" received in #[context:serviceName]" />
+            appendString=" received" />
     </flow>
 
     <flow name="testService4">

@@ -6,6 +6,10 @@
  */
 package org.mule.transformers.xml.xslt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
@@ -27,11 +31,6 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamReader;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransformerTestCase
 {
@@ -242,7 +241,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
 
         // set parameter
         Map<String, Object> params = new HashMap<String, Object>();
-        params.put("param1", "#[header:myproperty]");
+        params.put("param1", "#[message.outboundProperties.myproperty]");
         transformer.setContextProperties(params);
 
         // init transformer

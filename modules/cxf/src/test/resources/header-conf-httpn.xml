@@ -38,7 +38,7 @@
         </component>
         <message-properties-transformer>
             <add-message-property key="FOO"
-                                  value="#[header:INBOUND:FOO]" />
+                                  value="#[message.inboundProperties['FOO']]" />
         </message-properties-transformer>
         <flow-ref name="testService"/>
     </flow>

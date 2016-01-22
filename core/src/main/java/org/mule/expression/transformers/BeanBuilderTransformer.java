@@ -113,9 +113,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
 
             if (!argument.isOptional() && value == null)
             {
-                throw new TransformerException(CoreMessages.expressionEvaluatorReturnedNull(
-                        argument.getExpressionConfig().getEvaluator(), argument.getExpressionConfig().getExpression()), this);
-
+                throw new TransformerException(CoreMessages.expressionReturnedNull(argument.getExpressionConfig().getExpression()), this);
             }
             args.put(argument.getName(), value);
         }

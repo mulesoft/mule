@@ -42,7 +42,7 @@ import org.w3c.dom.Document;
  * obtained by an expression, generating a message for each element.
  * <p/>
  * The number of the message being processed is stored in <code>#[variable:counter]</code> and the root
- * message is store in <code>#[variable:rootMessage]</code>. Both variables may be renamed by means of
+ * message is store in <code>#[flowVars.rootMessage]</code>. Both variables may be renamed by means of
  * {@link #setCounterVariableName(String)} and {@link #setRootMessageVariableName(String)}.
  * <p/>
  * Defining a groupSize greater than one, allows iterating over collections of elements of the specified size.
@@ -165,11 +165,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         {
             expressionConfig.setExpression(collectionExpression);
             splitter = new ExpressionSplitter(expressionConfig);
-            if (expressionConfig.getEvaluator() != null && expressionConfig.getEvaluator().startsWith(XPATH_PREFIX))
-            {
-                xpathCollection = true;
-            }
-            else if (expressionConfig.getEvaluator() == null && isXPathExpression(expressionConfig.getExpression()))
+            if (isXPathExpression(expressionConfig.getExpression()))
             {
                 xpathCollection = true;
             }

@@ -682,7 +682,7 @@
                 <xsd:attribute name="source" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            An evaluator expression used to extract a value from the result of the
+                            An expression used to extract a value from the result of the
                             enrichment message processor. If an
                             expression is not specified then the payload of the
                             message is used.
@@ -708,7 +708,7 @@
         <xsd:attribute name="source" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    An evaluator expression used to extract a value from the result of the
+                    An expression used to extract a value from the result of the
                     enrichment message processor. If an
                     expression is not specified then the payload of the
                     message is used.
@@ -3064,14 +3064,14 @@
                 <xsd:attribute name="username" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A Mule expression which extracts the username from the message. Defaults to #[header:inbound:username].
+                            A Mule expression which extracts the username from the message. Defaults to #[message.inboundProperties.username].
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="password" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A Mule expression which extracts the password from the message. Defaults to #[header:inbound:password].
+                            A Mule expression which extracts the password from the message. Defaults to #[message.inboundProperties.password].
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3348,21 +3348,9 @@
     <xsd:complexType name="expressionFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractFilterType">
-                <xsd:attribute name="evaluator" type="expressionFilterEvaluators" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>The expression evaluator to use. The expression filter supports some types such as header, payload, exception, wildcard, and regex, that are built-in filters not registered with the ExpressionEvaluatorManager. All others are registered with the ExpressionEvaluatorManager. Where XPath, bean, and ONGL are used, the expression should be a boolean expression.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="expression" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>The expression that will be evaluated. This should always be a boolean expression. The syntax of the expression will be determined by the expression language being used.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="customEvaluator" type="substitutableName">
-                    <xsd:annotation>
-                        <xsd:documentation>Must be set if the evaluator is set to custom. The custom evaluator must be registered with the ExpressionEvaluatorManager if it is to be used here.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -4316,108 +4304,19 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:simpleType name="standardExpressionEvaluators">
-        <xsd:restriction base="substitutableName">
-            <xsd:enumeration value="attachment"/>
-            <xsd:enumeration value="attachments"/>
-            <xsd:enumeration value="attachments-list"/>
-            <xsd:enumeration value="endpoint"/>
-            <xsd:enumeration value="exception-type"/>
-            <xsd:enumeration value="function"/>
-            <xsd:enumeration value="groovy"/>
-            <xsd:enumeration value="header"/>
-            <xsd:enumeration value="headers"/>
-            <xsd:enumeration value="headers-list"/>
-            <xsd:enumeration value="json"/>
-            <xsd:enumeration value="json-node"/>
-            <xsd:enumeration value="map-payload"/>
-            <xsd:enumeration value="message"/>
-            <xsd:enumeration value="mule"/>
-            <xsd:enumeration value="payload"/>
-            <xsd:enumeration value="process"/>
-            <xsd:enumeration value="regex"/>
-            <xsd:enumeration value="string"/>
-            <xsd:enumeration value="variable"/>
-            <xsd:enumeration value="custom"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-
-    <xsd:simpleType name="expressionFilterEvaluators">
-        <xsd:restriction base="substitutableName">
-            <xsd:enumeration value="header"/>
-            <xsd:enumeration value="payload-type"/>
-            <xsd:enumeration value="exception-type"/>
-            <xsd:enumeration value="wildcard"/>
-            <xsd:enumeration value="regex"/>
-            <xsd:enumeration value="groovy"/>
-            <xsd:enumeration value="custom"/>
-            <xsd:enumeration value="registry"/>
-            <xsd:enumeration value="variable"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-
-
-    <xsd:simpleType name="whenExpressionEvaluators">
-        <xsd:union>
-            <xsd:simpleType>
-                <xsd:restriction base="standardExpressionEvaluators"/>
-            </xsd:simpleType>
-            <xsd:simpleType>
-                <xsd:restriction base="substitutableName">
-                    <xsd:enumeration value="payload-type"/>
-                    <xsd:enumeration value="exception-type"/>
-                    <xsd:enumeration value="wildcard"/>
-                    <xsd:enumeration value="regex"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:union>
-    </xsd:simpleType>
-
-
-    <xsd:simpleType name="standardExpressionEnrichers">
-        <xsd:restriction base="substitutableName">
-            <xsd:enumeration value="header"/>
-            <xsd:enumeration value="custom"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-
     <xsd:attributeGroup name="expressionAttributes">
-        <xsd:attribute name="evaluator" use="optional" type="standardExpressionEvaluators">
-            <xsd:annotation>
-                <xsd:documentation>The expression evaluator to use. Expression evaluators must be registered with the ExpressionEvaluatorManager before they can be used. Using the custom evaluator allows you to define your own evaluator with the 'custom-evaluator' attribute. Note that some evaluators such as xpath, groovy, and bean are loaded from other Mule modules (XML and Scripting, respectively). These modules must be on your classpath before the evaluator can be used.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="expression" type="xsd:string" use="required">
             <xsd:annotation>
-                <xsd:documentation>The expression to evaluate. The syntax of this attribute changes depending on the evaluator being used.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="custom-evaluator" type="substitutableName" use="optional">
-            <xsd:annotation>
-                <xsd:documentation>The name of the custom evaluator to use. This attribute is only used when the 'evaluator' attribute is set to "custom". You can plug in your own expression evaluators by registering them with the ExpressionEvaluatorManager.
+                <xsd:documentation>The expression to evaluate.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="optionalExpressionAttributes">
-        <xsd:attribute name="evaluator" type="standardExpressionEvaluators">
-            <xsd:annotation>
-                <xsd:documentation>The expression evaluator to use. Expression evaluators must be registered with the ExpressionEvaluatorManager before they can be used. Using the custom evaluator allows you to define your own evaluator with the 'custom-evaluator' attribute. Note that some evaluators such as xpath, groovy, and bean are loaded from other Mule modules (XML and Scripting, respectively). These modules must be on your classpath before the evaluator can be used.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="expression" type="xsd:string">
             <xsd:annotation>
-                <xsd:documentation>The expression to evaluate. The syntax of this attribute changes depending on the evaluator being used.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="custom-evaluator" type="substitutableName">
-            <xsd:annotation>
-                <xsd:documentation>The name of the custom evaluator to use. This attribute is only used when the 'evaluator' attribute is set to "custom". You can plug in your own expression evaluators by registering them with the ExpressionEvaluatorManager.
+                <xsd:documentation>The expression to evaluate.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -4439,7 +4338,7 @@
                 <xsd:attribute name="source" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            An evaluator expression used to extract the value that will be matched against each regular expression. If an expression is not specified then the payload of the message is used.
+                            An expression used to extract the value that will be matched against each regular expression. If an expression is not specified then the payload of the message is used.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -5613,21 +5512,9 @@
                  no expression is specified -->
             <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded" />
           </xsd:sequence>
-          <xsd:attribute name="evaluator" use="optional" type="whenExpressionEvaluators">
-              <xsd:annotation>
-                  <xsd:documentation>The expression evaluator to use. Expression evaluators must be registered with the ExpressionEvaluatorManager before they can be used. Using the custom evaluator allows you to define your own evaluator with the 'custom-evaluator' attribute. Note that some evaluators such as xpath, groovy, and bean are loaded from other Mule modules (XML and Scripting, respectively). These modules must be on your classpath before the evaluator can be used.
-                  </xsd:documentation>
-              </xsd:annotation>
-          </xsd:attribute>
           <xsd:attribute name="expression" type="xsd:string" use="optional">
               <xsd:annotation>
-                  <xsd:documentation>The expression to evaluate. The syntax of this attribute changes depending on the evaluator being used.
-                  </xsd:documentation>
-              </xsd:annotation>
-          </xsd:attribute>
-          <xsd:attribute name="custom-evaluator" type="substitutableName" use="optional">
-              <xsd:annotation>
-                  <xsd:documentation>The name of the custom evaluator to use. This attribute is only used when the 'evaluator' attribute is set to "custom". You can plug in your own expression evaluators by registering them with the ExpressionEvaluatorManager.
+                  <xsd:documentation>The expression to evaluate.
                   </xsd:documentation>
               </xsd:annotation>
           </xsd:attribute>

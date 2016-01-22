@@ -95,7 +95,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
         Map<String, TypedValue> add = new HashMap<>();
-        add.put("Foo", new TypedValue("#[header:public-house]", DataType.STRING_DATA_TYPE));
+        add.put("Foo", new TypedValue("#[message.outboundProperties['public-house']]", DataType.STRING_DATA_TYPE));
         t.setAddTypedProperties(add);
         t.setMuleContext(muleContext);
 

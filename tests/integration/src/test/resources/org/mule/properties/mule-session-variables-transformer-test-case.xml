@@ -30,47 +30,47 @@
         <add-message-property key="invVarKey2" value="invVarValue2"/>
     </message-properties-transformer>
 
-    <set-session-variable name="setSessVarGlobal" variableName="#[header:SESSION:sesVarKey]" value="#[header:INVOCATION:invVarKey]"/>
+    <set-session-variable name="setSessVarGlobal" variableName="#[sessionVars.sesVarKey]" value="#[flowVars.invVarKey]"/>
 
     <remove-session-variable name="remSessVarGlobal" variableName="sesVarKey" />
 
     <flow name="addSessionVariableFlow" processingStrategy="synchronous">
-        <set-session-variable variableName="prop" value="#[string:some value]"/>
-        <test:assert expression="#[groovy:message.getProperty('prop', org.mule.api.transport.PropertyScope.SESSION).equals('some value')]"/>
+        <set-session-variable variableName="prop" value="#['some value']"/>
+        <test:assert expression="#[sessionVars.prop == 'some value']"/>
     </flow>
 
     <flow name="addSessionVariableUsingExpressionKeyFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addInvocationVariable"/>
         <transformer ref="setSessVarGlobal"/>
-        <test:assert expression="#[groovy:message.getProperty('sesVarValue', org.mule.api.transport.PropertyScope.SESSION).equals('invVarValue')]"/>
+        <test:assert expression="#[sessionVars.sesVarValue == 'invVarValue']"/>
     </flow>
 
     <flow name="addVariableWithParsedStringKeyFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addInvocationVariable"/>
-        <set-session-variable variableName="-#[header:SESSION:sesVarKey]-" value="-#[header:INVOCATION:invVarKey]-"/>
-        <test:assert expression="#[groovy:message.getProperty('-sesVarValue-', org.mule.api.transport.PropertyScope.SESSION).equals('-invVarValue-')]"/>
+        <set-session-variable variableName="-#[sessionVars.sesVarKey]-" value="-#[flowVars.invVarKey]-"/>
+        <test:assert expression="#[sessionVars['-sesVarValue-'] == '-invVarValue-']"/>
     </flow>
 
     <flow name="removeSessionVariableFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="remSessVarGlobal"/>
-        <test:assert expression="#[groovy:message.getProperty('sesVarKey', org.mule.api.transport.PropertyScope.SESSION) == null]"/>
+        <test:assert expression="#[sessionVars.sesVarKey == null]"/>
     </flow>
 
     <flow name="removeSessionVariableUsingExpressionFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addSessionVariableName"/>
-        <remove-session-variable variableName="#[header:SESSION:sesVarKeyName]"/>
-        <test:assert expression="#[groovy:message.getProperty('sesVarKey', org.mule.api.transport.PropertyScope.SESSION) == null]"/>
+        <remove-session-variable variableName="#[sessionVars.sesVarKeyName]"/>
+        <test:assert expression="#[sessionVars.sesVarKey == null]"/>
     </flow>
     
     <flow name="removeSessionVariableUsingParsedStringFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addSessionVariableName"/>
-        <remove-session-variable variableName="ses#[string:Var]key"/>
-        <test:assert expression="#[groovy:message.getProperty('sesVarKey', org.mule.api.transport.PropertyScope.SESSION) == null]"/>
+        <remove-session-variable variableName="ses#['Var']key"/>
+        <test:assert expression="#[sessionVars.sesVarKey == null]"/>
     </flow>
 
     <flow name="removeSessionVariableUsingRegexFlow" processingStrategy="synchronous">
@@ -78,9 +78,9 @@
         <transformer ref="addSessionVariable2"/>
         <transformer ref="addAnotherSessionVariable"/>
         <remove-session-variable variableName="ses*"/>
-        <test:assert expression="#[groovy:message.getProperty('sesPropKey', org.mule.api.transport.PropertyScope.SESSION) == null]"/>
-        <test:assert expression="#[groovy:message.getProperty('sesPropKey2', org.mule.api.transport.PropertyScope.SESSION) == null]"/>
-        <test:assert expression="#[groovy:message.getProperty('anotherSessionVarKey', org.mule.api.transport.PropertyScope.SESSION) != null]"/>
+        <test:assert expression="#[sessionVars.sesPropKey == null]"/>
+        <test:assert expression="#[sessionVars.sesPropKey2 == null]"/>
+        <test:assert expression="#[sessionVars.anotherSessionVarKey != null]"/>
     </flow>
     
     <flow name="removeAllSessionVariablesFlow" processingStrategy="synchronous">
@@ -88,9 +88,9 @@
         <transformer ref="addSessionVariable2"/>
         <transformer ref="addAnotherSessionVariable"/>
         <remove-session-variable variableName="*" />
-        <test:assert expression="#[groovy:message.getProperty('invPropKey', org.mule.api.transport.PropertyScope.SESSION) == null]"/>
-        <test:assert expression="#[groovy:message.getProperty('invPropKey2', org.mule.api.transport.PropertyScope.SESSION) == null]"/>
-        <test:assert expression="#[groovy:message.getProperty('anotherSessionVarKey', org.mule.api.transport.PropertyScope.SESSION) == null]"/>
+        <test:assert expression="#[sessionVars.invPropKey == null]"/>
+        <test:assert expression="#[sessionVars.invPropKey2 == null]"/>
+        <test:assert expression="#[sessionVars.anotherSessionVarKey == null]"/>
     </flow>
 
 </mule>

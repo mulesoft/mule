@@ -33,7 +33,7 @@
         <http:listener path="expressionTransformer" config-ref="listenerConfig"/>
         <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
         <expression-transformer>
-            <return-argument expression="return &quot;expressionTransformerResponse&quot;;" evaluator="groovy" />
+            <return-argument expression="return &quot;expressionTransformerResponse&quot;;" />
         </expression-transformer>
     </flow>
 </mule>

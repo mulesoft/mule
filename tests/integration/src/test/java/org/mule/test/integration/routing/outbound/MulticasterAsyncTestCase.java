@@ -6,10 +6,12 @@
  */
 package org.mule.test.integration.routing.outbound;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -31,24 +33,25 @@ public class MulticasterAsyncTestCase extends FunctionalTestCase
     public void testSplitter() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://distributor.queue", new Apple(), null);
+        Apple apple = new Apple();
+        client.dispatch("vm://distributor.queue", apple, null);
 
-        List<Object> results = new ArrayList<Object>(3);
+        List<Apple> results = new ArrayList<>(3);
 
-        MuleMessage result = client.request("vm://collector.queue", 5000);
+        MuleMessage result = client.request("vm://collector.queue", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        results.add(result.getPayload());
+        results.add((Apple) result.getPayload());
 
-        result = client.request("vm://collector.queue", 3000);
+        result = client.request("vm://collector.queue", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        results.add(result.getPayload());
+        results.add((Apple) result.getPayload());
 
-        result = client.request("vm://collector.queue", 3000);
+        result = client.request("vm://collector.queue", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        results.add(result.getPayload());
+        results.add((Apple) result.getPayload());
 
-        assertTrue(results.contains("Apple Received in ServiceOne"));
-        assertTrue(results.contains("Apple Received in ServiceTwo"));
-        assertTrue(results.contains("Apple Received in ServiceThree"));
+        assertThat(results.size(), equalTo(3));
+
+        FlowAssert.verify();
     }
 }

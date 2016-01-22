@@ -9,9 +9,7 @@ package org.mule.transformers.simple;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.expression.transformers.BeanBuilderTransformer;
@@ -45,13 +43,11 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
         assertNotNull(transformer.getArguments());
         assertEquals(2, transformer.getArguments().size());
         ExpressionArgument arg1 = transformer.getArguments().get(0);
-        assertNull(arg1.getEvaluator());
         assertEquals("message.payloadAs(org.mule.tck.testmodels.fruit.FruitBasket)", arg1.getExpression());
         assertFalse(arg1.isOptional());
 
         ExpressionArgument arg2 = transformer.getArguments().get(1);
-        assertEquals("headers", arg2.getEvaluator());
-        assertEquals("foo,bar?", arg2.getExpression());
+        assertEquals("['foo' : message.outboundProperties.foo, 'bar' : message.outboundProperties.bar]", arg2.getExpression());
         assertTrue(arg2.isOptional());
     }
 
@@ -76,13 +72,11 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
         assertEquals(3, transformer.getArguments().size());
         ExpressionArgument arg1 = transformer.getArguments().get(0);
         assertEquals("brand", arg1.getName());
-        assertNull(arg1.getEvaluator());
         assertEquals("payload", arg1.getExpression());
         assertFalse(arg1.isOptional());
 
         ExpressionArgument arg2 = transformer.getArguments().get(1);
         assertEquals("segments", arg2.getName());
-        assertNull(arg2.getEvaluator());
         assertEquals("message.outboundProperties['SEGMENTS']", arg2.getExpression());
         assertTrue(arg2.isOptional());
     }
@@ -138,25 +132,8 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
         Object o2 = ((Object[]) result)[1];
         assertTrue(o2 instanceof Map<?, ?>);
         Map<?, ?> map = (Map<?, ?>) o2;
-        assertEquals(1, map.size());
+        assertEquals(2, map.size());
         assertEquals("moo", map.get("foo"));
-    }
-
-    @Test
-    public void testExecutionWithAllMissingOptionalParams() throws Exception
-    {
-        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry()
-            .lookupTransformer("testTransformer");
-
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), muleContext);
-
-        Object result = transformer.transform(message);
-        assertNotNull(result);
-        assertTrue(result.getClass().isArray());
-        Object o1 = ((Object[]) result)[0];
-        assertTrue(o1 instanceof FruitBasket);
-
-        assertNull(((Object[]) result)[1]);
     }
 
     @Test

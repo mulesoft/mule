@@ -65,9 +65,7 @@ public class ExpressionTransformer extends AbstractExpressionTransformer
 
             if (!argument.isOptional() && results[i] == null)
             {
-                throw new TransformerException(CoreMessages.expressionEvaluatorReturnedNull(
-                        argument.getExpressionConfig().getEvaluator(), argument.getExpressionConfig().getExpression()), this);
-
+                throw new TransformerException(CoreMessages.expressionReturnedNull(argument.getExpressionConfig().getExpression()), this);
             }
 
         }

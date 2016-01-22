@@ -115,8 +115,8 @@
             <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
             <mule:outbound-endpoint address="test://msgInfoMappingTestComponent"
                                     exchange-pattern="one-way" name="msgInfoMappingTestComponent-Out"/>
-            <mule:expression-message-info-mapping messageIdExpression="#[header:id]"
-                                                  correlationIdExpression="#[header:correlation]"/>
+            <mule:expression-message-info-mapping messageIdExpression="#[message.outboundProperties.id]"
+                                                  correlationIdExpression="#[message.outboundProperties.correlation]"/>
         </mule:flow>
 
         <mule:interceptor-stack name="testInterceptorStack">

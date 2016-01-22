@@ -14,7 +14,7 @@
 
         <set-variable variableName="records" value="#[new ArrayList()]"/>
 
-        <enricher target="variable:unused">
+        <enricher target="flowVars.unused">
             <processor-chain>
                 <set-payload value="#[payload.get('resultSet1')]"/>
 
@@ -24,7 +24,7 @@
             </processor-chain>
         </enricher>
 
-        <enricher target="variable:unused">
+        <enricher target="flowVars.unused">
             <processor-chain>
                 <set-payload value="#[payload.get('resultSet2')]"/>
 

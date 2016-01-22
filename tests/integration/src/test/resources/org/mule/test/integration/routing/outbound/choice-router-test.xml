@@ -39,8 +39,7 @@
                 <regex-filter pattern="turnip" />
                 <outbound-endpoint ref="veggie-channel" />
             </when>
-            <!-- Test expression/evaluator configured on the when element -->
-            <when expression=".*berry" evaluator="regex">
+            <when expression="#[regex('.*berry')]">
                 <outbound-endpoint ref="fruit-channel" />
             </when>
             <otherwise>

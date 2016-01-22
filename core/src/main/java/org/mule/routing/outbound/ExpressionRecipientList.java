@@ -19,7 +19,6 @@ import java.util.List;
 public class ExpressionRecipientList extends AbstractRecipientList
 {
     public static final String DEFAULT_SELECTOR_PROPERTY = "recipients";
-    public static final String DEFAULT_SELECTOR_EVALUATOR = "header";
     public static final String DEFAULT_SELECTOR_EXPRESSION = DEFAULT_SELECTOR_PROPERTY;
 
     protected ExpressionConfig expressionConfig = new ExpressionConfig();
@@ -72,23 +71,4 @@ public class ExpressionRecipientList extends AbstractRecipientList
         expressionConfig.setExpression(expression);
     }
 
-    public String getCustomEvaluator()
-    {
-        return expressionConfig.getCustomEvaluator();
-    }
-
-    public void setCustomEvaluator(String customEvaluator)
-    {
-        expressionConfig.setCustomEvaluator(customEvaluator);
-    }
-
-    public String getEvaluator()
-    {
-        return expressionConfig.getEvaluator();
-    }
-
-    public void setEvaluator(String evaluator)
-    {
-        expressionConfig.setEvaluator(evaluator);
-    }
 }

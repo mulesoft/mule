@@ -70,7 +70,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
         };
 
         FirstSuccessful fs = createFirstSuccessfulRouter(intSetter, new StringAppendTransformer("abc"));
-        fs.setFailureExpression("#[payload-type:java.lang.Integer]");
+        fs.setFailureExpression("#[payload is Integer]");
         fs.initialise();
 
         assertEquals("abc", fs.process(getTestEvent("")).getMessageAsString());
@@ -159,6 +159,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
             MuleMessage returnedMessage = event.getMessage();
             if (returnedMessage.getExceptionPayload() != null)
             {
+                System.out.println(returnedMessage.getExceptionPayload().getMessage());
                 return EXCEPTION_SEEN;
             }
             else

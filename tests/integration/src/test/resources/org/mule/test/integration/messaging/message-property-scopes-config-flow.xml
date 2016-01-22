@@ -28,7 +28,7 @@
             <message-properties-transformer>
                 <!-- 2 issues here: * Use MPT's copy/propagate simplified syntax * Session props should probably be propagated 
                     automatically? -->
-                <add-message-property key="testProperty" value="#[header:SESSION:testProperty]"/>
+                <add-message-property key="testProperty" value="#[sessionVars.testProperty]"/>
             </message-properties-transformer>
         </vm:outbound-endpoint>
     </flow>

@@ -35,7 +35,7 @@
             <catch-exception-strategy when="#[exception.causeMatches('(.*)mule.test.integration.(.*).ChoiceExceptionStrategyTestCase(.*)MyException')]">
                 <append-string-transformer message=" catch-5"/>
             </catch-exception-strategy>
-            <catch-exception-strategy when="#[groovy:payload == 'groovy']">
+            <catch-exception-strategy when="#[payload == 'groovy']">
                 <append-string-transformer message=" catch-6"/>
             </catch-exception-strategy>
             <catch-exception-strategy when="#[exception.causeMatches('org.mule.test.integration.exceptions.ChoiceExceptionStrategyTestCase$StartsWith*')]">

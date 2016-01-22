@@ -68,8 +68,6 @@ public class TransientRegistry extends AbstractRegistry
         Map<String, Object> processors = new HashMap<>();
         processors.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
         //processors("_muleNotificationProcessor", new NotificationListenersProcessor(muleContext));
-        processors.put("_muleExpressionEvaluatorProcessor", new ExpressionEvaluatorProcessor(muleContext));
-        processors.put("_muleExpressionEnricherProcessor", new ExpressionEnricherProcessor(muleContext));
         processors.put("_muleLifecycleStateInjectorProcessor", new LifecycleStateInjectorProcessor(getLifecycleManager().getState()));
         processors.put("_muleLifecycleManager", getLifecycleManager());
         registryMap.putAll(processors);
