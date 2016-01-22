@@ -117,6 +117,8 @@ public abstract class AbstractRegistryBootstrap implements Initialisable, MuleCo
     }
 
     /**
+     * TODO Optimize me! MULE-9343
+     * 
      * {@inheritDoc}
      */
     @Override
