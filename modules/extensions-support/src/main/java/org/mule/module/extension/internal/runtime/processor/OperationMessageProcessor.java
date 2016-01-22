@@ -68,6 +68,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     private final ResolverSet resolverSet;
     private final ExtensionManager extensionManager;
     private final ExecutionMediator executionMediator;
+    private final String target;
 
     private ReturnDelegate returnDelegate;
     private MuleContext muleContext;
@@ -76,6 +77,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     public OperationMessageProcessor(ExtensionModel extensionModel,
                                      OperationModel operationModel,
                                      String configurationProviderName,
+                                     String target,
                                      ResolverSet resolverSet,
                                      ExtensionManager extensionManager)
     {
@@ -84,6 +86,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         this.configurationProviderName = configurationProviderName;
         this.resolverSet = resolverSet;
         this.extensionManager = extensionManager;
+        this.target = target;
         this.executionMediator = new DefaultExecutionMediator(getExceptionEnricher());
     }
 
@@ -124,9 +127,19 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     @Override
     public void initialise() throws InitialisationException
     {
-        returnDelegate = isVoid(operationModel) ? VoidReturnDelegate.INSTANCE : new ValueReturnDelegate(muleContext);
+        returnDelegate = createReturnDelegate();
         operationExecutor = operationModel.getExecutor().createExecutor();
         initialiseIfNeeded(operationExecutor, true, muleContext);
+    }
+
+    private ReturnDelegate createReturnDelegate()
+    {
+        if (isVoid(operationModel))
+        {
+            return VoidReturnDelegate.INSTANCE;
+        }
+
+        return StringUtils.isBlank(target) ? new ValueReturnDelegate(muleContext) : new TargetReturnDelegate(target, muleContext);
     }
 
     private ExceptionEnricher getExceptionEnricher()

@@ -11,12 +11,17 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mule.module.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.module.extension.model.HealthStatus.DEAD;
 import static org.mule.module.extension.model.KnockeableDoor.knock;
 import static org.mule.module.extension.model.Ricin.RICIN_KILL_MESSAGE;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.connection.ConnectionException;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
@@ -67,7 +72,25 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void operationWithReturnValueAndWithoutParameters() throws Exception
     {
-        runFlowAndExpect("sayMyName", "Heisenberg");
+        runFlowAndExpect("sayMyName", HEISENBERG);
+    }
+
+    @Test
+    public void operationWithReturnValueOnTarget() throws Exception
+    {
+        MuleEvent event = getTestEvent("");
+        MuleMessage message = spy(event.getMessage());
+        event.setMessage(message);
+        event = spy(event);
+
+        MuleEvent responseEvent = runFlow("sayMyNameOnTarget", event);
+
+        assertThat(responseEvent.getMessage().getPayload(), is(""));
+        verify(event, never()).setMessage(any(MuleMessage.class));
+        verify(message, never()).setPayload(any(Object.class));
+
+        MuleMessage responseMessage = event.getFlowVariable("myFace");
+        assertThat(responseMessage.getPayload(), is(HEISENBERG));
     }
 
     @Test

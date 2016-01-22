@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.config;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_CONFIG;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.CONFIG_ATTRIBUTE;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
@@ -310,7 +310,7 @@ final class XmlExtensionParserUtils
 
     static void parseConfigRef(Element element, BeanDefinitionBuilder builder)
     {
-        String configRef = element.getAttribute(ATTRIBUTE_NAME_CONFIG);
+        String configRef = element.getAttribute(CONFIG_ATTRIBUTE);
         if (StringUtils.isBlank(configRef))
         {
             configRef = null;

@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime.processor;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -13,6 +14,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -53,7 +55,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -62,6 +63,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
 {
 
     private static final String CONFIG_NAME = "config";
+    private static final String TARGET_VAR = "myFlowVar";
 
     @Mock
     private ExtensionModel extensionModel;
@@ -104,6 +106,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
 
     private OperationMessageProcessor messageProcessor;
     private String configurationName = CONFIG_NAME;
+    private String target = EMPTY;
 
     @Before
     public void before() throws Exception
@@ -164,6 +167,33 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
         messageProcessor.process(event);
 
         verify(event).setMessage(captor.capture());
+        MuleMessage message = captor.getValue();
+        assertThat(message, is(notNullValue()));
+
+        assertThat(message.getPayload(), is(sameInstance(payload)));
+        assertThat(message.getAttributes(), is(sameInstance(attributes)));
+        assertThat(message.getDataType(), is(sameInstance(dataType)));
+    }
+
+    @Test
+    public void operationReturnsMuleMessageOnTarget() throws Exception
+    {
+        target = TARGET_VAR;
+        messageProcessor = createOperationMessageProcessor();
+
+        Object payload = new Object();
+        DataType dataType = mock(DataType.class);
+        Serializable attributes = mock(Serializable.class);
+
+        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(new DefaultMuleMessage(payload, dataType, attributes));
+
+        messageProcessor.process(event);
+
+        verify(event, never()).setMessage(any(org.mule.api.MuleMessage.class));
+        verify(event.getMessage(), never()).setPayload(any(Object.class));
+
+        ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
+        verify(event).setFlowVariable(same(TARGET_VAR), captor.capture());
         MuleMessage message = captor.getValue();
         assertThat(message, is(notNullValue()));
 
@@ -243,7 +273,34 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
 
         messageProcessor.process(event);
 
-        verify(event.getMessage()).setPayload(value);
+        ArgumentCaptor<org.mule.api.MuleMessage> captor = ArgumentCaptor.forClass(org.mule.api.MuleMessage.class);
+        verify(event).setMessage(captor.capture());
+
+        MuleMessage message = captor.getValue();
+        assertThat(message, is(notNullValue()));
+        assertThat(message.getPayload(), is(sameInstance(value)));
+    }
+
+    @Test
+    public void operationReturnsPayloadValueWithTarget() throws Exception
+    {
+        target = TARGET_VAR;
+        messageProcessor = createOperationMessageProcessor();
+
+        Object value = new Object();
+        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(value);
+
+        messageProcessor.process(event);
+
+        verify(event, never()).setMessage(any(org.mule.api.MuleMessage.class));
+        verify(event.getMessage(), never()).setPayload(any(Object.class));
+
+        ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
+        verify(event).setFlowVariable(same(TARGET_VAR), captor.capture());
+
+        MuleMessage message = captor.getValue();
+        assertThat(message, is(notNullValue()));
+        assertThat(message.getPayload(), is(sameInstance(value)));
     }
 
     @Test
@@ -254,7 +311,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(null);
         assertThat(messageProcessor.process(event), is(sameInstance(event)));
-        verify(event, never()).setMessage(Mockito.any(org.mule.api.MuleMessage.class));
+        verify(event, never()).setMessage(any(org.mule.api.MuleMessage.class));
     }
 
     @Test
@@ -307,7 +364,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
 
     private OperationMessageProcessor createOperationMessageProcessor() throws Exception
     {
-        OperationMessageProcessor messageProcessor = new OperationMessageProcessor(extensionModel, operationModel, configurationName, resolverSet, extensionManager);
+        OperationMessageProcessor messageProcessor = new OperationMessageProcessor(extensionModel, operationModel, configurationName, target, resolverSet, extensionManager);
         messageProcessor.setMuleContext(muleContext);
         messageProcessor.initialise();
         return messageProcessor;

@@ -41,6 +41,7 @@ import org.mule.module.extension.internal.introspection.validation.ModelValidato
 import org.mule.module.extension.internal.introspection.validation.NameClashModelValidator;
 import org.mule.module.extension.internal.introspection.validation.OperationReturnTypeModelValidator;
 import org.mule.module.extension.internal.introspection.validation.ParameterModelValidator;
+import org.mule.module.extension.internal.introspection.validation.TargetParameterModelValidator;
 import org.mule.module.extension.internal.runtime.executor.OperationExecutorFactoryWrapper;
 import org.mule.util.CollectionUtils;
 import org.mule.util.ValueHolder;
@@ -88,6 +89,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                 .add(new ConnectionProviderModelValidator())
                 .add(new ConfigurationModelValidator())
                 .add(new OperationReturnTypeModelValidator())
+                .add(new TargetParameterModelValidator())
                 .build();
     }
 

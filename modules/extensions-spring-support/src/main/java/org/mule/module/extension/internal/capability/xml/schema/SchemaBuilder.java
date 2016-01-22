@@ -9,14 +9,16 @@ package org.mule.module.extension.internal.capability.xml.schema;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang.StringUtils.capitalize;
 import static org.mule.extension.api.introspection.DataQualifier.LIST;
 import static org.mule.extension.api.introspection.DataQualifier.OPERATION;
 import static org.mule.extension.api.introspection.DataQualifier.POJO;
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_DESCRIPTION_CONFIG;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_CONFIG;
+import static org.mule.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_VALUE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.CONFIG_ATTRIBUTE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.GROUP_SUFFIX;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION;
@@ -38,6 +40,8 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.TARGET_ATTRIBUTE_DESCRIPTION;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.TYPE_SUFFIX;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.XML_NAMESPACE;
 import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
 import static org.mule.module.extension.internal.introspection.utils.PoolingSupport.REQUIRED;
@@ -48,6 +52,7 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getFiel
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isIgnored;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isRequired;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getConnectedOperations;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDynamicParameters;
@@ -226,7 +231,7 @@ public final class SchemaBuilder
 
     private void addValidationFlag(ExtensionType providerType)
     {
-        providerType.getAttributeOrAttributeGroup().add(createAttribute(DISABLE_VALIDATION, DataType.of(boolean.class), false, ExpressionSupport.NOT_SUPPORTED));
+        providerType.getAttributeOrAttributeGroup().add(createAttribute(DISABLE_VALIDATION, DataType.of(boolean.class), false, NOT_SUPPORTED));
     }
 
     private void addConnectionProviderPoolingProfile(ExplicitGroup choice, ConnectionProviderModel providerModel)
@@ -265,7 +270,7 @@ public final class SchemaBuilder
 
     public SchemaBuilder registerOperation(OperationModel operationModel)
     {
-        String typeName = StringUtils.capitalize(operationModel.getName()) + SchemaConstants.TYPE_SUFFIX;
+        String typeName = capitalize(operationModel.getName()) + TYPE_SUFFIX;
         registerProcessorElement(operationModel, typeName);
         registerOperationType(typeName, operationModel);
 
@@ -274,7 +279,7 @@ public final class SchemaBuilder
 
     public SchemaBuilder registerMessageSource(SourceModel sourceModel)
     {
-        String typeName = StringUtils.capitalize(sourceModel.getName()) + SchemaConstants.TYPE_SUFFIX;
+        String typeName = capitalize(sourceModel.getName()) + TYPE_SUFFIX;
         registerSourceElement(sourceModel, typeName);
         registerSourceType(typeName, sourceModel);
 
@@ -744,7 +749,18 @@ public final class SchemaBuilder
 
     private void registerOperationType(String name, OperationModel operationModel)
     {
-        registerExecutableType(name, operationModel, MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE);
+        ExtensionType operationType = registerExecutableType(name, operationModel, MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE);
+        addTargetParameter(operationType, operationModel);
+    }
+
+    private void addTargetParameter(ExtensionType operationType, OperationModel operationModel)
+    {
+        if (!isVoid(operationModel))
+        {
+            Attribute attribute = createAttribute(TARGET_ATTRIBUTE, DataType.of(String.class), false, NOT_SUPPORTED);
+            attribute.setAnnotation(createDocAnnotation(TARGET_ATTRIBUTE_DESCRIPTION));
+            operationType.getAttributeOrAttributeGroup().add(attribute);
+        }
     }
 
     private void registerSourceType(String name, SourceModel sourceModel)
@@ -752,7 +768,7 @@ public final class SchemaBuilder
         registerExecutableType(name, sourceModel, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE);
     }
 
-    private void registerExecutableType(String name, ParametrizedModel parametrizedModel, QName base)
+    private ExtensionType registerExecutableType(String name, ParametrizedModel parametrizedModel, QName base)
     {
         TopLevelComplexType complexType = new TopLevelComplexType();
         complexType.setName(name);
@@ -763,7 +779,7 @@ public final class SchemaBuilder
         complexContentExtension.setBase(base);
         complexContent.setExtension(complexContentExtension);
 
-        Attribute configAttr = createAttribute(ATTRIBUTE_NAME_CONFIG, ATTRIBUTE_DESCRIPTION_CONFIG, true, SUBSTITUTABLE_NAME);
+        Attribute configAttr = createAttribute(CONFIG_ATTRIBUTE, CONFIG_ATTRIBUTE_DESCRIPTION, true, SUBSTITUTABLE_NAME);
         complexContentExtension.getAttributeOrAttributeGroup().add(configAttr);
 
         final ExplicitGroup all = new ExplicitGroup();
@@ -791,6 +807,8 @@ public final class SchemaBuilder
         }
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
+
+        return complexContentExtension;
     }
 
     private DataQualifierVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all, final ParameterModel parameterModel)
