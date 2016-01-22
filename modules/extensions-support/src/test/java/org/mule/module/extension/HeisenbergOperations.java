@@ -105,6 +105,12 @@ public class HeisenbergOperations
     }
 
     @Operation
+    public List<String> killWithMultipleWildCardWeapons(List<? extends Weapon> wildCardWeapons)
+    {
+        return wildCardWeapons.stream().map(Weapon::kill).collect(Collectors.toList());
+    }
+
+    @Operation
     public String killMany(@RestrictedTo(HeisenbergExtension.class) List<NestedProcessor> killOperations, String reason) throws Exception
     {
         StringBuilder builder = new StringBuilder("Killed the following because " + reason + ":\n");

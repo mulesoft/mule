@@ -95,6 +95,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String KILL_CUSTOM_OPERATION = "killWithCustomMessage";
     private static final String KILL_WITH_WEAPON = "killWithWeapon";
     private static final String KILL_WITH_MULTIPLES_WEAPONS = "killWithMultiplesWeapons";
+    private static final String KILL_WITH_MULTIPLE_WILDCARD_WEAPONS = "killWithMultipleWildCardWeapons";
     private static final String GET_PAYMENT_FROM_EVENT_OPERATION = "getPaymentFromEvent";
     private static final String GET_PAYMENT_FROM_MESSAGE_OPERATION = "getPaymentFromMessage";
     private static final String DIE = "die";
@@ -151,7 +152,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         ConfigurationDeclaration configuration = declaration.getConfigurations().get(1);
         assertThat(configuration, is(notNullValue()));
         assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-        assertThat(configuration.getParameters(), hasSize(18));
+        assertThat(configuration.getParameters(), hasSize(21));
         assertParameter(configuration.getParameters(), "extendedProperty", "", DataType.of(String.class), true, SUPPORTED, null);
     }
 
@@ -180,7 +181,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
         List<ParameterDeclaration> parameters = conf.getParameters();
-        assertThat(parameters, hasSize(17));
+        assertThat(parameters, hasSize(20));
 
         assertParameter(parameters, "myName", "", DataType.of(String.class), false, SUPPORTED, HEISENBERG);
         assertParameter(parameters, "age", "", DataType.of(Integer.class), false, SUPPORTED, AGE);
@@ -200,6 +201,9 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(parameters, "firstEndevour", "", DataType.of(String.class), false, NOT_SUPPORTED, null);
         assertParameter(parameters, "weapon", "", DataType.of(Weapon.class), false, SUPPORTED, null);
         assertParameter(parameters, "moneyFunction", "", DataType.of(Function.class, MuleEvent.class, Integer.class), false, SUPPORTED, null);
+        assertParameter(parameters, "wildCardWeapons", "", DataType.of(List.class, Weapon.class), false, SUPPORTED, null);
+        assertParameter(parameters, "wildCardList", "", DataType.of(List.class, Object.class), false, SUPPORTED, null);
+        assertParameter(parameters, "wildCardWeaponMap", "", DataType.of(Map.class, Weapon.class, Object.class), false, SUPPORTED, null);
     }
 
     private void assertExtensionProperties(Declaration declaration)
@@ -213,13 +217,14 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     private void assertTestModuleOperations(Declaration declaration) throws Exception
     {
-        assertThat(declaration.getOperations(), hasSize(20));
+        assertThat(declaration.getOperations(), hasSize(21));
         assertOperation(declaration, SAY_MY_NAME_OPERATION, "");
         assertOperation(declaration, GET_ENEMY_OPERATION, "");
         assertOperation(declaration, KILL_OPERATION, "");
         assertOperation(declaration, KILL_CUSTOM_OPERATION, "");
         assertOperation(declaration, KILL_WITH_WEAPON, "");
         assertOperation(declaration, KILL_WITH_MULTIPLES_WEAPONS, "");
+        assertOperation(declaration, KILL_WITH_MULTIPLE_WILDCARD_WEAPONS, "");
         assertOperation(declaration, GET_PAYMENT_FROM_EVENT_OPERATION, "");
         assertOperation(declaration, GET_PAYMENT_FROM_MESSAGE_OPERATION, "");
         assertOperation(declaration, DIE, "");
@@ -256,6 +261,11 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(1));
         assertParameter(operation.getParameters(), "weaponList", "", DataType.of(List.class, Weapon.class), true, SUPPORTED, null);
+
+        operation = getOperation(declaration, KILL_WITH_MULTIPLE_WILDCARD_WEAPONS);
+        assertThat(operation, is(notNullValue()));
+        assertThat(operation.getParameters(), hasSize(1));
+        assertParameter(operation.getParameters(), "wildCardWeapons", "", DataType.of(List.class, Weapon.class), true, SUPPORTED, null);
 
         operation = getOperation(declaration, KILL_CUSTOM_OPERATION);
         assertThat(operation, is(notNullValue()));

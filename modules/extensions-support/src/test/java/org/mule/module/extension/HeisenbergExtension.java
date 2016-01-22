@@ -50,6 +50,7 @@ import javax.inject.Inject;
 @Sources(HeisenbergSource.class)
 public class HeisenbergExtension implements Lifecycle, MuleContextAware
 {
+
     public static final String SCHEMA_VERSION = "1.0-blue";
     public static final String HEISENBERG = "Heisenberg";
     public static final String AGE = "50";
@@ -97,6 +98,17 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     @Optional
     private Function<MuleEvent, Integer> moneyFunction;
 
+    @Parameter
+    @Optional
+    private List<? extends Weapon> wildCardWeapons;
+
+    @Parameter
+    @Optional
+    private List<?> wildCardList;
+
+    @Parameter
+    @Optional
+    private Map<? extends Weapon, ?> wildCardWeaponMap;
     /**
      * Doors I might knock on but still haven't made up mind about
      */

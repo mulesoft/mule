@@ -50,6 +50,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ResolvableType;
 
 /**
@@ -59,6 +61,8 @@ import org.springframework.core.ResolvableType;
  */
 public class IntrospectionUtils
 {
+
+    private static final Logger logger = LoggerFactory.getLogger(IntrospectionUtils.class);
 
     private IntrospectionUtils()
     {
@@ -145,36 +149,19 @@ public class IntrospectionUtils
     {
         Class<?> rawClass = type.getRawClass();
         ResolvableType[] generics = type.getGenerics();
-        DataType resolvedDataType;
 
         if (isOperation(rawClass))
         {
-            resolvedDataType = DataType.of(OperationModel.class);
+            return DataType.of(OperationModel.class);
         }
-        else if (List.class.isAssignableFrom(rawClass))
+        else if (ArrayUtils.isEmpty(generics))
         {
-            if (!ArrayUtils.isEmpty(generics) && generics[0].getRawClass() != null)
-            {
-                if (isOperation(generics[0].getRawClass()))
-                {
-                    resolvedDataType = DataType.of(rawClass, OperationModel.class);
-                }
-                else
-                {
-                    resolvedDataType = DataType.of(rawClass, toRawTypes(generics));
-                }
-            }
-            else
-            {
-                resolvedDataType = DataType.of(List.class, Object.class);
-            }
+            return DataType.of(rawClass);
         }
         else
         {
-            resolvedDataType = DataType.of(rawClass, toRawTypes(generics));
+            return DataType.of(rawClass, toRawTypes(generics));
         }
-
-        return resolvedDataType;
     }
 
     public static List<Class<?>> getInterfaceGenerics(Class<?> type, Class<?> implementedInterface)
@@ -236,9 +223,17 @@ public class IntrospectionUtils
         Class<?>[] types = new Class<?>[resolvableTypes.length];
         for (int i = 0; i < resolvableTypes.length; i++)
         {
-            types[i] = resolvableTypes[i].getRawClass();
+            if (logger.isWarnEnabled() && resolvableTypes[i].getRawClass() == null)
+            {
+                logger.warn(String.format("WildCard used in extension definition: '%s'", resolvableTypes[i].toString()));
+            }
+            Class<?> rawClass = resolvableTypes[i].resolve(Object.class);
+            if (isOperation(rawClass))
+            {
+                rawClass = OperationModel.class;
+            }
+            types[i] = rawClass;
         }
-
         return types;
     }
 
@@ -299,7 +294,8 @@ public class IntrospectionUtils
         return isVoid(operationModel.getReturnType().getRawType());
     }
 
-    private static boolean isVoid(Class<?> type) {
+    private static boolean isVoid(Class<?> type)
+    {
         return type.equals(void.class) || type.equals(Void.class);
     }
 

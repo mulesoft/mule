@@ -20,7 +20,9 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBasket;
+import org.mule.tck.testmodels.fruit.FruitBox;
 import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.util.CollectionUtils;
 
@@ -41,6 +43,8 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase
 {
 
     private List<FruitBasket> baskets;
+    private FruitBox fruitBox;
+
 
     @Test
     public void getMethodReturnType() throws Exception
@@ -115,6 +119,21 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase
     {
         Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(FruitBasket.class);
         assertThat(exposedFields, is(empty()));
+    }
+
+    @Test
+    public void getWildCardFieldsDataTypes()
+    {
+
+        Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(FruitBox.class);
+        assertNotNull(exposedFields);
+        assertEquals(6, exposedFields.size());
+        assertField("fruitLikeList", DataType.of(List.class, Fruit.class), exposedFields);
+        assertField("wildCardList", DataType.of(List.class, Object.class), exposedFields);
+        assertField("rawList", DataType.of(List.class, Object.class), exposedFields);
+        assertField("wildCardMap", DataType.of(Map.class, Object.class, Object.class), exposedFields);
+        assertField("rawMap", DataType.of(Map.class, Object.class, Object.class), exposedFields);
+        assertField("fruitLikeMap", DataType.of(Map.class, Object.class, Fruit.class), exposedFields);
     }
 
     private void assertField(String name, DataType dt, Collection<Field> fields)
