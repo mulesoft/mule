@@ -6,9 +6,10 @@
  */
 package org.mule.tck.listener;
 
-import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.context.notification.ConnectionNotification;
@@ -117,6 +118,6 @@ public class ConnectionListener
     public void assertMinimumTimeBetweenNotifications(long expectedTimeBetweenNotifications)
     {
         Preconditions.checkState(minimumTimeBetweenNotifications.isPresent(), "At least two notifications must be received in order to get the minimum time between notifications");
-        assertThat(minimumTimeBetweenNotifications.get(), greaterThan(expectedTimeBetweenNotifications));
+        assertThat(minimumTimeBetweenNotifications.get(), greaterThanOrEqualTo(expectedTimeBetweenNotifications));
     }
 }
