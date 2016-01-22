@@ -1,1 +1,1 @@
-Mule ESB API documentation.
+Mule Runtime API documentation.
