@@ -9,6 +9,7 @@ package org.mule.module.extension.internal;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -18,11 +19,11 @@ import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 import org.mule.api.MuleEvent;
-import org.mule.module.extension.model.HealthStatus;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.module.extension.HeisenbergExtension;
+import org.mule.module.extension.model.HealthStatus;
 import org.mule.module.extension.model.KnockeableDoor;
 import org.mule.module.extension.model.Ricin;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -108,6 +109,27 @@ public class ConfigParserTestCase extends ExtensionFunctionalTestCase
         MuleEvent event = getHeisenbergEvent();
         HeisenbergExtension heisenberg = lookupHeisenberg(testConfig, event);
         assertThat(heisenberg, is(sameInstance(lookupHeisenberg(testConfig, event))));
+    }
+
+    @Test
+    public void configWithExpressionFunctionIsSameInstanceForDifferentEvents() throws Exception
+    {
+        MuleEvent event = getHeisenbergEvent();
+        MuleEvent anotherEvent = getTestEvent("");
+        HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, event);
+        HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_BYNAME, anotherEvent);
+        assertThat(config, is(sameInstance(anotherConfig)));
+    }
+
+    @Test
+    public void configWithExpressionFunctionStillDynamic() throws Exception
+    {
+        MuleEvent event = getHeisenbergEvent();
+        MuleEvent anotherEvent = getHeisenbergEvent();
+        anotherEvent.setFlowVariable("age", 40);
+        HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION, event);
+        HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_EXPRESSION, anotherEvent);
+        assertThat(config, is(not(sameInstance(anotherConfig))));
     }
 
     @Test

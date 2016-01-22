@@ -15,6 +15,7 @@ import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeN
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.module.extension.internal.util.NameUtils.singularize;
 import static org.springframework.util.xml.DomUtils.getChildElements;
+import org.mule.api.MuleEvent;
 import org.mule.api.NestedProcessor;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.processor.MessageProcessor;
@@ -32,6 +33,7 @@ import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.CollectionValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
+import org.mule.module.extension.internal.runtime.resolver.ExpressionFunctionValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.RegistryLookupValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -54,6 +56,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -381,6 +384,11 @@ final class XmlExtensionParserUtils
 
     private static ValueResolver getResolverFromValue(final Object value, final DataType expectedDataType)
     {
+        if (isExpressionFunction(expectedDataType) && value != null)
+        {
+            return new ExpressionFunctionValueResolver<>((String) value, expectedDataType.getGenericTypes()[1]);
+        }
+
         if (isExpression(value, parser))
         {
             return new TypeSafeExpressionValueResolver((String) value, expectedDataType);
@@ -417,6 +425,13 @@ final class XmlExtensionParserUtils
         }
 
         return null;
+    }
+
+    private static boolean isExpressionFunction(DataType dataType)
+    {
+        return dataType.getRawType().equals(Function.class)
+               && dataType.getGenericTypes().length == 2
+               && dataType.getGenericTypes()[0].getRawType().equals(MuleEvent.class);
     }
 
     /**
@@ -610,11 +625,6 @@ final class XmlExtensionParserUtils
 
     private static boolean isExpression(Object value, TemplateParser parser)
     {
-        if (value instanceof String)
-        {
-            return parser.isContainsTemplate((String) value);
-        }
-
-        return false;
+        return value instanceof String && parser.isContainsTemplate((String) value);
     }
 }
