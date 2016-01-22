@@ -85,8 +85,6 @@ public class TransactionalErrorHandlingExecutionTemplate implements ExecutionTem
      *
      * @param muleContext MuleContext for this application
      * @param transactionConfig Transaction configuration
-     *
-     * @deprecated 
      */
     public static TransactionalErrorHandlingExecutionTemplate createMainExecutionTemplate(MuleContext muleContext, TransactionConfig transactionConfig)
     {

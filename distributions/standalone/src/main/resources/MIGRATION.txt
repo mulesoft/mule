@@ -24,6 +24,7 @@ MULE-8677: The HTTP Connector will now ignore a "Transfer-Encoding" outbound pro
 MULE-8844: When until-successful throws an exception, it will now be a RetryPolicyExhaustedException wrapping the cause of the exception of the last try, instead of a MessagingException wrapping a RetryPolicyExhaustedException with no link to the actual cause.
 MULE-9044: The HTTP Listener will now return a 400 instead of a 500 when an invalid Content-Type is sent on a request. Additionally, in both cases a response body will be present.
 MULE-6298: AbstractMessageSequenceSplitter#process will now return null instead of a VoidMuleEvent. This affects only the scenario where the elements of a split collection are filtered out.
+MULE-9306: Losing flow and session variables when using MuleClient to dispatch/send an event. Exception strategy not caching exceptions after using MuleClient on a JavaComponent.
 
 Migration changes from 3.6.x to 3.7.x
 
