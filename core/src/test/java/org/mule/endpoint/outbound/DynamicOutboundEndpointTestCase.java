@@ -6,16 +6,24 @@
  */
 package org.mule.endpoint.outbound;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_DISPATCH_BEGIN;
+import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_DISPATCH_END;
+import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_SEND_BEGIN;
+import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_SEND_END;
 
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
@@ -32,7 +40,6 @@ import org.mule.api.security.SecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.MessageDispatcher;
-import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.endpoint.DynamicOutboundEndpoint;
@@ -51,6 +58,8 @@ import org.mule.transport.service.DefaultTransportServiceDescriptor;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.collections.Closure;
+import org.apache.commons.collections.functors.NOPClosure;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -69,6 +78,13 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     {
         overrideDispatcherInServiceDescriptor();
         MyMessageDispatcherFactory.dispatcher = null;
+    }
+
+    @Before
+    public void clearAssertionClosures()
+    {
+        MyMessageDispatcherFactory.afterSend = NOPClosure.getInstance();
+        MyMessageDispatcherFactory.afterDispatch = NOPClosure.getInstance();
     }
 
     @Test
@@ -148,49 +164,92 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     @Test
     public void testSendNotification() throws Exception
     {
-        TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener(2);
+        final TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener(2);
         muleContext.registerListener(listener);
 
+        final MuleEvent outboundEvent = createTestOutboundEvent();
+
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
-        MuleEvent outboundEvent = createTestOutboundEvent();
+
+        MyMessageDispatcherFactory.afterSend = new Closure()
+        {
+            @Override
+            public void execute(Object input)
+            {
+                try
+                {
+                    assertTrue(listener.latchFirst.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+                }
+                catch (InterruptedException e)
+                {
+                    fail(e.getMessage());
+                }
+                assertThat(listener.messageNotificationList, hasSize(1));
+                assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_SEND_BEGIN));
+                assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
+                assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
+                        is(outboundEvent.getMessage().getPayload()));
+            }
+        };
 
         endpoint.process(outboundEvent);
 
         assertEventSent();
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertEquals(2, listener.messageNotificationList.size());
-        assertEquals(EndpointMessageNotification.MESSAGE_SEND_BEGIN, listener.messageNotificationList.get(0).getAction());
-        assertEquals(EndpointMessageNotification.MESSAGE_SEND_END, listener.messageNotificationList.get(1).getAction());
-        assertTrue(listener.messageNotificationList.get(0).getSource() instanceof MuleMessage);
-        assertTrue(listener.messageNotificationList.get(1).getSource() instanceof MuleMessage);
-        assertEquals(outboundEvent.getMessage().getPayload(),
-            listener.messageNotificationList.get(0).getSource().getPayload());
-        assertEquals(RESPONSE_MESSAGE,
-            listener.messageNotificationList.get(1).getSource().getPayload());
+        assertThat(listener.messageNotificationList, hasSize(2));
+        assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_SEND_BEGIN));
+        assertThat(listener.messageNotificationList.get(1).getAction(), is(MESSAGE_SEND_END));
+        assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
+        assertThat(listener.messageNotificationList.get(1).getSource(), instanceOf(MuleMessage.class));
+        assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
+                is(outboundEvent.getMessage().getPayload()));
+        assertThat(listener.messageNotificationList.get(1).getSource().getPayload(),
+                is((Object) RESPONSE_MESSAGE));
     }
 
     @Test
     public void testDispatchNotification() throws Exception
     {
-        TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener(2);
+        final TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener(2);
         muleContext.registerListener(listener);
 
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.ONE_WAY, null);
-        MuleEvent outboundEvent = createTestOutboundEvent();
+        final MuleEvent outboundEvent = createTestOutboundEvent();
+
+        MyMessageDispatcherFactory.afterDispatch = new Closure()
+        {
+            @Override
+            public void execute(Object input)
+            {
+                try
+                {
+                    assertTrue(listener.latchFirst.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+                }
+                catch (InterruptedException e)
+                {
+                    fail(e.getMessage());
+                }
+                assertThat(listener.messageNotificationList, hasSize(1));
+                assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_DISPATCH_BEGIN));
+                assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
+                assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
+                        is(outboundEvent.getMessage().getPayload()));
+            }
+        };
 
         endpoint.process(outboundEvent);
 
         assertEventDispatched();
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertEquals(2, listener.messageNotificationList.size());
-        assertEquals(EndpointMessageNotification.MESSAGE_DISPATCH_BEGIN, listener.messageNotificationList.get(0).getAction());
-        assertEquals(EndpointMessageNotification.MESSAGE_DISPATCH_END, listener.messageNotificationList.get(1).getAction());
-        assertTrue(listener.messageNotificationList.get(0).getSource() instanceof MuleMessage);
-        assertTrue(listener.messageNotificationList.get(1).getSource() instanceof MuleMessage);
-        assertEquals(outboundEvent.getMessage().getPayload(),
-            listener.messageNotificationList.get(0).getSource().getPayload());
-        assertEquals(outboundEvent.getMessage().getPayload(),
-            listener.messageNotificationList.get(1).getSource().getPayload());
+        assertThat(listener.messageNotificationList, hasSize(2));
+        assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_DISPATCH_BEGIN));
+        assertThat(listener.messageNotificationList.get(1).getAction(), is(MESSAGE_DISPATCH_END));
+        assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
+        assertThat(listener.messageNotificationList.get(1).getSource(), instanceOf(MuleMessage.class));
+        assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
+                is(outboundEvent.getMessage().getPayload()));
+        assertThat(listener.messageNotificationList.get(1).getSource().getPayload(),
+                is(outboundEvent.getMessage().getPayload()));
     }
 
     @Test
@@ -354,14 +413,19 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     private static class FakeMessageDispatcher extends TestMessageDispatcher
     {
 
+        private final Closure afterSend;
+        private final Closure afterDispatch;
+
         private MuleEvent sensedSendEvent;
         private MuleEvent sensedDispatchEvent;
         private boolean sentEvent;
         private boolean dispatchedEvent;
 
-        public FakeMessageDispatcher(OutboundEndpoint endpoint)
+        public FakeMessageDispatcher(OutboundEndpoint endpoint, Closure afterSend, Closure afterDispatch)
         {
             super(endpoint);
+            this.afterSend = afterSend;
+            this.afterDispatch = afterDispatch;
         }
 
         @Override
@@ -369,6 +433,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         {
             sensedSendEvent = event;
             sentEvent = true;
+            afterSend.execute(event);
             return responseMessage;
         }
 
@@ -377,6 +442,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         {
             sensedDispatchEvent = event;
             dispatchedEvent = true;
+            afterDispatch.execute(event);
         }
     }
 
@@ -384,6 +450,9 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     {
 
         static FakeMessageDispatcher dispatcher;
+
+        static Closure afterSend;
+        static Closure afterDispatch;
 
         @Override
         public synchronized MessageDispatcher create(OutboundEndpoint ep) throws MuleException
@@ -393,7 +462,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
                 throw new IllegalStateException("Dispatcher for this test was already created");
             }
 
-            dispatcher = new FakeMessageDispatcher(ep);
+            dispatcher = new FakeMessageDispatcher(ep, afterSend, afterDispatch);
             return dispatcher;
         }
     }
