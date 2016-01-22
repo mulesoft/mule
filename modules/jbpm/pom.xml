@@ -12,6 +12,12 @@
     <name>BPM Support - JBoss jBPM</name>
     <description>Classes which allow Mule to integrate with JBoss jBPM via the BPM Module.</description>
 
+    <properties>
+        <antlrVersion>3.1.1</antlrVersion>
+        <hibernateVersion>3.6.0.Final</hibernateVersion>
+        <jbpmVersion>4.4</jbpmVersion>
+    </properties>
+
     <dependencies>
         <!-- Generic BPM Support -->
         <dependency>
@@ -23,15 +29,24 @@
         <dependency>
             <groupId>org.jbpm.jbpm4</groupId>
             <artifactId>jbpm-jpdl</artifactId>
+            <version>${jbpmVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.jbpm.jbpm4</groupId>
             <artifactId>jbpm-pvm</artifactId>
+            <version>${jbpmVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-jdk14</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Hibernate and dependencies -->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
+            <version>${hibernateVersion}</version>
             <exclusions>
                 <!-- Make sure we are using the same version as Drools -->
                 <exclusion>
@@ -68,6 +83,7 @@
             <!-- Use this one, already bundled with Mule, juel-api duplicates it and is excluded -->
             <groupId>org.apache.tomcat</groupId>
             <artifactId>el-api</artifactId>
+            <version>${tomcatVersion}</version>
         </dependency>
         <!-- Needed for org.mule.module.jbpm.MuleSendActivity -->
         <dependency>

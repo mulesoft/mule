@@ -8,6 +8,7 @@ package org.mule.test.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
@@ -20,8 +21,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.SerializationException;
 import org.apache.commons.lang.SerializationUtils;
-import org.hibernate.type.SerializationException;
 import org.junit.Test;
 
 public class CollectionAggregatorRouterSerializationTestCase extends FunctionalTestCase
