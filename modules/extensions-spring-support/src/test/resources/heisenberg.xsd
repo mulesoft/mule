@@ -53,15 +53,16 @@
                     </xs:choice>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="nextDoor"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="recipe"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
                     <xs:attribute type="mule:expressionBoolean" use="required" name="cancer"></xs:attribute>
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.module.extension.model.HealthStatusEnumType" use="required" name="finalHealth"></xs:attribute>
-                    <xs:attribute type="mule:expressionString" use="optional" name="labAddress"></xs:attribute>
-                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.module.extension.model.HealthStatusEnumType" use="optional" default="CANCER" name="initialHealth"></xs:attribute>
                     <xs:attribute type="mule:expressionDecimal" use="required" name="money"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="weapon"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="moneyFunction"></xs:attribute>
+                    <xs:attribute type="mule:expressionMap" use="optional" name="recipe"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="labAddress"></xs:attribute>
+                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.module.extension.model.HealthStatusEnumType" use="optional" default="CANCER" name="initialHealth"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="candidateDoors"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="firstEndevour"></xs:attribute>
                     <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>

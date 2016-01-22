@@ -24,7 +24,8 @@
                        finalHealth="DEAD"
                        candidateDoors="candidateDoors"
                        firstEndevour="Gray Matter Technologies"
-                       labAddress="#['Pollos Hermanos']">
+                       labAddress="#['Pollos Hermanos']"
+                       moneyFunction="#[money]">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
@@ -94,7 +95,8 @@
                        recipe="#[app.registry.recipes]"
                        candidateDoors="#[app.registry.candidateDoors]"
                        firstEndevour="Gray Matter Technologies"
-                       labAddress="#['Pollos Hermanos']">
+                       labAddress="#['Pollos Hermanos']"
+                       moneyFunction="#[money]">
         <heisenberg:enemies>
             <heisenberg:enemy value="#[gustavoFring]"/>
             <heisenberg:enemy value="#[hank]"/>

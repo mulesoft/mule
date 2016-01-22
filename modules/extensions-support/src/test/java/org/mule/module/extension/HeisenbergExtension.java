@@ -9,6 +9,7 @@ package org.mule.module.extension;
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
@@ -36,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -90,6 +92,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     @Parameter
     @Optional
     private Weapon weapon;
+
+    @Parameter
+    @Optional
+    private Function<MuleEvent, Integer> moneyFunction;
 
     /**
      * Doors I might knock on but still haven't made up mind about
@@ -246,5 +252,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     public MuleContext getMuleContext()
     {
         return muleContext;
+    }
+
+    public Function<MuleEvent, Integer> getMoneyFunction()
+    {
+        return moneyFunction;
     }
 }

@@ -23,6 +23,7 @@ import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTIO
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
 import static org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber.DEFAULT_CONNECTION_PROVIDER_NAME;
+import org.mule.api.MuleEvent;
 import org.mule.config.MuleManifest;
 import org.mule.extension.annotation.api.Configuration;
 import org.mule.extension.annotation.api.Configurations;
@@ -70,6 +71,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -149,7 +151,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         ConfigurationDeclaration configuration = declaration.getConfigurations().get(1);
         assertThat(configuration, is(notNullValue()));
         assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-        assertThat(configuration.getParameters(), hasSize(17));
+        assertThat(configuration.getParameters(), hasSize(18));
         assertParameter(configuration.getParameters(), "extendedProperty", "", DataType.of(String.class), true, SUPPORTED, null);
     }
 
@@ -178,7 +180,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
         List<ParameterDeclaration> parameters = conf.getParameters();
-        assertThat(parameters, hasSize(16));
+        assertThat(parameters, hasSize(17));
 
         assertParameter(parameters, "myName", "", DataType.of(String.class), false, SUPPORTED, HEISENBERG);
         assertParameter(parameters, "age", "", DataType.of(Integer.class), false, SUPPORTED, AGE);
@@ -197,6 +199,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(parameters, "labAddress", "", DataType.of(String.class), false, REQUIRED, null);
         assertParameter(parameters, "firstEndevour", "", DataType.of(String.class), false, NOT_SUPPORTED, null);
         assertParameter(parameters, "weapon", "", DataType.of(Weapon.class), false, SUPPORTED, null);
+        assertParameter(parameters, "moneyFunction", "", DataType.of(Function.class, MuleEvent.class, Integer.class), false, SUPPORTED, null);
     }
 
     private void assertExtensionProperties(Declaration declaration)
