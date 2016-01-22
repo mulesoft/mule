@@ -8,7 +8,7 @@ package org.mule.module.cxf;
 
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.module.tls.DefaultTlsContextFactory;
+import org.mule.module.tls.internal.DefaultTlsContextFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;

@@ -20,7 +20,7 @@ import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.module.tls.DefaultTlsContextFactory;
+import org.mule.module.tls.internal.DefaultTlsContextFactory;
 
 import java.io.IOException;
 

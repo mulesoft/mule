@@ -4,14 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.tls;
+package org.mule.module.tls.internal;
 
 
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.tls.TlsConfiguration;
-import org.mule.module.tls.api.TlsContextFactory;
-import org.mule.module.tls.api.TlsContextKeyStoreConfiguration;
-import org.mule.module.tls.api.TlsContextTrustStoreConfiguration;
+import org.mule.api.tls.TlsContextFactory;
+import org.mule.api.tls.TlsContextKeyStoreConfiguration;
+import org.mule.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.util.FileUtils;
 
 import java.io.IOException;
@@ -150,13 +151,21 @@ public class DefaultTlsContextFactory implements TlsContextFactory
 
 
     @Override
-    public SSLContext createSslContext() throws KeyManagementException, NoSuchAlgorithmException, CreateException
+    //TODO: MULE-9345 - Put CreateException back into the signature
+    public SSLContext createSslContext() throws KeyManagementException, NoSuchAlgorithmException
     {
         synchronized (this)
         {
             if (!initialized)
             {
-                tlsConfiguration.initialise(null == getKeyStorePath(), null);
+                try
+                {
+                    tlsConfiguration.initialise(null == getKeyStorePath(), null);
+                }
+                catch (CreateException e)
+                {
+                    throw new MuleRuntimeException(e);
+                }
                 initialized = true;
             }
         }

@@ -26,8 +26,8 @@ import org.mule.module.oauth2.asserter.OAuthContextFunctionAsserter;
 import org.mule.module.oauth2.internal.OAuthConstants;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.NullPayload;
-import org.mule.module.tls.DefaultTlsContextFactory;
-import org.mule.module.tls.api.TlsContextFactory;
+import org.mule.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.api.tls.TlsContextFactory;
 
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import com.google.common.collect.ImmutableMap;

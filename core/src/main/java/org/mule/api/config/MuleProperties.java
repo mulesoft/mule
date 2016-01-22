@@ -158,6 +158,8 @@ public class MuleProperties
     public static final String OBJECT_EXTENSION_MANAGER = "_muleExtensionManager";
     public static final String OBJECT_TIME_SUPPLIER = "_muleTimeSupplier";
     public static final String OBJECT_CONNECTION_MANAGER = "_muleConnectionManager";
+    public static final String DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY = "_muleDefaultTlsContextFactory";
+    public static final String DEFAULT_TLS_CONTEXT_FACTORY_BUILDER_REGISTRY_KEY = "_muleDefaultTlsContextFactoryBuilder";
 
     // Not currently used as these need to be instance variables of the MuleContext.
     public static final String OBJECT_WORK_MANAGER = "_muleWorkManager";

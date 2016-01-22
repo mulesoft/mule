@@ -10,7 +10,7 @@ import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIG_PROP_REF_ID;
 import static org.mule.module.ws.security.WSCryptoUtils.createDefaultTrustStoreProperties;
 import static org.mule.module.ws.security.WSCryptoUtils.createTrustStoreProperties;
-import org.mule.module.tls.api.TlsContextFactory;
+import org.mule.api.tls.TlsContextFactory;
 
 import java.util.Map;
 import java.util.Properties;

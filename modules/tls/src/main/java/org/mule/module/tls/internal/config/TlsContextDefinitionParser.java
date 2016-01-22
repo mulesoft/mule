@@ -9,7 +9,7 @@ package org.mule.module.tls.internal.config;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.module.tls.DefaultTlsContextFactory;
+import org.mule.module.tls.internal.DefaultTlsContextFactory;
 
 
 public class TlsContextDefinitionParser extends ParentContextDefinitionParser

@@ -7,7 +7,7 @@
 package org.mule.module.http.internal.listener;
 
 import org.mule.api.context.WorkManagerSource;
-import org.mule.module.tls.api.TlsContextFactory;
+import org.mule.api.tls.TlsContextFactory;
 
 import java.io.IOException;
 

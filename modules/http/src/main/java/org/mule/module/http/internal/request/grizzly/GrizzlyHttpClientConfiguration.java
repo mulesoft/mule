@@ -7,7 +7,7 @@
 package org.mule.module.http.internal.request.grizzly;
 
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.module.tls.api.TlsContextFactory;
+import org.mule.api.tls.TlsContextFactory;
 import org.mule.module.socket.api.TcpClientSocketProperties;
 
 
