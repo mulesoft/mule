@@ -12,9 +12,16 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.model.HealthStatus;
 import org.mule.module.extension.model.Ricin;
+import org.mule.util.ArrayUtils;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AbstractConfigParserTestCase extends ExtensionFunctionalTestCase
 {
+
     protected static final String HEISENBERG_BYNAME = "heisenberg";
     protected static final String HEISENBERG_PLACEHOLDERS = "heisenbergWithPlaceHolders";
     protected static final String HEISENBERG_BYREF = "heisenbergByRef";
@@ -46,6 +53,16 @@ public class AbstractConfigParserTestCase extends ExtensionFunctionalTestCase
     protected static final HealthStatus INITIAL_HEALTH = HealthStatus.CANCER;
     protected static final HealthStatus FINAL_HEALTH = HealthStatus.DEAD;
     protected static final Ricin WEAPON = new Ricin();
+
+    protected static final String SEASON_1_KEY = "s01";
+    protected static final String SEASON_2_KEY = "s02";
+    protected static final List<Long> MONTHLY_INCOMES = Arrays.asList(ArrayUtils.toObject(new long[] {12000, 500}));
+    protected static final Map<String, List<String>> DEATHS_BY_SEASON = new HashMap<String, List<String>>()
+    {{
+        put(SEASON_1_KEY, Arrays.asList("emilio", "domingo"));
+        put(SEASON_2_KEY, Arrays.asList("tuco", "tortuga"));
+    }};
+
 
     protected HeisenbergExtension lookupHeisenberg(String key) throws Exception
     {

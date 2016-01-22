@@ -73,6 +73,9 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     private List<String> enemies = new LinkedList<>();
 
     @Parameter
+    private List<Long> monthlyIncomes = new LinkedList<>();
+
+    @Parameter
     private BigDecimal money;
 
     @Parameter
@@ -81,6 +84,14 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     @Parameter
     @Optional
     private Map<String, Long> recipe;
+
+    @Parameter
+    @Optional
+    private Map<String, List<String>> deathsBySeasons;
+
+    @Parameter
+    @Optional
+    private Map<String, Ricin> labeledRicin;
 
     @Parameter
     @Optional
@@ -274,5 +285,20 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     public Weapon getWeapon()
     {
         return weapon;
+    }
+
+    public List<Long> getMonthlyIncomes()
+    {
+        return monthlyIncomes;
+    }
+
+    public Map<String, List<String>> getDeathsBySeasons()
+    {
+        return deathsBySeasons;
+    }
+
+    public Map<String, Ricin> getLabeledRicin()
+    {
+        return labeledRicin;
     }
 }

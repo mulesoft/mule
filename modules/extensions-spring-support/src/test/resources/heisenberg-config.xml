@@ -19,7 +19,6 @@
                        dateOfBirth="1959-09-07T00:00:00"
                        dateOfDeath="2011-09-07T00:00:00-05:00"
                        money="1000000"
-                       recipe="recipes"
                        initialHealth="CANCER"
                        finalHealth="DEAD"
                        candidateDoors="candidateDoors"
@@ -30,6 +29,9 @@
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
+        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        </heisenberg:next-door>
         <heisenberg:ricin-packs>
             <heisenberg:ricin-pack microgramsPerKilo="22">
                 <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
@@ -38,6 +40,30 @@
         <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
             <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
         </heisenberg:next-door>
+        <heisenberg:deaths-by-seasons>
+            <heisenberg:deaths-by-season key="s01">
+                <heisenberg:deaths-by-season-item value="emilio"/>
+                <heisenberg:deaths-by-season-item value="domingo"/>
+            </heisenberg:deaths-by-season>
+            <heisenberg:deaths-by-season key="s02" value="#[['some', 'other']]"/>
+            <heisenberg:deaths-by-season key="s02" value="#[['tuco', 'tortuga']]"/>
+        </heisenberg:deaths-by-seasons>
+        <heisenberg:labeled-ricins>
+            <heisenberg:labeled-ricin key="pojo">
+                <heisenberg:ricin microgramsPerKilo="22">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+            </heisenberg:labeled-ricin>
+        </heisenberg:labeled-ricins>
+        <heisenberg:recipes>
+            <heisenberg:recipe key="methylamine" value="75"/>
+            <heisenberg:recipe key="pseudoephedrine" value="0"/>
+            <heisenberg:recipe key="P2P" value="25"/>
+        </heisenberg:recipes>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
     </heisenberg:config>
 
     <heisenberg:config name="heisenbergWithPlaceHolders"
@@ -52,7 +78,10 @@
                        finalHealth="${finalHealth}"
                        candidateDoors="${candidateDoors}"
                        firstEndevour="Gray Matter Technologies"
-                       labAddress="#['Pollos Hermanos']">
+                       labAddress="#['Pollos Hermanos']"
+                       monthlyIncomes="${monthlyIncomes}"
+                       deathsBySeasons="${deathsBySeasons}"
+                       labeledRicin="${labeledRicin}">
         <heisenberg:enemies>
             <heisenberg:enemy value="${fring}"/>
             <heisenberg:enemy value="${hank}"/>
@@ -80,7 +109,10 @@
                        nextDoor="door"
                        candidateDoors="candidateDoors"
                        firstEndevour="Gray Matter Technologies"
-                       labAddress="#['Pollos Hermanos']">
+                       labAddress="#['Pollos Hermanos']"
+                       monthlyIncomes="monthlyIncomes"
+                       deathsBySeasons="deathsBySeasons"
+                       labeledRicin="labeledRicins">
     </heisenberg:config>
 
     <heisenberg:config name="expressionHeisenberg"
@@ -96,7 +128,10 @@
                        candidateDoors="#[app.registry.candidateDoors]"
                        firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
-                       moneyFunction="#[money]">
+                       moneyFunction="#[money]"
+                       monthlyIncomes="#[[12000L, 500L]]"
+                       deathsBySeasons="#[['s01':['emilio', 'domingo'], 's02':['tuco', 'tortuga']]]"
+                       labeledRicin="#[app.registry.labeledRicins]">
         <heisenberg:enemies>
             <heisenberg:enemy value="#[gustavoFring]"/>
             <heisenberg:enemy value="#[hank]"/>
@@ -126,7 +161,10 @@
                        ricinPacks="#[app.registry.ricinPacks]"
                        nextDoor="#[app.registry.door]"
                        firstEndevour="Gray Matter Technologies"
-                       labAddress="#['Pollos Hermanos']">
+                       labAddress="#['Pollos Hermanos']"
+                       monthlyIncomes="#[app.registry.monthlyIncomes]"
+                       deathsBySeasons="#[app.registry.deathsBySeasons]"
+                       labeledRicin="#[app.registry.labeledRicins]">
     </heisenberg:config>
 
     <spring:beans>
@@ -135,6 +173,30 @@
             <spring:entry key="pseudoephedrine" value="0"/>
             <spring:entry key="P2P" value="25"/>
         </util:map>
+
+        <util:map id="deathsBySeasons" value-type="java.util.List">
+            <spring:entry key="s01">
+                <util:list id="deaths-by-season" value-type="java.lang.String">
+                    <spring:value type="java.lang.String">emilio</spring:value>
+                    <spring:value type="java.lang.String">domingo</spring:value>
+                </util:list>
+            </spring:entry>
+            <spring:entry key="s02">
+                <util:list id="deaths-by-season2" value-type="java.lang.String">
+                    <spring:value type="java.lang.String">tuco</spring:value>
+                    <spring:value type="java.lang.String">tortuga</spring:value>
+                </util:list>
+            </spring:entry>
+        </util:map>
+
+        <util:map id="labeledRicins" value-type="org.mule.module.extension.model.Ricin">
+            <spring:entry key="pojo" value-ref="ricin"/>
+        </util:map>
+
+        <util:list id="monthlyIncomes" value-type="java.lang.Long">
+            <spring:value>12000</spring:value>
+            <spring:value>500</spring:value>
+        </util:list>
 
         <util:map id="candidateDoors">
             <spring:entry key="skyler" value-ref="skylerDoor"/>

@@ -7,12 +7,15 @@
 package org.mule.module.extension.internal.config;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_KEY;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.CONFIG_ATTRIBUTE;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
+import static org.mule.module.extension.internal.util.NameUtils.pluralize;
 import static org.mule.module.extension.internal.util.NameUtils.singularize;
 import static org.springframework.util.xml.DomUtils.getChildElements;
 import org.mule.api.MuleEvent;
@@ -26,14 +29,14 @@ import org.mule.extension.api.introspection.DataQualifierVisitor;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ParameterModel;
-import org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
 import org.mule.module.extension.internal.introspection.SimpleTypeDataQualifierVisitor;
 import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.CollectionValueResolver;
-import org.mule.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ExpressionFunctionValueResolver;
+import org.mule.module.extension.internal.runtime.resolver.MapValueResolver;
+import org.mule.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.RegistryLookupValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -41,6 +44,8 @@ import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
+import org.mule.module.extension.internal.util.NameUtils;
+import org.mule.util.ArrayUtils;
 import org.mule.util.TemplateParser;
 import org.mule.util.ValueHolder;
 
@@ -157,6 +162,7 @@ final class XmlExtensionParserUtils
     {
         final String hyphenizedFieldName = hyphenize(fieldName);
         final String singularName = singularize(hyphenizedFieldName);
+        final String pluralName = pluralize(hyphenizedFieldName);
         final ValueHolder<ValueResolver> resolverReference = new ValueHolder<>();
 
         DataQualifierVisitor visitor = new AbstractDataQualifierVisitor()
@@ -179,6 +185,32 @@ final class XmlExtensionParserUtils
             public void onList()
             {
                 resolverReference.set(parseCollection(element, fieldName, hyphenizedFieldName, singularName, defaultValue, dataType));
+            }
+
+            /**
+             * A map type. Might be defined in an inner element or referenced
+             * from an attribute
+             */
+            @Override
+            public void onMap()
+            {
+                String parentname;
+                String childname;
+                if (StringUtils.equals(pluralName, hyphenizedFieldName))
+                {
+                    parentname = hyphenizedFieldName;
+                    childname = singularName;
+                }
+                else
+                {
+                    parentname = pluralName;
+                    childname = hyphenizedFieldName;
+                }
+
+                resolverReference.set(
+                        parseMap(element, fieldName,
+                                 parentname, childname,
+                                 defaultValue, dataType));
             }
 
             @Override
@@ -243,7 +275,7 @@ final class XmlExtensionParserUtils
      * for each {@link ParameterModel} in the {@code parameters} list, taking as source the given {@code element}
      * an a {@code nestedOperations} {@link Map} which has {@link ParameterModel} names as keys, and {@link List}s
      * of {@link MessageProcessor} as values.
-     * <p>
+     * <p/>
      * For each {@link ParameterModel} in the {@code parameters} list, if an entry exists in the {@code nestedOperations}
      * {@link Map}, a {@link ValueResolver} that generates {@link NestedProcessor} instances will be added to the
      * {@link ResolverSet}. Otherwise, a {@link ValueResolver} will be inferred from the given {@code element} just
@@ -324,9 +356,9 @@ final class XmlExtensionParserUtils
 
     private static ValueResolver parseCollectionAsInnerElement(ElementDescriptor collectionElement,
                                                                String childElementName,
-                                                               DataType collectionType)
+                                                               final DataType collectionType)
     {
-        final DataType itemsType = collectionType.getGenericTypes().length > 0 ? collectionType.getGenericTypes()[0] : DataType.of(Object.class);
+        final DataType itemsType = ArrayUtils.isEmpty(collectionType.getGenericTypes()) ? DataType.of(Object.class) : collectionType.getGenericTypes()[0];
         final List<ValueResolver<Object>> resolvers = new LinkedList<>();
 
         for (final ElementDescriptor item : collectionElement.getChildsByName(childElementName))
@@ -342,8 +374,7 @@ final class XmlExtensionParserUtils
                 @Override
                 protected void defaultOperation()
                 {
-                    String value = item.getAttribute(SchemaConstants.ATTRIBUTE_NAME_VALUE);
-                    resolvers.add(getResolverFromValue(value, itemsType));
+                    resolvers.add(getResolverFromValue(item.getAttribute(ATTRIBUTE_NAME_VALUE), itemsType));
                 }
             };
 
@@ -353,20 +384,98 @@ final class XmlExtensionParserUtils
         return CollectionValueResolver.of((Class<Collection>) collectionType.getRawType(), resolvers);
     }
 
+    private static ValueResolver parseMapAsInnerElement(ElementDescriptor mapElement,
+                                                        String childElementName,
+                                                        DataType mapType)
+    {
+        final DataType keyType = mapType.getGenericTypes().length > 1 ? mapType.getGenericTypes()[0] : DataType.of(Object.class);
+        final DataType valueType = mapType.getGenericTypes().length > 1 ? mapType.getGenericTypes()[1] : DataType.of(Object.class);
+        final List<ValueResolver<Object>> keyResolvers = new LinkedList<>();
+        final List<ValueResolver<Object>> valueResolvers = new LinkedList<>();
+
+        for (final ElementDescriptor item : mapElement.getChildsByName(childElementName))
+        {
+            keyResolvers.add(getResolverFromValue(item.getAttribute(ATTRIBUTE_NAME_KEY), keyType));
+
+            valueType.getQualifier().accept(new AbstractDataQualifierVisitor()
+            {
+                @Override
+                public void onPojo()
+                {
+                    valueResolvers.add(parsePojo(item,
+                                                 ATTRIBUTE_NAME_VALUE,
+                                                 NameUtils.getTopLevelTypeName(valueType),
+                                                 valueType,
+                                                 null));
+                }
+
+                @Override
+                public void onList()
+                {
+                    ValueResolver<Object> resolver;
+                    String valueAsExpression = item.getAttribute(ATTRIBUTE_NAME_VALUE);
+                    if (!StringUtils.isBlank(valueAsExpression))
+                    {
+                        resolver = getResolverFromValue(valueAsExpression, valueType);
+                    }
+                    else
+                    {
+                        String itemName = hyphenize(NameUtils.singularize(childElementName)).concat("-item");
+                        resolver = parseCollectionAsInnerElement(item, itemName, valueType);
+                    }
+
+                    valueResolvers.add(resolver);
+                }
+
+                @Override
+                protected void defaultOperation()
+                {
+                    valueResolvers.add(getResolverFromValue(item.getAttribute(ATTRIBUTE_NAME_VALUE), valueType));
+                }
+            });
+        }
+
+        return MapValueResolver.of((Class<Map>) mapType.getRawType(), keyResolvers, valueResolvers);
+    }
+
     private static ValueResolver parseCollection(ElementDescriptor element,
                                                  String fieldName,
                                                  String parentElementName,
                                                  String childElementName,
                                                  Object defaultValue,
-                                                 DataType collectionDataType)
+                                                 DataType collectionType)
     {
-        ValueResolver resolver = getResolverFromAttribute(element, fieldName, collectionDataType, defaultValue);
+        ValueResolver resolver = getResolverFromAttribute(element, fieldName, collectionType, defaultValue);
         if (resolver == null)
         {
             ElementDescriptor collectionElement = element.getChildByName(parentElementName);
             if (collectionElement != null)
             {
-                resolver = parseCollectionAsInnerElement(collectionElement, childElementName, collectionDataType);
+                resolver = parseCollectionAsInnerElement(collectionElement, childElementName, collectionType);
+            }
+            else
+            {
+                resolver = new StaticValueResolver(defaultValue);
+            }
+        }
+
+        return resolver;
+    }
+
+    private static ValueResolver parseMap(ElementDescriptor element,
+                                          String fieldName,
+                                          String parentElementName,
+                                          String childElementName,
+                                          Object defaultValue,
+                                          DataType mapDataType)
+    {
+        ValueResolver resolver = getResolverFromAttribute(element, fieldName, mapDataType, defaultValue);
+        if (resolver == null)
+        {
+            ElementDescriptor mapElement = element.getChildByName(parentElementName);
+            if (mapElement != null)
+            {
+                resolver = parseMapAsInnerElement(mapElement, childElementName, mapDataType);
             }
             else
             {
