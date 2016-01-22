@@ -383,10 +383,16 @@ public final class TlsConfiguration
 
     public SSLContext getSslContext() throws NoSuchAlgorithmException, KeyManagementException
     {
-        KeyManager[] keyManagers =
-                null == getKeyManagerFactory() ? null : getKeyManagerFactory().getKeyManagers();
         TrustManager[] trustManagers =
                 null == getTrustManagerFactory() ? null : getTrustManagerFactory().getTrustManagers();
+
+        return getSslContext(trustManagers);
+    }
+
+    public SSLContext getSslContext(TrustManager[] trustManagers) throws NoSuchAlgorithmException, KeyManagementException
+    {
+        KeyManager[] keyManagers =
+                null == getKeyManagerFactory() ? null : getKeyManagerFactory().getKeyManagers();
 
         SSLContext context = SSLContext.getInstance(getSslType());
         // TODO - nice to have a configurable random number source set here

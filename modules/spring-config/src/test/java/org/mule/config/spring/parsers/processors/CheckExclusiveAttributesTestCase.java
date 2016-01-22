@@ -128,7 +128,7 @@ public class CheckExclusiveAttributesTestCase extends AbstractPreProcessorTestCa
     }
     
     @Override
-    protected PreProcessor createCheck(String[][] constraint)
+    protected PreProcessor createCheck(String[][] constraint, String elementName, String elementNamespaceUrl)
     {
         return new CheckExclusiveAttributes(constraint);
     }

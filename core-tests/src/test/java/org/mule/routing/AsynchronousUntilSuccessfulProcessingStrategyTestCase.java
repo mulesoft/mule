@@ -15,6 +15,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.TransformationService;
 import org.mule.api.ExceptionPayload;
@@ -44,6 +46,7 @@ import org.mule.util.store.SimpleMemoryObjectStore;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
@@ -63,7 +66,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
 
     private static interface FailCallback
     {
-                void doFail() throws Exception;
+        void doFail() throws Exception;
     }
 
     private static final String EXPECTED_FAILURE_MSG = "expected failure";
@@ -75,6 +78,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     private MuleEvent mockEvent = mock(MuleEvent.class, Answers.RETURNS_DEEP_STUBS.get());
     private MessageProcessor mockRoute = mock(MessageProcessor.class, Answers.RETURNS_DEEP_STUBS.get());
     private ExpressionFilter mockAlwaysTrueFailureExpressionFilter = mock(ExpressionFilter.class, Answers.RETURNS_DEEP_STUBS.get());
+    private ThreadPoolExecutor mockPool = mock(ThreadPoolExecutor.class, Answers.RETURNS_DEEP_STUBS.get());
     private ScheduledThreadPoolExecutor mockScheduledPool = mock(ScheduledThreadPoolExecutor.class, Answers.RETURNS_DEEP_STUBS.get());
     private SimpleMemoryObjectStore<MuleEvent> objectStore = new SimpleMemoryObjectStore<MuleEvent>();
     private MessageProcessor mockDLQ = mock(MessageProcessor.class);
@@ -109,16 +113,18 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
                 return numberOfAttempts++;
             }
         });
-        when(mockUntilSuccessfulConfiguration.getThreadingProfile().createScheduledPool(anyString())).thenReturn(mockScheduledPool);
+        when(mockUntilSuccessfulConfiguration.getThreadingProfile().createPool(anyString())).thenReturn(mockPool);
+        when(mockUntilSuccessfulConfiguration.createScheduledRetriesPool(anyString())).thenReturn(mockScheduledPool);
         when(mockUntilSuccessfulConfiguration.getObjectStore()).thenReturn(objectStore);
         objectStore.clear();
+        configureMockPoolToInvokeRunnableInNewThread();
         configureMockScheduledPoolToInvokeRunnableInNewThread();
         configureMockRouteToCountDownRouteLatch();
         configureExceptionStrategyToReleaseLatchWhenExecuted();
         configureDLQToReleaseLatchWhenExecuted();
         when(muleContext.getTransformationService()).thenReturn(transformationService);
-        when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenAnswer
-                (invocation -> new DefaultMuleMessage(invocation.getArguments()[0].toString().getBytes(), muleContext));
+        when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenAnswer(
+                invocation -> new DefaultMuleMessage(invocation.getArguments()[0].toString().getBytes(), muleContext));
     }
 
     @Test(expected = InitialisationException.class)
@@ -190,7 +196,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
             @Override
             public boolean matches(Object item)
             {
-                return item instanceof RetryPolicyExhaustedException && ((RetryPolicyExhaustedException) item).getMessage().contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
+                return item instanceof RetryPolicyExhaustedException
+                       && ((RetryPolicyExhaustedException) item).getMessage().contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
             }
         }), eq(mockEvent));
         verify(mockDLQ, never()).process(any(MuleEvent.class));
@@ -239,7 +246,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         });
         waitUntilRouteIsExecuted();
         waitUntilExceptionIsHandled();
-        
+
         verify(mockEvent.getFlowConstruct().getExceptionListener(), never()).handleException(any(Exception.class), any(MuleEvent.class));
         verify(mockDLQ, times(1)).process(argThat(new ArgumentMatcher<MuleEvent>()
         {
@@ -263,7 +270,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
             }
         }));
     }
-    
+
     @Test
     public void alwaysFailMessageUsingFailureExpressionDLQ() throws Exception
     {
@@ -279,7 +286,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         });
         waitUntilRouteIsExecuted();
         waitUntilExceptionIsHandled();
-        
+
         verify(mockEvent.getFlowConstruct().getExceptionListener(), never()).handleException(any(Exception.class), any(MuleEvent.class));
         verify(mockDLQ, times(1)).process(argThat(new ArgumentMatcher<MuleEvent>()
         {
@@ -303,7 +310,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
             }
         }));
     }
-    
+
     @Test
     public void alwaysFailMessageWrapUsingFailureExpressionDLQ() throws Exception
     {
@@ -319,15 +326,15 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         });
         waitUntilRouteIsExecuted();
         waitUntilExceptionIsHandled();
-        
+
         verify(mockEvent.getFlowConstruct().getExceptionListener(), never()).handleException(any(Exception.class), any(MuleEvent.class));
         verify(mockDLQ, times(1)).process(argThat(new ArgumentMatcher<MuleEvent>()
         {
             @Override
             public boolean matches(Object argument)
             {
-                MuleEvent argEvent = (MuleEvent)argument;
-                
+                MuleEvent argEvent = (MuleEvent) argument;
+
                 verify(argEvent.getMessage(), times(1)).setExceptionPayload(argThat(new ArgumentMatcher<ExceptionPayload>()
                 {
                     @Override
@@ -343,7 +350,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
             }
         }));
     }
-    
+
     @Test
     public void successfulExecution() throws Exception
     {
@@ -397,6 +404,26 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         });
     }
 
+    private void configureMockPoolToInvokeRunnableInNewThread()
+    {
+        doAnswer(new Answer<Object>()
+        {
+            @Override
+            public Object answer(final InvocationOnMock invocationOnMock) throws Throwable
+            {
+                new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        ((Runnable) invocationOnMock.getArguments()[0]).run();
+                    }
+                }).start();
+                return null;
+            }
+        }).when(mockPool).execute(any(Runnable.class));
+    }
+
     private void configureMockScheduledPoolToInvokeRunnableInNewThread()
     {
         when(mockScheduledPool.schedule(any(Callable.class), anyLong(), any(TimeUnit.class))).thenAnswer(new Answer<Object>()
@@ -417,7 +444,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
                         }
                         catch (Exception e)
                         {
-                            //Do nothing.
+                            // Do nothing.
                         }
                     }
                 }).start();

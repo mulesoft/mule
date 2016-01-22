@@ -10,7 +10,7 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.8/mule.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-current.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/tls"
@@ -241,6 +241,13 @@
                     The oauth authentication server url to get access to the token. Mule, after receiving the
                     authentication code from the oauth server (through the redirectUrl) will
                     call this url to get the access token.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="encodeClientCredentialsInBody" type="mule:substitutableBoolean" use="optional" default="false">
+            <xsd:annotation>
+                <xsd:documentation>
+                    If true, the client id and client secret will be sent in the request body. Otherwise, they will be sent as basic authentication.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

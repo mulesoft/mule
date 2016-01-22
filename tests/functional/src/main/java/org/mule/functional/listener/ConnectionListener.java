@@ -6,13 +6,18 @@
  */
 package org.mule.functional.listener;
 
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.NotificationException;
+import org.mule.util.Preconditions;
 import org.mule.util.concurrent.Latch;
 
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -24,6 +29,8 @@ public class ConnectionListener
 
     private CountDownLatch notificationReceivedLatch = new Latch();
     private int timeout = 10000;
+    private Optional<Long> previousNotificationTimestamp = Optional.empty();
+    private Optional<Long> minimumTimeBetweenNotifications = Optional.empty();
     private int expectedAction = ConnectionNotification.CONNECTION_CONNECTED;
 
     public ConnectionListener(MuleContext muleContext)
@@ -37,6 +44,16 @@ public class ConnectionListener
                 {
                     if (notification.getAction() == expectedAction)
                     {
+                        long currentNotificationTimestamp = System.currentTimeMillis();
+                        if (previousNotificationTimestamp.isPresent())
+                        {
+                            long timeBetweenNotifications = currentNotificationTimestamp - previousNotificationTimestamp.get();
+                            if (!minimumTimeBetweenNotifications.isPresent() || minimumTimeBetweenNotifications.get() > timeBetweenNotifications)
+                            {
+                                minimumTimeBetweenNotifications = Optional.of(timeBetweenNotifications);
+                            }
+                        }
+                        previousNotificationTimestamp = Optional.of(currentNotificationTimestamp);
                         notificationReceivedLatch.countDown();
                     }
                 }
@@ -93,4 +110,13 @@ public class ConnectionListener
         return this;
     }
 
+    /**
+     * @return the minimum time tracked between all received notifications
+     * @throws IllegalStateException if there were less than two notifications received
+     */
+    public void assertMinimumTimeBetweenNotifications(long expectedTimeBetweenNotifications)
+    {
+        Preconditions.checkState(minimumTimeBetweenNotifications.isPresent(), "At least two notifications must be received in order to get the minimum time between notifications");
+        assertThat(minimumTimeBetweenNotifications.get(), greaterThanOrEqualTo(expectedTimeBetweenNotifications));
+    }
 }

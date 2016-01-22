@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.construct.Flow;
+import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.oauth2.internal.AbstractTokenRequestHandler;
 import org.mule.module.oauth2.internal.ApplicationCredentials;
 import org.mule.module.oauth2.internal.MuleEventLogger;
@@ -28,6 +29,8 @@ import org.mule.transport.NullPayload;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Base64;
+
 /**
  * Handler for calling the token url, parsing the response and storing the oauth context data.
  */
@@ -38,6 +41,7 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
     private ApplicationCredentials applicationCredentials;
     private TokenResponseConfiguration tokenResponseConfiguration = new TokenResponseConfiguration();
     private TokenManagerConfig tokenManager;
+    private boolean encodeClientCredentialsInBody = false;
     private MuleEventLogger muleEventLogger = new MuleEventLogger(logger);
 
     public void setApplicationCredentials(ApplicationCredentials applicationCredentials)
@@ -61,12 +65,22 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
         super.setMuleContext(muleContext);
     }
 
-    private void setMapPayloadWithTokenRequestParameters(final MuleEvent event)
+    private void setMapPayloadWithTokenRequestParameters(final MuleEvent event) throws MuleException
     {
         final HashMap<String, String> formData = new HashMap<String, String>();
-        formData.put(OAuthConstants.CLIENT_ID_PARAMETER, applicationCredentials.getClientId());
-        formData.put(OAuthConstants.CLIENT_SECRET_PARAMETER, applicationCredentials.getClientSecret());
         formData.put(OAuthConstants.GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS);
+        String clientId = applicationCredentials.getClientId();
+        String clientSecret = applicationCredentials.getClientSecret();
+        if (encodeClientCredentialsInBody)
+        {
+            formData.put(OAuthConstants.CLIENT_ID_PARAMETER, clientId);
+            formData.put(OAuthConstants.CLIENT_SECRET_PARAMETER, clientSecret);
+        }
+        else
+        {
+            String encodedCredentials = Base64.encodeBase64String(String.format("%s:%s", clientId, clientSecret).getBytes());
+            event.getMessage().setOutboundProperty(HttpHeaders.Names.AUTHORIZATION, "Basic " + encodedCredentials);
+        }
         if (scopes != null)
         {
             formData.put(OAuthConstants.SCOPE_PARAMETER, scopes);
@@ -131,5 +145,10 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
     public void setTokenManager(TokenManagerConfig tokenManager)
     {
         this.tokenManager = tokenManager;
+    }
+
+    public void setEncodeClientCredentialsInBody(boolean encodeClientCredentialsInBody)
+    {
+        this.encodeClientCredentialsInBody = encodeClientCredentialsInBody;
     }
 }

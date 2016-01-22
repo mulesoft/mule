@@ -11,7 +11,7 @@ import org.mule.test.infrastructure.process.MuleProcessController;
 import org.junit.rules.ExternalResource;
 
 /**
- * This is a JUnit rule to start and stop Mule ESB during tests. Usage:
+ * This is a JUnit rule to start and stop Mule Runtime during tests. Usage:
  * <p/>
  * <pre>
  * public static class MuleStandaloneIntegrationTests {

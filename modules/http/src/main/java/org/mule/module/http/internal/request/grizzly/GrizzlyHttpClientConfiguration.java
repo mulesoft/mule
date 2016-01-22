@@ -20,9 +20,10 @@ public class GrizzlyHttpClientConfiguration
     private final boolean usePersistentConnections;
     private final int connectionIdleTimeout;
     private final String threadNamePrefix;
+    private final String ownerName;
 
     private GrizzlyHttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties,
-                                           int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix)
+                                           int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix, String ownerName)
     {
         this.tlsContextFactory = tlsContextFactory;
         this.proxyConfig = proxyConfig;
@@ -31,6 +32,7 @@ public class GrizzlyHttpClientConfiguration
         this.usePersistentConnections = usePersistentConnections;
         this.connectionIdleTimeout = connectionIdleTimeout;
         this.threadNamePrefix = threadNamePrefix;
+        this.ownerName = ownerName;
     }
 
     public TlsContextFactory getTlsContextFactory()
@@ -68,6 +70,11 @@ public class GrizzlyHttpClientConfiguration
         return threadNamePrefix;
     }
 
+    public String getOwnerName()
+    {
+        return ownerName;
+    }
+
     public static class Builder
     {
         private TlsContextFactory tlsContextFactory;
@@ -77,6 +84,7 @@ public class GrizzlyHttpClientConfiguration
         private boolean usePersistentConnections;
         private int connectionIdleTimeout;
         private String threadNamePrefix;
+        private String ownerName;
 
         public Builder setTlsContextFactory(TlsContextFactory tlsContextFactory)
         {
@@ -120,10 +128,16 @@ public class GrizzlyHttpClientConfiguration
             return this;
         }
 
+        public Builder setOwnerName(String ownerName)
+        {
+            this.ownerName = ownerName;
+            return this;
+        }
+
         public GrizzlyHttpClientConfiguration build()
         {
             return new GrizzlyHttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
-                                                      usePersistentConnections, connectionIdleTimeout, threadNamePrefix);
+                                                      usePersistentConnections, connectionIdleTimeout, threadNamePrefix, ownerName);
         }
     }
 }

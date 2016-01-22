@@ -57,7 +57,7 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase
         assertEquals("country", appProps.get("peru"));
         assertEquals("austin", appProps.get("texas.capital"));
         assertEquals("4", appProps.get("peru.capital.numberOfletters"));
-        assertEquals("esb", appProps.get("mule"));
+        assertEquals("runtime", appProps.get("mule"));
         assertEquals("ipaas", appProps.get("mule.ion"));
 
         try

@@ -954,22 +954,29 @@
     </xsd:complexType>
 
     <xsd:simpleType name="httpProtocol">
-        <xsd:restriction base="mule:substitutableName">
-            <xsd:enumeration value="HTTP">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Plain HTTP protocol with no encryption (HTTPS / SSL/ TLS) configured
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:enumeration>
-            <xsd:enumeration value="HTTPS">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        HTTP protocol used with encryption (HTTPS / SSL / TLS).
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:enumeration>
-        </xsd:restriction>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="HTTP">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Plain HTTP protocol with no encryption (HTTPS / SSL/ TLS) configured
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="HTTPS">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                HTTP protocol used with encryption (HTTPS / SSL / TLS).
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="mule:propertyPlaceholderType"/>
+            </xsd:simpleType>
+        </xsd:union>
     </xsd:simpleType>
 
     <xsd:element name="basic-security-filter" type="basicSecurityFilterType" substitutionGroup="mule:abstract-security-filter">

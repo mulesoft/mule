@@ -49,6 +49,7 @@ public class BulkExecuteProcessorBeanDefinitionParser extends AbstractAdvancedDb
         parseExecutorFactory(element, builder);
         parseTransactionalAction(element, builder);
         parseMetadataProvider(element, builder);
+        configureStatementResultSetCloser(builder);
     }
 
     private void parseBulkQuery(Element element, BeanDefinitionBuilder builder)

@@ -8,7 +8,6 @@ package org.mule.routing;
 
 import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
@@ -35,6 +34,7 @@ import org.mule.util.store.QueuePersistenceObjectStore;
 import java.io.Serializable;
 import java.util.Random;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -59,7 +59,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     private static final Random random = new Random();
     protected transient Log logger = LogFactory.getLog(getClass());
     private MessagingExceptionHandler messagingExceptionHandler;
-    private ScheduledExecutorService scheduledPool;
+    private ExecutorService pool;
+    private ScheduledExecutorService scheduledRetriesPool;
 
     @Override
     public void initialise() throws InitialisationException
@@ -77,16 +78,19 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     {
         final String threadPrefix = String.format("%s%s.%s", ThreadNameHelper.getPrefix(getUntilSuccessfulConfiguration().getMuleContext()),
                                                   getUntilSuccessfulConfiguration().getFlowConstruct().getName(), "until-successful");
-        scheduledPool = getUntilSuccessfulConfiguration().getThreadingProfile().createScheduledPool(threadPrefix);
+        pool = getUntilSuccessfulConfiguration().getThreadingProfile().createPool(threadPrefix);
+        scheduledRetriesPool = getUntilSuccessfulConfiguration().createScheduledRetriesPool(threadPrefix);
+
         scheduleAllPendingEventsForProcessing();
     }
-
 
     @Override
     public void stop()
     {
-        scheduledPool.shutdown();
-        scheduledPool = null;
+        scheduledRetriesPool.shutdown();
+        scheduledRetriesPool = null;
+        pool.shutdown();
+        pool = null;
     }
 
     @Override
@@ -136,12 +140,32 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         }
     }
 
-    private void scheduleForProcessing(final Serializable eventStoreKey, boolean firstTime) throws Exception
+    private void scheduleForProcessing(final Serializable eventStoreKey, boolean firstTime)
     {
-        this.scheduledPool.schedule(new Callable<Object>()
+        if (firstTime)
+        {
+            submitForProcessing(eventStoreKey);
+        }
+        else
+        {
+            this.scheduledRetriesPool.schedule(new Callable<Object>()
+            {
+                @Override
+                public Object call() throws Exception
+                {
+                    submitForProcessing(eventStoreKey);
+                    return null;
+                }
+            }, getUntilSuccessfulConfiguration().getMillisBetweenRetries(), TimeUnit.MILLISECONDS);
+        }
+    }
+
+    protected void submitForProcessing(final Serializable eventStoreKey)
+    {
+        this.pool.execute(new Runnable()
         {
             @Override
-            public Object call() throws Exception
+            public void run()
             {
                 try
                 {
@@ -151,12 +175,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                 {
                     incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(eventStoreKey, e);
                 }
-                return null;
             }
-        }, firstTime ? 0 : getUntilSuccessfulConfiguration().getMillisBetweenRetries(), TimeUnit.MILLISECONDS);
+        });
     }
 
-    private void incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(final Serializable eventStoreKey, Exception lastException) throws Exception
+    private void incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(final Serializable eventStoreKey, Exception lastException)
     {
         try
         {
@@ -222,10 +245,12 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         if (getUntilSuccessfulConfiguration().getDlqMP() == null)
         {
             logger.info("Retry attempts exhausted and no DLQ defined");
-            messagingExceptionHandler.handleException(buildRetryPolicyExhaustedException(lastException), event);
+            //mutableEvent should be a local copy of event
+            messagingExceptionHandler.handleException(buildRetryPolicyExhaustedException(lastException), mutableEvent);
             return;
         }
-
+        //we need another local copy in case mutableEvent is modified in the DLQ
+        MuleEvent eventCopy = threadSafeCopy(event);
         logger.info("Retry attempts exhausted, routing message to DLQ: " + getUntilSuccessfulConfiguration().getDlqMP());
         try
         {
@@ -234,11 +259,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         }
         catch (MessagingException e)
         {
-            messagingExceptionHandler.handleException(e, event);
+            messagingExceptionHandler.handleException(e, eventCopy);
         }
         catch (Exception e)
         {
-            messagingExceptionHandler.handleException(new MessagingException(event, e), event);
+            messagingExceptionHandler.handleException(new MessagingException(event, e), eventCopy);
         }
     }
 

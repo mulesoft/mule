@@ -24,11 +24,12 @@ public class IteratorResultSetHandler implements ResultSetHandler
 {
 
     private final RowHandler rowHandler;
-    private StatementStreamingResultSetCloser streamingResultSetCloser = new StatementStreamingResultSetCloser();
+    private final StatementStreamingResultSetCloser streamingResultSetCloser;
 
-    public IteratorResultSetHandler(RowHandler rowHandler)
+    public IteratorResultSetHandler(RowHandler rowHandler, StatementStreamingResultSetCloser streamingResultSetCloser)
     {
         this.rowHandler = rowHandler;
+        this.streamingResultSetCloser = streamingResultSetCloser;
     }
 
     @Override

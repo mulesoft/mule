@@ -329,7 +329,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
                 new CheckExclusiveAttributesAndChildren(new String[]{"source", "target"},
                     new String[]{"enrich"}))
             .registerPreProcessor(
-                new CheckRequiredAttributesWhenNoChildren(new String[][]{new String[]{"target"}}, "enrich"))
+                new CheckRequiredAttributesWhenNoChildren(new String[][]{new String[]{"target"}}, "enrich", "http://www.mulesoft.org/schema/mule/core"))
             .addCollection("enrichExpressionPairs");
         registerMuleBeanDefinitionParser("enrich", new ChildDefinitionParser("enrichExpressionPair",
             EnrichExpressionPair.class));

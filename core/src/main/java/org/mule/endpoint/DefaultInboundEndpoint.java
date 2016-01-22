@@ -26,7 +26,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
-import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.exception.ChoiceMessagingExceptionStrategy;
 import org.mule.exception.RollbackMessagingExceptionStrategy;
@@ -72,6 +71,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
             mimeType);
     }
 
+    @Override
     public MuleMessage request(long timeout) throws Exception
     {
         if (getConnector() != null)
@@ -82,16 +82,17 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
         {
             // TODO Either remove because this should never happen or i18n the
             // message
-            throw new IllegalStateException("The connector on the endpoint: " + toString()
-                                            + " is null. Please contact " + MuleManifest.getDevListEmail());
+            throw new IllegalStateException("The connector on the endpoint: " + toString() + " is null.");
         }
     }
 
+    @Override
     public void setListener(MessageProcessor listener)
     {
         this.listener = listener;
     }
 
+    @Override
     public void start() throws MuleException
     {
         try
@@ -113,6 +114,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
         }
     }
 
+    @Override
     public void stop() throws MuleException
     {
         try

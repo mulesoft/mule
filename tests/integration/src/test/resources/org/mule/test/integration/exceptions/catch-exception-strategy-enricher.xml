@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <flow name="enricherExceptionFlow">
+        <vm:inbound-endpoint path="inEnricherExceptionFlow" exchange-pattern="request-response" />
+        <enricher source="#[payload]" target="#[variable:blob]">
+            <test:component throwException="true" />
+        </enricher>
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyEnricherTestCase$ErrorProcessor" />
+        </catch-exception-strategy>
+    </flow>
+
+</mule>

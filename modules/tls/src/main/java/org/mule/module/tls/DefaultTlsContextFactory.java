@@ -8,30 +8,103 @@ package org.mule.module.tls;
 
 
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.tls.TlsConfiguration;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.module.tls.api.TlsContextFactory;
 import org.mule.module.tls.api.TlsContextKeyStoreConfiguration;
 import org.mule.module.tls.api.TlsContextTrustStoreConfiguration;
+import org.mule.util.ArrayUtils;
 import org.mule.util.FileUtils;
+import org.mule.util.StringUtils;
+
+import com.google.common.base.Joiner;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of the {@code TlsContextFactory} interface, which delegates all its operations to a
- * {@code TlsConfiguration} object.
+ * {@code TlsConfiguration} object. Only enabled cipher suites and protocols will not delegate to it if configured.
  */
-public class DefaultTlsContextFactory implements TlsContextFactory
+public class DefaultTlsContextFactory implements TlsContextFactory, Initialisable
 {
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultTlsContextFactory.class);
+    private static final String DEFAULT = "default";
 
     private String name;
 
     private TlsConfiguration tlsConfiguration = new TlsConfiguration(null);
 
-    private boolean initialized = false;
+    private AtomicBoolean initialized = new AtomicBoolean(false);
+    private boolean trustStoreInsecure = false;
+    private String[] enabledProtocols;
+    private String[] enabledCipherSuites;
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        if (initialized.getAndSet(true))
+        {
+            return;
+        }
+
+        try
+        {
+            tlsConfiguration.initialise(null == getKeyStorePath(), null);
+        }
+        catch (CreateException e)
+        {
+            throw new InitialisationException(MessageFactory.createStaticMessage("Unable to initialise TLS configuration"), e, this);
+        }
+
+        if (!isUseDefaults(enabledProtocols))
+        {
+            String[] globalEnabledProtocols = tlsConfiguration.getEnabledProtocols();
+            if (globalEnabledProtocols != null)
+            {
+                String[] validProtocols = ArrayUtils.intersection(enabledProtocols, globalEnabledProtocols);
+                if (validProtocols.length < enabledProtocols.length)
+                {
+                    globalConfigNotHonored("protocols", globalEnabledProtocols);
+                }
+            }
+        }
+
+        if (!isUseDefaults(enabledCipherSuites))
+        {
+            String[] globalEnabledCipherSuites = tlsConfiguration.getEnabledCipherSuites();
+            if (globalEnabledCipherSuites != null)
+            {
+                String[] validCipherSuites = ArrayUtils.intersection(enabledCipherSuites, globalEnabledCipherSuites);
+                if (validCipherSuites.length < enabledCipherSuites.length)
+                {
+                    globalConfigNotHonored("cipher suites", globalEnabledCipherSuites);
+                }
+            }
+        }
+    }
+
+    private boolean isUseDefaults(String[] array)
+    {
+        return (array == null) || ((array.length == 1) && DEFAULT.equalsIgnoreCase(array[0]));
+    }
+
+    private void globalConfigNotHonored(String element, String[] elementArray) throws InitialisationException
+    {
+        throw new InitialisationException(MessageFactory.createStaticMessage(String.format("Some selected %1$s are invalid. Valid %1$s according to your TLS configuration file are: %2$s", element, Joiner.on(", ").join(elementArray))), this);
+    }
 
     public String getName()
     {
@@ -148,31 +221,70 @@ public class DefaultTlsContextFactory implements TlsContextFactory
         tlsConfiguration.setTrustManagerAlgorithm(trustManagerAlgorithm);
     }
 
+    public boolean isTrustStoreInsecure()
+    {
+        return trustStoreInsecure;
+    }
+
+    public void setTrustStoreInsecure(boolean insecure)
+    {
+        if (insecure)
+        {
+            logger.warn(String.format("TLS context %s trust store set as insecure. No certificate validations will be performed, rendering connections vulnerable to attacks. Use at own risk.", name == null ? StringUtils.EMPTY : name));
+        }
+        this.trustStoreInsecure = insecure;
+    }
+
 
     @Override
     public SSLContext createSslContext() throws KeyManagementException, NoSuchAlgorithmException, CreateException
     {
-        synchronized (this)
+        SSLContext sslContext;
+        if (trustStoreInsecure)
         {
-            if (!initialized)
-            {
-                tlsConfiguration.initialise(null == getKeyStorePath(), null);
-                initialized = true;
-            }
+            sslContext = tlsConfiguration.getSslContext(new TrustManager[]{new InsecureTrustManager()});
         }
-        return tlsConfiguration.getSslContext();
+        else
+        {
+            sslContext = tlsConfiguration.getSslContext();
+        }
+        return sslContext;
     }
 
     @Override
     public String[] getEnabledCipherSuites()
     {
-        return tlsConfiguration.getEnabledCipherSuites();
+        if (isUseDefaults(enabledCipherSuites))
+        {
+            return tlsConfiguration.getEnabledCipherSuites();
+        }
+        else
+        {
+            return enabledCipherSuites;
+        }
+    }
+
+    public void setEnabledCipherSuites(String enabledCipherSuites)
+    {
+        this.enabledCipherSuites = StringUtils.splitAndTrim(enabledCipherSuites, ",");
     }
 
     @Override
     public String[] getEnabledProtocols()
     {
-        return tlsConfiguration.getEnabledProtocols();
+        if (isUseDefaults(enabledProtocols))
+        {
+            return tlsConfiguration.getEnabledProtocols();
+        }
+        else
+        {
+            return enabledProtocols;
+        }
+    }
+
+    public void setEnabledProtocols(String enabledProtocols)
+    {
+        this.enabledProtocols = StringUtils.splitAndTrim(enabledProtocols, ",");
     }
 
     @Override
@@ -258,6 +370,12 @@ public class DefaultTlsContextFactory implements TlsContextFactory
             {
                 return getTrustManagerAlgorithm();
             }
+
+            @Override
+            public boolean isInsecure()
+            {
+                return isTrustStoreInsecure();
+            }
         };
     }
 
@@ -287,5 +405,19 @@ public class DefaultTlsContextFactory implements TlsContextFactory
     public int hashCode()
     {
         return tlsConfiguration.hashCode();
+    }
+
+    private static class InsecureTrustManager implements X509TrustManager
+    {
+
+        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+            return new java.security.cert.X509Certificate[0];
+        }
+
+        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+        }
+
+        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+        }
     }
 }

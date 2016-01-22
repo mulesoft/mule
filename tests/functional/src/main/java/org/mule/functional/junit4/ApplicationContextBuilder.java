@@ -6,6 +6,9 @@
  */
 package org.mule.functional.junit4;
 
+import static org.mule.config.bootstrap.ArtifactType.APP;
+
+import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextBuilder;
@@ -25,6 +28,16 @@ public class ApplicationContextBuilder
 
     private MuleContext domainContext;
     private String[] applicationResources;
+    private MuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder()
+    {
+        @Override
+        protected DefaultMuleContext createDefaultMuleContext()
+        {
+            DefaultMuleContext muleContext = super.createDefaultMuleContext();
+            muleContext.setArtifactType(APP);
+            return muleContext;
+        }
+    };
 
     public ApplicationContextBuilder setDomainContext(MuleContext domainContext)
     {
@@ -52,9 +65,8 @@ public class ApplicationContextBuilder
                                                                             ClassUtils.NO_ARGS, getClass()));
         }
         builders.add(getAppBuilder(this.applicationResources));
-        DefaultMuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
-        configureMuleContext(contextBuilder);
-        context = muleContextFactory.createMuleContext(builders, contextBuilder);
+        configureMuleContext(muleContextBuilder);
+        context = muleContextFactory.createMuleContext(builders, muleContextBuilder);
         context.start();
         return context;
     }

@@ -7,9 +7,11 @@
 package org.mule.transport;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+
 import org.mule.AbstractAnnotatedObject;
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -64,6 +66,7 @@ import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.processor.IdempotentRedeliveryPolicy;
 import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
+import org.mule.retry.async.AsynchronousRetryTemplate;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.session.SerializeAndEncodeSessionHandler;
 import org.mule.transaction.TransactionCoordination;
@@ -143,6 +146,8 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     private static final long SCHEDULER_FORCED_SHUTDOWN_TIMEOUT = 5000l;
 
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
+    public static final String DEFAULT_CONTEXT_START_TIMEOUT = "15000";
+    public static final String MULE_CONTEXT_START_TIMEOUT_SYSTEM_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "contextStartTimeout";
 
     /**
      * logger used by this class
@@ -269,7 +274,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
 
     // TODO connect and disconnect are not part of lifecycle management right now
     private AtomicBoolean connected = new AtomicBoolean(false);
-    private AtomicBoolean connecting = new AtomicBoolean(false);
+    protected AtomicBoolean connecting = new AtomicBoolean(false);
 
     /**
      * Indicates whether the connector should start upon connecting. This is
@@ -500,11 +505,32 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
                             {
                                 receiver.start();
                             }
+                            else if (retryPolicyTemplate instanceof AsynchronousRetryTemplate)
+                            {
+                                //we must be running on a different thread
+                                String timeout = System.getProperty(MULE_CONTEXT_START_TIMEOUT_SYSTEM_PROPERTY, DEFAULT_CONTEXT_START_TIMEOUT);
+                                if(!muleContext.waitUntilStarted(Integer.valueOf(timeout)))
+                                {
+                                    String errorMessage = "Timeout waiting for mule context to be completely started.";
+                                    logger.error(errorMessage);
+                                    errors.add(new DefaultMuleException(errorMessage));
+                                }
+                                else
+                                {
+                                    receiver.start();
+                                }
+                            }
                         }
                         catch (MuleException e)
                         {
                             logger.error(e);
                             errors.add(e);
+                        }
+                        catch (InterruptedException e)
+                        {
+                            Thread.currentThread().interrupt();
+                            logger.error(e);
+                            errors.add(new DefaultMuleException(e));
                         }
 
                         if (!errors.isEmpty())
@@ -1601,57 +1627,14 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
                                     context.getLastFailure(), failed);
                         }
                     }
-                    doConnect();
-
-                    if (receivers != null)
-                    {
-                        for (MessageReceiver receiver : receivers.values())
-                        {
-                            final List<MuleException> errors = new ArrayList<MuleException>();
-                            try
-                            {
-                                if (logger.isDebugEnabled())
-                                {
-                                    logger.debug("Connecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
-                                }
-                                receiver.connect();
-                                if (isStarted())
-                                {
-                                    receiver.start();
-                                }
-                            }
-                            catch (MuleException e)
-                            {
-                                logger.error(e);
-                                errors.add(e);
-                            }
-
-                            if (!errors.isEmpty())
-                            {
-                                // throw the first one in order not to break the reconnection
-                                // strategy logic,
-                                // every exception has been logged above already
-                                // api needs refactoring to support the multi-cause exception
-                                // here
-                                throw errors.get(0);
-                            }
-                        }
-                    }
-
-                    setConnected(true);
-                    setConnecting(false);
-                    logger.info("Connected: " + getWorkDescription());
-
-                    if (startOnConnect && !isStarted() && !isStarting())
-                    {
-                        startAfterConnect();
-                    }
+                    connectConnectorAndReceivers();
                 }
                 finally
                 {
                     connectionLock.unlock();
                 }
             }
+
 
             @Override
             public String getWorkDescription()
@@ -1675,6 +1658,56 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
             retryPolicyTemplate.execute(callback, muleContext.getWorkManager());
         }
     }
+
+    protected void connectConnectorAndReceivers() throws Exception
+    {
+        doConnect();
+
+        if (receivers != null)
+        {
+            for (MessageReceiver receiver : receivers.values())
+            {
+                final List<MuleException> errors = new ArrayList<MuleException>();
+                try
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Connecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
+                    }
+                    receiver.connect();
+                    if (isStarted())
+                    {
+                        receiver.start();
+                    }
+                }
+                catch (MuleException e)
+                {
+                    logger.error(e);
+                    errors.add(e);
+                }
+
+                if (!errors.isEmpty())
+                {
+                    // throw the first one in order not to break the reconnection
+                    // strategy logic,
+                    // every exception has been logged above already
+                    // api needs refactoring to support the multi-cause exception
+                    // here
+                    throw errors.get(0);
+                }
+            }
+        }
+
+        setConnected(true);
+        setConnecting(false);
+        logger.info("Connected: " + getConnectionDescription());
+
+        if (startOnConnect && !isStarted() && !isStarting())
+        {
+            startAfterConnect();
+        }
+    }
+
 
     /**
      * Override this method to test whether the connector is able to connect to its
@@ -2671,14 +2704,13 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
             {
                 dispatcher = borrowDispatcher(endpoint);
                 boolean fireNotification = event.isNotificationsEnabled();
-                EndpointMessageNotification beginNotification = null;
                 if (fireNotification)
                 {
                     if (notificationMessageProcessor == null)
                     {
                         notificationMessageProcessor = new OutboundNotificationMessageProcessor(endpoint);
                     }
-                    beginNotification = notificationMessageProcessor.createBeginNotification(event);
+                    notificationMessageProcessor.dispatchNotification(notificationMessageProcessor.createBeginNotification(event), event);
                 }
                 MuleEvent result = dispatcher.process(event);
 
@@ -2686,7 +2718,6 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
                 {
                     // We need to invoke notification message processor with request
                     // message only after successful send/dispatch
-                    notificationMessageProcessor.dispatchNotification(beginNotification, event);
                     notificationMessageProcessor.process((result != null && !VoidMuleEvent.getInstance().equals(
                             result)) ? result : event);
                 }

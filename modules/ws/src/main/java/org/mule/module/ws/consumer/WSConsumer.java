@@ -34,9 +34,12 @@ import org.mule.module.ws.security.WSSecurity;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.util.Base64;
 import org.mule.util.IOUtils;
 
+import java.io.IOException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -66,6 +69,7 @@ import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 
 
 public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware, Disposable, NonBlockingMessageProcessor
@@ -353,9 +357,16 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         try
         {
             WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
-            wsdlDefinition = wsdlReader.readWSDL(url.toString());
+
+            URLConnection urlConnection = url.openConnection();
+            if (url.getUserInfo() != null)
+            {
+                urlConnection.setRequestProperty("Authorization", "Basic " + Base64.encodeBytes(url.getUserInfo().getBytes()));
+            }
+
+            wsdlDefinition = wsdlReader.readWSDL(url.toString(), new InputSource(urlConnection.getInputStream()));
         }
-        catch (WSDLException e)
+        catch (WSDLException | IOException e)
         {
             throw new InitialisationException(e, this);
         }

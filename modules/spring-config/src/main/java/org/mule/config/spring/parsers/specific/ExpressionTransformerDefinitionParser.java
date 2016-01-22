@@ -34,7 +34,7 @@ public class ExpressionTransformerDefinitionParser extends ParentContextDefiniti
         otherwise(new ExpressionTransformerChildDefinitionParser("messageProcessor", messageProcessor));
 
         registerPreProcessor(new CheckRequiredAttributesWhenNoChildren(new String[][]{{"expression"}},
-                "return-argument")).registerPreProcessor(
+                "return-argument", "http://www.mulesoft.org/schema/mule/core")).registerPreProcessor(
             new CheckExclusiveAttributesAndChildren(new String[]{"expression"},
                 new String[]{"return-argument"}))
             .addIgnored("expression");

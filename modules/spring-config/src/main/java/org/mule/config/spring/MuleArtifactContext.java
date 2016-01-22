@@ -195,8 +195,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     {
         XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
         // annotate parsed elements with metadata
-
-        beanDefinitionReader.setDocumentLoader(new MuleDocumentLoader());
+        beanDefinitionReader.setDocumentLoader(createLoader());
         // hook in our custom hierarchical reader
         beanDefinitionReader.setDocumentReaderClass(getBeanDefinitionDocumentReaderClass());
         // add error reporting
@@ -204,6 +203,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         registerAnnotationConfigProcessors(beanDefinitionReader.getRegistry(), null);
 
         return beanDefinitionReader;
+    }
+
+    protected MuleDocumentLoader createLoader()
+    {
+        return new MuleDocumentLoader();
     }
 
     private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, Object source)

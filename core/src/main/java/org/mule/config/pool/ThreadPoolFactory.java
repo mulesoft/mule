@@ -59,6 +59,7 @@ public abstract class ThreadPoolFactory implements MuleContextAware
         return threadPoolFactory;
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -66,5 +67,9 @@ public abstract class ThreadPoolFactory implements MuleContextAware
 
     public abstract ThreadPoolExecutor createPool(String name, ThreadingProfile tp);
 
+    /**
+     * By limitations of java's {@link ScheduledThreadPoolExecutor}, {@link ThreadingProfile#getMaxThreadsActive()} will
+     * be ignored and a fixed pool with {@link ThreadingProfile#getMaxThreadsIdle()} will be created.
+     */
     public abstract ScheduledThreadPoolExecutor createScheduledPool(String name, ThreadingProfile tp);
 }

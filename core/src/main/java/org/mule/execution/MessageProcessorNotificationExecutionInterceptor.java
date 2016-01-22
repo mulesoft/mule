@@ -92,10 +92,11 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
                     originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
                 }
             });
-            // Update RequestContext ThreadLocal for backwards compatibility
-            OptimizedRequestContext.unsafeSetEvent(eventToProcess);
-
         }
+        // Update RequestContext ThreadLocal in case if previous processor modified it
+        // also for backwards compatibility
+        OptimizedRequestContext.unsafeSetEvent(eventToProcess);
+
         try
         {
             if (next == null)

@@ -10,9 +10,10 @@ import static java.lang.Integer.MAX_VALUE;
 import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
-import org.mule.api.execution.CompletionHandler;
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -25,6 +26,7 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.debug.Debuggable;
 import org.mule.api.debug.FieldDebugInfo;
 import org.mule.api.debug.FieldDebugInfoFactory;
+import org.mule.api.execution.CompletionHandler;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
@@ -42,12 +44,16 @@ import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.processor.AbstractNonBlockingMessageProcessor;
 import org.mule.util.AttributeEvaluator;
+import org.mule.util.StringUtils;
 
 import com.google.common.collect.Lists;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor implements Initialisable, MuleContextAware, FlowConstructAware, Debuggable
@@ -56,6 +62,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
     public static final String DEFAULT_PAYLOAD_EXPRESSION = "#[payload]";
     public static final String DEFAULT_FOLLOW_REDIRECTS = "true";
+    private static final Logger logger = LoggerFactory.getLogger(DefaultHttpRequester.class);
 
     private static final int WAIT_FOR_EVER = MAX_VALUE;
 
@@ -67,13 +74,13 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     static final String PARSE_RESPONSE_DEBUG = "Parse Response";
     static final String RESPONSE_TIMEOUT_DEBUG = "Response Timeout";
     static final String USERNAME_DEBUG = "Username";
-    static final String NO_SECURITY_CONFIGURED = "No security configured";
     static final String SECURITY_DEBUG = "Security";
     static final String DOMAIN_DEBUG = "Domain";
     static final String PASSWORD_DEBUG = "Password";
     static final String WORKSTATION_DEBUG = "Workstation";
     static final String AUTHENTICATION_TYPE_DEBUG = "Authentication Type";
     static final String QUERY_PARAMS_DEBUG = "Query Params";
+    static final String REMOTELY_CLOSED = "Remotely closed";
 
     private DefaultHttpRequesterConfig requestConfig;
     private HttpRequesterRequestBuilder requestBuilder;
@@ -236,6 +243,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                                                                               resetMuleEventForNewThread(muleEvent),
                                                                                               exception,
                                                                                               DefaultHttpRequester.this);
+                                     checkIfRemotelyClosed(exception);
                                      completionHandler.onFailure(msgException);
                                  }
 
@@ -270,6 +278,10 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                      {
                                          completionHandler.onFailure(new MessagingException(resetMuleEventForNewThread(muleEvent), muleException, DefaultHttpRequester.this));
                                      }
+                                     finally
+                                     {
+                                         RequestContext.clear();
+                                     }
                                  }
 
                                  private MuleEvent resetMuleEventForNewThread(MuleEvent event)
@@ -281,6 +293,14 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                      return event;
                                  }
                              }, getWorkManager(muleEvent));
+    }
+
+    private void checkIfRemotelyClosed(Exception exception)
+    {
+        if (requestConfig.getTlsContext() != null && StringUtils.containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED))
+        {
+            logger.error("Remote host closed connection. Possible SSL/TLS handshake issue. Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=handshake for further debugging.");
+        }
     }
 
     private WorkManager getWorkManager(MuleEvent event)
@@ -310,6 +330,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         }
         catch (Exception e)
         {
+            checkIfRemotelyClosed(e);
             throw new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"), muleEvent, e, this);
         }
 

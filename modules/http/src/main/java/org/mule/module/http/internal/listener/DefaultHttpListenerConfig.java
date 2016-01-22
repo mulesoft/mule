@@ -19,6 +19,7 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.config.MutableThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpConstants;
@@ -183,6 +184,7 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
         }
         else
         {
+            LifecycleUtils.initialiseIfNeeded(tlsContext);
             server = connectionManager.createSslServer(serverAddress, createWorkManagerSource(), tlsContext, usePersistentConnections, connectionIdleTimeout);
         }
         initialised = true;

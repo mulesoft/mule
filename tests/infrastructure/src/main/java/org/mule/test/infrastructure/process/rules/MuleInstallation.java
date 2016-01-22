@@ -22,15 +22,15 @@ import org.apache.commons.io.FileUtils;
 import org.junit.rules.ExternalResource;
 
 /**
- * This is a JUnit rule to install Mule ESB during tests. Usage:
+ * This is a JUnit rule to install Mule Runtime during tests. Usage:
  *
  * <pre>
- * public static class MuleEsbInstallationTest {
+ * public static class MuleRuntimeInstallationTest {
  *  &#064;Rule
  *  public MuleInstallation installation = new MuleInstallation(&quot;/path/to/packed/distribution.zip&quot;);
  *
  *  &#064;Test
- *  public void usingMuleEsb() throws IOException {
+ *  public void usingMuleRuntime() throws IOException {
  *      String muleHomePath = installation.getMuleHome();
  *      MuleProcessController mule = new MuleProcessController(muleHomePath);
  *      mule.start();

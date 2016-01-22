@@ -9,6 +9,8 @@ package org.mule.test.config;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -41,7 +43,7 @@ import org.junit.Test;
 public class ExceptionHelperTestCase extends AbstractMuleTestCase
 {
     @Test
-    public void nestedExceptionRetreval() throws Exception
+    public void nestedExceptionRetrieval() throws Exception
     {
         Exception testException = getException();
         Throwable t = ExceptionHelper.getRootException(testException);
@@ -54,10 +56,12 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
         assertThat(t.getCause(), not(nullValue()));
 
         List<Throwable> l = ExceptionHelper.getExceptionsAsList(testException);
-        assertThat(l.size(), is(3));
+        assertThat(l, hasSize(3));
 
         Map<String, String> info = ExceptionHelper.getExceptionInfo(testException);
-        assertThat(info.size(), is(0));
+        assertThat(info.entrySet(), hasSize(2));
+        assertThat(info, hasEntry("info_1", "Imma in!"));
+        assertThat(info, hasEntry("info_2", "Imma out!"));
     }
 
     @Test
@@ -246,7 +250,15 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
 
     private Exception getException()
     {
-        return new DefaultMuleException(MessageFactory.createStaticMessage("foo"), new DefaultMuleException(
-            MessageFactory.createStaticMessage("bar"), new Exception("blah")));
+        DefaultMuleException innerMuleException = new DefaultMuleException(MessageFactory.createStaticMessage("bar"), new Exception("blah"));
+
+        innerMuleException.addInfo("info_1", "Imma in!");
+
+        DefaultMuleException outerMuleException = new DefaultMuleException(MessageFactory.createStaticMessage("foo"), innerMuleException);
+
+        outerMuleException.addInfo("info_1", "Imma out!");
+        outerMuleException.addInfo("info_2", "Imma out!");
+
+        return outerMuleException;
     }
 }

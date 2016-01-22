@@ -6,61 +6,37 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.mule.util.SystemUtils;
-
-import org.xml.sax.Attributes;
+import java.util.Map;
 
 /**
  * Stores the metadata annotations from the XML parser so they are available when building the actual objects of the
  * application.
  */
-public class XmlMetadataAnnotations
+public interface XmlMetadataAnnotations
 {
     public static final String METADATA_ANNOTATIONS_KEY = "metadataAnnotations";
     
-    private StringBuilder xmlContent = new StringBuilder();
-    private int lineNumber;
-
-    public XmlMetadataAnnotations(int lineNumber)
-    {
-        this.lineNumber = lineNumber;
-    }
-
     /**
      * Builds the opening tag of the xml element.
      * 
      * @param qName the qualified name of the element
-     * @param atts the attributes of the element
+     * @param atts the attributes of the element, with the qualified name as key
      */
-    public void appendElementStart(String qName, Attributes atts)
-    {
-        xmlContent.append("<" + qName);
-        for (int i = 0; i < atts.getLength(); ++i)
-        {
-            xmlContent.append(" " + atts.getQName(i) + "=\"" + atts.getValue(i) + "\"");
-        }
-        xmlContent.append(">");
-    }
+    void appendElementStart(String qName, Map<String, String> atts);
 
     /**
      * Adds the body of the xml tag.
      * 
      * @param elementBody the body content to be added
      */
-    public void appendElementBody(String elementBody)
-    {
-        xmlContent.append(elementBody);
-    }
+    void appendElementBody(String elementBody);
 
     /**
      * Builds the closing tag of the xml element.
      * 
      * @param qName the qualified name of the element
      */
-    public void appendElementEnd(String qName)
-    {
-        xmlContent.append("</" + qName + ">");
-    }
+    void appendElementEnd(String qName);
 
     /**
      * @return the reconstruction of the declaration of the element in its source xml file.
@@ -68,18 +44,10 @@ public class XmlMetadataAnnotations
      *         Note that the order of the elements may be different, and any implicit attributes with default values
      *         will be included.
      */
-    public String getElementString()
-    {
-        return xmlContent.toString()
-                         .replaceAll(">\\s+<+", ">" + SystemUtils.LINE_SEPARATOR + "<") /* compact whitespaces and line breaks */
-                         .trim();
-    }
+    String getElementString();
 
     /**
      * @return the line where the declaration of the element starts in its source xml file.
      */
-    public int getLineNumber()
-    {
-        return lineNumber;
-    }
+    int getLineNumber();
 }

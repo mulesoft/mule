@@ -347,4 +347,24 @@
                            namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false" soapVersion="1.2"/>
         <echo-component/>
     </flow>
+
+    <flow name="proxyOneWay">
+        <http:listener path="/proxyOneWay" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryOneWay.wsdl" port="EmployeeDirectoryPort"
+                           namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false"/>
+                           
+        <echo-component/>
+    </flow>
+
+    <flow name="proxyOneWayFault">
+        <http:listener path="/proxyOneWayFault" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryOneWay.wsdl" port="EmployeeDirectoryPort"
+                           namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false"/>
+                           
+        <script:component>
+            <script:script engine="groovy">
+                throw new RuntimeException("ERROR");
+            </script:script>
+        </script:component>
+    </flow>
 </mule>

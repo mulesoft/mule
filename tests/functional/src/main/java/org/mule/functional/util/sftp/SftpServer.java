@@ -6,19 +6,19 @@
  */
 package org.mule.functional.util.sftp;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.Security;
 import java.util.Arrays;
 
-import org.apache.sshd.SshServer;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.server.Command;
-import org.apache.sshd.server.PasswordAuthenticator;
+import org.apache.sshd.server.SshServer;
+import org.apache.sshd.server.auth.password.PasswordAuthenticator;
 import org.apache.sshd.server.command.ScpCommandFactory;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
-import org.apache.sshd.server.session.ServerSession;
-import org.apache.sshd.server.sftp.SftpSubsystem;
 import org.apache.sshd.server.shell.ProcessShellFactory;
+import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class SftpServer
@@ -33,27 +33,31 @@ public class SftpServer
     {
         this.port = port;
         configureSecurityProvider();
-        SftpSubsystem.Factory factory = createFtpSubsystemFactory();
+        SftpSubsystemFactory factory = createFtpSubsystemFactory();
         sshdServer = SshServer.setUpDefaultServer();
         configureSshdServer(factory, passwordAuthenticator());
     }
 
-    private void configureSshdServer(SftpSubsystem.Factory factory,
+    public void setPasswordAuthenticator(PasswordAuthenticator passwordAuthenticator)
+    {
+        sshdServer.setPasswordAuthenticator(passwordAuthenticator);
+    }
+
+    private void configureSshdServer(SftpSubsystemFactory factory,
                                      PasswordAuthenticator passwordAuthenticator)
     {
         sshdServer.setPort(port);
-        sshdServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("hostkey.ser"));
-        sshdServer.setSubsystemFactories(Arrays.<NamedFactory<Command>> asList(factory));
+        sshdServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(new File("hostkey.ser")));
+        sshdServer.setSubsystemFactories(Arrays.<NamedFactory<Command>>asList(factory));
         sshdServer.setCommandFactory(new ScpCommandFactory());
         sshdServer.setShellFactory(new ProcessShellFactory());
         sshdServer.setPasswordAuthenticator(passwordAuthenticator);
     }
 
-    private SftpSubsystem.Factory createFtpSubsystemFactory()
-    {
-        SftpSubsystem.Factory factory = new SftpSubsystem.Factory();
-        return factory;
-    }
+        private SftpSubsystemFactory createFtpSubsystemFactory()
+        {
+            return new SftpSubsystemFactory();
+        }
 
     private void configureSecurityProvider()
     {
@@ -62,15 +66,7 @@ public class SftpServer
 
     private static PasswordAuthenticator passwordAuthenticator()
     {
-        return new PasswordAuthenticator()
-        {
-
-            @Override
-            public boolean authenticate(String arg0, String arg1, ServerSession arg2)
-            {
-                return USERNAME.equals(arg0) && PASSWORD.equals(arg1);
-            }
-        };
+        return (arg0, arg1, arg2) -> USERNAME.equals(arg0) && PASSWORD.equals(arg1);
     }
 
     public void start()
@@ -89,13 +85,12 @@ public class SftpServer
     {
         try
         {
-            sshdServer.stop(true);
+            sshdServer.stop(false);
         }
-        catch (InterruptedException e)
+        catch (IOException e)
         {
             e.printStackTrace();
         }
         sshdServer = null;
     }
-
 }

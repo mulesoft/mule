@@ -75,5 +75,18 @@
         <test:assert expression="#[payload == 'bar-mutated']"/>
     </flow>
     
+    <flow name="scriptExpressionVariables">
+        <script:component>
+            <script:script engine="groovy">
+                <property key="expr1" value="#[flowVars.prop1]"/>
+                <property key="expr2" value="#[flowVars.prop2]"/>
+                <script:text>
+                        payload = expr1 + expr2
+                    </script:text>
+            </script:script>
+        </script:component>
+        <test:assert expression="#[payload == 'ReceivedA-OK']"/>
+    </flow>
+    
 </mule>
 

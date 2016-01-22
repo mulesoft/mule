@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.requester;
+package org.mule.test.integration.http;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -36,8 +36,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-
-public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase extends FunctionalTestCase
+public abstract class AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase extends FunctionalTestCase
 {
 
     private static final String CLIENT_CIPHER_SUITE_ENABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA256";
@@ -50,12 +49,6 @@ public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase extends Funct
     public DynamicPort httpsPort = new DynamicPort("httpsPort");
 
     private String body;
-
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-restricted-protocols-ciphers-config.xml";
-    }
 
     @BeforeClass
     public static void createTlsPropertiesFile() throws Exception
@@ -75,7 +68,7 @@ public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase extends Funct
 
     private static File getTlsPropertiesFile()
     {
-        String path = ClassUtils.getClassPathRoot(HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase.class).getPath();
+        String path = ClassUtils.getClassPathRoot(AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase.class).getPath();
         return new File(path, String.format(TlsConfiguration.PROPERTIES_FILE_PATTERN, TlsConfiguration.DEFAULT_SECURITY_MODEL));
     }
 

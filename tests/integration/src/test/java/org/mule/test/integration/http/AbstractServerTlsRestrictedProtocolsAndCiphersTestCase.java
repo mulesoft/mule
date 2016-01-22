@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.listener;
+package org.mule.test.integration.http;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -19,8 +19,6 @@ import java.io.PrintWriter;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.HandshakeCompletedEvent;
-import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSocket;
@@ -31,23 +29,17 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends FunctionalTestCase
+public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase extends FunctionalTestCase
 {
 
     @Rule
     public DynamicPort httpsPort = new DynamicPort("port");
 
-    private static final String SERVER_CIPHER_SUITE_ENABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
-    private static final String SERVER_CIPHER_SUITE_DISABLED = "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA";
+    private static final String SERVER_CIPHER_SUITE_ENABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA256";
+    private static final String SERVER_CIPHER_SUITE_DISABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
 
-    private static final String SERVER_PROTOCOL_ENABLED = "TLSv1";
-    private static final String SERVER_PROTOCOL_DISABLED = "SSLv3";
-
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-restricted-protocols-ciphers-config.xml";
-    }
+    private static final String SERVER_PROTOCOL_ENABLED = "TLSv1.2";
+    private static final String SERVER_PROTOCOL_DISABLED = "TLSv1";
 
     @BeforeClass
     public static void createTlsPropertiesFile() throws Exception
@@ -66,7 +58,7 @@ public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends Functi
 
     private static File getTlsPropertiesFile()
     {
-        String path = ClassUtils.getClassPathRoot(HttpListenerTlsRestrictedProtocolsAndCiphersTestCase.class).getPath();
+        String path = ClassUtils.getClassPathRoot(AbstractServerTlsRestrictedProtocolsAndCiphersTestCase.class).getPath();
         return new File(path, String.format(TlsConfiguration.PROPERTIES_FILE_PATTERN, TlsConfiguration.DEFAULT_SECURITY_MODEL));
     }
 
@@ -78,14 +70,7 @@ public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends Functi
         SSLSocket socket = createSocket(new String[] {SERVER_CIPHER_SUITE_ENABLED, SERVER_CIPHER_SUITE_DISABLED},
                                         new String[] {SERVER_PROTOCOL_ENABLED, SERVER_PROTOCOL_DISABLED});
 
-        socket.addHandshakeCompletedListener(new HandshakeCompletedListener()
-        {
-            @Override
-            public void handshakeCompleted(HandshakeCompletedEvent handshakeCompletedEvent)
-            {
-                latch.countDown();
-            }
-        });
+        socket.addHandshakeCompletedListener(handshakeCompletedEvent -> latch.countDown());
 
         socket.startHandshake();
 
@@ -117,6 +102,7 @@ public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends Functi
         DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
         tlsContextFactory.setTrustStorePath("trustStore");
         tlsContextFactory.setTrustStorePassword("mulepassword");
+        tlsContextFactory.initialise();
 
         SSLContext sslContext = tlsContextFactory.createSslContext();
         SSLSocketFactory socketFactory = sslContext.getSocketFactory();
@@ -127,4 +113,5 @@ public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends Functi
 
         return socket;
     }
+
 }

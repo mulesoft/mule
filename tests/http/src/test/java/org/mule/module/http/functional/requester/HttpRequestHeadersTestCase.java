@@ -18,6 +18,7 @@ import static org.mule.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
+
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -35,7 +36,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
 {
 
     @Rule
-    public SystemProperty host = new SystemProperty("host" , "localhost");
+    public SystemProperty host = new SystemProperty("host", "localhost");
     @Rule
     public SystemProperty encoding = new SystemProperty("encoding" , CHUNKED);
 

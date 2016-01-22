@@ -223,7 +223,8 @@ public class CheckRequiredAttributesTestCase extends AbstractPreProcessorTestCas
         assertOk(groups, "from id name type");
     }
 
-    protected PreProcessor createCheck(String[][] constraint)
+    @Override
+    protected PreProcessor createCheck(String[][] constraint, String elementName, String elementNamespaceUrl)
     {
         return new CheckRequiredAttributes(constraint);
     }

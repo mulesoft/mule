@@ -36,7 +36,7 @@ public abstract class AbstractAnnotatedObject implements AnnotatedObject
     }
 
     @Override
-    public synchronized final void setAnnotations(Map<QName, Object> newAnnotations)
+    public synchronized void setAnnotations(Map<QName, Object> newAnnotations)
     {
         annotations.clear();
         annotations.putAll(newAnnotations);

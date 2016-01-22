@@ -6,11 +6,13 @@
  */
 package org.mule.config.spring.handlers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertThat;
+import static org.mule.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 
-import org.mule.api.config.MuleProperties;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.Connector;
 import org.mule.retry.policies.SimpleRetryPolicyTemplate;
@@ -29,24 +31,24 @@ public class DefaultRetryPolicyTestCase extends FunctionalTestCase
     @Test
     public void testPolicyRegistration() throws Exception
     {
-        Object obj = muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
-        assertNotNull(obj);
-        assertTrue(obj.getClass().getName(), obj instanceof SimpleRetryPolicyTemplate);
-        assertEquals(3, ((SimpleRetryPolicyTemplate) obj).getCount());
+        Object obj = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
+        assertThat(obj, not(nullValue()));
+        assertThat(obj, instanceOf(SimpleRetryPolicyTemplate.class));
+        assertThat(((SimpleRetryPolicyTemplate) obj).getCount(), is(3));
     }
 
     @Test
     public void testConnectorPolicy() throws Exception
     {
         Connector c = muleContext.getRegistry().lookupConnector("testConnector");
-        assertNotNull(c);
+        assertThat(c, not(nullValue()));
 
         RetryPolicyTemplate rpf = c.getRetryPolicyTemplate();
-        assertNotNull(rpf);
-        assertTrue(rpf instanceof SimpleRetryPolicyTemplate);
-        assertEquals(3, ((SimpleRetryPolicyTemplate) rpf).getCount());
+        assertThat(rpf, not(nullValue()));
+        assertThat(rpf, instanceOf(SimpleRetryPolicyTemplate.class));
+        assertThat(((SimpleRetryPolicyTemplate) rpf).getCount(), is(3));
         
-        assertTrue(c.isConnected());
-        assertTrue(c.isStarted());
+        assertThat(c.isConnected(), is(true));
+        assertThat(c.isStarted(), is(true));
     }
 }
