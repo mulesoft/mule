@@ -325,6 +325,12 @@
         </foreach>
     </flow>
     
+    <flow name="mvel-error">
+        <foreach collection="#[invalid]">
+            <test:component/>
+        </foreach>
+    </flow>
+    
     <flow name="request-reply">
         <vm:inbound-endpoint path="input-22" exchange-pattern="request-response"/>
         <set-session-variable variableName="processedMessages" value="0"/>
