@@ -10,14 +10,17 @@ import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
-import org.mule.module.extension.file.api.FilePayload;
+import org.mule.module.extension.file.api.FileAttributes;
+import org.mule.module.extension.file.api.TreeNode;
 
 import java.io.File;
-import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -46,17 +49,35 @@ public class FileListTestCase extends FileConnectorTestCase
     @Test
     public void listNotRecursive() throws Exception
     {
-        List<FilePayload> list = doList(".", false);
-        assertThat(list, hasSize(6));
-        assertThat(assertListedFiles(list), is(true));
+        TreeNode node = doList(".", false);
+        List<TreeNode> childs = node.getChilds();
+
+        assertThat(childs, hasSize(6));
+        assertThat(assertListedFiles(childs), is(true));
     }
 
     @Test
     public void listRecursive() throws Exception
     {
-        List<FilePayload> list = doList(".", true);
-        assertThat(list, hasSize(8));
-        assertThat(assertListedFiles(list), is(true));
+        TreeNode node = doList(".", true);
+        assertRecursiveTreeNode(node);
+    }
+
+    private void assertRecursiveTreeNode(TreeNode node) throws Exception
+    {
+        List<TreeNode> childs = node.getChilds();
+
+        assertThat(childs, hasSize(6));
+        assertThat(assertListedFiles(childs), is(true));
+
+        List<TreeNode> subDirectories = childs.stream()
+                .filter(child -> child.getAttributes().isDirectory())
+                .collect(Collectors.toList());
+
+        assertThat(subDirectories, hasSize(1));
+        TreeNode subDirectory = subDirectories.get(0);
+        assertThat(subDirectory.getChilds(), hasSize(2));
+        assertThat(assertListedFiles(subDirectory.getChilds()), is(false));
     }
 
     @Test
@@ -76,56 +97,71 @@ public class FileListTestCase extends FileConnectorTestCase
     @Test
     public void listWithEmbeddedMatcher() throws Exception
     {
-        List<FilePayload> list = doList("listWithEmbeddedPredicate", ".", false);
-        assertThat(list, hasSize(2));
-        assertThat(assertListedFiles(list), is(false));
+        TreeNode node = doList("listWithEmbeddedPredicate", ".", false);
+        List<TreeNode> childs = node.getChilds();
+
+        assertThat(childs, hasSize(2));
+        assertThat(assertListedFiles(childs), is(false));
     }
 
     @Test
-    public void listWithGlobalMatcher() throws Exception {
-        List<FilePayload> list = doList("listWithGlobalMatcher", ".", true);
-        assertThat(list, hasSize(1));
-        FilePayload file = list.get(0);
+    public void listWithGlobalMatcher() throws Exception
+    {
+        TreeNode node = doList("listWithGlobalMatcher", ".", true);
+        List<TreeNode> childs = node.getChilds();
+
+        assertThat(childs, hasSize(1));
+
+        FileAttributes file = childs.get(0).getAttributes();
         assertThat(file.isDirectory(), is(true));
         assertThat(file.getName(), equalTo(SUB_DIRECTORY_NAME));
     }
 
-    private boolean assertListedFiles(List<FilePayload> list) throws IOException
+    private boolean assertListedFiles(List<TreeNode> nodes) throws Exception
     {
         boolean directoryWasFound = false;
 
-        for (FilePayload file : list)
+        for (TreeNode node : nodes)
         {
-            if (file.isDirectory())
+            FileAttributes attributes = node.getAttributes();
+            if (attributes.isDirectory())
             {
                 assertThat("two directories found", directoryWasFound, is(false));
                 directoryWasFound = true;
-                assertThat(file.getName(), equalTo(SUB_DIRECTORY_NAME));
+                assertThat(attributes.getName(), equalTo(SUB_DIRECTORY_NAME));
             }
             else
             {
-                assertThat(file.getName(), endsWith(".html"));
-                assertThat(IOUtils.toString(file.getContent()), equalTo(CONTENT));
-                assertThat(file.getSize(), is(new Long(CONTENT.length())));
+                assertThat(attributes.getName(), endsWith(".html"));
+                assertThat(IOUtils.toString(node.getContent()), equalTo(CONTENT));
+                assertThat(attributes.getSize(), is(new Long(CONTENT.length())));
             }
         }
 
         return directoryWasFound;
     }
 
-
-    private List<FilePayload> doList(String path, boolean recursive) throws Exception
+    private TreeNode doList(String path, boolean recursive) throws Exception
     {
         return doList("list", path, recursive);
     }
 
-    private List<FilePayload> doList(String flowName, String path, boolean recursive) throws Exception
+    private TreeNode doList(String flowName, String path, boolean recursive) throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("path", path);
-        event.setFlowVariable("recursive", recursive);
+        TreeNode node = (TreeNode) flowRunner(flowName)
+                .withFlowVariable("path", path)
+                .withFlowVariable("recursive", recursive)
+                .run().getMessage().getPayload();
 
-        return (List<FilePayload>) runFlow(flowName, event).getMessage().getPayload();
+        assertThat(node, is(notNullValue()));
+        assertThat(node.getContent(), is(nullValue()));
+
+        FileAttributes attributes = node.getAttributes();
+        assertThat(attributes.isDirectory(), is(true));
+        assertThat(attributes.getPath(), equalTo(Paths.get(temporaryFolder.getRoot().toURI()).resolve(path).toString()));
+        assertThat(attributes.isDirectory(), is(true));
+
+        return node;
     }
 
     private void createTestFiles() throws Exception

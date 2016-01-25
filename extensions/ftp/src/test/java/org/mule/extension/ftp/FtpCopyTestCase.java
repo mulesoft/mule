@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
 
 import java.nio.file.Paths;
 
@@ -171,13 +170,12 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
 
     private void doExecute(String target, boolean overwrite, boolean createParentFolder) throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable(SOURCE_DIRECTORY_NAME, sourcePath);
-        event.setFlowVariable("target", target);
-        event.setFlowVariable("overwrite", overwrite);
-        event.setFlowVariable("createParent", createParentFolder);
-
-        runFlow(getFlowName(), event);
+        flowRunner(getFlowName())
+                .withFlowVariable(SOURCE_DIRECTORY_NAME, sourcePath)
+                .withFlowVariable("target", target)
+                .withFlowVariable("overwrite", overwrite)
+                .withFlowVariable("createParent", createParentFolder)
+                .run();
     }
 
     protected void assertCopy(String target) throws Exception

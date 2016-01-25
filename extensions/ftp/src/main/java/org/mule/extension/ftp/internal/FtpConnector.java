@@ -6,7 +6,6 @@
  */
 package org.mule.extension.ftp.internal;
 
-import org.mule.api.MuleContext;
 import org.mule.api.connector.ConnectionManager;
 import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.Operations;
@@ -36,9 +35,6 @@ public class FtpConnector implements FileConnectorConfig
 
     @Inject
     private ConnectionManager connectionManager;
-
-    @Inject
-    private MuleContext muleContext;
 
     /**
      * The FTP server host, such as www.mulesoft.com, localhost, or 192.168.0.1, etc

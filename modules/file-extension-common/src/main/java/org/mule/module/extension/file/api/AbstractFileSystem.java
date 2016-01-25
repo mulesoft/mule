@@ -18,9 +18,11 @@ import org.mule.module.extension.file.api.command.MoveCommand;
 import org.mule.module.extension.file.api.command.ReadCommand;
 import org.mule.module.extension.file.api.command.RenameCommand;
 import org.mule.module.extension.file.api.command.WriteCommand;
+import org.mule.module.extension.file.api.lock.PathLock;
+import org.mule.transformer.types.DataTypeFactory;
 
+import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.function.Predicate;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -32,6 +34,7 @@ import javax.activation.MimetypesFileTypeMap;
  */
 public abstract class AbstractFileSystem implements FileSystem
 {
+
     private final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
 
     /**
@@ -78,16 +81,16 @@ public abstract class AbstractFileSystem implements FileSystem
      * {@inheritDoc}
      */
     @Override
-    public List<FilePayload> list(String directoryPath, boolean recursive, Predicate<FilePayload> matcher)
+    public TreeNode list(String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher)
     {
-        return getListCommand().list(directoryPath, recursive, matcher);
+        return getListCommand().list(directoryPath, recursive, message, matcher);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public MuleMessage read(MuleMessage message, String filePath, boolean lock)
+    public MuleMessage<InputStream, FileAttributes> read(MuleMessage<?, ?> message, String filePath, boolean lock)
     {
         return getReadCommand().read(message, filePath, lock);
     }
@@ -165,14 +168,15 @@ public abstract class AbstractFileSystem implements FileSystem
      * {@inheritDoc}
      */
     @Override
-    public DataType<FilePayload> updateDataType(DataType<FilePayload> dataType, FilePayload filePayload)
+    public DataType<InputStream> getFileMessageDataType(DataType<?> originalDataType, FileAttributes attributes)
     {
-        String presumedMimeType = mimetypesFileTypeMap.getContentType(filePayload.getPath());
-        if (presumedMimeType != null)
-        {
-            dataType.setMimeType(presumedMimeType);
-        }
-        return dataType;
+        DataType<InputStream> newDataType = DataTypeFactory.create(InputStream.class);
+        newDataType.setEncoding(originalDataType.getEncoding());
+
+        String presumedMimeType = mimetypesFileTypeMap.getContentType(attributes.getPath());
+        newDataType.setMimeType(presumedMimeType != null ? presumedMimeType : originalDataType.getMimeType());
+
+        return newDataType;
     }
 
     /**

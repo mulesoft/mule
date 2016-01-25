@@ -12,9 +12,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.transformer.types.MimeTypes.JSON;
 import org.mule.api.MuleEvent;
-import org.mule.module.extension.file.api.FilePayload;
-import org.mule.util.IOUtils;
+import org.mule.api.MuleMessage;
+import org.mule.module.extension.file.api.stream.AbstractFileInputStream;
+import org.mule.module.extension.file.api.FileAttributes;
 
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -42,21 +44,19 @@ public class FtpReadTestCase extends FtpConnectorTestCase
     @Test
     public void read() throws Exception
     {
-        MuleEvent response = readHelloWorld();
+        MuleMessage message = readHelloWorld().getMessage();
 
-        assertThat(response.getMessage().getDataType().getMimeType(), is(JSON));
+        assertThat(message.getDataType().getMimeType(), is(JSON));
 
-        FilePayload payload = (FilePayload) response.getMessage().getPayload();
+        AbstractFileInputStream payload = (AbstractFileInputStream) message.getPayload();
         assertThat(payload.isLocked(), is(false));
-        assertThat(IOUtils.toString(payload.getContent()), is(HELLO_WORLD));
+        assertThat(getPayloadAsString(message), is(HELLO_WORLD));
     }
 
     @Test
     public void readWithForcedMimeType() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("path", HELLO_PATH);
-        event = runFlow("readWithForcedMimeType", event);
+        MuleEvent event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
         assertThat(event.getMessage().getDataType().getMimeType(), equalTo("test/test"));
     }
 
@@ -77,34 +77,34 @@ public class FtpReadTestCase extends FtpConnectorTestCase
     @Test
     public void readLockReleasedOnContentConsumed() throws Exception
     {
-        FilePayload payload = readWithLock();
-        IOUtils.toString(payload.getContent());
+        MuleMessage message = readWithLock();
+        getPayloadAsString(message);
 
-        assertThat(payload.isLocked(), is(false));
+        assertThat(isLocked(message), is(false));
     }
 
     @Test
     public void readLockReleasedOnEarlyClose() throws Exception
     {
-        FilePayload payload = readWithLock();
-        payload.close();
+        MuleMessage message = readWithLock();
+        ((InputStream) message.getPayload()).close();
 
-        assertThat(payload.isLocked(), is(false));
+        assertThat(isLocked(message), is(false));
     }
 
     @Test
     public void getProperties() throws Exception
     {
-        FilePayload filePayload = (FilePayload) readHelloWorld().getMessage().getPayload();
+        FileAttributes fileAttributes = (FileAttributes) readHelloWorld().getMessage().getAttributes();
         FTPFile file = ftpClient.get(HELLO_PATH);
 
-        assertThat(filePayload.getName(), equalTo(file.getName()));
-        assertThat(filePayload.getPath(), equalTo(Paths.get("/", BASE_DIR, HELLO_PATH).toString()));
-        assertThat(filePayload.getSize(), is(file.getSize()));
-        assertTime(filePayload.getLastModifiedTime(), file.getTimestamp());
-        assertThat(filePayload.isDirectory(), is(false));
-        assertThat(filePayload.isSymbolicLink(), is(false));
-        assertThat(filePayload.isRegularFile(), is(true));
+        assertThat(fileAttributes.getName(), equalTo(file.getName()));
+        assertThat(fileAttributes.getPath(), equalTo(Paths.get("/", BASE_DIR, HELLO_PATH).toString()));
+        assertThat(fileAttributes.getSize(), is(file.getSize()));
+        assertTime(fileAttributes.getLastModifiedTime(), file.getTimestamp());
+        assertThat(fileAttributes.isDirectory(), is(false));
+        assertThat(fileAttributes.isSymbolicLink(), is(false));
+        assertThat(fileAttributes.isRegularFile(), is(true));
     }
 
     private void assertTime(LocalDateTime dateTime, Calendar calendar)
@@ -112,11 +112,11 @@ public class FtpReadTestCase extends FtpConnectorTestCase
         assertThat(dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), is(calendar.toInstant().toEpochMilli()));
     }
 
-    private FilePayload readWithLock() throws Exception
+    private MuleMessage readWithLock() throws Exception
     {
-        FilePayload payload = (FilePayload) runFlow("readWithLock").getMessage().getPayload();
-        assertThat(payload.isLocked(), is(true));
+        MuleMessage message = flowRunner("readWithLock").run().getMessage();
 
-        return payload;
+        assertThat(isLocked(message), is(true));
+        return message;
     }
 }

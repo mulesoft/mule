@@ -16,9 +16,9 @@ import org.mule.extension.file.internal.command.LocalReadCommand;
 import org.mule.extension.file.internal.command.LocalRenameCommand;
 import org.mule.extension.file.internal.command.LocalWriteCommand;
 import org.mule.extension.file.internal.lock.LocalPathLock;
-import org.mule.module.extension.file.api.FilePayload;
+import org.mule.module.extension.file.api.FileAttributes;
 import org.mule.module.extension.file.api.FileSystem;
-import org.mule.module.extension.file.api.PathLock;
+import org.mule.module.extension.file.api.lock.PathLock;
 import org.mule.module.extension.file.api.command.CopyCommand;
 import org.mule.module.extension.file.api.command.CreateDirectoryCommand;
 import org.mule.module.extension.file.api.command.DeleteCommand;
@@ -42,8 +42,8 @@ import java.nio.file.Path;
  * which produces file system level locks which rely on the host
  * operating system.
  * <p>
- * Also, for any method returning {@link FilePayload} instances,
- * instances of {@link LocalFilePayload} will be returned
+ * Also, for any method returning {@link FileAttributes} instances,
+ * a {@link LocalFileAttributes} will be used.
  *
  * @since 4.0
  */

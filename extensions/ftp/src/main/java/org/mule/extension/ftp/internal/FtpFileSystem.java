@@ -20,8 +20,6 @@ import org.mule.extension.ftp.internal.command.FtpReadCommand;
 import org.mule.extension.ftp.internal.command.FtpRenameCommand;
 import org.mule.extension.ftp.internal.command.FtpWriteCommand;
 import org.mule.module.extension.file.api.AbstractFileSystem;
-import org.mule.module.extension.file.api.PathLock;
-import org.mule.module.extension.file.api.URLPathLock;
 import org.mule.module.extension.file.api.command.CopyCommand;
 import org.mule.module.extension.file.api.command.CreateDirectoryCommand;
 import org.mule.module.extension.file.api.command.DeleteCommand;
@@ -30,6 +28,8 @@ import org.mule.module.extension.file.api.command.MoveCommand;
 import org.mule.module.extension.file.api.command.ReadCommand;
 import org.mule.module.extension.file.api.command.RenameCommand;
 import org.mule.module.extension.file.api.command.WriteCommand;
+import org.mule.module.extension.file.api.lock.PathLock;
+import org.mule.module.extension.file.api.lock.URLPathLock;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -191,10 +191,10 @@ public final class FtpFileSystem extends AbstractFileSystem
      * is closed in order for the underlying connection
      * to be closed.
      *
-     * @param filePayload a {@link FtpFilePayload} referencing to a FTP file
+     * @param filePayload a {@link FtpFileAttributes} referencing to a FTP file
      * @return an {@link InputStream}
      */
-    InputStream retrieveFileContent(FtpFilePayload filePayload)
+    InputStream retrieveFileContent(FtpFileAttributes filePayload)
     {
         try
         {

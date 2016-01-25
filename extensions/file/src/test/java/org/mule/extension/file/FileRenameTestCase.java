@@ -9,7 +9,6 @@ package org.mule.extension.file;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
 
 import java.io.File;
 
@@ -73,10 +72,9 @@ public class FileRenameTestCase extends FileConnectorTestCase
 
     private void doRename(String source) throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("path", source);
-        event.setFlowVariable("to", RENAME_TO);
-
-        runFlow("rename", event);
+        flowRunner("rename")
+                .withFlowVariable("path", source)
+                .withFlowVariable("to", RENAME_TO)
+                .run();
     }
 }

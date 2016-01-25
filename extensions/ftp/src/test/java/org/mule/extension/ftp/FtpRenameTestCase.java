@@ -9,7 +9,6 @@ package org.mule.extension.ftp;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
 
 import java.nio.file.Paths;
 
@@ -17,6 +16,7 @@ import org.junit.Test;
 
 public class FtpRenameTestCase extends FtpConnectorTestCase
 {
+
     private static final String RENAME_TO = "renamed";
 
     @Override
@@ -72,10 +72,9 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
 
     private void doRename(String source) throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("path", source);
-        event.setFlowVariable("to", RENAME_TO);
-
-        runFlow("rename", event);
+        flowRunner("rename")
+                .withFlowVariable("path", source)
+                .withFlowVariable("to", RENAME_TO)
+                .run();
     }
 }

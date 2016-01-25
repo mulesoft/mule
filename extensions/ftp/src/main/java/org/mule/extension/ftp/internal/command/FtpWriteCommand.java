@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import org.mule.api.MuleEvent;
 import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.extension.ftp.internal.FtpFileSystem;
-import org.mule.module.extension.file.api.FilePayload;
+import org.mule.module.extension.file.api.FileAttributes;
 import org.mule.module.extension.file.api.FileWriteMode;
 import org.mule.module.extension.file.api.command.WriteCommand;
 import org.mule.module.extension.file.api.FileContentWrapper;
@@ -44,7 +44,7 @@ public final class FtpWriteCommand extends FtpCommand implements WriteCommand
     public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event, boolean lock, boolean createParentDirectory)
     {
         Path path = resolvePath(filePath);
-        FilePayload file = getFile(filePath);
+        FileAttributes file = getFile(filePath);
 
         if (file == null)
         {
@@ -99,7 +99,7 @@ public final class FtpWriteCommand extends FtpCommand implements WriteCommand
             return;
         }
 
-        FilePayload parentFolder = getFile(parentFolderPath.toString());
+        FileAttributes parentFolder = getFile(parentFolderPath.toString());
         if (parentFolder == null)
         {
             if (createParentFolder)

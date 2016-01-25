@@ -10,10 +10,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import org.mule.api.MuleEvent;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.file.api.FileConnector;
-import org.mule.extension.file.api.LocalFilePayload;
+import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.module.extension.file.api.FileWriteMode;
+import org.mule.module.extension.file.api.stream.AbstractFileInputStream;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 
@@ -76,31 +78,32 @@ public abstract class FileConnectorTestCase extends ExtensionFunctionalTestCase
         return getPath(HELLO_PATH);
     }
 
-    protected LocalFilePayload readPath(String path) throws Exception
+    protected MuleMessage<AbstractFileInputStream, LocalFileAttributes> readPath(String path) throws Exception
     {
-        return (LocalFilePayload) getPath(path).getMessage().getPayload();
+        return getPath(path).getMessage().asNewMessage();
     }
 
     private MuleEvent getPath(String path) throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("path", path);
-        return runFlow("read", event);
+        return flowRunner("read")
+                .withFlowVariable("path", path)
+                .run();
     }
 
     protected String readPathAsString(String path) throws Exception
     {
-        return IOUtils.toString(readPath(path).getContent());
+        return IOUtils.toString(readPath(path).getPayload());
     }
 
     protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception
     {
-        MuleEvent event = getTestEvent(content);
-        event.setFlowVariable("path", path);
-        event.setFlowVariable("createParent", createParent);
-        event.setFlowVariable("mode", mode);
 
-        runFlow("write", event);
+        flowRunner("write")
+                .withFlowVariable("path", path)
+                .withFlowVariable("createParent", createParent)
+                .withFlowVariable("mode", mode)
+                .withPayload(content)
+                .run();
     }
 
     protected File createHelloWorldFile() throws IOException

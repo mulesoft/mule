@@ -14,11 +14,11 @@ import org.mule.api.MuleEvent;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
 import org.mule.module.extension.file.api.FileWriteMode;
-import org.mule.module.extension.file.api.PathLock;
+import org.mule.module.extension.file.api.lock.PathLock;
 import org.mule.module.extension.file.api.command.WriteCommand;
 import org.mule.module.extension.file.api.FileContentWrapper;
 import org.mule.module.extension.file.api.FileWriterVisitor;
-import org.mule.module.extension.file.api.NullPathLock;
+import org.mule.module.extension.file.api.lock.NullPathLock;
 
 import java.io.File;
 import java.io.IOException;

@@ -8,7 +8,6 @@ package org.mule.extension.ftp;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
 
 import org.junit.Test;
 
@@ -60,7 +59,8 @@ public class FtpDeleteTestCase extends FtpConnectorTestCase
     }
 
     @Test
-    public void deleteOnBaseDirParent() throws Exception {
+    public void deleteOnBaseDirParent() throws Exception
+    {
         doDelete("/" + BASE_DIR);
         ftpClient.changeWorkingDirectory("/");
         assertThat(ftpClient.getFileList(".").length, is(0));
@@ -68,9 +68,7 @@ public class FtpDeleteTestCase extends FtpConnectorTestCase
 
     private void doDelete(String path) throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("delete", path);
-        runFlow("delete", event);
+        flowRunner("delete").withFlowVariable("delete", path).run();
     }
 
     private void assertExists(boolean exists, String... paths) throws Exception

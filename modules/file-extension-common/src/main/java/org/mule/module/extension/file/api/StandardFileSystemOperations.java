@@ -18,7 +18,6 @@ import org.mule.transport.NullPayload;
 
 import java.io.InputStream;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Predicate;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -44,30 +43,33 @@ public class StandardFileSystemOperations
      *
      * @param directoryPath the path to the directory to be listed
      * @param recursive     whether to include the contents of sub-directories. Defaults to {@code false}
+     * @param message       the {@link MuleMessage} on which this operation was triggered
      * @param matcher       a matcher used to filter the output list
-     * @return a {@link List} of {@link FilePayload}. Might be empty but will never be null
+     * @return a {@link TreeNode} object representing the listed directory
      * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
      */
     @Operation
-    //TODO: MULE-9233
-    public List<FilePayload> list(@Connection FileSystem fileSystem,
-                                  @Optional String directoryPath,
-                                  @Optional(defaultValue = "false") boolean recursive,
-                                  @Optional FilePayloadPredicateBuilder matcher)
+    public TreeNode list(@Connection FileSystem fileSystem,
+                         @Optional String directoryPath,
+                         @Optional(defaultValue = "false") boolean recursive,
+                         MuleMessage<?, ?> message,
+                         @Optional FilePayloadPredicateBuilder matcher)
     {
-        return fileSystem.list(directoryPath, recursive, getPredicate(matcher));
+        return fileSystem.list(directoryPath, recursive, message, getPredicate(matcher));
     }
 
     /**
-     * Obtains the content and metadata of a file at a given path.
+     * Obtains the content and metadata of a file at a given path. The operation itself
+     * returns a {@link MuleMessage} which payload is a {@link InputStream} with the
+     * file's content, and the metadata is represent as a {@link FileAttributes} object
+     * that's placed as the message {@link MuleMessage#getAttributes() attributes}.
      * <p>
      * If the {@code lock} parameter is set to {@code true}, then a file system
-     * level lock will be placed on the file until the {@link InputStream} returned
-     * by the {@link FilePayload#getContent()} this operation returns is closed or
-     * fully consumed. Because the lock is actually provided by the host file system,
-     * its behavior might change depending on the mounted drive and the operation system
-     * on which mule is running. Take that into consideration before blindly relying on this
-     * lock.
+     * level lock will be placed on the file until the input stream this operation
+     * returns is closed or fully consumed. Because the lock is actually provided by
+     * the host file system, its behavior might change depending on the mounted drive
+     * and the operation system on which mule is running. Take that into consideration
+     * before blindly relying on this lock.
      * <p>
      * This method also makes a best effort to determine the mime type of the
      * file being read. A {@link MimetypesFileTypeMap} will be used to make an
@@ -75,20 +77,19 @@ public class StandardFileSystemOperations
      * the chance to force the output enconding and mimeType through the {@code outputEncoding}
      * and {@code outputMimeType} optional parameters.
      *
-     *
-     * @param fileSystem      a reference to the host {@link FileSystem}
-     * @param message         the incoming {@link MuleMessage}
-     * @param path            the path to the file to be read
-     * @param lock            whether or not to lock the file. Defaults to {@code false}
-     * @return a MuleMessage with the file's content and metadata on a {@link FilePayload} instance
+     * @param fileSystem a reference to the host {@link FileSystem}
+     * @param message    the incoming {@link MuleMessage}
+     * @param path       the path to the file to be read
+     * @param lock       whether or not to lock the file. Defaults to {@code false}
+     * @return the file's content and metadata on a {@link FileAttributes} instance
      * @throws IllegalArgumentException if the file at the given path doesn't exists
      */
     @Operation
     @DataTypeParameters
-    public MuleMessage read(@Connection FileSystem fileSystem,
-                            MuleMessage message,
-                            String path,
-                            @Optional(defaultValue = "false") boolean lock)
+    public MuleMessage<InputStream, FileAttributes> read(@Connection FileSystem fileSystem,
+                                                         MuleMessage<?, ?> message,
+                                                         String path,
+                                                         @Optional(defaultValue = "false") boolean lock)
     {
         return fileSystem.read(message, path, lock);
     }
@@ -266,7 +267,7 @@ public class StandardFileSystemOperations
         fileSystem.createDirectory(basePath, directoryName);
     }
 
-    private Predicate<FilePayload> getPredicate(FilePayloadPredicateBuilder builder)
+    private Predicate<FileAttributes> getPredicate(FilePayloadPredicateBuilder builder)
     {
         return builder != null ? builder.build() : new NullFilePayloadPredicate();
     }

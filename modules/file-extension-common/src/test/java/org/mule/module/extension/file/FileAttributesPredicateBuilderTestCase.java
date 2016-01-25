@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.module.extension.file.api.FilePayload;
+import org.mule.module.extension.file.api.FileAttributes;
 import org.mule.module.extension.file.api.FilePayloadPredicateBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class FilePayloadPredicateBuilderTestCase extends AbstractMuleTestCase
+public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
 {
 
     private static final String FILENAME = "Mule.java";
@@ -32,12 +32,12 @@ public class FilePayloadPredicateBuilderTestCase extends AbstractMuleTestCase
     private static final long SIZE = 1024;
 
     private FilePayloadPredicateBuilder builder = new FilePayloadPredicateBuilder();
-    private FilePayload payload;
+    private FileAttributes payload;
 
     @Before
     public void before()
     {
-        payload = mock(FilePayload.class);
+        payload = mock(FileAttributes.class);
         when(payload.getName()).thenReturn(FILENAME);
         when(payload.getPath()).thenReturn(PATH);
         when(payload.getCreationTime()).thenReturn(CREATION_TIME);

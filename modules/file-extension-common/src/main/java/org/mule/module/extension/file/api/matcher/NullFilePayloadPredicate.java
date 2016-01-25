@@ -6,24 +6,24 @@
  */
 package org.mule.module.extension.file.api.matcher;
 
-import org.mule.module.extension.file.api.FilePayload;
+import org.mule.module.extension.file.api.FileAttributes;
 
 import java.util.function.Predicate;
 
 /**
- * A {@link Predicate} of {@link FilePayload} instances which accepts
+ * A {@link Predicate} of {@link FileAttributes} instances which accepts
  * any value
  *
  * @since 4.0
  */
-public final class NullFilePayloadPredicate implements Predicate<FilePayload>
+public final class NullFilePayloadPredicate implements Predicate<FileAttributes>
 {
 
     /**
      * @return {@code true}
      */
     @Override
-    public boolean test(FilePayload filePayload)
+    public boolean test(FileAttributes fileAttributes)
     {
         return true;
     }

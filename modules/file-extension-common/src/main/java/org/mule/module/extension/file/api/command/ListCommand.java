@@ -6,10 +6,11 @@
  */
 package org.mule.module.extension.file.api.command;
 
-import org.mule.module.extension.file.api.FilePayload;
+import org.mule.api.temporary.MuleMessage;
+import org.mule.module.extension.file.api.FileAttributes;
 import org.mule.module.extension.file.api.FileSystem;
+import org.mule.module.extension.file.api.TreeNode;
 
-import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -21,13 +22,14 @@ public interface ListCommand
 {
 
     /**
-     * Lists files under the considerations of {@link FileSystem#list(String, boolean, Predicate)}
+     * Lists files under the considerations of {@link FileSystem#list(String, boolean, MuleMessage, Predicate)}
      *
      * @param directoryPath the path to the directory to be listed
      * @param recursive     whether to include the contents of sub-directories
-     * @param matcher       a {@link Predicate} of {@link FilePayload} used to filter the output list
-     * @return a {@link List} of {@link FilePayload}. Might be empty but will never be null
+     * @param message       the {@link MuleMessage} on which this operation was triggered
+     * @param matcher       a {@link Predicate} of {@link FileAttributes} used to filter the output list
+     * @return a {@link TreeNode} object representing the listed directory
      * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
      */
-    List<FilePayload> list(String directoryPath, boolean recursive, Predicate<FilePayload> matcher);
+    TreeNode list(String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher);
 }

@@ -13,7 +13,6 @@ import static org.mule.module.extension.file.api.FileWriteMode.APPEND;
 import static org.mule.module.extension.file.api.FileWriteMode.CREATE_NEW;
 import static org.mule.module.extension.file.api.FileWriteMode.OVERWRITE;
 import org.mule.module.extension.file.api.FileWriteMode;
-import org.mule.util.IOUtils;
 
 import java.nio.file.Paths;
 
@@ -116,7 +115,7 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
 
         doWrite(path, HELLO_WORLD, mode, true);
 
-        String content = IOUtils.toString(readPath(path).getContent());
+        String content = getPayloadAsString(readPath(path));
         assertThat(content, is(HELLO_WORLD));
     }
 
@@ -127,7 +126,7 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
         String path = Paths.get(ftpClient.getWorkingDirectory(), TEMP_DIRECTORY, "test.txt").toString();
         doWrite(path, HELLO_WORLD, mode, false);
 
-        String content = IOUtils.toString(readPath(path).getContent());
+        String content = getPayloadAsString(readPath(path));
         assertThat(content, is(HELLO_WORLD));
     }
 
@@ -144,6 +143,6 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
         ftpClient.putFile(filePath, ".", HELLO_WORLD);
 
         doWrite(filePath, HELLO_WORLD, mode, false);
-        return IOUtils.toString(readPath(filePath).getContent());
+        return getPayloadAsString(readPath(filePath));
     }
 }

@@ -9,7 +9,7 @@ package org.mule.extension.ftp.internal.command;
 import static java.lang.String.format;
 import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.extension.ftp.internal.FtpFileSystem;
-import org.mule.module.extension.file.api.FilePayload;
+import org.mule.module.extension.file.api.FileAttributes;
 import org.mule.module.extension.file.api.command.CreateDirectoryCommand;
 
 import java.nio.file.Paths;
@@ -44,7 +44,7 @@ public final class FtpCreateDirectoryCommand extends FtpCommand implements Creat
             changeWorkingDirectory(basePath);
         }
 
-        FilePayload targetFile = getFile(directoryName);
+        FileAttributes targetFile = getFile(directoryName);
 
         if (targetFile != null)
         {
