@@ -91,8 +91,11 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
         }
         catch (SQLException e)
         {
-            // Close all other streaming ResultSets that remain open from the current connection.
-            streamingResultSetCloser.closeResultSets(connection);
+            if (connection != null)
+            {
+                // Close all other streaming ResultSets that remain open from the current connection.
+                streamingResultSetCloser.closeResultSets(connection);
+            }
             throw new MessagingException(muleEvent, e);
         }
         finally
