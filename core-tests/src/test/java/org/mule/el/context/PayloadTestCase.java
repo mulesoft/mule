@@ -8,34 +8,55 @@ package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 public class PayloadTestCase extends AbstractELTestCase
 {
+    private MuleEvent event;
+    private MuleMessage message;
+
     public PayloadTestCase(Variant variant, String mvelOptimizer)
     {
         super(variant, mvelOptimizer);
     }
 
+    @Before
+    public void setup()
+    {
+        event = mock(MuleEvent.class);
+        message = mock(MuleMessage.class);
+        doAnswer(invocation -> {
+            message = (MuleMessage) invocation.getArguments()[0];
+            return null;
+        }).when(event).setMessage(any(MuleMessage.class));
+        when(event.getMessage()).thenAnswer(invocation -> message);
+        when(event.getMuleContext()).thenReturn(muleContext);
+    }
+
     @Test
     public void payload() throws Exception
     {
-        MuleMessage mockMessage = Mockito.mock(MuleMessage.class);
         Object payload = new Object();
-        Mockito.when(mockMessage.getPayload()).thenReturn(payload);
-        assertSame(payload, evaluate("payload", mockMessage));
+        Mockito.when(message.getPayload()).thenReturn(payload);
+        assertSame(payload, evaluate("payload", event));
     }
 
     @Test
     public void assignPayload() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        evaluate("payload = 'foo'", message);
+        message = new DefaultMuleMessage("", muleContext);
+        when(event.getMessage()).thenReturn(message);
+        evaluate("payload = 'foo'", event);
         assertEquals("foo", message.getPayload());
     }
 

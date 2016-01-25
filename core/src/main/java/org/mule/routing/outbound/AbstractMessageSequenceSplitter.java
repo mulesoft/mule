@@ -100,7 +100,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         {
             messageInfoMapping = originalEvent.getFlowConstruct().getMessageInfoMapping();
         }
-        String correlationId = messageInfoMapping.getCorrelationId(originalEvent.getMessage());
+        String correlationId = messageInfoMapping.getCorrelationId(originalEvent);
         List<MuleEvent> resultEvents = new ArrayList<MuleEvent>();
         int correlationSequence = 0;
         MessageSequence<?> messageSequence = seq;

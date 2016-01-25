@@ -6,7 +6,7 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -47,9 +47,9 @@ public class ObjectToXml extends AbstractXStreamTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
-        Object src = message.getPayload();
+        Object src = event.getMessage().getPayload();
         /*
          * If the MuleMessage source type has been registered that we can assume that
          * the whole message is to be serialised to Xml, not just the payload. This
@@ -58,7 +58,7 @@ public class ObjectToXml extends AbstractXStreamTransformer
          */
         if (this.isAcceptMuleMessage())
         {
-            src = message;
+            src = event.getMessage();
         }
         return this.getXStream().toXML(src);
     }

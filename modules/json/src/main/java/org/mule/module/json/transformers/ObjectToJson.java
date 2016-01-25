@@ -6,14 +6,11 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.json.filters.IsJsonFilter;
 import org.mule.transformer.types.DataTypeFactory;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -22,6 +19,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Converts a java object to a JSON encoded object that can be consumed by other languages such as
@@ -74,9 +74,9 @@ public class ObjectToJson extends AbstractJsonTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
-        Object src = message.getPayload();
+        Object src = event.getMessage().getPayload();
         if (src instanceof String && isJsonFilter.accept(src))
         {
             //Nothing to transform
@@ -84,13 +84,13 @@ public class ObjectToJson extends AbstractJsonTransformer
         }
 
         // Checks if there's an exception
-        if (message.getExceptionPayload() != null && this.isHandleException())
+        if (event.getMessage().getExceptionPayload() != null && this.isHandleException())
         {
             if (logger.isDebugEnabled())
             {
                 logger.debug("Found exception with null payload");
             }
-            src = this.getException(message.getExceptionPayload().getException());
+            src = this.getException(event.getMessage().getExceptionPayload().getException());
         }
 
         StringWriter writer = new StringWriter();

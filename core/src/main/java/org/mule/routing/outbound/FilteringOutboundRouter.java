@@ -74,7 +74,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
 
         try
         {
-            result = sendRequest(event, message, ep, true);
+            result = sendRequest(event, createEventToRoute(event, message), ep, true);
         }
         catch (RoutingException e)
         {

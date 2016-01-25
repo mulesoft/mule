@@ -8,7 +8,6 @@ package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -19,29 +18,36 @@ import org.mule.api.transport.PropertyScope;
 
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 public class VariablesTestCase extends AbstractELTestCase
 {
+    private MuleEvent event;
+
     public VariablesTestCase(Variant variant, String mvelOptimizer)
     {
         super(variant, mvelOptimizer);
     }
 
+    @Before
+    public void setup() throws Exception
+    {
+        event = getTestEvent("");
+    }
+
     @Test
     public void flowVariablesMap() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setProperty("foo", "bar", PropertyScope.INVOCATION);
-        assertTrue(evaluate("flowVars", message) instanceof Map);
+        event.getMessage().setProperty("foo", "bar", PropertyScope.INVOCATION);
+        assertTrue(evaluate("flowVars", event) instanceof Map);
     }
 
     @Test
     public void assignToFlowVariablesMap() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertImmutableVariable("flowVars='foo'", message);
+        assertImmutableVariable("flowVars='foo'", event);
     }
 
     @Test
@@ -51,7 +57,7 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
         event.setFlowVariable("foo", "bar");
-        assertEquals(event.getFlowVariable("foo"), evaluate("flowVars['foo']", message));
+        assertEquals(event.getFlowVariable("foo"), evaluate("flowVars['foo']", event));
     }
 
     @Test
@@ -61,7 +67,7 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
         event.setFlowVariable("foo", "bar_old");
-        evaluate("flowVars['foo']='bar'", message);
+        evaluate("flowVars['foo']='bar'", event);
         assertEquals("bar", event.getFlowVariable("foo"));
     }
 
@@ -71,7 +77,7 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
-        evaluate("flowVars['foo']='bar'", message);
+        evaluate("flowVars['foo']='bar'", event);
         assertEquals("bar", event.getFlowVariable("foo"));
     }
 
@@ -79,16 +85,15 @@ public class VariablesTestCase extends AbstractELTestCase
     public void sessionVariablesMap() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
-        new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow());
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow());
         message.setProperty("foo", "bar", PropertyScope.SESSION);
-        assertTrue(evaluate("sessionVars", message) instanceof Map);
+        assertTrue(evaluate("sessionVars", event) instanceof Map);
     }
 
     @Test
     public void assignToSessionVariablesMap() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertImmutableVariable("sessionVars='foo'", message);
+        assertImmutableVariable("sessionVars='foo'", event);
     }
 
     @Test
@@ -98,7 +103,7 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
         event.getSession().setProperty("foo", "bar");
-        assertEquals(event.getSession().getProperty("foo"), evaluate("sessionVars['foo']", message));
+        assertEquals(event.getSession().getProperty("foo"), evaluate("sessionVars['foo']", event));
     }
 
     @Test
@@ -108,7 +113,7 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
         event.getSession().setProperty("foo", "bar_old");
-        evaluate("sessionVars['foo']='bar'", message);
+        evaluate("sessionVars['foo']='bar'", event);
         assertEquals("bar", event.getSession().getProperty("foo"));
     }
 
@@ -118,7 +123,7 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
-        evaluate("sessionVars['foo']='bar'", message);
+        evaluate("sessionVars['foo']='bar'", event);
         assertEquals("bar", event.getSession().getProperty("foo"));
     }
 
@@ -130,7 +135,7 @@ public class VariablesTestCase extends AbstractELTestCase
             Mockito.mock(FlowConstruct.class));
         event.setFlowVariable("foo", "bar");
         event.getSession().setProperty("foo", "NOTbar");
-        assertEquals(event.getFlowVariable("foo"), evaluate("foo", message));
+        assertEquals(event.getFlowVariable("foo"), evaluate("foo", event));
     }
 
     @Test
@@ -140,7 +145,7 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
         event.setFlowVariable("foo", "bar");
-        assertEquals("bar_new", evaluate("foo='bar_new'", message));
+        assertEquals("bar_new", evaluate("foo='bar_new'", event));
     }
 
     @Test
@@ -150,7 +155,7 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
         event.getSession().setProperty("foo", "bar");
-        assertEquals(event.getSession().getProperty("foo"), evaluate("foo", message));
+        assertEquals(event.getSession().getProperty("foo"), evaluate("foo", event));
     }
 
     @Test
@@ -160,7 +165,7 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
         event.getSession().setProperty("foo", "bar");
-        assertEquals("bar_new", evaluate("foo='bar_new'", message));
+        assertEquals("bar_new", evaluate("foo='bar_new'", event));
     }
 
     @Test
@@ -170,7 +175,7 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
         event.setFlowVariable("foo", "bar_old");
-        evaluate("foo='bar'", message);
+        evaluate("foo='bar'", event);
         assertEquals("bar", event.getFlowVariable("foo"));
     }
 
@@ -180,7 +185,7 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
-        evaluate("localVar='bar'", message);
+        evaluate("localVar='bar'", event);
     }
 
     /**
@@ -192,7 +197,7 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
-        evaluate("localVar='bar';localVar='bar2'", message);
+        evaluate("localVar='bar';localVar='bar2'", event);
     }
 
     @Test
@@ -201,6 +206,6 @@ public class VariablesTestCase extends AbstractELTestCase
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
             Mockito.mock(FlowConstruct.class));
-        assertEquals("bar", evaluate("localVar='bar';localVar", message));
+        assertEquals("bar", evaluate("localVar='bar';localVar", event));
     }
 }

@@ -62,6 +62,12 @@ public class DefaultMuleEventContext implements MuleEventContext
         return event.getMessage();
     }
 
+    @Override
+    public MuleEvent getEvent()
+    {
+        return event;
+    }
+
     /**
      * Returns the message transformed into its recognised or expected format. The
      * transformer used is the one configured on the endpoint through which this

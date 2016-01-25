@@ -7,8 +7,7 @@
 package org.mule.test.el;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -41,21 +40,21 @@ public class ExpressionLanguageConfigTestCase extends FunctionalTestCase
     public void testExpressionLanguageImport()
     {
         assertEquals(Locale.class, el.evaluate("loc"));
-        assertEquals(Locale.class, em.evaluate("loc", (MuleMessage) null));
+        assertEquals(Locale.class, em.evaluate("loc", null));
     }
 
     @Test
     public void testExpressionLanguageImportNoName()
     {
         assertEquals(DateFormat.class, el.evaluate("DateFormat"));
-        assertEquals(DateFormat.class, em.evaluate("DateFormat", (MuleMessage) null));
+        assertEquals(DateFormat.class, em.evaluate("DateFormat", null));
     }
 
     @Test
     public void testExpressionLanguageAlias()
     {
         assertEquals(muleContext.getConfiguration().getId(), el.evaluate("appName"));
-        assertEquals(muleContext.getConfiguration().getId(), em.evaluate("appName", (MuleMessage) null));
+        assertEquals(muleContext.getConfiguration().getId(), em.evaluate("appName", null));
     }
 
     @Test
@@ -65,14 +64,14 @@ public class ExpressionLanguageConfigTestCase extends FunctionalTestCase
         // function definition file is being used (otherwise hiOTHER' would be returned
 
         assertEquals("hi", el.evaluate("echo('hi')"));
-        assertEquals("hi", em.evaluate("echo('hi')", (MuleMessage) null));
+        assertEquals("hi", em.evaluate("echo('hi')", null));
     }
 
     @Test
     public void testExpressionLanguageGlobalFunctionFromFile()
     {
         assertEquals("hi", el.evaluate("echo2('hi')"));
-        assertEquals("hi", em.evaluate("echo2('hi')", (MuleMessage) null));
+        assertEquals("hi", em.evaluate("echo2('hi')", null));
     }
 
     @Test
@@ -80,23 +79,23 @@ public class ExpressionLanguageConfigTestCase extends FunctionalTestCase
     {
         assertEquals("Hello " + muleContext.getConfiguration().getId() + "!", el.evaluate("hello()"));
         assertEquals("Hello " + muleContext.getConfiguration().getId() + "!",
-            em.evaluate("hello()", (MuleMessage) null));
+            em.evaluate("hello()", null));
     }
 
     @Test
-    public void testExpressionLanguageGlobalFunctionUsingMessageContext()
+    public void testExpressionLanguageGlobalFunctionUsingMessageContext() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("123", muleContext);
-        assertEquals("123appended", el.evaluate("appendPayload()", message));
-        assertEquals("123appended", em.evaluate("appendPayload()", message));
+        MuleEvent event = getTestEvent("123");
+        assertEquals("123appended", el.evaluate("appendPayload()", event));
+        assertEquals("123appended", em.evaluate("appendPayload()", event));
     }
 
     @Test
-    public void testExpressionLanguageGlobalFunctionUsingMessageContextAndImport()
+    public void testExpressionLanguageGlobalFunctionUsingMessageContextAndImport() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("123", muleContext);
-        assertEquals("321", el.evaluate("reversePayload()", message));
-        assertEquals("321", em.evaluate("reversePayload()", message));
+        MuleEvent event = getTestEvent("123");
+        assertEquals("321", el.evaluate("reversePayload()", event));
+        assertEquals("321", em.evaluate("reversePayload()", event));
     }
 
     @Test

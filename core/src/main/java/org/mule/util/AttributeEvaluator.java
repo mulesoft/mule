@@ -7,7 +7,6 @@
 package org.mule.util;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.config.i18n.CoreMessages;
@@ -83,31 +82,15 @@ public class AttributeEvaluator
         return attributeType.equals(AttributeType.PARSE_EXPRESSION);
     }
 
-    public Object resolveValue(MuleMessage message)
+    public TypedValue resolveTypedValue(MuleEvent event)
     {
         if (isExpression())
         {
-            return expressionManager.evaluate(attributeValue, message);
+            return expressionManager.evaluateTyped(attributeValue, event);
         }
         else if (isParseExpression())
         {
-            return expressionManager.parse(attributeValue, message);
-        }
-        else
-        {
-            return attributeValue;
-        }
-    }
-
-    public TypedValue resolveTypedValue(MuleMessage message)
-    {
-        if (isExpression())
-        {
-            return expressionManager.evaluateTyped(attributeValue, message);
-        }
-        else if (isParseExpression())
-        {
-            final String value = expressionManager.parse(attributeValue, message);
+            final String value = expressionManager.parse(attributeValue, event);
             return new TypedValue(value, DataTypeFactory.create(String.class, null));
         }
         else

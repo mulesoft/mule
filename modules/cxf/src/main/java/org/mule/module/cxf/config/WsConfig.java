@@ -63,7 +63,7 @@ public class WsConfig
                     {
                         AttributeEvaluator evaluator = new AttributeEvaluator((String)entry.getValue());
                         evaluator.initialize(message.getMuleContext().getExpressionManager());
-                        evaluatedMap.put(entry.getKey(), evaluator.resolveValue(message));
+                        evaluatedMap.put(entry.getKey(), evaluator.resolveValue(event));
                     }
                     else
                     {

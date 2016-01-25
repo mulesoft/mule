@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
@@ -36,6 +37,7 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase
 
     private SetPayloadTransformer setPayloadTransformer;
     private MuleContext mockMuleContext;
+    private MuleEvent mockMuleEvent;
     private MuleMessage mockMuleMessage;
     private ExpressionManager mockExpressionManager;
 
@@ -46,10 +48,12 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase
         mockMuleContext = mock(MuleContext.class);
         setPayloadTransformer.setMuleContext(mockMuleContext);
         mockExpressionManager = mock(ExpressionManager.class);
+        mockMuleEvent = mock(MuleEvent.class);
         mockMuleMessage = mock(MuleMessage.class);
 
+        when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
         when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-        Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleMessage.class))).thenAnswer(
+        Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(
             new Answer<String>()
             {
                 @Override
@@ -67,7 +71,7 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase
         setPayloadTransformer.setValue(null);
         setPayloadTransformer.initialise();
 
-        Object response = setPayloadTransformer.transformMessage(mockMuleMessage, "UTF-8");
+        Object response = setPayloadTransformer.transformMessage(mockMuleEvent, "UTF-8");
         assertTrue(response instanceof NullPayload);
     }
 
@@ -79,7 +83,7 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase
 
         when(mockExpressionManager.isExpression(PLAIN_TEXT)).thenReturn(false);
 
-        Object response = setPayloadTransformer.transformMessage(mockMuleMessage, "UTF-8");
+        Object response = setPayloadTransformer.transformMessage(mockMuleEvent, "UTF-8");
         assertEquals(PLAIN_TEXT, response);
     }
 
@@ -89,9 +93,9 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase
         setPayloadTransformer.setValue(EXPRESSION);
         when(mockExpressionManager.isExpression(EXPRESSION)).thenReturn(true);
         setPayloadTransformer.initialise();
-        when(mockExpressionManager.evaluate(EXPRESSION, mockMuleMessage)).thenReturn(PLAIN_TEXT);
+        when(mockExpressionManager.evaluate(EXPRESSION, mockMuleEvent)).thenReturn(PLAIN_TEXT);
 
-        Object response = setPayloadTransformer.transformMessage(mockMuleMessage, "UTF-8");
+        Object response = setPayloadTransformer.transformMessage(mockMuleEvent, "UTF-8");
         assertEquals(PLAIN_TEXT, response);
     }
 

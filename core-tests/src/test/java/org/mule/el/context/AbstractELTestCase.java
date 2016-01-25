@@ -8,9 +8,7 @@ package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
@@ -60,20 +58,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
             case EVALUATOR_LANGUAGE :
                 return expressionLanguage.evaluate(expression);
             case EXPRESSION_MANAGER :
-                return muleContext.getExpressionManager().evaluate(expression, (MuleMessage) null);
-        }
-        return null;
-    }
-
-    @SuppressWarnings("deprecation")
-    protected Object evaluate(String expression, MuleMessage message)
-    {
-        switch (variant)
-        {
-            case EVALUATOR_LANGUAGE :
-                return expressionLanguage.evaluate(expression, message);
-            case EXPRESSION_MANAGER :
-                return muleContext.getExpressionManager().evaluate(expression, message);
+                return muleContext.getExpressionManager().evaluate(expression, null);
         }
         return null;
     }
@@ -126,11 +111,11 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
         }
     }
 
-    protected void assertUnsupportedOperation(String expression, MuleMessage message)
+    protected void assertUnsupportedOperation(String expression, MuleEvent event)
     {
         try
         {
-            evaluate(expression, message);
+            evaluate(expression, event);
             fail("ExpressionRuntimeException expected");
         }
         catch (ExpressionRuntimeException e)
@@ -144,19 +129,6 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
         try
         {
             evaluate(expression);
-            fail("ExpressionRuntimeException expected");
-        }
-        catch (ExpressionRuntimeException e)
-        {
-            assertEquals(ImmutableElementException.class, ExceptionUtils.getRootCause(e).getClass());
-        }
-    }
-
-    protected void assertImmutableVariable(String expression, MuleMessage message)
-    {
-        try
-        {
-            evaluate(expression, message);
             fail("ExpressionRuntimeException expected");
         }
         catch (ExpressionRuntimeException e)
@@ -183,19 +155,6 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase
         try
         {
             evaluate(expression);
-            fail("ExpressionRuntimeException expected");
-        }
-        catch (ExpressionRuntimeException e)
-        {
-            assertEquals(PropertyAccessException.class, ExceptionUtils.getRootCause(e).getClass());
-        }
-    }
-
-    protected void assertFinalProperty(String expression, MuleMessage message)
-    {
-        try
-        {
-            evaluate(expression, message);
             fail("ExpressionRuntimeException expected");
         }
         catch (ExpressionRuntimeException e)

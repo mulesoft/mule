@@ -7,7 +7,6 @@
 package org.mule.module.xml.transformer;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transport.OutputHandler;
 import org.mule.module.xml.util.XMLUtils;
@@ -45,9 +44,9 @@ public class XmlToOutputHandler extends AbstractXmlTransformer implements Discov
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, final String encoding)
+    public Object transformMessage(MuleEvent event, final String encoding)
     {
-        final Object src = message.getPayload();
+        final Object src = event.getMessage().getPayload();
         return new OutputHandler()
         {
             public void write(MuleEvent event, OutputStream out) throws IOException

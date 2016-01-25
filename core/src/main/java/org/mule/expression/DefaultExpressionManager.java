@@ -14,7 +14,6 @@ import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
-import org.mule.api.expression.RequiredValueException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
@@ -56,72 +55,18 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         this.muleContext = context;
     }
 
-    /**
-     * Evaluates the given expression. The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For
-     * situations where one or more expressions need to be parsed within a single text, the
-     * {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)} method
-     * should be used since it will iterate through all expressions in a string.
-     * 
-     * @param expression a single expression i.e. xpath://foo
-     * @param message the current message to process. The expression will evaluata on the message.
-     * @return the result of the evaluation. Expressions that return collection will return an empty
-     *         collection, not null.
-     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression
-     *             and 'failIfNull is set to true.
-     */
-    public Object evaluate(String expression, MuleMessage message) throws ExpressionRuntimeException
-    {
-        return evaluate(expression, message, false);
-    }
-
+    @Override
     public Object evaluate(String expression, MuleEvent event) throws ExpressionRuntimeException
     {
         return evaluate(expression, event, false);
     }
 
-    /**
-     * Evaluates the given expression. The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For
-     * situations where one or more expressions need to be parsed within a single text, the
-     * {@link org.mule.api.expression.ExpressionManager#parse(String,org.mule.api.MuleMessage,boolean)} method
-     * should be used since it will iterate through all expressions in a string.
-     * 
-     * @param expression a single expression i.e. xpath://foo
-     * @param event the current message to process. The expression will evaluata on the message.
-     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or
-     *            returns null.
-     * @return the result of the evaluation. Expressions that return collection will return an empty
-     *         collection, not null.
-     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression
-     *             and 'failIfNull is set to true.
-     */
+    @Override
     public Object evaluate(String expression, MuleEvent event, boolean failIfNull)
         throws ExpressionRuntimeException
     {
         expression = removeExpressionMarker(expression);
         return expressionLanguage.evaluate(expression, event);
-    }
-
-    public Object evaluate(String expression, MuleMessage message, boolean failIfNull)
-    {
-        expression = removeExpressionMarker(expression);
-        return expressionLanguage.evaluate(expression, message);
-    }
-
-    public void enrich(String expression, MuleMessage message, Object object)
-        throws ExpressionRuntimeException
-    {
-        expression = removeExpressionMarker(expression);
-        expressionLanguage.evaluate(createEnrichmentExpression(expression), message,
-                                    Collections.singletonMap(OBJECT_FOR_ENRICHMENT, object));
-    }
-
-    @Override
-    public void enrichTyped(String expression, MuleMessage message, TypedValue object)
-    {
-        expression = removeExpressionMarker(expression);
-        expressionLanguage.enrich(createEnrichmentExpression(expression), message, object);
     }
 
     @Override
@@ -133,25 +78,11 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
                                     Collections.singletonMap(OBJECT_FOR_ENRICHMENT, object));
     }
 
-    public boolean evaluateBoolean(String expression, MuleMessage message) throws ExpressionRuntimeException
+    @Override
+    public void enrichTyped(String expression, MuleEvent event, TypedValue object)
     {
-        return evaluateBoolean(expression, message, false, false);
-    }
-
-    public boolean evaluateBoolean(String expression,
-                                   MuleMessage message,
-                                   boolean nullReturnsTrue,
-                                   boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException
-    {
-        try
-        {
-            return resolveBoolean(evaluate(expression, message, false), nullReturnsTrue,
-                nonBooleanReturnsTrue, expression);
-        }
-        catch (RequiredValueException e)
-        {
-            return nullReturnsTrue;
-        }
+        expression = removeExpressionMarker(expression);
+        expressionLanguage.enrich(createEnrichmentExpression(expression), event, object);
     }
 
     @Override
@@ -200,61 +131,10 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         }
     }
 
-    /**
-     * Evaluates expressions in a given string. This method will iterate through each expression and evaluate
-     * it. If a user needs to evaluate a single expression they can use
-     * {@link org.mule.api.expression.ExpressionManager#evaluate(String,org.mule.api.MuleMessage,boolean)}.
-     * 
-     * @param expression a single expression i.e. xpath://foo
-     * @param message the current message to process. The expression will evaluata on the message.
-     * @return the result of the evaluation. Expressions that return collection will return an empty
-     *         collection, not null.
-     * @throws org.mule.api.expression.ExpressionRuntimeException if the expression is invalid, or a null is
-     *             found for the expression and 'failIfNull is set to true.
-     */
-    public String parse(String expression, MuleMessage message) throws ExpressionRuntimeException
-    {
-        return parse(expression, message, false);
-    }
-
     @Override
     public String parse(String expression, MuleEvent event) throws ExpressionRuntimeException
     {
         return parse(expression, event, false);
-    }
-
-    /**
-     * Evaluates expressions in a given string. This method will iterate through each expression and evaluate
-     * it. If a user needs to evaluate a single expression they can use
-     * {@link org.mule.api.expression.ExpressionManager#evaluate(String,org.mule.api.MuleMessage,boolean)}.
-     * 
-     * @param expression a single expression i.e. xpath://foo
-     * @param message the current message to process. The expression will evaluata on the message.
-     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or
-     *            returns null.
-     * @return the result of the evaluation. Expressions that return collection will return an empty
-     *         collection, not null.
-     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression
-     *             and 'failIfNull is set to true.
-     */
-    public String parse(final String expression, final MuleMessage message, final boolean failIfNull)
-        throws ExpressionRuntimeException
-    {
-        return parser.parse(new TemplateParser.TemplateCallback()
-        {
-            public Object match(String token)
-            {
-                Object result = evaluate(token, message, failIfNull);
-                if (result instanceof MuleMessage)
-                {
-                    return ((MuleMessage) result).getPayload();
-                }
-                else
-                {
-                    return result;
-                }
-            }
-        }, expression);
     }
 
     @Override
@@ -278,25 +158,20 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         }, expression);
     }
 
-    public boolean isExpression(String string)
+    @Override
+    public TypedValue evaluateTyped(String expression, MuleEvent event)
     {
-        return (string.contains(DEFAULT_EXPRESSION_PREFIX));
+        expression = removeExpressionMarker(expression);
+        return expressionLanguage.evaluateTyped(expression, event);
     }
 
     @Override
-    public TypedValue evaluateTyped(String expression, MuleMessage message)
+    public boolean isExpression(String expression)
     {
-        expression = removeExpressionMarker(expression);
-        return expressionLanguage.evaluateTyped(expression, message);
+        return (expression.contains(DEFAULT_EXPRESSION_PREFIX));
     }
 
-    /**
-     * Determines if the expression is valid or not. This method will validate a single expression or
-     * expressions embedded in a string. the expression must be well formed i.e. #[bean:user]
-     * 
-     * @param expression the expression to validate
-     * @return true if the expression evaluator is recognised
-     */
+    @Override
     public boolean isValidExpression(String expression)
     {
         try
@@ -311,6 +186,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         }
     }
 
+    @Override
     public void validateExpression(String expression) throws InvalidExpressionException
     {
         if (!muleContext.getConfiguration().isValidateExpressions())

@@ -6,7 +6,7 @@
  */
 package org.mule.transformer.simple;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -37,11 +37,11 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
         try
         {
-            Object keyValue = nameEvaluator.resolveValue(message);
+            Object keyValue = nameEvaluator.resolveValue(event);
             if (keyValue == null)
             {
                 logger.error("Setting Null attachment key is not supported, this entry is being ignored");
@@ -49,7 +49,7 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
             else
             {
                 String key = keyValue.toString();
-                Object value = valueEvaluator.resolveValue(message);
+                Object value = valueEvaluator.resolveValue(event);
                 if (value == null)
                 {
                     logger.error(MessageFormat.format(
@@ -58,12 +58,12 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
                 }
                 else
                 {
-                    String contentType = contentTypeEvaluator.resolveValue(message).toString();
-                    message.addOutboundAttachment(key,value,contentType);
+                    String contentType = contentTypeEvaluator.resolveValue(event).toString();
+                    event.getMessage().addOutboundAttachment(key,value,contentType);
                 }
             }
             
-            return message;
+            return event.getMessage();
         }
         catch (Exception e)
         {

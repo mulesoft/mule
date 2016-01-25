@@ -10,7 +10,6 @@ import static org.mule.expression.DefaultExpressionManager.OBJECT_FOR_ENRICHMENT
 import static org.mule.expression.DefaultExpressionManager.removeExpressionMarker;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.el.ExpressionLanguage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
@@ -19,8 +18,8 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DataType;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.el.mvel.datatype.MvelEnricherDataTypePropagator;
 import org.mule.el.mvel.datatype.MvelDataTypeResolver;
+import org.mule.el.mvel.datatype.MvelEnricherDataTypePropagator;
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ast.Function;
@@ -145,6 +144,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     @Override
     public <T> T evaluate(String expression, MuleEvent event, Map<String, Object> vars)
     {
+        if (event == null)
+        {
+            return evaluate(expression, vars);
+        }
         MVELExpressionLanguageContext context = createExpressionLanguageContext();
         if (vars != null)
         {
@@ -164,54 +167,25 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     }
 
     @Override
-    @Deprecated
-    public <T> T evaluate(String expression, MuleMessage message)
+    public void enrich(String expression, MuleEvent event, TypedValue typedValue)
     {
-        return evaluate(expression, message, null);
-    }
-
-    @Override
-    @Deprecated
-    public <T> T evaluate(String expression, MuleMessage message, Map<String, Object> vars)
-    {
-        MVELExpressionLanguageContext context = createExpressionLanguageContext();
-        if (vars != null)
-        {
-            context.setNextFactory(new CachedMapVariableResolverFactory(vars,
-                new DelegateVariableResolverFactory(staticContext, new MessageVariableResolverFactory(
-                    parserConfiguration, muleContext, message, new DelegateVariableResolverFactory(
-                        globalContext, createVariableVariableResolverFactory(message))))));
-        }
-        else
-        {
-            context.setNextFactory(new DelegateVariableResolverFactory(staticContext,
-                new MessageVariableResolverFactory(parserConfiguration, muleContext, message,
-                    new DelegateVariableResolverFactory(globalContext,
-                        createVariableVariableResolverFactory(message)))));
-        }
-        return evaluateInternal(expression, context);
-    }
-
-    @Override
-    public void enrich(String expression, MuleMessage message, TypedValue typedValue)
-    {
-        evaluate(expression, message, Collections.singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
+        evaluate(expression, event, Collections.singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
 
         expression = removeExpressionMarker(expression);
 
         final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
 
-        dataTypePropagator.propagate(typedValue, message, compiledExpression);
+        dataTypePropagator.propagate(typedValue, event.getMessage(), compiledExpression);
     }
 
     @Override
-    public TypedValue evaluateTyped(String expression, MuleMessage message)
+    public TypedValue evaluateTyped(String expression, MuleEvent event)
     {
         expression = removeExpressionMarker(expression);
 
-        final Object value = evaluate(expression, message);
+        final Object value = evaluate(expression, event);
         final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
-        final DataType dataType = dataTypeResolver.resolve(value, message, compiledExpression);
+        final DataType dataType = dataTypeResolver.resolve(value, event.getMessage(), compiledExpression);
 
         return new TypedValue(value, dataType);
     }
@@ -367,19 +341,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         }
     }
 
-    @Deprecated
-    protected VariableResolverFactory createVariableVariableResolverFactory(MuleMessage message)
-    {
-        if (autoResolveVariables)
-        {
-            return new VariableVariableResolverFactory(parserConfiguration, muleContext, message);
-        }
-        else
-        {
-            return new NullVariableResolverFactory();
-        }
-    }
-
     public Map<String, String> getAliases()
     {
         return aliases;
@@ -394,5 +355,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     {
         return parserConfiguration;
     }
+
+
 
 }

@@ -6,7 +6,7 @@
  */
 package org.mule.transformer.simple;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -20,8 +20,8 @@ public class MuleMessageToByteArray extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding)
+    public Object transformMessage(MuleEvent event, String outputEncoding)
     {
-        return muleContext.getObjectSerializer().serialize(message);
+        return muleContext.getObjectSerializer().serialize(event.getMessage());
     }
 }

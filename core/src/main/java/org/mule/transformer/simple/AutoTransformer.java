@@ -6,8 +6,8 @@
  */
 package org.mule.transformer.simple;
 
+import org.mule.api.MuleEvent;
 import org.mule.transformer.AbstractMessageTransformer;
-import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
@@ -39,8 +39,8 @@ public class AutoTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
-        return muleContext.getTransformationService().transform(message, DataTypeFactory.create(getReturnDataType().getType())).getPayload();
+        return muleContext.getTransformationService().transform(event.getMessage(), DataTypeFactory.create(getReturnDataType().getType())).getPayload();
     }
 }

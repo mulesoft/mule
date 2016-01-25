@@ -33,7 +33,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
     {
         MuleMessage message = event.getMessage();
 
-        String correlationId = event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(message);
+        String correlationId = event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(event);
 
         List<MuleEvent> results = new ArrayList<MuleEvent>();
         int correlationSequence = 1;
@@ -81,13 +81,15 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
                     sendMessage.setCorrelationSequence(correlationSequence++);
                 }
 
+                MuleEvent toRoute = createEventToRoute(event, message);
+
                 if (part.getEndpoint().getExchangePattern().hasResponse())
                 {
-                    results.add(sendRequest(event, sendMessage, part.getEndpoint(), true));
+                    results.add(sendRequest(event, toRoute, part.getEndpoint(), true));
                 }
                 else
                 {
-                    sendRequest(event, sendMessage, part.getEndpoint(), false);
+                    sendRequest(event, toRoute, part.getEndpoint(), false);
                 }
             }
             catch (MuleException e)

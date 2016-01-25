@@ -10,8 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.expression.ExpressionConfig;
@@ -21,7 +20,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import groovyjarjarasm.asm.ClassWriter;
 import groovyjarjarasm.asm.Opcodes;
-
 import org.junit.Test;
 
 public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase
@@ -65,8 +63,8 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase
         argument.setMuleContext(muleContext);
         transformer.addArgument(argument);
 
-        MuleMessage message = new DefaultMuleMessage("Test", muleContext);
-        Object result = transformer.transformMessage(message, null);
+        MuleEvent event = getTestEvent("Test");
+        Object result = transformer.transformMessage(event, null);
         assertTrue(result instanceof MuleMessage);
         MuleMessage transformedMessage = (MuleMessage) result;
 

@@ -25,7 +25,7 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
                                         MuleContext muleContext,
                                         MuleEvent event)
     {
-        super(parserConfiguration, muleContext, event.getMessage());
+        super(parserConfiguration, muleContext, event);
         this.event = event;
     }
 

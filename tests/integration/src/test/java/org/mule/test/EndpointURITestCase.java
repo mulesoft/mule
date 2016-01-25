@@ -8,13 +8,16 @@ package org.mule.test;
 
 import static org.junit.Assert.assertEquals;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.construct.Flow;
 import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -55,13 +58,14 @@ public class EndpointURITestCase extends AbstractMuleContextTestCase
         private String uri;
         private boolean isDynamic;
         private String resultUri;
-        private MuleMessage message;
+        private MuleEvent event;
         {
             Map<String, Object> inbound = new HashMap<String, Object>();
             inbound.put("prop1", "apple");
             inbound.put("prop2", "orange");
             inbound.put("prop3", "banana");
-            message = new DefaultMuleMessage("Hello, world", inbound, null, null, muleContext);
+            MuleMessage message = new DefaultMuleMessage("Hello, world", inbound, null, null, muleContext);
+            event = new DefaultMuleEvent(message,  MessageExchangePattern.ONE_WAY, new Flow("", muleContext));
         }
 
         public EndpointUri(String uri, String resultUri)
@@ -92,7 +96,7 @@ public class EndpointURITestCase extends AbstractMuleContextTestCase
             String epUri;
             if (ep instanceof DynamicOutboundEndpoint)
             {
-                epUri = muleContext.getExpressionManager().parse(ep.getAddress(), message, true);
+                epUri = muleContext.getExpressionManager().parse(ep.getAddress(), event, true);
             }
             else
             {

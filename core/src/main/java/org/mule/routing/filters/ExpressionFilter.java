@@ -8,13 +8,19 @@ package org.mule.routing.filters;
 
 import static org.mule.util.ClassUtils.equal;
 import static org.mule.util.ClassUtils.hash;
+import org.mule.DefaultMuleEvent;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.routing.filter.Filter;
+import org.mule.construct.Flow;
 import org.mule.expression.ExpressionConfig;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -95,8 +101,21 @@ public class ExpressionFilter implements Filter, MuleContextAware
         try
         {
             Thread.currentThread().setContextClassLoader(expressionEvaluationClassLoader);
-            return muleContext.getExpressionManager().evaluateBoolean(expr, message, nullReturnsTrue,
-                !nullReturnsTrue);
+
+            // TODO MULE-9341 Remove Filters. Expression filter will be replaced by something that uses MuleEvent.
+            // For now conserve the flowVars manually to allow tests to continue to pass.
+            Map<String, Object> flowVars = new HashMap<>();
+            for (String var: message.getInvocationPropertyNames())
+            {
+                flowVars.put(var, message.getInvocationProperty(var));
+            }
+            MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, new Flow("", muleContext));
+            for (Map.Entry<String, Object> var: flowVars.entrySet())
+            {
+                event.setFlowVariable(var.getKey(), var.getValue());
+            }
+
+            return muleContext.getExpressionManager().evaluateBoolean(expr, event, nullReturnsTrue, !nullReturnsTrue);
         }
         finally
         {

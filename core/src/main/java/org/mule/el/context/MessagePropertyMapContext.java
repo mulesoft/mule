@@ -6,7 +6,7 @@
  */
 package org.mule.el.context;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 
@@ -16,12 +16,12 @@ import java.util.Set;
 
 public class MessagePropertyMapContext extends AbstractMapContext<String, Object>
 {
-    private MuleMessage message;
+    private MuleEvent event;
     private PropertyScope propertyScope;
 
-    public MessagePropertyMapContext(MuleMessage message, PropertyScope propertyScope)
+    public MessagePropertyMapContext(MuleEvent event, PropertyScope propertyScope)
     {
-        this.message = message;
+        this.event = event;
         this.propertyScope = propertyScope;
     }
 
@@ -32,7 +32,7 @@ public class MessagePropertyMapContext extends AbstractMapContext<String, Object
         {
             return null;
         }
-        return message.getProperty((String) key, propertyScope);
+        return event.getMessage().getProperty((String) key, propertyScope);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class MessagePropertyMapContext extends AbstractMapContext<String, Object
         else
         {
             Object previousValue = get(key);
-            message.setProperty(key, value, propertyScope);
+            event.getMessage().setProperty(key, value, propertyScope);
             return previousValue;
         }
     }
@@ -66,14 +66,14 @@ public class MessagePropertyMapContext extends AbstractMapContext<String, Object
         }
         else
         {
-            return message.removeProperty((String) key, propertyScope);
+            return event.getMessage().removeProperty((String) key, propertyScope);
         }
     }
 
     @Override
     public Set<String> keySet()
     {
-        return message.getPropertyNames(propertyScope);
+        return event.getMessage().getPropertyNames(propertyScope);
     }
 
     @Override
@@ -84,16 +84,16 @@ public class MessagePropertyMapContext extends AbstractMapContext<String, Object
             throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable()
                 .getMessage());
         }
-        message.clearProperties(propertyScope);
+        event.getMessage().clearProperties(propertyScope);
     }
 
     @Override
     public String toString()
     {
         Map<String, Object> map = new HashMap<String, Object>();
-        for (String key : message.getPropertyNames(propertyScope))
+        for (String key : event.getMessage().getPropertyNames(propertyScope))
         {
-            Object value = message.getProperty(key, propertyScope);
+            Object value = event.getMessage().getProperty(key, propertyScope);
             map.put(key, value);
         }
         return map.toString();

@@ -181,7 +181,6 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
     {
         int argSize = argumentTemplates != null ? argumentTemplates.size() : 0;
         Object[] args = new Object[argSize];
-        MuleMessage message = event.getMessage();
         try
         {
             for (int i = 0; i < args.length; i++)
@@ -189,7 +188,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
                 Object argumentTemplate = argumentTemplates.get(i);
                 if (argumentTemplate != null)
                 {
-                    args[i] = transformArgument(evaluateExpressionCandidate(argumentTemplate, message),
+                    args[i] = transformArgument(evaluateExpressionCandidate(argumentTemplate, event),
                         argumentTypes[i]);
                 }
             }
@@ -202,7 +201,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
     }
 
     @SuppressWarnings("unchecked")
-    protected Object evaluateExpressionCandidate(Object expressionCandidate, MuleMessage message)
+    protected Object evaluateExpressionCandidate(Object expressionCandidate, MuleEvent event)
         throws TransformerException
     {
         if (expressionCandidate instanceof Collection<?>)
@@ -211,7 +210,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
             Collection<Object> newCollection = new ArrayList<Object>();
             for (Object object : collectionTemplate)
             {
-                newCollection.add(evaluateExpressionCandidate(object, message));
+                newCollection.add(evaluateExpressionCandidate(object, event));
             }
             return newCollection;
         }
@@ -221,8 +220,8 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
             Map<Object, Object> newMap = new HashMap<Object, Object>();
             for (Entry<Object, Object> entry : mapTemplate.entrySet())
             {
-                newMap.put(evaluateExpressionCandidate(entry.getKey(), message), evaluateExpressionCandidate(
-                    entry.getValue(), message));
+                newMap.put(evaluateExpressionCandidate(entry.getKey(), event), evaluateExpressionCandidate(
+                    entry.getValue(), event));
             }
             return newMap;
         }
@@ -232,7 +231,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
             Object[] newArray = new String[stringArrayTemplate.length];
             for (int j = 0; j < stringArrayTemplate.length; j++)
             {
-                newArray[j] = evaluateExpressionCandidate(stringArrayTemplate[j], message);
+                newArray[j] = evaluateExpressionCandidate(stringArrayTemplate[j], event);
             }
             return newArray;
         }
@@ -246,11 +245,11 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
             if (expression.startsWith(patternInfo.getPrefix())
                 && expression.endsWith(patternInfo.getSuffix()))
             {
-                arg = expressionManager.evaluate(expression, message);
+                arg = expressionManager.evaluate(expression, event);
             }
             else
             {
-                arg = expressionManager.parse(expression, message);
+                arg = expressionManager.parse(expression, event);
             }
 
             // If expression evaluates to a MuleMessage then use it's payload

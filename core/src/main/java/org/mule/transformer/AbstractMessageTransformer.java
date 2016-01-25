@@ -6,19 +6,25 @@
  */
 package org.mule.transformer;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <code>AbstractMessageTransformer</code> is a transformer that has a reference
@@ -118,6 +124,12 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
         {
             message = (MuleMessage) src;
         }
+        // TODO MULE-9342 Clean up transformer vs message transformer confusion
+        else if (src instanceof MuleEvent)
+        {
+            event = (MuleEvent) src;
+            message = event.getMessage();
+        }
         else if (muleContext.getConfiguration().isAutoWrapMessageAwareTransform())
         {
             message = new DefaultMuleMessage(src, muleContext);
@@ -129,16 +141,27 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
                 throw new TransformerMessagingException(CoreMessages.noCurrentEventForTransformer(), event, this);
             }
             message = event.getMessage();
-            if (!message.getPayload().equals(src))
-            {
-                throw new IllegalStateException("Transform payload does not match current event");
-            }
         }
 
         Object result;
+        // TODO MULE-9342 Clean up transformer vs message transformer confusion
+        if (event == null)
+        {
+            Map<String, Object> flowVars = new HashMap<>();
+            for (String var: message.getInvocationPropertyNames())
+            {
+                flowVars.put(var, message.getInvocationProperty(var));
+            }
+            event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, new DefaultLocalMuleClient
+                    .MuleClientFlowConstruct(muleContext));
+            for (Map.Entry<String, Object> var: flowVars.entrySet())
+            {
+                event.setFlowVariable(var.getKey(), var.getValue());
+            }
+        }
         try
         {
-            result = transformMessage(message, enc);
+            result = transformMessage(event, enc);
         }
         catch (TransformerException e)
         {
@@ -194,5 +217,5 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     /**
      * Transform the message
      */
-    public abstract Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException;
+    public abstract Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException;
 }

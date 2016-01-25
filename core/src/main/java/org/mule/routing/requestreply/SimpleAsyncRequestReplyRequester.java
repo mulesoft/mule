@@ -38,8 +38,7 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
         event.getMessage().setReplyTo(getReplyTo());
         event.getMessage().setOutboundProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY,
             event.getFlowConstruct().getName());
-        String correlation = event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(
-            event.getMessage());
+        String correlation = event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(event);
         event.getMessage().setCorrelationId(correlation);
     }
 

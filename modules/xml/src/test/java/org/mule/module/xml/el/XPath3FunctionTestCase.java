@@ -186,7 +186,7 @@ public class XPath3FunctionTestCase extends AbstractELTestCase
         RequestContext.setEvent(event);
         try
         {
-            return evaluate(expression, event.getMessage());
+            return evaluate(expression, event);
         }
         finally
         {

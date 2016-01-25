@@ -164,7 +164,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     public MuleEvent process(MuleEvent event) throws RoutingException
     {
         // the correlationId of the event's message
-        final String groupId = messageInfoMapping.getCorrelationId(event.getMessage());
+        final String groupId = messageInfoMapping.getCorrelationId(event);
 
         if (logger.isTraceEnabled())
         {

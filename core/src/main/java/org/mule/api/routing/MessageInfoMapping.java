@@ -6,7 +6,7 @@
  */
 package org.mule.api.routing;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 
 /**
  * This mapping us used by routers to control how Important message information is pulled from the current
@@ -15,7 +15,7 @@ import org.mule.api.MuleMessage;
  */
 public interface MessageInfoMapping
 {
-    String getMessageId(MuleMessage message);
+    String getMessageId(MuleEvent event);
 
-    String getCorrelationId(MuleMessage message);
+    String getCorrelationId(MuleEvent event);
 }

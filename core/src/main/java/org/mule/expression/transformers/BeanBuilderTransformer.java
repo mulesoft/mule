@@ -6,7 +6,7 @@
  */
 package org.mule.expression.transformers;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.RequiredValueException;
@@ -80,7 +80,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
         Object bean;
         try
@@ -100,7 +100,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
             Object value = null;
             try
             {
-                value = argument.evaluate(message);
+                value = argument.evaluate(event);
             }
             catch (RequiredValueException e)
             {

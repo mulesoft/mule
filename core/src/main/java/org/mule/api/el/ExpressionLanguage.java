@@ -7,7 +7,6 @@
 package org.mule.api.el;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.transformer.types.TypedValue;
@@ -95,29 +94,14 @@ public interface ExpressionLanguage
     void validate(String expression) throws InvalidExpressionException;
 
     /**
-     * Required to provide gradual migration to use of MuleEvent signatures
-     * 
-     * @see ExpressionLanguage#evaluate(String, MuleEvent)
-     */
-    @Deprecated
-    <T> T evaluate(String expression, MuleMessage message);
-
-    /**
-     * Required to provide gradual migration to use of MuleEvent signatures
-     * 
-     * @see ExpressionLanguage#evaluate(String, MuleEvent)
-     */
-    @Deprecated
-    <T> T evaluate(String expression, MuleMessage message, Map<String, Object> vars);
-
-    /**
      * Enriches a message
      *
      * @param expression a single expression i.e. header://foo that defines how the message should be enriched
-     * @param message The message to be enriched
+     * @param event The event to be enriched
      * @param value The typed value used for enrichment
      */
-    void enrich(String expression, MuleMessage message, TypedValue value);
+    void enrich(String expression, MuleEvent event, TypedValue value);
 
-    TypedValue evaluateTyped(String expression, MuleMessage message);
+    TypedValue evaluateTyped(String expression, MuleEvent event);
+
 }

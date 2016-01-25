@@ -6,6 +6,7 @@
  */
 package org.mule.module.xml.transformer;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
@@ -149,8 +150,9 @@ public class XsltTransformer extends AbstractXmlTransformer
      * @return The result in the type specified by the user
      */
     @Override
-    public Object transformMessage(MuleMessage message, String putputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String putputEncoding) throws TransformerException
     {
+        MuleMessage message = event.getMessage();
         Object src = message.getPayload();
         try
         {
@@ -172,10 +174,10 @@ public class XsltTransformer extends AbstractXmlTransformer
             // as it is the most efficient.
             if (holder == null || DelayedResult.class.equals(returnType.getType()))
             {
-                return getDelayedResult(message, putputEncoding, sourceDoc);
+                return getDelayedResult(event, putputEncoding, sourceDoc);
             }
 
-            doTransform(message, putputEncoding, sourceDoc, holder.getResult());
+            doTransform(event, putputEncoding, sourceDoc, holder.getResult());
 
             return holder.getResultObject();
         }
@@ -185,7 +187,7 @@ public class XsltTransformer extends AbstractXmlTransformer
         }
     }
 
-    protected Object getDelayedResult(final MuleMessage message, final String outputEncoding, final Source sourceDoc)
+    protected Object getDelayedResult(final MuleEvent event, final String outputEncoding, final Source sourceDoc)
     {
         return new DelayedResult()
         {
@@ -194,7 +196,7 @@ public class XsltTransformer extends AbstractXmlTransformer
             @Override
             public void write(Result result) throws Exception
             {
-                doTransform(message, outputEncoding, sourceDoc, result);
+                doTransform(event, outputEncoding, sourceDoc, result);
             }
 
             @Override
@@ -211,7 +213,7 @@ public class XsltTransformer extends AbstractXmlTransformer
         };
     }
 
-    protected void doTransform(MuleMessage message, String outputEncoding, Source sourceDoc, Result result)
+    protected void doTransform(MuleEvent event, String outputEncoding, Source sourceDoc, Result result)
             throws Exception
     {
         DefaultErrorListener errorListener = new DefaultErrorListener(this);
@@ -230,7 +232,7 @@ public class XsltTransformer extends AbstractXmlTransformer
                 for (Entry<String, Object> parameter : contextProperties.entrySet())
                 {
                     String key = parameter.getKey();
-                    transformer.setParameter(key, evaluateTransformParameter(key, parameter.getValue(), message));
+                    transformer.setParameter(key, evaluateTransformParameter(key, parameter.getValue(), event));
                 }
             }
 
@@ -494,14 +496,14 @@ public class XsltTransformer extends AbstractXmlTransformer
      * @return the object to be set as the parameter value
      * @throws TransformerException
      */
-    protected Object evaluateTransformParameter(String key, Object value, MuleMessage message) throws TransformerException
+    protected Object evaluateTransformParameter(String key, Object value, MuleEvent event) throws TransformerException
     {
         if (value instanceof String)
         {
             String stringValue = (String) value;
             if (muleContext.getExpressionManager().isExpression(stringValue))
             {
-                return muleContext.getExpressionManager().evaluate(stringValue, message);
+                return muleContext.getExpressionManager().evaluate(stringValue, event);
             }
         }
 

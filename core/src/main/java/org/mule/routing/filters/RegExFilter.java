@@ -7,6 +7,8 @@
 package org.mule.routing.filters;
 
 import static org.mule.util.ClassUtils.hash;
+import org.mule.DefaultMuleEvent;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -16,6 +18,7 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.ObjectFilter;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.construct.Flow;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
@@ -82,7 +85,8 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
         {
             if (value != null && value.getRawValue() != null)
             {
-                Object evaluatedValue = value.resolveValue(message);
+                // TODO MULE-9341 Remove Filters that are not needed
+                Object evaluatedValue = value.resolveValue(new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, new Flow("", muleContext)));
                 return accept(evaluatedValue);
             }
             else

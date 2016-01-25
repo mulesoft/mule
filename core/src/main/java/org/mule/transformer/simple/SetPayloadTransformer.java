@@ -7,7 +7,7 @@
 package org.mule.transformer.simple;
 
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -36,14 +36,14 @@ public class SetPayloadTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
         if(valueEvaluator.getRawValue() == null)
         {
             return NullPayload.getInstance();
         }
 
-        return valueEvaluator.resolveValue(message);
+        return valueEvaluator.resolveValue(event);
     }
 
     public void setValue(String value)

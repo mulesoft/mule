@@ -7,7 +7,7 @@
 package org.mule.routing;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.routing.MessageInfoMapping;
 
@@ -25,17 +25,17 @@ public class ExpressionMessageInfoMapping implements MessageInfoMapping, MuleCon
         this.muleContext = context;
     }
 
-    public String getMessageId(MuleMessage message)
+    public String getMessageId(MuleEvent event)
     {
-        return (String) muleContext.getExpressionManager().evaluate(getMessageIdExpression(), message, true);
+        return (String) muleContext.getExpressionManager().evaluate(getMessageIdExpression(), event, true);
     }
 
-    public String getCorrelationId(MuleMessage message)
+    public String getCorrelationId(MuleEvent event)
     {
-        String id = (String) muleContext.getExpressionManager().evaluate(getCorrelationIdExpression(), message, false);
+        String id = (String) muleContext.getExpressionManager().evaluate(getCorrelationIdExpression(), event, false);
         if (id == null)
         {
-            id = getMessageId(message);
+            id = getMessageId(event);
         }
         return id;
     }

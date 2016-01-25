@@ -19,7 +19,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.PropertyScope;
@@ -220,30 +219,6 @@ public class Scriptable implements Initialisable, MuleContextAware
         }
     }
 
-    /**
-     * @deprecated This uses the deprecated method {@link ExpressionManager#parse(String, MuleMessage)} internally. Use
-     *             {@link #populatePropertyBindings(Bindings, MuleEvent)} instead.
-     */
-    @Deprecated
-    protected void populatePropertyBindings(Bindings bindings, MuleMessage message)
-    {
-        if (properties != null)
-        {
-            for (Entry entry : properties.entrySet())
-            {
-                String value = (String) entry.getValue();
-                if (muleContext.getExpressionManager().isExpression(value))
-                {
-                    bindings.put((String) entry.getKey(), muleContext.getExpressionManager().parse(value, message));
-                }
-                else
-                {
-                    bindings.put((String) entry.getKey(), value);
-                }
-            }
-        }
-    }
-
     protected void populatePropertyBindings(Bindings bindings, MuleEvent event)
     {
         if (properties != null)
@@ -271,28 +246,6 @@ public class Scriptable implements Initialisable, MuleContextAware
         bindings.put(BINDING_RESULT, NullPayload.getInstance());
         bindings.put(BINDING_MULE_CONTEXT, muleContext);
         bindings.put(BINDING_REGISTRY, muleContext.getRegistry());
-    }
-
-    public void populateBindings(Bindings bindings, Object payload)
-    {
-        populatePropertyBindings(bindings);
-        populateDefaultBindings(bindings);
-        bindings.put(BINDING_PAYLOAD, payload);
-        // For backward compatability. Usually used by the script transformer since
-        // src maps with the argument passed into the transformer
-        bindings.put(BINDING_SRC, payload);
-    }
-
-    /**
-     * @deprecated This uses the deprecated method {@link ExpressionManager#parse(String, MuleMessage)} internally. Use
-     *             {@link #populateBindings(Bindings, MuleEvent)} instead.
-     */
-    @Deprecated
-    public void populateBindings(Bindings bindings, MuleMessage message)
-    {
-        populatePropertyBindings(bindings, message);
-        populateDefaultBindings(bindings);
-        populateMessageBindings(bindings, message);
     }
 
     public void populateBindings(Bindings bindings, MuleEvent event)

@@ -6,7 +6,7 @@
  */
 package org.mule.transformer.simple;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -40,9 +40,9 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
-        Object keyValue = identifierEvaluator.resolveValue(message);
+        Object keyValue = identifierEvaluator.resolveValue(event);
         String key = (keyValue == null ? null : keyValue.toString());
         if (key == null)
         {
@@ -50,10 +50,10 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
         }
         else
         {
-            TypedValue typedValue = valueEvaluator.resolveTypedValue(message);
+            TypedValue typedValue = valueEvaluator.resolveTypedValue(event);
             if (typedValue.getValue() == null || typedValue.getValue() instanceof NullPayload)
             {
-                message.removeProperty(key, getScope());
+                event.getMessage().removeProperty(key, getScope());
 
                 if (logger.isDebugEnabled())
                 {
@@ -68,15 +68,15 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
                 {
                     DataType<?> dataType = DataTypeFactory.create(typedValue.getValue().getClass(), getMimeType());
                     dataType.setEncoding(getEncoding());
-                    message.setProperty(key, typedValue.getValue(), getScope(), dataType);
+                    event.getMessage().setProperty(key, typedValue.getValue(), getScope(), dataType);
                 }
                 else
                 {
-                    message.setProperty(key, typedValue.getValue(), getScope(), typedValue.getDataType());
+                    event.getMessage().setProperty(key, typedValue.getValue(), getScope(), typedValue.getDataType());
                 }
             }
         }
-        return message;
+        return event.getMessage();
     }
 
     @Override

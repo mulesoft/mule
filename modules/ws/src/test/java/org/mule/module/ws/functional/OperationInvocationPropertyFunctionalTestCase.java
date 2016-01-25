@@ -38,11 +38,11 @@ public class OperationInvocationPropertyFunctionalTestCase extends AbstractWSCon
         Flow flow = (Flow) getFlowConstruct("echo");
         MuleEvent event = getTestEvent(ECHO_REQUEST);
 
-        event.getMessage().setInvocationProperty(CxfConstants.OPERATION, OPERATION_VALUE);
+        event.setFlowVariable(CxfConstants.OPERATION, OPERATION_VALUE);
         event = flow.process(event);
 
         assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
-        assertEquals(OPERATION_VALUE, event.getMessage().getInvocationProperty(CxfConstants.OPERATION));
+        assertEquals(OPERATION_VALUE, event.getFlowVariable(CxfConstants.OPERATION));
     }
 
 

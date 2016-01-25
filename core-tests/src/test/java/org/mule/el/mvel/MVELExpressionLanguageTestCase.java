@@ -182,37 +182,37 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     @Test
     public void testEvaluateStringMuleMessage()
     {
-        MuleMessage message = createMockMessage();
+        MuleEvent event = createMockEvent();
 
         // Literals
-        assertEquals("hi", evaluate("'hi'", message));
-        assertEquals(4, evaluate("2*2", message));
+        assertEquals("hi", evaluate("'hi'", event));
+        assertEquals(4, evaluate("2*2", event));
 
         // Static context
-        assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", message));
-        assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", message));
-        assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", message));
+        assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", event));
+        assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", event));
+        assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", event));
 
         // Event context
-        assertEquals("foo", evaluate("message.payload", message));
+        assertEquals("foo", evaluate("message.payload", event));
     }
 
     @Test
     public void testEvaluateStringMuleMessageMapOfStringObject()
     {
-        MuleMessage message = createMockMessage();
+        MuleEvent event = createMockEvent();
 
         // Literals
-        assertEquals("hi", evaluate("'hi'", message));
-        assertEquals(4, evaluate("2*2", message));
+        assertEquals("hi", evaluate("'hi'", event));
+        assertEquals(4, evaluate("2*2", event));
 
         // Static context
-        assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", message));
-        assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", message));
-        assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", message));
+        assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", event));
+        assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", event));
+        assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", event));
 
         // Event context
-        assertEquals("foo", evaluate("message.payload", message));
+        assertEquals("foo", evaluate("message.payload", event));
 
         // Custom variables (via method param)
         assertEquals(1, evaluate("foo", Collections.<String, Object> singletonMap("foo", 1)));
@@ -244,10 +244,10 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void regexFunction()
+    public void regexFunction() throws Exception
     {
         assertEquals("foo",
-            evaluate("regex('TEST(\\\\w+)TEST')", new DefaultMuleMessage("TESTfooTEST", muleContext)));
+            evaluate("regex('TEST(\\\\w+)TEST')", getTestEvent("TESTfooTEST")));
     }
 
     @Test
@@ -269,11 +269,11 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void messageTakesPrecedenceOverEverything() throws RegistrationException, InitialisationException
+    public void messageTakesPrecedenceOverEverything() throws Exception
     {
         mvel.setAliases(Collections.singletonMap("message", "'other1'"));
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setInvocationProperty("message", "other2");
+        MuleEvent event = getTestEvent("");
+        event.getMessage().setInvocationProperty("message", "other2");
         muleContext.getRegistry().registerObject("foo", new ExpressionLanguageExtension()
         {
             @Override
@@ -283,15 +283,15 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
             }
         });
         mvel.initialise();
-        assertEquals(MessageContext.class, evaluate("message", message).getClass());
+        assertEquals(MessageContext.class, evaluate("message", event).getClass());
     }
 
     @Test
     public void extensionTakesPrecedenceOverAutoResolved()
-        throws RegistrationException, InitialisationException
+            throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setInvocationProperty("foo", "other");
+        MuleEvent event = getTestEvent("");
+        event.setFlowVariable("foo", "other");
         muleContext.getRegistry().registerObject("key", new ExpressionLanguageExtension()
         {
             @Override
@@ -301,7 +301,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
             }
         });
         mvel.initialise();
-        assertEquals("bar", evaluate("foo", message));
+        assertEquals("bar", evaluate("foo", event));
     }
 
     @Test
@@ -503,9 +503,9 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         DataType<?> dataType = DataTypeFactory.create(String.class, MimeTypes.JSON);
         dataType.setEncoding(StandardCharsets.UTF_16.name());
 
-        MuleMessage message = createMockMessage(TEST_MESSAGE, dataType);
+        MuleEvent event = createMockEvent(TEST_MESSAGE, dataType);
 
-        TypedValue typedValue = evaluateTyped("payload", message);
+        TypedValue typedValue = evaluateTyped("payload", event);
 
         assertThat((String) typedValue.getValue(), equalTo(TEST_MESSAGE));
         assertThat(typedValue.getDataType(), like(String.class, MimeTypes.JSON, StandardCharsets.UTF_16.name()));
@@ -523,15 +523,15 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         }
     }
 
-    protected TypedValue evaluateTyped(String expression, MuleMessage message)
+    protected TypedValue evaluateTyped(String expression, MuleEvent event)
     {
         if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER))
         {
-            return mvel.evaluateTyped("#[" + expression + "]", message);
+            return mvel.evaluateTyped("#[" + expression + "]", event);
         }
         else
         {
-            return mvel.evaluateTyped(expression, message);
+            return mvel.evaluateTyped(expression, event);
         }
     }
 
@@ -544,18 +544,6 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         else
         {
             return mvel.evaluate(expression, vars);
-        }
-    }
-
-    protected Object evaluate(String expression, MuleMessage message)
-    {
-        if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER))
-        {
-            return mvel.evaluate("#[" + expression + "]", message);
-        }
-        else
-        {
-            return mvel.evaluate(expression, message);
         }
     }
 
@@ -583,30 +571,27 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         }
     }
 
-    protected MuleEvent createMockEvent()
+    protected MuleEvent createMockEvent(DataType dataType)
+    {
+        return createMockEvent("foo", DataTypeFactory.STRING);
+    }
+
+    protected MuleEvent createMockEvent(String payload, DataType dataType)
     {
         MuleEvent event = mock(MuleEvent.class);
         FlowConstruct flowConstruct = mock(FlowConstruct.class);
         when(flowConstruct.getName()).thenReturn("myFlow");
-        MuleMessage message = createMockMessage();
+        MuleMessage message = mock(MuleMessage.class);
+        when(message.getPayload()).thenReturn(payload);
         when(event.getFlowConstruct()).thenReturn(flowConstruct);
         when(event.getMessage()).thenReturn(message);
+        when(message.getDataType()).thenReturn(dataType);
         return event;
     }
 
-    protected MuleMessage createMockMessage()
+    protected MuleEvent createMockEvent()
     {
-        MuleMessage message = mock(MuleMessage.class);
-        when(message.getPayload()).thenReturn("foo");
-        return message;
-    }
-
-    protected MuleMessage createMockMessage(Object payload, DataType dataType)
-    {
-        MuleMessage message = mock(MuleMessage.class);
-        when(message.getPayload()).thenReturn(payload);
-        when(message.getDataType()).thenReturn(dataType);
-        return message;
+        return createMockEvent(DataTypeFactory.STRING);
     }
 
     public static enum Variant

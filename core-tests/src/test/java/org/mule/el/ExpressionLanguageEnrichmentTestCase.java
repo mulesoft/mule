@@ -13,7 +13,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.config.DefaultMuleConfiguration;
@@ -62,15 +61,15 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
     }
 
     @Test
-    public void enrichReplacePayload()
+    public void enrichReplacePayload() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
-        expressionManager.enrich("message.payload", message, "bar");
-        Assert.assertEquals("bar", message.getPayload());
+        MuleEvent event = getTestEvent("foo");
+        expressionManager.enrich("message.payload", event, "bar");
+        Assert.assertEquals("bar", event.getMessage().getPayload());
     }
 
     @Test
-    public void enrichObjectPayload()
+    public void enrichObjectPayload() throws Exception
     {
         Apple apple = new Apple();
         FruitCleaner fruitCleaner = new FruitCleaner()
@@ -85,25 +84,25 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
 
             }
         };
-        expressionManager.enrich("message.payload.appleCleaner", new DefaultMuleMessage(apple, muleContext), fruitCleaner);
+        expressionManager.enrich("message.payload.appleCleaner", getTestEvent(apple), fruitCleaner);
         Assert.assertEquals(apple.getAppleCleaner(), fruitCleaner);
     }
 
     @Test
-    public void enrichMessageProperty()
+    public void enrichMessageProperty() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
-        expressionManager.enrich("message.outboundProperties.foo", message, "bar");
-        Assert.assertEquals("bar", message.getOutboundProperty("foo"));
+        MuleEvent event = getTestEvent("foo");
+        expressionManager.enrich("message.outboundProperties.foo", event, "bar");
+        Assert.assertEquals("bar", event.getMessage().getOutboundProperty("foo"));
     }
 
     @Test
-    public void enrichMessageAttachment()
+    public void enrichMessageAttachment() throws Exception
     {
         DataHandler dataHandler = new DataHandler(new Object(), "test/xml");
-        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
-        expressionManager.enrich("message.outboundAttachments.foo", message, dataHandler);
-        Assert.assertEquals(dataHandler, message.getOutboundAttachment("foo"));
+        MuleEvent event = getTestEvent("foo");
+        expressionManager.enrich("message.outboundAttachments.foo", event, dataHandler);
+        Assert.assertEquals(dataHandler, event.getMessage().getOutboundAttachment("foo"));
     }
 
     @Test
@@ -127,11 +126,11 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
     }
 
     @Test
-    public void enrichWithDolarPlaceholder()
+    public void enrichWithDolarPlaceholder() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        expressionManager.enrich("message.outboundProperties.put('foo', $)", message, "bar");
-        Assert.assertEquals("bar", message.getOutboundProperty("foo"));
+        MuleEvent event = getTestEvent("");
+        expressionManager.enrich("message.outboundProperties.put('foo', $)", event, "bar");
+        Assert.assertEquals("bar", event.getMessage().getOutboundProperty("foo"));
     }
 
 }

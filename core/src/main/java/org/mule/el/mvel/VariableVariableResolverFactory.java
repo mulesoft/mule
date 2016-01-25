@@ -6,10 +6,8 @@
  */
 package org.mule.el.mvel;
 
-import static org.mule.api.transport.PropertyScope.SESSION;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 
@@ -18,33 +16,25 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
 
     private static final long serialVersionUID = -4433478558175131280L;
 
-    private MuleMessage message;
+    private MuleEvent event;
 
     public VariableVariableResolverFactory(ParserConfiguration parserConfiguration,
                                            MuleContext muleContext,
                                            MuleEvent event)
     {
-        this.message = event.getMessage();
-    }
-
-    @Deprecated
-    public VariableVariableResolverFactory(ParserConfiguration parserConfiguration,
-                                           MuleContext muleContext,
-                                           MuleMessage message)
-    {
-        this.message = message;
+        this.event = event;
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public boolean isTarget(String name)
     {
-        if (message == null)
+        if (event == null)
         {
             return false;
         }
-        return message.getInvocationPropertyNames().contains(name)
-               || message.getPropertyNames(SESSION).contains(name);
+        return event.getFlowVariableNames().contains(name)
+               || (event.getSession() != null && event.getSession().getPropertyNamesAsSet().contains(name));
     }
 
     @SuppressWarnings("deprecation")
@@ -52,11 +42,11 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
     public VariableResolver getVariableResolver(String name)
     {
 
-        if (message != null && message.getInvocationPropertyNames().contains(name))
+        if (event != null && event.getFlowVariableNames().contains(name))
         {
             return new FlowVariableVariableResolver(name);
         }
-        else if (message != null && message.getPropertyNames(SESSION).contains(name))
+        else if (event != null && event.getSession().getPropertyNamesAsSet().contains(name))
         {
             return new SessionVariableVariableResolver(name);
         }
@@ -105,13 +95,13 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
         @Override
         public Object getValue()
         {
-            return message.getInvocationProperty(name);
+            return event.getFlowVariable(name);
         }
 
         @Override
         public void setValue(Object value)
         {
-            message.setInvocationProperty(name, value);
+            event.setFlowVariable(name, value);
         }
     }
 
@@ -154,62 +144,13 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
         @Override
         public Object getValue()
         {
-            return message.getProperty(name, SESSION);
+            return event.getSession().getProperty(name);
         }
 
         @Override
         public void setValue(Object value)
         {
-            message.setProperty(name, value, SESSION);
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
-    class RegistryVariableVariableResolver implements VariableResolver
-    {
-
-        private static final long serialVersionUID = 7658449705305592397L;
-
-        String name;
-
-        public RegistryVariableVariableResolver(String name)
-        {
-            this.name = name;
-        }
-
-        @Override
-        public String getName()
-        {
-            return name;
-        }
-
-        @Override
-        public Class getType()
-        {
-            return Object.class;
-        }
-
-        @Override
-        public void setStaticType(Class type)
-        {
-        }
-
-        @Override
-        public int getFlags()
-        {
-            return 0;
-        }
-
-        @Override
-        public Object getValue()
-        {
-            return message.getMuleContext().getRegistry().lookupObject(name);
-        }
-
-        @Override
-        public void setValue(Object value)
-        {
-            throw new UnsupportedOperationException();
+            event.getSession().setProperty(name, value);
         }
     }
 

@@ -60,7 +60,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
         muleMessage = mock(MuleMessage.class);
 
         when(muleContext.getExpressionManager()).thenReturn(expressionManager);
-        when(expressionManager.parse(anyString(), any(MuleMessage.class))).thenAnswer(
+        when(expressionManager.parse(anyString(), any(MuleEvent.class))).thenAnswer(
                 new Answer<String>()
                 {
                     @Override
@@ -121,7 +121,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
         when(expressionManager.isExpression(EXPRESSION)).thenReturn(true);
         setPayloadMessageProcessor.initialise();
         TypedValue typedValue = new TypedValue(PLAIN_TEXT, DataType.STRING_DATA_TYPE);
-        when(expressionManager.evaluateTyped(EXPRESSION, muleMessage)).thenReturn(typedValue);
+        when(expressionManager.evaluateTyped(EXPRESSION, muleEvent)).thenReturn(typedValue);
 
 
         setPayloadMessageProcessor.process(muleEvent);
