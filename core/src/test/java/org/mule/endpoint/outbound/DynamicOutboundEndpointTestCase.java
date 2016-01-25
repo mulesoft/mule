@@ -8,7 +8,6 @@ package org.mule.endpoint.outbound;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -184,7 +183,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
                 {
                     fail(e.getMessage());
                 }
-                assertThat(listener.messageNotificationList, hasSize(1));
+                assertThat(listener.messageNotificationList.size(), is(1));
                 assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_SEND_BEGIN));
                 assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
                 assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
@@ -196,7 +195,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         assertEventSent();
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertThat(listener.messageNotificationList, hasSize(2));
+        assertThat(listener.messageNotificationList.size(), is(2));
         assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_SEND_BEGIN));
         assertThat(listener.messageNotificationList.get(1).getAction(), is(MESSAGE_SEND_END));
         assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
@@ -229,7 +228,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
                 {
                     fail(e.getMessage());
                 }
-                assertThat(listener.messageNotificationList, hasSize(1));
+                assertThat(listener.messageNotificationList.size(), is(1));
                 assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_DISPATCH_BEGIN));
                 assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
                 assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
@@ -241,7 +240,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         assertEventDispatched();
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertThat(listener.messageNotificationList, hasSize(2));
+        assertThat(listener.messageNotificationList.size(), is(2));
         assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_DISPATCH_BEGIN));
         assertThat(listener.messageNotificationList.get(1).getAction(), is(MESSAGE_DISPATCH_END));
         assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
