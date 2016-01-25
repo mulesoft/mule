@@ -7,6 +7,7 @@
 package org.mule.transport;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+
 import org.mule.AbstractAnnotatedObject;
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
@@ -2713,14 +2714,13 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
             {
                 dispatcher = borrowDispatcher(endpoint);
                 boolean fireNotification = event.isNotificationsEnabled();
-                EndpointMessageNotification beginNotification = null;
                 if (fireNotification)
                 {
                     if (notificationMessageProcessor == null)
                     {
                         notificationMessageProcessor = new OutboundNotificationMessageProcessor(endpoint);
                     }
-                    beginNotification = notificationMessageProcessor.createBeginNotification(event);
+                    notificationMessageProcessor.dispatchNotification(notificationMessageProcessor.createBeginNotification(event), event);
                 }
                 MuleEvent result = dispatcher.process(event);
 
@@ -2728,7 +2728,6 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
                 {
                     // We need to invoke notification message processor with request
                     // message only after successful send/dispatch
-                    notificationMessageProcessor.dispatchNotification(beginNotification, event);
                     notificationMessageProcessor.process((result != null && !VoidMuleEvent.getInstance().equals(
                             result)) ? result : event);
                 }
