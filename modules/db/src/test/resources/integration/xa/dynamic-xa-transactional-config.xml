@@ -10,10 +10,6 @@
             http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <flow name="jdbcRollback">
-        <vm:inbound-endpoint path="testRollback" exchange-pattern="request-response">
-            <xa-transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-
         <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
 
         <db:update config-ref="dbConfig">
@@ -23,10 +19,6 @@
     </flow>
 
     <flow name="jdbcCommit">
-        <vm:inbound-endpoint path="testCommit" exchange-pattern="request-response">
-            <xa-transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-
         <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
 
         <db:update config-ref="dbConfig">
@@ -35,10 +27,6 @@
     </flow>
 
     <flow name="rollbackWithNonTransactionalMP">
-        <vm:inbound-endpoint path="rollbackWithNonTransactionalMP" exchange-pattern="request-response">
-            <xa-transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-
         <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
 
         <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
@@ -49,10 +37,6 @@
     </flow>
 
     <flow name="commitWithNonTransactionalMP">
-        <vm:inbound-endpoint path="commitWithNonTransactionalMP" exchange-pattern="request-response">
-            <xa-transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-
         <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
 
         <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">

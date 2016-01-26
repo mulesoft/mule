@@ -7,19 +7,22 @@
 
 package org.mule.module.db.integration.xa;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
+import static org.mule.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.model.Planet.MARS;
+
+import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.DerbyTestDatabase;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;
-import org.mule.transport.NullPayload;
+import org.mule.transaction.XaTransactionFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -53,8 +56,7 @@ public abstract class AbstractXaTransactionalTestCase extends AbstractDbIntegrat
     @Test
     public void commitsChanges() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testCommit", TEST_MESSAGE, null);
+        MuleMessage response = runTransactionalFlow("jdbcCommit", ACTION_ALWAYS_BEGIN, new XaTransactionFactory()).getMessage();
 
         assertEquals(1, response.getPayload());
 
@@ -65,11 +67,9 @@ public abstract class AbstractXaTransactionalTestCase extends AbstractDbIntegrat
     @Test
     public void rollbacksChanges() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testRollback", TEST_MESSAGE, null);
+        MessagingException e = runTransactionalFlowExpectingException("jdbcRollback", ACTION_ALWAYS_BEGIN, new XaTransactionFactory());
 
-        assertTrue(response.getPayload() instanceof NullPayload);
-
+        assertThat(e.getCause(), instanceOf(IllegalStateException.class));
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", MARS.getName()), new Field("POSITION", 4)));
     }
@@ -77,11 +77,9 @@ public abstract class AbstractXaTransactionalTestCase extends AbstractDbIntegrat
     @Test
     public void commitsChangesWhenMpIsNotTransactionalOnRollback() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://rollbackWithNonTransactionalMP", TEST_MESSAGE, null);
+        MessagingException e = runTransactionalFlowExpectingException("rollbackWithNonTransactionalMP", ACTION_ALWAYS_BEGIN, new XaTransactionFactory());
 
-        assertTrue(response.getPayload() instanceof NullPayload);
-
+        assertThat(e.getCause(), instanceOf(IllegalStateException.class));
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
     }
@@ -89,11 +87,9 @@ public abstract class AbstractXaTransactionalTestCase extends AbstractDbIntegrat
     @Test
     public void commitsChangesWhenMpIsNotTransactionalOnCommit() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://commitWithNonTransactionalMP", TEST_MESSAGE, null);
+        MessagingException e = runTransactionalFlowExpectingException("commitWithNonTransactionalMP", ACTION_ALWAYS_BEGIN, new XaTransactionFactory());
 
-        assertTrue(response.getPayload() instanceof NullPayload);
-
+        assertThat(e.getCause(), instanceOf(IllegalStateException.class));
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
     }

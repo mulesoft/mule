@@ -10,10 +10,6 @@
             http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <flow name="jdbcRollback">
-        <vm:inbound-endpoint path="testRollback" exchange-pattern="request-response">
-            <xa-transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-
         <db:update config-ref="dbConfig">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
         </db:update>
@@ -21,20 +17,12 @@
     </flow>
 
     <flow name="jdbcCommit">
-        <vm:inbound-endpoint path="testCommit" exchange-pattern="request-response">
-            <xa-transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-
         <db:update config-ref="dbConfig">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
         </db:update>
     </flow>
 
     <flow name="rollbackWithNonTransactionalMP">
-        <vm:inbound-endpoint path="rollbackWithNonTransactionalMP" exchange-pattern="request-response">
-            <xa-transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-
         <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
         </db:update>
@@ -43,10 +31,6 @@
     </flow>
 
     <flow name="commitWithNonTransactionalMP">
-        <vm:inbound-endpoint path="commitWithNonTransactionalMP" exchange-pattern="request-response">
-            <xa-transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-
         <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
         </db:update>

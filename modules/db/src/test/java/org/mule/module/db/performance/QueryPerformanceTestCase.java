@@ -24,9 +24,9 @@ public class QueryPerformanceTestCase extends FunctionalTestCase
     private LoadGenerator loadGenerator = new LoadGenerator();
 
     @Override
-    protected String getConfigFile()
+    protected String[] getConfigFiles()
     {
-        return "integration/derby-datasource.xml,integration/select/select-default-config.xml";
+        return new String[] {"integration/derby-datasource.xml", "integration/select/select-default-config.xml"};
     }
 
     @Override
@@ -68,7 +68,7 @@ public class QueryPerformanceTestCase extends FunctionalTestCase
             {
                 try
                 {
-                    client.request("vm://testOut", RECEIVE_TIMEOUT);
+                    client.request("test://testOut", RECEIVE_TIMEOUT);
                 }
                 catch (Exception e)
                 {
@@ -96,9 +96,7 @@ public class QueryPerformanceTestCase extends FunctionalTestCase
         public void execute(int messageId) throws Exception
         {
             logger.info("Thread: " + Thread.currentThread().getName() + " message: " + messageId);
-            LocalMuleClient client = muleContext.getClient();
-
-            client.dispatch("vm://testOneWay", TEST_MESSAGE, null);
+            runFlowAsync("defaultQueryOneWay", TEST_MESSAGE);
         }
     }
 

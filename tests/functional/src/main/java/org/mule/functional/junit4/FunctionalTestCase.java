@@ -7,6 +7,8 @@
 package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
+import static org.mule.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -18,10 +20,14 @@ import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
+import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transaction.TransactionFactory;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
@@ -32,6 +38,7 @@ import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.transaction.MuleTransactionConfig;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -267,9 +274,88 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     }
 
     /**
-     * Runs the given flow with a default event expecting a failure.
-     * Will fail if there's no failure running the flow.
+     * Runs the given flow with a default event inside a transaction
+     * 
+     * @param flowName the name of the flow to be executed
+     * @param action See {@link TransactionConfig} constants
+     * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    protected MuleEvent runTransactionalFlow(String flowName, byte action, TransactionFactory factory) throws Exception
+    {
+        return runTransactionalFlow(flowName, (Object) null, action, factory);
+    }
+
+    /**
+     * Runs the given flow with a default event inside a transaction
+     * 
+     * @param flowName the name of the flow to be executed
+     * @param payload the payload to use in the message
+     * @param action See {@link TransactionConfig} constants
+     * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    protected <T> MuleEvent runTransactionalFlow(String flowName, T payload, byte action, TransactionFactory factory) throws Exception
+    {
+        MuleTransactionConfig transactionConfig = new MuleTransactionConfig(action);
+        transactionConfig.setFactory(factory);
+
+        ExecutionTemplate<MuleEvent> executionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
+
+        return executionTemplate.execute(new ExecutionCallback<MuleEvent>()
+        {
+            @Override
+            public MuleEvent process() throws Exception
+            {
+                return runFlow(flowName, payload);
+            }
+        });
+    }
+
+    /**
+     * Runs the given flow with a default event inside a transaction expecting a failure. Will fail if there's no
+     * failure running the flow.
      *
+     * @param flowName the name of the flow to be executed
+     * @param action See {@link TransactionConfig} constants
+     * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
+     * @return the message exception return by the flow
+     * @throws Exception
+     */
+    protected MessagingException runTransactionalFlowExpectingException(String flowName, byte action, TransactionFactory factory) throws Exception
+    {
+        return runTransactionalFlowExpectingException(flowName, (Object) null, action, factory);
+    }
+
+    /**
+     * Runs the given flow with a default event inside a transaction expecting a failure. Will fail if there's no
+     * failure running the flow.
+     *
+     * @param flowName the name of the flow to be executed
+     * @param payload the payload to use in the message
+     * @param action See {@link TransactionConfig} constants
+     * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
+     * @return the message exception return by the flow
+     * @throws Exception
+     */
+    protected <T> MessagingException runTransactionalFlowExpectingException(String flowName, T payload, byte action, TransactionFactory factory) throws Exception
+    {
+        try
+        {
+            this.runTransactionalFlow(flowName, payload, action, factory);
+            fail("Flow executed successfully. Expecting exception");
+            return null;
+        }
+        catch (MessagingException e)
+        {
+            return e;
+        }
+    }
+
+    /**
+     * Runs the given flow with a default event expecting a failure. Will fail if there's no failure running the flow.
      *
      * @param flowName the name of the flow to be executed
      * @return the message exception return by the flow
@@ -280,17 +366,13 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         try
         {
             this.runFlow(flowName, (Object) null);
+            fail("Flow executed successfully. Expecting exception");
+            return null;
         }
         catch (MessagingException e)
         {
             return e;
         }
-        catch (Exception e)
-        {
-            fail("Flow exception is not a MessagingException");
-        }
-        fail("Flow executed successfully. Expecting exception");
-        return null;
     }
 
     /**
