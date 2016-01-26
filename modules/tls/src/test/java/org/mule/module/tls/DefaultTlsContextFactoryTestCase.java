@@ -7,6 +7,7 @@
 package org.mule.module.tls;
 
 import static org.hamcrest.Matchers.containsString;
+import org.mule.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;

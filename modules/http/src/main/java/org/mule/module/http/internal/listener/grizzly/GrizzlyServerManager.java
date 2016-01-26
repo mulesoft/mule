@@ -19,7 +19,7 @@ import org.mule.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.module.http.internal.listener.HttpServerManager;
 import org.mule.module.http.internal.listener.Server;
 import org.mule.module.http.internal.listener.ServerAddress;
-import org.mule.module.tls.api.TlsContextFactory;
+import org.mule.api.tls.TlsContextFactory;
 import org.mule.module.socket.api.TcpServerSocketProperties;
 import org.mule.util.concurrent.NamedThreadFactory;
 

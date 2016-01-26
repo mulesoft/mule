@@ -7,9 +7,9 @@
 package org.mule.module.http.internal.request;
 
 import static java.lang.String.format;
+import static org.mule.api.config.MuleProperties.DEFAULT_TLS_CONTEXT_FACTORY_BUILDER_REGISTRY_KEY;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -19,6 +19,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.tls.TlsContextFactory;
+import org.mule.api.tls.TlsContextFactoryBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.HttpConstants;
@@ -28,13 +30,14 @@ import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClient;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClientConfiguration;
-import org.mule.module.socket.internal.DefaultTcpClientSocketProperties;
-import org.mule.module.tls.api.TlsContextFactory;
-import org.mule.module.tls.api.TlsContextFactoryBuilder;
 import org.mule.module.socket.api.TcpClientSocketProperties;
+import org.mule.module.socket.internal.DefaultTcpClientSocketProperties;
 import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.net.CookieManager;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 
 public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implements HttpRequesterConfig, Initialisable, Stoppable, Startable, MuleContextAware
@@ -69,6 +72,10 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
     private boolean enableCookies = false;
     private CookieManager cookieManager;
 
+    @Inject
+    @Named(DEFAULT_TLS_CONTEXT_FACTORY_BUILDER_REGISTRY_KEY)
+    private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
+
     private MuleContext muleContext;
 
     @Override
@@ -90,7 +97,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
 
         if (protocol.equals(HTTPS) && tlsContext == null)
         {
-            tlsContext = new TlsContextFactoryBuilder(muleContext).buildDefault();
+            tlsContext = defaultTlsContextFactoryBuilder.buildDefault();
         }
 
         if (enableCookies)
