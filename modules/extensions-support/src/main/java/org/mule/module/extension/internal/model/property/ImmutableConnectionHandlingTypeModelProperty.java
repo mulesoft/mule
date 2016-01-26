@@ -11,27 +11,22 @@ import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.PoolingListener;
-import org.mule.module.extension.internal.introspection.utils.PoolingSupport;
+import org.mule.extension.api.introspection.PoolingSupport;
+import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
 
 /**
- * A immutable model property for {@link org.mule.extension.api.introspection.ConnectionProviderModel} which describes
- * the Connection Handling Type for a given ConnectionProvider.
+ * Immutable implementation of {@link ConnectionHandlingTypeModelProperty}
  *
  * @since 4.0
  */
-public final class ConnectionHandlingTypeModelProperty
+public final class ImmutableConnectionHandlingTypeModelProperty implements ConnectionHandlingTypeModelProperty
 {
 
     private boolean cached = false;
     private PoolingSupport poolingSupport = PoolingSupport.NOT_SUPPORTED;
     private boolean none = false;
 
-    /**
-     * A unique key that identifies this property type
-     */
-    public static final String KEY = ConnectionHandlingTypeModelProperty.class.getName();
-
-    public ConnectionHandlingTypeModelProperty(ConnectionProvider connectionProvider)
+    public ImmutableConnectionHandlingTypeModelProperty(ConnectionProvider connectionProvider)
     {
         connectionProvider.getHandlingStrategy(new ConnectionHandlingStrategyFactory()
         {
@@ -77,21 +72,37 @@ public final class ConnectionHandlingTypeModelProperty
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isCached()
     {
         return cached;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isNone()
     {
         return none;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isPooled()
     {
         return !poolingSupport.equals(PoolingSupport.NOT_SUPPORTED);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public PoolingSupport getPoolingSupport()
     {
         return poolingSupport;
