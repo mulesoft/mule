@@ -1,4 +1,4 @@
-Mule ESB is distributed under the terms of the Common Public Attribution 
+Mule Runtime is distributed under the terms of the Common Public Attribution 
 License (CPAL), whose definition follows below.  For information on the license
 type for each third-party software product used by Mule, refer to 
 https://developer.mulesoft.com/docs/display/current/Third-Party+Software+In+Mule

@@ -23,7 +23,7 @@
     <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
     <http:listener-config name="listenerConfigHttps" host="localhost" port="${port3}" protocol="HTTPS">
         <tls:context>
-            <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword" />
+            <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit" />
         </tls:context>
     </http:listener-config>
 

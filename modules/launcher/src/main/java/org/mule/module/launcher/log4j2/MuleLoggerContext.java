@@ -6,9 +6,11 @@
  */
 package org.mule.module.launcher.log4j2;
 
+import org.mule.logging.LogConfigChangeSubject;
 import org.mule.module.launcher.application.ApplicationClassLoader;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 
+import java.beans.PropertyChangeListener;
 import java.net.URI;
 
 import org.apache.logging.log4j.core.Logger;
@@ -34,7 +36,7 @@ import org.apache.logging.log4j.message.MessageFactory;
  *
  * @since 3.6.0
  */
-class MuleLoggerContext extends LoggerContext
+class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject
 {
 
     private final URI configFile;
@@ -105,6 +107,18 @@ class MuleLoggerContext extends LoggerContext
                 ((DispatchingLogger) logger).updateConfiguration(config);
             }
         }
+    }
+
+    @Override
+    public void registerLogConfigChangeListener(PropertyChangeListener logConfigChangeListener)
+    {
+        addPropertyChangeListener(logConfigChangeListener);
+    }
+
+    @Override
+    public void unregisterLogConfigChangeListener(PropertyChangeListener logConfigChangeListener)
+    {
+        removePropertyChangeListener(logConfigChangeListener);
     }
 
     /**

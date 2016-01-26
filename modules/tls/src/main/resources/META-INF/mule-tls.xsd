@@ -9,13 +9,13 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd" />
-    <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.8/mule.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
+                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.8/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
-        The TLS module can be used for secure socket communication using SSL or TLS.
+            The TLS module can be used for secure socket communication using SSL or TLS.
         </xsd:documentation>
         <xsd:appinfo>
             <schemadoc:short-name>TLS</schemadoc:short-name>
@@ -24,7 +24,7 @@
         </xsd:appinfo>
     </xsd:annotation>
 
-    <xsd:element name="context" type="tlsContextType" substitutionGroup="mule:abstract-extension">
+    <xsd:element name="context" type="tlsContextType" substitutionGroup="mule:abstract-shared-extension">
         <xsd:annotation>
             <xsd:documentation>
                 Reusable configuration element for TLS. A TLS context optionally defines a key store and a trust store.
@@ -56,22 +56,36 @@
             <xsd:extension base="mule:abstractExtensionType">
                 <xsd:choice minOccurs="1">
                     <xsd:sequence>
-                        <xsd:element ref="trust-store" minOccurs="1" maxOccurs="1" />
-                        <xsd:element ref="key-store" minOccurs="0" maxOccurs="1" />
+                        <xsd:element ref="trust-store" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element ref="key-store" minOccurs="0" maxOccurs="1"/>
                     </xsd:sequence>
                     <xsd:sequence>
-                        <xsd:element ref="trust-store" minOccurs="0" maxOccurs="1" />
-                        <xsd:element ref="key-store" minOccurs="1" maxOccurs="1" />
+                        <xsd:element ref="trust-store" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element ref="key-store" minOccurs="1" maxOccurs="1"/>
                     </xsd:sequence>
                     <xsd:sequence>
-                        <xsd:element ref="trust-store" minOccurs="1" maxOccurs="1" />
-                        <xsd:element ref="key-store" minOccurs="1" maxOccurs="1" />
+                        <xsd:element ref="trust-store" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element ref="key-store" minOccurs="1" maxOccurs="1"/>
                     </xsd:sequence>
                 </xsd:choice>
                 <xsd:attribute name="name" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             The name of this context, so that it can be referenced from other configuration elements.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enabledProtocols" type="mule:substitutableString" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A comma separated list of protocols enabled for this context.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enabledCipherSuites" type="mule:substitutableString" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A comma separated list of cipher suites enabled for this context.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -84,7 +98,8 @@
         <xsd:attribute name="path" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The location (which will be resolved relative to the current classpath and file system, if possible) of the trust store.
+                    The location (which will be resolved relative to the current classpath and file system, if possible)
+                    of the trust store.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -109,6 +124,13 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="insecure" type="mule:substitutableBoolean" default="false">
+            <xsd:annotation>
+                <xsd:documentation>
+                    If true, no certificate validations will be performed.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
 
@@ -116,7 +138,8 @@
         <xsd:attribute name="path" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The location (which will be resolved relative to the current classpath and file system, if possible) of the key store.
+                    The location (which will be resolved relative to the current classpath and file system, if possible)
+                    of the key store.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -157,5 +180,4 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
-
 </xsd:schema>

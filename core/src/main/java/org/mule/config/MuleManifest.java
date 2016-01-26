@@ -91,11 +91,6 @@ public class MuleManifest
         return getManifestProperty("Build-Date");
     }
 
-    public static String getDevListEmail()
-    {
-        return getManifestProperty("Dev-List-Email");
-    }
-
 	public static String getSupportedJdks()
 	{
 		return getManifestProperty("Supported-Jdks");
@@ -146,6 +141,7 @@ public class MuleManifest
 
     static class UrlPrivilegedAction implements PrivilegedAction<URL>
     {
+        @Override
         public URL run()
         {
             URL result = null;

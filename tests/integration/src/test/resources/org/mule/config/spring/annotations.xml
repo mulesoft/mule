@@ -10,4 +10,8 @@
         </annotations>
         <echo-component doc:name="echo"/>
     </flow>
+
+    <flow name="NotAnnotatedBridge">
+        <echo-component/>
+    </flow>
 </mule>

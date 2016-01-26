@@ -244,6 +244,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
             this.accept = accept;
         }
 
+        @Override
         public boolean accept(MuleMessage message)
         {
             return accept;
@@ -255,6 +256,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         public SecurityNotification securityNotification;
         public Latch latch = new Latch();
 
+        @Override
         public void onNotification(SecurityNotification notification)
         {
             securityNotification = notification;
@@ -266,6 +268,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     {
         public MuleEvent sensedEvent;
 
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             sensedEvent = event;
@@ -277,29 +280,38 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     {
         public TestEndpointMessageNotificationListener()
         {
+            latchFirst = new CountDownLatch(1);
             latch = new CountDownLatch(1);
         }
 
         public TestEndpointMessageNotificationListener(int numExpected)
         {
+            latchFirst = new CountDownLatch(1);
             latch = new CountDownLatch(numExpected);
         }
 
         public EndpointMessageNotification messageNotification;
         public List<EndpointMessageNotification> messageNotificationList = new ArrayList<EndpointMessageNotification>();
 
+        public CountDownLatch latchFirst;
         public CountDownLatch latch;
 
+        @Override
         public void onNotification(EndpointMessageNotification notification)
         {
             messageNotification = notification;
             messageNotificationList.add(notification);
+            if (latchFirst.getCount() > 0)
+            {
+                latchFirst.countDown();
+            }
             latch.countDown();
         }
     }
 
     public static class ExceptionThrowingMessageProcessr implements MessageProcessor
     {
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             throw new IllegalStateException();
@@ -310,6 +322,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     {
         public Exception sensedException;
 
+        @Override
         public MuleEvent handleException(Exception exception, MuleEvent event)
         {
             sensedException = exception;
@@ -325,16 +338,19 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         public MuleContext context;
         public ImmutableEndpoint endpoint;
 
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             return null;
         }
 
+        @Override
         public void setEndpoint(ImmutableEndpoint endpoint)
         {
             this.endpoint = endpoint;
         }
 
+        @Override
         public void setMuleContext(MuleContext context)
         {
             this.context = context;

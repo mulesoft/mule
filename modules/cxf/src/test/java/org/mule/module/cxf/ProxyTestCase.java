@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
@@ -13,21 +14,22 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.module.cxf.testmodels.AsyncService;
-import org.mule.module.cxf.testmodels.AsyncServiceWithSoapAction;
-import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.module.cxf.testmodels.AsyncService;
+import org.mule.module.cxf.testmodels.AsyncServiceWithSoapAction;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -560,7 +562,7 @@ public class ProxyTestCase extends FunctionalTestCase
                         + "<soap:Body>"
                         + "<emp:addEmployee xmlns:emp=\"http://employee.example.mule.org/\">"
                         + "<emp:employee>"
-                        + "<emp:division>ESB</emp:division>"
+                        + "<emp:division>Runtime</emp:division>"
                         + "<emp:name>Pepe</emp:name>"
                         + "</emp:employee>"
                         + "</emp:addEmployee>"
@@ -572,6 +574,50 @@ public class ProxyTestCase extends FunctionalTestCase
                                          getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS);
         assertThat(result, is(notNullValue()));
         assertThat(getPayloadAsString(result), is(payload));
+    }
+
+    @Test
+    public void testProxyOneWay() throws Exception
+    {
+        String body = "<emp:addEmployee xmlns:emp=\"http://employee.example.mule.org/\">"
+                                 + "<emp:employee>"
+                                 + "<emp:division>Runtime</emp:division>"
+                                 + "<emp:name>Pepe</emp:name>"
+                                 + "</emp:employee>"
+                                 + "</emp:addEmployee>";
+        String payload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                         + "<soap:Body>"
+                         + body
+                         + "</soap:Body>"
+                         + "</soap:Envelope>";
+
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyOneWay",
+                getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS);
+        assertThat(result, is(notNullValue()));
+        assertThat(result.getInboundProperty(HTTP_STATUS_PROPERTY), is(ACCEPTED.getStatusCode()));
+        assertThat(getPayloadAsString(result), is(""));
+    }
+
+    @Test
+    public void testProxyOneWayFault() throws Exception
+    {
+        String payload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                         + "<soap:Body>"
+                         + "<emp:addEmployee xmlns:emp=\"http://employee.example.mule.org/\">"
+                         + "<emp:employee>"
+                         + "<emp:division>Runtime</emp:division>"
+                         + "<emp:name>Pepe</emp:name>"
+                         + "</emp:employee>"
+                         + "</emp:addEmployee>"
+                         + "</soap:Body>"
+                         + "</soap:Envelope>";
+
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyOneWayFault",
+                getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS);
+        assertThat(result, is(notNullValue()));
+        assertThat(getPayloadAsString(result), containsString("ERROR"));
     }
 
     protected String prepareOneWayTestMessage()

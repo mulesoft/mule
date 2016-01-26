@@ -271,6 +271,12 @@
         </foreach>
     </flow>
     
+    <flow name="mvel-error">
+        <foreach collection="#[invalid]">
+            <test:component/>
+        </foreach>
+    </flow>
+    
     <flow name="request-reply">
         <vm:inbound-endpoint path="input-22" exchange-pattern="request-response"/>
         <set-session-variable variableName="processedMessages" value="0"/>
@@ -319,5 +325,11 @@
 		
 		<expression-component>flowVars['latch'].countDown()</expression-component>
 	</sub-flow>
+
+    <sub-flow name="sub-flow-with-foreach">
+        <foreach>
+            <append-string-transformer message="y" />
+        </foreach>
+    </sub-flow>
 
 </mule>

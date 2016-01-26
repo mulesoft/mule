@@ -14,12 +14,9 @@
     </organization>
 
     <!-- Project -->
-    <name>Mule ESB</name>
+    <name>Mule Runtime</name>
     <description>
-        Mule is the world's most widely used open source Enterprise Service
-        Bus (ESB). Designed to support high-performance, multi-protocol transactions
-        between heterogeneous systems and services, Mule provides the basis for
-        service oriented architecture (SOA).
+        Mule is the runtime engine of Anypoint™ Platform. It is the industry’s only unified platform that combines data and application integration across legacy systems, SaaS applications, and APIs with hybrid deployment options for maximum flexibility.
     </description>
     <url>http://www.mulesoft.org</url>
     <inceptionYear>2003</inceptionYear>
@@ -29,12 +26,6 @@
             <url>http://www.mulesoft.com/CPAL</url>
         </license>
     </licenses>
-    <mailingLists>
-        <mailingList>
-            <name>developers</name>
-            <post>mule-esb@mulesoft.com</post>
-        </mailingList>
-    </mailingLists>
     <developers>
         <developer>
             <id>rrinaudo</id>
@@ -158,10 +149,10 @@
 
         <activemqVersion>5.11.1</activemqVersion>
         <antVersion>1.7.0</antVersion>
-        <antlrVersion>3.1.1</antlrVersion>
+        <antlrVersion>3.5</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.7.3</aspectjVersion>
-        <asyncHttpClientVersion>1.9.31</asyncHttpClientVersion>
+        <asyncHttpClientVersion>1.9.32</asyncHttpClientVersion>
         <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.50</bouncycastleVersion>
@@ -194,10 +185,9 @@
         <geronimoSpecsEjbVersion>1.1</geronimoSpecsEjbVersion>
         <geronimoSpecsJaxRpcVersion>2.1</geronimoSpecsJaxRpcVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
-        <grizzlyVersion>2.3.21</grizzlyVersion>
+        <grizzlyVersion>2.3.24</grizzlyVersion>
         <guavaVersion>18.0</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
-        <hibernateVersion>3.6.0.Final</hibernateVersion>
         <jacksonVersion>1.9.11</jacksonVersion>
         <jackson2Version>2.4.3</jackson2Version>
         <javax.inject.version>1</javax.inject.version>
@@ -214,7 +204,7 @@
         <jdomVersion>1.1.3</jdomVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
         <jffiVersion>1.2.9</jffiVersion>
-        <jodaTimeVersion>2.5</jodaTimeVersion>
+        <jodaTimeVersion>2.9.1</jodaTimeVersion>
         <jschVersion>0.1.53</jschVersion>
         <junitVersion>4.11</junitVersion>
         <log4jVersion>2.1</log4jVersion>
@@ -242,7 +232,7 @@
         <springOsgiVersion>1.0.2</springOsgiVersion>
         <springVersion>4.1.6.RELEASE</springVersion>
         <springSecurityVersion>4.0.1.RELEASE</springSecurityVersion>
-        <sshCoreVersion>0.6.0</sshCoreVersion>
+        <sshCoreVersion>1.0.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <staxApiVersion>3.1.4</staxApiVersion>
         <staxonVersion>1.2</staxonVersion>
@@ -1158,61 +1148,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.jbpm.jbpm4</groupId>
-                <artifactId>jbpm-jpdl</artifactId>
-                <version>${jbpmVersion}</version>
-                <exclusions>
-                    <!-- Mule uses a newer version -->
-                    <exclusion>
-                        <groupId>javax.mail</groupId>
-                        <artifactId>mail</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javassist</groupId>
-                        <artifactId>javassist</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-jdk14</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jbpm.jbpm4</groupId>
-                <artifactId>jbpm-pvm</artifactId>
-                <version>${jbpmVersion}</version>
-                <exclusions>
-                    <!-- Mule uses a newer version -->
-                    <exclusion>
-                        <groupId>javassist</groupId>
-                        <artifactId>javassist</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-jdk14</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <!-- JSP EL API already bundled with the jetty transport -->
-                        <groupId>juel</groupId>
-                        <artifactId>juel-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-core</artifactId>
-                <version>${hibernateVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.transaction</groupId>
-                        <artifactId>jta</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
                 <groupId>jboss</groupId>
                 <artifactId>javassist</artifactId>
                 <version>${javassistVersion}</version>
@@ -1266,11 +1201,6 @@
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
-                <version>${aspectjVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.aspectj</groupId>
-                <artifactId>aspectjtools</artifactId>
                 <version>${aspectjVersion}</version>
             </dependency>
             <dependency>
@@ -1678,7 +1608,7 @@
                             <exclude>**/BobberArchetypeMojo.java</exclude>
                             <exclude>**/DummySSLServerSocketFactory.java</exclude>
                             <exclude>**/MultipartConfiguration.java</exclude>
-    
+
                             <exclude>**/ParamReader.java</exclude>
                             <exclude>**/Part.java</exclude>
                             <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
@@ -1811,7 +1741,7 @@
                         <manifestEntries>
                             <More-Info>For more information go to ${productUrl}</More-Info>
                             <Support>Get commercial support: ${project.organization.url}/support</Support>
-                            <Description>Mule ESB and Integration Platform</Description>
+                            <Description>Mule Runtime and Integration Platform</Description>
                             <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
                             <Vendor-Url>${project.organization.url}</Vendor-Url>
                             <Product-Url>${productUrl}</Product-Url>

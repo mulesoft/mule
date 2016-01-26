@@ -9,11 +9,12 @@ package org.mule.module.http.internal.request.grizzly;
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
-import org.mule.api.execution.CompletionHandler;
 import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
+import org.mule.api.execution.CompletionHandler;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
@@ -28,8 +29,9 @@ import org.mule.module.http.internal.multipart.HttpPart;
 import org.mule.module.http.internal.request.HttpAuthenticationType;
 import org.mule.module.http.internal.request.HttpClient;
 import org.mule.module.http.internal.request.NtlmProxyConfig;
-import org.mule.module.tls.api.TlsContextFactory;
 import org.mule.module.socket.api.TcpClientSocketProperties;
+import org.mule.module.tls.api.TlsContextFactory;
+import org.mule.module.tls.api.TlsContextTrustStoreConfiguration;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
@@ -73,6 +75,7 @@ public class GrizzlyHttpClient implements HttpClient
     private boolean usePersistentConnections;
     private int connectionIdleTimeout;
     private String threadNamePrefix;
+    private String ownerName;
 
     private AsyncHttpClient asyncHttpClient;
     private SSLContext sslContext;
@@ -86,6 +89,7 @@ public class GrizzlyHttpClient implements HttpClient
         this.usePersistentConnections = config.isUsePersistentConnections();
         this.connectionIdleTimeout = config.getConnectionIdleTimeout();
         this.threadNamePrefix = config.getThreadNamePrefix();
+        this.ownerName = config.getOwnerName();
     }
 
     @Override
@@ -111,6 +115,7 @@ public class GrizzlyHttpClient implements HttpClient
     {
         if (tlsContextFactory != null)
         {
+            LifecycleUtils.initialiseIfNeeded(tlsContextFactory);
             try
             {
                 sslContext = tlsContextFactory.createSslContext();
@@ -131,7 +136,14 @@ public class GrizzlyHttpClient implements HttpClient
             {
                 builder.setEnabledProtocols(tlsContextFactory.getEnabledProtocols());
             }
+            TlsContextTrustStoreConfiguration trustStoreConfiguration = tlsContextFactory.getTrustStoreConfiguration();
 
+            if(trustStoreConfiguration != null && trustStoreConfiguration.isInsecure())
+            {
+                logger.warn(String.format("TLS configuration for requester %s has been set to use an insecure trust store. This means no certificate validations will be performed, rendering connections vulnerable to attacks. Use at own risk.", ownerName));
+                //This disables hostname verification
+                builder.setAcceptAnyCertificate(true);
+            }
         }
     }
 

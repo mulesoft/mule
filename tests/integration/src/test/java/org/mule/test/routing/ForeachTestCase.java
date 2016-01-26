@@ -8,12 +8,17 @@ package org.mule.test.routing;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
+
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -375,7 +380,7 @@ public class ForeachTestCase extends FunctionalTestCase
             for(int j = 0; j < payload.get(i).size(); j++)
             {
                 out = client.request("vm://out", getTestTimeoutSecs());
-                assertEquals("The nested counters are not consistent.", (Object) out.getInboundProperty("j"), j+1);
+                assertThat("The nested counters are not consistent.", out.getInboundProperty("j"), is(j + 1));
             }
             out = client.request("vm://out", getTestTimeoutSecs());
             assertThat("The nested counters are not consistent", out.getInboundProperty("i"), is(i +1));
@@ -497,6 +502,20 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void mvelError() throws Exception
+    {
+        try
+        {
+            runFlow("mvel-error");
+            fail("MessagingException expected");
+        }
+        catch (MessagingException me)
+        {
+            assertThat((String) me.getInfo().get(INFO_LOCATION_KEY), startsWith("/mvel-error/processors/0 @"));
+        }
+    }
+
+    @Test
     public void requestReply() throws Exception
     {
         MuleMessage parent = new DefaultMuleMessage(null, muleContext);
@@ -523,5 +542,11 @@ public class ForeachTestCase extends FunctionalTestCase
         this.testFlow("foreachWithAsync", event);
 
         latch.await(10, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void initializesForeachOnSubFLow() throws Exception
+    {
+        getSubFlow("sub-flow-with-foreach");
     }
 }

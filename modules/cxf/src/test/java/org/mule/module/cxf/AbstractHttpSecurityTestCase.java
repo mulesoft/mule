@@ -30,6 +30,7 @@ public class AbstractHttpSecurityTestCase extends FunctionalTestCase
         DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
         tlsContextFactory.setTrustStorePath("trustStore");
         tlsContextFactory.setTrustStorePassword("mulepassword");
+        tlsContextFactory.initialise();
 
         SSLSocketFactory factory = tlsContextFactory.createSslContext().getSocketFactory();
         Protocol httpsWithTrustStore = new Protocol(HTTPS.getScheme(), getSocketFactory(factory),  HTTPS.getDefaultPort());

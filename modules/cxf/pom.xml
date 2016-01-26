@@ -404,6 +404,10 @@
                     <artifactId>xalan</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>serializer</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>velocity</groupId>
                     <artifactId>velocity</artifactId>
                 </exclusion>

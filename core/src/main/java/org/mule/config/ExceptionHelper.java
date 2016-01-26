@@ -6,20 +6,6 @@
  */
 package org.mule.config;
 
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -34,6 +20,18 @@ import org.mule.util.MapUtils;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.SpiUtils;
 import org.mule.util.SystemUtils;
+
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>ExceptionHelper</code> provides a number of helper functions that can be
@@ -493,11 +491,15 @@ public final class ExceptionHelper
     {
         Throwable cause = t;
         MuleException exception = null;
+        // Info is added to the wrapper exceptions. We add them to the root mule exception so the gotten info is
+        // properly logged.
+        Map muleExceptionInfo = new HashMap<>();
         while (cause != null)
         {
             if (cause instanceof MuleException)
             {
                 exception = (MuleException) cause;
+                muleExceptionInfo.putAll(exception.getInfo());
             }
             final Throwable tempCause = getExceptionReader(cause).getCause(cause);
             if (DefaultMuleConfiguration.fullStackTraces)
@@ -513,6 +515,10 @@ public final class ExceptionHelper
             {
                 break;
             }
+        }
+        if (exception != null)
+        {
+            exception.getInfo().putAll(muleExceptionInfo);
         }
         return exception;
     }

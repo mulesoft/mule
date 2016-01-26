@@ -8,7 +8,6 @@ package org.mule.module.cxf;
 
 import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.VoidMuleEvent;
@@ -28,7 +27,6 @@ import org.mule.module.cxf.i18n.CxfMessages;
 import org.mule.module.cxf.security.WebServiceSecurityException;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.TemplateParser;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
@@ -62,10 +59,6 @@ import org.apache.cxf.ws.addressing.WSAContextUtils;
 public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProcessor implements CloneableMessageProcessor, NonBlockingSupported
 {
 
-    private static final String URI_REGEX = "cxf:\\[(.+?)\\]:(.+?)/\\[(.+?)\\]:(.+?)";
-    Pattern URI_PATTERN = Pattern.compile(URI_REGEX);
-
-    private final TemplateParser soapActionTemplateParser = TemplateParser.createMuleStyleParser();
     private CxfPayloadToArguments payloadToArguments = CxfPayloadToArguments.NULL_PAYLOAD_AS_PARAMETER;
     private Client client;
     private boolean proxy;

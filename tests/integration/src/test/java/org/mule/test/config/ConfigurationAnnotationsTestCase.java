@@ -10,14 +10,16 @@ package org.mule.test.config;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.AnnotatedObject;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.transformer.Transformer;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.SystemUtils;
+
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
@@ -45,7 +47,7 @@ public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
         assertThat(getDocName(stb), is("stb-transformer"));
         assertThat(getDocDescription(stb), is("Convert a String to a Byte Array"));
         assertThat(getSourceFile(stb), is("annotations-config.xml"));
-        assertThat(getSourceFileLine(stb), is(7));
+        assertThat(getSourceFileLine(stb), is(10));
         assertThat(getSourceElement(stb), is("<string-to-byte-array-transformer name=\"StringtoByteArray\" doc:name=\"stb-transformer\">" + SystemUtils.LINE_SEPARATOR +
                                              "<annotations>" + SystemUtils.LINE_SEPARATOR +
                                              "<doc:description>Convert a String to a Byte Array</doc:description>" + SystemUtils.LINE_SEPARATOR +
@@ -72,14 +74,48 @@ public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testDefaultAnnotationsInNotAnnotatedObject()
+    {
+        FlowConstruct flow = muleContext.getRegistry().lookupFlowConstruct("NotAnnotatedBridge");
+        assertThat(flow, not(nullValue()));
+        assertThat(getDocName(flow), is(nullValue()));
+        assertThat(getDocDescription(flow), is(nullValue()));
+        assertThat(getSourceFile(flow), is("annotations.xml"));
+        assertThat(getSourceFileLine(flow), is(14));
+        assertThat(getSourceElement(flow), is("<flow name=\"NotAnnotatedBridge\">" + SystemUtils.LINE_SEPARATOR +
+                                              "<echo-component></echo-component>" + SystemUtils.LINE_SEPARATOR +
+                                              "</flow>"));
+    }
+
+    @Test
     public void testJavaComponentAnnotations()
     {
-        DefaultJavaComponent echo = muleContext.getRegistry().lookupByType(DefaultJavaComponent.class).values().iterator().next();
-        assertEquals("echo", getDocName(echo));
-        assertThat(getSourceFile(echo), is("annotations.xml"));
-        assertThat(getSourceFileLine(echo), is(11));
-        assertThat(getSourceElement(echo), is("<echo-component doc:name=\"echo\">" +
-                                              "</echo-component>"));
+        boolean echoAsserted = false;
+        for (DefaultJavaComponent echo : muleContext.getRegistry().lookupByType(DefaultJavaComponent.class).values())
+        {
+            if ("echo".equals(getDocName(echo)))
+            {
+                assertThat(getSourceFile(echo), is("annotations.xml"));
+                assertThat(getSourceFileLine(echo), is(11));
+                assertThat(getSourceElement(echo), is("<echo-component doc:name=\"echo\">" +
+                                                      "</echo-component>"));
+
+                echoAsserted = true;
+            }
+        }
+
+        assertThat(echoAsserted, is(true));
+    }
+
+    @Test
+    public void testInsideSpringBeansAnnotations()
+    {
+        Transformer stb = muleContext.getRegistry().lookupTransformer("ManziTransformer");
+        assertThat(stb, not(nullValue()));
+        assertThat(getDocName(stb), is("manzi-transformer"));
+        assertThat(getSourceFile(stb), is("annotations-config.xml"));
+        assertThat(getSourceFileLine(stb), is(18));
+        assertThat(getSourceElement(stb), is("<append-string-transformer message=\"Manzi\" name=\"ManziTransformer\" doc:name=\"manzi-transformer\"></append-string-transformer>"));
     }
 
     protected String getDocName(Object obj)

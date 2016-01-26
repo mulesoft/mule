@@ -33,6 +33,7 @@ import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.util.StreamCloserService;
+import org.mule.config.bootstrap.ArtifactType;
 import org.mule.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
@@ -367,6 +368,11 @@ public interface MuleContext extends Lifecycle
      * @throws InterruptedException if the current thread is interrupted while waiting
      */
     boolean waitUntilStarted(int timeout) throws InterruptedException;
+
+    /**
+     * The {@link ArtifactType} indicating if this configuration object is for an application or a domain.
+     */
+    ArtifactType getArtifactType();
 
     /**
      * @return the callbacks for notifying when a flow call from another flow is started or completed.

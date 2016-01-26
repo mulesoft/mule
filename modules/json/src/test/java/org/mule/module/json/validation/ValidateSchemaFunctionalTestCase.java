@@ -13,6 +13,7 @@ import static org.mule.module.json.validation.JsonSchemaDereferencing.INLINE;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_DRAFTV3;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_INLINE;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_JSON;
+import static org.mule.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_REFERRING;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.getBadFstab;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.getBadFstab2;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.getBadFstab2AsJsonData;
@@ -57,6 +58,12 @@ public class ValidateSchemaFunctionalTestCase extends AbstractValidateSchemaFunc
                 {"Draft3 as JsonNode", SCHEMA_FSTAB_DRAFTV3, CANONICAL, fromString(getGoodFstab()), fromString(getBadFstab()), fromString(getBadFstab2())},
                 {"Draft3 as JsonData", SCHEMA_FSTAB_DRAFTV3, CANONICAL, getGoodFstabAsJsonData(), getBadFstabAsJsonData(), getBadFstabAsJsonData()},
                 {"Draft3 as Stream", SCHEMA_FSTAB_DRAFTV3, CANONICAL, toStream(getGoodFstab()), toStream(getBadFstab()), toStream(getBadFstab2())},
+
+                {"ReferringV4Schema as String", SCHEMA_FSTAB_REFERRING, CANONICAL, getGoodFstab(), getBadFstab(), getBadFstab2()},
+                {"ReferringV4Schema as bytes", SCHEMA_FSTAB_REFERRING, CANONICAL, getGoodFstab().getBytes(), getBadFstab().getBytes(), getBadFstab2().getBytes()},
+                {"ReferringV4Schema as JsonNode", SCHEMA_FSTAB_REFERRING, CANONICAL, fromString(getGoodFstab()), fromString(getBadFstab()), fromString(getBadFstab2())},
+                {"ReferringV4Schema as JsonData", SCHEMA_FSTAB_REFERRING, CANONICAL, getGoodFstabAsJsonData(), getBadFstabAsJsonData(), getBadFstabAsJsonData()},
+                {"ReferringV4Schema as Stream", SCHEMA_FSTAB_REFERRING, CANONICAL, toStream(getGoodFstab()), toStream(getBadFstab()), toStream(getBadFstab2())},
         });
     }
 

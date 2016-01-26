@@ -8,8 +8,15 @@
 package org.mule.transformer.types;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.metadata.DataType;
+import org.mule.api.metadata.SimpleDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -33,5 +40,17 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
         DataType<?> dataType = DataTypeFactory.createFromObject("test");
 
         assertThat(dataType, like(String.class, MimeTypes.ANY, null));
+    }
+
+    @Test
+    public void createsDataTypeForMessage() throws Exception
+    {
+        MuleContext muleContext = mock(MuleContext.class);
+        when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
+
+        DataType<?> dataType = DataTypeFactory.createFromObject(
+                new DefaultMuleMessage("test", null, null, null, muleContext, new SimpleDataType<>(String.class, "text/plain")));
+
+        assertThat(dataType, like(String.class, "text/plain", null));
     }
 }

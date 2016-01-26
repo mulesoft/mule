@@ -6,6 +6,8 @@
  */
 package org.mule.util;
 
+import static java.util.Collections.synchronizedSet;
+
 import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
@@ -13,7 +15,6 @@ import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.processor.chain.DynamicMessageProcessorContainer;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,7 +37,7 @@ public class NotificationUtils
     {
         private Map<MessageProcessor, String> flowMap = new ConcurrentHashMap<MessageProcessor, String>();
         // This set allows for dynamic containers to not be analyzed more than once. Dynamic containers cannot be removed because as a container it also must have a path.
-        private Set<MessageProcessor> resolvedDynamicContainers = Collections.synchronizedSet(new HashSet<MessageProcessor>());
+        private Set<MessageProcessor> resolvedDynamicContainers = synchronizedSet(new HashSet<MessageProcessor>());
 
         public FlowMap(Map<MessageProcessor, String> paths)
         {
@@ -106,10 +107,24 @@ public class NotificationUtils
 
     }
 
-
-    public static FlowMap buildPaths(MessageProcessorPathElement element)
+    /**
+     * @param element where to get the paths from.
+     * @return a resolver for the elements corresponding to <b>element</b>.
+     */
+    public static FlowMap buildPathResolver(MessageProcessorPathElement element)
     {
         return new FlowMap(buildPaths(element, new LinkedHashMap<MessageProcessor, String>()));
+    }
+
+    /**
+     * @deprecated Use {@link #buildPathResolver(MessageProcessorPathElement)} instead.
+     * @param element where to get the paths from.
+     * @return the element paths corresponding to <b>element</b>.
+     */
+    @Deprecated
+    public static Map<MessageProcessor, String> buildPaths(MessageProcessorPathElement element)
+    {
+        return buildPaths(element, new LinkedHashMap<MessageProcessor, String>());
     }
 
     private static Map<MessageProcessor, String> buildPaths(MessageProcessorPathElement element, Map<MessageProcessor, String> elements)

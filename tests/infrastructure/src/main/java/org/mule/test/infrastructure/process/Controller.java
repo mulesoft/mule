@@ -34,7 +34,7 @@ public abstract class Controller
     private static final int DEFAULT_TIMEOUT = 30000;
     private static final String MULE_HOME_VARIABLE = "MULE_HOME";
     private static final String DOMAIN_DEPLOY_ERROR = "Error deploying domain %s.";
-    private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule ESB.";
+    private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule Runtime.";
     private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
     private static final int IS_RUNNING_STATUS_CODE = 0;
     protected String muleHome;

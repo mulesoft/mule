@@ -8,7 +8,10 @@ package org.mule.module.http.internal.listener;
 
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
+import static org.mule.module.http.api.HttpConstants.ALL_INTERFACES_IP;
 import static org.mule.module.http.internal.HttpParser.decodeUrlEncodedBody;
+import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_0_9;
+import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
 
 import org.mule.DefaultMuleEvent;
@@ -133,9 +136,33 @@ public class HttpRequestToMuleEvent
     {
         URIBuilder uriBuilder = new URIBuilder();
         uriBuilder.setProtocol(requestContext.getScheme());
-        uriBuilder.setHost(requestContext.getRequest().getHeaderValue("host"));
+        uriBuilder.setHost(resolveTargetHost(requestContext.getRequest()));
         uriBuilder.setPath(requestContext.getRequest().getPath());
         return uriBuilder.getEndpoint().getUri();
+    }
+
+    /**
+     * See <a href="http://www8.org/w8-papers/5c-protocols/key/key.html#SECTION00070000000000000000" >Internet address
+     * conservation</a>.
+     */
+    private static String resolveTargetHost(HttpRequest request)
+    {
+        String hostHeaderValue = request.getHeaderValue("host");
+        if (HTTP_1_0.equals(request.getProtocol()) || HTTP_0_9.equals(request.getProtocol()))
+        {
+            return hostHeaderValue == null ? ALL_INTERFACES_IP : hostHeaderValue;
+        }
+        else
+        {
+            if (hostHeaderValue == null)
+            {
+                throw new IllegalArgumentException("Missing 'host' header");
+            }
+            else
+            {
+                return hostHeaderValue;
+            }
+        }
     }
 
     private static String resolveRemoteHostAddress(final HttpRequestContext requestContext)

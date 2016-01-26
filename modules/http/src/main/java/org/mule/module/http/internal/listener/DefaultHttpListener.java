@@ -8,7 +8,9 @@ package org.mule.module.http.internal.listener;
 
 import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+
 import org.mule.OptimizedRequestContext;
+import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -105,6 +107,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
         this.parseRequest = parseRequest;
     }
 
+    @Override
     public HttpListenerConfig getConfig()
     {
         return config;
@@ -138,6 +141,10 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
                 {
                     logger.warn("Exception occurred processing request:", e);
                     sendErrorResponse(INTERNAL_SERVER_ERROR, SERVER_PROBLEM, responseCallback);
+                }
+                finally
+                {
+                    RequestContext.clear();
                 }
             }
 
@@ -277,11 +284,13 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
         requestHandlerManager.dispose();
     }
 
+    @Override
     public String getPath()
     {
         return path;
     }
 
+    @Override
     public String[] getAllowedMethods()
     {
         return parsedAllowedMethods;

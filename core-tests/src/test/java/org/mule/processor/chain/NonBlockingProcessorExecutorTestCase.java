@@ -83,6 +83,9 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
         processors.add(processor2);
         processors.add(processor3);
         assertBlockingExecution(processors, not(sameInstance(event)));
+
+        // When NonBlockingProcessorExecutor falls-back to blocking the existing ReplyToHandler should be cleared
+        assertThat(processor1.event.getReplyToHandler(), is(nullValue()));
     }
 
     @Test
@@ -93,6 +96,9 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
         processors.add(processor2);
         processors.add(processor3);
         assertBlockingExecution(processors, not(sameInstance(event)));
+
+        // When NonBlockingProcessorExecutor falls-back to blocking the existing ReplyToHandler should be cleared
+        assertThat(processor1.event.getReplyToHandler(), is(nullValue()));
     }
 
     @Test

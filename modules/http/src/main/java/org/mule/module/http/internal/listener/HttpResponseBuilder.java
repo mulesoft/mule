@@ -9,6 +9,7 @@ package org.mule.module.http.internal.listener;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
@@ -213,9 +214,10 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         {
             httpResponseBuilder.setStatusCode(resolvedStatusCode);
         }
-        if (this.reasonPhrase != null)
+        String resolvedReasonPhrase = resolveReasonPhrase(event);
+        if (resolvedReasonPhrase != null)
         {
-            httpResponseBuilder.setReasonPhrase(reasonPhraseEvaluator.resolveStringValue(event));
+            httpResponseBuilder.setReasonPhrase(resolvedReasonPhrase);
         }
         httpResponseBuilder.setEntity(httpEntity);
         return httpResponseBuilder.build();
@@ -282,6 +284,22 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         if (statusCodeOutboundProperty != null)
         {
             return NumberUtils.toInt(statusCodeOutboundProperty);
+        }
+
+        return null;
+    }
+
+    private String resolveReasonPhrase(MuleEvent event)
+    {
+        if (reasonPhrase != null)
+        {
+            return reasonPhraseEvaluator.resolveStringValue(event);
+        }
+
+        Object reasonPhraseOutboundProperty = event.getMessage().getOutboundProperty(HTTP_REASON_PROPERTY);
+        if (reasonPhraseOutboundProperty != null)
+        {
+            return reasonPhraseOutboundProperty.toString();
         }
 
         return null;

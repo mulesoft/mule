@@ -6,7 +6,9 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.api.config.MuleProperties;
+import static org.mule.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
+import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
+
 import org.mule.config.spring.parsers.generic.OptionalChildDefinitionParser;
 import org.mule.retry.async.AsynchronousRetryTemplate;
 
@@ -38,15 +40,20 @@ public class RetryPolicyDefinitionParser extends OptionalChildDefinitionParser
     @Override
     protected boolean isChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        if (getParentBeanName(element).equals(MuleProperties.OBJECT_MULE_CONFIGURATION))
+        if (isConfigElement(element))
         {
-            element.setAttribute(ATTRIBUTE_ID, MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
+            element.setAttribute(ATTRIBUTE_ID, OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
             return false;
         }
         else
         {
             return true;
         }
+    }
+
+    protected boolean isConfigElement(Element element)
+    {
+        return getParentBeanName(element).equals(OBJECT_MULE_CONFIGURATION);
     }
 
     @Override
@@ -98,18 +105,36 @@ public class RetryPolicyDefinitionParser extends OptionalChildDefinitionParser
         {
             // Create the AsynchronousRetryTemplate as a wrapper bean
             BeanDefinitionBuilder bdb = BeanDefinitionBuilder.genericBeanDefinition(AsynchronousRetryTemplate.class);
-            // Generate a bean name
-            String asynchWrapperName = parserContext.getReaderContext().generateBeanName(bdb.getBeanDefinition());
-            // Pass in the retry policy as a constructor argument
-            String retryPolicyName = getBeanName(element);
-            bdb.addConstructorArgReference(retryPolicyName);
-            // Register the new bean
-            BeanDefinitionHolder holder = new BeanDefinitionHolder(bdb.getBeanDefinition(), asynchWrapperName);
-            registerBeanDefinition(holder, parserContext.getRegistry());
 
-            // Set the AsynchronousRetryTemplate wrapper bean on the retry policy's parent instead of the retry policy itself
-            BeanDefinition parent = parserContext.getRegistry().getBeanDefinition(getParentBeanName(element));
-            parent.getPropertyValues().addPropertyValue(getPropertyName(element), new RuntimeBeanReference(asynchWrapperName));
+            if (isConfigElement(element))
+            {
+                // rename the delegate policy
+                element.removeAttribute(ATTRIBUTE_ID);
+                element.setAttribute(ATTRIBUTE_ID, getBeanName(element));
+
+                wrapDelegateRetryPolicy(element, parserContext, bdb, OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
+            }
+            else
+            {
+                // Generate a bean name
+                String asynchWrapperName = parserContext.getReaderContext().generateBeanName(bdb.getBeanDefinition());
+
+                wrapDelegateRetryPolicy(element, parserContext, bdb, asynchWrapperName);
+
+                // Set the AsynchronousRetryTemplate wrapper bean on the retry policy's parent instead of the retry
+                // policy itself
+                BeanDefinition parent = parserContext.getRegistry().getBeanDefinition(getParentBeanName(element));
+                parent.getPropertyValues().addPropertyValue(getPropertyName(element), new RuntimeBeanReference(asynchWrapperName));
+            }
         }
+    }
+
+    protected void wrapDelegateRetryPolicy(Element element, ParserContext parserContext, BeanDefinitionBuilder bdb, String asynchWrapperName)
+    {
+        // Pass in the retry policy as a constructor argument
+        bdb.addConstructorArgReference(getBeanName(element));
+        // Register the new bean
+        BeanDefinitionHolder holder = new BeanDefinitionHolder(bdb.getBeanDefinition(), asynchWrapperName);
+        registerBeanDefinition(holder, parserContext.getRegistry());
     }
 }

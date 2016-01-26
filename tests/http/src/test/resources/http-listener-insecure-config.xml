@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <tls:context name="globalTlsContext" >
+        <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
+        <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+    </tls:context>
+
+    <http:listener-config name="insecureConfig" protocol="HTTPS" host="localhost" port="${port1}">
+        <tls:context>
+            <tls:trust-store path="ssltest-cacerts.jks" password="changeit" insecure="true"/>
+            <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        </tls:context>
+    </http:listener-config>
+
+    <http:listener-config name="secureConfig" protocol="HTTPS" host="localhost" port="${port2}">
+        <tls:context>
+            <tls:trust-store path="ssltest-cacerts.jks" password="changeit" />
+            <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        </tls:context>
+    </http:listener-config>
+
+    <http:request-config name="clientGlobalConfig" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="globalTlsContext" />
+
+    <flow name="testInsecureServer">
+        <http:listener config-ref="insecureConfig" path="/"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="testSecureServer">
+        <http:listener config-ref="secureConfig" path="/"/>
+        <echo-component/>
+    </flow>
+
+
+    <flow name="testRequestToInsecure">
+        <http:request config-ref="clientGlobalConfig" port="${port1}" path="/" method="POST" />
+    </flow>
+
+    <flow name="testRequestToSecure">
+        <http:request config-ref="clientGlobalConfig" port="${port2}" path="/" method="POST" />
+    </flow>
+
+</mule>

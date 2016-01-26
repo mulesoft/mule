@@ -9,15 +9,13 @@ package org.mule.module.json.validation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_JSON;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.io.InputStream;
+import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,16 +31,16 @@ public class LoadJsonSchemaForValidationTestCase extends AbstractMuleTestCase
     @Mock
     private ClassLoader mockClassLoader;
 
-    private InputStream schemaInputStream;
+    private URL schemaUrl;
 
     @Before
     public void before() throws Exception
     {
-        schemaInputStream = getClass().getResourceAsStream(SCHEMA_FSTAB_JSON);
-        assertThat("could not load schema", schemaInputStream, is(notNullValue()));
-        schemaInputStream = spy(schemaInputStream);
+        schemaUrl = getClass().getResource(SCHEMA_FSTAB_JSON);
+        assertThat("could not load schema", schemaUrl, is(notNullValue()));
 
-        when(mockClassLoader.getResourceAsStream(SCHEMA_FSTAB_JSON)).thenReturn(schemaInputStream);
+        when(mockClassLoader.getResource(SCHEMA_FSTAB_JSON)).thenReturn(schemaUrl);
+        when(mockClassLoader.getResource("resource:" + SCHEMA_FSTAB_JSON)).thenReturn(schemaUrl);
     }
 
     @Test
@@ -59,8 +57,25 @@ public class LoadJsonSchemaForValidationTestCase extends AbstractMuleTestCase
             }
         });
 
-        verify(mockClassLoader).getResourceAsStream(SCHEMA_FSTAB_JSON);
-        verify(schemaInputStream, atLeastOnce()).close();
+        verify(mockClassLoader).getResource(SCHEMA_FSTAB_JSON);
+    }
+
+    @Test
+    public void usesThreadClassloaderWithRedirect() throws Exception
+    {
+        doWithMockClasssLoader(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                JsonSchemaValidator.builder()
+                        .setSchemaLocation("http://mule.org/schemas/fstab.json")
+                        .addSchemaRedirect("http://mule.org/schemas/fstab.json", SCHEMA_FSTAB_JSON)
+                        .build();
+            }
+        });
+
+        verify(mockClassLoader).getResource(SCHEMA_FSTAB_JSON);
     }
 
     private void doWithMockClasssLoader(Runnable closure)

@@ -27,14 +27,14 @@ In this guide you will find:
 
  
 # Before you begin 
-Mule is a powerful and complex project. Before contributing to the Mule source code, it's important to understand the domain of the enterprise integration, Mule ESB from the user point of view and the different mechanisms to extend Mule.
+Mule is a powerful and complex project. Before contributing to the Mule source code, it's important to understand the domain of the enterprise integration, Mule Runtime from the user point of view and the different mechanisms to extend Mule.
 
 ## Getting to know better Mule
 There are a number of sources you can use to understand better Mule and its forthcoming features:
 
 - MuleSoft's [blog](http://blogs.mulesoft.com/). The fastest way of knowing about new features in mule. 
 - [@MuleSoft](https://twitter.com/MuleSoft)'s twitter account. You might also want to check the [#MuleESB](https://twitter.com/hashtag/MuleESB) hashtag.
-- [Mule User Guide](https://developer.mulesoft.com/docs/display/current/Mule+User+Guide), the official documentation around usage of Mule ESB.
+- [Mule User Guide](https://developer.mulesoft.com/docs/display/current/Mule+User+Guide), the official documentation around usage of Mule Runtime.
 - The books [Mule in Action 2ed](http://www.manning.com/dossot2/) and [Getting Started with Mule Cloud Connect](http://shop.oreilly.com/product/0636920025726.do). Both are excellent resources to understand how to use and extend Mule.
 
 
@@ -51,8 +51,11 @@ If, in the above-listed resources, no-one else has initiated your improvement or
 
 ## Understanding the extension mechanisms
 
-For creating new connectors and modules which augment the functionality in this distribution use the Mule SDK, which is conformed
-by the Extensions API, the Extensions Framework and the related tooling.
+Mule ESB has two different extension mechanisms for writing modules and connectors. Avoiding to add functionality to this project and rather use one of those mechanisms to extend Mule is probably the more favorable option.
+
+It is therefor important to understand those two extension mechanisms. The first and more intuitive mechanism for extensions is the [Anypoint Connector DevKit](https://developer.mulesoft.com/docs/display/current/Anypoint+Connector+DevKit), an annotation based framework for easy construction of extensions. The second choice is to extend mule through the [Extensions](https://developer.mulesoft.com/docs/display/current/Extending) mechanism.
+
+Now we should understand Mule and the enterprise integration domain. At the same time we should  know the different extension mechanisms of Mule.
 
  
 # Setting up the development environment
@@ -97,7 +100,7 @@ If you're new to Git, consider reading [Pro Git](http://git-scm.com/book) to abs
 2. If you haven't already done so, [set up git](https://help.github.com/articles/set-up-git) on your local drive. 
 3. Navigate to Mule's github page at: [https://github.com/mulesoft/mule.git](https://github.com/mulesoft/mule.git) 
 4. Click the Fork button at the top right corner of the page, then select your own git repository into which github inserts a copy of the repository.
-5. Prepare to clone your forked Mule ESB repository from your github account to your local drive via a secure file transfer connection. As per git's recommendation, we advise using HTTPS to transfer the source code files to your local drive. However, if you prefer to establish a secure connection for transferring the files via SSH, follow git's procedure to [generate SSH keys](https://help.github.com/articles/generating-ssh-keys).
+5. Prepare to clone your forked Mule Runtime repository from your github account to your local drive via a secure file transfer connection. As per git's recommendation, we advise using HTTPS to transfer the source code files to your local drive. However, if you prefer to establish a secure connection for transferring the files via SSH, follow git's procedure to [generate SSH keys](https://help.github.com/articles/generating-ssh-keys).
 6. In the command line, create or navigate to an existing folder on your local drive into which you wish to store your forked clone of Mule source code.
 7. From the command line, execute one of the following:
     - For **HTTPS**:  `git clone https://github.com/<yourreponame>/mule`
@@ -188,6 +191,7 @@ Use IntelliJ's IDEA integration platform to modify or add to your cloned Mule so
 2. Open IDEA, then select ***File > Open...***
 3. Browse to the directory into which you downloaded the Mule source code, then select the `pom.xml` file. 
 4. Click ***OK***. IDEA takes awhile to process all the pom.xml files.
+5. Set the correct source for the JDK on your local drive. Right click the ***mule-transport-jdbc*** directory, then select  **Module Settings > Sources > src > main > jdk6** or **jdk7**. Repeat this step for test sources, as tests.
 
 ##### Troubleshooting
 
@@ -225,7 +229,7 @@ In order to create our feature branch we should follow these steps:
 2. Switch to the new branch using the following command: 
 `git checkout yourJIRAissuenumber`.
 
-Now we should be able to make our very first compilation of the Mule ESB source code. We just need to instruct Maven to download all the dependent libraries and compile the project, you can do so execution the following command Within the directory into which you cloned the Mule source code: `mvn -DskipTests install`.
+Now we should be able to make our very first compilation of the Mule Runtime source code. We just need to instruct Maven to download all the dependent libraries and compile the project, you can do so execution the following command Within the directory into which you cloned the Mule source code: `mvn -DskipTests install`.
 
 Note that if this is your first time using Maven, the download make take several minutes to complete.
 
@@ -305,7 +309,7 @@ In order to set up our [development environment](#setting-up-the-development-env
 
 At that point we were almost ready to develop improvements, we just needed to [configured our favourite IDE](#configuring-the-ide) to develop or debug Mule code.
 
-Then we were finally ready to [develop our contribution](#developing-your-contribution). We created our very own [feature branch](#creating-your-topic-branch) were we'll develop our improvement, then we learnt how to [keep it updated](#updating-your-topic-branch) in order to be able to submit a [pull request](#submitting-a-pull-request) to the main Mule ESB repository
+Then we were finally ready to [develop our contribution](#developing-your-contribution). We created our very own [feature branch](#creating-your-topic-branch) were we'll develop our improvement, then we learnt how to [keep it updated](#updating-your-topic-branch) in order to be able to submit a [pull request](#submitting-a-pull-request) to the main Mule Runtime repository
 
-Thank you one more time for taking some time understanding how to contribute to Mule ESB.
+Thank you one more time for taking some time understanding how to contribute to Mule Runtime.
 

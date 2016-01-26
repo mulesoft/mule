@@ -17,6 +17,14 @@ import org.w3c.dom.Element;
 public class CheckRequiredAttributesWhenNoChildren extends CheckRequiredAttributes
 {
     private String elementName;
+    private String elementNamespaceUrl;
+
+    public CheckRequiredAttributesWhenNoChildren(String[][] attributeNames, String elementName, String elementNamespaceUrl)
+    {
+        super(attributeNames);
+        this.elementName = elementName;
+        this.elementNamespaceUrl = elementNamespaceUrl;
+    }
 
     public CheckRequiredAttributesWhenNoChildren(String[][] attributeNames, String elementName)
     {
@@ -27,7 +35,7 @@ public class CheckRequiredAttributesWhenNoChildren extends CheckRequiredAttribut
     public void preProcess(PropertyConfiguration config, Element element)
     {
         // If there are child elements we skip this check
-        if (element.getElementsByTagName(elementName).getLength() > 0)
+        if (element.getElementsByTagNameNS(elementNamespaceUrl, elementName).getLength() > 0)
         {
             return;
         }

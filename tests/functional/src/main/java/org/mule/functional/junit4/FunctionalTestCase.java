@@ -6,7 +6,6 @@
  */
 package org.mule.functional.junit4;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.fail;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -28,10 +27,10 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.construct.AbstractPipeline;
 import org.mule.construct.Flow;
-import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
-import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
+import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.IOUtils;
 
@@ -220,7 +219,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     /**
      * Looks up the given flow in the registry and processes it with the given event.
      * A flow asserting is then executed by calling {@link
-     * FlowAssert.verify(String)}
+     * FlowAssert#verify(String)}
      * 
      * @param flowName the name of the flow to be executed
      * @param event the event ot execute with

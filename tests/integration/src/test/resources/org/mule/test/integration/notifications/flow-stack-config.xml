@@ -11,8 +11,8 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <spring:beans>
-        <spring:bean id="flowStackAsserter" name="flowStackAsserter" class="org.mule.context.notification.FlowStackTestCase$FlowStackAsserter" scope="prototype" />
-        <spring:bean id="flowStackAsyncAsserter" name="flowStackAsyncAsserter" class="org.mule.context.notification.FlowStackTestCase$FlowStackAsyncAsserter" scope="prototype" />
+        <spring:bean id="flowStackAsserter" name="flowStackAsserter" class="org.mule.tck.util.FlowTraceUtils$FlowStackAsserter" scope="prototype" />
+        <spring:bean id="flowStackAsyncAsserter" name="flowStackAsyncAsserter" class="org.mule.tck.util.FlowTraceUtils$FlowStackAsyncAsserter" scope="prototype" />
     </spring:beans>
 
 

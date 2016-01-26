@@ -6,6 +6,7 @@
  */
 package org.mule.el;
 
+import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -18,7 +19,7 @@ import org.mule.util.IOUtils;
 
 import java.io.IOException;
 
-public class ExpressionLanguageComponent implements MessageProcessor, MuleContextAware, Initialisable
+public class ExpressionLanguageComponent extends AbstractAnnotatedObject implements MessageProcessor, MuleContextAware, Initialisable
 {
 
     protected MuleContext muleContext;

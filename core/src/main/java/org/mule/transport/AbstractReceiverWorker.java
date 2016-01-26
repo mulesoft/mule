@@ -6,6 +6,9 @@
  */
 package org.mule.transport;
 
+import static java.lang.Thread.currentThread;
+
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -55,6 +58,7 @@ public abstract class AbstractReceiverWorker implements Work
      * This will run the receiver logic and call {@link #release()} once {@link #doRun()} completes.
     *
     */
+    @Override
     public final void run()
     {
         doRun();
@@ -92,6 +96,7 @@ public abstract class AbstractReceiverWorker implements Work
         // may have been started
         ExecutionCallback<List<MuleEvent>> processingCallback = new ExecutionCallback<List<MuleEvent>>()
         {
+            @Override
             public List<MuleEvent> process() throws Exception
             {
                 final Transaction tx = TransactionCoordination.getInstance().getTransaction();
@@ -163,14 +168,19 @@ public abstract class AbstractReceiverWorker implements Work
             }
         };
 
+        ClassLoader originalCl = currentThread().getContextClassLoader();
         try
         {
+            currentThread().setContextClassLoader(endpoint.getMuleContext().getExecutionClassLoader());
+
             List<MuleEvent> results = executionTemplate.execute(processingCallback);
             handleResults(handleEventResults(results));
         }
         finally
         {
             messages.clear();
+            RequestContext.clear();
+            currentThread().setContextClassLoader(originalCl);
         }
     }
 
@@ -255,6 +265,7 @@ public abstract class AbstractReceiverWorker implements Work
      * This method is called once this worker is no longer required.  Any resources *only* associated with
      * this worker should be cleaned up here.
      */
+    @Override
     public void release()
     {
         // no op

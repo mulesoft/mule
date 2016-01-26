@@ -11,7 +11,7 @@
 
     <http:listener-config name="sharedListenerConfig" host="localhost" port="${port1}" protocol="HTTPS">
         <tls:context>
-            <tls:key-store  path="clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
+            <tls:key-store  path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
         </tls:context>
     </http:listener-config>
 

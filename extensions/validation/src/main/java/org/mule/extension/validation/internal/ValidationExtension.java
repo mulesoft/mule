@@ -7,6 +7,7 @@
 package org.mule.extension.validation.internal;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;

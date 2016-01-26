@@ -169,7 +169,7 @@
 /mule-standalone-${productVersion}/lib/opt/asm-tree-3.1.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjrt-1.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjweaver-1.7.3.jar
-/mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.31.jar
+/mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.32.jar
 /mule-standalone-${productVersion}/lib/opt/bcpg-jdk15on-1.50.jar
 /mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15on-1.50.jar
 /mule-standalone-${productVersion}/lib/opt/bcprov-jdk15on-1.50.jar
@@ -216,11 +216,11 @@
 /mule-standalone-${productVersion}/lib/opt/geronimo-jta_1.1_spec-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/grabbag-1.8.1.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-framework-2.3.21.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-http-2.3.21.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-http-server-2.3.21.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-websockets-2.3.21.jar
-/mule-standalone-${productVersion}/lib/opt/connection-pool-2.3.21.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-framework-2.3.24.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-http-2.3.24.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-http-server-2.3.24.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-websockets-2.3.24.jar
+/mule-standalone-${productVersion}/lib/opt/connection-pool-2.3.24.jar
 /mule-standalone-${productVersion}/lib/opt/groovy-all-2.4.4-indy.jar
 /mule-standalone-${productVersion}/lib/opt/guava-18.0.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-core-1.3.jar
@@ -254,7 +254,7 @@
 /mule-standalone-${productVersion}/lib/opt/jnr-posix-2.5.2.jar
 /mule-standalone-${productVersion}/lib/opt/jnr-unixsocket-0.3.jar
 /mule-standalone-${productVersion}/lib/opt/jnr-x86asm-1.0.2.jar
-/mule-standalone-${productVersion}/lib/opt/joda-time-2.5.jar
+/mule-standalone-${productVersion}/lib/opt/joda-time-2.9.1.jar
 /mule-standalone-${productVersion}/lib/opt/joni-2.0.0.jar
 /mule-standalone-${productVersion}/lib/opt/jopt-simple-4.6.jar
 /mule-standalone-${productVersion}/lib/opt/json-20140107.jar
