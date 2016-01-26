@@ -34,6 +34,7 @@
     </xsd:annotation>
 
     <xsd:element name="connector" type="imapsConnectorType" substitutionGroup="mule:abstract-connector"/>
+    <xsd:element name="msexchange-connector" type="imapsConnectorType" substitutionGroup="mule:abstract-connector"/>
 
     <xsd:complexType name="imapsConnectorType">
         <xsd:complexContent>

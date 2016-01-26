@@ -8,10 +8,12 @@ package org.mule.transport.email.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.email.ImapsConnector;
+import org.mule.transport.email.MicrosoftExchangeImapsConnector;
 
 /**
  * Registers a Bean Definition Parser for handling <code><imaps:connector></code> elements.
@@ -28,5 +30,7 @@ public class ImapsNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("tls-trust-store", new TrustStoreDefinitionParser());
         registerBeanDefinitionParser("tls-client", new ClientKeyStoreDefinitionParser());
+
+        registerBeanDefinitionParser("msexchange-connector", new MuleOrphanDefinitionParser(MicrosoftExchangeImapsConnector.class, true));
     }
 }

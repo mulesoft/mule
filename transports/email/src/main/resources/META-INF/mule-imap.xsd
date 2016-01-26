@@ -43,6 +43,8 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="msexchange-connector" type="imapConnectorType" substitutionGroup="mule:abstract-connector"/>
+
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
