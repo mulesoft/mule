@@ -8,14 +8,17 @@ package org.mule.module.extension.internal.runtime.connector;
 
 import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandler;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connector.ConnectionManager;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.OperationContext;
+import org.mule.extension.api.runtime.RetryRequest;
 import org.mule.module.extension.internal.ExtensionProperties;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.util.ExceptionUtils;
 
 import java.util.Optional;
 
@@ -65,7 +68,26 @@ public final class ConnectionInterceptor implements Interceptor
         }
     }
 
-    //TODO: MULE-8909 && MULE-8910: validate the connection before returning it. Reconnect if necessary
+    /**
+     * If the {@code exception} is a {@link ConnectionException} a retry of failed request will be asked
+     *
+     * @param operationContext the {@link OperationContext} that was used to execute the operation
+     * @param retryRequest     a {@link RetryRequest} in case that the operation should be retried
+     * @param exception        the {@link Exception} that was thrown by the failing operation
+     * @return the same {@link Throwable} given in the parameter
+     */
+    @Override
+    public Throwable onError(OperationContext operationContext, RetryRequest retryRequest, Throwable exception)
+    {
+        Optional<ConnectionException> connectionException = ExceptionUtils.extractRootConnectionException(exception);
+        if (connectionException.isPresent())
+        {
+            retryRequest.request();
+        }
+
+        return exception;
+    }
+
     private Object getConnection(OperationContext operationContext) throws ConnectionException
     {
         Optional<ConnectionProvider> connectionProvider = operationContext.getConfiguration().getConnectionProvider();

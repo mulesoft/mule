@@ -8,9 +8,13 @@ package org.mule.config.spring.parsers.specific;
 
 import static org.mule.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
-
+import static org.mule.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_NAMESPACE;
+import static org.mule.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_PREFIX;
+import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
 import org.mule.config.spring.parsers.generic.OptionalChildDefinitionParser;
 import org.mule.retry.async.AsynchronousRetryTemplate;
+
+import javax.xml.namespace.QName;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -25,6 +29,9 @@ import org.w3c.dom.Element;
  */
 public class RetryPolicyDefinitionParser extends OptionalChildDefinitionParser
 {
+
+    public static final QName MULE_EXTENSION_CONNECTION_PROVIDER_TYPE = new QName(MULE_EXTENSION_NAMESPACE, "abstractConnectionProviderType", MULE_EXTENSION_PREFIX);
+
     boolean asynchronous = false;
 
     public RetryPolicyDefinitionParser()
@@ -45,10 +52,11 @@ public class RetryPolicyDefinitionParser extends OptionalChildDefinitionParser
             element.setAttribute(ATTRIBUTE_ID, OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
             return false;
         }
-        else
+        else if (getParentElement(element).getSchemaTypeInfo().isDerivedFrom(MULE_EXTENSION_CONNECTION_PROVIDER_TYPE.getNamespaceURI(), MULE_EXTENSION_CONNECTION_PROVIDER_TYPE.getLocalPart(), DERIVATION_EXTENSION))
         {
-            return true;
+            return false;
         }
+        return true;
     }
 
     protected boolean isConfigElement(Element element)
@@ -66,35 +74,36 @@ public class RetryPolicyDefinitionParser extends OptionalChildDefinitionParser
         element.removeAttribute("blocking");
 
         // Deprecated attribute from 2.x kept for backwards-compatibility.  Remove for the next major release.
+        // TODO MULE-9347
         if (StringUtils.isNotEmpty(element.getAttribute("asynchronous")))
         {
             asynchronous = Boolean.parseBoolean(element.getAttribute("asynchronous"));
-            element.removeAttribute("asynchronous");            
+            element.removeAttribute("asynchronous");
             return;
         }
     }
 
     /**
      * The BDP magic inside this method will transform this simple config:
-     *
-     *      <test:connector name="testConnector8">
-     *          <ee:reconnect blocking="false" count="5" frequency="1000"/>
-     *      </test:connector>
-     *
+     * <p>
+     * <test:connector name="testConnector8">
+     * <ee:reconnect blocking="false" count="5" frequency="1000"/>
+     * </test:connector>
+     * <p>
      * into this equivalent config, because of the attribute asynchronous="true":
-     *
-     *      <test:connector name="testConnector8">
-     *          <spring:property name="retryPolicyTemplate">
-     *              <spring:bean class="org.mule.retry.async.AsynchronousRetryTemplate">
-     *                  <spring:constructor-arg>
-     *                      <spring:bean name="delegate" class="org.mule.retry.policies.SimpleRetryPolicyTemplate">
-     *                          <spring:property name="count" value="5"/>
-     *                          <spring:property name="frequency" value="1000"/>
-     *                      </spring:bean>
-     *                  </spring:constructor-arg>
-     *              </spring:bean>
-     *          </spring:property>
-     *      </test:connector>
+     * <p>
+     * <test:connector name="testConnector8">
+     * <spring:property name="retryPolicyTemplate">
+     * <spring:bean class="org.mule.retry.async.AsynchronousRetryTemplate">
+     * <spring:constructor-arg>
+     * <spring:bean name="delegate" class="org.mule.retry.policies.SimpleRetryPolicyTemplate">
+     * <spring:property name="count" value="5"/>
+     * <spring:property name="frequency" value="1000"/>
+     * </spring:bean>
+     * </spring:constructor-arg>
+     * </spring:bean>
+     * </spring:property>
+     * </test:connector>
      */
     @Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)

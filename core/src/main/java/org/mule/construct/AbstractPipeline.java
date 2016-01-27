@@ -292,9 +292,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         if (!userConfiguredProcessingStrategy && redeliveryHandlerConfigured)
         {
             setProcessingStrategy(new SynchronousProcessingStrategy());
-            if (logger.isWarnEnabled())
+            if (LOGGER.isWarnEnabled())
             {
-                logger.warn("Using message redelivery and rollback-exception-strategy requires synchronous processing strategy. Processing strategy re-configured to synchronous");
+                LOGGER.warn("Using message redelivery and rollback-exception-strategy requires synchronous processing strategy. Processing strategy re-configured to synchronous");
             }
         }
     }

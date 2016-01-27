@@ -8,10 +8,13 @@ package org.mule.internal.connection;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.retry.RetryPolicy;
+import org.mule.api.retry.RetryPolicyTemplate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,5 +96,21 @@ class LifecycleAwareConnectionProviderWrapper<Config, Connection> extends Connec
                 LOGGER.warn("Exception was found trying to dispose connection", e);
             }
         }
+    }
+
+    /**
+     * @return a {@link RetryPolicyTemplate} from the delegated {@link ConnectionProviderWrapper}, if the {@link #delegate}
+     * is a {@link ConnectionProvider} then a default {@link RetryPolicy} is returned from the {@link ConnectionProviderWrapper}
+     */
+    @Override
+    public RetryPolicyTemplate getRetryPolicyTemplate()
+    {
+        final ConnectionProvider<Config, Connection> delegate = getDelegate();
+        if (delegate instanceof ConnectionProviderWrapper)
+        {
+            return ((ConnectionProviderWrapper) delegate).getRetryPolicyTemplate();
+        }
+
+        return ((ConnectionManagerAdapter) muleContext.getRegistry().get(MuleProperties.OBJECT_CONNECTION_MANAGER)).getDefaultRetryPolicyTemplate();
     }
 }

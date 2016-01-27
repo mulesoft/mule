@@ -12,7 +12,7 @@
                     <xs:annotation>
                         <xs:documentation>Default configuration</xs:documentation>
                     </xs:annotation>
-                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="next-door">
@@ -50,7 +50,7 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
-                    </xs:choice>
+                    </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="nextDoor"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
@@ -522,10 +522,15 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
-                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:sequence>
+                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
-                    </xs:choice>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" name="disableValidation"></xs:attribute>
+                    </xs:sequence>
+                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" default="false" name="disableValidation">
+                        <xs:annotation>
+                            <xs:documentation>Connection Provider attribute to disable connection validation</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
                     <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" default="505-503-4455" name="saulPhoneNumber"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>

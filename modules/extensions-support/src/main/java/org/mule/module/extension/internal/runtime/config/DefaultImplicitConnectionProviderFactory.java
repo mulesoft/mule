@@ -6,15 +6,21 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
+import static org.mule.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.buildImplicitResolverSet;
 import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.internal.connection.ConnectionManagerAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
+
+import javax.inject.Inject;
 
 /**
  * Default implementation of {@link ImplicitConnectionProviderFactory}
@@ -41,7 +47,7 @@ public final class DefaultImplicitConnectionProviderFactory implements ImplicitC
         final ResolverSet resolverSet = buildImplicitResolverSet(implicitModel, event.getMuleContext().getExpressionManager());
         try
         {
-            return new ConnectionProviderObjectBuilder(implicitModel, resolverSet).build(event);
+            return new ConnectionProviderObjectBuilder(implicitModel, resolverSet, event.getMuleContext().getRegistry().get(OBJECT_CONNECTION_MANAGER)).build(event);
         }
         catch (MuleException e)
         {

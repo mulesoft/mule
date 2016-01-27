@@ -7,14 +7,19 @@
 package org.mule.internal.connection;
 
 import static org.mule.api.lifecycle.LifecycleUtils.assertNotStopping;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandler;
 import org.mule.api.connection.ConnectionHandlingStrategy;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connector.ConnectionManager;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.LifecycleUtils;
+import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.retry.policies.NoRetryPolicyTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +38,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public final class DefaultConnectionManager implements ConnectionManager, Stoppable
+public final class DefaultConnectionManager implements ConnectionManagerAdapter, Lifecycle
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConnectionManager.class);
@@ -43,6 +48,7 @@ public final class DefaultConnectionManager implements ConnectionManager, Stoppa
     private final Lock readLock = readWriteLock.readLock();
     private final Lock writeLock = readWriteLock.writeLock();
     private final MuleContext muleContext;
+    private final RetryPolicyTemplate retryPolicyTemplate;
 
     /**
      * Creates a new instance
@@ -53,6 +59,7 @@ public final class DefaultConnectionManager implements ConnectionManager, Stoppa
     public DefaultConnectionManager(MuleContext muleContext)
     {
         this.muleContext = muleContext;
+        this.retryPolicyTemplate = new NoRetryPolicyTemplate();
     }
 
     /**
@@ -172,6 +179,24 @@ public final class DefaultConnectionManager implements ConnectionManager, Stoppa
         return (ConnectionHandlingStrategyAdapter<Config, Connection>) connectionProvider.getHandlingStrategy(new DefaultConnectionHandlingStrategyFactory(config, connectionProvider, muleContext));
     }
 
+    @Override
+    public void dispose()
+    {
+        LifecycleUtils.disposeIfNeeded(retryPolicyTemplate, LOGGER);
+    }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        LifecycleUtils.initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
+    }
+
+    @Override
+    public void start() throws MuleException
+    {
+        LifecycleUtils.startIfNeeded(retryPolicyTemplate);
+    }
+
     private class ConnectionKey
     {
 
@@ -199,4 +224,11 @@ public final class DefaultConnectionManager implements ConnectionManager, Stoppa
             return System.identityHashCode(key);
         }
     }
+
+    @Override
+    public RetryPolicyTemplate getDefaultRetryPolicyTemplate()
+    {
+        return retryPolicyTemplate;
+    }
+
 }

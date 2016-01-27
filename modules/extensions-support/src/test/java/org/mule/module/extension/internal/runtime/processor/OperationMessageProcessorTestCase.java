@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -39,11 +40,14 @@ import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.extension.api.runtime.OperationExecutorFactory;
+import org.mule.internal.connection.ConnectionManagerAdapter;
+import org.mule.internal.connection.ConnectionProviderWrapper;
+import org.mule.internal.connection.DefaultConnectionManager;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
@@ -59,7 +63,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
+public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
 
     private static final String CONFIG_NAME = "config";
@@ -68,7 +72,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
     @Mock
     private ExtensionModel extensionModel;
 
-    @Mock
+    @Mock(answer = RETURNS_DEEP_STUBS)
     private ConfigurationModel configurationModel;
 
     @Mock
@@ -76,6 +80,9 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
 
     @Mock
     private ExtensionManager extensionManager;
+
+    @Mock
+    private ConnectionManagerAdapter connectionManagerAdapter;
 
     @Mock
     private OperationExecutorFactory operationExecutorFactory;
@@ -104,9 +111,13 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
     @Mock
     private ExceptionEnricherFactory exceptionEnricherFactory;
 
+    @Mock
+    private ConnectionProviderWrapper connectionProviderWrapper;
+
     private OperationMessageProcessor messageProcessor;
     private String configurationName = CONFIG_NAME;
     private String target = EMPTY;
+    private DefaultConnectionManager connectionManager;
 
     @Before
     public void before() throws Exception
@@ -124,8 +135,14 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
         when(configurationInstance.getModel()).thenReturn(configurationModel);
         when(configurationInstance.getValue()).thenReturn(configuration);
 
+        connectionManager = new DefaultConnectionManager(muleContext);
+        connectionManager.initialise();
+        when(connectionProviderWrapper.getRetryPolicyTemplate()).thenReturn(connectionManager.getDefaultRetryPolicyTemplate());
+        when(configurationInstance.getConnectionProvider()).thenReturn(Optional.of(connectionProviderWrapper));
+
         when(extensionManager.getConfiguration(CONFIG_NAME, event)).thenReturn(configurationInstance);
         when(extensionManager.getConfiguration(extensionModel, event)).thenReturn(configurationInstance);
+
 
         messageProcessor = createOperationMessageProcessor();
     }
@@ -366,6 +383,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleTestCase
     {
         OperationMessageProcessor messageProcessor = new OperationMessageProcessor(extensionModel, operationModel, configurationName, target, resolverSet, extensionManager);
         messageProcessor.setMuleContext(muleContext);
+        muleContext.getInjector().inject(connectionManager);
         messageProcessor.initialise();
         return messageProcessor;
     }
