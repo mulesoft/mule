@@ -10,7 +10,6 @@ import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
-
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -313,7 +312,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
 
     protected void initialiseIfInitialisable(Object candidate) throws InitialisationException
     {
-        initialiseIfNeeded(candidate, true, muleContext);
+        initialiseIfNeeded(candidate);
     }
 
     protected void startIfStartable(Object candidate) throws MuleException
