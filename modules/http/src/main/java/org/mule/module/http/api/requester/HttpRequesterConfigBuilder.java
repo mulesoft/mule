@@ -7,17 +7,16 @@
 package org.mule.module.http.api.requester;
 
 import static java.lang.String.valueOf;
-
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.tls.TlsContextFactory;
+import org.mule.api.tls.TlsContextFactoryBuilder;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
-import org.mule.module.tls.api.TlsContextFactoryBuilder;
-import org.mule.module.tls.api.TlsContextFactory;
 import org.mule.util.ObjectNameHelper;
 
 /**

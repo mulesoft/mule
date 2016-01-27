@@ -17,7 +17,7 @@ import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
-import org.mule.module.tls.api.TlsContextFactory;
+import org.mule.api.tls.TlsContextFactory;
 import org.mule.util.ObjectNameHelper;
 
 public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequesterBuilder>

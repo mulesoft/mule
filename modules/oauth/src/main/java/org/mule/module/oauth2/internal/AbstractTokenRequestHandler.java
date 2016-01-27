@@ -15,7 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.module.tls.api.TlsContextFactory;
+import org.mule.api.tls.TlsContextFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

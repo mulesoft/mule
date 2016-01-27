@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.tls.TlsConfiguration;
+import org.mule.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;

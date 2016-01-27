@@ -17,7 +17,7 @@ import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.api.MuleContext;
 import org.mule.api.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.module.tls.api.TlsContextFactory;
+import org.mule.api.tls.TlsContextFactory;
 
 import org.junit.Before;
 import org.junit.Rule;

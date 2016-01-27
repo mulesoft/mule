@@ -21,7 +21,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.module.tls.DefaultTlsContextFactory;
+import org.mule.module.tls.internal.DefaultTlsContextFactory;
 
 import javax.jws.WebParam;
 import javax.jws.WebResult;
