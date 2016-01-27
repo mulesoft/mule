@@ -20,6 +20,7 @@ import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleEvent;
 import org.mule.module.extension.HeisenbergExtension;
+import org.mule.module.extension.model.HealthStatus;
 import org.mule.module.extension.model.KnockeableDoor;
 import org.mule.module.extension.model.Ricin;
 
@@ -38,6 +39,40 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestCase
 {
+
+    private static final String HEISENBERG_BYNAME = "heisenberg";
+    private static final String HEISENBERG_PLACEHOLDERS = "heisenbergWithPlaceHolders";
+    private static final String HEISENBERG_BYREF = "heisenbergByRef";
+    private static final String HEISENBERG_EXPRESSION = "expressionHeisenberg";
+    private static final String HEISENBERG_EXPRESSION_BYREF = "expressionHeisenbergByRef";
+
+    private static final Long MICROGRAMS_PER_KILO = 22L;
+    private static final String LIDIA = "Lidia";
+    private static final String STEVIA_COFFE_SHOP = "Stevia coffe shop";
+    private static final String POLLOS_HERMANOS = "pollos hermanos";
+    private static final String GUSTAVO_FRING = "Gustavo Fring";
+    private static final String KRAZY_8 = "Krazy-8";
+    private static final String JESSE_S = "Jesse's";
+    private static final String METHYLAMINE = "methylamine";
+    private static final int METHYLAMINE_QUANTITY = 75;
+    private static final String PSEUDOEPHEDRINE = "pseudoephedrine";
+    private static final int PSEUDOEPHEDRINE_QUANTITY = 0;
+    private static final String P2P = "P2P";
+    private static final int P2P_QUANTITY = 25;
+    private static final String HANK = "Hank";
+    private static final String MONEY = "1000000";
+    private static final String SKYLER = "Skyler";
+    private static final String SAUL = "Saul";
+    private static final String WHITE_ADDRESS = "308 Negra Arroyo Lane";
+    private static final String SHOPPING_MALL = "Shopping Mall";
+    private static final String LAB_ADDRESS = "Pollos Hermanos";
+    private static final String FIRST_ENDEVOUR = "Gray Matter Technologies";
+    private static final String LITERAL_EXPRESSION = "#[money]";
+    private static final String DEFAULT_LITERAL_EXPRESSION = "#[payload]";
+    private static final int DEATH_YEAR = 2011;
+    private static final HealthStatus INITIAL_HEALTH = HealthStatus.CANCER;
+    private static final HealthStatus FINAL_HEALTH = HealthStatus.DEAD;
+    private static final Ricin WEAPON = new Ricin();
 
     @Parameters
     public static Collection<Object[]> data()
@@ -126,7 +161,9 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         assertDeathsBySeason(heisenberg);
         assertMonthlyIncomes(heisenberg);
         assertLabeledRicins(heisenberg);
+        assertLiteralExpressions(heisenberg);
     }
+
 
     private void assertRicinPacks(HeisenbergExtension heisenberg)
     {
@@ -202,6 +239,12 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         assertNotNull(door);
         assertThat(door.getVictim(), equalTo(victim));
         assertThat(door.getAddress(), equalTo(address));
+    }
+
+    private void assertLiteralExpressions(HeisenbergExtension heisenberg)
+    {
+        assertThat(heisenberg.getLiteralExpressionWitouthDefault(), equalTo(LITERAL_EXPRESSION));
+        assertThat(heisenberg.getLiteralExpressionWithDefault(), equalTo(DEFAULT_LITERAL_EXPRESSION));
     }
 
     public static Calendar getDateOfBirth()

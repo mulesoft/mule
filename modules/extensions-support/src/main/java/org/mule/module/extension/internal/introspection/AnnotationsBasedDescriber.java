@@ -20,7 +20,6 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getSour
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkArgument;
-
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Configuration;
@@ -39,11 +38,8 @@ import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.annotation.api.param.display.Password;
 import org.mule.extension.annotation.api.param.display.Text;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
-import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
-import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDescriptor;
@@ -59,6 +55,8 @@ import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.extension.api.introspection.property.PasswordModelProperty;
 import org.mule.extension.api.introspection.property.TextModelProperty;
 import org.mule.extension.api.runtime.source.Source;
+import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.module.extension.internal.model.property.ConfigTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
@@ -293,7 +291,7 @@ public final class AnnotationsBasedDescriber implements Describer
             }
 
             parameterDescriptor.ofType(dataType);
-            parameterDescriptor.withExpressionSupport(parameter != null ? parameter.expressionSupport() : ExpressionSupport.SUPPORTED);
+            parameterDescriptor.withExpressionSupport(IntrospectionUtils.getExpressionSupport(field));
             parameterDescriptor.withModelProperty(DeclaringMemberModelProperty.KEY, new DeclaringMemberModelProperty(field));
 
             parameters.add(parameterDescriptor);
@@ -412,6 +410,7 @@ public final class AnnotationsBasedDescriber implements Describer
                                                 ? operation.with().requiredParameter(parsedParameter.getName())
                                                 : operation.with().optionalParameter(parsedParameter.getName()).defaultingTo(parsedParameter.getDefaultValue());
 
+                parameter.withExpressionSupport(IntrospectionUtils.getExpressionSupport(parsedParameter));
                 parameter.describedAs(EMPTY).ofType(parsedParameter.getType());
                 addTypeRestrictions(parameter, parsedParameter);
                 addModelPropertiesToParameter(parsedParameter, parameter);

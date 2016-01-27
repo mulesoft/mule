@@ -12,6 +12,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.NestedProcessor;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.annotation.api.DataTypeParameters;
+import org.mule.extension.annotation.api.Expression;
 import org.mule.extension.annotation.api.OnException;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.ParameterGroup;
@@ -20,6 +21,7 @@ import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.module.extension.exception.CureCancerExceptionEnricher;
 import org.mule.module.extension.exception.HealthException;
 import org.mule.module.extension.exception.HeisenbergException;
@@ -184,5 +186,11 @@ public class HeisenbergOperations
     public String getSaulPhone(@Connection HeisenbergConnection connection)
     {
         return connection.getSaulPhoneNumber();
+    }
+
+    @Operation
+    public String literalEcho(@Expression(ExpressionSupport.LITERAL) String literalExpression)
+    {
+        return literalExpression;
     }
 }

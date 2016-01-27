@@ -177,4 +177,8 @@
     <flow name="getSaulNumber">
         <heisenberg:get-saul-phone />
     </flow>
+    
+    <flow name="literalEcho">
+        <heisenberg:literal-echo literalExpression="#[money]"/>
+    </flow>
 </mule>
