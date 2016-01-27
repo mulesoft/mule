@@ -21,6 +21,7 @@ import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.module.extension.model.HealthStatus.DEAD;
 import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
+import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
@@ -83,6 +84,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     private OperationContextAdapter operationContext;
     private HeisenbergExtension config;
     private HeisenbergOperations operations;
+    private PrimitiveTypesTestOperations primitiveTypesTestOperations = new PrimitiveTypesTestOperations();
 
 
     @Before
@@ -153,6 +155,36 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
         assertThat(executor.execute(operationContext), is(nullValue()));
     }
 
+    @Test
+    public void withPrimitiveTypeArgumentsWithoutValue() throws Exception
+    {
+        Object[][] primitiveOperations = {
+                {"charOperation", char.class},
+                {"byteOperation", byte.class},
+                {"shortOperation", short.class},
+                {"intOperation", int.class},
+                {"longOperation", long.class},
+                {"floatOperation", float.class},
+                {"doubleOperation", double.class},
+                {"booleanOperation", boolean.class}
+        };
+        for (Object[] primitiveOperation : primitiveOperations)
+        {
+            Method method = ClassUtils.getMethod(PrimitiveTypesTestOperations.class, (String) primitiveOperation[0], new Class<?>[] {(Class<?>) primitiveOperation[1]});
+            executor = new ReflectiveMethodOperationExecutor(method, primitiveTypesTestOperations);
+            executor.execute(operationContext);
+        }
+    }
+
+    @Test
+    public void withAllPrimitiveTypeArgumentsWithoutValue() throws Exception
+    {
+        Class<?>[] parameterTypes = {char.class, byte.class, short.class, int.class, long.class, float.class, double.class, boolean.class};
+        Method method = ClassUtils.getMethod(PrimitiveTypesTestOperations.class, "allCombined", parameterTypes);
+        executor = new ReflectiveMethodOperationExecutor(method, primitiveTypesTestOperations);
+        executor.execute(operationContext);
+    }
+
     private void initHeisenberg()
     {
         config = new HeisenbergExtension();
@@ -164,5 +196,86 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     private void assertResult(Object value, Object expected) throws Exception
     {
         assertThat(value, is(expected));
+    }
+
+    public static class PrimitiveTypesTestOperations
+    {
+
+        private char charValue;
+        private byte byteValue;
+        private short shortValue;
+        private int intValue;
+        private long longValue;
+        private float floatValue;
+        private double doubleValue;
+        private boolean booleanValue;
+
+        @Operation
+        public void charOperation(@org.mule.extension.annotation.api.param.Optional char value)
+        {
+            assertThat(value, is(charValue));
+        }
+
+        @Operation
+        public void byteOperation(@org.mule.extension.annotation.api.param.Optional byte value)
+        {
+            assertThat(value, is(byteValue));
+        }
+
+        @Operation
+        public void shortOperation(@org.mule.extension.annotation.api.param.Optional short value)
+        {
+            assertThat(value, is(shortValue));
+        }
+
+        @Operation
+        public void intOperation(@org.mule.extension.annotation.api.param.Optional int value)
+        {
+            assertThat(value, is(intValue));
+        }
+
+        @Operation
+        public void longOperation(@org.mule.extension.annotation.api.param.Optional long value)
+        {
+            assertThat(value, is(longValue));
+        }
+
+        @Operation
+        public void floatOperation(@org.mule.extension.annotation.api.param.Optional float value)
+        {
+            assertThat(value, is(floatValue));
+        }
+
+        @Operation
+        public void doubleOperation(@org.mule.extension.annotation.api.param.Optional double value)
+        {
+            assertThat(value, is(doubleValue));
+        }
+
+        @Operation
+        public void booleanOperation(@org.mule.extension.annotation.api.param.Optional boolean value)
+        {
+            assertThat(value, is(booleanValue));
+        }
+
+        @Operation
+        public void allCombined(@org.mule.extension.annotation.api.param.Optional char charValue,
+                                @org.mule.extension.annotation.api.param.Optional byte byteValue,
+                                @org.mule.extension.annotation.api.param.Optional short shortValue,
+                                @org.mule.extension.annotation.api.param.Optional int intValue,
+                                @org.mule.extension.annotation.api.param.Optional long longValue,
+                                @org.mule.extension.annotation.api.param.Optional float floatValue,
+                                @org.mule.extension.annotation.api.param.Optional double doubleValue,
+                                @org.mule.extension.annotation.api.param.Optional boolean booleanValue)
+        {
+            assertThat(charValue, is(this.charValue));
+            assertThat(byteValue, is(this.byteValue));
+            assertThat(shortValue, is(this.shortValue));
+            assertThat(intValue, is(this.intValue));
+            assertThat(longValue, is(this.longValue));
+            assertThat(floatValue, is(this.floatValue));
+            assertThat(doubleValue, is(this.doubleValue));
+            assertThat(booleanValue, is(this.booleanValue));
+        }
     }
 }

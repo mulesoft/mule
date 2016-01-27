@@ -45,7 +45,7 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
         private static final Object[] EMPTY = new Object[] {};
 
         @Override
-        public Object[] resolve(OperationContext operationContext)
+        public Object[] resolve(OperationContext operationContext, Class<?>[] parameterTypes)
         {
             return EMPTY;
         }
@@ -73,12 +73,12 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
     @Override
     public Object execute(OperationContext operationContext) throws Exception
     {
-        return invokeMethod(operationMethod, executorDelegate, getParameterValues(operationContext));
+        return invokeMethod(operationMethod, executorDelegate, getParameterValues(operationContext, operationMethod.getParameterTypes()));
     }
 
-    private Object[] getParameterValues(OperationContext operationContext)
+    private Object[] getParameterValues(OperationContext operationContext, Class<?>[] parameterTypes)
     {
-        return argumentResolverDelegate.resolve(operationContext);
+        return argumentResolverDelegate.resolve(operationContext, parameterTypes);
     }
 
 
