@@ -7,13 +7,10 @@
 package org.mule.module.extension.internal.config;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
-
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connector.ConnectionManager;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.internal.connection.ConnectionManagerAdapter;
@@ -21,7 +18,6 @@ import org.mule.module.extension.internal.runtime.config.ConnectionProviderObjec
 import org.mule.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.retry.policies.AbstractPolicyTemplate;
 
 import javax.inject.Inject;
 
@@ -36,15 +32,12 @@ import org.springframework.beans.factory.FactoryBean;
  *
  * @since 4.0
  */
-public class ConnectionProviderFactoryBean implements FactoryBean<ValueResolver>
+public class ConnectionProviderFactoryBean extends ExtensionComponentFactoryBean<ValueResolver>
 {
 
-    private final ResolverSet resolverSet;
+    private final ElementDescriptor element;
     private final ConnectionProviderModel providerModel;
-    private ValueResolver<ConnectionProvider> resolver;
-    private PoolingProfile poolingProfile = null;
     private boolean disableValidation = false;
-    private RetryPolicyTemplate retryPolicyTemplate;
 
     @Inject
     private ConnectionManagerAdapter connectionManager;
@@ -52,14 +45,7 @@ public class ConnectionProviderFactoryBean implements FactoryBean<ValueResolver>
     public ConnectionProviderFactoryBean(ConnectionProviderModel providerModel, ElementDescriptor element)
     {
         this.providerModel = providerModel;
-        try
-        {
-            resolverSet = getResolverSet(element, providerModel.getParameterModels());
-        }
-        catch (ConfigurationException e)
-        {
-            throw new MuleRuntimeException(createStaticMessage("Could not parse connection provider"), e);
-        }
+        this.element = element;
     }
 
     /**
@@ -68,12 +54,20 @@ public class ConnectionProviderFactoryBean implements FactoryBean<ValueResolver>
     @Override
     public synchronized ValueResolver getObject() throws Exception
     {
-        if (resolver == null)
+        ResolverSet resolverSet;
+        try
         {
-            resolver = new ObjectBuilderValueResolver<>(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile, disableValidation, retryPolicyTemplate, connectionManager));
+            resolverSet = parserDelegate.getResolverSet(element, providerModel.getParameterModels());
+        }
+        catch (ConfigurationException e)
+        {
+            throw new MuleRuntimeException(createStaticMessage("Could not parse connection provider"), e);
         }
 
-        return resolver;
+        PoolingProfile poolingProfile = parserDelegate.getInfrastructureParameter(PoolingProfile.class);
+        RetryPolicyTemplate retryPolicyTemplate = parserDelegate.getInfrastructureParameter(RetryPolicyTemplate.class);
+
+        return new ObjectBuilderValueResolver<>(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile, disableValidation, retryPolicyTemplate, connectionManager));
     }
 
     /**
@@ -94,18 +88,8 @@ public class ConnectionProviderFactoryBean implements FactoryBean<ValueResolver>
         return true;
     }
 
-    public void setPoolingProfile(PoolingProfile poolingProfile)
-    {
-        this.poolingProfile = poolingProfile;
-    }
-
     public void setDisableValidation(boolean disableValidation)
     {
         this.disableValidation = disableValidation;
-    }
-
-    public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
-    {
-        this.retryPolicyTemplate = retryPolicyTemplate;
     }
 }

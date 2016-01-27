@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
@@ -35,7 +34,7 @@ import org.springframework.beans.factory.FactoryBean;
  *
  * @since 4.0
  */
-final class ExtensionMessageSourceFactoryBean implements FactoryBean<ExtensionMessageSource>
+final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryBean<ExtensionMessageSource>
 {
 
     private final ElementDescriptor element;
@@ -43,7 +42,6 @@ final class ExtensionMessageSourceFactoryBean implements FactoryBean<ExtensionMe
     private final SourceModel sourceModel;
     private final String configurationProviderName;
     private final MuleContext muleContext;
-    private final ResolverSet resolverSet;
 
     ExtensionMessageSourceFactoryBean(ElementDescriptor element,
                                       ExtensionModel extensionModel,
@@ -56,18 +54,18 @@ final class ExtensionMessageSourceFactoryBean implements FactoryBean<ExtensionMe
         this.sourceModel = sourceModel;
         this.configurationProviderName = configurationProviderName;
         this.muleContext = muleContext;
-
-        resolverSet = getResolverSet(element, sourceModel.getParameterModels());
-        if (resolverSet.isDynamic())
-        {
-            throw dynamicParameterException(resolverSet, sourceModel, element);
-        }
     }
 
     @Override
     public ExtensionMessageSource getObject() throws Exception
     {
-        ExtensionMessageSource messageSource = new ExtensionMessageSource(extensionModel, getSourceFactory(), configurationProviderName, getThreadingProfile());
+        ResolverSet resolverSet = parserDelegate.getResolverSet(element, sourceModel.getParameterModels());
+        if (resolverSet.isDynamic())
+        {
+            throw dynamicParameterException(resolverSet, sourceModel, element);
+        }
+
+        ExtensionMessageSource messageSource = new ExtensionMessageSource(extensionModel, getSourceFactory(resolverSet), configurationProviderName, getThreadingProfile());
         muleContext.getInjector().inject(messageSource);
 
         return messageSource;
@@ -93,7 +91,7 @@ final class ExtensionMessageSourceFactoryBean implements FactoryBean<ExtensionMe
         return true;
     }
 
-    private SourceFactory getSourceFactory()
+    private SourceFactory getSourceFactory(ResolverSet resolverSet)
     {
         return () -> {
             Source source = sourceModel.getSourceFactory().createSource();
@@ -104,7 +102,7 @@ final class ExtensionMessageSourceFactoryBean implements FactoryBean<ExtensionMe
             catch (Exception e)
             {
                 throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s' in flow '%s'",
-                                                                          sourceModel.getName(), element.getParentNode().getLocalName())));
+                                                                          sourceModel.getName(), element.getSourceElement().getParentNode().getLocalName())));
             }
         };
     }
@@ -118,6 +116,6 @@ final class ExtensionMessageSourceFactoryBean implements FactoryBean<ExtensionMe
 
         return new ConfigurationException(createStaticMessage(format("The '%s' message source on flow '%s' is using expressions, which are not allowed on message sources. " +
                                                                      "Offending parameters are: [%s]",
-                                                                     model.getName(), element.getParentNode().getLocalName(), Joiner.on(',').join(dynamicParams))));
+                                                                     model.getName(), element.getSourceElement().getParentNode().getLocalName(), Joiner.on(',').join(dynamicParams))));
     }
 }

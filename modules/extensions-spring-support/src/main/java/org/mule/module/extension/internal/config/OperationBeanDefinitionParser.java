@@ -6,13 +6,9 @@
  */
 package org.mule.module.extension.internal.config;
 
-import static org.mule.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
-import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.parseConfigRef;
-import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.toElementDescriptorBeanDefinition;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_SINGLETON;
 
-import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.factories.PollingMessageSourceFactoryBean;
@@ -64,13 +60,13 @@ final class OperationBeanDefinitionParser extends BaseExtensionBeanDefinitionPar
     }
 
     @Override
-    protected void doParse(BeanDefinitionBuilder builder, Element element, ParserContext parserContext)
+    protected void doParse(BeanDefinitionBuilder builder, Element element, XmlExtensionParserDelegate parserDelegate, ParserContext parserContext)
     {
-        parseConfigRef(element, builder);
+        parserDelegate.parseConfigRef(element, builder);
 
         builder.addConstructorArgValue(extensionModel)
                 .addConstructorArgValue(operationModel)
-                .addConstructorArgValue(toElementDescriptorBeanDefinition(element))
+                .addConstructorArgValue(parserDelegate.toElementDescriptorBeanDefinition(element))
                 .addConstructorArgValue(parseNestedOperations(element, parserContext))
                 .addConstructorArgReference(OBJECT_MULE_CONTEXT);
 

@@ -13,15 +13,18 @@ import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.annotation.api.param.display.Password;
 
 import javax.inject.Inject;
 
 public abstract class PetStoreConnectionProvider implements ConnectionProvider<PetStoreConnector, PetStoreClient>, Lifecycle
 {
+
     public static final String USER = "john";
-    public  static final String PASSWORD = "doe";
+    public static final String PASSWORD = "doe";
 
     private int initialise, start, stop, dispose = 0;
 
@@ -35,10 +38,14 @@ public abstract class PetStoreConnectionProvider implements ConnectionProvider<P
     @Password
     private String password;
 
+    @Parameter
+    @Optional
+    private TlsContextFactory tls;
+
     @Override
     public PetStoreClient connect(PetStoreConnector config)
     {
-        return new PetStoreClient(username, password);
+        return new PetStoreClient(username, password, tls);
     }
 
     @Override

@@ -7,8 +7,6 @@
 package org.mule.module.extension.internal.config;
 
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
-import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.parseConfigRef;
-import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.toElementDescriptorBeanDefinition;
 import org.mule.api.source.MessageSource;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.SourceModel;
@@ -44,13 +42,13 @@ final class SourceBeanDefinitionParser extends BaseExtensionBeanDefinitionParser
     }
 
     @Override
-    protected void doParse(BeanDefinitionBuilder builder, Element element, ParserContext parserContext)
+    protected void doParse(BeanDefinitionBuilder builder, Element element, XmlExtensionParserDelegate parserDelegate, ParserContext parserContext)
     {
-        builder.addConstructorArgValue(toElementDescriptorBeanDefinition(element))
+        builder.addConstructorArgValue(parserDelegate.toElementDescriptorBeanDefinition(element))
                 .addConstructorArgValue(extensionModel)
                 .addConstructorArgValue(sourceModel);
 
-        parseConfigRef(element, builder);
+        parserDelegate.parseConfigRef(element, builder);
         builder.addConstructorArgReference(OBJECT_MULE_CONTEXT);
         attachSourceDefinition(parserContext, builder.getBeanDefinition());
     }

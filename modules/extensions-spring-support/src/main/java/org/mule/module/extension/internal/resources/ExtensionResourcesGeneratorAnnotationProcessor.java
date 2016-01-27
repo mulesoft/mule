@@ -15,7 +15,7 @@ import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.extension.api.resources.ResourcesGenerator;
 import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils;
-import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
+import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.introspection.VersionResolver;
 import org.mule.registry.SpiServiceRegistry;

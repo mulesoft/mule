@@ -22,8 +22,10 @@ import static org.mule.module.extension.HeisenbergExtension.AGE;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
-import static org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber.DEFAULT_CONNECTION_PROVIDER_NAME;
+import static org.mule.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
+import static org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DEFAULT_CONNECTION_PROVIDER_NAME;
 import org.mule.api.MuleEvent;
+import org.mule.api.tls.TlsContextFactory;
 import org.mule.config.MuleManifest;
 import org.mule.extension.annotation.api.Configuration;
 import org.mule.extension.annotation.api.Configurations;
@@ -327,9 +329,10 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(connectionProvider.getName(), is(DEFAULT_CONNECTION_PROVIDER_NAME));
 
         List<ParameterDeclaration> parameters = connectionProvider.getParameters();
-        assertThat(parameters, hasSize(1));
+        assertThat(parameters, hasSize(2));
 
         assertParameter(parameters, "saulPhoneNumber", "", DataType.of(String.class), false, SUPPORTED, SAUL_OFFICE_NUMBER);
+        assertParameter(parameters, TLS_ATTRIBUTE_NAME, "", DataType.of(TlsContextFactory.class), false, NOT_SUPPORTED, null);
         ImplementingTypeModelProperty typeModelProperty = connectionProvider.getModelProperty(ImplementingTypeModelProperty.KEY);
         assertThat(typeModelProperty, is(notNullValue()));
         assertThat(typeModelProperty.getType(), equalTo(HeisenbergConnectionProvider.class));

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <tls:context name="globalTlsContext">
+        <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
+        <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+    </tls:context>
+
+    <petstore:config name="globalTls">
+        <petstore:connection username="john" password="doe" tlsContext="globalTlsContext"/>
+        <petstore:pets>
+            <petstore:pet value="Lassie" />
+            <petstore:pet value="Sapo Pepe" />
+            <petstore:pet value="My mother's parrot" />
+        </petstore:pets>
+    </petstore:config>
+
+    <petstore:config name="inlineTls">
+        <petstore:connection username="john" password="doe">
+            <tls:context>
+                <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
+                <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+            </tls:context>
+        </petstore:connection>
+        <petstore:pets>
+            <petstore:pet value="Lassie" />
+            <petstore:pet value="Sapo Pepe" />
+            <petstore:pet value="My mother's parrot" />
+        </petstore:pets>
+    </petstore:config>
+
+    <flow name="getClient">
+        <petstore:get-client config-ref="${config}" />
+    </flow>
+</mule>

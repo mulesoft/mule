@@ -9,7 +9,6 @@ package org.mule.module.extension.internal.config;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
-import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.getResolverSet;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.processor.MessageProcessor;
@@ -32,7 +31,7 @@ import org.springframework.beans.factory.FactoryBean;
  *
  * @since 3.7.0
  */
-public class OperationMessageProcessorFactoryBean implements FactoryBean<OperationMessageProcessor>
+public class OperationMessageProcessorFactoryBean extends ExtensionComponentFactoryBean<OperationMessageProcessor>
 {
 
     private final String configurationProviderName;
@@ -66,7 +65,7 @@ public class OperationMessageProcessorFactoryBean implements FactoryBean<Operati
     @Override
     public OperationMessageProcessor getObject() throws Exception
     {
-        ResolverSet resolverSet = getResolverSet(element, operationModel.getParameterModels(), nestedOperations);
+        ResolverSet resolverSet = parserDelegate.getResolverSet(element, operationModel.getParameterModels(), nestedOperations);
         OperationMessageProcessor processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target, resolverSet, extensionManager);
 
         //TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically

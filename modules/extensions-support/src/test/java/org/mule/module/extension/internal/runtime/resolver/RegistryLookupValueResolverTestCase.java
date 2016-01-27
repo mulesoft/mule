@@ -45,14 +45,14 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase
     public void cache() throws Exception
     {
         Object value = resolver.resolve(event);
-        assertThat((String) value, is(HELLO_WORLD));
+        assertThat(value, is(HELLO_WORLD));
         verify(event.getMuleContext().getRegistry()).get(KEY);
     }
 
     @Test
     public void isDynamic()
     {
-        assertThat(resolver.isDynamic(), is(true));
+        assertThat(resolver.isDynamic(), is(false));
     }
 
     @Test(expected = IllegalArgumentException.class)
