@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal;
+package org.mule.module.extension.internal.config;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -17,11 +17,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 import org.mule.api.MuleEvent;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.model.HealthStatus;
 import org.mule.module.extension.model.KnockeableDoor;
 import org.mule.module.extension.model.Ricin;
 
@@ -38,40 +35,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class ConfigParserTestCase extends ExtensionFunctionalTestCase
+public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestCase
 {
-
-    private static final String HEISENBERG_BYNAME = "heisenberg";
-    private static final String HEISENBERG_PLACEHOLDERS = "heisenbergWithPlaceHolders";
-    private static final String HEISENBERG_BYREF = "heisenbergByRef";
-    private static final String HEISENBERG_EXPRESSION = "expressionHeisenberg";
-    private static final String HEISENBERG_EXPRESSION_BYREF = "expressionHeisenbergByRef";
-
-    private static final Long MICROGRAMS_PER_KILO = 22L;
-    private static final String LIDIA = "Lidia";
-    private static final String STEVIA_COFFE_SHOP = "Stevia coffe shop";
-    private static final String POLLOS_HERMANOS = "pollos hermanos";
-    private static final String GUSTAVO_FRING = "Gustavo Fring";
-    private static final String KRAZY_8 = "Krazy-8";
-    private static final String JESSE_S = "Jesse's";
-    private static final String METHYLAMINE = "methylamine";
-    private static final int METHYLAMINE_QUANTITY = 75;
-    private static final String PSEUDOEPHEDRINE = "pseudoephedrine";
-    private static final int PSEUDOEPHEDRINE_QUANTITY = 0;
-    private static final String P2P = "P2P";
-    private static final int P2P_QUANTITY = 25;
-    private static final String HANK = "Hank";
-    private static final String MONEY = "1000000";
-    private static final String SKYLER = "Skyler";
-    private static final String SAUL = "Saul";
-    private static final String WHITE_ADDRESS = "308 Negra Arroyo Lane";
-    private static final String SHOPPING_MALL = "Shopping Mall";
-    private static final String LAB_ADDRESS = "Pollos Hermanos";
-    private static final String FIRST_ENDEVOUR = "Gray Matter Technologies";
-    private static final int DEATH_YEAR = 2011;
-    private static final HealthStatus INITIAL_HEALTH = HealthStatus.CANCER;
-    private static final HealthStatus FINAL_HEALTH = HealthStatus.DEAD;
-    private static final Ricin WEAPON = new Ricin();
 
     @Parameters
     public static Collection<Object[]> data()
@@ -83,18 +48,6 @@ public class ConfigParserTestCase extends ExtensionFunctionalTestCase
 
     @Parameter(0)
     public String testConfig;
-
-    @Override
-    protected String getConfigFile()
-    {
-        return "heisenberg-config.xml";
-    }
-
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {HeisenbergExtension.class};
-    }
 
     @Test
     public void config() throws Exception
@@ -158,46 +111,6 @@ public class ConfigParserTestCase extends ExtensionFunctionalTestCase
     {
         HeisenbergExtension heisenberg = lookupHeisenberg(testConfig);
         assertThat(heisenberg.getExtensionManager(), is(sameInstance(muleContext.getExtensionManager())));
-    }
-
-    private HeisenbergExtension lookupHeisenberg(String key) throws Exception
-    {
-        return lookupHeisenberg(key, getHeisenbergEvent());
-    }
-
-    private HeisenbergExtension lookupHeisenberg(String key, MuleEvent event) throws Exception
-    {
-        return getConfigurationFromRegistry(key, event);
-    }
-
-    private MuleEvent getHeisenbergEvent() throws Exception
-    {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("lidia", LIDIA);
-
-        event.setFlowVariable("myName", HeisenbergExtension.HEISENBERG);
-        event.setFlowVariable("age", HeisenbergExtension.AGE);
-        event.setFlowVariable("microgramsPerKilo", MICROGRAMS_PER_KILO);
-        event.setFlowVariable("steviaCoffeShop", STEVIA_COFFE_SHOP);
-        event.setFlowVariable("pollosHermanos", POLLOS_HERMANOS);
-        event.setFlowVariable("gustavoFring", GUSTAVO_FRING);
-        event.setFlowVariable("krazy8", KRAZY_8);
-        event.setFlowVariable("jesses", JESSE_S);
-        event.setFlowVariable("methylamine", METHYLAMINE_QUANTITY);
-        event.setFlowVariable("pseudoephedrine", PSEUDOEPHEDRINE_QUANTITY);
-        event.setFlowVariable("p2p", P2P_QUANTITY);
-        event.setFlowVariable("hank", HANK);
-        event.setFlowVariable("money", MONEY);
-        event.setFlowVariable("skyler", SKYLER);
-        event.setFlowVariable("saul", SAUL);
-        event.setFlowVariable("whiteAddress", WHITE_ADDRESS);
-        event.setFlowVariable("shoppingMall", SHOPPING_MALL);
-        event.setFlowVariable("initialHealth", INITIAL_HEALTH);
-        event.setFlowVariable("finalHealth", FINAL_HEALTH);
-        WEAPON.setMicrogramsPerKilo(10L);
-        event.setFlowVariable("weapon", WEAPON);
-
-        return event;
     }
 
     private void assertHeisenbergConfig(HeisenbergExtension heisenberg)
