@@ -152,7 +152,7 @@
         <antVersion>1.7.0</antVersion>
         <antlrVersion>3.5</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
-        <aspectjVersion>1.7.3</aspectjVersion>
+        <aspectjVersion>1.8.5</aspectjVersion>
         <asyncHttpClientVersion>1.9.32</asyncHttpClientVersion>
         <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
