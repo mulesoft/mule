@@ -42,6 +42,7 @@ public class OperationMessageProcessorFactoryBean implements FactoryBean<Operati
     private final ExtensionManager extensionManager;
     private final Map<String, List<MessageProcessor>> nestedOperations;
     private final String target;
+    private final MuleContext muleContext;
 
     public OperationMessageProcessorFactoryBean(String configurationProviderName,
                                                 ExtensionModel extensionModel,
@@ -56,6 +57,7 @@ public class OperationMessageProcessorFactoryBean implements FactoryBean<Operati
         this.element = element;
         this.extensionManager = muleContext.getExtensionManager();
         this.nestedOperations = nestedOperations;
+        this.muleContext = muleContext;
 
         registerNestedProcessors(nestedOperations, muleContext);
         target = getTarget(element);
@@ -65,7 +67,12 @@ public class OperationMessageProcessorFactoryBean implements FactoryBean<Operati
     public OperationMessageProcessor getObject() throws Exception
     {
         ResolverSet resolverSet = getResolverSet(element, operationModel.getParameterModels(), nestedOperations);
-        return new OperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target, resolverSet, extensionManager);
+        OperationMessageProcessor processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target, resolverSet, extensionManager);
+
+        //TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
+        muleContext.getInjector().inject(processor);
+
+        return processor;
     }
 
     private String getTarget(ElementDescriptor element)
