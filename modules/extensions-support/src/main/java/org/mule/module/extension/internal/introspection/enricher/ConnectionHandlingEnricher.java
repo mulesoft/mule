@@ -9,7 +9,8 @@ package org.mule.module.extension.internal.introspection.enricher;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.module.extension.internal.model.property.ConnectionHandlingTypeModelProperty;
+import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
+import org.mule.module.extension.internal.model.property.ImmutableConnectionHandlingTypeModelProperty;
 
 
 /**
@@ -26,7 +27,7 @@ public final class ConnectionHandlingEnricher implements ModelEnricher
     {
         for (ConnectionProviderDeclaration declaration : describingContext.getDeclarationDescriptor().getDeclaration().getConnectionProviders())
         {
-            declaration.addModelProperty(ConnectionHandlingTypeModelProperty.KEY, new ConnectionHandlingTypeModelProperty(declaration.getFactory().newInstance()));
+            declaration.addModelProperty(ConnectionHandlingTypeModelProperty.KEY, new ImmutableConnectionHandlingTypeModelProperty(declaration.getFactory().newInstance()));
         }
     }
 }
