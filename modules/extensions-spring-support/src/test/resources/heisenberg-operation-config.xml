@@ -162,6 +162,10 @@
         <heisenberg:kill-with-multiples-weapons weaponList="#[weapons]"/>
     </flow>
 
+    <flow name="killWithMultipleWildCardWeapons">
+        <heisenberg:kill-with-multiple-wild-card-weapons wildCardWeapons="#[weapons]"/>
+    </flow>
+
     <flow name="callGus">
         <heisenberg:call-gus-fring />
     </flow>
