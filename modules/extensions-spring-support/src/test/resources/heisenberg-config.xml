@@ -89,8 +89,8 @@
                        cancer="#[true]"
                        initialHealth="#[initialHealth]"
                        finalHealth="#[finalHealth]"
-                       dateOfBirth="#[org.mule.module.extension.internal.ConfigParserTestCase.getDateOfBirth().getTime()]"
-                       dateOfDeath="#[org.mule.module.extension.internal.ConfigParserTestCase.getDateOfDeath()]"
+                       dateOfBirth="#[org.mule.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfBirth().getTime()]"
+                       dateOfDeath="#[org.mule.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfDeath()]"
                        money="#[money]"
                        recipe="#[app.registry.recipes]"
                        candidateDoors="#[app.registry.candidateDoors]"
@@ -117,8 +117,8 @@
                        cancer="#[true]"
                        initialHealth="#[initialHealth]"
                        finalHealth="#[finalHealth]"
-                       dateOfBirth="#[org.mule.module.extension.internal.ConfigParserTestCase.getDateOfBirth().getTime()]"
-                       dateOfDeath="#[org.mule.module.extension.internal.ConfigParserTestCase.getDateOfDeath()]"
+                       dateOfBirth="#[org.mule.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfBirth().getTime()]"
+                       dateOfDeath="#[org.mule.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfDeath()]"
                        money="#[money]"
                        recipe="#[app.registry.recipes]"
                        candidateDoors="#[app.registry.candidateDoors]"
@@ -126,8 +126,7 @@
                        ricinPacks="#[app.registry.ricinPacks]"
                        nextDoor="#[app.registry.door]"
                        firstEndevour="Gray Matter Technologies"
-                       labAddress="#['Pollos Hermanos']"
-                       weapon="#[weapon]">
+                       labAddress="#['Pollos Hermanos']">
     </heisenberg:config>
 
     <spring:beans>

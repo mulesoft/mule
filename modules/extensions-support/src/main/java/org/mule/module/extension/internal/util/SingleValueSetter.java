@@ -45,6 +45,10 @@ public final class SingleValueSetter implements ValueSetter
     @Override
     public void set(Object target, ResolverSetResult resolverSetResult)
     {
-        fieldSetter.set(target, resolverSetResult.get(parameterModel));
+        Object value = resolverSetResult.get(parameterModel);
+        if (value != null)
+        {
+            fieldSetter.set(target, value);
+        }
     }
 }

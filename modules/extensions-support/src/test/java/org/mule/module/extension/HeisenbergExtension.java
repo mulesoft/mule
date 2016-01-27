@@ -91,7 +91,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
 
     @Parameter
     @Optional
-    private Weapon weapon;
+    private Weapon weapon = new Ricin();
 
     @Parameter
     @Optional
@@ -257,5 +257,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     public Function<MuleEvent, Integer> getMoneyFunction()
     {
         return moneyFunction;
+    }
+
+    public Weapon getWeapon()
+    {
+        return weapon;
     }
 }
