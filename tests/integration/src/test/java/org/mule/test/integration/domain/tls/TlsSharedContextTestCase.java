@@ -18,7 +18,7 @@ import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
-import org.mule.module.tls.api.TlsContextFactory;
+import org.mule.api.tls.TlsContextFactory;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 

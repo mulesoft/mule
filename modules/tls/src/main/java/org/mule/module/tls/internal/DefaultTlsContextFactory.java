@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.tls;
+package org.mule.module.tls.internal;
 
 
 import org.mule.api.lifecycle.CreateException;
@@ -12,9 +12,9 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.module.tls.api.TlsContextFactory;
-import org.mule.module.tls.api.TlsContextKeyStoreConfiguration;
-import org.mule.module.tls.api.TlsContextTrustStoreConfiguration;
+import org.mule.api.tls.TlsContextFactory;
+import org.mule.api.tls.TlsContextKeyStoreConfiguration;
+import org.mule.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.util.ArrayUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -237,7 +237,7 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
 
 
     @Override
-    public SSLContext createSslContext() throws KeyManagementException, NoSuchAlgorithmException, CreateException
+    public SSLContext createSslContext() throws KeyManagementException, NoSuchAlgorithmException
     {
         SSLContext sslContext;
         if (trustStoreInsecure)
