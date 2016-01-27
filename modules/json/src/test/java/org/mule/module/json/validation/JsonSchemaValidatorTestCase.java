@@ -21,7 +21,7 @@ import static org.mule.module.json.validation.JsonSchemaTestUtils.getGoodFstabAs
 import static org.mule.module.json.validation.JsonSchemaTestUtils.getGoodFstabInline;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.getGoodFstabInlineAsJsonData;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.toStream;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -145,7 +145,7 @@ public class JsonSchemaValidatorTestCase extends AbstractMuleContextTestCase
         }
 
         @Override
-        public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+        public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
         {
             return value;
         }

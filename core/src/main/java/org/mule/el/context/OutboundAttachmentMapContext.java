@@ -6,7 +6,7 @@
  */
 package org.mule.el.context;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleRuntimeException;
 
 import java.util.Set;
@@ -15,11 +15,11 @@ import javax.activation.DataHandler;
 
 public class OutboundAttachmentMapContext extends AbstractMapContext<String, DataHandler>
 {
-    private MuleMessage message;
+    private MuleEvent event;
 
-    public OutboundAttachmentMapContext(MuleMessage message)
+    public OutboundAttachmentMapContext(MuleEvent event)
     {
-        this.message = message;
+        this.event = event;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<String, Dat
             return null;
         }
 
-        return message.getOutboundAttachment((String) key);
+        return event.getMessage().getOutboundAttachment((String) key);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<String, Dat
         DataHandler previousValue = get(key);
         try
         {
-            message.addOutboundAttachment(key, value);
+            event.getMessage().addOutboundAttachment(key, value);
         }
         catch (Exception e)
         {
@@ -59,7 +59,7 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<String, Dat
         DataHandler previousValue = get(key);
         try
         {
-            message.removeOutboundAttachment((String) key);
+            event.getMessage().removeOutboundAttachment((String) key);
         }
         catch (Exception e)
         {
@@ -71,13 +71,13 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<String, Dat
     @Override
     public Set<String> keySet()
     {
-        return message.getOutboundAttachmentNames();
+        return event.getMessage().getOutboundAttachmentNames();
     }
     
     @Override
     public void clear()
     {
-        message.clearAttachments();
+        event.getMessage().clearAttachments();
     }
 
 }

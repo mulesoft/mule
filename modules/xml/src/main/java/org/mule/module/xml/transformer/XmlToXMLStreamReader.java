@@ -6,7 +6,7 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
@@ -39,9 +39,9 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String encoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String encoding) throws TransformerException
     {
-        Object src = message.getPayload();
+        Object src = event.getMessage().getPayload();
         try
         {
             XMLStreamReader xsr = XMLUtils.toXMLStreamReader(getXMLInputFactory(), src);

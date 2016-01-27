@@ -6,7 +6,9 @@
  */
 package org.mule.el.mvel;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.VariableAssignmentCallback;
 import org.mule.api.transport.PropertyScope;
@@ -30,14 +32,14 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
     public static final String FLOW_VARS = "flowVars";
     public static final String SESSION_VARS = "sessionVars";
 
-    private MuleMessage muleMessage;
+    private MuleEvent event;
     private MuleContext muleContext;
 
     public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration,
                                           final MuleContext muleContext,
-                                          final MuleMessage message)
+                                          final MuleEvent event)
     {
-        this.muleMessage = message;
+        this.event = event;
         this.muleContext = muleContext;
     }
 
@@ -50,10 +52,10 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
      */
     public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration,
                                           final MuleContext muleContext,
-                                          final MuleMessage message,
+                                          final MuleEvent event,
                                           final VariableResolverFactory next)
     {
-        this(parserConfiguration, muleContext, message);
+        this(parserConfiguration, muleContext, event);
         setNextFactory(next);
     }
 
@@ -68,37 +70,37 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
     @Override
     public VariableResolver getVariableResolver(String name)
     {
-        if (muleMessage != null)
+        if (event != null)
         {
             if (MESSAGE.equals(name))
             {
                 return new MuleImmutableVariableResolver<MessageContext>(MESSAGE, new MessageContext(
-                    muleMessage, muleContext), null);
+                        event, muleContext), null);
             }
             else if (PAYLOAD.equals(name))
             {
                 return new MuleVariableResolver<Object>(PAYLOAD, new MessageContext(
-                        muleMessage, muleContext).getPayload(), null,
+                        event, muleContext).getPayload(), null,
                     new VariableAssignmentCallback<Object>()
                     {
                         @Override
                         public void assignValue(String name, Object value, Object newValue)
                         {
-                            muleMessage.setPayload(newValue);
+                            event.setMessage(new DefaultMuleMessage(newValue, event.getMessage(), event.getMuleContext()));
                         }
                     });
             }
             else if (FLOW_VARS.equals(name))
             {
                 return new MuleImmutableVariableResolver<Map<String, Object>>(FLOW_VARS,
-                    new MessagePropertyMapContext(muleMessage, PropertyScope.INVOCATION), null);
+                    new MessagePropertyMapContext(event, PropertyScope.INVOCATION), null);
             }
             else if (EXCEPTION.equals(name))
             {
-                if (muleMessage.getExceptionPayload() != null)
+                if (event.getMessage().getExceptionPayload() != null)
                 {
                     return new MuleImmutableVariableResolver<Throwable>(EXCEPTION,
-                        muleMessage.getExceptionPayload().getException(), null);
+                        event.getMessage().getExceptionPayload().getException(), null);
                 }
                 else
                 {
@@ -108,12 +110,12 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
             else if (SESSION_VARS.equals(name))
             {
                 return new MuleImmutableVariableResolver<Map<String, Object>>(SESSION_VARS,
-                    new MessagePropertyMapContext(muleMessage, PropertyScope.SESSION), null);
+                    new MessagePropertyMapContext(event, PropertyScope.SESSION), null);
             }
             else if (MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE.equals(name))
             {
                 return new MuleImmutableVariableResolver<MuleMessage>(
-                    MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE, muleMessage, null);
+                    MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE, event.getMessage(), null);
             }
         }
         return super.getNextFactoryVariableResolver(name);

@@ -7,7 +7,7 @@
 package org.mule.expression.transformers;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.transformer.Transformer;
@@ -95,11 +95,11 @@ public class ExpressionArgument implements MuleContextAware
     /**
      * Evaluates this Expression against the passed in Message.  If a returnClass is set on this Expression Argument it
      * will be checked to ensure the Argument returns the correct class type.
-     * @param message the message to execute the expression on
+     * @param event the event to execute the expression on
      * @return the result of the expression
      * @throws ExpressionRuntimeException if the wrong return type is returned from the expression.
      */
-    public Object evaluate(MuleMessage message) throws ExpressionRuntimeException
+    public Object evaluate(MuleEvent event) throws ExpressionRuntimeException
     {
         Object result = null;
 
@@ -113,7 +113,7 @@ public class ExpressionArgument implements MuleContextAware
         try
         {
             Thread.currentThread().setContextClassLoader(expressionEvaluationClassLoader);
-            result = muleContext.getExpressionManager().evaluate(getExpression(), message, !isOptional());
+            result = muleContext.getExpressionManager().evaluate(getExpression(), event, !isOptional());
         }
         finally
         {

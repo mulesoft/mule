@@ -7,6 +7,7 @@
 package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -75,10 +76,10 @@ public class MessageRootIdPropagationTestCase extends FunctionalTestCase
         }
 
         @Override
-        public Object transformMessage(MuleMessage msg, String outputEncoding)
+        public Object transformMessage(MuleEvent event, String outputEncoding)
         {
-            process(msg);
-            return msg.getPayload();
+            process(event.getMessage());
+            return event.getMessage().getPayload();
         }
 
         public static Set<String> getIds()

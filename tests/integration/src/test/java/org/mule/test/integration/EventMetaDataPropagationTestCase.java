@@ -119,9 +119,10 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
     {
 
         @Override
-        public Object transformMessage(MuleMessage msg, String outputEncoding) throws TransformerException
+        public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
         {
-            assertEquals("param1", msg.getOutboundProperty("stringParam"));
+            MuleMessage msg = event.getMessage();
+            assertEquals("param1", event.getMessage().getOutboundProperty("stringParam"));
             final Object o = msg.getOutboundProperty("objectParam");
             assertTrue(o instanceof Apple);
             assertEquals(12345.6, 12345.6, msg.<Double> getOutboundProperty("doubleParam", 0d));

@@ -31,6 +31,13 @@ public interface MuleEventContext
     MuleMessage getMessage();
 
     /**
+     * Returns the event
+     *
+     * @return the event
+     */
+    MuleEvent getEvent();
+
+    /**
      * Returns the message transformed into its recognised or expected format. The
      * transformer used is the one configured on the endpoint through which this
      * event was received.

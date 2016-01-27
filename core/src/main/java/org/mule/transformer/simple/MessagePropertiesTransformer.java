@@ -7,6 +7,7 @@
 package org.mule.transformer.simple;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.metadata.DataType;
 import org.mule.api.transport.PropertyScope;
@@ -79,22 +80,23 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding)
+    public Object transformMessage(MuleEvent event, String outputEncoding)
     {
+        MuleMessage message = event.getMessage();
         if (deleteProperties != null && deleteProperties.size() > 0)
         {
-            deleteProperties(message);
+            deleteProperties(event);
         }
 
         if (addProperties != null && addProperties.size() > 0)
         {
-            addProperties(message);
+            addProperties(event);
         }
 
         /* perform renaming transformation */
         if (this.renameProperties != null && this.renameProperties.size() > 0)
         {
-            renameProperties(message);
+            renameProperties(event);
         }
         
         if (getProperty != null)
@@ -113,8 +115,9 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
         return message;
     }
 
-    protected void deleteProperties(MuleMessage message)
+    protected void deleteProperties(MuleEvent event)
     {
+        MuleMessage message = event.getMessage();
         final Set<String> propertyNames = new HashSet<String>(message.getPropertyNames(scope));
         
         for (String expression : deleteProperties)
@@ -142,7 +145,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
         }
     }
 
-    protected void addProperties(MuleMessage message)
+    protected void addProperties(MuleEvent event)
     {
         for (Map.Entry<String, TypedValue> entry : addProperties.entrySet())
         {
@@ -160,9 +163,10 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
                 //Enable expression support for property values
                 if (muleContext.getExpressionManager().isExpression(value.toString()))
                 {
-                    value = muleContext.getExpressionManager().evaluate(value.toString(), message);
+                    value = muleContext.getExpressionManager().evaluate(value.toString(), event);
                 }
 
+                MuleMessage message = event.getMessage();
                 if (value != null)
                 {
                     DataType<?> propertyDataType = createPropertyDataType(value, typedValue.getDataType());
@@ -205,7 +209,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
         return dataType;
     }
 
-    protected void renameProperties(MuleMessage message)
+    protected void renameProperties(MuleEvent event)
     {
         for (Map.Entry<String, String> entry : this.renameProperties.entrySet())
         {
@@ -227,13 +231,14 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
                     //Enable expression support for property values
                     if (muleContext.getExpressionManager().isValidExpression(value))
                     {
-                        Object temp = muleContext.getExpressionManager().evaluate(value, message);
+                        Object temp = muleContext.getExpressionManager().evaluate(value, event);
                         if (temp != null)
                         {
                             value = temp.toString();
                         }
                     }
 
+                    MuleMessage message = event.getMessage();
                     /* log transformation */
                     if (logger.isDebugEnabled() && message.getProperty(key, scope) == null)
                     {

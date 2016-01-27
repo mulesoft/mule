@@ -6,7 +6,7 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.types.DataTypeFactory;
@@ -24,9 +24,9 @@ public class DomDocumentToXml extends AbstractXmlTransformer implements Discover
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String encoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String encoding) throws TransformerException
     {
-        Object src = message.getPayload();
+        Object src = event.getMessage().getPayload();
         try
         {
             // We now offer XML in byte OR String form.

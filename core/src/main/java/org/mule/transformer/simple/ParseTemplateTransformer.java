@@ -6,7 +6,7 @@
  */
 package org.mule.transformer.simple;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -54,14 +54,14 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer
 
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
         if(template == null)
         {
             throw new IllegalArgumentException("Template cannot be null");
         }
 
-        return muleContext.getExpressionManager().parse(template, message);
+        return muleContext.getExpressionManager().parse(template, event);
     }
 
     public void setLocation(String location)

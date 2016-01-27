@@ -6,7 +6,7 @@
  */
 package org.mule.expression.transformers;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transformer.TransformerException;
@@ -39,7 +39,7 @@ public class ExpressionTransformer extends AbstractExpressionTransformer
     private boolean returnSourceIfNull = false;
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
         Object results[] = new Object[arguments.size()];
         int i = 0;
@@ -48,7 +48,7 @@ public class ExpressionTransformer extends AbstractExpressionTransformer
             ExpressionArgument argument = iterator.next();
             try
             {
-                results[i] = argument.evaluate(message);
+                results[i] = argument.evaluate(event);
             }
             catch (RequiredValueException e)
             {
@@ -71,7 +71,7 @@ public class ExpressionTransformer extends AbstractExpressionTransformer
         }
         if (isReturnSourceIfNull() && checkIfAllAreNull(results))
         {
-            return message;
+            return event.getMessage();
         }
 
         if (results.length == 1)

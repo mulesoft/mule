@@ -6,8 +6,9 @@
  */
 package org.mule.el.context;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
@@ -38,58 +39,58 @@ import javax.activation.DataHandler;
  */
 public class MessageContext
 {
-    protected MuleMessage message;
+    private MuleEvent event;
     private MuleContext muleContext;
 
-    public MessageContext(MuleMessage message, MuleContext muleContext)
+    public MessageContext(MuleEvent event, MuleContext muleContext)
     {
-        this.message = message;
+        this.event = event;
         this.muleContext = muleContext;
     }
 
     public String getId()
     {
-        return message.getUniqueId();
+        return event.getMessage().getUniqueId();
     }
 
     public String getRootId()
     {
-        return message.getMessageRootId();
+        return event.getMessage().getMessageRootId();
     }
 
     public String getCorrelationId()
     {
-        return message.getCorrelationId();
+        return event.getMessage().getCorrelationId();
     }
 
     public int getCorrelationSequence()
     {
-        return message.getCorrelationSequence();
+        return event.getMessage().getCorrelationSequence();
     }
 
     public int getCorrelationGroupSize()
     {
-        return message.getCorrelationGroupSize();
+        return event.getMessage().getCorrelationGroupSize();
     }
 
     public Object getReplyTo()
     {
-        return message.getReplyTo();
+        return event.getMessage().getReplyTo();
     }
 
     public void setReplyTo(String replyTo)
     {
-        message.setReplyTo(replyTo);
+        event.getMessage().setReplyTo(replyTo);
     }
 
     public DataType<?> getDataType()
     {
-        return message.getDataType();
+        return event.getMessage().getDataType();
     }
 
     public Object getPayload()
     {
-        if (NullPayload.getInstance().equals(message.getPayload()))
+        if (NullPayload.getInstance().equals(event.getMessage().getPayload()))
         {
             // Return null for NullPayload because MEL user doesn't not know what NullPayload is and to allow
             // them to use null check (#[payload == null])
@@ -97,16 +98,12 @@ public class MessageContext
         }
         else
         {
-            return message.getPayload();
+            return event.getMessage().getPayload();
         }
     }
 
     /**
      * Obtains the payload of the current message transformed to the given #type.
-     * <p/>
-     * <b>Note:</b> If this current payload is a stream this operation will read the stream making it unreadable for
-     * further processing.  To avoid this transform the message prior to use of this expression.
-     * TODO MULE-9285
      *
      * @param type the java type the payload is to be transformed to
      * @return the transformed payload
@@ -114,15 +111,12 @@ public class MessageContext
      */
     public <T> T payloadAs(Class<T> type) throws TransformerException
     {
-        return (T) muleContext.getTransformationService().transform(message, DataTypeFactory.create(type)).getPayload();
+        event.setMessage(muleContext.getTransformationService().transform(event.getMessage(), DataTypeFactory.create(type)));
+        return (T) event.getMessage().getPayload();
     }
 
     /**
      * Obtains the payload of the current message transformed to the given #dataType.
-     * <p/>
-     * <b>Note:</b> If this current payload is a stream this operation will read the stream making it unreadable for
-     * further processing.  To avoid this transform the message prior to use of this expression.
-     * TODO MULE-9285
      *
      * @param dataType the DatType to transform the current message payload to
      * @param <T> the java type the payload is to be transformed to
@@ -131,42 +125,43 @@ public class MessageContext
      */
     public <T> T payloadAs(DataType<T> dataType) throws TransformerException
     {
-        return (T) muleContext.getTransformationService().transform(message, dataType).getPayload();
+        event.setMessage(muleContext.getTransformationService().transform(event.getMessage(), dataType));
+        return (T) event.getMessage().getPayload();
     }
 
     public void setPayload(Object payload)
     {
-        message.setPayload(payload);
+        event.setMessage(new DefaultMuleMessage(payload, event.getMessage()));
     }
 
     public Map<String, Object> getInboundProperties()
     {
-        return new MessagePropertyMapContext(message, PropertyScope.INBOUND);
+        return new MessagePropertyMapContext(event, PropertyScope.INBOUND);
     }
 
     public Map<String, Object> getOutboundProperties()
     {
-        return new MessagePropertyMapContext(message, PropertyScope.OUTBOUND);
+        return new MessagePropertyMapContext(event, PropertyScope.OUTBOUND);
     }
 
     public Map<String, DataHandler> getInboundAttachments()
     {
-        return new InboundAttachmentMapContext(message);
+        return new InboundAttachmentMapContext(event);
     }
 
     public Map<String, DataHandler> getOutboundAttachments()
     {
-        return new OutboundAttachmentMapContext(message);
+        return new OutboundAttachmentMapContext(event);
     }
 
     public Serializable getAttributes()
     {
-        return message.getAttributes();
+        return event.getMessage().getAttributes();
     }
 
     @Override
     public String toString()
     {
-        return message.toString();
+        return event.getMessage().toString();
     }
 }

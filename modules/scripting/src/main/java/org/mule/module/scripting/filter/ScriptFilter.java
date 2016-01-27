@@ -6,6 +6,8 @@
  */
 package org.mule.module.scripting.filter;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Disposable;
@@ -13,6 +15,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.routing.filter.Filter;
+import org.mule.construct.Flow;
 import org.mule.module.scripting.component.Scriptable;
 import org.mule.processor.AbstractFilteringMessageProcessor;
 
@@ -45,19 +48,35 @@ public class ScriptFilter extends AbstractFilteringMessageProcessor implements F
     @Override
     protected boolean accept(MuleEvent event)
     {
-        return this.accept(event.getMessage());
-    }
-    
-    public boolean accept(MuleMessage message)
-    {
         Bindings bindings = script.getScriptEngine().createBindings();
-        script.populateBindings(bindings, message);
+
+        script.populateBindings(bindings, event);
         try
         {
             return (Boolean) script.runScript(bindings);
         }
         catch (Throwable e)
         {
+            // TODO MULE-9356 ScriptFilter should rethrow exceptions, or at least log, not ignore them
+            return false;
+        }
+    }
+    
+    @Override
+    public boolean accept(MuleMessage message)
+    {
+        Bindings bindings = script.getScriptEngine().createBindings();
+
+        // TODO MULE-9341 Remove Filters.
+        MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, new Flow("", muleContext));
+        script.populateBindings(bindings, event);
+        try
+        {
+            return (Boolean) script.runScript(bindings);
+        }
+        catch (Throwable e)
+        {
+            // TODO MULE-9356 ScriptFilter should rethrow exceptions, or at least log, not ignore them
             return false;
         }
     }

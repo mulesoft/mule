@@ -8,6 +8,7 @@ package org.mule.functional.functional;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -214,12 +215,12 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      * Note that the value of {@link #getAppendString()} can contain expressions.
      *
      * @param contents the string vlaue of the current message payload
-     * @param message  the current message
+     * @param event  the current event
      * @return a concatenated string of the current payload and the appendString
      */
-    protected String append(String contents, MuleMessage message)
+    protected String append(String contents, MuleEvent event)
     {
-        return contents + muleContext.getExpressionManager().parse(appendString, message);
+        return contents + muleContext.getExpressionManager().parse(appendString, event);
     }
 
     /**
@@ -269,7 +270,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         {
             if (returnData instanceof String && muleContext.getExpressionManager().isExpression(returnData.toString()))
             {
-                replyMessage = muleContext.getExpressionManager().parse(returnData.toString(), message);
+                replyMessage = muleContext.getExpressionManager().parse(returnData.toString(), context.getEvent());
             }
             else
             {
@@ -280,7 +281,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         {
             if (appendString != null)
             {
-                replyMessage = append(data.toString(), message);
+                replyMessage = append(data.toString(), context.getEvent());
             }
             else
             {

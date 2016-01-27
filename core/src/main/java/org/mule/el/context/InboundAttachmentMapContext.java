@@ -6,7 +6,7 @@
  */
 package org.mule.el.context;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.config.i18n.CoreMessages;
 
 import java.util.Set;
@@ -15,11 +15,11 @@ import javax.activation.DataHandler;
 
 public class InboundAttachmentMapContext extends AbstractMapContext<String, DataHandler>
 {
-    private MuleMessage message;
+    private MuleEvent event;
 
-    public InboundAttachmentMapContext(MuleMessage message)
+    public InboundAttachmentMapContext(MuleEvent event)
     {
-        this.message = message;
+        this.event = event;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class InboundAttachmentMapContext extends AbstractMapContext<String, Data
         {
             return null;
         }
-        return message.getInboundAttachment((String) key);
+        return event.getMessage().getInboundAttachment((String) key);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class InboundAttachmentMapContext extends AbstractMapContext<String, Data
     @Override
     public Set<String> keySet()
     {
-        return message.getInboundAttachmentNames();
+        return event.getMessage().getInboundAttachmentNames();
     }
 
     @Override

@@ -67,7 +67,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter
                     AbstractRoutingStrategy.validateMessageIsNotConsumable(event,message);
                     MuleMessage clonedMessage = cloneMessage(event, message);
 
-                    MuleEvent result = sendRequest(event, clonedMessage, mp, true);
+                    MuleEvent result = sendRequest(event, createEventToRoute(event, clonedMessage), mp, true);
                     if (result != null && !VoidMuleEvent.getInstance().equals(result))
                     {
                         results.add(result);

@@ -6,8 +6,8 @@
  */
 package org.mule.routing;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.routing.MessageInfoMapping;
-import org.mule.api.MuleMessage;
 
 /**
  * A simple facade implementation of {@link org.mule.api.routing.MessageInfoMapping} that simply
@@ -15,18 +15,18 @@ import org.mule.api.MuleMessage;
  */
 public class MuleMessageInfoMapping implements MessageInfoMapping
 {
-    public String getCorrelationId(MuleMessage message)
+    public String getCorrelationId(MuleEvent event)
     {
-        String id= message.getCorrelationId();
+        String id= event.getMessage().getCorrelationId();
         if (id == null)
         {
-            id = getMessageId(message);
+            id = getMessageId(event);
         }
         return id;
     }
 
-    public String getMessageId(MuleMessage message)
+    public String getMessageId(MuleEvent event)
     {
-        return message.getUniqueId();
+        return event.getMessage().getUniqueId();
     }
 }

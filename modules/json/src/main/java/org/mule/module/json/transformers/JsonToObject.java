@@ -6,7 +6,7 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -66,9 +66,9 @@ public class JsonToObject extends AbstractJsonTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
-        Object src = message.getPayload();
+        Object src = event.getMessage().getPayload();
         Object returnValue;
         InputStream is = null;
         Reader reader = null;

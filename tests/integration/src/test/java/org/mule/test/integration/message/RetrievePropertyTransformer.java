@@ -6,7 +6,7 @@
  */
 package org.mule.test.integration.message;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.transformer.AbstractMessageTransformer;
 
 public class RetrievePropertyTransformer extends AbstractMessageTransformer
@@ -14,9 +14,9 @@ public class RetrievePropertyTransformer extends AbstractMessageTransformer
     private String property;
     
     @Override
-    public Object transformMessage(MuleMessage message, String encoding)
+    public Object transformMessage(MuleEvent event, String encoding)
     {
-        Object storedProperty = message.getInboundProperty(property);
+        Object storedProperty = event.getMessage().getInboundProperty(property);
         return storedProperty != null ? storedProperty.getClass().getName() : null;
     }
 

@@ -122,8 +122,8 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
     protected abstract MuleEvent route(MuleEvent event) throws MessagingException;
 
-    protected final MuleEvent sendRequest(final MuleEvent routedEvent,
-                                          final MuleMessage message,
+    protected final MuleEvent sendRequest(final MuleEvent originalEvent,
+                                          final MuleEvent eventToRoute,
                                           final MessageProcessor route,
                                           boolean awaitResponse) throws MuleException
     {
@@ -133,7 +133,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
             awaitResponse = false;
         }
 
-        setMessageProperties(routedEvent.getFlowConstruct(), message, route);
+        setMessageProperties(originalEvent.getFlowConstruct(), eventToRoute, route);
 
         if (logger.isDebugEnabled())
         {
@@ -141,7 +141,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
             {
                 logger.debug("Message being sent to: " + ((OutboundEndpoint) route).getEndpointURI());
             }
-            logger.debug(message);
+            logger.debug(eventToRoute.getMessage());
         }
 
         if (logger.isTraceEnabled())
@@ -149,7 +149,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
             try
             {
                 logger.trace("Request payload: \n"
-                             + StringMessageUtils.truncate(muleContext.getTransformationService().getPayloadForLogging(message), 100, false));
+                             + StringMessageUtils.truncate(muleContext.getTransformationService().getPayloadForLogging(eventToRoute.getMessage()), 100, false));
                 if (route instanceof OutboundEndpoint)
                 {
                     logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
@@ -168,7 +168,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         MuleEvent result;
         try
         {
-            result = sendRequestEvent(routedEvent, message, route, awaitResponse);
+            result = sendRequestEvent(originalEvent, eventToRoute, route, awaitResponse);
         }
         catch (MessagingException me)
         {
@@ -176,7 +176,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         }
         catch (Exception e)
         {
-            throw new RoutingException(routedEvent, null, e);
+            throw new RoutingException(originalEvent, null, e);
         }
 
         if (getRouterStatistics() != null)
@@ -211,8 +211,9 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         return result;
     }
 
-    protected void setMessageProperties(FlowConstruct service, MuleMessage message, MessageProcessor route)
+    protected void setMessageProperties(FlowConstruct service, MuleEvent event, MessageProcessor route)
     {
+        MuleMessage message = event.getMessage();
         if (replyTo != null)
         {
             // if replyTo is set we'll probably want the correlationId set as
@@ -254,7 +255,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
             }
 
             String correlation;
-            correlation = service.getMessageInfoMapping().getCorrelationId(message);
+            correlation = service.getMessageInfoMapping().getCorrelationId(event);
             if (logger.isDebugEnabled())
             {
                 logger.debug("Extracted correlation Id as: " + correlation);
@@ -447,40 +448,38 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     /**
      * Send message event to destination.
      */
-    protected MuleEvent sendRequestEvent(MuleEvent routedEvent,
-                                         MuleMessage message,
+    protected MuleEvent sendRequestEvent(MuleEvent originalEvent,
+                                         MuleEvent eventToRoute,
                                          MessageProcessor route,
                                          boolean awaitResponse) throws MuleException
     {
         if (route == null)
         {
-            throw new DispatchException(CoreMessages.objectIsNull("Outbound Endpoint"), routedEvent, null);
+            throw new DispatchException(CoreMessages.objectIsNull("Outbound Endpoint"), originalEvent, null);
         }
-
-        MuleEvent event = createEventToRoute(routedEvent, message, route);
 
         if (awaitResponse)
         {
-            int timeout = message.getOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
+            int timeout = eventToRoute.getMessage().getOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
             if (timeout >= 0)
             {
-                event.setTimeout(timeout);
+                eventToRoute.setTimeout(timeout);
             }
         }
         if (route instanceof MessageProcessorChain)
         {
-            return route.process(event);
+            return route.process(eventToRoute);
         }
         else
         {
-            return notificationTemplate.execute(route, event);
+            return notificationTemplate.execute(route, eventToRoute);
         }
     }
 
     /**
      * Create a new event to be routed to the target MP
      */
-    protected MuleEvent createEventToRoute(MuleEvent routedEvent, MuleMessage message, MessageProcessor route)
+    protected MuleEvent createEventToRoute(MuleEvent routedEvent, MuleMessage message)
     {
         return new DefaultMuleEvent(message, routedEvent, true);
     }

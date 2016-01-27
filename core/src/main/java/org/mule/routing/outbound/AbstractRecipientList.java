@@ -75,11 +75,11 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
                 if (sync)
                 {
-                    results.add(sendRequest(event, request, endpoint, true));
+                    results.add(sendRequest(event, createEventToRoute(event, request), endpoint, true));
                 }
                 else
                 {
-                    sendRequest(event, request, endpoint, false);
+                    sendRequest(event, createEventToRoute(event, request), endpoint, false);
                 }
             }
             catch (MuleException e)

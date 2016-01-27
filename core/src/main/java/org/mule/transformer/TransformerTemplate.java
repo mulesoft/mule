@@ -6,6 +6,7 @@
  */
 package org.mule.transformer;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 
@@ -20,11 +21,11 @@ public class TransformerTemplate extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
         try
         {
-            return callback.doTransform(message);
+            return callback.doTransform(event.getMessage());
         }
         catch (TransformerException e)
         {

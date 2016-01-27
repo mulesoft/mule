@@ -6,7 +6,7 @@
  */
 package org.mule.transformer.simple;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
@@ -34,16 +34,16 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
     }
 
     @Override
-    public Object transformMessage(final MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
         if (wildcardAttributeEvaluator.hasWildcards())
         {
-            wildcardAttributeEvaluator.processValues(message.getPropertyNames(getScope()),new WildcardAttributeEvaluator.MatchCallback()
+            wildcardAttributeEvaluator.processValues(event.getMessage().getPropertyNames(getScope()),new WildcardAttributeEvaluator.MatchCallback()
             {
                 @Override
                 public void processMatch(String matchedValue)
                 {
-                    message.removeProperty(matchedValue,getScope());
+                    event.getMessage().removeProperty(matchedValue,getScope());
                     if (logger.isDebugEnabled())
                     {
                         logger.debug(String.format("Removing property: '%s' from scope: '%s'", matchedValue, getScope().getScopeName()));
@@ -53,17 +53,17 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
         }
         else
         {
-            Object keyValue = identifierEvaluator.resolveValue(message);
+            Object keyValue = identifierEvaluator.resolveValue(event);
             if (keyValue != null)
             {
-                message.removeProperty(keyValue.toString(), getScope());
+                event.getMessage().removeProperty(keyValue.toString(), getScope());
             }
             else
             {
                 logger.info("Key expression return null, no property will be removed");
             }
         }
-        return message;
+        return event.getMessage();
     }
 
     @Override

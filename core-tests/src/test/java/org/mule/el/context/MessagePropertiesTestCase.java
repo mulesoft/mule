@@ -8,8 +8,9 @@ package org.mule.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
+import static org.mockito.Mockito.mock;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 
@@ -21,151 +22,149 @@ import java.util.Set;
 import javax.activation.DataHandler;
 
 import junit.framework.Assert;
-
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class MessagePropertiesTestCase extends AbstractELTestCase
 {
+
+    private MuleEvent event;
+
     public MessagePropertiesTestCase(Variant variant, String mvelOptimizer)
     {
         super(variant, mvelOptimizer);
     }
 
+    @Before
+    public void setup() throws Exception
+    {
+        event = getTestEvent("");
+    }
+
     @Test
     public void inboundPropertyMap() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setProperty("foo", "bar", PropertyScope.INBOUND);
-        assertTrue(evaluate("message.inboundProperties", message) instanceof Map);
+        event.getMessage().setProperty("foo", "bar", PropertyScope.INBOUND);
+        assertTrue(evaluate("message.inboundProperties", event) instanceof Map);
     }
 
     @Test
     public void assignToInboundPropertyMap() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertFinalProperty("message.inboundProperties='foo'", message);
+        assertFinalProperty("message.inboundProperties='foo'", event);
     }
 
     @Test
     public void inboundProperty() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setProperty("foo", "bar", PropertyScope.INBOUND);
-        assertEquals("bar", evaluate("message.inboundProperties['foo']", message));
+        event.getMessage().setProperty("foo", "bar", PropertyScope.INBOUND);
+        assertEquals("bar", evaluate("message.inboundProperties['foo']", event));
     }
 
     @Test
     public void assignValueToInboundProperty() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setProperty("foo", "bar", PropertyScope.INBOUND);
-        assertUnsupportedOperation("message.inboundProperties['foo']='bar'", message);
+        event.getMessage().setProperty("foo", "bar", PropertyScope.INBOUND);
+        assertUnsupportedOperation("message.inboundProperties['foo']='bar'", event);
     }
 
     @Test
     public void assignValueToNewInboundProperty() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertUnsupportedOperation("message.inboundProperties['foo_new']='bar'", message);
+        assertUnsupportedOperation("message.inboundProperties['foo_new']='bar'", event);
     }
 
     @Test
     public void outboundPropertyMap() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setProperty("foo", "bar", PropertyScope.OUTBOUND);
-        assertTrue(evaluate("message.outboundProperties", message) instanceof Map);
+        event.getMessage().setProperty("foo", "bar", PropertyScope.OUTBOUND);
+        assertTrue(evaluate("message.outboundProperties", event) instanceof Map);
     }
 
     @Test
     public void assignToOutboundPropertyMap() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertFinalProperty("message.outboundProperties='foo'", message);
+        assertFinalProperty("message.outboundProperties='foo'", event);
     }
 
     @Test
     public void outboundProperty() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setOutboundProperty("foo", "bar");
-        assertEquals("bar", evaluate("message.outboundProperties['foo']", message));
+        event.getMessage().setOutboundProperty("foo", "bar");
+        assertEquals("bar", evaluate("message.outboundProperties['foo']", event));
     }
 
     @Test
     public void assignValueToOutboundProperty() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setOutboundProperty("foo", "bar_old");
-        evaluate("message.outboundProperties['foo']='bar'", message);
-        assertEquals("bar", message.getOutboundProperty("foo"));
+        event.getMessage().setOutboundProperty("foo", "bar_old");
+        evaluate("message.outboundProperties['foo']='bar'", event);
+        assertEquals("bar", event.getMessage().getOutboundProperty("foo"));
     }
 
     @Test
     public void assignValueToNewOutboundProperty() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        evaluate("message.outboundProperties['foo']='bar'", message);
-        assertEquals("bar", message.getOutboundProperty("foo"));
+        evaluate("message.outboundProperties['foo']='bar'", event);
+        assertEquals("bar", event.getMessage().getOutboundProperty("foo"));
     }
 
     @Test
     public void inboundClear() throws Exception
     {
-        assertUnsupportedOperation("message.inboundProperties.clear())", Mockito.mock(MuleMessage.class));
+        assertUnsupportedOperation("message.inboundProperties.clear())", event);
     }
 
     @Test
     public void inboundSize() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Mockito.mock(DataHandler.class);
+        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        mock(DataHandler.class);
         message.setInboundProperty("foo", "abc");
         message.setInboundProperty("bar", "xyz");
-        assertEquals(2, evaluate("message.inboundProperties.size()", message));
+        assertEquals(2, evaluate("message.inboundProperties.size()", event));
     }
 
     @Test
     public void inboundKeySet() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Mockito.mock(DataHandler.class);
+        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        mock(DataHandler.class);
         message.setInboundProperty("foo", "abc");
         message.setInboundProperty("bar", "xyz");
-        assertEquals("foo", evaluate("message.inboundProperties.keySet().toArray()[0]", message));
-        assertEquals("bar", evaluate("message.inboundProperties.keySet().toArray()[1]", message));
+        assertEquals("foo", evaluate("message.inboundProperties.keySet().toArray()[0]", event));
+        assertEquals("bar", evaluate("message.inboundProperties.keySet().toArray()[1]", event));
     }
 
     @Test
     public void inboundContainsKey() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Mockito.mock(DataHandler.class);
+        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        mock(DataHandler.class);
         message.setInboundProperty("foo", "abc");
-        Assert.assertTrue((Boolean)evaluate("message.inboundProperties.containsKey('foo')", message));
-        Assert.assertFalse((Boolean)evaluate("message.inboundProperties.containsKey('bar')", message));
+        Assert.assertTrue((Boolean)evaluate("message.inboundProperties.containsKey('foo')", event));
+        Assert.assertFalse((Boolean)evaluate("message.inboundProperties.containsKey('bar')", event));
     }
 
     @Test
     public void inboundContainsValue() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
         message.setInboundProperty("foo", "abc");
-        Assert.assertTrue((Boolean)evaluate("message.inboundProperties.containsValue('abc')", message));
-        Assert.assertFalse((Boolean)evaluate("message.inboundProperties.containsValue('xyz')", message));
+        Assert.assertTrue((Boolean)evaluate("message.inboundProperties.containsValue('abc')", event));
+        Assert.assertFalse((Boolean)evaluate("message.inboundProperties.containsValue('xyz')", event));
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void inboundEntrySet() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
         message.setInboundProperty("foo", "abc");
         message.setInboundProperty("bar", "xyz");
         Set<Map.Entry<String, Object>> entrySet = (Set<Entry<String, Object>>)evaluate(
-            "message.inboundProperties.entrySet()", message);
+            "message.inboundProperties.entrySet()", event);
         assertEquals(2, entrySet.size());
         entrySet.contains(new DefaultMapEntry("foo", "abc"));
         entrySet.contains(new DefaultMapEntry("bar", "xyz"));
@@ -175,11 +174,11 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void inboundValues() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
         message.setInboundProperty("foo", "abc");
         message.setInboundProperty("bar", "xyz");
         Collection<DataHandler> values = (Collection<DataHandler>)evaluate(
-            "message.inboundProperties.values()", message);
+            "message.inboundProperties.values()", event);
         assertEquals(2, values.size());
         values.contains("abc");
         values.contains("xyz");
@@ -188,82 +187,79 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void inboundIsEmpty() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Assert.assertTrue((Boolean)evaluate("message.inboundProperties.isEmpty()", message));
+        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        Assert.assertTrue((Boolean)evaluate("message.inboundProperties.isEmpty()", event));
         message.setInboundProperty("foo", "abc");
         message.setInboundProperty("bar", "xyz");
-        Assert.assertFalse((Boolean)evaluate("message.inboundProperties.isEmpty()", message));
+        Assert.assertFalse((Boolean)evaluate("message.inboundProperties.isEmpty()", event));
     }
 
     @Test
     public void inboundPutAll() throws Exception
     {
-        assertUnsupportedOperation("message.inboundProperties.putAll(['foo': 'abc','bar': 'xyz'])",
-            Mockito.mock(MuleMessage.class));
+        assertUnsupportedOperation("message.inboundProperties.putAll(['foo': 'abc','bar': 'xyz'])", event);
     }
 
     @Test
     public void inboundRemove() throws Exception
     {
-        assertUnsupportedOperation("message.inboundProperties.remove('foo')", Mockito.mock(MuleMessage.class));
+        assertUnsupportedOperation("message.inboundProperties.remove('foo')", event);
     }
 
     @Test
     public void outboundClear() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleMessage message = event.getMessage();
         message.setOutboundProperty("foo", "abc");
         message.setOutboundProperty("bar", "xyz");
-        evaluate("message.outboundProperties.clear()", message);
+        evaluate("message.outboundProperties.clear()", event);
         assertEquals(0, message.getOutboundPropertyNames().size());
     }
 
     @Test
     public void outboundSize() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleMessage message = event.getMessage();
         message.setOutboundProperty("foo", "abc");
         message.setOutboundProperty("bar", "xyz");
-        assertEquals(2, evaluate("message.outboundProperties.size()", message));
+        assertEquals(2, evaluate("message.outboundProperties.size()", event));
     }
 
     @Test
     public void outboundKeySet() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleMessage message = event.getMessage();
         message.setOutboundProperty("foo", "abc");
         message.setOutboundProperty("bar", "xyz");
-        assertEquals("foo", evaluate("message.outboundProperties.keySet().toArray()[0]", message));
-        assertEquals("bar", evaluate("message.outboundProperties.keySet().toArray()[1]", message));
+        assertEquals("foo", evaluate("message.outboundProperties.keySet().toArray()[0]", event));
+        assertEquals("bar", evaluate("message.outboundProperties.keySet().toArray()[1]", event));
     }
 
     @Test
     public void outboundContainsKey() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setOutboundProperty("foo", "abc");
-        Assert.assertTrue((Boolean)evaluate("message.outboundProperties.containsKey('foo')", message));
-        Assert.assertFalse((Boolean)evaluate("message.outboundProperties.containsKey('bar')", message));
+        event.getMessage().setOutboundProperty("foo", "abc");
+        Assert.assertTrue((Boolean)evaluate("message.outboundProperties.containsKey('foo')", event));
+        Assert.assertFalse((Boolean)evaluate("message.outboundProperties.containsKey('bar')", event));
     }
 
     @Test
     public void outboundContainsValue() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setOutboundProperty("foo", "abc");
-        Assert.assertTrue((Boolean)evaluate("message.outboundProperties.containsValue('abc')", message));
-        Assert.assertFalse((Boolean)evaluate("message.outboundProperties.containsValue('xyz')", message));
+        event.getMessage().setOutboundProperty("foo", "abc");
+        Assert.assertTrue((Boolean)evaluate("message.outboundProperties.containsValue('abc')", event));
+        Assert.assertFalse((Boolean)evaluate("message.outboundProperties.containsValue('xyz')", event));
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void outboundEntrySet() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleMessage message = event.getMessage();
         message.setOutboundProperty("foo", "abc");
         message.setOutboundProperty("bar", "xyz");
         Set<Map.Entry<String, Object>> entrySet = (Set<Entry<String, Object>>)evaluate(
-            "message.outboundProperties.entrySet()", message);
+            "message.outboundProperties.entrySet()", event);
         assertEquals(2, entrySet.size());
         entrySet.contains(new DefaultMapEntry("foo", "abc"));
         entrySet.contains(new DefaultMapEntry("bar", "xyz"));
@@ -273,11 +269,11 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void outboundValues() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleMessage message = event.getMessage();
         message.setOutboundProperty("foo", "abc");
         message.setOutboundProperty("bar", "xyz");
         Collection<DataHandler> values = (Collection<DataHandler>)evaluate(
-            "message.outboundProperties.values()", message);
+            "message.outboundProperties.values()", event);
         assertEquals(2, values.size());
         values.contains("abc");
         values.contains("xyz");
@@ -286,30 +282,30 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void outboundIsEmpty() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        Assert.assertTrue((Boolean)evaluate("message.outboundProperties.isEmpty()", message));
+        MuleMessage message = event.getMessage();
+        Assert.assertTrue((Boolean)evaluate("message.outboundProperties.isEmpty()", event));
         message.setOutboundProperty("foo", "abc");
         message.setOutboundProperty("bar", "xyz");
-        Assert.assertFalse((Boolean)evaluate("message.outboundProperties.isEmpty()", message));
+        Assert.assertFalse((Boolean)evaluate("message.outboundProperties.isEmpty()", event));
     }
 
     @Test
     public void outboundPutAll() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
-        evaluate("message.outboundProperties.putAll(['foo': 'abc','bar': 'xyz'])", message);
-        assertEquals("abc", evaluate("message.outboundProperties['foo']", message));
-        assertEquals("xyz", evaluate("message.outboundProperties['bar']", message));
+        MuleMessage message = event.getMessage();
+        evaluate("message.outboundProperties.putAll(['foo': 'abc','bar': 'xyz'])", event);
+        assertEquals("abc", evaluate("message.outboundProperties['foo']", event));
+        assertEquals("xyz", evaluate("message.outboundProperties['bar']", event));
     }
 
     @Test
     public void outboundInboundRemove() throws Exception
     {
-        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
+        MuleMessage message = event.getMessage();
         message.setOutboundProperty("foo", "abc");
-        Assert.assertFalse((Boolean)evaluate("message.outboundProperties.isEmpty()", message));
-        evaluate("message.outboundProperties.remove('foo')", message);
-        Assert.assertTrue((Boolean)evaluate("message.outboundProperties.isEmpty()", message));
+        Assert.assertFalse((Boolean)evaluate("message.outboundProperties.isEmpty()", event));
+        evaluate("message.outboundProperties.remove('foo')", event);
+        Assert.assertTrue((Boolean)evaluate("message.outboundProperties.isEmpty()", event));
     }
 
 }

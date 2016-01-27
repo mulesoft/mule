@@ -6,6 +6,7 @@
  */
 package org.mule.transformer.simple;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
@@ -36,8 +37,9 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(final MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
+        MuleMessage message = event.getMessage();
         try
         {
             if (wildcardAttachmentNameEvaluator.hasWildcards())
@@ -66,7 +68,7 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
             }
             else
             {
-                String attachmentName = attachmentNameEvaluator.resolveValue(message).toString();
+                String attachmentName = attachmentNameEvaluator.resolveValue(event).toString();
                 DataHandler inboundAttachment = message.getInboundAttachment(attachmentName);
                 message.addOutboundAttachment(attachmentName, inboundAttachment);
             }

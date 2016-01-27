@@ -6,6 +6,7 @@
  */
 package org.mule.transformer.simple;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
@@ -34,8 +35,9 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(final MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
+        MuleMessage message = event.getMessage();
         if (wildcardPropertyNameEvaluator.hasWildcards())
         {
             wildcardPropertyNameEvaluator.processValues(message.getInboundPropertyNames(), new WildcardAttributeEvaluator.MatchCallback()
@@ -49,7 +51,7 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
         }
         else
         {
-            Object keyValue = propertyNameEvaluator.resolveValue(message);
+            Object keyValue = propertyNameEvaluator.resolveValue(event);
             if (keyValue != null)
             {
                 String propertyName = keyValue.toString();

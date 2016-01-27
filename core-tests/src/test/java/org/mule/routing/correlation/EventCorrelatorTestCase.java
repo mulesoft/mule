@@ -104,7 +104,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     @Test
     public void initAfterDeserializationAfterProcess() throws Exception
     {
-        when(mockMessagingInfoMapping.getCorrelationId(isA(MuleMessage.class))).thenReturn(TEST_GROUP_ID);
+        when(mockMessagingInfoMapping.getCorrelationId(isA(MuleEvent.class))).thenReturn(TEST_GROUP_ID);
         when(mockProcessedGroups.contains(TEST_GROUP_ID)).thenReturn(false);
         when(mockEventCorrelatorCallback.shouldAggregateEvents(mockEventGroup)).thenReturn(false);
         EventCorrelator eventCorrelator = createEventCorrelator();

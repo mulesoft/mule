@@ -72,8 +72,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
         return new EnricherProcessor(enrichmentProcessor, muleContext).process(event);
     }
 
-    protected void enrich(MuleMessage currentMessage,
-                          MuleMessage enrichmentMessage,
+    protected void enrich(MuleEvent currentEvent,
+                          MuleEvent enrichmentEvent,
                           String sourceExpressionArg,
                           String targetExpressionArg,
                           ExpressionManager expressionManager)
@@ -83,7 +83,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
             sourceExpressionArg = "#[payload:]";
         }
 
-        TypedValue typedValue = expressionManager.evaluateTyped(sourceExpressionArg, enrichmentMessage);
+        TypedValue typedValue = expressionManager.evaluateTyped(sourceExpressionArg, enrichmentEvent);
 
         if (typedValue.getValue() instanceof MuleMessage)
         {
@@ -93,11 +93,11 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
 
         if (!StringUtils.isEmpty(targetExpressionArg))
         {
-            expressionManager.enrichTyped(targetExpressionArg, currentMessage, typedValue);
+            expressionManager.enrichTyped(targetExpressionArg, currentEvent, typedValue);
         }
         else
         {
-            currentMessage.setPayload(typedValue.getValue(), typedValue.getDataType());
+            currentEvent.getMessage().setPayload(typedValue.getValue(), typedValue.getDataType());
         }
     }
 
@@ -244,8 +244,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
             {
                 for (EnrichExpressionPair pair : enrichExpressionPairs)
                 {
-                    enrich(eventToEnrich.getMessage(), event.getMessage(), pair.getSource(), pair.getTarget(),
-                           expressionManager);
+                    enrich(eventToEnrich, event, pair.getSource(), pair.getTarget(), expressionManager);
                 }
             }
 

@@ -6,7 +6,7 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -138,7 +138,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
         try
         {
@@ -147,9 +147,9 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
             {
                 transformer = (XQPreparedExpression) transformerPool.borrowObject();
 
-                bindParameters(transformer, message);
+                bindParameters(transformer, event);
 
-                bindDocument(message.getPayload(), transformer);
+                bindDocument(event.getMessage().getPayload(), transformer);
                 XQResultSequence result = transformer.executeQuery();
                 //No support for return Arrays yet
                 List<Object> results = new ArrayList<Object>();
@@ -238,7 +238,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         }
     }
 
-    protected void bindParameters(XQPreparedExpression transformer, MuleMessage message) throws XQException, TransformerException
+    protected void bindParameters(XQPreparedExpression transformer, MuleEvent event) throws XQException, TransformerException
     {
         // set transformation parameters
         if (contextProperties != null)
@@ -246,7 +246,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
             for (Map.Entry<String, Object> parameter : contextProperties.entrySet())
             {
                 String key = parameter.getKey();
-                Object o = evaluateTransformParameter(key, parameter.getValue(), message);
+                Object o = evaluateTransformParameter(key, parameter.getValue(), event);
 
                 if (o == null)
                 {
@@ -508,11 +508,11 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
      * @return the object to be set as the parameter value
      * @throws TransformerException
      */
-    protected Object evaluateTransformParameter(String name, Object value, MuleMessage message) throws TransformerException
+    protected Object evaluateTransformParameter(String name, Object value, MuleEvent event) throws TransformerException
     {
         if (value instanceof String)
         {
-            return muleContext.getExpressionManager().evaluate(value.toString(), message);
+            return muleContext.getExpressionManager().evaluate(value.toString(), event);
         }
         return value;
     }

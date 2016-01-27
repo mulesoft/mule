@@ -6,6 +6,7 @@
  */
 package org.mule.transformer.simple;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
@@ -34,8 +35,9 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(final MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
+        MuleMessage message = event.getMessage();
         try
         {
             if (wildcardAttributeEvaluator.hasWildcards())
@@ -64,7 +66,7 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
             }
             else
             {
-                Object keyValue = nameEvaluator.resolveValue(message);
+                Object keyValue = nameEvaluator.resolveValue(event);
                 if (keyValue != null)
                 {
                     String name = keyValue.toString();

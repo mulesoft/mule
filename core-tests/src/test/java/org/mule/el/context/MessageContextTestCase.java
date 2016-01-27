@@ -13,169 +13,180 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleMessage;
 import org.mule.TransformationService;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.metadata.DataType;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class MessageContextTestCase extends AbstractELTestCase
 {
+
+    private MuleEvent event;
+    private MuleMessage message;
 
     public MessageContextTestCase(Variant variant, String mvelOptimizer)
     {
         super(variant, mvelOptimizer);
     }
 
+    @Before
+    public void setup()
+    {
+        event = mock(MuleEvent.class);
+        message = mock(MuleMessage.class);
+        doAnswer(invocation -> {
+            message = (MuleMessage) invocation.getArguments()[0];
+            return null;
+        }).when(event).setMessage(any(MuleMessage.class));
+        when(event.getMessage()).thenAnswer(invocation -> message);
+    }
+
     @Test
     public void message() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
-        assertTrue(evaluate("message", message) instanceof MessageContext);
-        assertEquals("foo", evaluate("message.payload", message));
+        MuleEvent event = getTestEvent("foo");
+        assertTrue(evaluate("message", event) instanceof MessageContext);
+        assertEquals("foo", evaluate("message.payload", event));
     }
 
     @Test
     public void assignToMessage() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        assertImmutableVariable("message='foo'", message);
+        MuleEvent event = getTestEvent("");
+        assertImmutableVariable("message='foo'", event);
     }
 
     @Test
     public void messageId() throws Exception
     {
-        MuleMessage message = mock(MuleMessage.class);
         when(message.getUniqueId()).thenReturn("1");
-        assertEquals("1", evaluate("message.id", message));
-        assertFinalProperty("message.id=2", message);
+        assertEquals("1", evaluate("message.id", event));
+        assertFinalProperty("message.id=2", event);
     }
 
     @Test
     public void rootId() throws Exception
     {
-        MuleMessage message = mock(MuleMessage.class);
         when(message.getMessageRootId()).thenReturn("2");
-        assertEquals("2", evaluate("message.rootId", message));
-        assertFinalProperty("message.rootId=2", message);
+        assertEquals("2", evaluate("message.rootId", event));
+        assertFinalProperty("message.rootId=2", event);
     }
 
     @Test
     public void correlationId() throws Exception
     {
-        MuleMessage message = mock(MuleMessage.class);
         when(message.getCorrelationId()).thenReturn("3");
-        assertEquals("3", evaluate("message.correlationId", message));
-        assertFinalProperty("message.correlationId=2", message);
+        assertEquals("3", evaluate("message.correlationId", event));
+        assertFinalProperty("message.correlationId=2", event);
     }
 
     @Test
     public void correlationSequence() throws Exception
     {
-        MuleMessage message = mock(MuleMessage.class);
         when(message.getCorrelationSequence()).thenReturn(4);
-        assertEquals(4, evaluate("message.correlationSequence", message));
-        assertFinalProperty("message.correlationSequence=2", message);
+        assertEquals(4, evaluate("message.correlationSequence", event));
+        assertFinalProperty("message.correlationSequence=2", event);
     }
 
     @Test
     public void correlationGroupSize() throws Exception
     {
-        MuleMessage message = mock(MuleMessage.class);
         when(message.getCorrelationGroupSize()).thenReturn(4);
-        assertEquals(4, evaluate("message.correlationGroupSize", message));
-        assertFinalProperty("message.correlationGroupSize=2", message);
+        assertEquals(4, evaluate("message.correlationGroupSize", event));
+        assertFinalProperty("message.correlationGroupSize=2", event);
     }
 
     @Test
     public void replyTo() throws Exception
     {
-        MuleMessage message = mock(MuleMessage.class);
         when(message.getReplyTo()).thenReturn("replyQueue");
-        assertEquals("replyQueue", evaluate("message.replyTo", message));
-        assertFinalProperty("message.correlationGroupSize=2", message);
+        assertEquals("replyQueue", evaluate("message.replyTo", event));
+        assertFinalProperty("message.correlationGroupSize=2", event);
     }
 
     @Test
     public void assignValueToReplyTo() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        evaluate("message.replyTo='my://uri'", message);
-        assertEquals("my://uri", message.getReplyTo());
+        MuleEvent event = getTestEvent("");
+        evaluate("message.replyTo='my://uri'", event);
+        assertEquals("my://uri", event.getMessage().getReplyTo());
     }
 
     @Test
     public void dataType() throws Exception
     {
-        MuleMessage message = mock(MuleMessage.class);
         when(message.getDataType()).thenReturn((DataType) DataTypeFactory.STRING);
-        assertEquals(DataTypeFactory.STRING, evaluate("message.dataType", message));
-        assertFinalProperty("message.mimType=2", message);
+        assertEquals(DataTypeFactory.STRING, evaluate("message.dataType", event));
+        assertFinalProperty("message.mimType=2", event);
     }
 
     @Test
     public void payload() throws Exception
     {
-        MuleMessage mockMessage = mock(MuleMessage.class);
+        MuleEvent event = mock(MuleEvent.class);
+        MuleMessage message = mock(MuleMessage.class);
+        when(event.getMessage()).thenReturn(message);
         Object payload = new Object();
-        when(mockMessage.getPayload()).thenReturn(payload);
-        assertSame(payload, evaluate("message.payload", mockMessage));
+        when(message.getPayload()).thenReturn(payload);
+        assertSame(payload, evaluate("message.payload", event));
     }
 
     @Test
     public void assignPayload() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        evaluate("message.payload = 'foo'", message);
-        assertEquals("foo", message.getPayload());
+        message = new DefaultMuleMessage("", muleContext);
+        evaluate("message.payload = 'foo'", event);
+        assertEquals("foo", event.getMessage().getPayload());
     }
 
     @Test
     public void payloadAsType() throws Exception
     {
-        MuleMessage mockMessage = mock(MuleMessage.class);
         MuleMessage transformedMessage = mock(MuleMessage.class, RETURNS_DEEP_STUBS);
         TransformationService transformationService = mock(TransformationService.class);
         muleContext.setTransformationService(transformationService);
         when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenReturn(transformedMessage);
-        assertSame(transformedMessage.getPayload(), evaluate("message.payloadAs(org.mule.tck.testmodels.fruit.Banana)", mockMessage));
+        assertSame(transformedMessage.getPayload(), evaluate("message.payloadAs(org.mule.tck.testmodels.fruit.Banana)", event));
     }
 
     @Test
     public void payloadAsDataType() throws Exception
     {
-        MuleMessage mockMessage = mock(MuleMessage.class);
+        String payload = TEST_PAYLOAD;
         MuleMessage transformedMessage = mock(MuleMessage.class, RETURNS_DEEP_STUBS);
         TransformationService transformationService = mock(TransformationService.class);
+        when(transformedMessage.getPayload()).thenReturn(TEST_PAYLOAD);
         muleContext.setTransformationService(transformationService);
-        when(transformationService.transform(mockMessage, DataTypeFactory.STRING)).thenReturn(transformedMessage);
-        assertSame(transformedMessage.getPayload(),
-            evaluate("message.payloadAs(org.mule.transformer.types.DataTypeFactory.STRING)", mockMessage));
+        when(transformationService.transform(event.getMessage(), DataTypeFactory.STRING)).thenReturn(transformedMessage);
+        Object result = evaluate("message.payloadAs(org.mule.transformer.types.DataTypeFactory.STRING)", event);
+        assertSame(TEST_PAYLOAD, result);
     }
 
     @Test
     public void nullPayloadTest() throws Exception
     {
-        MuleMessage mockMessage = mock(MuleMessage.class);
-        when(mockMessage.getPayload()).thenReturn(NullPayload.getInstance());
-        assertEquals(true, evaluate("message.payload == null", mockMessage));
-        assertEquals(true, evaluate("payload == null", mockMessage));
-        assertEquals(false, evaluate("message.payload is NullPayload", mockMessage));
-        assertEquals(true, evaluate("message.payload == empty", mockMessage));
+        when(message.getPayload()).thenReturn(NullPayload.getInstance());
+        assertEquals(true, evaluate("message.payload == null", event));
+        assertEquals(true, evaluate("payload == null", event));
+        assertEquals(false, evaluate("message.payload is NullPayload", event));
+        assertEquals(true, evaluate("message.payload == empty", event));
     }
 
     @Test
     public void attributes() throws Exception
     {
-        MuleMessage mockMessage = mock(MuleMessage.class);
         Banana banana = new Banana();
-        when(mockMessage.getAttributes()).thenReturn(banana);
-        assertThat(evaluate("message.attributes", mockMessage), is(banana));
+        when(message.getAttributes()).thenReturn(banana);
+        assertThat(evaluate("message.attributes", event), is(banana));
     }
 }

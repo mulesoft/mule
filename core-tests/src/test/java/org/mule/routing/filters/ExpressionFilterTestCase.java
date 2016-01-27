@@ -20,6 +20,7 @@ import org.mule.tck.testmodels.fruit.Apple;
 
 import java.io.IOException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
@@ -36,6 +37,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         assertTrue(filter.accept(message));
     }
 
+    @Ignore("MULE-9341")
     @Test
     public void testVariableFilterEL() throws Exception
     {
@@ -61,6 +63,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         assertTrue(filter.accept(message));
     }
 
+    @Ignore("MULE-9341")
     @Test
     public void testVariableFilterWithNotEL() throws Exception
     {
@@ -97,6 +100,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         assertTrue(filter.accept(message));
     }
 
+    @Ignore("MULE-9341")
     @Test
     public void testVariableFilterWithNotNullEL() throws Exception
     {

@@ -7,7 +7,6 @@
 package org.mule.api.expression;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.transformer.types.TypedValue;
 
 /**
@@ -24,41 +23,33 @@ public interface ExpressionManager
      * Evaluates the given expression. The expression should be a single expression definition with or without
      * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For
      * situations where one or more expressions need to be parsed within a single text, the
-     * {@link #parse(String,org.mule.api.MuleMessage,boolean)} method should be used since it will iterate
+     * {@link #parse(String,org.mule.api.MuleEvent,boolean)} method should be used since it will iterate
      * through all expressions in a string.
      * 
      * @param expression a single expression i.e. xpath://foo
-     * @param message The current message being processed
+     * @param event The current event being processed
      * @return the result of the evaluation
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression
      *             and 'failIfNull is set to true.
      */
-    @Deprecated
-    Object evaluate(String expression, MuleMessage message) throws ExpressionRuntimeException;
-
     Object evaluate(String expression, MuleEvent event) throws ExpressionRuntimeException;
 
     /**
      * Evaluates the given expression. The expression should be a single expression definition with or without
      * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For
      * situations where one or more expressions need to be parsed within a single text, the
-     * {@link #parse(String,org.mule.api.MuleMessage,boolean)} method should be used since it will iterate
+     * {@link #parse(String,org.mule.api.MuleEvent,boolean)} method should be used since it will iterate
      * through all expressions in a string.
      * 
      * @param expression a single expression i.e. xpath://foo
-     * @param message The current message being processed
+     * @param event The current event being processed
      * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or
      *            returns null. @return the result of the evaluation
      * @return the parsered expression string
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression
      *             and 'failIfNull is set to true.
      */
-    @Deprecated
-    Object evaluate(String expression, MuleMessage message, boolean failIfNull)
-        throws ExpressionRuntimeException;
-
-    Object evaluate(String expression, MuleEvent event, boolean failIfNull)
-        throws ExpressionRuntimeException;
+    Object evaluate(String expression, MuleEvent event, boolean failIfNull) throws ExpressionRuntimeException;
 
     /**
      * Evaluates the given expression resolving the result of the evaluation to a boolean. The expression
@@ -66,11 +57,8 @@ public interface ExpressionManager
      * and "#[context:serviceName]" are both valid.
      * 
      * @param expression a single expression i.e. header:foo=bar
-     * @param message The current message being processed
+     * @param event The current event being processed
      */
-    @Deprecated
-    boolean evaluateBoolean(String expression, MuleMessage message) throws ExpressionRuntimeException;
-
     boolean evaluateBoolean(String expression, MuleEvent event) throws ExpressionRuntimeException;
 
     /**
@@ -79,78 +67,64 @@ public interface ExpressionManager
      * and "#[context:serviceName]" are both valid.
      * 
      * @param expression a single expression i.e. header:foo=bar
-     * @param message The current message being processed
+     * @param event The current message being processed
      * @param nullReturnsTrue determines if true should be returned if the result of the evaluation is null
      * @param nonBooleanReturnsTrue determines if true should returned if the result is not null but isn't
      *            recognised as a boolean
      */
-    @Deprecated
-    boolean evaluateBoolean(String expression,
-                                   MuleMessage message,
-                                   boolean nullReturnsTrue,
-                                   boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException;
-
     boolean evaluateBoolean(String expression,
                                    MuleEvent event,
                                    boolean nullReturnsTrue,
                                    boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException;
 
+    TypedValue evaluateTyped(String expression, MuleEvent event);
+
     /**
      * Enriches the current message using
      * 
      * @param expression a single expression i.e. header://foo that defines how the message should be enriched
-     * @param message The current message being processed that will be enriched
+     * @param event The current event being processed that will be enriched
      * @param object The object that will be used to enrich the message
      */
-    @Deprecated
-    void enrich(String expression, MuleMessage message, Object object);
+    void enrich(String expression, MuleEvent event, Object object);
 
     /**
      * Enriches the current message using a typed value
      *
      * @param expression a single expression i.e. header://foo that defines how the message should be enriched
-     * @param message The current message being processed that will be enriched
+     * @param event The current event being processed that will be enriched
      * @param object The typed value that will be used to enrich the message
      */
-    void enrichTyped(String expression, MuleMessage message, TypedValue object);
-
-    void enrich(String expression, MuleEvent message, Object object);
+    void enrichTyped(String expression, MuleEvent event, TypedValue object);
 
     /**
      * Evaluates expressions in a given string. This method will iterate through each expression and evaluate
      * it. If a user needs to evaluate a single expression they can use
-     * {@link #evaluate(String,org.mule.api.MuleMessage,boolean)}.
+     * {@link #evaluate(String,org.mule.api.MuleEvent,boolean)}.
      * 
      * @param expression one or more expressions ebedded in a literal string i.e.
      *            "Value is #[xpath://foo] other value is #[header:foo]."
-     * @param message The current message being processed
+     * @param event The current event being processed
      * @return the result of the evaluation
      * @throws org.mule.api.expression.ExpressionRuntimeException if the expression is invalid, or a null is
      *             found for the expression and 'failIfNull is set to true.
      */
-    @Deprecated
-    String parse(String expression, MuleMessage message) throws ExpressionRuntimeException;
-
     String parse(String expression, MuleEvent event) throws ExpressionRuntimeException;
 
     /**
      * Evaluates expressions in a given string. This method will iterate through each expression and evaluate
      * it. If a user needs to evaluate a single expression they can use
-     * {@link #evaluate(String,org.mule.api.MuleMessage,boolean)}.
+     * {@link #evaluate(String,org.mule.api.MuleEvent,boolean)}.
      * 
      * @param expression one or more expressions ebedded in a literal string i.e.
      *            "Value is #[xpath://foo] other value is #[header:foo]."
-     * @param message The current message being processed
+     * @param event The current event being processed
      * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or
      *            returns null. @return the result of the evaluation
      * @return the parsered expression string
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression
      *             and 'failIfNull is set to true.
      */
-    @Deprecated
-    String parse(final String expression, final MuleMessage message, final boolean failIfNull)
-        throws ExpressionRuntimeException;
-
     String parse(final String expression, final MuleEvent event, final boolean failIfNull)
         throws ExpressionRuntimeException;
 
@@ -181,11 +155,10 @@ public interface ExpressionManager
      * the expression prefix (malformed) or a full expression. This isn't full proof but catches most error
      * cases
      * 
-     * @param string is this string an expression string
+     * @param expression is this string an expression string
      * @return true if the string contains an expression
      * @since 3.0
      */
-    boolean isExpression(String string);
+    boolean isExpression(String expression);
 
-    TypedValue evaluateTyped(String expression, MuleMessage message);
 }

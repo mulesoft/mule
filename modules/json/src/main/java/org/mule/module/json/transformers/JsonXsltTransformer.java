@@ -6,14 +6,16 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
-import de.odysseus.staxon.json.JsonXMLInputFactory;
-import de.odysseus.staxon.json.JsonXMLOutputFactory;
+import java.io.File;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.net.URL;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -22,10 +24,9 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.stax.StAXResult;
 import javax.xml.transform.stax.StAXSource;
-import java.io.File;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.net.URL;
+
+import de.odysseus.staxon.json.JsonXMLInputFactory;
+import de.odysseus.staxon.json.JsonXMLOutputFactory;
 
 /**
  * Convert Json to Json using XSLT
@@ -49,11 +50,11 @@ public class JsonXsltTransformer extends XsltTransformer
      * run a JSON to JSON XSLT transformationn XML string
      */
     @Override
-    public Object transformMessage(MuleMessage message, String enc) throws TransformerException
+    public Object transformMessage(MuleEvent event, String enc) throws TransformerException
     {
         XMLInputFactory inputFactory = new JsonXMLInputFactory();
         inputFactory.setProperty(JsonXMLInputFactory.PROP_MULTIPLE_PI, false);
-        TransformerInputs inputs = new TransformerInputs(this, message.getPayload());
+        TransformerInputs inputs = new TransformerInputs(this, event.getMessage().getPayload());
         Source source;
         try
         {
@@ -73,7 +74,7 @@ public class JsonXsltTransformer extends XsltTransformer
             XMLStreamWriter output = outputFactory.createXMLStreamWriter(writer);
             Result result = new StAXResult(output);
 
-            doTransform(message, enc, source, result);
+            doTransform(event, enc, source, result);
             return writer.toString();
         }
         catch (Exception ex)

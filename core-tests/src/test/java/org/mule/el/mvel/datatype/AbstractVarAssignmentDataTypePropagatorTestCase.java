@@ -103,7 +103,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
         context.setNextFactory(new CachedMapVariableResolverFactory(Collections.EMPTY_MAP,
                                                                     new DelegateVariableResolverFactory(staticContext, new MessageVariableResolverFactory(
-                                                                            parserConfiguration, muleContext, testEvent.getMessage(), new DelegateVariableResolverFactory(
+                                                                            parserConfiguration, muleContext, testEvent, new DelegateVariableResolverFactory(
                                                                             globalContext, new VariableVariableResolverFactory(parserConfiguration, muleContext, testEvent))))));
         return context;
     }

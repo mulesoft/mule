@@ -63,7 +63,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
         }
         else
         {
-            value = valueEvaluator.resolveValue(event.getMessage());
+            value = valueEvaluator.resolveValue(event);
         }
         return value;
     }
@@ -76,7 +76,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
         }
         else
         {
-            return valueEvaluator.resolveTypedValue(event.getMessage());
+            return valueEvaluator.resolveTypedValue(event);
         }
     }
 

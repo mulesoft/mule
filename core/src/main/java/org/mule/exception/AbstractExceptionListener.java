@@ -220,7 +220,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
                 MulticastingRouter router = new MulticastingRouter()
                 {
                     @Override
-                    protected void setMessageProperties(FlowConstruct session, MuleMessage message, MessageProcessor target)
+                    protected void setMessageProperties(FlowConstruct session, MuleEvent event, MessageProcessor target)
                     {
                         // No reply-to or correlation for exception targets, at least for now anyway.
                     }
