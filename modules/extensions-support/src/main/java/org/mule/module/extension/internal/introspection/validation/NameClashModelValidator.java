@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Validates names clashes in the model by comparing:
@@ -78,6 +79,40 @@ public final class NameClashModelValidator implements ModelValidator
                                                                                             operationNames,
                                                                                             operationModel.getName(),
                                                                                             "operation"));
+
+            // Check clash between each operation and its parameters type
+            extensionModel.getOperationModels().stream().forEach(operationModel -> {
+                operationModel.getParameterModels().stream().forEach(parameterModel -> {
+                    validateClash(operationModel.getName(),
+                                  parameterModel.getType().getName(),
+                                  "operation",
+                                  "argument");
+                });
+            });
+
+            // Check clashes between each operation argument and the connection providers
+            extensionModel.getConnectionProviders().stream().forEach(connectionProviderModel -> {
+                extensionModel.getOperationModels().stream().forEach(operationModel -> {
+                    operationModel.getParameterModels().stream().forEach(parameterModel -> {
+                        validateClash(connectionProviderModel.getName(),
+                                      parameterModel.getType().getName(),
+                                      "connection provider",
+                                      String.format("operation's (%s) parameter", operationModel.getName()));
+                    });
+                });
+            });
+
+            // Check clashes between each operation argument and the configs
+            extensionModel.getConfigurationModels().stream().forEach(configurationModel -> {
+                extensionModel.getOperationModels().stream().forEach(operationModel -> {
+                    operationModel.getParameterModels().stream().forEach(parameterModel -> {
+                        validateClash(configurationModel.getName(),
+                                      parameterModel.getType().getName(),
+                                      "configuration",
+                                      String.format("operation's (%s) parameter", operationModel.getName()));
+                    });
+                });
+            });
 
             extensionModel.getConnectionProviders().stream().forEach(providerModel -> validate(providerModel.getParameterModels(),
                                                                                                connectionProviderNames,
@@ -160,6 +195,15 @@ public final class NameClashModelValidator implements ModelValidator
             {
                 throw new IllegalModelDefinitionException(format("Extension '%s' has %s and %s with the same name. Offending names are: [%s]",
                                                                  extensionModel.getName(), type1, type2, Joiner.on(", ").join(intersection)));
+            }
+        }
+
+        private void validateClash(String existingNamingModel, String newNamingModel, String typeOfExistingNamingModel, String typeOfNewNamingModel)
+        {
+            if (StringUtils.equalsIgnoreCase(existingNamingModel, newNamingModel))
+            {
+                throw new IllegalModelDefinitionException(format("Extension '%s' has a %s named '%s' with an %s type named equally.",
+                                                                 extensionModel.getName(), typeOfExistingNamingModel, existingNamingModel, typeOfNewNamingModel));
             }
         }
     }

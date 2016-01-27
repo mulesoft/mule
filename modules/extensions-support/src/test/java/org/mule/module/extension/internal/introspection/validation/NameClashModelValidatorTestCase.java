@@ -112,10 +112,37 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase
     }
 
     @Test(expected = IllegalModelDefinitionException.class)
+    public void configNameClashesWithOperationParameterType()
+    {
+        ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, Banana.class);
+        when(configurationModel.getName()).thenReturn(Banana.class.getName());
+        when(operationModel.getParameterModels()).thenReturn(asList(topLevelOperationParam, offending));
+        validate();
+    }
+
+    @Test(expected = IllegalModelDefinitionException.class)
     public void connectionProviderTopLevelParameterCrashesWithOperationName()
     {
         ParameterModel offending = getParameter(TOP_LEVEL_OPERATION_PARAM_NAME, Banana.class);
         when(connectionProviderModel.getParameterModels()).thenReturn(asList(simpleConnectionProviderParam, topLevelConnectionProviderParam, offending));
+        validate();
+    }
+
+    @Test(expected = IllegalModelDefinitionException.class)
+    public void connectionProviderNameClashesWithOperationParameterName()
+    {
+        ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, Banana.class);
+        when(connectionProviderModel.getName()).thenReturn(SIMPLE_PARAM_NAME);
+        when(operationModel.getParameterModels()).thenReturn(asList(topLevelOperationParam, offending));
+        validate();
+    }
+
+    @Test(expected = IllegalModelDefinitionException.class)
+    public void connectionProviderNameClashesWithOperationParameterType()
+    {
+        ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, Banana.class);
+        when(connectionProviderModel.getName()).thenReturn(Banana.class.getName());
+        when(operationModel.getParameterModels()).thenReturn(asList(topLevelOperationParam, offending));
         validate();
     }
 
@@ -164,6 +191,15 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase
     {
         ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
         when(operationModel.getParameterModels()).thenReturn(asList(simpleOperationParam, topLevelOperationParam, offending));
+        validate();
+    }
+
+    @Test(expected = IllegalModelDefinitionException.class)
+    public void operationNameClashesWithParameterTypeName()
+    {
+        ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, Banana.class);
+        when(operationModel.getName()).thenReturn(Banana.class.getName());
+        when(operationModel.getParameterModels()).thenReturn(asList(topLevelOperationParam, offending));
         validate();
     }
 
