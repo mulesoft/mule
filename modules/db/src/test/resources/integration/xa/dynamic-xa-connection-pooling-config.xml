@@ -8,10 +8,6 @@
             http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <flow name="defaultQueryRequestResponse">
-        <vm:inbound-endpoint path="testIn" exchange-pattern="request-response">
-            <xa-transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-
         <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
 
         <db:select config-ref="pooledJdbcConfig" maxRows="2">
