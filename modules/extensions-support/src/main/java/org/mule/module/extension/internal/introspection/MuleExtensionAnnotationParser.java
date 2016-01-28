@@ -21,8 +21,6 @@ import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
-import org.mule.extension.api.runtime.ContentMetadata;
-import org.mule.extension.api.runtime.ContentType;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ClassUtils;
@@ -54,8 +52,6 @@ public final class MuleExtensionAnnotationParser
             .add(MuleEvent.class)
             .add(org.mule.api.temporary.MuleMessage.class)
             .add(MuleMessage.class)
-            .add(ContentMetadata.class)
-            .add(ContentType.class)
             .build();
 
     static String getParameterName(Field field, Parameter parameterAnnotation)

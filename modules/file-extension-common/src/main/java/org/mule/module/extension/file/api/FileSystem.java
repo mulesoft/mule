@@ -7,8 +7,9 @@
 package org.mule.module.extension.file.api;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.metadata.DataType;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.api.transport.OutputHandler;
-import org.mule.extension.api.runtime.ContentMetadata;
 import org.mule.transport.NullPayload;
 
 import java.io.InputStream;
@@ -63,17 +64,16 @@ public interface FileSystem
      * might be simply not possible and no extra assumptions are to be taken.
      * <p>
      * This method also makes a best effort to determine the mime type of the
-     * file being read. If {@link ContentMetadata#isOutputModifiable()} return
-     * {@code true} on the {@code contentMetadata} argument, a {@link MimetypesFileTypeMap}
-     * will be used to make an educated guess on the file's mime type
+     * file being read. a {@link MimetypesFileTypeMap} will be used to
+     * make an educated guess on the file's mime type
      *
+     * @param message         the incoming {@link MuleMessage}
      * @param filePath        the path of the file you want to read
      * @param lock            whether or not to lock the file
-     * @param contentMetadata a {@link ContentMetadata} to pass mimeType information of the file
-     * @return the file's content and metadata on a {@link FilePayload} instance
+     * @return a MuleMessage with the file's content and metadata on a {@link FilePayload} instance
      * @throws IllegalArgumentException if the file at the given path doesn't exists
      */
-    FilePayload read(String filePath, boolean lock, ContentMetadata contentMetadata);
+    MuleMessage read(MuleMessage message, String filePath, boolean lock);
 
     /**
      * Writes the {@code content} into the file pointed by {@code filePath}.
@@ -101,7 +101,7 @@ public interface FileSystem
      * <p>
      * This method also supports locking support depending on the value of the
      * {@code lock} argument, but following the same rules and considerations
-     * as described in the {@link #read(String, boolean, ContentMetadata)} method
+     * as described in the {@link #read(MuleMessage, String, boolean)} method
      *
      * @param filePath              the path of the file to be written
      * @param content               the content to be written into the file
@@ -218,6 +218,16 @@ public interface FileSystem
     PathLock lock(Path path, Object... params);
 
     /**
+     * it tries to update the mymeType with a best guess mimeType
+     * derived from the given {@code filePayload}
+     *
+     * @param dataType        the {@link DataType} associated to the incoming {@link MuleMessage}
+     * @param filePayload     a {@link FilePayload}
+     * @return a {@link DataType} with the new mymeType if modified
+     */
+    DataType<FilePayload> updateDataType(DataType<FilePayload> dataType, FilePayload filePayload);
+
+    /**
      * Verify that the given {@code path} is not locked
      *
      * @param path the path to test
@@ -225,12 +235,4 @@ public interface FileSystem
      */
     void verifyNotLocked(Path path);
 
-    /**
-     * If the {@code contentMetadata} is modifiable, it updates it
-     * with a best guess mimeType derived from the given {@code filePayload}
-     *
-     * @param filePayload     a {@link FilePayload}
-     * @param contentMetadata the current {@link ContentMetadata}
-     */
-    void updateContentMetadata(FilePayload filePayload, ContentMetadata contentMetadata);
 }

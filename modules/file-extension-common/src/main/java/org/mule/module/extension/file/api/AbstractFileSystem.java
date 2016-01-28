@@ -8,8 +8,8 @@ package org.mule.module.extension.file.api;
 
 import static java.lang.String.format;
 import org.mule.api.MuleEvent;
-import org.mule.extension.api.runtime.ContentMetadata;
-import org.mule.extension.api.runtime.ContentType;
+import org.mule.api.metadata.DataType;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.module.extension.file.api.command.CopyCommand;
 import org.mule.module.extension.file.api.command.CreateDirectoryCommand;
 import org.mule.module.extension.file.api.command.DeleteCommand;
@@ -87,9 +87,9 @@ public abstract class AbstractFileSystem implements FileSystem
      * {@inheritDoc}
      */
     @Override
-    public FilePayload read(String filePath, boolean lock, ContentMetadata contentMetadata)
+    public MuleMessage read(MuleMessage message, String filePath, boolean lock)
     {
-        return getReadCommand().read(filePath, lock, contentMetadata);
+        return getReadCommand().read(message, filePath, lock);
     }
 
     /**
@@ -165,19 +165,14 @@ public abstract class AbstractFileSystem implements FileSystem
      * {@inheritDoc}
      */
     @Override
-    public void updateContentMetadata(FilePayload filePayload, ContentMetadata contentMetadata)
+    public DataType<FilePayload> updateDataType(DataType<FilePayload> dataType, FilePayload filePayload)
     {
-        if (!contentMetadata.isOutputModifiable())
-        {
-            return;
-        }
-
         String presumedMimeType = mimetypesFileTypeMap.getContentType(filePayload.getPath());
-        ContentType outputContentType = contentMetadata.getOutputContentType();
         if (presumedMimeType != null)
         {
-            contentMetadata.setOutputContentType(new ContentType(outputContentType.getEncoding(), presumedMimeType));
+            dataType.setMimeType(presumedMimeType);
         }
+        return dataType;
     }
 
     /**
@@ -211,5 +206,4 @@ public abstract class AbstractFileSystem implements FileSystem
     }
 
     protected abstract PathLock createLock(Path path, Object... params);
-
 }

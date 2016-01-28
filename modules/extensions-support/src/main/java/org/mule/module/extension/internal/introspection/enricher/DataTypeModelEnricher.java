@@ -9,12 +9,11 @@ package org.mule.module.extension.internal.introspection.enricher;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
-import org.mule.extension.annotation.api.ContentMetadataParameters;
+import org.mule.extension.annotation.api.DataTypeParameters;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.extension.api.runtime.ContentType;
 import org.mule.module.extension.internal.ExtensionProperties;
 import org.mule.module.extension.internal.model.AbstractAnnotatedModelEnricher;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
@@ -23,15 +22,14 @@ import org.mule.module.extension.internal.util.MuleExtensionUtils;
 import java.lang.reflect.Method;
 
 /**
- * Enriches operations which were defined in methods annotated with {@link ContentMetadataParameters} so that
- * parameters related to {@link ContentType} are added. In particular, it adds two parameters named
- * {@link ExtensionProperties#MIME_TYPE_PARAMETER_NAME} and {@link ExtensionProperties#ENCODING_PARAMETER_NAME}.
- * <p>
+ * Enriches operations which were defined in methods annotated with {@link DataTypeParameters} so that
+ * parameters {@link ExtensionProperties#MIME_TYPE_PARAMETER_NAME} and {@link ExtensionProperties#ENCODING_PARAMETER_NAME}.
+ * are added
  * Both attributes are optional, have no default value and accept expressions.
  *
  * @since 4.0
  */
-public final class ContentMetadataModelEnricher extends AbstractAnnotatedModelEnricher
+public final class DataTypeModelEnricher extends AbstractAnnotatedModelEnricher
 {
 
     @Override
@@ -41,7 +39,7 @@ public final class ContentMetadataModelEnricher extends AbstractAnnotatedModelEn
             Method method = MuleExtensionUtils.getImplementingMethod(operation);
             if (method != null)
             {
-                ContentMetadataParameters annotation = method.getAnnotation(ContentMetadataParameters.class);
+                DataTypeParameters annotation = method.getAnnotation(DataTypeParameters.class);
                 if (annotation != null)
                 {
                     if (IntrospectionUtils.isVoid(method))
@@ -51,7 +49,6 @@ public final class ContentMetadataModelEnricher extends AbstractAnnotatedModelEn
                                 " Mutating the content metadata requires an operation with a return type.",
                                 operation.getName(), describingContext.getDeclarationDescriptor().getDeclaration().getName()));
                     }
-
                     operation.addParameter(newParameter(MIME_TYPE_PARAMETER_NAME, "The mime type of the payload that this operation outputs."));
                     operation.addParameter(newParameter(ENCODING_PARAMETER_NAME, "The encoding of the payload that this operation outputs."));
                 }

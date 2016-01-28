@@ -6,7 +6,9 @@
  */
 package org.mule.extension.file.internal.command;
 
-import org.mule.extension.api.runtime.ContentMetadata;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.metadata.DataType;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFilePayload;
 import org.mule.extension.file.api.LocalFileSystem;
@@ -36,7 +38,7 @@ public final class LocalReadCommand extends LocalFileCommand implements ReadComm
      * {@inheritDoc}
      */
     @Override
-    public FilePayload read(String filePath, boolean lock, ContentMetadata contentMetadata)
+    public MuleMessage read(MuleMessage message, String filePath, boolean lock)
     {
         Path path = resolveExistingPath(filePath);
         if (Files.isDirectory(path))
@@ -55,7 +57,7 @@ public final class LocalReadCommand extends LocalFileCommand implements ReadComm
             filePayload = new LocalFilePayload(path);
         }
 
-        fileSystem.updateContentMetadata(filePayload, contentMetadata);
-        return filePayload;
+        DataType<FilePayload> updatedDataType = fileSystem.updateDataType(message.getDataType(), filePayload);
+        return new DefaultMuleMessage(filePayload, updatedDataType);
     }
 }
