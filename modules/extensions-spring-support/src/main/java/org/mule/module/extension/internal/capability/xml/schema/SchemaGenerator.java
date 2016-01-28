@@ -10,6 +10,7 @@ import static org.mule.util.Preconditions.checkArgument;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
+import org.mule.module.extension.internal.capability.xml.schema.builder.SchemaBuilder;
 import org.mule.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
 import org.mule.module.extension.internal.capability.xml.schema.model.Schema;
 import org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants;

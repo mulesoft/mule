@@ -152,7 +152,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         ConfigurationDeclaration configuration = declaration.getConfigurations().get(1);
         assertThat(configuration, is(notNullValue()));
         assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-        assertThat(configuration.getParameters(), hasSize(21));
+        assertThat(configuration.getParameters(), hasSize(24));
         assertParameter(configuration.getParameters(), "extendedProperty", "", DataType.of(String.class), true, SUPPORTED, null);
     }
 
@@ -181,7 +181,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
         List<ParameterDeclaration> parameters = conf.getParameters();
-        assertThat(parameters, hasSize(20));
+        assertThat(parameters, hasSize(23));
 
         assertParameter(parameters, "myName", "", DataType.of(String.class), false, SUPPORTED, HEISENBERG);
         assertParameter(parameters, "age", "", DataType.of(Integer.class), false, SUPPORTED, AGE);
@@ -204,6 +204,9 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(parameters, "wildCardWeapons", "", DataType.of(List.class, Weapon.class), false, SUPPORTED, null);
         assertParameter(parameters, "wildCardList", "", DataType.of(List.class, Object.class), false, SUPPORTED, null);
         assertParameter(parameters, "wildCardWeaponMap", "", DataType.of(Map.class, Weapon.class, Object.class), false, SUPPORTED, null);
+        assertParameter(parameters, "monthlyIncomes", "", DataType.of(List.class, Long.class), true, SUPPORTED, null);
+        assertParameter(parameters, "labeledRicin", "", DataType.of(Map.class, String.class, Ricin.class), false, SUPPORTED, null);
+        assertParameter(parameters, "deathsBySeasons", "", DataType.of(Map.class, DataType.of(String.class), DataType.of(List.class, DataType.of(String.class))), false, SUPPORTED, null);
     }
 
     private void assertExtensionProperties(Declaration declaration)

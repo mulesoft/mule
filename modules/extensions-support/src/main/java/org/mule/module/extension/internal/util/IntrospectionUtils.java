@@ -160,7 +160,7 @@ public class IntrospectionUtils
         }
         else
         {
-            return DataType.of(rawClass, toRawTypes(generics));
+            return DataType.of(rawClass, toDataTypes(generics));
         }
     }
 
@@ -190,7 +190,6 @@ public class IntrospectionUtils
         return Arrays.stream(interfaceType.getGenerics()).map(ResolvableType::getRawClass).collect(toList());
     }
 
-
     public static List<Class<?>> getSuperClassGenerics(Class<?> type, Class<?> superClass)
     {
         Class<?> searchClass = type;
@@ -218,9 +217,9 @@ public class IntrospectionUtils
         return NestedProcessor.class.isAssignableFrom(rawClass);
     }
 
-    private static Class<?>[] toRawTypes(ResolvableType[] resolvableTypes)
+    private static DataType[] toDataTypes(ResolvableType[] resolvableTypes)
     {
-        Class<?>[] types = new Class<?>[resolvableTypes.length];
+        DataType[] types = new DataType[resolvableTypes.length];
         for (int i = 0; i < resolvableTypes.length; i++)
         {
             if (logger.isWarnEnabled() && resolvableTypes[i].getRawClass() == null)
@@ -232,7 +231,15 @@ public class IntrospectionUtils
             {
                 rawClass = OperationModel.class;
             }
-            types[i] = rawClass;
+
+            if (resolvableTypes[i].getGenerics().length > 0)
+            {
+                types[i] = DataType.of(rawClass, toDataTypes(resolvableTypes[i].getGenerics()));
+            }
+            else
+            {
+                types[i] = DataType.of(rawClass);
+            }
         }
         return types;
     }

@@ -4,49 +4,35 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.capability.xml.schema;
+package org.mule.module.extension.internal.capability.xml.schema.builder;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.apache.commons.lang.StringUtils.capitalize;
 import static org.mule.extension.api.introspection.DataQualifier.LIST;
 import static org.mule.extension.api.introspection.DataQualifier.OPERATION;
 import static org.mule.extension.api.introspection.DataQualifier.POJO;
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
-import static org.mule.extension.api.introspection.PoolingSupport.REQUIRED;
-import static org.mule.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.CONFIG_ATTRIBUTE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION_DESCRIPTION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.GROUP_SUFFIX;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_NAMESPACE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_NAMESPACE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_POOLING_PROFILE_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.OPERATION_SUBSTITUTION_GROUP_SUFFIX;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.TARGET_ATTRIBUTE_DESCRIPTION;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.TYPE_SUFFIX;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.XML_NAMESPACE;
-import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
@@ -54,34 +40,27 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getFiel
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isIgnored;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isRequired;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.getConnectedOperations;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDynamicParameters;
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
-
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.DataQualifier;
 import org.mule.extension.api.introspection.DataQualifierVisitor;
 import org.mule.extension.api.introspection.DataType;
-import org.mule.extension.api.introspection.Described;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.ParametrizedModel;
 import org.mule.extension.api.introspection.SourceModel;
-import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
 import org.mule.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.module.extension.internal.capability.xml.schema.model.ComplexType;
 import org.mule.module.extension.internal.capability.xml.schema.model.Documentation;
-import org.mule.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.module.extension.internal.capability.xml.schema.model.ExtensionType;
 import org.mule.module.extension.internal.capability.xml.schema.model.FormChoice;
@@ -96,14 +75,11 @@ import org.mule.module.extension.internal.capability.xml.schema.model.Restrictio
 import org.mule.module.extension.internal.capability.xml.schema.model.Schema;
 import org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants;
 import org.mule.module.extension.internal.capability.xml.schema.model.SchemaTypeConversion;
-import org.mule.module.extension.internal.capability.xml.schema.model.SimpleContent;
-import org.mule.module.extension.internal.capability.xml.schema.model.SimpleExtensionType;
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.module.extension.internal.capability.xml.schema.model.Union;
 import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
-import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.module.extension.internal.util.NameUtils;
@@ -120,6 +96,8 @@ import java.util.Set;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
+
+import org.springframework.util.ClassUtils;
 
 /**
  * Builder class to generate a XSD schema that describes a
@@ -197,151 +175,45 @@ public final class SchemaBuilder
 
     public SchemaBuilder registerConnectionProviderElement(ConnectionProviderModel providerModel)
     {
-        Element providerElement = new TopLevelElement();
-        providerElement.setName(providerModel.getName());
-        providerElement.setSubstitutionGroup(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
-
-        LocalComplexType complexType = new LocalComplexType();
-        providerElement.setComplexType(complexType);
-
-        ExtensionType providerType = new ExtensionType();
-        providerType.setBase(MULE_EXTENSION_CONNECTION_PROVIDER_TYPE);
-
-        ComplexContent complexContent = new ComplexContent();
-        complexContent.setExtension(providerType);
-        complexType.setComplexContent(complexContent);
-
-        schema.getSimpleTypeOrComplexTypeOrGroup().add(providerElement);
-
-        final ExplicitGroup sequence = new ExplicitGroup();
-
-        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
-
-        if (connectionHandlingType != null)
-        {
-            if (connectionHandlingType.isPooled() || connectionHandlingType.isCached())
-            {
-                addValidationFlag(providerType);
-                addConnectionProviderRetryPolicy(sequence);
-            }
-            if (connectionHandlingType.isPooled())
-            {
-                addConnectionProviderPoolingProfile(sequence, providerModel);
-            }
-        }
-
-        registerParameters(providerType, sequence, providerModel.getParameterModels());
+        new ConnectionProviderSchemaDelegate(this).registerConnectionProviderElement(schema, providerModel);
         return this;
-    }
-
-    private void addValidationFlag(ExtensionType providerType)
-    {
-        providerType.getAttributeOrAttributeGroup().add(createAttribute(DISABLE_VALIDATION, DISABLE_VALIDATION_DESCRIPTION, DataType.of(boolean.class), "false", false, ExpressionSupport.NOT_SUPPORTED));
-    }
-
-    private void addConnectionProviderPoolingProfile(ExplicitGroup choice, ConnectionProviderModel providerModel)
-    {
-        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
-        TopLevelElement objectElement = new TopLevelElement();
-
-        objectElement.setMinOccurs(ZERO);
-        objectElement.setMaxOccurs("1");
-        objectElement.setRef(MULE_POOLING_PROFILE_TYPE);
-
-        choice.getParticle().add(objectFactory.createElement(objectElement));
-    }
-
-    private void addConnectionProviderRetryPolicy(ExplicitGroup choice)
-    {
-        TopLevelElement providerElementRetry = new TopLevelElement();
-        providerElementRetry.setMinOccurs(ZERO);
-        providerElementRetry.setMaxOccurs("1");
-        providerElementRetry.setRef(MULE_ABSTRACT_RECONNECTION_STRATEGY);
-
-        choice.getParticle().add(objectFactory.createElement(providerElementRetry));
     }
 
     public SchemaBuilder registerConfigElement(final ConfigurationModel configurationModel)
     {
-        ExtensionType config = registerExtension(configurationModel.getName());
-        config.getAttributeOrAttributeGroup().add(createNameAttribute());
-
-        final ExplicitGroup choice = new ExplicitGroup();
-        choice.setMinOccurs(ZERO);
-        choice.setMaxOccurs(UNBOUNDED);
-
-        addConnectionProviderElement(choice, configurationModel);
-        addDynamicConfigPolicyElement(choice, configurationModel);
-        registerParameters(config, choice, configurationModel.getParameterModels());
-        config.setAnnotation(createDocAnnotation(configurationModel.getDescription()));
-
+        new ConfigurationSchemaDelegate(this).registerConfigElement(schema, configurationModel);
         return this;
     }
 
-    private Attribute createNameAttribute()
+    Attribute createNameAttribute()
     {
         return createAttribute(SchemaConstants.ATTRIBUTE_NAME_NAME, DataType.of(String.class), true, NOT_SUPPORTED);
     }
 
     public SchemaBuilder registerOperation(OperationModel operationModel)
     {
-        String typeName = capitalize(operationModel.getName()) + TYPE_SUFFIX;
-        registerProcessorElement(operationModel, typeName);
-        registerOperationType(typeName, operationModel);
-
+        new OperationSchemaDelegate(this).registerOperation(schema, operationModel);
         return this;
     }
 
     public SchemaBuilder registerMessageSource(SourceModel sourceModel)
     {
-        String typeName = capitalize(sourceModel.getName()) + TYPE_SUFFIX;
-        registerSourceElement(sourceModel, typeName);
-        registerSourceType(typeName, sourceModel);
 
+        new SourceSchemaDelegate(this).registerMessageSource(schema, sourceModel);
         return this;
     }
 
-    private void addConnectionProviderElement(ExplicitGroup all, ConfigurationModel configurationModel)
-    {
-        ExtensionModel extensionModel = configurationModel.getExtensionModel();
-        if (!getConnectedOperations(extensionModel).isEmpty())
-        {
-            TopLevelElement objectElement = new TopLevelElement();
 
-            objectElement.setMinOccurs(getFirstImplicit(extensionModel.getConnectionProviders()) != null
-                                       ? ZERO
-                                       : ONE);
-
-            objectElement.setMaxOccurs("1");
-            objectElement.setRef(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
-
-            all.getParticle().add(objectFactory.createElement(objectElement));
-        }
-    }
-
-    private void addDynamicConfigPolicyElement(ExplicitGroup all, ConfigurationModel configurationModel)
-    {
-        if (!getDynamicParameters(configurationModel).isEmpty())
-        {
-            TopLevelElement objectElement = new TopLevelElement();
-            objectElement.setMinOccurs(ZERO);
-            objectElement.setMaxOccurs("1");
-            objectElement.setRef(MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT);
-
-            all.getParticle().add(objectFactory.createElement(objectElement));
-        }
-    }
-
-    private void registerParameters(ExtensionType type, ExplicitGroup sequence, Collection<ParameterModel> parameterModels)
+    void registerParameters(ExtensionType type, ExplicitGroup choice, Collection<ParameterModel> parameterModels)
     {
         for (final ParameterModel parameterModel : parameterModels)
         {
-            parameterModel.getType().getQualifier().accept(getParameterDeclarationVisitor(type, sequence, parameterModel));
+            parameterModel.getType().getQualifier().accept(getParameterDeclarationVisitor(type, choice, parameterModel));
         }
 
-        if (!sequence.getParticle().isEmpty())
+        if (!choice.getParticle().isEmpty())
         {
-            type.setSequence(sequence);
+            type.setSequence(choice);
         }
     }
 
@@ -411,6 +283,12 @@ public final class SchemaBuilder
                 public void onList()
                 {
                     generateCollectionElement(all, name, EMPTY, fieldType, required);
+                }
+
+                @Override
+                public void onMap()
+                {
+                    generateMapElement(all, name, EMPTY, fieldType, required);
                 }
 
                 @Override
@@ -496,10 +374,7 @@ public final class SchemaBuilder
         name = hyphenize(name);
 
         // this top level element is for declaring the object inside a config or operation
-        TopLevelElement objectElement = new TopLevelElement();
-        objectElement.setName(name);
-        objectElement.setMinOccurs(required ? ONE : ZERO);
-        objectElement.setMaxOccurs("1");
+        TopLevelElement objectElement = createTopLevelElement(name, required ? ONE : ZERO, "1");
         objectElement.setComplexType(newLocalComplexTypeWithBase(type, description));
         objectElement.setAnnotation(createDocAnnotation(description));
 
@@ -533,26 +408,6 @@ public final class SchemaBuilder
         return objectComplexType;
     }
 
-    private ExtensionType registerExtension(String name)
-    {
-        LocalComplexType complexType = new LocalComplexType();
-
-        Element extension = new TopLevelElement();
-        extension.setName(name);
-        extension.setSubstitutionGroup(MULE_ABSTRACT_EXTENSION);
-        extension.setComplexType(complexType);
-
-        ComplexContent complexContent = new ComplexContent();
-        complexType.setComplexContent(complexContent);
-        ExtensionType complexContentExtension = new ExtensionType();
-        complexContentExtension.setBase(MULE_ABSTRACT_EXTENSION_TYPE);
-        complexContent.setExtension(complexContentExtension);
-
-        schema.getSimpleTypeOrComplexTypeOrGroup().add(extension);
-
-        return complexContentExtension;
-    }
-
     private Attribute createAttribute(ParameterModel parameterModel, boolean required)
     {
         return createAttribute(parameterModel.getName(),
@@ -563,11 +418,10 @@ public final class SchemaBuilder
                                parameterModel.getExpressionSupport());
     }
 
-    private Attribute createAttribute(String name, DataType type, boolean required, ExpressionSupport expressionSupport)
+    Attribute createAttribute(String name, DataType type, boolean required, ExpressionSupport expressionSupport)
     {
         return createAttribute(name, EMPTY, type, null, required, expressionSupport);
     }
-
 
     private Attribute createAttribute(final String name, String description, final DataType type, Object defaultValue, boolean required, final ExpressionSupport expressionSupport)
     {
@@ -616,10 +470,7 @@ public final class SchemaBuilder
         String collectionName = hyphenize(NameUtils.singularize(name));
         LocalComplexType collectionComplexType = generateCollectionComplexType(collectionName, description, type);
 
-        TopLevelElement collectionElement = new TopLevelElement();
-        collectionElement.setName(name);
-        collectionElement.setMinOccurs(minOccurs);
-        collectionElement.setMaxOccurs("1");
+        TopLevelElement collectionElement = createTopLevelElement(name, minOccurs, "1");
         collectionElement.setAnnotation(createDocAnnotation(description));
         all.getParticle().add(objectFactory.createElement(collectionElement));
 
@@ -632,10 +483,7 @@ public final class SchemaBuilder
         final ExplicitGroup sequence = new ExplicitGroup();
         collectionComplexType.setSequence(sequence);
 
-        final TopLevelElement collectionItemElement = new TopLevelElement();
-        collectionItemElement.setName(name);
-        collectionItemElement.setMinOccurs(ZERO);
-        collectionItemElement.setMaxOccurs(SchemaConstants.UNBOUNDED);
+        final TopLevelElement collectionItemElement = createTopLevelElement(name, ZERO, SchemaConstants.UNBOUNDED);
 
         final DataType genericType = getFirstGenericType(type);
         genericType.getQualifier().accept(new AbstractDataQualifierVisitor()
@@ -650,7 +498,9 @@ public final class SchemaBuilder
             @Override
             protected void defaultOperation()
             {
-                collectionItemElement.setComplexType(generateComplexValueType(genericType));
+                LocalComplexType complexType = new LocalComplexType();
+                complexType.getAttributeOrAttributeGroup().add(createAttribute(ATTRIBUTE_NAME_VALUE, genericType, true, SUPPORTED));
+                collectionItemElement.setComplexType(complexType);
             }
         });
 
@@ -659,20 +509,87 @@ public final class SchemaBuilder
         return collectionComplexType;
     }
 
-    private LocalComplexType generateComplexValueType(DataType type)
+    private void generateMapElement(ExplicitGroup all, ParameterModel parameterModel, boolean forceOptional)
     {
-        LocalComplexType complexType = new LocalComplexType();
-        SimpleContent simpleContent = new SimpleContent();
-        complexType.setSimpleContent(simpleContent);
-        SimpleExtensionType simpleContentExtension = new SimpleExtensionType();
-        QName extensionBase = SchemaTypeConversion.convertType(type, NOT_SUPPORTED);
-        simpleContentExtension.setBase(extensionBase);
-        simpleContent.setExtension(simpleContentExtension);
+        boolean required = isRequired(parameterModel, forceOptional);
+        generateMapElement(all, parameterModel.getName(), parameterModel.getDescription(), parameterModel.getType(), required);
+    }
 
-        Attribute valueAttribute = createAttribute(ATTRIBUTE_NAME_VALUE, type, true, SUPPORTED);
-        simpleContentExtension.getAttributeOrAttributeGroup().add(valueAttribute);
+    private void generateMapElement(ExplicitGroup all, String name, String description, DataType type, boolean required)
+    {
+        name = hyphenize(name);
 
-        return complexType;
+        BigInteger minOccurs = required ? ONE : ZERO;
+        String mapName = hyphenize(NameUtils.pluralize(name));
+        LocalComplexType mapComplexType = generateMapComplexType(mapName, description, type);
+
+        TopLevelElement mapElement = createTopLevelElement(mapName, minOccurs, "1");
+        mapElement.setAnnotation(createDocAnnotation(description));
+        all.getParticle().add(objectFactory.createElement(mapElement));
+
+        mapElement.setComplexType(mapComplexType);
+    }
+
+    private LocalComplexType generateMapComplexType(String name, final String description, final DataType type)
+    {
+        final LocalComplexType mapComplexType = new LocalComplexType();
+        final ExplicitGroup mapEntrySequence = new ExplicitGroup();
+        mapComplexType.setSequence(mapEntrySequence);
+
+        final TopLevelElement mapEntryElement = new TopLevelElement();
+        mapEntryElement.setName(NameUtils.singularize(name));
+        mapEntryElement.setMinOccurs(ZERO);
+        mapEntryElement.setMaxOccurs(SchemaConstants.UNBOUNDED);
+
+        final DataType keyType = getFirstGenericType(type);
+        final DataType valueType = type.getGenericTypes()[1];
+        final LocalComplexType entryComplexType = new LocalComplexType();
+        final Attribute keyAttribute = createAttribute(ATTRIBUTE_NAME_KEY, keyType, true, ExpressionSupport.REQUIRED);
+        entryComplexType.getAttributeOrAttributeGroup().add(keyAttribute);
+
+        valueType.getQualifier().accept(new AbstractDataQualifierVisitor()
+        {
+            @Override
+            public void onPojo()
+            {
+                entryComplexType.getAttributeOrAttributeGroup().add(createAttribute(ATTRIBUTE_NAME_VALUE, valueType, false, SUPPORTED));
+                ExplicitGroup singleItemSequence = new ExplicitGroup();
+                singleItemSequence.setMaxOccurs("1");
+
+                LocalComplexType itemComplexType = newLocalComplexTypeWithBase(valueType, description);
+                TopLevelElement itemElement = createTopLevelElement(NameUtils.getTopLevelTypeName(valueType), ZERO, "1", itemComplexType);
+                singleItemSequence.getParticle().add(objectFactory.createElement(itemElement));
+
+                entryComplexType.setSequence(singleItemSequence);
+            }
+
+            @Override
+            public void onList()
+            {
+                entryComplexType.getAttributeOrAttributeGroup().add(createAttribute(ATTRIBUTE_NAME_VALUE, valueType, false, SUPPORTED));
+                entryComplexType.setSequence(new ExplicitGroup());
+
+                LocalComplexType itemComplexType = new LocalComplexType();
+                DataType itemType = ArrayUtils.isEmpty(valueType.getGenericTypes()) ? DataType.of(Object.class) : valueType.getGenericTypes()[0];
+                itemComplexType.getAttributeOrAttributeGroup().add(createAttribute(ATTRIBUTE_NAME_VALUE, itemType, true, REQUIRED));
+
+                String itemName = hyphenize(NameUtils.singularize(name)).concat("-item");
+                TopLevelElement itemElement = createTopLevelElement(itemName, ZERO, SchemaConstants.UNBOUNDED, itemComplexType);
+                entryComplexType.getSequence().getParticle().add(objectFactory.createElement(itemElement));
+            }
+
+            @Override
+            protected void defaultOperation()
+            {
+                entryComplexType.getAttributeOrAttributeGroup().add(createAttribute(ATTRIBUTE_NAME_VALUE, valueType, true, SUPPORTED));
+            }
+        });
+
+        mapEntryElement.setComplexType(entryComplexType);
+
+        mapEntrySequence.getParticle().add(objectFactory.createElement(mapEntryElement));
+
+        return mapComplexType;
     }
 
     private DataType getFirstGenericType(DataType type)
@@ -680,39 +597,7 @@ public final class SchemaBuilder
         return ArrayUtils.isEmpty(type.getGenericTypes()) ? type : type.getGenericTypes()[0];
     }
 
-    private void registerProcessorElement(OperationModel operationModel, String typeName)
-    {
-        Element element = new TopLevelElement();
-        element.setName(getElementName(operationModel));
-        element.setType(new QName(schema.getTargetNamespace(), typeName));
-        element.setAnnotation(createDocAnnotation(operationModel.getDescription()));
-        element.setSubstitutionGroup(getOperationSubstitutionGroup(operationModel));
-        schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
-    }
-
-    private void registerSourceElement(SourceModel sourceModel, String typeName)
-    {
-        Element element = new TopLevelElement();
-        element.setName(getElementName(sourceModel));
-        element.setType(new QName(schema.getTargetNamespace(), typeName));
-        element.setAnnotation(createDocAnnotation(sourceModel.getDescription()));
-        element.setSubstitutionGroup(MULE_ABSTRACT_MESSAGE_SOURCE);
-        schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
-    }
-
-    private QName getOperationSubstitutionGroup(OperationModel operationModel)
-    {
-        QName substitutionGroup = MULE_ABSTRACT_MESSAGE_PROCESSOR;
-        ExtendingOperationModelProperty extendingOperationModelProperty = operationModel.getModelProperty(ExtendingOperationModelProperty.class.getName());
-        if (extendingOperationModelProperty != null)
-        {
-            substitutionGroup = getSubstitutionGroup(extendingOperationModelProperty.getType());
-        }
-
-        return substitutionGroup;
-    }
-
-    private QName getSubstitutionGroup(Class<?> type)
+    QName getSubstitutionGroup(Class<?> type)
     {
         return new QName(schema.getTargetNamespace(), registerExtensibleElement(type));
     }
@@ -752,38 +637,12 @@ public final class SchemaBuilder
         return name;
     }
 
-    private String getElementName(Described model)
-    {
-        return hyphenize(model.getName());
-    }
-
     private String getGroupName(String name)
     {
         return name + GROUP_SUFFIX;
     }
 
-    private void registerOperationType(String name, OperationModel operationModel)
-    {
-        ExtensionType operationType = registerExecutableType(name, operationModel, MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE);
-        addTargetParameter(operationType, operationModel);
-    }
-
-    private void addTargetParameter(ExtensionType operationType, OperationModel operationModel)
-    {
-        if (!isVoid(operationModel))
-        {
-            Attribute attribute = createAttribute(TARGET_ATTRIBUTE, DataType.of(String.class), false, NOT_SUPPORTED);
-            attribute.setAnnotation(createDocAnnotation(TARGET_ATTRIBUTE_DESCRIPTION));
-            operationType.getAttributeOrAttributeGroup().add(attribute);
-        }
-    }
-
-    private void registerSourceType(String name, SourceModel sourceModel)
-    {
-        registerExecutableType(name, sourceModel, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE);
-    }
-
-    private ExtensionType registerExecutableType(String name, ParametrizedModel parametrizedModel, QName base)
+    ExtensionType registerExecutableType(String name, ParametrizedModel parametrizedModel, QName base)
     {
         TopLevelComplexType complexType = new TopLevelComplexType();
         complexType.setName(name);
@@ -845,6 +704,18 @@ public final class SchemaBuilder
             }
 
             @Override
+            public void onMap()
+            {
+                forceOptional = true;
+                defaultOperation();
+                DataType genericType = parameterModel.getType().getGenericTypes()[0];
+                if (genericType != null && shouldGenerateListChildElements(genericType))
+                {
+                    generateMapElement(all, parameterModel, true);
+                }
+            }
+
+            @Override
             public void onPojo()
             {
                 forceOptional = true;
@@ -868,7 +739,8 @@ public final class SchemaBuilder
             private boolean shouldGenerateListChildElements(DataType type)
             {
                 boolean isPojo = type.getQualifier().equals(POJO);
-                return (isPojo && shouldGeneratePojoChildElements(type.getRawType())) || (!isPojo && isInstantiable(type.getRawType()));
+                boolean isPrimitive = type.getRawType().isPrimitive() || ClassUtils.isPrimitiveWrapper(type.getRawType());
+                return isPrimitive || (isPojo && shouldGeneratePojoChildElements(type.getRawType())) || (!isPojo && isInstantiable(type.getRawType()));
             }
 
             private boolean shouldGeneratePojoChildElements(Class<?> type)
@@ -938,7 +810,7 @@ public final class SchemaBuilder
         return attr;
     }
 
-    private Annotation createDocAnnotation(String content)
+    Annotation createDocAnnotation(String content)
     {
         if (StringUtils.isBlank(content))
         {
@@ -950,6 +822,23 @@ public final class SchemaBuilder
         doc.getContent().add(content);
         annotation.getAppinfoOrDocumentation().add(doc);
         return annotation;
+    }
+
+    private TopLevelElement createTopLevelElement(String name, BigInteger minOccurs, String maxOccurs)
+    {
+        TopLevelElement element = new TopLevelElement();
+        element.setName(name);
+        element.setMinOccurs(minOccurs);
+        element.setMaxOccurs(maxOccurs);
+        return element;
+    }
+
+    private TopLevelElement createTopLevelElement(String name, BigInteger minOccurs, String maxOccurs, LocalComplexType type)
+    {
+        TopLevelElement element = createTopLevelElement(name, minOccurs, maxOccurs);
+        element.setComplexType(type);
+
+        return element;
     }
 
     private class ComplexTypeHolder

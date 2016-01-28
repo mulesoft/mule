@@ -23,6 +23,7 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_DECIMAL;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_INT;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_LONG;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_MAP;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;
@@ -35,7 +36,8 @@ import javax.xml.namespace.QName;
 public final class SchemaTypeConversion
 {
 
-    public static QName convertType(final DataType type, ExpressionSupport expressionSupport) {
+    public static QName convertType(final DataType type, ExpressionSupport expressionSupport)
+    {
         final boolean dynamic = MuleExtensionUtils.acceptsExpressions(expressionSupport);
         final ValueHolder<QName> qName = new ValueHolder<>();
         type.getQualifier().accept(new AbstractDataQualifierVisitor()
@@ -91,7 +93,7 @@ public final class SchemaTypeConversion
             @Override
             public void onMap()
             {
-                qName.set(dynamic ? EXPRESSION_MAP : SUBSTITUTABLE_NAME);
+                qName.set(dynamic ? EXPRESSION_MAP : SUBSTITUTABLE_MAP);
             }
 
             @Override

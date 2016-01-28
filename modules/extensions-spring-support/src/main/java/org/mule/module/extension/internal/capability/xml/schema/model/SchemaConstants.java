@@ -50,6 +50,7 @@ public final class SchemaConstants
     public static final QName SUBSTITUTABLE_DECIMAL = new QName(MULE_NAMESPACE, "substitutableDecimal", MULE_PREFIX);
     public static final QName SUBSTITUTABLE_DATE_TIME = new QName(MULE_NAMESPACE, "substitutableDateTime", MULE_PREFIX);
     public static final QName SUBSTITUTABLE_NAME = new QName(MULE_NAMESPACE, "substitutableName", MULE_PREFIX);
+    public static final QName SUBSTITUTABLE_MAP = new QName(MULE_NAMESPACE, "mapType", MULE_PREFIX);
     public static final QName STRING = new QName(XSD_NAMESPACE, "string", "xs");
     public static final QName EXPRESSION_STRING = new QName(MULE_NAMESPACE, "expressionString", MULE_PREFIX);
     public static final QName EXPRESSION_LONG = new QName(MULE_NAMESPACE, "expressionLong", MULE_PREFIX);
@@ -68,6 +69,7 @@ public final class SchemaConstants
     public static final String CONFIG_ATTRIBUTE = "config-ref";
     public static final String CONFIG_ATTRIBUTE_DESCRIPTION = "Specify which configuration to use for this invocation.";
     public static final String ATTRIBUTE_NAME_VALUE = "value";
+    public static final String ATTRIBUTE_NAME_KEY = "key";
     public static final String ENUM_TYPE_SUFFIX = "EnumType";
     public static final String TYPE_SUFFIX = "Type";
     public static final String UNBOUNDED = "unbounded";

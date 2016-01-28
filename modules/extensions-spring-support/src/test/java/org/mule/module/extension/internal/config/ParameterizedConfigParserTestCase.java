@@ -6,11 +6,12 @@
  */
 package org.mule.module.extension.internal.config;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -122,6 +123,9 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         assertDoors(heisenberg);
         assertRicinPacks(heisenberg);
         assertCandidateDoors(heisenberg);
+        assertDeathsBySeason(heisenberg);
+        assertMonthlyIncomes(heisenberg);
+        assertLabeledRicins(heisenberg);
     }
 
     private void assertRicinPacks(HeisenbergExtension heisenberg)
@@ -129,9 +133,10 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         Set<Ricin> ricinPacks = heisenberg.getRicinPacks();
 
         assertNotNull(ricinPacks);
-        assertEquals(1, ricinPacks.size());
+        assertThat(ricinPacks.size(), equalTo(1));
+
         Ricin ricin = ricinPacks.iterator().next();
-        assertEquals(MICROGRAMS_PER_KILO, ricin.getMicrogramsPerKilo());
+        assertThat(ricin.getMicrogramsPerKilo(), equalTo(MICROGRAMS_PER_KILO));
         assertDoor(ricin.getDestination(), LIDIA, STEVIA_COFFE_SHOP);
     }
 
@@ -149,22 +154,22 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
     {
         Map<String, Long> recipe = heisenberg.getRecipe();
         assertNotNull(recipe);
-        assertEquals(3, recipe.size());
-        assertEquals(Long.valueOf(METHYLAMINE_QUANTITY), recipe.get(METHYLAMINE));
-        assertEquals(Long.valueOf(PSEUDOEPHEDRINE_QUANTITY), recipe.get(PSEUDOEPHEDRINE));
-        assertEquals(Long.valueOf(P2P_QUANTITY), recipe.get(P2P));
+        assertThat(recipe.size(), equalTo(3));
+        assertThat(recipe.get(METHYLAMINE), equalTo(Long.valueOf(METHYLAMINE_QUANTITY)));
+        assertThat(recipe.get(PSEUDOEPHEDRINE), equalTo(Long.valueOf(PSEUDOEPHEDRINE_QUANTITY)));
+        assertThat(recipe.get(P2P), equalTo(Long.valueOf(P2P_QUANTITY)));
     }
 
     private void assertSimpleProperties(HeisenbergExtension heisenberg)
     {
-        assertEquals(HeisenbergExtension.HEISENBERG, heisenberg.getPersonalInfo().getName());
-        assertEquals(Integer.valueOf(HeisenbergExtension.AGE), heisenberg.getPersonalInfo().getAge());
+        assertThat(heisenberg.getPersonalInfo().getName(), equalTo(HeisenbergExtension.HEISENBERG));
+        assertThat(heisenberg.getPersonalInfo().getAge(), equalTo(Integer.valueOf(HeisenbergExtension.AGE)));
 
         List<String> enemies = heisenberg.getEnemies();
         assertThat(enemies, notNullValue());
-        assertEquals(2, enemies.size());
-        assertEquals(GUSTAVO_FRING, enemies.get(0));
-        assertEquals(HANK, enemies.get(1));
+        assertThat(enemies.size(), equalTo(2));
+        assertThat(enemies.get(0), equalTo(GUSTAVO_FRING));
+        assertThat(enemies.get(1), equalTo(HANK));
 
         assertTrue(heisenberg.isCancer());
         assertThat(heisenberg.getInitialHealth(), is(INITIAL_HEALTH));
@@ -176,17 +181,17 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         dayOfBirth.setTime(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfBirth());
 
         //only compare year to avoid timezone related flakyness
-        assertEquals(getDateOfBirth().get(Calendar.YEAR), dayOfBirth.get(Calendar.YEAR));
-        assertEquals(getDateOfDeath().get(Calendar.YEAR), heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfDeath().get(Calendar.YEAR));
+        assertThat(dayOfBirth.get(Calendar.YEAR), equalTo(getDateOfBirth().get(Calendar.YEAR)));
+        assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfDeath().get(Calendar.YEAR), equalTo(getDateOfDeath().get(Calendar.YEAR)));
 
-        assertEquals(new BigDecimal(MONEY), heisenberg.getMoney());
+        assertThat(heisenberg.getMoney(), equalTo(new BigDecimal(MONEY)));
     }
 
     private void assertCandidateDoors(HeisenbergExtension heisenberg)
     {
         Map<String, KnockeableDoor> candidates = heisenberg.getCandidateDoors();
         assertNotNull(candidates);
-        assertEquals(2, candidates.size());
+        assertThat(candidates.size(), equalTo(2));
 
         assertDoor(candidates.get(SKYLER.toLowerCase()), SKYLER, WHITE_ADDRESS);
         assertDoor(candidates.get(SAUL.toLowerCase()), SAUL, SHOPPING_MALL);
@@ -195,8 +200,8 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
     private void assertDoor(KnockeableDoor door, String victim, String address)
     {
         assertNotNull(door);
-        assertEquals(victim, door.getVictim());
-        assertEquals(address, door.getAddress());
+        assertThat(door.getVictim(), equalTo(victim));
+        assertThat(door.getAddress(), equalTo(address));
     }
 
     public static Calendar getDateOfBirth()
@@ -219,5 +224,47 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         calendar.set(Calendar.YEAR, DEATH_YEAR);
 
         return calendar;
+    }
+
+    private void assertLabeledRicins(HeisenbergExtension heisenberg)
+    {
+
+        Map<String, Ricin> labeledRicin = heisenberg.getLabeledRicin();
+
+        assertNotNull(labeledRicin);
+        assertThat(labeledRicin.size(), equalTo(1));
+
+        Ricin ricin = labeledRicin.get("pojo");
+        assertNotNull(ricin);
+        assertThat(ricin.getMicrogramsPerKilo(), equalTo(MICROGRAMS_PER_KILO));
+        assertDoor(ricin.getDestination(), LIDIA, STEVIA_COFFE_SHOP);
+    }
+
+    private void assertMonthlyIncomes(HeisenbergExtension heisenberg)
+    {
+        List<Long> incomes = heisenberg.getMonthlyIncomes();
+
+        assertNotNull(incomes);
+        assertThat(incomes.size(), equalTo(MONTHLY_INCOMES.size()));
+        assertThat(incomes, containsInAnyOrder(MONTHLY_INCOMES.toArray()));
+    }
+
+    private void assertDeathsBySeason(HeisenbergExtension heisenberg)
+    {
+
+        Map<String, List<String>> deaths = heisenberg.getDeathsBySeasons();
+
+        assertNotNull(deaths);
+        assertThat(deaths.size(), equalTo(2));
+
+        List<String> s01 = deaths.get(SEASON_1_KEY);
+        assertNotNull(s01);
+        assertThat(s01.size(), equalTo(DEATHS_BY_SEASON.get(SEASON_1_KEY).size()));
+        assertThat(s01, containsInAnyOrder(DEATHS_BY_SEASON.get(SEASON_1_KEY).toArray()));
+
+        List<String> s02 = deaths.get(SEASON_2_KEY);
+        assertNotNull(s02);
+        assertThat(s02.size(), equalTo(DEATHS_BY_SEASON.get(SEASON_2_KEY).size()));
+        assertThat(s02, containsInAnyOrder(DEATHS_BY_SEASON.get(SEASON_2_KEY).toArray()));
     }
 }
