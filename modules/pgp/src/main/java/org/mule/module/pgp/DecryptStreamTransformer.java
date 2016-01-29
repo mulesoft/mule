@@ -142,16 +142,14 @@ public class DecryptStreamTransformer implements StreamTransformer
     {
         int len = 0;
         byte[] buf = new byte[1 << 16];
-        boolean wroteSomething = false;
 
         while (bytesRequested.get() + offset > bytesWrote && (len = uncStream.read(buf)) > 0)
         {
             out.write(buf, 0, len);
             bytesWrote = bytesWrote + len;
-            wroteSomething = true;
         }
 
-        if (wroteSomething && len <= 0)
+        if (len <= 0)
         {
             uncStream.close();
             if (compressedStream != null)
