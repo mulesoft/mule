@@ -25,7 +25,17 @@ public class PGPIntegrationTestCase extends FunctionalTestCase
     @Test
     public void testEncryptDecrypt() throws Exception
     {
-        String payload = "this is a super simple test. Hope it works!!!";
+        doEncryptDecryptTest("this is a super simple test. Hope it works!!!");
+    }
+
+    @Test
+    public void testEncryptDecryptEmptyPayload() throws Exception
+    {
+        doEncryptDecryptTest("");
+    }
+
+    private void doEncryptDecryptTest(String payload) throws Exception
+    {
         runFlow("pgpEncryptProcessor", payload);
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.request("test://out", 5000);
