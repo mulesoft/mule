@@ -6,7 +6,9 @@
  */
 package org.mule.extension.ftp.internal.command;
 
-import org.mule.extension.api.runtime.ContentMetadata;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.metadata.DataType;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.extension.ftp.internal.FtpFilePayload;
 import org.mule.extension.ftp.internal.FtpFileSystem;
@@ -38,7 +40,7 @@ public final class FtpReadCommand extends FtpCommand implements ReadCommand
      * {@inheritDoc}
      */
     @Override
-    public FilePayload read(String filePath, boolean lock, ContentMetadata contentMetadata)
+    public MuleMessage read(MuleMessage message, String filePath, boolean lock)
     {
         FtpFilePayload filePayload = getExistingFile(filePath);
         if (filePayload.isDirectory())
@@ -66,7 +68,7 @@ public final class FtpReadCommand extends FtpCommand implements ReadCommand
             fileSystem.verifyNotLocked(path);
         }
 
-        fileSystem.updateContentMetadata(filePayload, contentMetadata);
-        return filePayload;
+        DataType<FilePayload> updatedDataType = fileSystem.updateDataType(message.getDataType(), filePayload);
+        return new DefaultMuleMessage(filePayload, updatedDataType);
     }
 }

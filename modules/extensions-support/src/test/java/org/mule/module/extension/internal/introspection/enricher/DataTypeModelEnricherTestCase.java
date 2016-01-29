@@ -24,7 +24,7 @@ import static org.mule.module.extension.internal.ExtensionProperties.ENCODING_PA
 import static org.mule.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withReturnType;
-import org.mule.extension.annotation.api.ContentMetadataParameters;
+import org.mule.extension.annotation.api.DataTypeParameters;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
@@ -47,7 +47,7 @@ import org.reflections.ReflectionUtils;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ContentMetadataModelEnricherTestCase extends AbstractMuleTestCase
+public class DataTypeModelEnricherTestCase extends AbstractMuleTestCase
 {
 
     @Mock(answer = RETURNS_DEEP_STUBS)
@@ -61,10 +61,10 @@ public class ContentMetadataModelEnricherTestCase extends AbstractMuleTestCase
 
     private Method method = getAnnotatedMethod();
 
-    private ContentMetadataModelEnricher enricher = new ContentMetadataModelEnricher();
+    private DataTypeModelEnricher enricher = new DataTypeModelEnricher();
 
     @Before
-    @ContentMetadataParameters
+    @DataTypeParameters
     public void before()
     {
         when(describingContext.getDeclarationDescriptor().getDeclaration().getOperations()).thenReturn(asList(annotatedOperation, notAnnotatedOperation));
@@ -110,21 +110,21 @@ public class ContentMetadataModelEnricherTestCase extends AbstractMuleTestCase
         assertThat(parameter.getDefaultValue(), is(nullValue()));
     }
 
-    @ContentMetadataParameters
+    @DataTypeParameters
     public Object operationMethod() {
         return null;
     }
 
     private Method getAnnotatedMethod()
     {
-        return ReflectionUtils.getMethods(getClass(), withAnnotation(ContentMetadataParameters.class),
+        return ReflectionUtils.getMethods(getClass(), withAnnotation(DataTypeParameters.class),
                                           withReturnType(Object.class))
                 .stream().findFirst().get();
     }
 
     private Method getVoidAnnotatedMethod()
     {
-        return ReflectionUtils.getMethods(getClass(), withAnnotation(ContentMetadataParameters.class),
+        return ReflectionUtils.getMethods(getClass(), withAnnotation(DataTypeParameters.class),
                                           withReturnType(void.class))
                 .stream().findFirst().get();
     }

@@ -9,7 +9,6 @@ package org.mule.module.extension.file.api.command;
 import static java.lang.String.format;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.api.runtime.ContentMetadata;
 import org.mule.module.extension.file.api.FileConnectorConfig;
 import org.mule.module.extension.file.api.FileSystem;
 

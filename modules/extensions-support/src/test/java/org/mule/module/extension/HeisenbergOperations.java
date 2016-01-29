@@ -7,10 +7,11 @@
 package org.mule.module.extension;
 
 import static java.util.stream.Collectors.toList;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.NestedProcessor;
 import org.mule.api.temporary.MuleMessage;
-import org.mule.extension.annotation.api.ContentMetadataParameters;
+import org.mule.extension.annotation.api.DataTypeParameters;
 import org.mule.extension.annotation.api.OnException;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.ParameterGroup;
@@ -19,8 +20,6 @@ import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.runtime.ContentMetadata;
-import org.mule.extension.api.runtime.ContentType;
 import org.mule.module.extension.exception.CureCancerExceptionEnricher;
 import org.mule.module.extension.exception.HealthException;
 import org.mule.module.extension.exception.HeisenbergException;
@@ -28,6 +27,7 @@ import org.mule.module.extension.model.HealthStatus;
 import org.mule.module.extension.model.KnockeableDoor;
 import org.mule.module.extension.model.PersonalInfo;
 import org.mule.module.extension.model.Weapon;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -50,8 +50,8 @@ public class HeisenbergOperations
     private ExtensionManager extensionManager;
 
     @Operation
-    @ContentMetadataParameters
-    public String sayMyName(@UseConfig HeisenbergExtension config, ContentMetadata contentMetadata)
+    @DataTypeParameters
+    public String sayMyName(@UseConfig HeisenbergExtension config)
     {
         return config.getPersonalInfo().getName();
     }
@@ -63,15 +63,13 @@ public class HeisenbergOperations
     }
 
     @Operation
-    public String getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index, ContentMetadata contentMetadata)
+    public MuleMessage getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index)
     {
-        if (contentMetadata.isOutputModifiable())
-        {
-            Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
-            contentMetadata.setOutputContentType(new ContentType(lastSupportedEncoding, "dead/dead"));
-        }
-
-        return config.getEnemies().get(index);
+        org.mule.api.metadata.DataType<String> dt = DataTypeFactory.create(String.class);
+        Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
+        dt.setEncoding(lastSupportedEncoding.toString());
+        dt.setMimeType("dead/dead");
+        return new DefaultMuleMessage(config.getEnemies().get(index), dt);
     }
 
     @Operation
@@ -138,9 +136,8 @@ public class HeisenbergOperations
     }
 
     @Operation
-    public void getPaymentFromEvent(@UseConfig HeisenbergExtension config, MuleEvent event, ContentType contentType)
+    public void getPaymentFromEvent(@UseConfig HeisenbergExtension config, MuleEvent event)
     {
-        event.setFlowVariable(CONTENT_TYPE, contentType);
         Long payment = (Long) event.getMessage().getPayload();
         config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
     }

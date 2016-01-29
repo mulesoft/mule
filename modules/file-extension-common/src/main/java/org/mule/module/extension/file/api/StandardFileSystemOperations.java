@@ -7,13 +7,12 @@
 package org.mule.module.extension.file.api;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.api.transport.OutputHandler;
-import org.mule.extension.annotation.api.ContentMetadataParameters;
+import org.mule.extension.annotation.api.DataTypeParameters;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
-import org.mule.extension.api.runtime.ContentMetadata;
 import org.mule.module.extension.file.api.matcher.NullFilePayloadPredicate;
 import org.mule.transport.NullPayload;
 
@@ -71,27 +70,27 @@ public class StandardFileSystemOperations
      * lock.
      * <p>
      * This method also makes a best effort to determine the mime type of the
-     * file being read. If {@link ContentMetadata#isOutputModifiable()} return
-     * {@code true} on the {@code contentMetadata} argument, a {@link MimetypesFileTypeMap}
-     * will be used to make an educated guess on the file's mime type. The user also has
+     * file being read. A {@link MimetypesFileTypeMap} will be used to make an
+     * educated guess on the file's mime type. The user also has
      * the chance to force the output enconding and mimeType through the {@code outputEncoding}
-     * and {@code outputMimeType} parameters.
+     * and {@code outputMimeType} optional parameters.
+     *
      *
      * @param fileSystem      a reference to the host {@link FileSystem}
+     * @param message         the incoming {@link MuleMessage}
      * @param path            the path to the file to be read
      * @param lock            whether or not to lock the file. Defaults to {@code false}
-     * @param contentMetadata a {@link ContentMetadata} to pass mimeType information of the file
-     * @return the file's content and metadata on a {@link FilePayload} instance
+     * @return a MuleMessage with the file's content and metadata on a {@link FilePayload} instance
      * @throws IllegalArgumentException if the file at the given path doesn't exists
      */
     @Operation
-    @ContentMetadataParameters
-    public FilePayload read(@Connection FileSystem fileSystem,
+    @DataTypeParameters
+    public MuleMessage read(@Connection FileSystem fileSystem,
+                            MuleMessage message,
                             String path,
-                            @Optional(defaultValue = "false") boolean lock,
-                            ContentMetadata contentMetadata)
+                            @Optional(defaultValue = "false") boolean lock)
     {
-        return fileSystem.read(path, lock, contentMetadata);
+        return fileSystem.read(message, path, lock);
     }
 
     /**

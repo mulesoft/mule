@@ -21,6 +21,7 @@ import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.module.extension.model.HealthStatus.DEAD;
 import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ConfigurationModel;
@@ -28,7 +29,6 @@ import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
-import org.mule.extension.api.runtime.ContentMetadata;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
@@ -100,7 +100,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     @Test
     public void operationWithReturnValueAndWithoutParameters() throws Exception
     {
-        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "sayMyName", new Class<?>[] {HeisenbergExtension.class, ContentMetadata.class});
+        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "sayMyName", new Class<?>[] {HeisenbergExtension.class});
         executor = new ReflectiveMethodOperationExecutor(method, operations);
         assertResult(executor.execute(operationContext), HEISENBERG);
     }
@@ -110,7 +110,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     {
         final RuntimeException exception = new RuntimeException();
         operations = mock(HeisenbergOperations.class);
-        when(operations.sayMyName(any(HeisenbergExtension.class), any(ContentMetadata.class))).thenThrow(exception);
+        when(operations.sayMyName(any(HeisenbergExtension.class))).thenThrow(exception);
 
         try
         {
@@ -141,10 +141,10 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
         when(parameters.asMap()).thenReturn(parametersMap);
         init();
 
-        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "getEnemy", new Class<?>[] {HeisenbergExtension.class, int.class, ContentMetadata.class});
+        Method method = ClassUtils.getMethod(HeisenbergOperations.class, "getEnemy", new Class<?>[] {HeisenbergExtension.class, int.class});
         executor = new ReflectiveMethodOperationExecutor(method, operations);
 
-        assertResult(executor.execute(operationContext), "Hank");
+        assertResult(((MuleMessage)executor.execute(operationContext)).getPayload(), "Hank");
     }
 
     @Test

@@ -6,13 +6,12 @@
  */
 package org.mule.module.extension.internal.runtime.processor;
 
-import static org.mule.module.extension.internal.ExtensionProperties.CONTENT_METADATA;
+import static org.mule.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
+import static org.mule.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
-import org.mule.extension.api.runtime.ContentMetadata;
-import org.mule.extension.api.runtime.ContentType;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
@@ -21,7 +20,7 @@ import java.io.Serializable;
 
 /**
  * Base class for {@link ReturnDelegate} implementations.
- * <p>
+ * <p/>
  * Contains the logic for taking an operation's output value
  * and turn it into a {@link MuleMessage} which not only contains
  * the updated payload but also the proper {@link DataType}
@@ -66,8 +65,10 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
 
     private DataType resolveDataType(Object value, OperationContextAdapter operationContext)
     {
-        ContentMetadata contentMetadata = operationContext.getVariable(CONTENT_METADATA);
-        if (contentMetadata == null)
+        String mimeType = operationContext.getTypeSafeParameter(MIME_TYPE_PARAMETER_NAME, String.class);
+        String encoding = operationContext.getTypeSafeParameter(ENCODING_PARAMETER_NAME, String.class);
+
+        if (encoding == null && mimeType == null)
         {
             if (value instanceof MuleMessage)
             {
@@ -82,10 +83,17 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
             return null;
         }
 
-        final ContentType contentType = contentMetadata.getOutputContentType();
+        final DataType dataType = DataTypeFactory.create(value.getClass());
 
-        final DataType dataType = DataTypeFactory.createWithEncoding(value.getClass(), contentType.getEncoding().name());
-        dataType.setMimeType(contentType.getMimeType());
+        if (encoding != null)
+        {
+            dataType.setEncoding(encoding);
+        }
+
+        if (mimeType != null)
+        {
+            dataType.setMimeType(mimeType);
+        }
 
         return dataType;
     }
