@@ -30,14 +30,24 @@ public class PGPIntegrationTestCase extends AbstractServiceAndFlowTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "pgp-integration-mule-config-service.xml"},
+            //{ConfigVariant.SERVICE, "pgp-integration-mule-config-service.xml"},
             {ConfigVariant.FLOW, "pgp-integration-mule-config-flow.xml"}});
     }
 
     @Test
     public void testEncryptDecrypt() throws Exception
     {
-        String payload = "this is a super simple test. Hope it works!!!";
+        doEncryptDecryptTest("this is a super simple test. Hope it works!!!");
+    }
+
+    @Test
+    public void testEncryptDecryptEmptyPayload() throws Exception
+    {
+        doEncryptDecryptTest("");
+    }
+
+    private void doEncryptDecryptTest(String payload) throws Exception
+    {
         MuleClient client = muleContext.getClient();
 
         client.send("vm://in", new DefaultMuleMessage(payload, muleContext));
