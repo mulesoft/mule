@@ -157,6 +157,7 @@ public class DecryptStreamTransformer implements StreamTransformer
                 compressedStream.close();
             }
             clearStream.close();
+            toBeDecrypted.close();
             return true;
         }
 
