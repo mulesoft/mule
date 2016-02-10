@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.introspection.utils;
 
 import org.mule.api.expression.ExpressionManager;
+import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.ParametrizedModel;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -48,7 +49,7 @@ public final class ImplicitObjectUtils
             if (defaultValue != null)
             {
                 ValueResolver<Object> valueResolver;
-                if (defaultValue instanceof String && expressionManager.isExpression((String) defaultValue))
+                if (defaultValue instanceof String && expressionManager.isExpression((String) defaultValue) && parameterModel.getExpressionSupport() != ExpressionSupport.LITERAL)
                 {
                     valueResolver = new TypeSafeExpressionValueResolver<>((String) defaultValue, parameterModel.getType());
                 }

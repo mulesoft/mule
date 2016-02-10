@@ -152,7 +152,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         ConfigurationDeclaration configuration = declaration.getConfigurations().get(1);
         assertThat(configuration, is(notNullValue()));
         assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-        assertThat(configuration.getParameters(), hasSize(24));
+        assertThat(configuration.getParameters(), hasSize(26));
         assertParameter(configuration.getParameters(), "extendedProperty", "", DataType.of(String.class), true, SUPPORTED, null);
     }
 
@@ -181,7 +181,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
         List<ParameterDeclaration> parameters = conf.getParameters();
-        assertThat(parameters, hasSize(23));
+        assertThat(parameters, hasSize(25));
 
         assertParameter(parameters, "myName", "", DataType.of(String.class), false, SUPPORTED, HEISENBERG);
         assertParameter(parameters, "age", "", DataType.of(Integer.class), false, SUPPORTED, AGE);
@@ -220,7 +220,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     private void assertTestModuleOperations(Declaration declaration) throws Exception
     {
-        assertThat(declaration.getOperations(), hasSize(21));
+        assertThat(declaration.getOperations(), hasSize(22));
         assertOperation(declaration, SAY_MY_NAME_OPERATION, "");
         assertOperation(declaration, GET_ENEMY_OPERATION, "");
         assertOperation(declaration, KILL_OPERATION, "");

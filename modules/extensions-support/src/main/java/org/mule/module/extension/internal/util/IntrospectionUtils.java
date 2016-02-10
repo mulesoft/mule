@@ -20,6 +20,7 @@ import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
 import org.mule.api.NestedProcessor;
 import org.mule.extension.annotation.api.Alias;
+import org.mule.extension.annotation.api.Expression;
 import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
@@ -40,6 +41,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -285,10 +287,10 @@ public class IntrospectionUtils
         return !forceOptional && parameterModel.isRequired();
     }
 
-    public static ExpressionSupport getExpressionSupport(AccessibleObject object)
+    public static ExpressionSupport getExpressionSupport(AnnotatedElement object)
     {
-        Parameter parameter = object.getAnnotation(Parameter.class);
-        return parameter != null ? parameter.expressionSupport() : SUPPORTED;
+        Expression expression = object.getAnnotation(Expression.class);
+        return expression != null ? expression.value() : SUPPORTED;
     }
 
     public static boolean isVoid(Method method)

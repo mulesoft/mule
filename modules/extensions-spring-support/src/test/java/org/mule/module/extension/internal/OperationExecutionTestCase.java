@@ -327,6 +327,14 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
         assertThat(event.getMessage().getPayload(), is(result));
     }
 
+    @Test
+    public void operationWithLiteralArgument() throws Exception
+    {
+        MuleEvent event = getTestEvent(EMPTY);
+        event = runFlow("literalEcho", event);
+        assertThat(event.getMessage().getPayload(), is("#[money]"));
+    }
+
     private void assertDynamicDoor(String flowName) throws Exception
     {
         assertDynamicVictim(flowName, "Skyler");

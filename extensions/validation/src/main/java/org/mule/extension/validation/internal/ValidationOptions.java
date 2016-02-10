@@ -6,7 +6,8 @@
  */
 package org.mule.extension.validation.internal;
 
-import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.extension.api.introspection.ExpressionSupport.LITERAL;
+import org.mule.extension.annotation.api.Expression;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.extension.validation.api.Validator;
@@ -37,7 +38,8 @@ public final class ValidationOptions
      * Components consuming this value are to manually check if this
      * is an expression and evaluate it in case that the validation failed
      */
-    @Parameter(expressionSupport = NOT_SUPPORTED)
+    @Parameter
+    @Expression(LITERAL)
     @Optional
     private String message = null;
 

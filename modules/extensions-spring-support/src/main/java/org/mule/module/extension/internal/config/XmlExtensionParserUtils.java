@@ -141,6 +141,11 @@ final class XmlExtensionParserUtils
      */
     static ValueResolver parseParameter(ElementDescriptor element, ParameterModel parameterModel)
     {
+        if (parameterModel.getExpressionSupport() == ExpressionSupport.LITERAL)
+        {
+            return new StaticValueResolver<>(getAttributeValue(element, parameterModel.getName(), parameterModel.getDefaultValue()));
+        }
+
         return parseElement(element, parameterModel.getName(), parameterModel.getType(), parameterModel.getDefaultValue());
     }
 
@@ -275,7 +280,7 @@ final class XmlExtensionParserUtils
      * for each {@link ParameterModel} in the {@code parameters} list, taking as source the given {@code element}
      * an a {@code nestedOperations} {@link Map} which has {@link ParameterModel} names as keys, and {@link List}s
      * of {@link MessageProcessor} as values.
-     * <p/>
+     * <p>
      * For each {@link ParameterModel} in the {@code parameters} list, if an entry exists in the {@code nestedOperations}
      * {@link Map}, a {@link ValueResolver} that generates {@link NestedProcessor} instances will be added to the
      * {@link ResolverSet}. Otherwise, a {@link ValueResolver} will be inferred from the given {@code element} just
@@ -301,11 +306,7 @@ final class XmlExtensionParserUtils
             }
             else
             {
-                ValueResolver<?> resolver = parseParameter(element, parameterModel);
-                if (resolver == null)
-                {
-                    resolver = new StaticValueResolver(null);
-                }
+                ValueResolver<?> resolver = getValueResolver(element, parameterModel);
 
                 if (resolver.isDynamic() && parameterModel.getExpressionSupport() == ExpressionSupport.NOT_SUPPORTED)
                 {
@@ -735,5 +736,16 @@ final class XmlExtensionParserUtils
     private static boolean isExpression(Object value, TemplateParser parser)
     {
         return value instanceof String && parser.isContainsTemplate((String) value);
+    }
+
+    private static ValueResolver<?> getValueResolver(ElementDescriptor element, ParameterModel parameterModel)
+    {
+        if (parameterModel.getExpressionSupport() == ExpressionSupport.LITERAL)
+        {
+            return new StaticValueResolver<>(getAttributeValue(element, parameterModel.getName(), parameterModel.getDefaultValue()));
+        }
+
+        ValueResolver<?> resolver = parseParameter(element, parameterModel);
+        return resolver == null ? new StaticValueResolver(null) : resolver;
     }
 }

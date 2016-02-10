@@ -247,7 +247,7 @@ public class BasicValidationTestCase extends ValidationTestCase
     @Test
     public void customValidationByClass() throws Exception
     {
-        assertCustomValidator("customValidationByClass", null, CUSTOM_VALIDATOR_MESSAGE);
+        assertCustomValidator("customValidationByClass", CUSTOM_VALIDATOR_MESSAGE, CUSTOM_VALIDATOR_MESSAGE);
     }
 
     @Test

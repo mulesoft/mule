@@ -9,6 +9,7 @@ package org.mule.module.extension.internal.introspection;
 import org.mule.extension.api.introspection.DataType;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ import java.util.Map;
  *
  * @since 3.7.0
  */
-final class ParsedParameter
+final class ParsedParameter implements AnnotatedElement
 {
 
     private String name;
@@ -98,5 +99,17 @@ final class ParsedParameter
     public <T extends Annotation> T getAnnotation(Class<T> annotationType)
     {
         return (T) annotations.get(annotationType);
+    }
+
+    @Override
+    public Annotation[] getAnnotations()
+    {
+        return (Annotation[]) annotations.values().toArray();
+    }
+
+    @Override
+    public Annotation[] getDeclaredAnnotations()
+    {
+        return getAnnotations();
     }
 }

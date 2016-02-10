@@ -24,7 +24,8 @@
                        candidateDoors="candidateDoors"
                        firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
-                       moneyFunction="#[money]">
+                       moneyFunction="#[money]"
+                       literalExpressionWithoutDefault="#[money]">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
@@ -81,7 +82,8 @@
                        labAddress="#['Pollos Hermanos']"
                        monthlyIncomes="${monthlyIncomes}"
                        deathsBySeasons="${deathsBySeasons}"
-                       labeledRicin="${labeledRicin}">
+                       labeledRicin="${labeledRicin}"
+                       literalExpressionWithoutDefault="#[money]">
         <heisenberg:enemies>
             <heisenberg:enemy value="${fring}"/>
             <heisenberg:enemy value="${hank}"/>
@@ -112,7 +114,8 @@
                        labAddress="#['Pollos Hermanos']"
                        monthlyIncomes="monthlyIncomes"
                        deathsBySeasons="deathsBySeasons"
-                       labeledRicin="labeledRicins">
+                       labeledRicin="labeledRicins"
+                       literalExpressionWithoutDefault="#[money]">
     </heisenberg:config>
 
     <heisenberg:config name="expressionHeisenberg"
@@ -131,7 +134,8 @@
                        moneyFunction="#[money]"
                        monthlyIncomes="#[[12000L, 500L]]"
                        deathsBySeasons="#[['s01':['emilio', 'domingo'], 's02':['tuco', 'tortuga']]]"
-                       labeledRicin="#[app.registry.labeledRicins]">
+                       labeledRicin="#[app.registry.labeledRicins]"
+                       literalExpressionWithoutDefault="#[money]">
         <heisenberg:enemies>
             <heisenberg:enemy value="#[gustavoFring]"/>
             <heisenberg:enemy value="#[hank]"/>
@@ -164,7 +168,9 @@
                        labAddress="#['Pollos Hermanos']"
                        monthlyIncomes="#[app.registry.monthlyIncomes]"
                        deathsBySeasons="#[app.registry.deathsBySeasons]"
-                       labeledRicin="#[app.registry.labeledRicins]">
+                       labeledRicin="#[app.registry.labeledRicins]"
+                       weapon="#[weapon]"
+                       literalExpressionWithoutDefault="#[money]">
     </heisenberg:config>
 
     <spring:beans>
