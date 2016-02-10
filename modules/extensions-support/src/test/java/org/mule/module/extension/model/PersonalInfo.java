@@ -8,13 +8,15 @@ package org.mule.module.extension.model;
 
 import static org.mule.module.extension.HeisenbergExtension.AGE;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
+import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.param.Optional;
 
 public class PersonalInfo
 {
 
-    @Parameter(alias = "myName")
+    @Parameter
+    @Alias("myName")
     @Optional(defaultValue = HEISENBERG)
     private String name;
 

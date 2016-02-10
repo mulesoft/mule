@@ -11,8 +11,8 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefa
 import static org.mule.util.Preconditions.checkState;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.RestrictedTo;
 import org.mule.extension.annotation.api.param.Connection;
@@ -54,14 +54,14 @@ public final class MuleExtensionAnnotationParser
             .add(MuleMessage.class)
             .build();
 
-    static String getParameterName(Field field, Parameter parameterAnnotation)
+    static String getAliasName(Field field, Alias aliasAnnotation)
     {
-        return getParameterName(field.getName(), parameterAnnotation);
+        return getAliasName(field.getName(), aliasAnnotation);
     }
 
-    static String getParameterName(String defaultName, Parameter parameterAnnotation)
+    static String getAliasName(String defaultName, Alias aliasAnnotation)
     {
-        String alias = parameterAnnotation != null ? parameterAnnotation.alias() : null;
+        String alias = aliasAnnotation != null ? aliasAnnotation.value() : null;
         return StringUtils.isEmpty(alias) ? defaultName : alias;
     }
 
@@ -143,7 +143,7 @@ public final class MuleExtensionAnnotationParser
         ParsedParameter parameter = new ParsedParameter(annotations);
         parameter.setAdvertised(shouldAdvertise(dataType, annotations));
 
-        parameter.setName(getParameterName(paramName, (Parameter) annotations.get(Parameter.class)));
+        parameter.setName(getAliasName(paramName, (Alias) annotations.get(Alias.class)));
         parameter.setType(dataType);
 
         Optional optional = (Optional) annotations.get(Optional.class);

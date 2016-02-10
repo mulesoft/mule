@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Expression;
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.annotation.api.Extension;
@@ -133,7 +134,8 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     @Optional(defaultValue = "CANCER")
     private HealthStatus initialHealth;
 
-    @Parameter(alias = "finalHealth")
+    @Parameter
+    @Alias("finalHealth")
     private HealthStatus endingHealth;
 
     @Parameter
