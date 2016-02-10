@@ -346,9 +346,9 @@ public class IntrospectionUtils
 
     public static String getAlias(Field field)
     {
-        Parameter parameter = field.getAnnotation(Parameter.class);
-        String alias = parameter != null ? parameter.alias() : EMPTY;
-        return StringUtils.isEmpty(alias) ? field.getName() : alias;
+        Alias alias = field.getAnnotation(Alias.class);
+        String name = alias != null ? alias.value() : EMPTY;
+        return StringUtils.isEmpty(name) ? field.getName() : name;
     }
 
     public static String getSourceName(Class<? extends Source> sourceType)

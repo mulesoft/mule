@@ -7,9 +7,9 @@
 package org.mule.module.extension.internal.introspection;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getAliasName;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getMemberName;
-import static org.mule.module.extension.internal.introspection.MuleExtensionAnnotationParser.getParameterName;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
@@ -29,7 +29,6 @@ import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.ExtensionOf;
 import org.mule.extension.annotation.api.OnException;
 import org.mule.extension.annotation.api.Operations;
-import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.Sources;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Connection;
@@ -275,10 +274,10 @@ public final class AnnotationsBasedDescriber implements Describer
 
         for (Field field : parameterFields)
         {
-            Parameter parameter = field.getAnnotation(Parameter.class);
             Optional optional = field.getAnnotation(Optional.class);
+            Alias alias = field.getAnnotation(Alias.class);
 
-            String parameterName = getParameterName(field, parameter);
+            String parameterName = getAliasName(field, alias);
             ParameterDescriptor parameterDescriptor;
             DataType dataType = IntrospectionUtils.getFieldDataType(field);
             if (optional == null)

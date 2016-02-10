@@ -7,7 +7,6 @@
 package org.mule.extension.validation.internal;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
@@ -18,6 +17,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
+import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.Operations;
@@ -60,11 +60,13 @@ public class ValidationExtension extends AbstractAnnotatedObject implements Conf
     private ExceptionFactory exceptionFactory;
     private MuleContext muleContext;
 
-    @Parameter(alias = EXCEPTION_FACTORY_PARAMETER_NAME)
+    @Parameter
+    @Alias(EXCEPTION_FACTORY_PARAMETER_NAME)
     @Optional
     private ExceptionFactorySource exceptionFactorySource;
 
-    @Parameter(alias = "i18n")
+    @Parameter
+    @Alias("i18n")
     @Optional
     private I18NConfig i18nConfig;
 

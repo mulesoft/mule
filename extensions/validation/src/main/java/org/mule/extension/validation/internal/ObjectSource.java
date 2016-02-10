@@ -11,6 +11,7 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.registry.MuleRegistry;
+import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.util.ClassUtils;
@@ -43,7 +44,8 @@ import org.apache.commons.lang.StringUtils;
 public class ObjectSource<T>
 {
 
-    @Parameter(alias = "class")
+    @Parameter
+    @Alias("class")
     @Optional
     private String type;
 
