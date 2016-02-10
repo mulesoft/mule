@@ -10,6 +10,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.util.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.pool.PoolableObjectFactory;
@@ -27,17 +28,20 @@ public class SftpConnectionFactory implements PoolableObjectFactory
         this.endpoint = endpoint;
     }
 
+    @Override
     public void activateObject(Object o) throws Exception
     {
         // Do nothing!
     }
 
+    @Override
     public void destroyObject(Object o) throws Exception
     {
         SftpClient client = (SftpClient) o;
         client.disconnect();
     }
 
+    @Override
     public Object makeObject() throws Exception
     {
         return createClient(endpoint, preferredAuthenticationMethods);
@@ -80,6 +84,11 @@ public class SftpConnectionFactory implements PoolableObjectFactory
 
             SftpUtil sftpUtil = new SftpUtil(endpoint);
             String identityFile = sftpUtil.getIdentityFile();
+            String sftpKnownHostsFile = endpoint.getMuleContext().getConfiguration().getSftpKnownHostsFile();
+            if (sftpKnownHostsFile != null)
+            {
+                client.setKnownHostsFile(new File(sftpKnownHostsFile));
+            }
 
             /*
              * TODO: There is a problem if the SSHd uses a low value of
@@ -129,11 +138,13 @@ public class SftpConnectionFactory implements PoolableObjectFactory
         }
     }
 
+    @Override
     public void passivateObject(Object o) throws Exception
     {
         // Do nothing!
     }
 
+    @Override
     public boolean validateObject(Object o)
     {
         SftpClient client = (SftpClient) o;

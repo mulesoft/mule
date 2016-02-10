@@ -59,6 +59,8 @@ public class SftpClient
 
     private int port = 22;
 
+    private File knownHostsFile;
+
     private String home;
 
     // Keep track of the current working directory for improved logging.
@@ -127,7 +129,7 @@ public class SftpClient
         try
         {
             Properties hash = new Properties();
-            hash.put(STRICT_HOST_KEY_CHECKING, "no");
+            configureHostChecking(hash);
             if (!StringUtils.isEmpty(preferredAuthenticationMethods))
             {
                 hash.put(PREFERRED_AUTHENTICATION_METHODS, preferredAuthenticationMethods);
@@ -176,7 +178,7 @@ public class SftpClient
             }
 
             Properties hash = new Properties();
-            hash.put(STRICT_HOST_KEY_CHECKING, "no");
+            configureHostChecking(hash);
             if (!StringUtils.isEmpty(preferredAuthenticationMethods))
             {
                 hash.put(PREFERRED_AUTHENTICATION_METHODS, preferredAuthenticationMethods);
@@ -202,6 +204,29 @@ public class SftpClient
         {
             logAndThrowLoginError(user, e);
         }
+    }
+
+    protected void configureHostChecking(Properties hash) throws JSchException
+    {
+        if (getKnownHostsFile() == null)
+        {
+            hash.put(STRICT_HOST_KEY_CHECKING, "no");
+        }
+        else
+        {
+            hash.put(STRICT_HOST_KEY_CHECKING, "ask");
+            jsch.setKnownHosts(getKnownHostsFile().getAbsolutePath());
+        }
+    }
+
+    public File getKnownHostsFile()
+    {
+        return knownHostsFile;
+    }
+
+    public void setKnownHostsFile(File knownHostsFile)
+    {
+        this.knownHostsFile = knownHostsFile;
     }
 
     private void logAndThrowLoginError(String user, Exception e) throws IOException
