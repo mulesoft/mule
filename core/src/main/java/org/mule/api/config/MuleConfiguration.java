@@ -92,6 +92,15 @@ public interface MuleConfiguration
     boolean isDisableTimeouts();
 
     /**
+     * If provided, the client will validate the server's key against the one in the referenced file.
+     * <p/>
+     * If the server key doesn't match the one in the file, the connection will be aborted.
+     * 
+     * @return the file to get the known hosts from.
+     */
+    String getSftpKnownHostsFile();
+
+    /**
      * @param extensionType class instance of the extension type
      * @param <T> type of the extension
      * @return extension configured of type extensionType, if there's no such extension then null.

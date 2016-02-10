@@ -146,6 +146,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      */
     private boolean disableTimeouts = false;
 
+    private String sftpKnownHostsFile = null;
+
     protected transient Log logger = LogFactory.getLog(DefaultMuleConfiguration.class);
 
     private MuleContext muleContext;
@@ -237,6 +239,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -368,6 +371,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             disableTimeouts = Boolean.valueOf(p);
         }
+
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "sftp.knownHostsFile");
+        if (p != null)
+        {
+            sftpKnownHostsFile = p;
+        }
     }
 
     protected void validateEncoding() throws FatalException
@@ -407,6 +416,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public int getDefaultResponseTimeout()
     {
         return responseTimeout;
@@ -420,11 +430,13 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public String getWorkingDirectory()
     {
         return workingDirectory;
     }
 
+    @Override
     public String getMuleHomeDirectory()
     {
         return System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
@@ -447,6 +459,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public int getDefaultTransactionTimeout()
     {
         return defaultTransactionTimeout;
@@ -460,16 +473,19 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public boolean isValidateExpressions()
     {
         return validateExpressions;
     }
 
+    @Override
     public boolean isClientMode()
     {
         return clientMode;
     }
 
+    @Override
     public String getDefaultEncoding()
     {
         return encoding;
@@ -483,6 +499,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public String getId()
     {
         return id;
@@ -505,6 +522,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         this.clusterId = clusterId;
     }
 
+    @Override
     public String getDomainId()
     {
         return domainId;
@@ -518,6 +536,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public String getSystemModelType()
     {
         return systemModelType;
@@ -539,11 +558,13 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public String getSystemName()
     {
         return domainId + "." + clusterId + "." + id;
     }
 
+    @Override
     public boolean isAutoWrapMessageAwareTransform()
     {
         return autoWrapMessageAwareTransform;
@@ -557,6 +578,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public boolean isCacheMessageAsBytes()
     {
         return cacheMessageAsBytes;
@@ -570,6 +592,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public boolean isCacheMessageOriginalPayload()
     {
         return cacheMessageOriginalPayload;
@@ -583,6 +606,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public boolean isEnableStreaming()
     {
         return enableStreaming;
@@ -622,6 +646,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public int getDefaultQueueTimeout()
     {
         return defaultQueueTimeout;
@@ -635,6 +660,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public int getShutdownTimeout()
     {
         return shutdownTimeout;
@@ -648,6 +674,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public boolean isContainerMode()
     {
         return this.containerMode;
@@ -664,6 +691,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    @Override
     public boolean isStandalone()
     {
         // this is our best guess
@@ -690,6 +718,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         return this.extendedProperties.get(name);
     }
 
+    @Override
     public String getDefaultExceptionStrategyName()
     {
         return defaultExceptionStrategyName;
@@ -725,6 +754,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         this.defaultExceptionStrategyName = defaultExceptionStrategyName;
     }
     
+    @Override
     public boolean isEnricherPropagatesSessionVariableChanges()
     {
         return enricherPropagatesSessionVariableChanges;
@@ -739,6 +769,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public boolean isDisableTimeouts()
     {
         return disableTimeouts;
+    }
+
+    @Override
+    public String getSftpKnownHostsFile()
+    {
+        return sftpKnownHostsFile;
     }
 
     /**
@@ -774,6 +810,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         this.extensions = extensions;
     }
 
+    @Override
     public <T> T getExtension(final Class<T> extensionType)
     {
         return (T) CollectionUtils.find(extensions, new Predicate()
