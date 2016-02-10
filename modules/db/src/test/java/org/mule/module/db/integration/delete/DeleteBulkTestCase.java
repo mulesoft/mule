@@ -53,7 +53,7 @@ public class DeleteBulkTestCase extends AbstractDbIntegrationTestCase
         planetNames.add(VENUS.getName());
         planetNames.add(MARS.getName());
 
-        final MuleEvent responseEvent = runFlow("deleteBulk", planetNames);
+        final MuleEvent responseEvent = flowRunner("deleteBulk").withPayload(planetNames).run();
         final MuleMessage response = responseEvent.getMessage();
 
         assertBulkDelete(response);
@@ -62,7 +62,7 @@ public class DeleteBulkTestCase extends AbstractDbIntegrationTestCase
     @Test(expected = MessagingException.class)
     public void requiresCollectionPayload() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("deleteBulk", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("deleteBulk").withPayload(TEST_MESSAGE).run();
         responseEvent.getMessage();
     }
 

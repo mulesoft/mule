@@ -43,7 +43,7 @@ public class InlineParameterizedQueryTestCase extends AbstractDbIntegrationTestC
     @Test
     public void usesParamsInInlineQuery() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("inlineQuery", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("inlineQuery").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, TestRecordUtil.getMarsRecord());
@@ -52,7 +52,7 @@ public class InlineParameterizedQueryTestCase extends AbstractDbIntegrationTestC
     @Test
     public void usesExpressionParam() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("expressionParam", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("expressionParam").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, TestRecordUtil.getEarthRecord());

@@ -6,17 +6,16 @@
  */
 package org.mule.module.http.functional.requester;
 
-import static junit.framework.TestCase.fail;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.api.MessagingException;
 import org.mule.construct.Flow;
-import org.mule.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.module.http.internal.request.NtlmProxyConfig;
-import org.mule.module.http.internal.request.DefaultHttpRequester;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.module.http.internal.request.DefaultHttpRequester;
+import org.mule.module.http.internal.request.NtlmProxyConfig;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
@@ -93,11 +92,8 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
     @Test
     public void testProxy() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct(flowName);
-
-        checkProxyConfig(flow);
-
-        ensureRequestGoesThroughProxy(flow);
+        checkProxyConfig((Flow) getFlowConstruct(flowName));
+        ensureRequestGoesThroughProxy(flowName);
     }
 
     private void checkProxyConfig(Flow flow)
@@ -120,18 +116,12 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
         }
     }
 
-    private void ensureRequestGoesThroughProxy(Flow flow) throws Exception
+    private void ensureRequestGoesThroughProxy(String flowName) throws Exception
     {
-        try
-        {
-            flow.process(getTestEvent(TEST_MESSAGE));
-            fail("Request should go through the proxy.");
-        }
-        catch (MessagingException e)
-        {
-            assertThat(e.getCauseException(), is(instanceOf(IOException.class)));
-            assertThat(e.getCauseException().getMessage(), is("Remotely closed"));
-        }
+        MessagingException e = flowRunner(flowName).withPayload(TEST_MESSAGE).runExpectingException();
+        // Request should go through the proxy.
+        assertThat(e.getCauseException(), is(instanceOf(IOException.class)));
+        assertThat(e.getCauseException().getMessage(), is("Remotely closed"));
         latch.await(1, TimeUnit.SECONDS);
     }
 

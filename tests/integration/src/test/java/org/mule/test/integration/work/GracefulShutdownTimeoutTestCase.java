@@ -7,6 +7,7 @@
 package org.mule.test.integration.work;
 
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.construct.Flow;
@@ -61,7 +62,7 @@ public class GracefulShutdownTimeoutTestCase extends FunctionalTestCase
             }
         });
 
-        ((Flow) flowConstruct).process(getTestEvent("test"));
+        flowRunner("TestService").withPayload("test").run();
         Thread.sleep(200);
         ((Flow) flowConstruct).dispose();
         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));

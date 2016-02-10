@@ -6,6 +6,24 @@
  */
 package org.mule.module.http.functional.requester;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
+
+import org.mule.api.MessagingException;
+import org.mule.api.security.tls.TlsConfiguration;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.ClassUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.URL;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.Grizzly;
@@ -20,26 +38,12 @@ import org.glassfish.grizzly.sni.SNIServerConfigResolver;
 import org.glassfish.grizzly.ssl.SSLBaseFilter;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
-import org.junit.*;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.security.tls.TlsConfiguration;
-import org.mule.construct.Flow;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.ClassUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.URL;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeThat;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 
 public class HttpsRequesterSniTestCase extends FunctionalTestCase
 {
@@ -96,7 +100,7 @@ public class HttpsRequesterSniTestCase extends FunctionalTestCase
     @Test(expected = MessagingException.class)
     public void testClientSNINotSentOnNonFQDN() throws Exception
     {
-        runFlow("requestFlowLocalhost", getTestEvent(TEST_MESSAGE));
+        flowRunner("requestFlowLocalhost").withPayload(TEST_MESSAGE).run();
     }
 
     /*
@@ -116,22 +120,8 @@ public class HttpsRequesterSniTestCase extends FunctionalTestCase
 
         assumeThat(address, is(notNullValue()));
 
-        runFlow("requestFlowFQDN", getTestEvent(TEST_MESSAGE));
+        flowRunner("requestFlowFQDN").withPayload(TEST_MESSAGE).run();
         assertThat(server.getHostname(), is(FQDN));
-    }
-
-    /**
-     * Executes the given flow with the given {@code event}
-     *
-     * @param flowName the name of the flow to be executed
-     * @param event the event which we'll use to execute the flow
-     * @return the resulting <code>MuleEvent</code>
-     * @throws Exception
-     */
-    protected MuleEvent runFlow(String flowName, MuleEvent event) throws Exception
-    {
-        Flow flow = lookupFlowConstruct(flowName);
-        return flow.process(event);
     }
 
     /**
@@ -218,6 +208,7 @@ public class HttpsRequesterSniTestCase extends FunctionalTestCase
 
         private class SniAddOn implements AddOn
         {
+            @Override
             public void setup(NetworkListener networkListener, FilterChainBuilder builder)
             {
                 // replace SSLFilter (if any) with SNIFilter

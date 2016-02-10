@@ -6,8 +6,8 @@
  */
 package org.mule.extension.validation;
 
-import org.mule.api.MuleEvent;
 import org.mule.extension.validation.internal.validator.NumberType;
+import org.mule.functional.junit4.FlowRunner;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -60,21 +60,19 @@ public class NumberValidationTestCase extends ValidationTestCase
     @Test
     public void validateNumber() throws Exception
     {
-        assertValid(FLOW_NAME, getNumberValidationEvent(value, minValue, maxValue));
+        assertValid(configureNumberValidationRunner(flowRunner(FLOW_NAME), value, minValue, maxValue));
         final String invalid = "unparseable";
-        assertInvalid(FLOW_NAME, getNumberValidationEvent(invalid, minValue, maxValue), messages.invalidNumberType(invalid, numberType.name()));
+        assertInvalid(configureNumberValidationRunner(flowRunner(FLOW_NAME), invalid, minValue, maxValue), messages.invalidNumberType(invalid, numberType.name()));
 
-        assertInvalid(FLOW_NAME, getNumberValidationEvent(upperBoundaryViolation, minValue, maxValue), messages.greaterThan(upperBoundaryViolation, maxValue));
-        assertInvalid(FLOW_NAME, getNumberValidationEvent(lowerBoundaryViolation, minValue, maxValue), messages.lowerThan(lowerBoundaryViolation, minValue));
+        assertInvalid(configureNumberValidationRunner(flowRunner(FLOW_NAME), upperBoundaryViolation, minValue, maxValue), messages.greaterThan(upperBoundaryViolation, maxValue));
+        assertInvalid(configureNumberValidationRunner(flowRunner(FLOW_NAME), lowerBoundaryViolation, minValue, maxValue), messages.lowerThan(lowerBoundaryViolation, minValue));
     }
 
-    private MuleEvent getNumberValidationEvent(Object value, Object minValue, Object maxValue) throws Exception
+    private FlowRunner configureNumberValidationRunner(FlowRunner runner, Object value, Object minValue, Object maxValue)
     {
-        MuleEvent event = getTestEvent(value);
-        event.setFlowVariable("minValue", minValue);
-        event.setFlowVariable("maxValue", maxValue);
-        event.setFlowVariable("numberType", numberType);
-
-        return event;
+        return runner.withPayload(value)
+                     .withFlowVariable("minValue", minValue)
+                     .withFlowVariable("maxValue", maxValue)
+                     .withFlowVariable("numberType", numberType);
     }
 }

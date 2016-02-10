@@ -8,14 +8,14 @@ package org.mule.module.db.integration;
 
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.construct.Flow;
+import org.mule.functional.junit4.DomainFunctionalTestCase;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.module.db.integration.model.DerbyTestDatabase;
 import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.resolver.database.DbConfigResolver;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.functional.junit4.DomainFunctionalTestCase;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -77,8 +77,8 @@ public class DbSharedConnectorTestCase extends DomainFunctionalTestCase
     public void createJdbcRecordAndConsumeIt() throws Exception
     {
         final MuleContext clientAppMuleContext = getMuleContextForApp(CLIENT_APP);
-        Flow flow = (Flow) clientAppMuleContext.getRegistry().lookupFlowConstruct("dbClientService");
-        flow.process(AbstractMuleContextTestCase.getTestEvent(new Object(), clientAppMuleContext));
+        new FlowRunner(clientAppMuleContext, "dbClientService").withPayload(new Object()).run();
+
         MuleMessage response = getMuleContextForApp(SERVER_APP).getClient().request("test://out", 5000);
         assertThat(response, notNullValue());
     }

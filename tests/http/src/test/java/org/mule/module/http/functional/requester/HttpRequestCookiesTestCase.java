@@ -10,7 +10,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.COOKIE;
-import org.mule.api.MuleEvent;
 
 import com.google.common.collect.Sets;
 
@@ -44,38 +43,31 @@ public class HttpRequestCookiesTestCase extends AbstractHttpRequestTestCase
     @Test
     public void cookiesEnabledForSameDomainAndPath() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.setFlowVariable("path", "/");
-
-        runFlow(CLIENT_COOKIES_ENABLED_FLOW, event);
+        flowRunner(CLIENT_COOKIES_ENABLED_FLOW).withPayload(TEST_MESSAGE).withFlowVariable("path", "/").run();
         assertNoCookiesSent();
 
-        runFlow(CLIENT_COOKIES_ENABLED_FLOW, event);
+        flowRunner(CLIENT_COOKIES_ENABLED_FLOW).withPayload(TEST_MESSAGE).withFlowVariable("path", "/").run();
         assertCookiesSent(COOKIE_ROOT_PATH_LOCAL_DOMAIN);
     }
 
     @Test
     public void cookiesEnabledForSpecificPath() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.setFlowVariable("path", "/path");
-
-        runFlow(CLIENT_COOKIES_ENABLED_FLOW, event);
+        flowRunner(CLIENT_COOKIES_ENABLED_FLOW).withPayload(TEST_MESSAGE).withFlowVariable("path", "/path").run();
         assertNoCookiesSent();
 
-        runFlow(CLIENT_COOKIES_ENABLED_FLOW, event);
+        flowRunner(CLIENT_COOKIES_ENABLED_FLOW).withPayload(TEST_MESSAGE).withFlowVariable("path", "/path").run();
         assertCookiesSent(COOKIE_ROOT_PATH_LOCAL_DOMAIN, COOKIE_CUSTOM_PATH_LOCAL_DOMAIN);
     }
 
     @Test
     public void cookiesDisabledKeepsNoStateBetweenRequests() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
 
-        runFlow(CLIENT_COOKIES_DISABLED_FLOW, event);
+        flowRunner(CLIENT_COOKIES_DISABLED_FLOW).withPayload(TEST_MESSAGE).run();
         assertNoCookiesSent();
 
-        runFlow(CLIENT_COOKIES_DISABLED_FLOW, event);
+        flowRunner(CLIENT_COOKIES_DISABLED_FLOW).withPayload(TEST_MESSAGE).run();
         assertNoCookiesSent();
     }
 

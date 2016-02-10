@@ -11,7 +11,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import static org.mule.module.http.api.HttpHeaders.Values.KEEP_ALIVE;
-import org.mule.api.MuleEvent;
+
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.util.StringUtils;
 
 import org.junit.Test;
@@ -58,12 +59,13 @@ public class HttpRequestKeepAliveTestCase extends AbstractHttpRequestTestCase
 
     private void assertConnectionHeader(String flow, String connectionOutboundProperty, String expectedConnectionHeader) throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        FlowRunner runner = flowRunner(flow).withPayload(TEST_MESSAGE);
+
         if (connectionOutboundProperty != null)
         {
-            event.getMessage().setOutboundProperty(CONNECTION, connectionOutboundProperty);
+            runner = runner.withOutboundProperty(CONNECTION, connectionOutboundProperty);
         }
-        runFlow(flow, event);
+        runner.run();
         String responseConnectionHeaderValue = StringUtils.join(headers.get(CONNECTION), " ");
         assertThat(responseConnectionHeaderValue, equalTo(expectedConnectionHeader));
     }

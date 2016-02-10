@@ -48,7 +48,7 @@ public class StoredProcedureOutputParamTestCase extends AbstractDbIntegrationTes
     @Test
     public void testRequestResponse() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("defaultQueryRequestResponse", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(Map.class)));

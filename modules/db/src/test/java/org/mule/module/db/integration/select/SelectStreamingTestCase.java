@@ -47,7 +47,7 @@ public class SelectStreamingTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void streamsRecords() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("selectStreaming", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("selectStreaming").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(ResultSetIterator.class)));

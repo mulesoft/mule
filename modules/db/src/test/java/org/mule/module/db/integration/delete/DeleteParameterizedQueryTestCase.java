@@ -43,7 +43,7 @@ public class DeleteParameterizedQueryTestCase extends AbstractDbIntegrationTestC
     @Test
     public void usesParameterizedQuery() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("deleteParameterizedQuery", VENUS.getName());
+        final MuleEvent responseEvent = flowRunner("deleteParameterizedQuery").withPayload(VENUS.getName()).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());

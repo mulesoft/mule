@@ -9,9 +9,7 @@ package org.mule.module.db.integration.vendor.oracle;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
@@ -52,8 +50,7 @@ public class OracleSelectsLongTransactionTestCase extends AbstractDbIntegrationT
         {
             sequence.add(i);
         }
-        final DefaultMuleEvent muleEvent = new DefaultMuleEvent(new DefaultMuleMessage(sequence, muleContext), MessageExchangePattern.REQUEST_RESPONSE, null);
-        final MuleEvent responseEvent = runFlow("longTransaction", muleEvent);
+        final MuleEvent responseEvent = flowRunner("longTransaction").withPayload(sequence).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getExceptionPayload(), nullValue());

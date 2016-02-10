@@ -8,10 +8,10 @@ package org.mule.transformers;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
-import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.module.xml.util.XMLTestUtils;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
@@ -30,8 +30,9 @@ public class XsltWithXmlParamsTestCase extends FunctionalTestCase
     @Test
     public void xmlSourceParam() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("xmlSourceParam");
-        MuleEvent event = flow.process(buildEvent(XMLTestUtils.toSource("simple.xml"), XMLTestUtils.toSource("test.xml")));
+        MuleEvent event = flowRunner("xmlSourceParam").withPayload(XMLTestUtils.toSource("simple.xml"))
+                                                      .withFlowVariable("xml", XMLTestUtils.toSource("test.xml"))
+                                                      .run();
 
         assertExpected(event);
     }
@@ -39,18 +40,11 @@ public class XsltWithXmlParamsTestCase extends FunctionalTestCase
     @Test
     public void xmlStringParam() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("xmlStringParam");
-        MuleEvent event = flow.process(buildEvent(XMLTestUtils.toString("simple.xml"), XMLTestUtils.toString("test.xml")));
+        MuleEvent event = flowRunner("xmlStringParam").withPayload(XMLTestUtils.toSource("simple.xml"))
+                                                      .withFlowVariable("xml", XMLTestUtils.toSource("test.xml"))
+                                                      .run();
 
         assertExpected(event);
-    }
-
-    private MuleEvent buildEvent(Object payload, Object param) throws Exception
-    {
-        MuleEvent event = getTestEvent(payload);
-        event.setFlowVariable("xml", param);
-
-        return event;
     }
 
     private void assertExpected(MuleEvent event) throws Exception

@@ -6,16 +6,17 @@
  */
 package org.mule.module.ws.functional;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThat;
+
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.transformer.TransformerMessagingException;
-import org.mule.PropertyScope;
-import org.mule.construct.Flow;
 import org.mule.functional.functional.EventCallback;
 
 import org.junit.Rule;
@@ -59,30 +60,19 @@ public class SoapHeadersFunctionalTestCase extends AbstractWSConsumerFunctionalT
     @Test
     public void messagePropertiesAreMappedToSoapHeaders() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("testFlow");
+        MuleEvent event = flowRunner("testFlow").withPayload(ECHO_HEADERS_REQUEST)
+                                                .withOutboundProperty(SOAP_HEADER_IN, REQUEST_HEADER_IN)
+                                                .withOutboundProperty(SOAP_HEADER_INOUT, REQUEST_HEADER_INOUT)
+                                                .run();
 
-        MuleEvent event = getTestEvent(ECHO_HEADERS_REQUEST);
-        event.getMessage().setProperty(SOAP_HEADER_IN, REQUEST_HEADER_IN, PropertyScope.OUTBOUND);
-        event.getMessage().setProperty(SOAP_HEADER_INOUT, REQUEST_HEADER_INOUT, PropertyScope.OUTBOUND);
-
-        event = flow.process(event);
-
-        assertEquals(RESPONSE_HEADER_OUT, event.getMessage().getInboundProperty(SOAP_HEADER_OUT));
-        assertEquals(RESPONSE_HEADER_INOUT, event.getMessage().getInboundProperty(SOAP_HEADER_INOUT));
+        assertThat(event.getMessage().getInboundProperty(SOAP_HEADER_OUT), is(RESPONSE_HEADER_OUT));
+        assertThat(event.getMessage().getInboundProperty(SOAP_HEADER_INOUT), is(RESPONSE_HEADER_INOUT));
 
     }
 
     @Test
     public void soapHeadersAreRemovedFromMessage() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("testFlow");
-
-        MuleEvent event = getTestEvent(ECHO_HEADERS_REQUEST);
-
-        event.getMessage().setProperty(SOAP_HEADER_IN, REQUEST_HEADER_IN, PropertyScope.OUTBOUND);
-        event.getMessage().setProperty(SOAP_HEADER_INOUT, REQUEST_HEADER_INOUT, PropertyScope.OUTBOUND);
-        event.getMessage().setProperty(HTTP_HEADER, TEST_MESSAGE, PropertyScope.OUTBOUND);
-
         // A test component is used on the server side to check HTTP headers that are received (inbound properties).
 
         getFunctionalTestComponent("server").setEventCallback(new EventCallback()
@@ -96,45 +86,33 @@ public class SoapHeadersFunctionalTestCase extends AbstractWSConsumerFunctionalT
             }
         });
 
-        flow.process(event);
+        flowRunner("testFlow").withPayload(ECHO_HEADERS_REQUEST)
+                              .withOutboundProperty(SOAP_HEADER_IN, REQUEST_HEADER_IN)
+                              .withOutboundProperty(SOAP_HEADER_INOUT, REQUEST_HEADER_INOUT)
+                              .withOutboundProperty(HTTP_HEADER, TEST_MESSAGE)
+                              .run();
     }
 
 
     @Test
     public void invalidXmlInSoapHeaderOutboundProperty() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("testFlow");
+        MessagingException e = flowRunner("testFlow").withPayload(ECHO_HEADERS_REQUEST)
+                                                     .withOutboundProperty(SOAP_HEADER_IN, "invalid xml")
+                                                     .runExpectingException();
 
-        MuleEvent event = getTestEvent(ECHO_HEADERS_REQUEST);
-        event.getMessage().setProperty(SOAP_HEADER_IN, "invalid xml", PropertyScope.OUTBOUND);
-
-        try
-        {
-            flow.process(event);
-            fail();
-        }
-        catch (TransformerMessagingException e)
-        {
-            assertTrue(e.getMessage().contains(SOAP_HEADER_IN));
-        }
+        assertThat("Expected as header can't be converted to XML", e, instanceOf(TransformerMessagingException.class));
+        assertThat(e.getMessage(), containsString(SOAP_HEADER_IN));
     }
 
     @Test
     public void invalidSoapHeaderOutboundPropertyType() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("testFlow");
+        MessagingException e = flowRunner("testFlow").withPayload(ECHO_HEADERS_REQUEST)
+                              .withOutboundProperty(SOAP_HEADER_IN, new Object())
+                              .runExpectingException();
 
-        MuleEvent event = getTestEvent(ECHO_HEADERS_REQUEST);
-        event.getMessage().setProperty(SOAP_HEADER_IN, new Object(), PropertyScope.OUTBOUND);
-        try
-        {
-            flow.process(event);
-            fail();
-        }
-        catch (TransformerMessagingException e)
-        {
-            // Expected as header can't be converted to XML
-        }
+        assertThat("Expected as header can't be converted to XML", e, instanceOf(TransformerMessagingException.class));
     }
 
 }

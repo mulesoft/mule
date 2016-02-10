@@ -66,7 +66,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends FunctionalTestCas
     @Test
     public void worksWithProtocolAndCipherSuiteMatch() throws Exception
     {
-        MuleEvent response = runFlow("12Client12Server", TEST_PAYLOAD);
+        MuleEvent response = flowRunner("12Client12Server").withPayload(TEST_PAYLOAD).run();
         assertThat(response.getMessageAsString(), is(TEST_PAYLOAD));
     }
 
@@ -93,13 +93,13 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends FunctionalTestCas
     public void failsWithProtocolMismatch() throws Exception
     {
         expectedException.expectCause(isA(IOException.class));
-        runFlow("12Client1Server", TEST_PAYLOAD);
+        flowRunner("12Client1Server").withPayload(TEST_PAYLOAD).run();
     }
 
     @Test
     public void failsWithCipherSuiteMismatch() throws Exception
     {
         expectedException.expectCause(isA(IOException.class));
-        runFlow("12CipherClient1CipherServer", TEST_PAYLOAD);
+        flowRunner("12CipherClient1CipherServer").withPayload(TEST_PAYLOAD).run();
     }
 }

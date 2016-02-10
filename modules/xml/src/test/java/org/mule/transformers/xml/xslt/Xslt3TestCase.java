@@ -35,7 +35,7 @@ public class Xslt3TestCase extends FunctionalTestCase
     public void groupByCities() throws Exception
     {
         String cities = IOUtils.getResourceAsString("cities.xml", getClass());
-        String output = getPayloadAsString(runFlow("groupCities", cities).getMessage());
+        String output = getPayloadAsString(flowRunner("groupCities").withPayload(cities).run().getMessage());
         String expected = IOUtils.getResourceAsString("transformed-cities.xml", getClass());
         assertThat(XMLUnit.compareXML(expected, output).similar(), is(true));
     }
@@ -44,7 +44,7 @@ public class Xslt3TestCase extends FunctionalTestCase
     public void booksAsCsv() throws Exception
     {
         String books = IOUtils.getResourceAsString("books.xml", getClass());
-        String output = getPayloadAsString(runFlow("booksAsCsv", books).getMessage());
+        String output = getPayloadAsString(flowRunner("booksAsCsv").withPayload(books).run().getMessage());
 
         final String expected = "Title,Author,Category,Stock-Value\n" +
                                 "\"Pride and Prejudice\",\"Jane Austen\",\"MMP(Unclassified)\",\"N/A\"\n" +
@@ -61,7 +61,7 @@ public class Xslt3TestCase extends FunctionalTestCase
     public void multipleInputs() throws Exception
     {
         String cities = IOUtils.getResourceAsString("cities.xml", getClass());
-        String response = getPayloadAsString(runFlow("multipleInputs", cities).getMessage());
+        String response = getPayloadAsString(flowRunner("multipleInputs").withPayload(cities).run().getMessage());
 
         assertThat(response, containsString("<cities>"));
         assertThat(response, containsString("<BOOKS>"));

@@ -43,7 +43,7 @@ public class SelectSourceTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesCustomSource() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("selectCustomSource", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("selectCustomSource").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getMarsRecord());

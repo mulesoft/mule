@@ -109,7 +109,7 @@ public class ValidateSchemaFunctionalTestCase extends AbstractValidateSchemaFunc
     @Test
     public void good() throws Exception
     {
-        runFlow(VALIDATE_FLOW, goodJson);
+        flowRunner(VALIDATE_FLOW).withPayload(goodJson).run();
     }
 
     @Test(expected = JsonSchemaValidationException.class)

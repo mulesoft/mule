@@ -12,12 +12,10 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.PropertyScope.INBOUND;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -71,23 +69,22 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase
     @Test
     public void payloadIsSentAsRequestBody() throws Exception
     {
-        runFlow("requestFlow", TEST_MESSAGE);
+        flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
         assertThat(body, equalTo(TEST_MESSAGE));
     }
 
     @Test
     public void outboundPropertiesAreSentAsHeaders() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty("TestHeader", "TestValue");
-        testFlow("requestFlow", event);
+        flowRunner("requestFlow").withPayload(TEST_MESSAGE).withOutboundProperty("TestHeader", "TestValue").run();
+
         assertThat(getFirstReceivedHeader("TestHeader"), equalTo("TestValue"));
     }
 
     @Test
     public void responseBodyIsMappedToPayload() throws Exception
     {
-        MuleEvent event = runFlow("requestFlow", TEST_MESSAGE);
+        MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
         assertTrue(event.getMessage().getPayload() instanceof InputStream);
         assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
     }
@@ -98,7 +95,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase
     @Test
     public void blockingResponseBodyIsMappedToPayload() throws Exception
     {
-        MuleEvent event = runFlow("blockingRequestFlow", TEST_MESSAGE);
+        MuleEvent event = flowRunner("blockingRequestFlow").withPayload(TEST_MESSAGE).run();
         assertTrue(event.getMessage().getPayload() instanceof String);
         assertThat(getPayloadAsString(event.getMessage()), equalTo("value"));
     }
@@ -106,14 +103,14 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase
     @Test
     public void responseStatusCodeIsSetAsInboundProperty() throws Exception
     {
-        MuleEvent event = runFlow("requestFlow", TEST_MESSAGE);
+        MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
         assertThat((int) event.getMessage().getInboundProperty("http.status"), CoreMatchers.is(200));
     }
 
     @Test
     public void responseHeadersAreMappedAsInboundProperties() throws Exception
     {
-        MuleEvent event = runFlow("requestFlow", TEST_MESSAGE);
+        MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
         String headerValue = event.getMessage().getInboundProperty(TEST_HEADER_NAME);
         assertThat(headerValue, equalTo(TEST_HEADER_VALUE));
     }
@@ -121,19 +118,14 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase
     @Test
     public void basePathFromConfigIsUsedInRequest() throws Exception
     {
-        runFlow("requestFlow", TEST_MESSAGE);
+        flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
         assertThat(uri, equalTo("/basePath/requestPath"));
     }
 
     @Test
     public void previousInboundPropertiesAreCleared() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setProperty("TestInboundProperty", "TestValue", INBOUND);
-
-        Flow flow = (Flow) getFlowConstruct("requestFlow");
-        event = flow.process(event);
-
+        MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).withInboundProperty("TestInboundProperty", "TestValue").run();
         assertThat(event.getMessage().getInboundProperty("TestInboundProperty"), nullValue());
     }
 

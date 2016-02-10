@@ -51,7 +51,7 @@ public class UpdateStoredProcedureTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testRequestResponse() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("updateStoredProcedure", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("updateStoredProcedure").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         int expectedUpdateCount = testDatabase instanceof DerbyTestDatabase ? 0 : 1;

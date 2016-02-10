@@ -11,8 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
@@ -23,7 +22,6 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import net.sf.saxon.dom.DocumentBuilderImpl;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -31,6 +29,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import net.sf.saxon.dom.DocumentBuilderImpl;
 
 public class XQuery3TestCase extends FunctionalTestCase
 {
@@ -53,7 +53,7 @@ public class XQuery3TestCase extends FunctionalTestCase
     @Test
     public void tryCatch() throws Exception
     {
-        List<Element> elements = (List<Element>) runFlow("tryCatch", input).getMessage().getPayload();
+        List<Element> elements = (List<Element>) flowRunner("tryCatch").withPayload(input).run().getMessage().getPayload();
         assertThat(elements, hasSize(1));
         assertThat(elements.get(0).getTagName(), equalTo("error"));
         assertThat(elements.get(0).getTextContent(), containsString("Caught error"));
@@ -62,7 +62,7 @@ public class XQuery3TestCase extends FunctionalTestCase
     @Test
     public void switchStatement() throws Exception
     {
-        List<Element> elements = (List<Element>) runFlow("switch", input).getMessage().getPayload();
+        List<Element> elements = (List<Element>) flowRunner("switch").withPayload(input).run().getMessage().getPayload();
 
         assertThat(elements, hasSize(1));
         assertThat(elements.get(0).getTagName(), equalTo("Quack"));
@@ -71,7 +71,7 @@ public class XQuery3TestCase extends FunctionalTestCase
     @Test
     public void groupBy() throws Exception
     {
-        List<Element> elements = (List<Element>) runFlow("groupBy", input).getMessage().getPayload();
+        List<Element> elements = (List<Element>) flowRunner("groupBy").withPayload(input).run().getMessage().getPayload();
 
         assertThat(elements, hasSize(2));
         assertThat(elements.get(0).getTagName(), equalTo("odd"));
@@ -83,7 +83,7 @@ public class XQuery3TestCase extends FunctionalTestCase
     @Test
     public void books() throws Exception
     {
-        List<Node> nodes = (List<Node>) runFlow("books", getBooks()).getMessage().getPayload();
+        List<Node> nodes = (List<Node>) flowRunner("books").withPayload(getBooks()).run().getMessage().getPayload();
         assertThat(nodes, hasSize(6));
         assertThat(nodes.get(0).getLastChild().getTextContent(), equalTo("The Eyre Affair"));
     }
@@ -115,12 +115,13 @@ public class XQuery3TestCase extends FunctionalTestCase
 
     private void assertMultipleInputs(String flowName, Object books, Object cities) throws Exception
     {
-        MuleEvent event = getTestEvent(input);
-        event.setFlowVariable("books", books);
-        event.setFlowVariable("cities", cities);
+        List<Element> elements = (List<Element>) flowRunner(flowName).withPayload(input)
+                                                                     .withFlowVariable("books", books)
+                                                                     .withFlowVariable("cities", cities)
+                                                                     .run()
+                                                                     .getMessage()
+                                                                     .getPayload();
 
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        List<Element> elements = (List<Element>) flow.process(event).getMessage().getPayload();
         assertThat(elements, hasSize(1));
 
         NodeList childNodes = elements.get(0).getChildNodes();

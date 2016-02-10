@@ -43,7 +43,7 @@ public class DatasourceBeanConfigTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesDatasourceConfig() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("usesBeanDatasourceConfig", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("usesBeanDatasourceConfig").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());

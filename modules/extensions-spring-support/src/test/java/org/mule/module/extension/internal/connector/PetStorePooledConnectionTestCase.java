@@ -12,8 +12,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
 import org.mule.api.connection.ConnectionException;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreClient;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStorePoolingProfile;
@@ -140,10 +140,12 @@ public class PetStorePooledConnectionTestCase extends PetStoreConnectionTestCase
     protected Future<PetStoreClient> getClientOnLatch()
     {
         return executorService.submit(() -> {
-            MuleEvent event = getTestEvent("");
-            event.setFlowVariable("testLatch", testLatch);
-            event.setFlowVariable("connectionLatch", connectionLatch);
-            return (PetStoreClient) runFlow("getClientOnLatch", event).getMessage().getPayload();
+            return (PetStoreClient) flowRunner("getClientOnLatch").withPayload("")
+                                                                  .withFlowVariable("testLatch", testLatch)
+                                                                  .withFlowVariable("connectionLatch", connectionLatch)
+                                                                  .run()
+                                                                  .getMessage()
+                                                                  .getPayload();
         });
     }
 }

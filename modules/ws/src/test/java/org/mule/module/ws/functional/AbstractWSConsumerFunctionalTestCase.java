@@ -49,7 +49,7 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
 
     protected void assertValidResponse(String flowName, MuleMessage message) throws Exception
     {
-        MuleMessage response = runFlow(flowName, message).getMessage();
+        MuleMessage response = flowRunner(flowName).withPayload(message).run().getMessage();
         assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
     }
 
@@ -67,7 +67,7 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
     {
         expectedException.expect(SoapFaultException.class);
         expectedException.expect(hasFaultCode(expectedFaultCode));
-        runFlow(flowName, new DefaultMuleMessage(message, properties, muleContext)).getMessage();
+        flowRunner(flowName).withPayload(new DefaultMuleMessage(message, properties, muleContext)).run().getMessage();
     }
 
 }

@@ -24,7 +24,7 @@ public class JsonSchemaValidatorWithRedirectFunctionalTestCase extends AbstractV
     @Test
     public void good() throws Exception
     {
-        runFlow(VALIDATE_FLOW, getGoodFstab());
+        flowRunner(VALIDATE_FLOW).withPayload(getGoodFstab()).run();
     }
 
     @Test(expected = JsonSchemaValidationException.class)

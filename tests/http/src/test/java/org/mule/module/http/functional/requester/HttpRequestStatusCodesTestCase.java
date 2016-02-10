@@ -6,13 +6,11 @@
  */
 package org.mule.module.http.functional.requester;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.construct.Flow;
 import org.mule.module.http.internal.request.ResponseValidatorException;
 
 import java.io.IOException;
@@ -72,30 +70,15 @@ public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase
 
     private void assertSuccess(int statusCode, String flowName) throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setInvocationProperty("code", statusCode);
-        flow.process(event);
-
+        flowRunner(flowName).withPayload(TEST_MESSAGE).withFlowVariable("code", statusCode).run();
     }
 
     private void assertFailure(int statusCode, String flowName) throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setInvocationProperty("code", statusCode);
+        MessagingException e = flowRunner(flowName).withPayload(TEST_MESSAGE).withFlowVariable("code", statusCode).runExpectingException();
 
-        try
-        {
-            flow.process(event);
-            fail();
-        }
-        catch (MessagingException e)
-        {
-            MuleMessage response = e.getEvent().getMessage();
-            assertNotNull(response.getExceptionPayload());
-            assertTrue(response.getExceptionPayload().getException() instanceof ResponseValidatorException);
-        }
+        MuleMessage response = e.getEvent().getMessage();
+        assertThat(response.getExceptionPayload().getException(), instanceOf(ResponseValidatorException.class));
     }
 
 

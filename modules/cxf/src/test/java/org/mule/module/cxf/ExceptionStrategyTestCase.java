@@ -121,7 +121,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
     {
         expectedException.expect(MessagingException.class);
         expectedException.expectMessage("Failed to build message");
-        runFlow("FlowWithClientAndTransformerExceptionDefaultException", getTestMuleMessage("hello"));
+        flowRunner("FlowWithClientAndTransformerExceptionDefaultException").withPayload(getTestMuleMessage("hello")).run();
     }
 
     @Test
@@ -129,7 +129,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
     {
         expectedException.expectCause(instanceOf(Fault.class));
         expectedException.expectMessage("Failed to route event");
-        runFlow("FlowWithClientWithFaultDefaultException", getTestMuleMessage("hello"));
+        flowRunner("FlowWithClientWithFaultDefaultException").withPayload(getTestMuleMessage("hello")).run();
     }
 
     @Test

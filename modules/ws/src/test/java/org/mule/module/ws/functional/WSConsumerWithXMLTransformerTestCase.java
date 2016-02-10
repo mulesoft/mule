@@ -7,8 +7,8 @@
 package org.mule.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 
 import org.junit.Test;
 
@@ -24,8 +24,7 @@ public class WSConsumerWithXMLTransformerTestCase extends AbstractWSConsumerFunc
     @Test
     public void consumerWorksWithXMLTransformer() throws Exception
     {
-        Flow client = (Flow) getFlowConstruct("client");
-        MuleEvent response = client.process(getTestEvent(ECHO_REQUEST));
+        MuleEvent response = flowRunner("client").withPayload(ECHO_REQUEST).run();
         assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response.getMessage()));
     }
 }

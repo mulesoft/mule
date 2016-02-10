@@ -9,7 +9,7 @@ package org.mule.module.http.functional.requester;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.construct.Flow;
+
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -38,8 +38,7 @@ public class HttpRequestConnectionsPersistenceTestCase extends AbstractHttpReque
     @Test
     public void persistentConnections() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("persistent");
-        flow.process(getTestEvent(TEST_MESSAGE));
+        flowRunner("persistent").withPayload(TEST_MESSAGE).run();
         ensureConnectionIsOpen();
 
         new PollingProber(GRIZZLY_IDLE_CHECK_TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitProbe()
@@ -61,8 +60,7 @@ public class HttpRequestConnectionsPersistenceTestCase extends AbstractHttpReque
     @Test
     public void nonPersistentConnections() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("nonPersistent");
-        flow.process(getTestEvent(TEST_MESSAGE));
+        flowRunner("nonPersistent").withPayload(TEST_MESSAGE).run();
         assertThat(isConnectionClosed(), is(true));
     }
 

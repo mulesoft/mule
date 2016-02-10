@@ -34,6 +34,6 @@ public abstract class AbstractMultipleDatabaseConfigErrorTestCase extends Abstra
     @Test(expected = MessagingException.class)
     public void returnsErrorWhenMultipleJdbcConfigDefined() throws Exception
     {
-        runFlow("testFlow", TEST_MESSAGE);
+        flowRunner("testFlow").withPayload(TEST_MESSAGE).run();
     }
 }

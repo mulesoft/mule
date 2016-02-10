@@ -8,6 +8,7 @@ package org.mule.module.scripting;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
 import org.mule.functional.junit4.FunctionalTestCase;
 
@@ -39,10 +40,7 @@ public class GreedyTestCase extends FunctionalTestCase
     
     private void runTest(double amount, String currency, String expectedResult) throws Exception
     {
-        MuleEvent event = getTestEvent(amount * 100); // to cents
-        event.setFlowVariable("currency", currency); // to cents
-
-        MuleEvent response = runFlow("greedy", event);
+        MuleEvent response = flowRunner("greedy").withPayload(amount * 100).withFlowVariable("currency", currency).run();
         assertThat(getPayloadAsString(response.getMessage()), equalTo(expectedResult));
     }
 }

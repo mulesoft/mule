@@ -44,7 +44,7 @@ public class DeleteDefaultTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testRequestResponse() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("defaultDeleteRequestResponse", VENUS.getName());
+        final MuleEvent responseEvent = flowRunner("defaultDeleteRequestResponse").withPayload(VENUS.getName()).run();
         final MuleMessage response = responseEvent.getMessage();
 
         assertEquals(1, response.getPayload());
@@ -53,7 +53,7 @@ public class DeleteDefaultTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testOneWay() throws Exception
     {
-        runFlowAsync("defaultDeleteOneWay", VENUS.getName());
+        flowRunner("defaultDeleteOneWay").withPayload(VENUS.getName()).asynchronously().run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);

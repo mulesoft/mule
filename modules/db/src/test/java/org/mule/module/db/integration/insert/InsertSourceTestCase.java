@@ -43,7 +43,7 @@ public class InsertSourceTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesCustomSource() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("insertCustomSource", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("insertCustomSource").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertInsert(response);

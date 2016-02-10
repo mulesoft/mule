@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
@@ -47,10 +47,13 @@ public class ImplicitConfigTestCase extends ExtensionFunctionalTestCase
     public void getImplicitConfig() throws Exception
     {
         final Integer defaultValue = 42;
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("optionalWithDefault", defaultValue);
+        ImplicitConfigExtension config = (ImplicitConfigExtension) flowRunner("implicitConfig").withPayload("")
+                                                                                               .withFlowVariable("optionalWithDefault", defaultValue)
+                                                                                               .run()
+                                                                                               .getMessage()
+                                                                                               .getPayload();
 
-        ImplicitConfigExtension config = (ImplicitConfigExtension) runFlow("implicitConfig", event).getMessage().getPayload();
+
         assertThat(config, is(notNullValue()));
         assertThat(config.getMuleContext(), is(sameInstance(muleContext)));
         assertThat(config.getInitialise(), is(1));

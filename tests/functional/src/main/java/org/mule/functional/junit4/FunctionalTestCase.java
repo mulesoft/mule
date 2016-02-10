@@ -7,27 +7,17 @@
 package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
-import static org.mule.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transaction.TransactionFactory;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
@@ -36,17 +26,12 @@ import org.mule.construct.Flow;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
-import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transaction.MuleTransactionConfig;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 
@@ -214,38 +199,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     }
 
     /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Tests the given flow with a one-way message exchange pattern
-     * 
-     * @param flowName the name of the flow to be executed
-     * @throws Exception
-     */
-    @Deprecated
-    protected void testFlow(String flowName) throws Exception
-    {
-        testFlow(flowName, getTestEvent("data", MessageExchangePattern.ONE_WAY));
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Looks up the given flow in the registry and processes it with the given event. A flow asserting is
-     *             then executed by calling {@link FlowAssert#verify(String)}
-     * 
-     * @param flowName the name of the flow to be executed
-     * @param event the event ot execute with
-     * @throws Exception
-     */
-    @Deprecated
-    protected void testFlow(String flowName, MuleEvent event) throws Exception
-    {
-        Flow flow = this.lookupFlowConstruct(flowName);
-        flow.process(event);
-        FlowAssert.verify(flowName);
-    }
-
-    /**
      * Initializes a builder to construct an event and the running context to run it through a flow.
      * 
      * @param flowName
@@ -254,36 +207,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     protected FlowRunner flowRunner(String flowName)
     {
         return new FlowRunner(muleContext, flowName);
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Runs the given flow before ensuring all assertions defined in the flow configuration were met.
-     * 
-     * @param flowName the flow to test
-     * @throws Exception
-     */
-    @Deprecated
-    protected void testFlowNonBlocking(String flowName) throws Exception
-    {
-        runFlowNonBlocking(flowName);
-        FlowAssert.verify(flowName);
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Runs the given flow before ensuring all assertions defined in the flow configuration were met.
-     * 
-     * @param flowName the flow to test
-     * @throws Exception
-     */
-    @Deprecated
-    protected void testFlowNonBlocking(String flowName, MuleEvent event) throws Exception
-    {
-        runFlowNonBlocking(flowName, event);
-        FlowAssert.verify(flowName);
     }
 
     /**
@@ -296,343 +219,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     protected MuleEvent runFlow(String flowName) throws Exception
     {
         return flowRunner(flowName).run();
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Runs the given flow with a default event inside a transaction
-     * 
-     * @param flowName the name of the flow to be executed
-     * @param action See {@link TransactionConfig} constants
-     * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
-     * @return the resulting <code>MuleEvent</code>
-     * @throws Exception
-     */
-    @Deprecated
-    protected MuleEvent runTransactionalFlow(String flowName, byte action, TransactionFactory factory) throws Exception
-    {
-        return runTransactionalFlow(flowName, (Object) null, action, factory);
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Runs the given flow with a default event inside a transaction
-     * 
-     * @param flowName the name of the flow to be executed
-     * @param payload the payload to use in the message
-     * @param action See {@link TransactionConfig} constants
-     * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
-     * @return the resulting <code>MuleEvent</code>
-     * @throws Exception
-     */
-    @Deprecated
-    protected <T> MuleEvent runTransactionalFlow(String flowName, T payload, byte action, TransactionFactory factory) throws Exception
-    {
-        MuleTransactionConfig transactionConfig = new MuleTransactionConfig(action);
-        transactionConfig.setFactory(factory);
-
-        ExecutionTemplate<MuleEvent> executionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
-
-        return executionTemplate.execute(new ExecutionCallback<MuleEvent>()
-        {
-            @Override
-            public MuleEvent process() throws Exception
-            {
-                return runFlow(flowName, payload);
-            }
-        });
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Runs the given flow asynchronously with a default event inside a transaction
-     * 
-     * @param flowName the name of the flow to be executed
-     * @param payload the payload to use in the message
-     * @param action See {@link TransactionConfig} constants
-     * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
-     * @throws Exception
-     */
-    @Deprecated
-    protected <T> void runTransactionalFlowAsync(String flowName, T payload, byte action, TransactionFactory factory) throws Exception
-    {
-        MuleTransactionConfig transactionConfig = new MuleTransactionConfig(action);
-        transactionConfig.setFactory(factory);
-
-        ExecutionTemplate<MuleEvent> executionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
-
-        executionTemplate.execute(new ExecutionCallback<MuleEvent>()
-        {
-            @Override
-            public MuleEvent process() throws Exception
-            {
-                runFlowAsync(flowName, payload);
-                return null;
-            }
-        });
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Runs the given flow with a default event inside a transaction expecting a failure. Will fail if
-     *             there's no failure running the flow.
-     *
-     * @param flowName the name of the flow to be executed
-     * @param action See {@link TransactionConfig} constants
-     * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
-     * @return the message exception return by the flow
-     * @throws Exception
-     */
-    @Deprecated
-    protected MessagingException runTransactionalFlowExpectingException(String flowName, byte action, TransactionFactory factory) throws Exception
-    {
-        return runTransactionalFlowExpectingException(flowName, (Object) null, action, factory);
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Runs the given flow with a default event inside a transaction expecting a failure. Will fail if
-     *             there's no failure running the flow.
-     *
-     * @param flowName the name of the flow to be executed
-     * @param payload the payload to use in the message
-     * @param action See {@link TransactionConfig} constants
-     * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
-     * @return the message exception return by the flow
-     * @throws Exception
-     */
-    @Deprecated
-    protected <T> MessagingException runTransactionalFlowExpectingException(String flowName, T payload, byte action, TransactionFactory factory) throws Exception
-    {
-        try
-        {
-            this.runTransactionalFlow(flowName, payload, action, factory);
-            fail("Flow executed successfully. Expecting exception");
-            return null;
-        }
-        catch (MessagingException e)
-        {
-            return e;
-        }
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Runs the given flow with a default event expecting a failure. Will fail if there's no failure running
-     *             the flow.
-     *
-     * @param flowName the name of the flow to be executed
-     * @return the message exception return by the flow
-     * @throws Exception
-     */
-    @Deprecated
-    protected MessagingException runFlowExpectingException(String flowName) throws Exception
-    {
-        try
-        {
-            this.runFlow(flowName, (Object) null);
-            fail("Flow executed successfully. Expecting exception");
-            return null;
-        }
-        catch (MessagingException e)
-        {
-            return e;
-        }
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Runs the given non blocking flow with a default event
-     *
-     * @param flowName the name of the flow to be executed
-     * @return the resulting <code>MuleEvent</code>
-     * @throws Exception
-     */
-    @Deprecated
-    protected MuleEvent runFlowNonBlocking(String flowName) throws Exception
-    {
-        Flow flow = this.lookupFlowConstruct(flowName);
-        return runFlowNonBlocking(flowName, getTestEvent(TEST_MESSAGE, flow));
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Runs the given non blocking flow with a default event
-     *
-     * @param flowName the name of the flow to be executed
-     * @return the resulting <code>MuleEvent</code>
-     * @throws Exception
-     */
-    @Deprecated
-    protected MuleEvent runFlowNonBlocking(String flowName, MuleEvent event) throws Exception
-    {
-        Flow flow = this.lookupFlowConstruct(flowName);
-        SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-        event = new DefaultMuleEvent(event, event.getFlowConstruct(), nullReplyToHandler, null, false);
-        MuleEvent result = flow.process(event);
-        if (NonBlockingVoidMuleEvent.getInstance() == result)
-        {
-            if (!nullReplyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
-            {
-                throw new RuntimeException("No Non-Blocking Response");
-            }
-            if (nullReplyToHandler.exception != null)
-            {
-                throw nullReplyToHandler.exception;
-            }
-        }
-        return nullReplyToHandler.event;
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Executes the given flow with a default message carrying the payload
-     * 
-     * @param flowName the name of the flow to be executed
-     * @param payload the payload to use in the message
-     * @return the resulting <code>MuleEvent</code>
-     * @throws Exception
-     */
-    @Deprecated
-    protected <T> MuleEvent runFlow(String flowName, T payload) throws Exception
-    {
-        return runFlow(flowName, getTestEvent(payload));
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Executes the given flow with a default message carrying the payload
-     * 
-     * @param flowName the name of the flow to be executed
-     * @param payload the payload to use in the message
-     * @param inboundProperties inbound properties for the message.
-     * @return the resulting <code>MuleEvent</code>
-     * @throws Exception
-     */
-    @Deprecated
-    protected <T> MuleEvent runFlow(String flowName, T payload, Map<String, Object> inboundProperties) throws Exception
-    {
-        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, Collections.emptyMap(), Collections.emptyMap(), muleContext);
-        final DefaultMuleEvent muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, null);
-
-        return runFlow(flowName, muleEvent);
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Executes the given flow with the given {@code event}
-     *
-     * @param flowName the name of the flow to be executed
-     * @param event the event which we'll use to execute the flow
-     * @return the resulting <code>MuleEvent</code>
-     * @throws Exception
-     */
-    @Deprecated
-    protected MuleEvent runFlow(String flowName, MuleEvent event) throws Exception
-    {
-        Flow flow = lookupFlowConstruct(flowName);
-        return flow.process(event);
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Run the flow specified by name and assert equality on the expected output
-     * 
-     * @param flowName The name of the flow to run
-     * @param expect The expected output
-     */
-    @Deprecated
-    protected <T> void runFlowAndExpect(String flowName, T expect) throws Exception
-    {
-        Assert.assertEquals(expect, this.runFlow(flowName).getMessage().getPayload());
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Runs the given flow and asserts for property name in the outbound scope to match the expected value
-     * 
-     * @param flowName the name of the flow to be executed
-     * @param propertyName the name of the property to test
-     * @param expect the expected value
-     * @throws Exception
-     */
-    @Deprecated
-    protected <T> void runFlowAndExpectProperty(String flowName, String propertyName, T expect)
-            throws Exception
-    {
-        Flow flow = lookupFlowConstruct(flowName);
-        MuleEvent event = getTestEvent(null);
-        MuleEvent responseEvent = flow.process(event);
-
-        Assert.assertEquals(expect, responseEvent.getMessage().getOutboundProperty(propertyName));
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Run the flow specified by name using the specified payload and assert equality on the expected output
-     * 
-     * @param flowName The name of the flow to run
-     * @param expect The expected output
-     * @param payload The payload of the input event
-     */
-    @Deprecated
-    protected <T, U> void runFlowWithPayloadAndExpect(String flowName, T expect, U payload) throws Exception
-    {
-        Assert.assertEquals(expect, this.runFlow(flowName, payload).getMessage().getPayload());
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Executes the given flow asynchronously with a default message carrying the payload.
-     *             <p/>
-     *             NOTE: flow must be configured with asycnrhonous processing strategy.
-     *
-     * @param flowName the name of the flow to be executed
-     * @param payload the payload to use in the message
-     * @return the resulting <code>MuleEvent</code>
-     * @throws Exception
-     */
-    @Deprecated
-    protected <T> void runFlowAsync(String flowName, T payload) throws Exception
-    {
-        runFlowAsync(flowName, payload, null);
-    }
-
-    /**
-     * @deprecated MULE-9373
-     *             <p/>
-     *             Executes the given flow asynchronously with a default message carrying the payload.
-     *             <p/>
-     *             NOTE: flow must be configured with asynchronous processing strategy.
-     *
-     * @param flowName the name of the flow to be executed
-     * @param payload the payload to use in the message
-     * @param inboundProperties inbound properties for the message.
-     * @return the resulting <code>MuleEvent</code>
-     * @throws Exception
-     */
-    @Deprecated
-    protected <T> void runFlowAsync(String flowName, T payload, Map<String, Object> inboundProperties) throws Exception
-    {
-        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, Collections.emptyMap(), Collections.emptyMap(), muleContext);
-        final DefaultMuleEvent muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.ONE_WAY, null);
-
-        runFlow(flowName, muleEvent);
     }
 
     /**

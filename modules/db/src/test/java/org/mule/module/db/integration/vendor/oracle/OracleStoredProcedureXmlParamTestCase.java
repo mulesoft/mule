@@ -12,9 +12,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecord;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.db.integration.TestDbConfig;
@@ -25,8 +23,6 @@ import org.mule.module.db.integration.model.XmlField;
 import org.mule.module.db.internal.domain.type.oracle.OracleXmlType;
 
 import java.sql.Connection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +64,7 @@ public class OracleStoredProcedureXmlParamTestCase extends AbstractOracleXmlType
     @Test
     public void returnsXmlTypeOutputParam() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("xmlTypeOutputParam", "ET");
+        final MuleEvent responseEvent = flowRunner("xmlTypeOutputParam").withPayload("ET").run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(Map.class)));
@@ -88,14 +84,10 @@ public class OracleStoredProcedureXmlParamTestCase extends AbstractOracleXmlType
         {
             Object xmlType = OracleXmlType.createXmlType(connection, Alien.ET.getXml());
 
-            Map<String, Object> messageProperties = new HashMap<String, Object>();
-            messageProperties.put("name", "Monguito");
-            messageProperties.put(DESCRIPTION_FIELD, xmlType);
-
-            final DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, messageProperties, Collections.emptyMap(), Collections.emptyMap(), muleContext);
-            final DefaultMuleEvent muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, null);
-
-            final MuleEvent responseEvent = runFlow("xmlTypeInputParam", muleEvent);
+            final MuleEvent responseEvent = flowRunner("xmlTypeInputParam").withPayload(TEST_MESSAGE)
+                                                                           .withInboundProperty("name", "Monguito")
+                                                                           .withInboundProperty(DESCRIPTION_FIELD, xmlType)
+                                                                           .run();
 
             final MuleMessage response = responseEvent.getMessage();
 

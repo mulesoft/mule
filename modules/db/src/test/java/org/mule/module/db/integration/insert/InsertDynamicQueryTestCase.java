@@ -43,7 +43,7 @@ public class InsertDynamicQueryTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesDynamicQuery() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("insertDynamicQuery", "Pluto");
+        final MuleEvent responseEvent = flowRunner("insertDynamicQuery").withPayload("Pluto").run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertInsert(response);

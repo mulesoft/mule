@@ -13,12 +13,9 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Alien;
@@ -29,8 +26,6 @@ import org.mule.util.IOUtils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -147,15 +142,9 @@ public class OracleInsertXmlTypeTestCase extends AbstractOracleXmlTypeTestCase
         {
             testDatabase.executeUpdate(connection, "DELETE FROM ALIEN");
 
-            LocalMuleClient client = muleContext.getClient();
-
-            Map<String, Object> messageProperties = new HashMap<String, Object>();
-            messageProperties.put("name", Alien.ET.getName());
-
-            final DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, messageProperties, Collections.emptyMap(), Collections.emptyMap(), muleContext);
-            final DefaultMuleEvent muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, null);
-
-            final MuleEvent responseEvent = runFlow("insertXmlType", muleEvent);
+            final MuleEvent responseEvent = flowRunner("insertXmlType").withPayload(TEST_MESSAGE)
+                                                                       .withInboundProperty("name", Alien.ET.getName())
+                                                                       .run();
 
             return responseEvent.getMessage();
         }

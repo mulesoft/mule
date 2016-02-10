@@ -10,9 +10,9 @@ package org.mule.module.http.functional.requester;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
@@ -67,20 +67,14 @@ public class HttpRequestTimeoutTestCase extends AbstractHttpRequestTestCase
             {
                 try
                 {
-                    Flow flow = (Flow) getFlowConstruct(flowName);
-                    MuleEvent event = getTestEvent(TEST_MESSAGE);
-                    event.setTimeout(responseTimeoutEvent);
-                    event.setFlowVariable("timeout", responseTimeoutRequester);
+                    FlowRunner runner = flowRunner(flowName).withPayload(TEST_MESSAGE)
+                                                            .withFlowVariable("timeout", responseTimeoutRequester);
+                    runner.buildEvent().setTimeout(responseTimeoutEvent);
 
-                    try
-                    {
-                        flow.process(event);
-                    }
-                    catch (MessagingException e)
-                    {
-                        assertThat(e.getCauseException(), instanceOf(TimeoutException.class));
-                        requestTimeoutLatch.release();
-                    }
+                    MessagingException e = runner.runExpectingException();
+
+                    assertThat(e.getCauseException(), instanceOf(TimeoutException.class));
+                    requestTimeoutLatch.release();
                 }
                 catch (Exception e)
                 {

@@ -9,8 +9,8 @@ package org.mule.module.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.util.FileUtils;
 
 import java.io.IOException;
@@ -66,15 +66,11 @@ public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase
 
     private void assertValidRequest(String flowName, String user, String password, boolean preemptive) throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct(flowName);
-
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
-        event.setFlowVariable("user", user);
-        event.setFlowVariable("password", password);
-        event.setFlowVariable("preemptive", preemptive);
-
-        event = flow.process(event);
+        MuleEvent event = flowRunner(flowName).withPayload(TEST_MESSAGE)
+                                              .withFlowVariable("user", user)
+                                              .withFlowVariable("password", password)
+                                              .withFlowVariable("preemptive", preemptive)
+                                              .run();
 
         assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
     }

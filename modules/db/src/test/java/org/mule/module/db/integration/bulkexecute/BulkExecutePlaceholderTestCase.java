@@ -60,7 +60,7 @@ public class BulkExecutePlaceholderTestCase extends AbstractBulkExecuteTestCase
 
     private void doTest(String flowName) throws Exception
     {
-        final MuleEvent responseEvent = runFlow(flowName, TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner(flowName).withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertBulkModeResult(response.getPayload());

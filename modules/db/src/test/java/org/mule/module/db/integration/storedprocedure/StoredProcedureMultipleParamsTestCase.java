@@ -47,7 +47,7 @@ public class StoredProcedureMultipleParamsTestCase extends AbstractDbIntegration
     @Test
     public void multipliesIntegers() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("multiplyIntsFlow", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("multiplyIntsFlow").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(Map.class)));
@@ -63,7 +63,7 @@ public class StoredProcedureMultipleParamsTestCase extends AbstractDbIntegration
     @Test
     public void concatenatesStrings() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("concatenateStringsFlow", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("concatenateStringsFlow").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(Map.class)));

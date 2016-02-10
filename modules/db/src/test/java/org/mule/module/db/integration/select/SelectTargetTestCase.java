@@ -45,7 +45,7 @@ public class SelectTargetTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesCustomTarget() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("queryCustomTarget", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("queryCustomTarget").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));

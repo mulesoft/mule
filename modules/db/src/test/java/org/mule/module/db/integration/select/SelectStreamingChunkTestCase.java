@@ -49,7 +49,7 @@ public class SelectStreamingChunkTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void chunksStreamedRecords() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("selectStreamingChunks", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("selectStreamingChunks").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         List chunks = (List) response.getPayload();

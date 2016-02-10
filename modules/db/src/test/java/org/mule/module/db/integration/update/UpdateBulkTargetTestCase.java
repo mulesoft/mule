@@ -42,7 +42,7 @@ public class UpdateBulkTargetTestCase extends AbstractUpdateBulkTestCase
     @Test
     public void usesCustomTarget() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("updateBulkCustomTarget", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("updateBulkCustomTarget").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());

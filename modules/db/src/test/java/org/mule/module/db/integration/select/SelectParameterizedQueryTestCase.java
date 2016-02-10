@@ -44,7 +44,7 @@ public class SelectParameterizedQueryTestCase extends AbstractDbIntegrationTestC
     @Test
     public void usesParameterizedQuery() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("selectParameterizedQuery", MARS.getName());
+        final MuleEvent responseEvent = flowRunner("selectParameterizedQuery").withPayload(MARS.getName()).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getMarsRecord());

@@ -56,7 +56,7 @@ public class CxfContentTypeTestCase extends FunctionalTestCase
     @Test
     public void testCxfClient() throws Exception
     {
-        MuleMessage received = runFlow("helloServiceClient", getTestMuleMessage("hello")).getMessage();
+        MuleMessage received = flowRunner("helloServiceClient").withPayload(getTestMuleMessage("hello")).run().getMessage();
         String contentType = received.getOutboundProperty("contentType");
         assertNotNull(contentType);
         assertTrue(contentType.contains("charset"));

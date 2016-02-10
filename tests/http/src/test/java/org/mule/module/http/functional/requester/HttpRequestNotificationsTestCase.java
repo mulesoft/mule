@@ -44,7 +44,7 @@ public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCas
         TestConnectorMessageNotificationListener listener = new TestConnectorMessageNotificationListener(latch, "http://localhost:" + httpPort.getValue() + "/basePath/requestPath");
         muleContext.getNotificationManager().addListener(listener);
 
-        runFlow("requestFlow", TEST_MESSAGE);
+        flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
 
         latch.await(1000, TimeUnit.MILLISECONDS);
 

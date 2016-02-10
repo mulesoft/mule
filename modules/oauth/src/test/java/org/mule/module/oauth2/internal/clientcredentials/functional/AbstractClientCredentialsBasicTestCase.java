@@ -14,7 +14,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.mule.module.oauth2.internal.AbstractGrantType.buildAuthorizationHeaderContent;
 
-import org.mule.construct.Flow;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -50,8 +49,7 @@ public abstract class AbstractClientCredentialsBasicTestCase extends AbstractOAu
                                      .willReturn(aResponse()
                                                          .withBody(TEST_MESSAGE)));
 
-        Flow testFlow = (Flow) getFlowConstruct(TEST_FLOW_NAME);
-        testFlow.process(getTestEvent(TEST_MESSAGE));
+        flowRunner(TEST_FLOW_NAME).withPayload(TEST_MESSAGE).run();
 
         wireMockRule.verify(postRequestedFor(urlEqualTo(RESOURCE_PATH))
                                     .withHeader(HttpHeaders.Names.AUTHORIZATION, equalTo(buildAuthorizationHeaderContent(ACCESS_TOKEN))));
@@ -73,8 +71,7 @@ public abstract class AbstractClientCredentialsBasicTestCase extends AbstractOAu
                                                          .withBody(TEST_MESSAGE)
                                                          .withStatus(200)));
 
-        Flow testFlow = (Flow) getFlowConstruct("testFlow");
-        testFlow.process(getTestEvent(TEST_MESSAGE));
+        flowRunner("testFlow").withPayload(TEST_MESSAGE).run();
 
         verifyRequestDoneToTokenUrlForClientCredentials();
 

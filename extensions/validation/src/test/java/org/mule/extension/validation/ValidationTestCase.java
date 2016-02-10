@@ -12,13 +12,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import org.mule.api.MuleEvent;
+
+import org.mule.api.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.internal.ValidationExtension;
 import org.mule.extension.validation.internal.ValidationMessages;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.util.ExceptionUtils;
 
 abstract class ValidationTestCase extends ExtensionFunctionalTestCase
@@ -44,26 +45,22 @@ abstract class ValidationTestCase extends ExtensionFunctionalTestCase
         messages = new ValidationMessages();
     }
 
-    protected void assertValid(String flowName, MuleEvent event) throws Exception
+    protected void assertValid(FlowRunner runner) throws MuleException, Exception
     {
-        MuleEvent responseEvent = runFlow(flowName, event);
-        assertThat(responseEvent.getMessage().getExceptionPayload(), is(nullValue()));
+        assertThat(runner.run().getMessage().getExceptionPayload(), is(nullValue()));
+        runner.reset();
     }
 
-    protected void assertInvalid(String flowName, MuleEvent event, Message expectedMessage) throws Exception
+    protected void assertInvalid(FlowRunner runner, Message expectedMessage) throws Exception
     {
-        try
-        {
-            runFlow(flowName, event);
-            fail("Was expecting a failure");
-        }
-        catch (Exception e)
-        {
-            Throwable rootCause = ExceptionUtils.getRootCause(e);
-            assertThat(rootCause, is(instanceOf(ValidationException.class)));
-            assertThat(rootCause.getMessage(), is(expectedMessage.getMessage()));
-            // assert that all placeholders were replaced in message
-            assertThat(rootCause.getMessage(), not(containsString("${")));
-        }
+        Exception e = runner.runExpectingException();
+
+        Throwable rootCause = ExceptionUtils.getRootCause(e);
+        assertThat(rootCause, is(instanceOf(ValidationException.class)));
+        assertThat(rootCause.getMessage(), is(expectedMessage.getMessage()));
+        // assert that all placeholders were replaced in message
+        assertThat(rootCause.getMessage(), not(containsString("${")));
+
+        runner.reset();
     }
 }

@@ -7,8 +7,11 @@
 package org.mule.module.cxf;
 
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -23,9 +26,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.exception.TemplateMessagingExceptionStrategy;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.AbstractTransformer;
 
@@ -105,24 +108,24 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testClientWithSOAPFaultCatchException() throws Exception
     {
-        MuleMessage response = runFlow("FlowWithClientAndSOAPFaultCatchException", getTestMuleMessage("hello")).getMessage();
+        MuleMessage response = flowRunner("FlowWithClientAndSOAPFaultCatchException").withPayload("hello").run().getMessage();
         assertNotNull(response);
-        assertTrue(response.getExceptionPayload() == null);
+        assertThat(response.getExceptionPayload(), is(nullValue()));
     }
 
     @Test
     public void testClientWithSOAPFaultCatchExceptionRedirect() throws Exception
     {
-        MuleMessage response = runFlow("FlowWithClientAndSOAPFaultCatchExceptionRedirect", getTestMuleMessage("TEST")).getMessage();
+        MuleMessage response = flowRunner("FlowWithClientAndSOAPFaultCatchExceptionRedirect").withPayload("TEST").run().getMessage();
         assertNotNull(response);
         assertTrue(getPayloadAsString(response).contains("TEST"));
-        assertTrue(response.getExceptionPayload() == null);
+        assertThat(response.getExceptionPayload(), is(nullValue()));
     }
 
     @Test
     public void testClientWithTransformerExceptionCatchException() throws Exception
     {
-        MuleMessage response = runFlow("FlowWithClientAndTransformerExceptionCatchException", getTestMuleMessage("hello")).getMessage();
+        MuleMessage response = flowRunner("FlowWithClientAndTransformerExceptionCatchException").withPayload("hello").run().getMessage();
         assertNotNull(response);
         assertTrue(getPayloadAsString(response).contains(" Anonymous"));
     }

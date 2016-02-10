@@ -52,7 +52,7 @@ public class DeleteBulkTargetTestCase extends AbstractDbIntegrationTestCase
         planetNames.add(VENUS.getName());
         planetNames.add(MARS.getName());
 
-        final MuleEvent responseEvent = runFlow("deleteCustomTarget", planetNames);
+        final MuleEvent responseEvent = flowRunner("deleteCustomTarget").withPayload(planetNames).run();
         final MuleMessage response = responseEvent.getMessage();
 
         assertBulkDelete(response.getOutboundProperty("updateCount"));

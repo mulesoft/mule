@@ -8,17 +8,13 @@ package org.mule.module.cxf.jaxws;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.DefaultMuleMessage;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.construct.Flow;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Rule;
@@ -60,10 +56,12 @@ public class HeaderPropertiesTestCase extends FunctionalTestCase
         };
         testComponent.setEventCallback(callback);
 
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put("operation", "greetMe");
-        props.put("FOO", "BAR");
-        MuleMessage result = ((Flow) getFlowConstruct("clientFlow")).process(getTestEvent(new DefaultMuleMessage("Dan", props, muleContext))).getMessage();
+        MuleMessage result = flowRunner("clientFlow").withPayload("Dan")
+                                                     .withOutboundProperty("operation", "greetMe")
+                                                     .withOutboundProperty("FOO", "BAR")
+                                                     .run()
+                                                     .getMessage();
+        
         assertEquals("Hello Dan Received", result.getPayload());
 
         GreeterImpl impl = getGreeter();

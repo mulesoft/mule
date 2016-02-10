@@ -33,7 +33,7 @@ public abstract class AbstractDatabaseConfigTestCase extends AbstractDbIntegrati
     @Test
     public void configuresDatabaseSuccessfully() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("simpleSelect", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("simpleSelect").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());

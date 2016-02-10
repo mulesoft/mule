@@ -11,9 +11,9 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_URI;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
-import org.mule.construct.Flow;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -100,12 +100,10 @@ public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
 
         proxyServer.start();
 
-        Flow flow = (Flow) getFlowConstruct("clientFlow");
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
-        event.setFlowVariable("host", requestHost);
-        event.setFlowVariable("path", PATH);
-        event = flow.process(event);
+        MuleEvent event = flowRunner("clientFlow").withPayload(TEST_MESSAGE)
+                                                  .withFlowVariable("host", requestHost)
+                                                  .withFlowVariable("path", PATH)
+                                                  .run();
 
         assertThat(requestPayload, equalTo(TEST_MESSAGE));
         assertThat(requestURI, equalTo(PATH));

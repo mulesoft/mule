@@ -49,7 +49,7 @@ public class UpdateTargetTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesCustomTarget() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("updateCustomTarget", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("updateCustomTarget").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));

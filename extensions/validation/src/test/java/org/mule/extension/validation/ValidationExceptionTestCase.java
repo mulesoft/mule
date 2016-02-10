@@ -10,9 +10,10 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
+
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.extension.validation.api.ExceptionFactory;
 import org.mule.extension.validation.api.ValidationException;
@@ -53,45 +54,24 @@ public class ValidationExceptionTestCase extends ValidationTestCase
     @Test
     public void customMessage() throws Exception
     {
-        try
-        {
-            runFlow("customMessage");
-            fail("was expecting failure");
-        }
-        catch (Exception e)
-        {
-            Throwable cause = ExceptionUtils.getRootCause(e);
-            assertThat(cause.getMessage(), is("Hello World!"));
-        }
+        MessagingException e = flowRunner("customMessage").runExpectingException();
+        Throwable cause = ExceptionUtils.getRootCause(e);
+        assertThat(cause.getMessage(), is("Hello World!"));
     }
 
     @Test
     public void customExceptionType() throws Exception
     {
-        try
-        {
-            runFlow("customExceptionType");
-            fail("was expecting failure");
-        }
-        catch (Exception e)
-        {
-            Throwable cause = ExceptionUtils.getRootCause(e);
-            assertThat(cause, is(instanceOf(IllegalArgumentException.class)));
-        }
+        MessagingException e = flowRunner("customExceptionType").runExpectingException();
+        Throwable cause = ExceptionUtils.getRootCause(e);
+        assertThat(cause, is(instanceOf(IllegalArgumentException.class)));
     }
 
     private void assertCustomExceptionFactory(String flowName) throws Exception
     {
-        try
-        {
-            runFlow(flowName);
-            fail("was expecting a failure");
-        }
-        catch (Exception e)
-        {
-            Throwable cause = ExceptionUtils.getRootCause(e);
-            assertThat(CUSTOM_EXCEPTION, is(sameInstance(cause)));
-        }
+        MessagingException e = flowRunner(flowName).runExpectingException();
+        Throwable cause = ExceptionUtils.getRootCause(e);
+        assertThat(CUSTOM_EXCEPTION, is(sameInstance(cause)));
     }
 
     public static class TestExceptionFactory implements ExceptionFactory

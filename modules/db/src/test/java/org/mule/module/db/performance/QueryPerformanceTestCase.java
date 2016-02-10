@@ -85,7 +85,7 @@ public class QueryPerformanceTestCase extends FunctionalTestCase
         public void execute(int messageId) throws Exception
         {
             logger.info("Thread: " + Thread.currentThread().getName() + " message: " + messageId);
-            runFlow("defaultQueryRequestResponse", TEST_MESSAGE);
+            flowRunner("defaultQueryRequestResponse").withPayload(TEST_MESSAGE).run();
         }
     }
 
@@ -96,7 +96,7 @@ public class QueryPerformanceTestCase extends FunctionalTestCase
         public void execute(int messageId) throws Exception
         {
             logger.info("Thread: " + Thread.currentThread().getName() + " message: " + messageId);
-            runFlowAsync("defaultQueryOneWay", TEST_MESSAGE);
+            flowRunner("defaultQueryOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
         }
     }
 

@@ -32,7 +32,7 @@ public class GroovyRegistryLookupTestCase extends FunctionalTestCase
     @Test
     public void testBindingCallout() throws Exception
     {
-        MuleMessage response = runFlow("sayHello", "").getMessage();
+        MuleMessage response = flowRunner("sayHello").withPayload("").run().getMessage();
         assertNotNull(response);
         assertEquals("hello", getPayloadAsString(response));
     }

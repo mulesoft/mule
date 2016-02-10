@@ -8,9 +8,11 @@ package org.mule.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
-import org.mule.module.extension.HeisenbergExtension;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.FlowRunner;
+import org.mule.module.extension.HeisenbergExtension;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -35,8 +37,10 @@ public class DynamicConfigExpirationTestCase extends ExtensionFunctionalTestCase
     public void expireDynamicConfig() throws Exception
     {
         final String myName = "Walt";
-        final MuleEvent event = getTestEvent(myName);
-        String returnedName = getPayloadAsString(runFlow("dynamic", event).getMessage());
+        FlowRunner runner = flowRunner("dynamic").withPayload(myName);
+
+        final MuleEvent event = runner.buildEvent();
+        String returnedName = getPayloadAsString(runner.run().getMessage());
 
         HeisenbergExtension config = (HeisenbergExtension) muleContext.getExtensionManager().getConfiguration("heisenberg", event).getValue();
 

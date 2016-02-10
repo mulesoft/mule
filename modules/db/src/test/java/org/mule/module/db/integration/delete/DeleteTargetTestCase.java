@@ -44,7 +44,7 @@ public class DeleteTargetTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesDefaultTarget() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("deleteDefaultTarget", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("deleteDefaultTarget").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertInsert(response.getPayload());

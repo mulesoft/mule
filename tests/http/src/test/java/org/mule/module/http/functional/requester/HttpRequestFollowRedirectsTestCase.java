@@ -8,8 +8,10 @@ package org.mule.module.http.functional.requester;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
+import org.mule.api.MuleException;
+import org.mule.functional.junit4.FlowRunner;
 
 import java.io.IOException;
 
@@ -147,14 +149,19 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
 
     private void testRedirectExpression(String flowName, String expectedPayload, String expectedPath, Object flowVar) throws Exception
     {
-        testEvent.setFlowVariable(FLOW_VAR_KEY, flowVar);
-        testRedirect(flowName, expectedPayload, expectedPath);
+        FlowRunner runner = flowRunner(flowName).withPayload(TEST_MESSAGE).withFlowVariable(FLOW_VAR_KEY, flowVar);
+        doTest(expectedPayload, expectedPath, runner);
     }
 
     private void testRedirect(String flowName, String expectedPayload, String expectedPath) throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        MuleEvent result = flow.process(testEvent);
+        FlowRunner runner = flowRunner(flowName).withPayload(TEST_MESSAGE);
+        doTest(expectedPayload, expectedPath, runner);
+    }
+
+    private void doTest(String expectedPayload, String expectedPath, FlowRunner runner) throws MuleException, Exception
+    {
+        MuleEvent result = runner.run();
         assertThat(getPayloadAsString(result.getMessage()), is(expectedPayload));
         assertThat(uri, is(expectedPath));
     }

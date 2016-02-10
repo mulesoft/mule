@@ -9,7 +9,6 @@ package org.mule.test.integration.routing.outbound;
 import static org.junit.Assert.fail;
 
 import org.mule.api.context.notification.ExceptionNotificationListener;
-import org.mule.construct.Flow;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
@@ -37,8 +36,7 @@ public class UntilSuccessfulRetryExhaustedTestCase extends FunctionalTestCase
                 exceptionStrategyCalledLatch.release();
             }
         });
-        Flow flow = (Flow) getFlowConstruct("retryExhausted");
-        flow.process(getTestEvent("message"));
+        flowRunner("retryExhausted").withPayload("message").run();
         if (!exceptionStrategyCalledLatch.await(10000, TimeUnit.MILLISECONDS))
         {
             fail("exception strategy was not executed");

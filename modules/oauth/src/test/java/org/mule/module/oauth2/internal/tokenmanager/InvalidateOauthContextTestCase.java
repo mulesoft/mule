@@ -9,17 +9,12 @@ package org.mule.module.oauth2.internal.tokenmanager;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.hamcrest.core.Is;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class InvalidateOauthContextTestCase extends FunctionalTestCase
 {
@@ -27,9 +22,6 @@ public class InvalidateOauthContextTestCase extends FunctionalTestCase
     public static final String ACCESS_TOKEN = "Access_token";
     public static final String RESOURCE_OWNER_JOHN = "john";
     public static final String RESOURCE_OWNER_TONY = "tony";
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
     protected String getConfigFile()
@@ -43,7 +35,7 @@ public class InvalidateOauthContextTestCase extends FunctionalTestCase
         TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().get("tokenManagerConfig");
         final ConfigOAuthContext configOAuthContext = tokenManagerConfig.getConfigOAuthContext();
         loadResourceOwnerWithAccessToken(configOAuthContext, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
-        ((Flow)getFlowConstruct("invalidateOauthContext")).process(getTestEvent(TEST_MESSAGE));
+        flowRunner("invalidateOauthContext").withPayload(TEST_MESSAGE).run();
         assertThatOAuthContextWasCleanForUser(configOAuthContext, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
     }
 
@@ -54,9 +46,10 @@ public class InvalidateOauthContextTestCase extends FunctionalTestCase
         final ConfigOAuthContext configOAuthContext = tokenManagerConfig.getConfigOAuthContext();
         loadResourceOwnerWithAccessToken(configOAuthContext, RESOURCE_OWNER_JOHN);
         loadResourceOwnerWithAccessToken(configOAuthContext, RESOURCE_OWNER_TONY);
-        final MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
-        testEvent.setFlowVariable("resourceOwnerId", RESOURCE_OWNER_TONY);
-        ((Flow)getFlowConstruct("invalidateOauthContextWithResourceOwnerId")).process(testEvent);
+
+        flowRunner("invalidateOauthContextWithResourceOwnerId").withPayload(TEST_MESSAGE)
+                                                               .withFlowVariable("resourceOwnerId", RESOURCE_OWNER_TONY)
+                                                               .run();
         assertThatOAuthContextWasCleanForUser(configOAuthContext, RESOURCE_OWNER_TONY);
         assertThat(configOAuthContext.getContextForResourceOwner(RESOURCE_OWNER_JOHN).getAccessToken(), Is.is(ACCESS_TOKEN));
     }
@@ -64,9 +57,7 @@ public class InvalidateOauthContextTestCase extends FunctionalTestCase
     @Test
     public void invalidateTokenManagerForNonExistentResourceOwnerId() throws Exception
     {
-        final MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
-        expectedException.expect(MessagingException.class);
-        ((Flow)getFlowConstruct("invalidateOauthContextWithResourceOwnerId")).process(testEvent);
+        flowRunner("invalidateOauthContextWithResourceOwnerId").withPayload(TEST_MESSAGE).runExpectingException();
     }
 
     private void assertThatOAuthContextWasCleanForUser(ConfigOAuthContext configOAuthContext, String resourceOwnerId)

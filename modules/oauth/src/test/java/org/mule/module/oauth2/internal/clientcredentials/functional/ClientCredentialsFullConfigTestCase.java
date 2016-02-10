@@ -17,7 +17,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.oauth2.internal.AbstractGrantType.buildAuthorizationHeaderContent;
 
-import org.mule.construct.Flow;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.module.oauth2.asserter.OAuthContextFunctionAsserter;
@@ -118,8 +117,7 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
                                                          .withBody(TEST_MESSAGE)
                                                          .withStatus(200)));
 
-        Flow testFlow = (Flow) getFlowConstruct("testFlow");
-        testFlow.process(getTestEvent(TEST_MESSAGE));
+        flowRunner("testFlow").withPayload(TEST_MESSAGE).run();
 
         verifyRequestDoneToTokenUrlForClientCredentials();
 

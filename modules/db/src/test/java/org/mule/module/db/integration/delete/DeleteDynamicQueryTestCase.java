@@ -43,7 +43,7 @@ public class DeleteDynamicQueryTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesDynamicQuery() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("deleteDynamicQuery", VENUS.getName());
+        final MuleEvent responseEvent = flowRunner("deleteDynamicQuery").withPayload(VENUS.getName()).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());

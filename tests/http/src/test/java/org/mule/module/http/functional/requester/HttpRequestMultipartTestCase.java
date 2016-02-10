@@ -10,6 +10,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+
 import org.mule.api.MuleEvent;
 
 import java.io.IOException;
@@ -68,9 +69,7 @@ public class HttpRequestMultipartTestCase extends AbstractHttpRequestTestCase
 
     private void testWithPath(String path) throws Exception
     {
-        MuleEvent testEvent = getTestEvent(null);
-        testEvent.getMessage().setInvocationProperty("requestPath", path);
-        MuleEvent response = runFlow("requestFlow", testEvent);
+        MuleEvent response = flowRunner("requestFlow").withFlowVariable("requestPath", path).run();
         assertThat(response.getMessage().getInboundAttachmentNames().size(), is(1));
     }
 }

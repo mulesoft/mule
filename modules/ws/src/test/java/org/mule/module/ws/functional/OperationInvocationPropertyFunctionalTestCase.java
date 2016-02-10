@@ -6,11 +6,12 @@
  */
 package org.mule.module.ws.functional;
 
-import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.module.cxf.CxfConstants;
 
 import org.junit.Test;
@@ -35,24 +36,19 @@ public class OperationInvocationPropertyFunctionalTestCase extends AbstractWSCon
     @Test
     public void consumerWorksWithOperationInvocationPropertyDefined() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("echo");
-        MuleEvent event = getTestEvent(ECHO_REQUEST);
-
-        event.setFlowVariable(CxfConstants.OPERATION, OPERATION_VALUE);
-        event = flow.process(event);
+        MuleEvent event = flowRunner("echo").withPayload(ECHO_REQUEST)
+                                            .withFlowVariable(CxfConstants.OPERATION, OPERATION_VALUE)
+                                            .run();
 
         assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
-        assertEquals(OPERATION_VALUE, event.getFlowVariable(CxfConstants.OPERATION));
+        assertThat(event.getFlowVariable(CxfConstants.OPERATION), is(OPERATION_VALUE));
     }
 
 
     @Test
     public void consumerWorksWithNoOperationInvocationPropertyDefined() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("echo");
-        MuleEvent event = getTestEvent(ECHO_REQUEST);
-
-        event = flow.process(event);
+        MuleEvent event = flowRunner("echo").withPayload(ECHO_REQUEST).run();
         assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
 
         assertNull(event.getMessage().getInvocationProperty(CxfConstants.OPERATION));

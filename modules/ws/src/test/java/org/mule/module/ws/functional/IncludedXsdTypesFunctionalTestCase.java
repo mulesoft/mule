@@ -7,8 +7,8 @@
 package org.mule.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
@@ -34,10 +34,7 @@ public class IncludedXsdTypesFunctionalTestCase extends AbstractWSConsumerFuncti
     @Test
     public void metadataIsGeneratedAndPayloadIsIgnored() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("noParams");
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
-        event = flow.process(event);
+        MuleEvent event = flowRunner("noParams").withPayload(TEST_MESSAGE).run();
 
         String expectedResponse = "<ns:noParamsResponse xmlns:ns=\"http://consumer.ws.module.mule.org/\">" +
                                   "<text>TEST</text></ns:noParamsResponse>";

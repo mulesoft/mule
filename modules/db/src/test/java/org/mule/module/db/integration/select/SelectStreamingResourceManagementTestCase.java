@@ -11,11 +11,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
@@ -57,7 +57,7 @@ public class SelectStreamingResourceManagementTestCase extends AbstractDbIntegra
 
     private void doSuccessfulTestMessage() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("selectStreaming", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("selectStreaming").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(ResultSetIterator.class)));
@@ -72,16 +72,9 @@ public class SelectStreamingResourceManagementTestCase extends AbstractDbIntegra
         doFailedMessageTest();
     }
 
-    private void doFailedMessageTest() throws MuleException
+    private void doFailedMessageTest() throws Exception
     {
-        try
-        {
-            runFlow("selectStreamingError", TEST_MESSAGE);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertThat(e.getMessage(), containsString("Failing test on purpose"));
-        }
+        MessagingException e = flowRunner("selectStreamingError").withPayload(TEST_MESSAGE).runExpectingException();
+        assertThat(e.getMessage(), containsString("Failing test on purpose"));
     }
 }

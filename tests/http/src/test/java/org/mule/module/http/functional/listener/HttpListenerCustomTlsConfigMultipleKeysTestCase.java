@@ -32,14 +32,14 @@ public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends FunctionalT
     @Test
     public void acceptsConnectionWithValidCertificate() throws Exception
     {
-        MuleEvent event = runFlow("testFlowClientWithCertificate", TEST_MESSAGE);
+        MuleEvent event = flowRunner("testFlowClientWithCertificate").withPayload(TEST_MESSAGE).run();
         assertThat(getPayloadAsString(event.getMessage()), equalTo(TEST_MESSAGE));
     }
 
     @Test(expected = MessagingException.class)
     public void rejectsConnectionWithInvalidCertificate() throws Exception
     {
-        runFlow("testFlowClientWithoutCertificate", TEST_MESSAGE);
+        flowRunner("testFlowClientWithoutCertificate").withPayload(TEST_MESSAGE).run();
     }
 
 

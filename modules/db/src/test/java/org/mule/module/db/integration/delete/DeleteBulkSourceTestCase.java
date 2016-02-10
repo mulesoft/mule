@@ -45,7 +45,7 @@ public class DeleteBulkSourceTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void deletesInBulkModeFromCustomSource() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("deleteBulkCustomSource", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("deleteBulkCustomSource").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertBulkDelete(response);

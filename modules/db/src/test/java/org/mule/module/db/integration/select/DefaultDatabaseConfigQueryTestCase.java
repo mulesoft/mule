@@ -43,7 +43,7 @@ public class DefaultDatabaseConfigQueryTestCase extends AbstractDbIntegrationTes
     @Test
     public void usesDefaultConfig() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("usesDefaultDatabaseConfig", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("usesDefaultDatabaseConfig").withPayload(TEST_MESSAGE).run();
         final MuleMessage response = responseEvent.getMessage();
 
         assertMessageContains(response, getAllPlanetRecords());

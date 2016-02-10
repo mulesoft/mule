@@ -54,7 +54,7 @@ public class StoredProcedureTargetTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesCustomTarget() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("storedProcedureCustomTarget", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("storedProcedureCustomTarget").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), equalTo(TEST_MESSAGE));

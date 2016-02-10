@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.InvocationCountMessageProcessor.getNumberOfInvocationsFor;
 
 import org.mule.api.ExceptionPayload;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -164,8 +163,7 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         final String payload = RandomStringUtils.randomAlphanumeric(20);
         final int expectedCounterExecutions = 4;
         final int expectedCounterInExceptionStrategyExecutions = 1;
-        Flow flow = (Flow) getFlowConstruct("asynchronous-using-threading-profile");
-        flow.process(getTestEvent(payload));
+        flowRunner("asynchronous-using-threading-profile").withPayload(payload).run();
         new PollingProber(10000, 100).check(new Probe()
         {
             private int executionOfCountInUntilSuccessful;
