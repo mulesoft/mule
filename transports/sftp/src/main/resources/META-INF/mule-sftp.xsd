@@ -380,6 +380,17 @@
 
     <!-- Various attributes both on the endpoints and connectors -->
     <xsd:attributeGroup name="commonEndpointAndConnectorAttributes">
+        <xsd:attribute name="knownHostsFile" type="mule:substitutableString">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: No
+                    Default: none
+
+                    If provided, the client will validate the server's key against the one in the referenced file.
+                    If the server key doesn't match the one in the file, the connection will be aborted.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="useTempFileTimestampSuffix" type="xsd:boolean">
             <xsd:annotation>
                 <xsd:documentation>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+      xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
+
+    <spring:beans>
+        <spring:import resource="sftp-properties.xml"/>
+    </spring:beans>
+
+    <sftp:connector name="sftpConnector" />
+
+    <sftp:connector name="sftpConnectorWithKnownHosts"
+        knownHostsFile="src/test/resources/empty_known_hosts" />
+        
+    <sftp:connector name="sftpConnectorWithInvalidKnownHosts"
+        knownHostsFile="src/test/resources/invalid_known_hosts" />
+
+    <flow name="knownHostsInConnector">
+        <sftp:outbound-endpoint
+            address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/tempdir2-test-outbound"
+            connector-ref="sftpConnectorWithKnownHosts" name="outboundEndpoint1">
+        </sftp:outbound-endpoint>
+    </flow>
+
+    <flow name="knownHostsInEndpoint">
+        <sftp:outbound-endpoint
+            address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/tempdir2-test-outbound"
+            connector-ref="sftpConnector" name="outboundEndpoint2"
+            knownHostsFile="src/test/resources/empty_known_hosts">
+        </sftp:outbound-endpoint>
+    </flow>
+
+    <flow name="invalidKnownHostsInConnector">
+        <sftp:outbound-endpoint
+            address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/tempdir2-test-outbound"
+            connector-ref="sftpConnectorWithInvalidKnownHosts" name="outboundEndpoint3">
+        </sftp:outbound-endpoint>
+    </flow>
+
+    <flow name="invalidKnownHostsInEndpoint">
+        <sftp:outbound-endpoint
+            address="sftp://${USER1_NAME}@${SFTP_HOST}:${SFTP_PORT}/~/tempdir2-test-outbound"
+            connector-ref="sftpConnector" name="outboundEndpoint4"
+            knownHostsFile="src/test/resources/invalid_known_hosts">
+        </sftp:outbound-endpoint>
+    </flow>
+</mule>

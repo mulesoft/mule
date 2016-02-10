@@ -7,6 +7,7 @@
 package org.mule.transport.sftp;
 
 import static org.mule.transport.sftp.AuthenticationMethodValidator.validateAuthenticationMethods;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -53,6 +54,7 @@ public class SftpConnector extends AbstractConnector
     public static final String PROPERTY_INCLUDE_SUBFOLDERS = "includeSubfolders";
     public static final String PROPERTY_IDENTITY_FILE = "identityFile";
     public static final String PROPERTY_PASS_PHRASE = "passphrase";
+    public static final String PROPERTY_KNOWN_HOSTS_FILE = "knownHostsFile";
     public static final String PROPERTY_FILE_AGE = "fileAge";
     public static final String PROPERTY_TEMP_DIR = "tempDir";
     public static final String PROPERTY_SIZE_CHECK_WAIT_TIME = "sizeCheckWaitTime";
@@ -83,6 +85,8 @@ public class SftpConnector extends AbstractConnector
 
     private String identityFile;
     private String passphrase;
+
+    private String knownHostsFile;
 
     private boolean checkFileAge = false;
     private long fileAge = 0;
@@ -139,6 +143,7 @@ public class SftpConnector extends AbstractConnector
         filenameParser = new ExpressionFilenameParser();
     }
 
+    @Override
     public String getProtocol()
     {
         return "sftp";
@@ -297,6 +302,7 @@ public class SftpConnector extends AbstractConnector
      * (non-Javadoc)
      * @see org.mule.transport.AbstractConnector#doConnect()
      */
+    @Override
     protected void doConnect() throws Exception
     {
         // Do nothing!
@@ -306,6 +312,7 @@ public class SftpConnector extends AbstractConnector
      * (non-Javadoc)
      * @see org.mule.transport.AbstractConnector#doDisconnect()
      */
+    @Override
     protected void doDisconnect() throws Exception
     {
         // Do nothing!
@@ -315,6 +322,7 @@ public class SftpConnector extends AbstractConnector
      * (non-Javadoc)
      * @see org.mule.transport.AbstractConnector#doDispose()
      */
+    @Override
     protected void doDispose()
     {
         // Do nothing!
@@ -324,6 +332,7 @@ public class SftpConnector extends AbstractConnector
      * (non-Javadoc)
      * @see org.mule.transport.AbstractConnector#doInitialise()
      */
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         if (filenameParser != null)
@@ -336,6 +345,7 @@ public class SftpConnector extends AbstractConnector
      * (non-Javadoc)
      * @see org.mule.transport.AbstractConnector#doStart()
      */
+    @Override
     protected void doStart() throws MuleException
     {
         // Do nothing!
@@ -345,6 +355,7 @@ public class SftpConnector extends AbstractConnector
      * (non-Javadoc)
      * @see org.mule.transport.AbstractConnector#doStop()
      */
+    @Override
     protected void doStop() throws MuleException
     {
         if (logger.isDebugEnabled())
@@ -430,6 +441,16 @@ public class SftpConnector extends AbstractConnector
     public void setPassphrase(String passphrase)
     {
         this.passphrase = passphrase;
+    }
+
+    public String getKnownHostsFile()
+    {
+        return knownHostsFile;
+    }
+
+    public void setKnownHostsFile(String knownHostsFile)
+    {
+        this.knownHostsFile = knownHostsFile;
     }
 
     /**
