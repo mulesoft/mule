@@ -16,17 +16,12 @@
 
 
     <flow name="TestUMO">
-
-        <inbound-endpoint address="vm://test"
-            exchange-pattern="request-response">
-            <jaas:jaas-security-filter />
-        </inbound-endpoint>
+        <jaas:jaas-security-filter />
         <custom-processor class="org.mule.module.jaas.JaasAuthenticationNoJaasConfigFileTestCase$AddNotSerializableProperty"/>
-        <outbound-endpoint address="vm://in" exchange-pattern="request-response"/>
+        <flow-ref name="flowWithPropagatedSecurityContext"/>
     </flow>
 
     <flow name="flowWithPropagatedSecurityContext">
-        <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
         <test:component appendString=" Received" />
     </flow>
 

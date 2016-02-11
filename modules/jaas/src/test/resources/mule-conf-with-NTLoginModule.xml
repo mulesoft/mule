@@ -15,10 +15,7 @@
     </jaas:security-manager>
 
     <flow name="TestUMO">
-        <inbound-endpoint address="vm://test" exchange-pattern="request-response">
-            <jaas:jaas-security-filter/>
-        </inbound-endpoint>
-
+        <jaas:jaas-security-filter/>
         <test:component/>
     </flow>
 </mule>

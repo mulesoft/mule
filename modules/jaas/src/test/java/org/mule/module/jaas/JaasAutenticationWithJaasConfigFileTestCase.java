@@ -10,16 +10,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
-import org.mule.api.security.UnauthorisedException;
-import org.mule.util.ExceptionUtils;
-
-import java.util.Map;
 
 import org.junit.Test;
 
 public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFunctionalTestCase
 {
-
     @Override
     protected String getConfigFile()
     {
@@ -29,59 +24,44 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFun
     @Test
     public void goodAuthentication() throws Exception
     {
-        Map<String, Object> props = createMessagePropertiesWithCredentials("Marie.Rizzo", "dragon");
-        MuleMessage m = muleContext.getClient().send("vm://test", "Test", props);
+        SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "dragon");
+        MuleMessage message = flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue()).withPayload("Test").run().getMessage();
 
-        assertNotNull(m);
-        assertTrue(m.getPayload() instanceof String);
-        assertEquals("Test Received", getPayloadAsString(m));
+        assertNotNull(message);
+        assertTrue(message.getPayload() instanceof String);
+        assertEquals("Test Received", getPayloadAsString(message));
     }
 
     @Test
     public void anotherGoodAuthentication() throws Exception
     {
-        Map<String, Object> props = createMessagePropertiesWithCredentials("anon", "anon");
-        MuleMessage m = muleContext.getClient().send("vm://test", "Test", props);
+        SecurityHeader securityHeader = createSecurityHeader("anon", "anon");
+        MuleMessage message = flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue()).withPayload("Test").run().getMessage();
 
-        assertNotNull(m);
-        assertTrue(m.getPayload() instanceof String);
-        assertEquals("Test Received", getPayloadAsString(m));
+        assertNotNull(message);
+        assertTrue(message.getPayload() instanceof String);
+        assertEquals("Test Received", getPayloadAsString(message));
     }
 
     @Test
     public void wrongCombinationOfCorrectUsernameAndPassword() throws Exception
     {
-        Map<String, Object> props = createMessagePropertiesWithCredentials("Marie.Rizzo", "anon");
-
-        MuleMessage message = muleContext.getClient().send("vm://test", "Test", props);
-        assertNotNull(message);
-        assertNotNull(message.getExceptionPayload());
-        assertTrue(ExceptionUtils.containsType(message.getExceptionPayload().getException(),
-            UnauthorisedException.class));
+        SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "anon");
+        runFlowAndExpectUnauthorizedException(securityHeader);
     }
 
     @Test
     public void badUserName() throws Exception
     {
-        Map<String, Object> props = createMessagePropertiesWithCredentials("Evil", "dragon");
-
-        MuleMessage message = muleContext.getClient().send("vm://test", "Test", props);
-        assertNotNull(message);
-        assertNotNull(message.getExceptionPayload());
-        assertTrue(ExceptionUtils.containsType(message.getExceptionPayload().getException(),
-            UnauthorisedException.class));
+        SecurityHeader securityHeader = createSecurityHeader("Evil", "dragon");
+        runFlowAndExpectUnauthorizedException(securityHeader);
     }
 
     @Test
     public void badPassword() throws Exception
     {
-        Map<String, Object> props = createMessagePropertiesWithCredentials("Marie.Rizzo", "evil");
-
-        MuleMessage message = muleContext.getClient().send("vm://test", "Test", props);
-        assertNotNull(message);
-        assertNotNull(message.getExceptionPayload());
-        assertTrue(ExceptionUtils.containsType(message.getExceptionPayload().getException(),
-            UnauthorisedException.class));
-
+        SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "evil");
+        runFlowAndExpectUnauthorizedException(securityHeader);
     }
+
 }

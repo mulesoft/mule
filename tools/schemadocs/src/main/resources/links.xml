@@ -149,12 +149,6 @@
     <link><item>udp:outbound-endpoint</item><page>UDP+Transport</page></link>
     <link><item>udp:endpoint</item><page>UDP+Transport</page></link>
 
-    <link><item>vm:connector</item><page>VM+Transport</page></link>
-    <link><item>vm:queueProfile</item><page>VM+Transport</page></link>
-    <link><item>vm:inbound-endpoint</item><page>VM+Transport</page></link>
-    <link><item>vm:outbound-endpoint</item><page>VM+Transport</page></link>
-    <link><item>vm:endpoint</item><page>VM+Transport</page></link>
-
     <link><item>client:remote-dispatcher-agent</item><page>Client+Module</page></link>
     <link><item>client:remote-endpoint</item><page>Client+Module</page></link>
     <link><item>client:xml-wire-format</item><page>Client+Module</page></link>
