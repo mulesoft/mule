@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection;
+package org.mule.module.extension.internal.introspection.describer;
 
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
@@ -54,9 +54,9 @@ public final class MuleExtensionAnnotationParser
             .add(MuleMessage.class)
             .build();
 
-    static String getAliasName(Field field, Alias aliasAnnotation)
+    static String getAliasName(Field field)
     {
-        return getAliasName(field.getName(), aliasAnnotation);
+        return getAliasName(field.getName(), field.getAnnotation(Alias.class));
     }
 
     static String getAliasName(String defaultName, Alias aliasAnnotation)
@@ -77,7 +77,7 @@ public final class MuleExtensionAnnotationParser
         return declaringMemberModelProperty != null ? declaringMemberModelProperty.getDeclaringField().getName() : defaultName;
     }
 
-    static Extension getExtension(Class<?> extensionType)
+    public static Extension getExtension(Class<?> extensionType)
     {
         Extension extension = extensionType.getAnnotation(Extension.class);
         checkState(extension != null, String.format("%s is not a Mule extension since it's not annotated with %s",

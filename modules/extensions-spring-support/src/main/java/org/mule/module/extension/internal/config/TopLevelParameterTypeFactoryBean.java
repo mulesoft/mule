@@ -26,22 +26,25 @@ import org.springframework.beans.factory.FactoryBean;
  *
  * @since 3.7.0
  */
-final class TopLevelParameterTypeFactoryBean implements FactoryBean<Object>
+final class TopLevelParameterTypeFactoryBean extends ExtensionComponentFactoryBean<Object>
 {
 
-    private final ValueResolver valueResolver;
+    private final ElementDescriptor element;
+    private final DataType dataType;
     private final MuleContext muleContext;
+    private ValueResolver<Object> valueResolver;
 
     TopLevelParameterTypeFactoryBean(ElementDescriptor element, DataType dataType, MuleContext muleContext)
     {
-        this.valueResolver = XmlExtensionParserUtils.parseElement(element, EMPTY, dataType, null);
+        this.element = element;
+        this.dataType = dataType;
         this.muleContext = muleContext;
     }
 
     @Override
     public Object getObject() throws Exception
     {
-        return valueResolver.resolve(getEvent());
+        return getValueResolver().resolve(getEvent());
     }
 
     @Override
@@ -53,7 +56,17 @@ final class TopLevelParameterTypeFactoryBean implements FactoryBean<Object>
     @Override
     public boolean isSingleton()
     {
-        return !valueResolver.isDynamic();
+        return !getValueResolver().isDynamic();
+    }
+
+    private ValueResolver<Object> getValueResolver()
+    {
+        if (valueResolver == null)
+        {
+            valueResolver = parserDelegate.parseElement(element, EMPTY, dataType, null);
+        }
+
+        return valueResolver;
     }
 
     private MuleEvent getEvent()

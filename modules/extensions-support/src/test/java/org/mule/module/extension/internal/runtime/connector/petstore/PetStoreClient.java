@@ -9,6 +9,8 @@ package org.mule.module.extension.internal.runtime.connector.petstore;
 import static org.mule.util.Preconditions.checkArgument;
 import static org.mule.util.Preconditions.checkState;
 
+import org.mule.api.tls.TlsContextFactory;
+
 import java.util.List;
 
 public class PetStoreClient
@@ -16,12 +18,14 @@ public class PetStoreClient
 
     private String username;
     private String password;
+    private TlsContextFactory tlsContext;
     private int disconnectCount;
 
-    public PetStoreClient(String username, String password)
+    public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory)
     {
         this.username = username;
         this.password = password;
+        this.tlsContext = tlsContextFactory;
     }
 
     public List<String> getPets(String ownerName, PetStoreConnector config)
@@ -54,5 +58,10 @@ public class PetStoreClient
     {
         checkState(disconnectCount >= 0, "negative disconnectCount");
         return disconnectCount == 0;
+    }
+
+    public TlsContextFactory getTlsContext()
+    {
+        return tlsContext;
     }
 }

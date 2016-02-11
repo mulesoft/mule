@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection;
+package org.mule.module.extension.internal.introspection.describer;
 
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.IOUtils.closeQuietly;
@@ -16,6 +16,8 @@ import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getMet
 import static org.mule.util.IOUtils.getResourceAsStream;
 import org.mule.extension.annotation.api.Extension;
 import org.mule.module.extension.HeisenbergExtension;
+import org.mule.module.extension.internal.introspection.VersionResolver;
+import org.mule.module.extension.internal.introspection.describer.ManifestBasedVersionResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;

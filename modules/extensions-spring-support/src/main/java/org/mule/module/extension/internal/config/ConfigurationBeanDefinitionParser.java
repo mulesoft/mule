@@ -10,8 +10,6 @@ import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_NAMESPACE;
-import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.parseConfigName;
-import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.toElementDescriptorBeanDefinition;
 import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
 import org.mule.api.registry.Registry;
 import org.mule.extension.api.introspection.ConfigurationModel;
@@ -53,12 +51,12 @@ final class ConfigurationBeanDefinitionParser extends BaseExtensionBeanDefinitio
     }
 
     @Override
-    protected void doParse(BeanDefinitionBuilder builder, Element element, ParserContext parserContext)
+    protected void doParse(BeanDefinitionBuilder builder, Element element, XmlExtensionParserDelegate parserDelegate, ParserContext parserContext)
     {
-        String name = parseConfigName(element, builder);
+        String name = parserDelegate.parseConfigName(element, builder);
 
         builder.addConstructorArgValue(configurationModel);
-        builder.addConstructorArgValue(toElementDescriptorBeanDefinition(element));
+        builder.addConstructorArgValue(parserDelegate.toElementDescriptorBeanDefinition(element));
         builder.addConstructorArgReference(OBJECT_MULE_CONTEXT);
         builder.addConstructorArgReference(OBJECT_TIME_SUPPLIER);
 

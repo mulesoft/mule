@@ -12,6 +12,7 @@ import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionValidationResult;
+import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.param.Optional;
 
@@ -23,6 +24,10 @@ public class HeisenbergConnectionProvider implements ConnectionProvider<Heisenbe
     @Parameter
     @Optional(defaultValue = SAUL_OFFICE_NUMBER)
     private String saulPhoneNumber;
+
+    @Parameter
+    @Optional
+    private TlsContextFactory tlsContextFactory;
 
     @Override
     public HeisenbergConnection connect(HeisenbergExtension heisenbergExtension) throws ConnectionException

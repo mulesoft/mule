@@ -22,6 +22,8 @@ public final class SchemaConstants
     public static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
     public static final String MULE_EXTENSION_NAMESPACE = "http://www.mulesoft.org/schema/mule/extension";
     public static final String MULE_EXTENSION_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd";
+    public static final String MULE_TLS_NAMESPACE = "http://www.mulesoft.org/schema/mule/tls";
+    public static final String MULE_TLS_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd";
     public static final String MULE_PREFIX = "mule";
     public static final String MULE_EXTENSION_PREFIX = "extension";
     public static final String OPERATION_SUBSTITUTION_GROUP_SUFFIX = "-OperationGroup";
@@ -42,6 +44,7 @@ public final class SchemaConstants
     public static final QName MULE_ABSTRACT_RECONNECTION_STRATEGY = new QName(MULE_NAMESPACE, "abstract-reconnection-strategy", MULE_PREFIX);
     public static final QName MULE_ABSTRACT_RECONNECTION_STRATEGY_TYPE = new QName(MULE_NAMESPACE, "abstractReconnectionStrategyType", MULE_PREFIX);
     public static final QName MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE = new QName(MULE_NAMESPACE, "messageProcessorOrOutboundEndpoint", MULE_PREFIX);
+    public static final QName TLS_CONTEXT_TYPE = new QName(MULE_TLS_NAMESPACE, "context", "tls");
 
     //TYPES
     public static final QName SUBSTITUTABLE_INT = new QName(MULE_NAMESPACE, "substitutableInt", MULE_PREFIX);

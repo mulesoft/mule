@@ -19,7 +19,7 @@ import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.introspection.property.StudioModelProperty;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
+import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.introspection.enricher.StudioModelEnricher;
 import org.mule.registry.SpiServiceRegistry;

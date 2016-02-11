@@ -54,4 +54,6 @@ public class ExtensionProperties
      * through the pipeline
      */
     public static final String TARGET_ATTRIBUTE = "target";
+
+    public static final String TLS_ATTRIBUTE_NAME = "tlsContext";
 }

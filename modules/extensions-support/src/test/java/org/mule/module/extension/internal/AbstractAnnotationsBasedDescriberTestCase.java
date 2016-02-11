@@ -9,7 +9,7 @@ package org.mule.module.extension.internal;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.module.extension.internal.introspection.AnnotationsBasedDescriber;
+import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.CollectionUtils;
 

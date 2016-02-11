@@ -6,13 +6,18 @@
  */
 package org.mule.module.extension.internal.config;
 
-import static org.mule.module.extension.internal.config.XmlExtensionParserUtils.setNoRecurseOnDefinition;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_SINGLETON;
+
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -30,6 +35,18 @@ abstract class BaseExtensionBeanDefinitionParser implements BeanDefinitionParser
     private final Class<?> type;
 
     /**
+     *
+     */
+    protected XmlExtensionParserDelegate parserDelegate;
+
+    /**
+     * An ordered {@link List} of {@link InfrastructureParserDelegate}.
+     * For any given {@link Element}, only the first matching delegate
+     * will be used, hence order is important
+     */
+    private final List<InfrastructureParserDelegate> infrastructureParsers;
+
+    /**
      * Creates a new instance which will generate instances of {@code type}
      *
      * @param type a {@link Class}
@@ -37,11 +54,14 @@ abstract class BaseExtensionBeanDefinitionParser implements BeanDefinitionParser
     BaseExtensionBeanDefinitionParser(Class<?> type)
     {
         this.type = type;
+        infrastructureParsers = ImmutableList.of(new PoolingProfileInfrastructureParser(),
+                                                 new RetryPolicyInfrastructureParser(),
+                                                 new TlsContextInfrastructureParser());
     }
 
     /**
      * Creates and returns a singleton {@link BeanDefinition}. Actual parsing
-     * is delegated to the {@link #doParse(BeanDefinitionBuilder, Element, ParserContext)}
+     * is delegated to the {@link #doParse(BeanDefinitionBuilder, Element, XmlExtensionParserDelegate, ParserContext)}
      * method
      *
      * @param element       a {@link Element}
@@ -51,12 +71,14 @@ abstract class BaseExtensionBeanDefinitionParser implements BeanDefinitionParser
     @Override
     public BeanDefinition parse(Element element, ParserContext parserContext)
     {
+        XmlExtensionParserDelegate parserDelegate = new XmlExtensionParserDelegate();
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(type);
         builder.setScope(SCOPE_SINGLETON);
-        doParse(builder, element, parserContext);
+        doParse(builder, element, parserDelegate, parserContext);
 
         BeanDefinition definition = builder.getBeanDefinition();
-        setNoRecurseOnDefinition(definition);
+        parserDelegate.setNoRecurseOnDefinition(definition);
+        injectParseDelegate(builder, element, parserContext);
 
         return definition;
     }
@@ -64,9 +86,36 @@ abstract class BaseExtensionBeanDefinitionParser implements BeanDefinitionParser
     /**
      * Performs component specific parsing logic.
      *
-     * @param builder       a {@link BeanDefinitionBuilder}
-     * @param element       the {@link Element} being parsed
-     * @param parserContext the current{@link ParserContext}
+     * @param builder        a {@link BeanDefinitionBuilder}
+     * @param element        the {@link Element} being parsed
+     * @param parserDelegate A {@link XmlExtensionParserDelegate} to assist with the parsing
+     * @param parserContext  the current{@link ParserContext}
      */
-    protected abstract void doParse(BeanDefinitionBuilder builder, Element element, ParserContext parserContext);
+    protected abstract void doParse(BeanDefinitionBuilder builder, Element element, XmlExtensionParserDelegate parserDelegate, ParserContext parserContext);
+
+    private void injectParseDelegate(BeanDefinitionBuilder builder, Element element, ParserContext parserContext)
+    {
+        if (HasExtensionParserDelegate.class.isAssignableFrom(type))
+        {
+            BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(XmlExtensionParserDelegate.class);
+            beanDefinitionBuilder.addPropertyValue("infrastructureParameters", getInfrastructureChilds(element, parserContext));
+
+            builder.addPropertyValue("parserDelegate", beanDefinitionBuilder.getBeanDefinition());
+        }
+    }
+
+    private ManagedMap<Class<?>, BeanDefinition> getInfrastructureChilds(Element element, ParserContext parserContext)
+    {
+        ManagedMap<Class<?>, BeanDefinition> parameters = new ManagedMap<>();
+
+        for (Element childElement : DomUtils.getChildElements(element))
+        {
+            infrastructureParsers.stream()
+                    .filter(parser -> parser.accepts(childElement))
+                    .findFirst()
+                    .ifPresent(parser -> parser.parse(childElement, parameters, parserContext));
+        }
+
+        return parameters;
+    }
 }
