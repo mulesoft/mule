@@ -18,18 +18,38 @@ import java.util.Map;
 public abstract class AbstractJaasFunctionalTestCase extends FunctionalTestCase
 {
 
-    protected Map<String, Object> createMessagePropertiesWithCredentials(String username, String password)
+    protected SecurityHeader createSecurityHeader(String username, String password)
         throws CryptoFailureException
     {
-        Map<String, Object> props = new HashMap<String, Object>();
         String header = createEncryptedHeader(username, password);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        return props;
+        return new SecurityHeader(MuleProperties.MULE_USER_PROPERTY, header);
     }
 
     private String createEncryptedHeader(String username, String password) throws CryptoFailureException
     {
         EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
         return MuleCredentials.createHeader(username, password, "PBE", strategy);
+    }
+
+    public static class SecurityHeader {
+
+        private String key;
+        private String value;
+
+        public SecurityHeader(String key, String value)
+        {
+            this.key = key;
+            this.value = value;
+        }
+
+        public String getKey()
+        {
+            return key;
+        }
+
+        public String getValue()
+        {
+            return value;
+        }
     }
 }

@@ -170,14 +170,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Include all Mule Transports -->
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transports-all</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-        </dependency>
-
         <!--
             We need to register the endorsed XML jars as dependencies of the
             distribution, so that they can be referenced in the assembly as in/excludes.

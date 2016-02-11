@@ -11,8 +11,6 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.util.SystemUtils;
 
-import java.util.Map;
-
 import org.junit.Test;
 
 public class JaasAuthenticationWithNtLoginModule extends AbstractJaasFunctionalTestCase
@@ -33,10 +31,9 @@ public class JaasAuthenticationWithNtLoginModule extends AbstractJaasFunctionalT
     @Test
     public void testCaseAuthentication() throws Exception
     {
-        Map<String, Object> props = createMessagePropertiesWithCredentials("Marie.Rizzo", "dragon");
-        MuleMessage m = muleContext.getClient().send("vm://test", "Test", props);
-
-        assertNotNull(m);
-        assertTrue(getPayloadAsString(m).equals("Test Received"));
+        SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "dragon");
+        MuleMessage message = flowRunner("TestUMO").withInboundProperty(securityHeader.getKey(), securityHeader.getValue()).run().getMessage();
+        assertNotNull(message);
+        assertTrue(getPayloadAsString(message).equals("Test Received"));
     }
 }
