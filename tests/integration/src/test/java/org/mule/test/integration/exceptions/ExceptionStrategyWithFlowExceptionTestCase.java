@@ -29,11 +29,11 @@ public class ExceptionStrategyWithFlowExceptionTestCase extends FunctionalTestCa
     }
 
     @Test
-    public void testFlowExceptionExceptionStrategy() throws MuleException
+    public void testFlowExceptionExceptionStrategy() throws Exception
     {
+        flowRunner("customException").withPayload(getTestMuleMessage(TEST_MESSAGE)).asynchronously().run();
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://in", TEST_MESSAGE, null);
-        MuleMessage message = client.request("vm://out", RECEIVE_TIMEOUT);
+        MuleMessage message = client.request("test://out", RECEIVE_TIMEOUT);
 
         assertNotNull("request returned no message", message);
         assertTrue(message.getPayload() instanceof ExceptionMessage);

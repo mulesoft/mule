@@ -7,11 +7,11 @@
 package org.mule.test.integration.streaming;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.api.client.MuleClient;
+
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.util.concurrent.Latch;
@@ -37,7 +37,6 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     private static Latch streamReaderLatch;
     private String xmlText = "<test attribute=\"1\"/>";
     private TestByteArrayInputStream inputStream;
-    private MuleClient client;
 
     @Override
     protected String getConfigFile()
@@ -49,7 +48,6 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        client = muleContext.getClient();
         inputStream = new TestByteArrayInputStream(xmlText.getBytes());
         streamReaderLatch = new Latch();
     }
@@ -57,7 +55,8 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     @Test
     public void testCloseStreamOnComponentException() throws Exception
     {
-        client.dispatch("vm://inEcho?connector=vm", inputStream, null);
+        flowRunner("echo").withPayload(inputStream).asynchronously().run();
+
         streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
         assertTrue(inputStream.isClosed());
     }
@@ -67,7 +66,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     {
         InputSource stream = new InputSource(inputStream);
 
-        client.dispatch("vm://inEcho?connector=vm", stream, null);
+        flowRunner("echo").withPayload(stream).asynchronously().run();
 
         streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
         assertTrue(((TestByteArrayInputStream) stream.getByteStream()).isClosed());
@@ -78,7 +77,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     {
         Source stream = XMLUtils.toXmlSource(XMLInputFactory.newInstance(), false, inputStream);
 
-        client.dispatch("vm://inEcho?connector=vm", stream, null);
+        flowRunner("echo").withPayload(stream).asynchronously().run();
 
         streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
         assertTrue(((TestByteArrayInputStream) ((StreamSource) stream).getInputStream()).isClosed());
@@ -90,7 +89,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         TestXMLStreamReader stream = new TestXMLStreamReader(XMLInputFactory.newInstance()
             .createXMLStreamReader(inputStream));
 
-        client.dispatch("vm://inEcho?connector=vm", stream, null);
+        flowRunner("echo").withPayload(stream).asynchronously().run();
 
         streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
         assertTrue(stream.isClosed());
@@ -101,7 +100,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     {
         SAXSource stream = new SAXSource(new InputSource(inputStream));
 
-        client.dispatch("vm://inEcho?connector=vm", stream, null);
+        flowRunner("echo").withPayload(stream).asynchronously().run();
 
         verifyInputStreamIsClosed(((TestByteArrayInputStream) stream.getInputSource().getByteStream()));
     }
@@ -109,26 +108,18 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     @Test
     public void testCloseStaxSourceOnComponentException() throws Exception
     {
-
         StaxSource stream = new StaxSource(new TestXMLStreamReader(XMLInputFactory.newInstance()
             .createXMLStreamReader(inputStream)));
 
-        client.dispatch("vm://inEcho?connector=vm", stream, null);
+        flowRunner("echo").withPayload(stream).asynchronously().run();
 
         verifyInputStreamIsClosed(((TestXMLStreamReader) stream.getXMLStreamReader()));
     }
 
     @Test
-    public void testCloseStreamOnDispatcherException() throws Exception
-    {
-        client.dispatch("vm://dispatcherExceptionBridge?connector=vm", inputStream, null);
-        verifyInputStreamIsClosed(inputStream);
-    }
-
-    @Test
     public void testCloseStreamOnInboundFilterException() throws Exception
     {
-        client.dispatch("vm://inboundFilterExceptionBridge?connector=vm", inputStream, null);
+        flowRunner("inboundFilterExceptionBridge").withPayload(inputStream).asynchronously().run();
 
         verifyInputStreamIsClosed(inputStream);
     }
@@ -161,6 +152,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     {
         private boolean closed;
 
+        @Override
         public boolean isClosed()
         {
             return closed;
@@ -189,6 +181,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     {
         private boolean closed;
 
+        @Override
         public boolean isClosed()
         {
             return closed;

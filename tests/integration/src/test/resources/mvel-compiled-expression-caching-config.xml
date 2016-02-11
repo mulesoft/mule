@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="
-             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-             http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="foo-flow">
-        <vm:inbound-endpoint path="fooInput" exchange-pattern="request-response"/>
         <set-payload value="#[new org.mule.mvel.Foo()]"/>
 
         <enricher target="#[payload.stuff]">

@@ -22,19 +22,20 @@ public class NonBlockingPartlySupportedFunctionalTestCase extends FunctionalTest
     @Test
     public void foreach() throws Exception
     {
-        testFlowNonBlocking("foreach");
+        flowRunner("foreach").withPayload(TEST_MESSAGE).nonBlocking().run();
+
     }
 
     @Test
     public void wiretap() throws Exception
     {
-        testFlowNonBlocking("wiretap");
+        flowRunner("wiretap").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
     @Test
     public void async() throws Exception
     {
-        testFlowNonBlocking("async");
+        flowRunner("async").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
 }

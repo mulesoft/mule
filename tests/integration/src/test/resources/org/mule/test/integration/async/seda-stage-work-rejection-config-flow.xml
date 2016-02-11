@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-
-        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
@@ -22,26 +20,18 @@
             poolExhaustedAction="RUN" threadWaitTimeout="20" />
 
     <flow name="limitedThreadsFlow" processingStrategy="max2ThreadSmallTimeout">
-        <vm:inbound-endpoint address="vm://flow1.in"
-            exchange-pattern="one-way" />
         <test:component waitTime="1000" />
-        <vm:outbound-endpoint address="vm://out"
-            exchange-pattern="one-way" />
+        <test:queue name="out"/>
         <catch-exception-strategy>
-            <vm:outbound-endpoint address="vm://exception"
-                exchange-pattern="one-way" />
+            <test:queue name="exception"/>
         </catch-exception-strategy>
     </flow>
 
     <flow name="limitedQueueFlow" processingStrategy="smallQueue">
-        <vm:inbound-endpoint address="vm://flow2.in"
-                             exchange-pattern="one-way" />
         <test:component waitTime="50" />
-        <vm:outbound-endpoint address="vm://out"
-                              exchange-pattern="one-way" />
+        <test:queue name="out"/>
         <catch-exception-strategy>
-            <vm:outbound-endpoint address="vm://exception"
-                                  exchange-pattern="one-way" />
+            <test:queue name="exception"/>
         </catch-exception-strategy>
     </flow>
 

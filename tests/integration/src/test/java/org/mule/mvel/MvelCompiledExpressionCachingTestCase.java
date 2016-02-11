@@ -9,9 +9,7 @@ package org.mule.mvel;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -28,9 +26,7 @@ public class MvelCompiledExpressionCachingTestCase extends FunctionalTestCase
     @Test
     public void testIssue() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send("vm://fooInput", TEST_MESSAGE, null);
+        MuleMessage response = flowRunner("foo-flow").withPayload(TEST_MESSAGE).run().getMessage();
 
         assertThat(getPayloadAsString(response), equalTo("SUCCESS"));
     }

@@ -2,15 +2,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="test">
-        <vm:inbound-endpoint path="testInput" exchange-pattern="request-response"/>
-
         <message-properties-transformer scope="session">
             <add-message-property key="ErrorCount" value="#[0]"/>
         </message-properties-transformer>
@@ -21,18 +17,14 @@
     </flow>
 
     <flow name="splitterFlow">
-        <vm:inbound-endpoint path="second" exchange-pattern="request-response"/>
-
         <test:component throwException="true"/>
 
         <catch-exception-strategy>
-            <vm:outbound-endpoint path="exceptionProcessor" exchange-pattern="request-response"/>
+            <flow-ref name="exceptionFlow"/>
         </catch-exception-strategy>
     </flow>
 
     <flow name="exceptionFlow">
-        <vm:inbound-endpoint path="exceptionProcessor" exchange-pattern="request-response"/>
-
         <message-properties-transformer scope="session">
             <add-message-property key="ErrorCount" value="#[sessionVars.ErrorCount + 1]"/>
         </message-properties-transformer>

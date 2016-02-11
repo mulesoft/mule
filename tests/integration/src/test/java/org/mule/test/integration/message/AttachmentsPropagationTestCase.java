@@ -10,13 +10,13 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.message.ds.StringDataSource;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.message.ds.StringDataSource;
 
 import java.util.Set;
 
@@ -71,14 +71,14 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase implement
     @Test
     public void singleFlowShouldReceiveAttachment() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://Single", "", null);
+        MuleMessage result = flowRunner("SINGLE").withPayload("").run().getMessage();
+
         assertThat(result, is(notNullValue()));
 
         // expect SINGLE attachment from SINGLE service
         assertThat((Set<String>) result.getPayload(), containsInAnyOrder("SINGLE"));
 
-        DataHandler attachment = result.getInboundAttachment("SINGLE");
+        DataHandler attachment = result.getOutboundAttachment("SINGLE");
         assertThat(attachment, is(notNullValue()));
         assertThat(attachment.getContent().toString(), is(ATTACHMENT_CONTENT));
     }
@@ -86,8 +86,7 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase implement
     @Test
     public void chainedFlowShouldReceiveAttachments() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://Chained", "", null);
+        MuleMessage result = flowRunner("CHAINED").withPayload("").run().getMessage();
         assertThat(result, is(notNullValue()));
 
         // expect CHAINED attachment from CHAINED service

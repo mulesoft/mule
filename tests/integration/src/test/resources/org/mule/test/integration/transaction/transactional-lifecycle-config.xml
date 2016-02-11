@@ -1,31 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="CE-3.2.1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd ">
+http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <flow name="vm-in-flow">
-        <vm:inbound-endpoint path="in" exchange-pattern="request-response" />
+    <flow name="in-flow">
         <transactional action="BEGIN_OR_JOIN">
             <test:component throwException="true"
                 exceptionToThrow="java.lang.RuntimeException" />
             <catch-exception-strategy>
-                <vm:outbound-endpoint path="dlqOut">
-                    <vm:transaction action="NOT_SUPPORTED" />
-                </vm:outbound-endpoint>
+                <flow-ref name="dlq-out"/>
             </catch-exception-strategy>
         </transactional>
     </flow>
 
-    <flow name="dlq-out" processingStrategy="asynchronous">
-        <vm:inbound-endpoint path="dlqOut" exchange-pattern="one-way" />
+    <flow name="dlq-out">
         <test:component/>
     </flow>
 

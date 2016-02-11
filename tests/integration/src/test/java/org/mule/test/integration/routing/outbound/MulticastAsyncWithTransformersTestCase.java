@@ -8,6 +8,7 @@ package org.mule.test.integration.routing.outbound;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -39,21 +40,21 @@ public class MulticastAsyncWithTransformersTestCase extends FunctionalTestCase
         FruitBowl fruitBowl = new FruitBowl(apple, banana);
         fruitBowl.addFruit(orange);
 
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://distributor.queue", fruitBowl, null);
+        flowRunner("Distributor").withPayload(fruitBowl).asynchronously().run();
 
         List<Object> results = new ArrayList<Object>(3);
 
+        MuleClient client = muleContext.getClient();
         //We have to wait a lot longer here since groovy takes an age to compile the first time
-        MuleMessage result = client.request("vm://collector.queue", 5000);
+        MuleMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
         assertNotNull(result);
         results.add(result.getPayload());
 
-        result = client.request("vm://collector.queue", 3000);
+        result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
         assertNotNull(result);
         results.add(result.getPayload());
 
-        result = client.request("vm://collector.queue", 3000);
+        result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
         assertNotNull(result);
         results.add(result.getPayload());
 

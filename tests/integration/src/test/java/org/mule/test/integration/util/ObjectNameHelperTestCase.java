@@ -6,73 +6,20 @@
  */
 package org.mule.test.integration.util;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.ObjectNameHelper;
-
-import org.junit.Ignore;
-import org.junit.Test;
-
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.util.ObjectNameHelper;
+
+import org.junit.Test;
 
 public class ObjectNameHelperTestCase extends AbstractMuleContextTestCase
 {
 
     public static final String UNIQUE_NAME_PREFIX = "unique-name-prefix";
-
-    @Ignore
-    @Test
-    public void endpointAutomaticNames() throws Exception
-    {
-        ImmutableEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(
-            "test://cn=foo,name=queue");
-        muleContext.getRegistry().registerEndpoint(ep);
-        assertEquals("endpoint.test.cn.foo.name.queue", ep.getName());
-
-        ep = muleContext.getEndpointFactory().getInboundEndpoint("test://cn=foo,name=queue");
-        assertEquals("endpoint.test.cn.foo.name.queue.1", ep.getName());
-
-        // Test generating a unique name when there is a matching endpoint
-        ep = muleContext.getEndpointFactory().getInboundEndpoint("vm://my.queue");
-        assertEquals("endpoint.vm.my.queue", ep.getName());
-    }
-
-    @Test
-    @Ignore
-    public void endpointNameGenerationWithParams() throws Exception
-    {
-        ImmutableEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(
-            "test://cn=foo,name=queue?endpointName=foo");
-        muleContext.getRegistry().registerEndpoint(ep);
-        assertEquals("endpoint.test.cn.foo.name.queue", ep.getName());
-
-        ep = muleContext.getEndpointFactory().getInboundEndpoint(
-            "test://cn=foo,name=queue?endpointName=this_is@aWierd-Name:x");
-        assertEquals("this.is.aWierd.Name.x", ep.getName());
-        muleContext.getRegistry().registerEndpoint(ep);
-
-        // Test generating a unique name when there is a matching endpoint
-        ep = muleContext.getEndpointFactory().getInboundEndpoint(
-            "test://cn=foo,name=queue?endpointName=this_is@aWierd-Name:x");
-        assertEquals("this.is.aWierd.Name.x", ep.getName());
-        ep = muleContext.getEndpointFactory().getInboundEndpoint(
-            "test://cn=foo,name=queue?endpointName=this____is+another=@Wierd----Name:x:::");
-        assertEquals("this.is.another.Wierd.Name.x", ep.getName());
-    }
-
-    @Ignore
-    @Test
-    public void endpointNameGeneration() throws Exception
-    {
-        ImmutableEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(
-            "test://exception.listener");
-        muleContext.getRegistry().registerEndpoint(ep);
-        assertEquals("endpoint.test.exception.listener", ep.getName());
-    }
 
     @Test
     public void uniqueNameGeneration() throws Exception

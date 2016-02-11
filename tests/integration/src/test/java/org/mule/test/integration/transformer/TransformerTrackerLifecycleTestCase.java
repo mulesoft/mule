@@ -6,7 +6,9 @@
  */
 package org.mule.test.integration.transformer;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
 
@@ -24,13 +26,16 @@ public class TransformerTrackerLifecycleTestCase extends FunctionalTestCase
     @Test
     public void testLifecycle() throws Exception
     {
-        final MuleMessage result = muleContext.getClient().send("vm://EchoService.In", "foo", null);
+        final MuleMessage result = flowRunner("EchoService").withPayload("foo").run().getMessage();
 
         final LifecycleTrackerTransformer ltt = (LifecycleTrackerTransformer) result.getPayload();
 
         muleContext.dispose();
 
-        assertEquals("[setProperty, setMuleContext, setMuleContext, initialise, setMuleContext, initialise, start, start, stop, stop, dispose]",
-            ltt.getTracker().toString());
+        assertThat(ltt.getTracker(),
+                contains("setProperty",
+                        "setMuleContext", "setMuleContext",
+                        "initialise", "start",
+                        "stop", "dispose"));
     }
 }

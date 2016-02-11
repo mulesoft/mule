@@ -32,7 +32,7 @@ public class AutoTransformerTestCase extends FunctionalTestCase
     public void testInboundAutoTransform() throws Exception
     {
         latch = new Latch();
-        runFlowAsync("test", new FruitBowl(new Apple(), new Banana()));
+        flowRunner("test").withPayload(new FruitBowl(new Apple(), new Banana())).asynchronously().run();
 
         assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
     }

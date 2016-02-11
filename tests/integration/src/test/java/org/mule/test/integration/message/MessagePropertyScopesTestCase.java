@@ -9,8 +9,8 @@ package org.mule.test.integration.message;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
@@ -29,8 +29,7 @@ public class MessagePropertyScopesTestCase extends FunctionalTestCase
     @Test
     public void testSessionProperty() throws Exception {
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://in1", "Hello World", null);
+        MuleMessage response = flowRunner("InService1").withPayload("Hello World").run().getMessage();
         assertNotNull(response);
         String payload = getPayloadAsString(response);
         assertNotNull(payload);
@@ -41,8 +40,7 @@ public class MessagePropertyScopesTestCase extends FunctionalTestCase
     @Test
     public void testInvocationProperty() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://in2", "Hello World", null);
+        MuleMessage response = flowRunner("InService2").withPayload("Hello World").run().getMessage();
         // scope = "invocation" should not propagate the property on to the next service
         assertTrue(response.getPayload() instanceof NullPayload);
     }

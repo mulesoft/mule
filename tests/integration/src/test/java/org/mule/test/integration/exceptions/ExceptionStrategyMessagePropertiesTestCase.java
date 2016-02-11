@@ -9,12 +9,10 @@ package org.mule.test.integration.exceptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -40,9 +38,9 @@ public class ExceptionStrategyMessagePropertiesTestCase extends FunctionalTestCa
         MuleMessage msg;
         for (int i = 0; i < numMessages; ++i)
         {
-            msg = client.request("vm://error", 5000);
+            msg = client.request("test://out", 5000);
             assertNotNull(msg);
-            assertEquals("bar", msg.getInboundProperty("foo"));
+            assertEquals("bar", msg.getOutboundProperty("prop"));
         }
     }
 
@@ -53,13 +51,12 @@ public class ExceptionStrategyMessagePropertiesTestCase extends FunctionalTestCa
         {
             try
             {
-                MuleClient client = muleContext.getClient();
-
-                Map<String, Object> props = new HashMap<String, Object>();
-                props.put("foo", "bar");
                 for (int i = 0; i < numMessages; ++i)
                 {
-                    client.dispatch("vm://in", "test", props);
+                    flowRunner("inbound").withPayload(getTestMuleMessage())
+                                         .withInboundProperty("foo", "bar")
+                                         .asynchronously()
+                                         .run();
                 }
             }
             catch (Exception e)

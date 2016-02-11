@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <!-- the test registers notifications via java that we want the connector to respond to, so disable caching -->
     <notifications dynamic="true">
@@ -14,13 +13,11 @@
     </notifications>
 
     <flow name="Receiver">
-        <vm:inbound-endpoint path="inbound.channel" exchange-pattern="one-way"/>
         <message-chunk-splitter messageSize="2"/>
-        <vm:outbound-endpoint path="chunking.channel" exchange-pattern="one-way"/>
+        <flow-ref name="ChunkingReceiver"/>
     </flow>
 
     <flow name="ChunkingReceiver">
-        <vm:inbound-endpoint path="chunking.channel" exchange-pattern="one-way"/>
         <message-chunk-aggregator/>
         <test:component appendString=" Received" logMessageDetails="true"/>
     </flow>
@@ -28,13 +25,11 @@
     <!-- this has changed slightly from 1.x; we need to stop the functional test component from converting response to a 
         string -->
     <flow name="ObjectReceiver">
-        <vm:inbound-endpoint path="inbound.object.channel" exchange-pattern="one-way"/>
         <message-chunk-splitter messageSize="2"/>
-        <vm:outbound-endpoint path="chunking.object.channel" exchange-pattern="one-way"/>
+        <flow-ref name="ChunkingObjectReceiver"/>
     </flow>
 
     <flow name="ChunkingObjectReceiver">
-        <vm:inbound-endpoint path="chunking.object.channel" exchange-pattern="one-way"/>
         <message-chunk-aggregator/>
         <test:component doInboundTransform="false" logMessageDetails="true"/>
         <!--<component> -->

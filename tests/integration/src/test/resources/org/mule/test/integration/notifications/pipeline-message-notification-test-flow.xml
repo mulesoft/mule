@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <notifications>
         <notification event="PIPELINE-MESSAGE" />
@@ -19,32 +19,27 @@
     </notifications>
 
     <flow name="service-1">
-        <vm:inbound-endpoint path="rr" exchange-pattern="request-response" />
         <echo-component />
     </flow>
 
     <flow name="service-2">
-        <vm:inbound-endpoint path="rrException" exchange-pattern="request-response" />
         <expression-component>hola</expression-component>
     </flow>
 
     <flow name="service-3">
-        <vm:inbound-endpoint path="rrResponseException" exchange-pattern="request-response" />
         <response>
             <expression-component>hola</expression-component>
         </response>
     </flow>
 
     <flow name="service-4">
-        <vm:inbound-endpoint path="ow" exchange-pattern="one-way" />
-        <vm:outbound-endpoint path="ow-out" exchange-pattern="one-way" />
+        <test:queue name="ow-out" />
     </flow>
 
     <flow name="service-5">
-        <vm:inbound-endpoint path="owException" exchange-pattern="one-way" />
         <expression-component>hola</expression-component>
         <catch-exception-strategy>
-            <vm:outbound-endpoint path="owException-out" exchange-pattern="one-way" />
+            <test:queue name="owException-out" />
         </catch-exception-strategy>
     </flow>
 

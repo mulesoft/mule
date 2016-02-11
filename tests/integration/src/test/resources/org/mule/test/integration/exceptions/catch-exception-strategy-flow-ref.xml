@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:json="http://www.mulesoft.org/schema/mule/json"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
 
-    <flow name="vmExceptionHandlingBlock">
-        <vm:inbound-endpoint path="inExceptionBlock" exchange-pattern="request-response"/>
+    <flow name="exceptionHandlingBlock">
         <flow-ref name="blockWithOwnExceptionStrategy"/>
         <json:object-to-json-transformer/>
     </flow>
@@ -26,13 +23,12 @@
     </flow>
 
     <flow name="transactionNotResolvedAfterException">
-        <vm:inbound-endpoint path="inTxWithException" exchange-pattern="request-response">
-            <vm:transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-        <flow-ref name="blockWithOwnExceptionStrategy"/>
-        <custom-processor
-                class="org.mule.test.integration.exceptions.CatchExceptionStrategyFlowRefTestCase$VerifyTransactionNotResolvedProcessor"/>
-        <json:object-to-json-transformer/>
+        <transactional action="ALWAYS_BEGIN">
+            <flow-ref name="blockWithOwnExceptionStrategy"/>
+            <custom-processor
+                    class="org.mule.test.integration.exceptions.CatchExceptionStrategyFlowRefTestCase$VerifyTransactionNotResolvedProcessor"/>
+            <json:object-to-json-transformer/>
+        </transactional>
     </flow>
 
 </mule>

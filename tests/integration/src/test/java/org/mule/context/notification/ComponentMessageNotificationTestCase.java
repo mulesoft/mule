@@ -26,9 +26,9 @@ public class ComponentMessageNotificationTestCase extends AbstractNotificationTe
     public void doTest() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        assertNotNull(client.send("vm://in-1", "hello sweet world", null));
-        client.dispatch("vm://in-2", "goodbye cruel world", null);
-        assertNotNull(client.request("vm://out-2", 5000));
+        assertNotNull(flowRunner("service-1").withPayload("hello sweet world").run());
+        flowRunner("service-2").withPayload("goodbye cruel world").run();
+        assertNotNull(client.request("test://out-2", RECEIVE_TIMEOUT));
     }
 
     @Override

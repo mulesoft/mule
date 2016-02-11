@@ -7,14 +7,12 @@
 package org.mule.routing.outbound;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.routing.RoutingException;
-import org.mule.message.ExceptionMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.message.ExceptionMessage;
 
 import java.io.ByteArrayInputStream;
 
@@ -33,12 +31,9 @@ public class MulticastRouterTestCase extends FunctionalTestCase
     {
         ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://inbound1", bis, null);
+        flowRunner("all").withPayload(bis).asynchronously().run();
 
-        MuleMessage response = client.request("vm://output1", 2000);
-        assertNull(response);
-
-        MuleMessage error = client.request("vm://errors", 2000);
+        MuleMessage error = client.request("test://errors", 2000);
         assertRoutingExceptionReceived(error);
     }
 
@@ -48,12 +43,9 @@ public class MulticastRouterTestCase extends FunctionalTestCase
         ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
 
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://inbound2", bis, null);
+        flowRunner("first-successful").withPayload(bis).asynchronously().run();
 
-        MuleMessage response = client.request("vm://output4", 2000);
-        assertNull(response);
-
-        MuleMessage error = client.request("vm://errors2", 2000);
+        MuleMessage error = client.request("test://errors2", 2000);
         assertRoutingExceptionReceived(error);
     }
 

@@ -6,22 +6,19 @@
  */
 package org.mule.test.integration.messaging.meps;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Test;
 
 public class InOptionalOutOutOnlyTestCase extends FunctionalTestCase
 {
-    public static final long TIMEOUT = 3000;
-
     @Override
     protected String getConfigFile()
     {
@@ -31,16 +28,18 @@ public class InOptionalOutOutOnlyTestCase extends FunctionalTestCase
     @Test
     public void testExchange() throws Exception
     {
-        MuleClient client = muleContext.getClient();
+        FlowRunner baseRunner = flowRunner("In-Optional-Out_Out-Only-Service").withPayload("some data");
+        MuleMessage result = baseRunner.run().getMessage();
 
-        MuleMessage result = client.send("inboundEndpoint", "some data", null);
         assertNotNull(result);
-        assertEquals(NullPayload.getInstance(), result.getPayload());
+        assertThat(result.getPayload(), is(NullPayload.getInstance()));
 
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put("foo", "bar");
-        result = client.send("inboundEndpoint", "some data", props);
+        baseRunner.reset();
+        result = baseRunner.withInboundProperty("foo", "bar")
+                           .run()
+                           .getMessage();
+
         assertNotNull(result);
-        assertEquals("foo header received", result.getPayload());
+        assertThat(result.getPayload(), is("foo header received"));
     }
 }

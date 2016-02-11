@@ -9,16 +9,13 @@ package org.mule.test.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.DefaultMuleEvent;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transformer.TransformerException;
-import org.mule.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -44,12 +41,9 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testEventMetaDataPropagation() throws MuleException
+    public void testEventMetaDataPropagation() throws Exception
     {
-        Flow flow = muleContext.getRegistry().lookupObject("component1");
-        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
-                                               ((InboundEndpoint) flow.getMessageSource()), flow);
-        flow.process(event);
+        flowRunner("component1").withPayload(TEST_PAYLOAD).run();
     }
 
     public static class DummyComponent implements Callable

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:spring="http://www.springframework.org/schema/beans" 
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
@@ -25,45 +23,37 @@
     </flow>
 
     <flow name="flowStatic">
-        <vm:inbound-endpoint path="in-flowStatic" exchange-pattern="request-response"/>
         <flow-ref name="flow"/>
     </flow>
 
     <flow name="subFlowStatic">
-        <vm:inbound-endpoint path="in-subFlowStatic" exchange-pattern="request-response"/>
         <flow-ref name="subFlow"/>
     </flow>
 
     <flow name="flowDynamic">
-        <vm:inbound-endpoint path="in-flowDynamic" exchange-pattern="request-response"/>
         <flow-ref name="#['flow']"/>
     </flow>
 
     <flow name="subFlowDynamic">
-        <vm:inbound-endpoint path="in-subFlowDynamic" exchange-pattern="request-response"/>
         <flow-ref name="#['subFlow']"/>
     </flow>
 
     <flow name="secondFlowStatic">
-        <vm:inbound-endpoint path="in-secondFlowStatic" exchange-pattern="request-response"/>
         <flow-ref name="flow"/>
         <flow-ref name="flow"/>
     </flow>
 
     <flow name="secondSubFlowStatic">
-        <vm:inbound-endpoint path="in-secondSubFlowStatic" exchange-pattern="request-response"/>
         <flow-ref name="subFlow"/>
         <flow-ref name="subFlow"/>
     </flow>
 
     <flow name="secondFlowDynamic">
-        <vm:inbound-endpoint path="in-secondFlowDynamic" exchange-pattern="request-response"/>
         <flow-ref name="#['flow']"/>
         <flow-ref name="#['flow']"/>
     </flow>
 
     <flow name="secondSubFlowDynamic">
-        <vm:inbound-endpoint path="in-secondSubFlowDynamic" exchange-pattern="request-response"/>
         <flow-ref name="#['subFlow']"/>
         <flow-ref name="#['subFlow']"/>
     </flow>
@@ -79,28 +69,24 @@
     </flow>
     
     <flow name="flowStaticWithAsync">
-        <vm:inbound-endpoint path="in-flowStaticWithAsync" exchange-pattern="request-response"/>
         <async>
             <flow-ref name="flowInAsync"/>
         </async>
     </flow>
 
     <flow name="subFlowStaticWithAsync">
-        <vm:inbound-endpoint path="in-subFlowStaticWithAsync" exchange-pattern="request-response"/>
         <async>
             <flow-ref name="subFlowInAsync"/>
         </async>
     </flow>
 
     <flow name="flowDynamicWithAsync">
-        <vm:inbound-endpoint path="in-flowDynamicWithAsync" exchange-pattern="request-response"/>
         <async>
             <flow-ref name="#['flowInAsync']"/>
         </async>
     </flow>
 
     <flow name="subFlowDynamicWithAsync">
-        <vm:inbound-endpoint path="in-subFlowDynamicWithAsync" exchange-pattern="request-response"/>
         <async>
             <flow-ref name="#['subFlowInAsync']"/>
         </async>
@@ -109,28 +95,24 @@
     <!-- Enricher -->
     
     <flow name="flowStaticWithEnricher">
-        <vm:inbound-endpoint path="in-flowStaticWithEnricher" exchange-pattern="request-response"/>
         <enricher source="#[payload]" target="#[flowVars.enriched]">
             <flow-ref name="flow"/>
         </enricher>
     </flow>
 
     <flow name="subFlowStaticWithEnricher">
-        <vm:inbound-endpoint path="in-subFlowStaticWithEnricher" exchange-pattern="request-response"/>
         <enricher source="#[payload]" target="#[flowVars.enriched]">
             <flow-ref name="subFlow"/>
         </enricher>
     </flow>
 
     <flow name="flowDynamicWithEnricher">
-        <vm:inbound-endpoint path="in-flowDynamicWithEnricher" exchange-pattern="request-response"/>
         <enricher source="#[payload]" target="#[flowVars.enriched]">
             <flow-ref name="#['flow']"/>
         </enricher>
     </flow>
 
     <flow name="subFlowDynamicWithEnricher">
-        <vm:inbound-endpoint path="in-subFlowDynamicWithEnricher" exchange-pattern="request-response"/>
         <enricher source="#[payload]" target="#[flowVars.enriched]">
             <flow-ref name="#['subFlow']"/>
         </enricher>
@@ -139,7 +121,6 @@
     <!-- Choice -->
     
     <flow name="flowStaticWithChoice">
-        <vm:inbound-endpoint path="in-flowStaticWithChoice" exchange-pattern="request-response"/>
         <choice>
             <when expression="#[true]">
                 <flow-ref name="flow"/>
@@ -151,7 +132,6 @@
     </flow>
 
     <flow name="subFlowStaticWithChoice">
-        <vm:inbound-endpoint path="in-subFlowStaticWithChoice" exchange-pattern="request-response"/>
         <choice>
             <when expression="#[true]">
                 <flow-ref name="subFlow"/>
@@ -163,7 +143,6 @@
     </flow>
 
     <flow name="flowDynamicWithChoice">
-        <vm:inbound-endpoint path="in-flowDynamicWithChoice" exchange-pattern="request-response"/>
         <choice>
             <when expression="#[true]">
                 <flow-ref name="#['flow']"/>
@@ -175,7 +154,6 @@
     </flow>
 
     <flow name="subFlowDynamicWithChoice">
-        <vm:inbound-endpoint path="in-subFlowDynamicWithChoice" exchange-pattern="request-response"/>
         <choice>
             <when expression="#[true]">
                 <flow-ref name="#['subFlow']"/>
@@ -189,7 +167,6 @@
     <!-- Scatter Gather single -->
     
     <flow name="flowStaticWithScatterGather">
-        <vm:inbound-endpoint path="in-flowStaticWithScatterGather" exchange-pattern="request-response"/>
         <scatter-gather>
             <test:component/>
             <flow-ref name="flow"/>
@@ -197,7 +174,6 @@
     </flow>
 
     <flow name="subFlowStaticWithScatterGather">
-        <vm:inbound-endpoint path="in-subFlowStaticWithScatterGather" exchange-pattern="request-response"/>
         <scatter-gather>
             <test:component/>
             <flow-ref name="subFlow"/>
@@ -205,7 +181,6 @@
     </flow>
 
     <flow name="flowDynamicWithScatterGather">
-        <vm:inbound-endpoint path="in-flowDynamicWithScatterGather" exchange-pattern="request-response"/>
         <scatter-gather>
             <test:component/>
             <flow-ref name="#['flow']"/>
@@ -213,7 +188,6 @@
     </flow>
 
     <flow name="subFlowDynamicWithScatterGather">
-        <vm:inbound-endpoint path="in-subFlowDynamicWithScatterGather" exchange-pattern="request-response"/>
         <scatter-gather>
             <test:component/>
             <flow-ref name="#['subFlow']"/>
@@ -223,7 +197,6 @@
     <!-- Scatter Gather chain -->
     
     <flow name="flowStaticWithScatterGatherChain">
-        <vm:inbound-endpoint path="in-flowStaticWithScatterGatherChain" exchange-pattern="request-response"/>
         <scatter-gather>
             <test:component/>
             <processor-chain>
@@ -233,7 +206,6 @@
     </flow>
 
     <flow name="subFlowStaticWithScatterGatherChain">
-        <vm:inbound-endpoint path="in-subFlowStaticWithScatterGatherChain" exchange-pattern="request-response"/>
         <scatter-gather>
             <test:component/>
             <processor-chain>
@@ -243,7 +215,6 @@
     </flow>
 
     <flow name="flowDynamicWithScatterGatherChain">
-        <vm:inbound-endpoint path="in-flowDynamicWithScatterGatherChain" exchange-pattern="request-response"/>
         <scatter-gather>
             <test:component/>
             <processor-chain>
@@ -253,7 +224,6 @@
     </flow>
 
     <flow name="subFlowDynamicWithScatterGatherChain">
-        <vm:inbound-endpoint path="in-subFlowDynamicWithScatterGatherChain" exchange-pattern="request-response"/>
         <scatter-gather>
             <test:component/>
             <processor-chain>

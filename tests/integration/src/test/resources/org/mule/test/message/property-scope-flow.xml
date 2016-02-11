@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <flow name="foo" processingStrategy="synchronous">
+        <append-string-transformer message=" bar" />
+        <message-properties-transformer
+            scope="outbound">
+            <add-message-property key="foo"
+                value="#[message.inboundProperties.foo]" />
+        </message-properties-transformer>
+        <echo-component />
+    </flow>
+
+    <flow name="s1">
+        <message-properties-transformer scope="outbound">
+            <add-message-property key="foo2" value="#[message.inboundProperties.foo]" />
+        </message-properties-transformer>
+        <flow-ref name="s2" />
+        <message-properties-transformer scope="outbound">
+            <add-message-property key="foo4" value="#[message.outboundProperties.foo3]" />
+        </message-properties-transformer>
+    </flow>
+
+    <flow name="s2">
+        <append-string-transformer message=" bar" />
+        <message-properties-transformer scope="outbound">
+            <add-message-property key="foo3" value="#[message.outboundProperties.foo2]" />
+        </message-properties-transformer>
+        <echo-component />
+    </flow>
+
+    <flow name="oneWay">
+        <append-string-transformer message=" bar" />
+        <message-properties-transformer scope="outbound">
+            <add-message-property key="foo2" value="#[message.inboundProperties.foo]" />
+        </message-properties-transformer>
+        <test:queue name="queueOut" />
+    </flow>
+
+    <flow name="rrToOneWay">
+        <append-string-transformer message=" baz" />
+        <message-properties-transformer scope="outbound">
+            <add-message-property key="foo2" value="#[message.inboundProperties.foo]" />
+        </message-properties-transformer>
+        <test:queue name="rrQueueOut" />
+    </flow>
+</mule>

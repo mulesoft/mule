@@ -6,10 +6,12 @@
  */
 package org.mule.test.usecases.routing.response;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -44,7 +46,7 @@ public class SerializationOnResponseAggregatorTestCase extends FunctionalTestCas
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() , getTestMuleMessage("request"), newOptions().method(POST.name()).build());
         assertNotNull(message);
-        assertEquals("request processed", new String(getPayloadAsBytes(message)));
+        assertThat(new String(getPayloadAsBytes(message)), is("request processed"));
     }
 
     private static class TestObjectStore extends SimpleMemoryObjectStore<Serializable>

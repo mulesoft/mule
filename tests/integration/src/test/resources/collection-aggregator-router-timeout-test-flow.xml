@@ -2,39 +2,38 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
-
-    <vm:connector name="queue"/>
 
     <!-- Split the message and set correlation group ids and sizes -->
     <flow name="splitter">
-        <vm:inbound-endpoint path="splitter" exchange-pattern="one-way"/>
         <collection-splitter/>
         <!-- round-robin is critical here, otherwise 'aggregator' endpoint is never hit. -->
         <round-robin>
-            <vm:outbound-endpoint path="aggregator" exchange-pattern="one-way"/>
-            <vm:outbound-endpoint path="lostInTime" exchange-pattern="one-way"/>
+            <async>
+                <flow-ref name="aggregator"/>
+            </async>
+            <async>
+                <flow-ref name="vortex"/>
+            </async>
         </round-robin>
     </flow>
 
     <!-- This service waits long enough for the correlation-aggregator-router to timeout, no message should pass through 
         this service. -->
     <flow name="vortex">  
-        <vm:inbound-endpoint path="lostInTime" exchange-pattern="one-way"/>
         <test:component waitTime="6000"/>
-        <vm:outbound-endpoint path="aggregator" exchange-pattern="one-way"/>
+        <async>
+            <flow-ref name="aggregator"/>
+        </async>
     </flow>
 
     <!-- This service waits for messages and times out -->
     <flow name="aggregator">
-        <vm:inbound-endpoint path="aggregator" exchange-pattern="one-way" />
         <collection-aggregator timeout="2000" failOnTimeout="false"/>
         <test:component/>
-        <vm:outbound-endpoint path="out" exchange-pattern="one-way" connector-ref="queue"/>
+        <test:queue name="out"/>
     </flow>
 
 </mule>

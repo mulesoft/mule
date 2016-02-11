@@ -1,37 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
     <flow name="SplitterFlow">
-        <vm:inbound-endpoint path="in"/>
         <message-chunk-splitter messageSize="2" enableCorrelation="NEVER" />
-        <vm:outbound-endpoint path="afterSplit" exchange-pattern="request-response"/>
+        <flow-ref name="AggregationFlow"/>
     </flow>
 
     <flow name="AggregationFlow">
-        <vm:inbound-endpoint path="afterSplit" exchange-pattern="request-response"/>
         <collection-aggregator timeout="2000" failOnTimeout="false"/>
-        <vm:outbound-endpoint path="collectionCreated"/>
+        <logger message="#[payload]" level="ERROR"/>
+        <test:queue name="collectionCreated"/>
     </flow>
 
     <flow name="SplitterFlow2">
-        <vm:inbound-endpoint path="in2"/>
         <message-chunk-splitter messageSize="2" enableCorrelation="NEVER" />
-        <vm:outbound-endpoint path="afterSplit2" exchange-pattern="request-response"/>
+        <flow-ref name="AggregationFlow2"/>
     </flow>
 
     <flow name="AggregationFlow2">
-        <vm:inbound-endpoint path="afterSplit2" exchange-pattern="request-response"/>
         <custom-aggregator class="org.mule.routing.outbound.AggregationTestCase$Aggregator" timeout="2000" failOnTimeout="false"/>
-        <vm:outbound-endpoint path="collectionCreated2"/>
+        <logger message="#[payload]" level="ERROR"/>
+        <test:queue name="collectionCreated2"/>
     </flow>
 
 </mule>

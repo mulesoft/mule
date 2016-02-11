@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mule.api.transport.PropertyScope.SESSION;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -33,8 +32,7 @@ public class PropertiesWithAllTestCase extends FunctionalTestCase
     @Test
     public void testSessionAndOutboundProperties() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://in", "Hello", null);
+        MuleMessage response = flowRunner("flow1").withPayload("Hello").run().getMessage();
         assertNotNull(response);
         assertEquals("foo", response.getProperty("foo", SESSION));
         assertEquals("bar", response.getProperty("bar", SESSION));

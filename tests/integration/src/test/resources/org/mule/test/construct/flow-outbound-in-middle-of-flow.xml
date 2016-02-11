@@ -1,23 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <configuration>
+        <expression-language autoResolveVariables="false">
+            <import class="org.mule.util.StringUtils" />
+            <global-functions>
+                def reversePayload() { StringUtils.reverse(payload) }
+            </global-functions>
+        </expression-language>
+    </configuration>
 
     <flow name="flowTest">
-        <vm:inbound-endpoint path="test.in" />
 
         <append-string-transformer message="hello"></append-string-transformer>
 
-        <vm:outbound-endpoint path="test.out.1" />
+        <test:queue name="test.out.1" />
 
         <expression-transformer expression="payload.replaceAll('hello', 'bye')" />
 
-        <vm:outbound-endpoint path="test.out.2" />
+        <test:queue name="test.out.2" />
         
-        <expression-transformer expression="payload.replaceAll('bye', '').reverse()" />
+        <expression-transformer expression="payload.replaceAll('bye', '')" />
+        <expression-transformer expression="reversePayload()" />
             
-        <vm:outbound-endpoint path="test.out.3" />
+        <test:queue name="test.out.3" />
 
     </flow>
 

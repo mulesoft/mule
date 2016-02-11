@@ -19,25 +19,31 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
 import org.mule.routing.SimpleCollectionAggregator;
 import org.mule.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.routing.correlation.EventCorrelatorCallback;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Test that aggregators preserve message order in synchronous scenarios (MULE-5998)
  */
+//TODO: MULE-9303
+@Ignore("MULE-9303 Review aggregator sorting using runFlow")
 public class AggregationTestCase extends FunctionalTestCase
 {
+
+    private static final String PAYLOAD = "Long string that will be broken up into multiple messages";
+
     @Override
     protected String getConfigFile()
     {
@@ -49,9 +55,8 @@ public class AggregationTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        String payload = "Long string that wil be broken uop into multiple messages";
-        client.dispatch("vm://in", payload, null);
-        MuleMessage msg = client.request("vm://collectionCreated", 5000);
+        flowRunner("SplitterFlow").withPayload(PAYLOAD).asynchronously().run();
+        MuleMessage msg = client.request("test://collectionCreated", RECEIVE_TIMEOUT);
         assertNotNull(msg);
         assertTrue(msg.getPayload() instanceof List);
 
@@ -63,16 +68,15 @@ public class AggregationTestCase extends FunctionalTestCase
             baos.write(chunk);
         }
         String aggregated = baos.toString();
-        assertEquals(payload, aggregated);
+        assertEquals(PAYLOAD, aggregated);
     }
 
     @Test
     public void testCustomAggregator() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        String payload = "Long string that wil be broken uop into multiple messages";
-        client.dispatch("vm://in2", payload, null);
-        MuleMessage msg = client.request("vm://collectionCreated2", 5000);
+        flowRunner("SplitterFlow2").withPayload(PAYLOAD).asynchronously().run();
+        MuleMessage msg = client.request("test://collectionCreated2", RECEIVE_TIMEOUT);
         assertNotNull(msg);
         assertNotNull(msg.getPayload());
         assertTrue(msg.getPayload() instanceof List);
@@ -86,7 +90,7 @@ public class AggregationTestCase extends FunctionalTestCase
             baos.write((byte[])event.getMessage().getPayload());
         }
         String aggregated = baos.toString();
-        assertEquals(payload, aggregated);
+        assertEquals(PAYLOAD, aggregated);
     }
     public static class Aggregator extends SimpleCollectionAggregator
     {

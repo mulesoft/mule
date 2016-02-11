@@ -74,7 +74,7 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Function
         }
     }
 
-    private static class ClientRequest extends Thread
+    private class ClientRequest extends Thread
     {
         final MuleClient client;
         int requestCount;
@@ -94,7 +94,7 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Function
             {
                 try
                 {
-                    final MuleMessage outbound = client.send("vm://test.inbound.sync", payload, null);
+                    final MuleMessage outbound = flowRunner("flowTestSync").withPayload(payload).run().getMessage();
                     assertNull(outbound.getExceptionPayload());
                     assertNotNull(outbound.getPayload());
                     byte[] bytes = null;

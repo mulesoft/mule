@@ -8,9 +8,8 @@ package org.mule.config.spring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 public abstract class AbstractBeanProfileTestCase extends FunctionalTestCase
@@ -22,11 +21,11 @@ public abstract class AbstractBeanProfileTestCase extends FunctionalTestCase
         return "org/mule/test/integration/spring/bean-profiles-config.xml";
     }
 
-    public void profile(String appended) throws MuleException
+    public void profile(String appended) throws Exception
     {
-        org.mule.api.client.MuleClient client = muleContext.getClient();
-        client.dispatch("vm://in", "Homero", null);
-        MuleMessage response = client.request("vm://out", RECEIVE_TIMEOUT);
+        flowRunner("service").withPayload(getTestMuleMessage("Homero")).run();
+        MuleClient client = muleContext.getClient();
+        MuleMessage response = client.request("test://out", RECEIVE_TIMEOUT);
         assertNotNull("Response is null", response);
         assertEquals("Homero" + appended, response.getPayload());
     }

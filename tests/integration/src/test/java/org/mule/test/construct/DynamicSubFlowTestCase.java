@@ -31,7 +31,7 @@ public class DynamicSubFlowTestCase extends FunctionalTestCase
     @Test
     public void testCofiguration() throws Exception
     {
-        final MuleEvent muleEvent = runFlow("ApplicationFlow", "");
+        final MuleEvent muleEvent = flowRunner("ApplicationFlow").withPayload("").run();
         MuleMessage result = muleEvent.getMessage();
         assertThat(result, is(notNullValue()));
         assertThat(result.getExceptionPayload(), is(nullValue()));

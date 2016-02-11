@@ -9,7 +9,6 @@ package org.mule.test.integration.resolvers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -31,8 +30,7 @@ public class MethodEntryPointWithTransformerTestCase extends FunctionalTestCase
     @Test
     public void testReceivesMethodPropertyFromAPropertyTransformer() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://in", "payload", null);
+        MuleMessage response = flowRunner("testService").withPayload("payload").run().getMessage();
         assertNotNull(response);
         assertNotNull(response.getPayload());
         assertEquals("Transformed payload", getPayloadAsString(response));

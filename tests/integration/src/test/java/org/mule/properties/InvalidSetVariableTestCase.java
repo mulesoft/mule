@@ -11,8 +11,10 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -23,8 +25,12 @@ public class InvalidSetVariableTestCase extends AbstractMuleTestCase
     private String muleConfigPath;
 
     @Parameterized.Parameters
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] {{"org/mule/properties/invalid-set-property.xml"}, {"org/mule/properties/invalid-set-variable.xml"}});
+    public static Collection<Object[]> data()
+    {
+        return Arrays.asList(new Object[][] {
+                                             {"org/mule/properties/invalid-set-property.xml"},
+                                             {"org/mule/properties/invalid-set-variable.xml"}
+        });
     }
 
     public InvalidSetVariableTestCase(String muleConfigPath)

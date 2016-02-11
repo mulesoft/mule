@@ -60,7 +60,7 @@ public class FlowRefTestCase extends FunctionalTestCase
     @Test
     public void twoFlowRefsToSubFlow() throws Exception
     {
-        final MuleEvent muleEvent = runFlow("flow1", "0");
+        final MuleEvent muleEvent = flowRunner("flow1").withPayload("0").run();
         final MuleMessage msg = muleEvent.getMessage();
 
         assertEquals("012xyzabc312xyzabc3", getPayloadAsString(msg));

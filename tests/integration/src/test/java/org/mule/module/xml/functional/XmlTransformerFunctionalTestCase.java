@@ -6,9 +6,12 @@
  */
 package org.mule.module.xml.functional;
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -31,73 +34,76 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
         return "org/mule/module/xml/xml-transformer-functional-test-flow.xml";
     }
 
-    protected MuleClient sendXml() throws MuleException
+    protected void sendXml() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("xml-in", SIMPLE_XML, null);
-        return client;
+        flowRunner("xml to ...").withPayload(SIMPLE_XML).asynchronously().run();
     }
 
-    protected MuleClient sendObject() throws MuleException
+    protected void sendObject() throws Exception
     {
-        return sendObject("object-in");
+        sendObject("object to xml");
     }
 
-    protected MuleClient sendObject(String endpoint) throws MuleException
+    protected void sendObject(String flowName) throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.dispatch(endpoint, new Parent(new Child()), null);
-        return client;
+        flowRunner(flowName).withPayload(new Parent(new Child())).asynchronously().run();
     }
 
     @Test
     public void testXmlOut() throws Exception
     {
-        String xml = (String) request(sendXml(), "xml-out", String.class);
-        XMLAssert.assertXMLEqual(SIMPLE_XML, xml);
+        sendXml();
+        String xml = (String) request("test://xml-out", String.class);
+        assertXMLEqual(SIMPLE_XML, xml);
     }
 
     @Test
-    public void testXmlDomOut() throws MuleException
+    public void testXmlDomOut() throws Exception
     {
-        Document dom = (Document) request(sendXml(), "xml-dom-out", Document.class);
+        sendXml();
+        Document dom = (Document) request("test://xml-dom-out", Document.class);
         assertEquals("parent", dom.getDocumentElement().getLocalName());
     }
 
     @Test
     public void testXmlXsltOut() throws Exception
     {
-        String xml = (String) request(sendXml(), "xml-xslt-out-string", String.class);
-        XMLAssert.assertXMLEqual(CHILDLESS_XML, xml);
+        sendXml();
+        String xml = (String) request("test://xml-xslt-out-string", String.class);
+        assertXMLEqual(CHILDLESS_XML, xml);
     }
 
     @Test
     public void testDomXmlOut() throws Exception
     {
-        String xml = (String) request(sendXml(), "dom-xml-out", String.class);
+        sendXml();
+        String xml = (String) request("test://dom-xml-out", String.class);
         XMLAssert.assertXMLEqual(SIMPLE_XML, xml);
     }
 
     @Test
     public void testObjectOut() throws Exception
     {
-        request(sendObject(), "object-out", Parent.class);
+        sendObject();
+        request("test://object-out", Parent.class);
     }
 
     @Test
     public void testObjectXmlOut() throws Exception
     {
-        String xml = (String) request(sendObject(), "object-xml-out", String.class);
+        sendObject();
+        String xml = (String) request("test://object-xml-out", String.class);
         System.out.println(xml);
         XMLAssert.assertXMLEqual(SERIALIZED, xml);
     }
 
-    protected Object request(MuleClient client, String endpoint, Class<?> clazz) throws MuleException
+    protected Object request(String endpoint, Class<?> clazz) throws MuleException
     {
+        MuleClient client = muleContext.getClient();
         MuleMessage message = client.request(endpoint, TIMEOUT);
         assertNotNull(message);
         assertNotNull(message.getPayload());
-        assertTrue(message.getPayload().getClass().getName(), clazz.isAssignableFrom(message.getPayload().getClass()));
+        assertThat(message.getPayload(), instanceOf(clazz));
         return message.getPayload();
     }
 

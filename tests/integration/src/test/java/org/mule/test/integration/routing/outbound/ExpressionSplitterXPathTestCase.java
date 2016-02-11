@@ -10,27 +10,17 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
 public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
 {
-
-    protected ConfigVariant variant;
-    protected String configResources;
 
     private final String MESSAGE = "<Batch xmlns=\"http://acme.com\">\n" +
             "    <Trade>\n" +
@@ -63,29 +53,21 @@ public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
             "        <Received/>\n" +
             "    </Trade>";
 
-
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test-flow.xml"},
-            {ConfigVariant.FLOW_EL, "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test-flow-el.xml"}
-        });
+        return "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test-flow-el.xml";
     }
 
-    public ExpressionSplitterXPathTestCase(ConfigVariant variant, String configResources)
+    public ExpressionSplitterXPathTestCase()
     {
-        this.variant = variant;
-        this.configResources = configResources;
         XMLUnit.setIgnoreWhitespace(true);
     }
 
     @Test
-    @Ignore("MULE-6926: flaky test")
     public void testRecipientList() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://distributor.queue", MESSAGE, null);
+        MuleMessage result = flowRunner("Distributor").withPayload(MESSAGE).run().getMessage();
 
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof List);
@@ -95,16 +77,5 @@ public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
 
         assertTrue(XMLUnit.compareXML(EXPECTED_MESSAGE_1, results.get(0).toString()).identical());
         assertTrue(XMLUnit.compareXML(EXPECTED_MESSAGE_2, results.get(1).toString()).identical());
-    }
-
-    public static enum ConfigVariant
-    {
-        FLOW, FLOW_EL
-    }
-
-    @Override
-    public String getConfigResources()
-    {
-        return configResources;
     }
 }

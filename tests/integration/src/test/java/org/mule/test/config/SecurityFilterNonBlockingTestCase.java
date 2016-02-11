@@ -6,7 +6,6 @@
  */
 package org.mule.test.config;
 
-import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -26,8 +25,7 @@ public class SecurityFilterNonBlockingTestCase extends FunctionalTestCase
     @Test
     public void securityFilterShouldAllowNonBlocking() throws Exception
     {
-        runFlowNonBlocking("nonBlockingSecurity");
-        FlowAssert.verify();
+        flowRunner("nonBlockingSecurity").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
 }

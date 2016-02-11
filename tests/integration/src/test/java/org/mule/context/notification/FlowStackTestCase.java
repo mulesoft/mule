@@ -12,10 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.api.config.MuleProperties.MULE_FLOW_TRACE;
 import static org.mule.tck.util.FlowTraceUtils.assertStackElements;
 import static org.mule.tck.util.FlowTraceUtils.isFlowStackElement;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.context.notification.MessageProcessorNotificationListener;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.FlowTraceUtils.FlowStackAsserter;
@@ -53,7 +50,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void flowStatic() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowStatic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowStatic").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -65,7 +62,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void subFlowStatic() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowStatic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowStatic").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -77,7 +74,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void flowDynamic() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowDynamic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowDynamic").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -89,7 +86,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void subFlowDynamic() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowDynamic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowDynamic").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -101,7 +98,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void secondFlowStatic() throws Exception
     {
-        muleContext.getClient().send("vm://in-secondFlowStatic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("secondFlowStatic").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -113,7 +110,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void secondSubFlowStatic() throws Exception
     {
-        muleContext.getClient().send("vm://in-secondSubFlowStatic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("secondSubFlowStatic").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -125,7 +122,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void secondFlowDynamic() throws Exception
     {
-        muleContext.getClient().send("vm://in-secondFlowDynamic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("secondFlowDynamic").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -137,7 +134,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void secondSubFlowDynamic() throws Exception
     {
-        muleContext.getClient().send("vm://in-secondSubFlowDynamic", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("secondSubFlowDynamic").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -149,7 +146,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void flowStaticWithAsync() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowStaticWithAsync", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowStaticWithAsync").withPayload("payload").run();
 
         FlowStackAsyncAsserter.latch.await(1, TimeUnit.SECONDS);
 
@@ -163,7 +160,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void subFlowStaticWithAsync() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowStaticWithAsync", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowStaticWithAsync").withPayload("payload").run();
 
         FlowStackAsyncAsserter.latch.await(1, TimeUnit.SECONDS);
 
@@ -177,7 +174,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void flowDynamicWithAsync() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowDynamicWithAsync", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowDynamicWithAsync").withPayload("payload").run();
 
         FlowStackAsyncAsserter.latch.await(1, TimeUnit.SECONDS);
 
@@ -191,7 +188,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void subFlowDynamicWithAsync() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowDynamicWithAsync", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowDynamicWithAsync").withPayload("payload").run();
 
         FlowStackAsyncAsserter.latch.await(1, TimeUnit.SECONDS);
 
@@ -205,7 +202,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void flowStaticWithEnricher() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowStaticWithEnricher", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowStaticWithEnricher").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -217,7 +214,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void subFlowStaticWithEnricher() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowStaticWithEnricher", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowStaticWithEnricher").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -229,7 +226,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void flowDynamicWithEnricher() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowDynamicWithEnricher", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowDynamicWithEnricher").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -241,7 +238,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void subFlowDynamicWithEnricher() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowDynamicWithEnricher", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowDynamicWithEnricher").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -253,7 +250,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void flowStaticWithChoice() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowStaticWithChoice", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowStaticWithChoice").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -265,7 +262,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void subFlowStaticWithChoice() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowStaticWithChoice", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowStaticWithChoice").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -277,7 +274,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void flowDynamicWithChoice() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowDynamicWithChoice", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowDynamicWithChoice").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -289,7 +286,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void subFlowDynamicWithChoice() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowDynamicWithChoice", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowDynamicWithChoice").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -301,7 +298,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void flowStaticWithScatterGather() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowStaticWithScatterGather", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowStaticWithScatterGather").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -313,7 +310,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void subFlowStaticWithScatterGather() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowStaticWithScatterGather", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowStaticWithScatterGather").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -325,7 +322,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void flowDynamicWithScatterGather() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowDynamicWithScatterGather", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowDynamicWithScatterGather").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -337,7 +334,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void subFlowDynamicWithScatterGather() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowDynamicWithScatterGather", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowDynamicWithScatterGather").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -349,7 +346,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void flowStaticWithScatterGatherChain() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowStaticWithScatterGatherChain", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowStaticWithScatterGatherChain").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -361,7 +358,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void subFlowStaticWithScatterGatherChain() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowStaticWithScatterGatherChain", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowStaticWithScatterGatherChain").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -373,7 +370,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void flowDynamicWithScatterGatherChain() throws Exception
     {
-        muleContext.getClient().send("vm://in-flowDynamicWithScatterGatherChain", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("flowDynamicWithScatterGatherChain").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
@@ -385,7 +382,7 @@ public class FlowStackTestCase extends FunctionalTestCase
     @Test
     public void subFlowDynamicWithScatterGatherChain() throws Exception
     {
-        muleContext.getClient().send("vm://in-subFlowDynamicWithScatterGatherChain", new DefaultMuleMessage("payload", muleContext));
+        flowRunner("subFlowDynamicWithScatterGatherChain").withPayload("payload").run();
 
         assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
         

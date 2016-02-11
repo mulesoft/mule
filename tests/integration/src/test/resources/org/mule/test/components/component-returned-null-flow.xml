@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="StopFlowService">
-        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
         <component class="org.mule.test.components.ComponentReturningNullFlowTestCase$ComponentReturningNull"/>
-        <vm:outbound-endpoint path="next" exchange-pattern="request-response"/>
+        <async>
+            <flow-ref name="ShouldNotBeReachable"/>
+        </async>
     </flow>
 
     <flow name="ShouldNotBeReachable">
-        <vm:inbound-endpoint path="next" exchange-pattern="one-way"/>
         <test:component>
             <test:return-data>ERROR</test:return-data>
         </test:component>

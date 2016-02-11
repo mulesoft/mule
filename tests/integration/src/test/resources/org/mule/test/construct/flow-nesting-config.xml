@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"                      
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="               
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd                                                           
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd                             
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
     <flow name="NestedFilters">
-        <vm:inbound-endpoint exchange-pattern="one-way" path="inFilter"/>
         <and-filter>
             <message-property-filter scope="inbound" pattern="Currency=MyCurrency"/>
             <or-filter>
@@ -26,11 +25,10 @@
                 </and-filter>
             </or-filter>
         </and-filter>
-        <vm:outbound-endpoint exchange-pattern="one-way" path="outFilter"/>
+        <test:queue name="outFilter"/>
     </flow>
 
     <flow name="NestedChoice">
-        <vm:inbound-endpoint exchange-pattern="one-way" path="inChoice"/>
         <choice>
             <when expression="payload is org.mule.tck.testmodels.fruit.Apple">
                 <script:transformer>
@@ -45,17 +43,17 @@
                         <choice>
                             <when expression="#[message.inboundProperties['Amount'] &lt; 5000]">
                                 <append-string-transformer message="C"/>
-                                <vm:outbound-endpoint exchange-pattern="one-way" path="outChoice"/>
+                                <test:queue name="outChoice"/>
                             </when>
                             <otherwise>
-                                <vm:outbound-endpoint exchange-pattern="one-way" path="outChoice"/>
+                                <test:queue name="outChoice"/>
                             </otherwise>
                         </choice>
                     </when>
                 </choice>
             </when>
             <otherwise>
-                <vm:outbound-endpoint exchange-pattern="one-way" path="outChoice"/>
+                <test:queue name="outChoice"/>
             </otherwise>
         </choice>
     </flow>              

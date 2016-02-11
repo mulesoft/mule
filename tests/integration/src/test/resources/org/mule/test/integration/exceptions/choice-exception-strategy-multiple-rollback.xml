@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+       ">
 
     <flow name="test">
-        <vm:inbound-endpoint path="in"/>
         <logger/>
         <choice-exception-strategy>
             <rollback-exception-strategy when="#[flowVars['nonsense'].equals('hi')]" maxRedeliveryAttempts="4"/>

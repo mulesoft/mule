@@ -6,17 +6,17 @@
  */
 package org.mule.properties;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.api.transport.PropertyScope;
-import org.mule.construct.Flow;
-import org.mule.functional.functional.FlowAssert;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -42,81 +42,62 @@ public class InvocationPropertiesTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort3 = new DynamicPort("port3");
 
+    @Override
+    protected String getConfigFile()
+    {
+        return "org/mule/properties/invocation-properties-config.xml";
+    }
+
     @Test
     public void setInvocationPropertyUsingAPIGetInFlow() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
-
-        message.setProperty("P1", "P1_VALUE", PropertyScope.INVOCATION);
-
-        testFlow("GetInvocationPropertyInFlow", event);
+        FlowRunner runner = flowRunner("GetInvocationPropertyInFlow").withPayload("data").withInvocationProperty("P1", "P1_VALUE").asynchronously();
+        runner.run();
     }
 
     @Test
     public void setInvocationPropertyInFlowGetUsingAPI() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
+        FlowRunner runner = flowRunner("SetInvocationPropertyInFlow").withPayload("data").asynchronously();
+        MuleEvent event = runner.buildEvent();
+        runner.run();
 
-        Flow flowA = (Flow) muleContext.getRegistry().lookupFlowConstruct("SetInvocationPropertyInFlow");
-        MuleEvent result = flowA.process(event);
-
-        assertEquals("P1_VALUE", result.getMessage().getProperty("P1", PropertyScope.INVOCATION));
+        assertThat(event.getMessage().getProperty("P1", PropertyScope.INVOCATION), is("P1_VALUE"));
     }
 
     @Test
     public void overwritePropertyValueInFlow() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
-
-        message.setProperty("P1", "P1_VALUE", PropertyScope.INVOCATION);
-
-        testFlow("OverwritePropertyValueInFlow", event);
-
-        assertEquals("P1_VALUE_NEW", event.getMessage().getProperty("P1", PropertyScope.INVOCATION));
+        FlowRunner runner = flowRunner("OverwritePropertyValueInFlow").withPayload("data").withInvocationProperty("P1", "P1_VALUE").asynchronously();
+        MuleEvent event = runner.buildEvent();
+        runner.run();
+        
+        assertThat(event.getMessage().getProperty("P1", PropertyScope.INVOCATION), is("P1_VALUE_NEW"));
     }
 
     @Test
     public void propagationInSameFlow() throws Exception
     {
-        testFlow("propagationInSameFlow");
-    }
-
-    @Test
-    public void noPropagationInDifferentFlowVMRequestResponse() throws Exception
-    {
-        testFlow("noPropagationInDifferentFlowVMRequestResponse");
-        FlowAssert.verify("noPropagationInDifferentFlowVMRequestResponse-2");
-    }
-
-    @Test
-    public void noPropagationInDifferentFlowVMOneWay() throws Exception
-    {
-        testFlow("noPropagationInDifferentFlowVMOneWay");
-        FlowAssert.verify("noPropagationInDifferentFlowVMOneWay-2");
+        flowRunner("propagationInSameFlow").asynchronously().run();
     }
 
     @Test
     public void noPropagationInDifferentFlowHttp() throws Exception
     {
-        testFlow("noPropagationInDifferentFlowHttp");
-        FlowAssert.verify("noPropagationInDifferentFlowHttp-2");
+        flowRunner("noPropagationInDifferentFlowHttp").asynchronously().runAndVerify("noPropagationInDifferentFlowHttp-2");
     }
 
     @Test
     public void propagationThroughOneWayFlowSedaQueue() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
-
         Object nonSerializable = new Object();
-        message.setInvocationProperty("P1", "value");
-        message.setInvocationProperty("P2", nonSerializable);
-        message.setInvocationProperty("testThread", Thread.currentThread());
-
-        testFlow("AsyncFlow", event);
+        FlowRunner runner = flowRunner("AsyncFlow").withPayload("data")
+                                                   .withInvocationProperty("P1", "value")
+                                                   .withInvocationProperty("P2", nonSerializable)
+                                                   .withInvocationProperty("testThread", Thread.currentThread())
+                                                   .asynchronously();
+        MuleMessage message = runner.buildEvent().getMessage();
+        runner.run();
 
         assertNotNull(message.getInvocationProperty("P1"));
         assertNotNull(message.getInvocationProperty("P2"));
@@ -124,127 +105,118 @@ public class InvocationPropertiesTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void propagationWithVMRequestResponseOutboundEndpointMidFlow() throws Exception
-    {
-        testFlow("VMRequestResponseEndpointFlowMidFlow");
-    }
-
-    @Test
     public void propagationWithHTTPRequestResponseOutboundEndpointMidFlow() throws Exception
     {
-        testFlow("HTTPRequestResponseEndpointFlowMidFlow");
+        flowRunner("HTTPRequestResponseEndpointFlowMidFlow").asynchronously().run();
     }
 
     @Test
     public void propagationThroughFlowRefToFlow() throws Exception
     {
-        testFlow("propagationThroughFlowRefToFlow");
-        FlowAssert.verify("FlowRef-1");
-        FlowAssert.verify("FlowRef-2");
-        FlowAssert.verify("FlowRef-3");
+        flowRunner("propagationThroughFlowRefToFlow").asynchronously().runAndVerify("FlowRef-1", "FlowRef-2", "FlowRef-3");
     }
 
     @Test
     public void overwritePropertyValueInFlowViaFlowRef() throws Exception
     {
-        testFlow("OverwriteInFlowRef");
+        flowRunner("OverwriteInFlowRef").asynchronously().run();
     }
 
     @Test
     public void propagationThroughFlowRefToSubFlow() throws Exception
     {
-        testFlow("propagationThroughFlowRefToSubFlow");
+        flowRunner("propagationThroughFlowRefToSubFlow").asynchronously().run();
     }
 
     @Test
     public void overwritePropertyValueInSubFlowViaFlowRef() throws Exception
     {
-        testFlow("OverwriteInSubFlowRef");
+        flowRunner("OverwriteInSubFlowRef").asynchronously().run();
     }
 
     @Test
     public void propagationThroughAsyncElement() throws Exception
     {
-        testFlow("propagationThroughAsyncElement");
+        flowRunner("propagationThroughAsyncElement").asynchronously().run();
     }
 
     @Test
     public void propertyAddedInAsyncElementNotAddedinFlow() throws Exception
     {
-        testFlow("propertyAddedInAsyncElementNotAddedinFlow");
+        flowRunner("propertyAddedInAsyncElementNotAddedinFlow").asynchronously().run();
     }
 
     @Test
     public void propagationThroughWireTap() throws Exception
     {
-        testFlow("propagationThroughWireTap");
+        flowRunner("propagationThroughWireTap").asynchronously().run();
     }
 
     @Test
     public void propertyAddedInWireTapNotAddedinFlow() throws Exception
     {
-        testFlow("propertyAddedInWireTapNotAddedinFlow");
+        flowRunner("propertyAddedInWireTapNotAddedinFlow").asynchronously().run();
     }
 
     @Test
     public void propagationThroughEnricher() throws Exception
     {
-        testFlow("propagationThroughEnricher");
+        flowRunner("propagationThroughEnricher").asynchronously().run();
     }
 
     @Test
     public void propertyAddedInEnricherNotAddedinFlow() throws Exception
     {
-        testFlow("propertyAddedInEnricherNotAddedinFlow");
+        flowRunner("propertyAddedInEnricherNotAddedinFlow").asynchronously().run();
     }
 
     @Test
     /** Router drops invocation properties **/
     public void propagateToRoutesInAll() throws Exception
     {
-        testFlow("propagateToRoutesInAll");
+        flowRunner("propagateToRoutesInAll").asynchronously().run();
     }
 
     @Test
     public void propagateThroughAllRouterWithResults() throws Exception
     {
-        testFlow("propagateThroughAllRouterWithResults");
+        flowRunner("propagateThroughAllRouterWithResults").asynchronously().run();
     }
 
     @Test
     public void propagateThroughAllRouterWithNoResults() throws Exception
     {
-        testFlow("propagateThroughAllRouterWithNoResults");
+        flowRunner("propagateThroughAllRouterWithNoResults").asynchronously().run();
     }
 
     @Test
     public void propagateBetweenRoutes() throws Exception
     {
-        testFlow("propagateBetweenRoutes");
+        flowRunner("propagateBetweenRoutes").asynchronously().run();
     }
 
     @Test
     public void propagateFromRouteToNextProcessorSingleRoute() throws Exception
     {
-        testFlow("propagateFromRouteToNextProcessorSingleRoute");
+        flowRunner("propagateFromRouteToNextProcessorSingleRoute").asynchronously().run();
     }
 
     @Test
     public void propagateFromRouteToNextProcessorMultipleRoutes() throws Exception
     {
-        testFlow("propagateFromRouteToNextProcessorMultipleRoutes");
+        flowRunner("propagateFromRouteToNextProcessorMultipleRoutes").asynchronously().run();
     }
 
     @Test
     public void propagateFromRouteToNextProcessorNoResult() throws Exception
     {
-        testFlow("propagateFromRouteToNextProcessorNoResult");
+        flowRunner("propagateFromRouteToNextProcessorNoResult").asynchronously().run();
     }
 
     @Test
     public void allAsync() throws Exception
     {
-        testFlow("AllAsync");
+        flowRunner("AllAsync").asynchronously().run();
     }
 
     @Test
@@ -254,7 +226,7 @@ public class InvocationPropertiesTestCase extends FunctionalTestCase
         fruitList.add(new Apple());
         fruitList.add(new Orange());
         fruitList.add(new Banana());
-        testFlow("propogationOfPropertiesInMessageSplitWithSplitter", getTestEvent(fruitList));
+        flowRunner("propogationOfPropertiesInMessageSplitWithSplitter").withPayload(fruitList).run();
     }
 
     @Test
@@ -264,33 +236,26 @@ public class InvocationPropertiesTestCase extends FunctionalTestCase
         fruitList.add(new Apple());
         fruitList.add(new Orange());
         fruitList.add(new Banana());
-        testFlow("aggregationOfPropertiesFromMultipleMessageWithAggregator", getTestEvent(fruitList));
-        FlowAssert.verify("Split");
+        flowRunner("aggregationOfPropertiesFromMultipleMessageWithAggregator").withPayload(fruitList).runAndVerify("Split");
     }
 
     @Test
     public void defaultExceptionStrategy() throws Exception
     {
-        testFlow("defaultExceptionStrategy");
+        flowRunner("defaultExceptionStrategy").asynchronously().run();
     }
 
     @Test
     public void catchExceptionStrategy() throws Exception
     {
-        testFlow("catchExceptionStrategy");
+        flowRunner("catchExceptionStrategy").asynchronously().run();
     }
 
     @Test
     public void defaultExceptionStrategyAfterCallSubflow() throws Exception
     {
-        muleContext.getClient().send("vm://in","test",null,RECEIVE_TIMEOUT);
-        FlowAssert.verify("defaultExceptionStrategyAfterCallingSubflow");
-    }
-
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/properties/invocation-properties-config.xml";
+        Exception e = flowRunner("defaultExceptionStrategyAfterCallingSubflow").withPayload(TEST_PAYLOAD).runExpectingException();
+        assertThat(e, instanceOf(FilterUnacceptedException.class));
     }
 
 }

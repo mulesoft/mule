@@ -6,15 +6,17 @@
  */
 package org.mule.test.integration.security;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
-import org.mule.client.DefaultLocalMuleClient;
+import org.mule.config.ExceptionHelper;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -33,21 +35,22 @@ public class CustomSecurityFilterTestCase extends FunctionalTestCase
     @Test
     public void testOutboundAutenticationSend() throws Exception
     {
-        DefaultLocalMuleClient client = new DefaultLocalMuleClient(muleContext);
-
-        HashMap<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("username", "ross");
         props.put("pass", "ross");
-        MuleMessage result = client.send("vm://test", "hi", props);
+
+        MuleMessage result = flowRunner("test").withPayload("hi")
+                                               .withInboundProperties(props)
+                                               .run()
+                                               .getMessage();
+
         assertNull(result.getExceptionPayload());
 
         props.put("pass", "badpass");
 
-        MuleMessage resultMessage = client.send("vm://test", "hi", props);
-        assertNotNull(resultMessage);
-        assertNotNull(resultMessage.getExceptionPayload());
-        assertEquals(BadCredentialsException.class, resultMessage.getExceptionPayload()
-            .getRootException()
-            .getClass());
+        MessagingException e = flowRunner("test").withPayload("hi")
+                                                 .withInboundProperties(props)
+                                                 .runExpectingException();
+        assertThat(ExceptionHelper.getRootException(e), instanceOf(BadCredentialsException.class));
     }
 }

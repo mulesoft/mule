@@ -23,32 +23,32 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
     @Test
     public void testArrayEntryPointResolverOnComponent() throws Exception
     {
-        doTest("array2", new String[]{"hello", "world"}, "array");
+        doTest("Array2", new String[]{"hello", "world"}, "array");
     }
 
     @Test
     public void testCallableEntryPointResolverOnComponent() throws Exception
     {
-        doTest("callable2", new Object(), "callable");
+        doTest("Callable2", new Object(), "callable");
     }
 
     @Test
     public void testCustomEntryPointResolverOnComponent() throws Exception
     {
-        doTest("custom2", new Object(), "custom");
+        doTest("Custom2", new Object(), "custom");
     }
 
     @Test
     public void testMethodEntryPointResolverOnComponent() throws Exception
     {
-        doTest("method2", new String(), "methodString");
-        doTest("method2", new Integer(0), "methodInteger");
+        doTest("Method2", new String(), "methodString");
+        doTest("Method2", new Integer(0), "methodInteger");
     }
 
     @Test
     public void testNoArgumentsEntryPointResolverOnComponent() throws Exception
     {
-        doTest("no-arguments2", new String(), "noArguments");
+        doTest("NoArguments2", new String(), "noArguments");
     }
 
     @Test
@@ -56,19 +56,19 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
     {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("propertyName", "property");
-        doTest("property2", new Object(), "property", properties);
+        doTest("Property2", new Object(), "property", properties);
     }
 
     @Test
     public void testReflectionEntryPointResolverOnComponent() throws Exception
     {
-        doTest("reflection2", new Object[]{new Integer(0), new String("String")}, "reflection");
+        doTest("Reflection2", new Object[]{new Integer(0), new String("String")}, "reflection");
     }
 
     @Test
     public void testLegacyEntryPointResolversOnComponent() throws Exception
     {
-        doTest("legacy2", "hello world", "callable");
+        doTest("Legacy2", "hello world", "callable");
     }
 
     @Test
@@ -78,7 +78,7 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
 
         try
         {
-            doTest("reflection2", new Object[]{new Integer(42), null}, "{NullPayload}");
+            doTest("Reflection2", new Object[]{new Integer(42), null}, "{NullPayload}");
         }
         catch (Exception e)
         {
@@ -88,6 +88,6 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
             // handle the null as class
         }
 
-        doTest("array2", new String[]{"hello", null, "world"}, "array");
+        doTest("Array2", new String[]{"hello", null, "world"}, "array");
     }
 }

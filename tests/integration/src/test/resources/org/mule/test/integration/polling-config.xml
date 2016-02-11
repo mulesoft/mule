@@ -2,14 +2,9 @@
 
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <vm:endpoint path="foo" exchange-pattern="request-response" name="foo"/>
-
-    <flow name="echo">
-        <inbound-endpoint ref="foo"/>
+    <flow name="echo" processingStrategy="synchronous">
         <static-component>
             <return-data>foo</return-data>
         </static-component>
@@ -18,7 +13,7 @@
     <flow name="pollfoo" processingStrategy="queued-asynchronous">
         <poll>
             <fixed-frequency-scheduler frequency="1000" timeUnit="MILLISECONDS"/>
-            <outbound-endpoint ref="foo"/>
+            <flow-ref name="echo"/>
         </poll>
         <component class="org.mule.test.integration.PollingTestCase$FooComponent"/>
     </flow>

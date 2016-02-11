@@ -6,15 +6,16 @@
  */
 package org.mule.test.usecases.sync;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.compression.GZipUncompressTransformer;
 import org.mule.transformer.simple.ByteArrayToSerializable;
@@ -53,7 +54,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         gu.setReturnDataType(DataTypeFactory.STRING);
         assertNotNull(message.getPayload());
         String result = (String)gu.transform(getPayloadAsBytes(message));
-        assertEquals("<string>payload</string>", result);
+        assertThat(result, is("<string>payload</string>"));
     }
 
     @Test
@@ -70,7 +71,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         bas.setMuleContext(muleContext);
         assertNotNull(message.getPayload());
         Object result = bas.transform(message.getPayload());
-        assertEquals(payload, result);
+        assertThat(result, is(payload));
     }
 
     @Test
@@ -78,12 +79,12 @@ public class HttpTransformTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         Object payload = Arrays.asList(42);
-        MuleMessage message = client.send("vm://LocalService", getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS);
+        MuleMessage message = flowRunner("LocalService").withPayload(payload).run().getMessage();
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         bas.setMuleContext(muleContext);
         assertNotNull(message.getPayload());
         Object result = bas.transform(message.getPayload());
-        assertEquals(payload, result);
+        assertThat(result, is(payload));
     }
 }

@@ -8,6 +8,7 @@
 package org.mule.transformer.simple;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.metadata.DataType;
@@ -29,14 +30,15 @@ public class SetPayloadDataTypeTestCase extends FunctionalTestCase
     @Test
     public void setsPayloadLocal() throws Exception
     {
-        doSetPayloadTest("vm://setPayloadLocal");
+        doSetPayloadTest("setPayload");
     }
 
-    private void doSetPayloadTest(String url) throws Exception
+    private void doSetPayloadTest(String flowName) throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.send(url, TEST_MESSAGE, null);
+        // MuleMessage response = client.send(url, TEST_MESSAGE, null);
+        MuleMessage response = flowRunner(flowName).withPayload(TEST_MESSAGE).run().getMessage();
 
         DataType dataType = response.getDataType();
 

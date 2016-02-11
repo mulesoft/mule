@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
             http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
             http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
@@ -17,11 +15,7 @@
     <http:listener-config name="listenerConfig" host="localhost" port="${httpPort}"/>
 
     <flow name="MainFlow">
-        <composite-source>
-            <http:listener path="/" config-ref="listenerConfig"/>
-            <vm:inbound-endpoint name="sleepingTestIn" address="vm://sleepingTestIn"
-                                 exchange-pattern="request-response"/>
-        </composite-source>
+        <http:listener path="/" config-ref="listenerConfig"/>
         <set-payload value="Processed"/>
     </flow>
 </mule>

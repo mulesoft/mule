@@ -55,7 +55,7 @@ public class TransformerEncodingTestCase extends FunctionalTestCase
 
     private void testEncoding(String flowName, MuleMessage message) throws Exception
     {
-        final MuleEvent muleEvent = runFlow(flowName, message);
+        final MuleEvent muleEvent = flowRunner(flowName).withPayload(message).run();
 
         MuleMessage response = muleEvent.getMessage();
         assertThat(getPayloadAsString(response), is(PAYLOAD));

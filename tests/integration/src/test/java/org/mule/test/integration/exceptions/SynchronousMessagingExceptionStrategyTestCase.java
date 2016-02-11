@@ -7,9 +7,6 @@
 package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
-import org.mule.api.MuleMessage;
 
 import java.util.concurrent.TimeUnit;
 
@@ -24,62 +21,38 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
     }
 
     @Test
-    public void testInboundTransformer() throws Exception
+    public void testTransformer() throws Exception
     {
-        client.send("vm://in1", TEST_MESSAGE, null);
+        flowRunner("Transformer").withPayload(getTestMuleMessage()).asynchronously().run();
         latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
         assertEquals(1, serviceExceptionCounter.get());
         assertEquals(0, systemExceptionCounter.get());
-    }
-
-    @Test
-    public void testInboundResponseTransformer() throws Exception
-    {
-        client.send("vm://in2", TEST_MESSAGE, null);
-        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertEquals(1, serviceExceptionCounter.get());
-        assertEquals(0, systemExceptionCounter.get());
-    }
-
-    @Test
-    public void testOutboundTransformer() throws Exception
-    {
-        client.send("vm://in3", TEST_MESSAGE, null);
-        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertEquals(1, serviceExceptionCounter.get());
-        assertEquals(0, systemExceptionCounter.get());
-        MuleMessage response = client.request("vm://out3", 500);
-        assertNull(response);
-    }
-
-    @Test
-    public void testOutboundResponseTransformer() throws Exception
-    {
-        client.send("vm://in4", TEST_MESSAGE, null);
-        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertEquals(1, serviceExceptionCounter.get());
-        assertEquals(0, systemExceptionCounter.get());
-        MuleMessage response = client.request("vm://out4", 500);
-        assertNull(response);
     }
 
     @Test
     public void testComponent() throws Exception
     {
-        client.send("vm://in5", TEST_MESSAGE, null);
+        flowRunner("Component").withPayload(getTestMuleMessage()).asynchronously().run();
         latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
         assertEquals(1, serviceExceptionCounter.get());
         assertEquals(0, systemExceptionCounter.get());
     }
 
     @Test
-    public void testRouter() throws Exception
+    public void testProcessorInboundRouter() throws Exception
     {
-        client.send("vm://in7", TEST_MESSAGE, null);
+        flowRunner("ProcessorInboundRouter").withPayload(getTestMuleMessage()).asynchronously().run();
         latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
         assertEquals(1, serviceExceptionCounter.get());
         assertEquals(0, systemExceptionCounter.get());
-        MuleMessage response = client.request("vm://out7", 500);
-        assertNull(response);
+    }
+
+    @Test
+    public void testProcessorOutboundRouter() throws Exception
+    {
+        flowRunner("ProcessorOutboundRouter").withPayload(getTestMuleMessage()).asynchronously().run();
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+        assertEquals(1, serviceExceptionCounter.get());
+        assertEquals(0, systemExceptionCounter.get());
     }
 }

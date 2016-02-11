@@ -9,17 +9,16 @@ package org.mule.test.integration.messaging.meps;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.construct.FlowConstruct;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
 public class InOptionalOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
 {
-    public static final long TIMEOUT = 3000;
-
     @Override
     protected String getConfigFile()
     {
@@ -29,22 +28,16 @@ public class InOptionalOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
     @Test
     public void testExchange() throws Exception
     {
-        MuleClient client = muleContext.getClient();
+        FlowRunner baseRunner = flowRunner("In-Out_Out-Only-Async-Service").withPayload("some data");
+        MuleEvent event = baseRunner.run();
+        assertNull(event);
 
-        MuleMessage result = client.send("inboundEndpoint", "some data", null);
-        assertNull(result);
+        baseRunner.reset();
+        MuleMessage result = baseRunner.withInboundProperty("foo", "bar")
+                                       .run()
+                                       .getMessage();
 
-        MuleMessage msg = getTestMuleMessage("some data");
-        msg.setOutboundProperty("foo", "bar");
-        result = client.send("inboundEndpoint", msg);
         assertNotNull(result);
         assertEquals("got it!", getPayloadAsString(result));
-
-        FlowConstruct async = muleContext.getRegistry().lookupFlowConstruct(
-                "In-Out_Out-Only-Async-Service");
-        FlowConstruct external = muleContext.getRegistry().lookupFlowConstruct("ExternalApp");
-
-        assertEquals(2, async.getStatistics().getProcessedEvents());
-        assertEquals(1, external.getStatistics().getProcessedEvents());
     }
 }

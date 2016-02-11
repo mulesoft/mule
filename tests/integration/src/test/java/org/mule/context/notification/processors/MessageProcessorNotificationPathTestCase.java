@@ -98,12 +98,6 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void requestReply() throws Exception
-    {
-        testFlowPaths("request-reply", "/0", "/1" );
-    }
-
-    @Test
     public void multipleEndpoints() throws Exception
     {
         testFlowPaths("composite-source", "/0" );

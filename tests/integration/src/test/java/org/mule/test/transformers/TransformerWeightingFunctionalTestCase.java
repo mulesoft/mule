@@ -36,7 +36,7 @@ public class TransformerWeightingFunctionalTestCase extends FunctionalTestCase
     @Test
     public void findTwoTransformers() throws Exception
     {
-        final MuleEvent muleEvent = runFlow("test", XML_REQUEST);
+        final MuleEvent muleEvent = flowRunner("test").withPayload(XML_REQUEST).run();
 
         MuleMessage response = muleEvent.getMessage();
         XMLAssert.assertXMLEqual(XML_REQUEST, getPayloadAsString(response));

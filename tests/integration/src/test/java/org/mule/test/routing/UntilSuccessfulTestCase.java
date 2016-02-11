@@ -9,26 +9,23 @@ package org.mule.test.routing;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.functional.functional.InvocationCountMessageProcessor.getNumberOfInvocationsFor;
 
 import org.mule.api.ExceptionPayload;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.client.MuleClient;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.construct.Flow;
-import org.mule.retry.RetryPolicyExhaustedException;
-import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.util.store.AbstractPartitionedObjectStore;
@@ -38,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
@@ -50,9 +46,7 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
 {
     private final String configFile;
 
-    private MuleClient client;
     private FunctionalTestComponent targetMessageProcessor;
-    private FunctionalTestComponent deadLetterQueueProcessor;
 
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
@@ -79,10 +73,7 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
     {
         super.doSetUp();
 
-        client = muleContext.getClient();
-
         targetMessageProcessor = getFunctionalTestComponent("target-mp");
-        deadLetterQueueProcessor = getFunctionalTestComponent("dlq-processor");
 
         final AbstractPartitionedObjectStore<Serializable> objectStore = muleContext.getRegistry()
             .lookupObject("objectStore");
@@ -93,63 +84,25 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
     public void testDefaultConfiguration() throws Exception
     {
         final String payload = RandomStringUtils.randomAlphanumeric(20);
-        client.dispatch("vm://input-1", payload, null);
+        flowRunner("minimal-config").withPayload(payload).asynchronously().run();
 
         final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(1);
-        assertEquals(1, receivedPayloads.size());
-        assertEquals(payload, receivedPayloads.get(0));
-    }
-
-    @Test
-    public void testFullConfiguration() throws Exception
-    {
-        final AtomicReference<ExceptionPayload> dlqExceptionPayload = new AtomicReference<>();
-        deadLetterQueueProcessor.setEventCallback(new EventCallback()
-        {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                dlqExceptionPayload.set(context.getMessage().getExceptionPayload());
-            }
-        });
-
-        final String payload = RandomStringUtils.randomAlphanumeric(20);
-        final MuleMessage response = client.send("vm://input-2", payload, null);
-        assertEquals("ACK", getPayloadAsString(response));
-
-        List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
-        assertEquals(3, receivedPayloads.size());
-        for (int i = 0; i <= 2; i++)
-        {
-            assertEquals(payload, receivedPayloads.get(i));
-        }
-
-        receivedPayloads = ponderUntilMessageCountReceivedByDlqProcessor(1);
-        assertEquals(1, receivedPayloads.size());
-        assertEquals(payload, receivedPayloads.get(0));
-
-        assertThat(dlqExceptionPayload.get(), is(notNullValue()));
-        assertThat(dlqExceptionPayload.get().getException(), instanceOf(RetryPolicyExhaustedException.class));
-        assertThat(dlqExceptionPayload.get().getException().getMessage(),
-                containsString("until-successful retries exhausted. Last exception message was: Failure expression positive when processing event"));
-
-        assertThat(dlqExceptionPayload.get().getException().getCause(), instanceOf(MuleRuntimeException.class));
-        assertThat(dlqExceptionPayload.get().getException().getMessage(),
-                containsString("Failure expression positive when processing event"));
+        assertThat(receivedPayloads, hasSize(1));
+        assertThat(receivedPayloads.get(0), is(payload));
     }
 
     @Test
     public void testFullConfigurationMP() throws Exception
     {
         final String payload = RandomStringUtils.randomAlphanumeric(20);
-        final MuleMessage response = client.send("vm://input-2MP", payload, null);
-        assertEquals("ACK", getPayloadAsString(response));
+        final MuleMessage response = flowRunner("full-config-with-mp").withPayload(payload).run().getMessage();
+        assertThat(getPayloadAsString(response), is("ACK"));
 
         final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
-        assertEquals(3, receivedPayloads.size());
+        assertThat(receivedPayloads, hasSize(3));
         for (int i = 0; i <= 2; i++)
         {
-            assertEquals(payload, receivedPayloads.get(i));
+            assertThat(receivedPayloads.get(i), is(payload));
         }
 
         ponderUntilMessageCountReceivedByCustomMP(1);
@@ -169,13 +122,13 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
     public void testRetryOnEndpoint() throws Exception
     {
         final String payload = RandomStringUtils.randomAlphanumeric(20);
-        client.dispatch("vm://input-3", payload, null);
+        flowRunner("retry-endpoint-config").withPayload(payload).asynchronously().run();
 
         final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
-        assertEquals(3, receivedPayloads.size());
+        assertThat(receivedPayloads, hasSize(3));
         for (int i = 0; i <= 2; i++)
         {
-            assertEquals(payload, receivedPayloads.get(i));
+            assertThat(receivedPayloads.get(i), is(payload));
         }
     }
 
@@ -183,26 +136,16 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
     public void executeSynchronously() throws Exception
     {
         final String payload = RandomStringUtils.randomAlphanumeric(20);
-        Flow flow = (Flow) getFlowConstruct("synchronous");
-        flow.process(getTestEvent(payload));
-        fail("Exception should be thrown");
+        throw flowRunner("synchronous").withPayload(payload).runExpectingException();
     }
 
     @Test
     public void executeSynchronouslyDoingRetries() throws Exception
     {
-        try
-        {
-            final String payload = RandomStringUtils.randomAlphanumeric(20);
-            Flow flow = (Flow) getFlowConstruct("synchronous-with-retry");
-            flow.process(getTestEvent(payload));
-            fail("Exception should be thrown");
-        }
-        catch (Exception e)
-        {
-            assertThat(getNumberOfInvocationsFor("untilSuccessful"), is(4));
-            assertThat(getNumberOfInvocationsFor("exceptionStrategy"), is(1));
-        }
+        final String payload = RandomStringUtils.randomAlphanumeric(20);
+        flowRunner("synchronous-with-retry").withPayload(payload).runExpectingException();
+        assertThat(getNumberOfInvocationsFor("untilSuccessful"), is(4));
+        assertThat(getNumberOfInvocationsFor("exceptionStrategy"), is(1));
     }
 
     /**
@@ -211,16 +154,8 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
     @Test
     public void measureSynchronousWait() throws Exception {
         final String payload = RandomStringUtils.randomAlphanumeric(20);
-        Flow flow = (Flow) getFlowConstruct("measureSynchronousWait");
-        try
-        {
-            flow.process(getTestEvent(payload));
-            fail("Exception should be thrown");
-        }
-        catch (Exception e)
-        {
-            assertThat(WaitMeasure.totalWait >= 1000, is(true));
-        }
+        flowRunner("measureSynchronousWait").withPayload(payload).runExpectingException();
+        assertThat(WaitMeasure.totalWait >= 1000, is(true));
     }
 
     @Test
@@ -268,12 +203,6 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         throws InterruptedException
     {
         return ponderUntilMessageCountReceived(expectedCount, targetMessageProcessor);
-    }
-
-    private List<Object> ponderUntilMessageCountReceivedByDlqProcessor(final int expectedCount)
-        throws InterruptedException
-    {
-        return ponderUntilMessageCountReceived(expectedCount, deadLetterQueueProcessor);
     }
 
     private List<Object> ponderUntilMessageCountReceived(final int expectedCount,

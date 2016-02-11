@@ -14,7 +14,6 @@ import static org.mule.test.integration.exceptions.CatchExceptionStrategyTestCas
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.Transaction;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -39,8 +38,7 @@ public class CatchExceptionStrategyFlowRefTestCase extends FunctionalTestCase
     @Test
     public void testFlowRefHandlingException() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://inExceptionBlock", JSON_REQUEST, null, TIMEOUT);
+        MuleMessage response  = flowRunner("exceptionHandlingBlock").withPayload(getTestMuleMessage(JSON_REQUEST)).run().getMessage();
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();
         JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
@@ -51,8 +49,7 @@ public class CatchExceptionStrategyFlowRefTestCase extends FunctionalTestCase
     @Test
     public void testFlowRefHandlingExceptionWithTransaction() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://inTxWithException", JSON_REQUEST, null, TIMEOUT);
+        MuleMessage response = flowRunner("transactionNotResolvedAfterException").withPayload(getTestMuleMessage(JSON_REQUEST)).run().getMessage();
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();
         JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));

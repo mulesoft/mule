@@ -2,19 +2,18 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <spring:bean name="processor" class="org.mule.test.integration.exceptions.ExceptionStrategyWithFlowExceptionTestCase$ExceptionThrower"/>
 
     <flow name="customException">
-        <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
         <processor ref="processor"/>
         <default-exception-strategy>
-            <vm:outbound-endpoint path="out"/>
+            <test:queue name="out"/>
         </default-exception-strategy>
     </flow>
 

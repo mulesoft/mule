@@ -2,18 +2,14 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <custom-queue-store name="dummyPersistentStore" class="org.mule.issues.PersistentStore6007TestCase$PersistentObjectStore" />
 
-    <flow name="echo">
-        <vm:inbound-endpoint path="input" exchange-pattern="request-response"/>
+    <flow name="input">
         <until-successful objectStore-ref="dummyPersistentStore">
             <processor-chain>
                 <logger level="WARN" message="Message Payload is #[payload:]"/>

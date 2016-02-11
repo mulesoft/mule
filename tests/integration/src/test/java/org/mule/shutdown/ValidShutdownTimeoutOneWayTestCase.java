@@ -39,22 +39,22 @@ public class ValidShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeoutR
     @Test
     public void testStaticComponent() throws Exception
     {
-        doShutDownTest("staticComponentResponse", "vm://staticComponent");
+        doShutDownTest("staticComponentResponse", "staticComponentFlow");
     }
 
     @Test
     public void testScriptComponent() throws Exception
     {
-        doShutDownTest("scriptComponentResponse", "vm://scriptComponent");
+        doShutDownTest("scriptComponentResponse", "scriptComponentFlow");
     }
 
     @Test
     public void testExpressionTransformer() throws Exception
     {
-        doShutDownTest("expressionTransformerResponse", "vm://expressionTransformer");
+        doShutDownTest("expressionTransformerResponse", "expressionTransformerFlow");
     }
 
-    private void doShutDownTest(final String payload, final String url) throws MuleException, InterruptedException
+    private void doShutDownTest(final String payload, final String flowName) throws MuleException, InterruptedException
     {
         final MuleClient client = muleContext.getClient();
         final boolean[] results = new boolean[] {false};
@@ -67,9 +67,9 @@ public class ValidShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeoutR
                 try
                 {
                     DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, new HashMap<String, Object>(), muleContext);
-                    client.dispatch(url, muleMessage);
+                    flowRunner(flowName).withPayload(muleMessage).asynchronously().run();
 
-                    MuleMessage response = client.request("vm://response", RECEIVE_TIMEOUT);
+                    MuleMessage response = client.request("test://response", RECEIVE_TIMEOUT);
                     results[0] = payload.equals(getPayloadAsString(response));
                 }
                 catch (Exception e)

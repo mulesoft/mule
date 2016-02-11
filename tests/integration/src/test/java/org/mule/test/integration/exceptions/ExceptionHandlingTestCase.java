@@ -6,11 +6,13 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -66,7 +68,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     @Test
     public void testOutboundEndpointInFlow() throws Exception
     {
-        runFlowAsync("outboundEndpointInFlow", TEST_MESSAGE);
+        flowRunner("outboundEndpointInFlow").withPayload(TEST_MESSAGE).asynchronously().run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outFlow2", 3000);
@@ -76,7 +78,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     @Test
     public void testOutboundDynamicEndpointInFlow() throws Exception
     {
-        runFlowAsync("outboundDynamicEndpointInFlow", MESSAGE);
+        flowRunner("outboundDynamicEndpointInFlow").withPayload(MESSAGE).asynchronously().run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outFlow3", 3000);
@@ -86,7 +88,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     @Test
     public void testAsyncInFlow() throws Exception
     {
-        runFlowAsync("asyncInFlow", MESSAGE);
+        flowRunner("asyncInFlow").withPayload(MESSAGE).asynchronously().run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outFlow4", 3000);
@@ -97,7 +99,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     @Test
     public void testUntilSuccessfulInFlow() throws Exception
     {
-        runFlowAsync("untilSuccessfulInFlow", MESSAGE);
+        flowRunner("untilSuccessfulInFlow").withPayload(MESSAGE).asynchronously().run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outFlow5", 3000);
@@ -111,7 +113,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     {
         LinkedList<String> list = new LinkedList<>();
         list.add(MESSAGE);
-        final MuleEvent muleEvent = runFlow("customProcessorInScope", list);
+        final MuleEvent muleEvent = flowRunner("customProcessorInScope").withPayload(list).run();
         MuleMessage response = muleEvent.getMessage();
 
         assertNotNull(response);
@@ -124,7 +126,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     {
         LinkedList<String> list = new LinkedList<String>();
         list.add(MESSAGE);
-        runFlowAsync("outboundEndpointInScope", list);
+        flowRunner("outboundEndpointInScope").withPayload(list).asynchronously().run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outScope2", 3000);
@@ -139,7 +141,10 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     {
         LinkedList<String> list = new LinkedList<String>();
         list.add(MESSAGE);
-        runFlowAsync("outboundDynamicEndpointInScope", list, getMessageProperties());
+        flowRunner("outboundDynamicEndpointInScope").withPayload(list)
+                                                    .withInboundProperties(getMessageProperties())
+                                                    .asynchronously()
+                                                    .run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outScope3", 3000);
@@ -152,7 +157,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     @Test
     public void testCustomProcessorInTransactionalScope() throws Exception
     {
-        runFlowAsync("customProcessorInTransactionalScope", MESSAGE);
+        flowRunner("customProcessorInTransactionalScope").withPayload(MESSAGE).asynchronously().run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outTransactional1", 3000);
@@ -165,7 +170,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     @Test
     public void testOutboundEndpointInTransactionalScope() throws Exception
     {
-        testTransactionalScope("outboundEndpointInTransactionalScope", "test://outTransactional2", null);
+        testTransactionalScope("outboundEndpointInTransactionalScope", "test://outTransactional2", emptyMap());
     }
 
     @Test
@@ -177,20 +182,20 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     @Test
     public void testAsyncInTransactionalScope() throws Exception
     {
-        testTransactionalScope("asyncInTransactionalScope", "test://outTransactional4", null);
+        testTransactionalScope("asyncInTransactionalScope", "test://outTransactional4", emptyMap());
     }
 
     @Test
     public void testUntilSuccessfulInTransactionalScope() throws Exception
     {
-        testTransactionalScope("untilSuccessfulInTransactionalScope", "test://outTransactional5", null);
+        testTransactionalScope("untilSuccessfulInTransactionalScope", "test://outTransactional5", emptyMap());
         assertTrue(injectedMessagingExceptionHandler instanceof CatchMessagingExceptionStrategy);
     }
 
     @Test
     public void testCustomProcessorInExceptionStrategy() throws Exception
     {
-        runFlowAsync("customProcessorInExceptionStrategy", MESSAGE);
+        flowRunner("customProcessorInExceptionStrategy").withPayload(MESSAGE).asynchronously().run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outStrategy1",3000);
@@ -203,7 +208,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     @Test
     public void testOutboundEndpointInExceptionStrategy() throws Exception
     {
-        testExceptionStrategy("outboundEndpointInExceptionStrategy", null);
+        testExceptionStrategy("outboundEndpointInExceptionStrategy", emptyMap());
     }
 
     @Test
@@ -215,21 +220,21 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     @Test
     public void testAsyncInExceptionStrategy() throws Exception
     {
-        testExceptionStrategy("asyncInExceptionStrategy", null);
+        testExceptionStrategy("asyncInExceptionStrategy", emptyMap());
         assertTrue(injectedMessagingExceptionHandler instanceof MessagingExceptionHandlerToSystemAdapter);
     }
 
     @Test
     public void testUntilSuccessfulInExceptionStrategy() throws Exception
     {
-        testExceptionStrategy("untilSuccessfulInExceptionStrategy", null);
+        testExceptionStrategy("untilSuccessfulInExceptionStrategy", emptyMap());
         assertTrue(injectedMessagingExceptionHandler instanceof MessagingExceptionHandlerToSystemAdapter);
     }
 
     @Test
     public void testUntilSuccessfulInExceptionStrategyRollback() throws Exception
     {
-        testExceptionStrategy("untilSuccessfulInExceptionStrategyRollback", null);
+        testExceptionStrategy("untilSuccessfulInExceptionStrategyRollback", emptyMap());
         assertTrue(injectedMessagingExceptionHandler instanceof MessagingExceptionHandlerToSystemAdapter);
     }
 
@@ -242,7 +247,10 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
 
     private void testTransactionalScope(String flowName, String expected, Map<String, Object> messageProperties) throws Exception
     {
-        runFlowAsync(flowName, MESSAGE, messageProperties);
+        flowRunner(flowName).withPayload(MESSAGE)
+                            .withInboundProperties(messageProperties)
+                            .asynchronously()
+                            .run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request(expected, 3000);
@@ -253,7 +261,10 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     private void testExceptionStrategy(String flowName, Map<String, Object> messageProperties) throws Exception
     {
         latch = spy(new CountDownLatch(2));
-        runFlowAsync(flowName, MESSAGE, messageProperties);
+        flowRunner(flowName).withPayload(MESSAGE)
+                            .withInboundProperties(messageProperties)
+                            .asynchronously()
+                            .run();
 
         assertFalse(latch.await(3, TimeUnit.SECONDS));
         verify(latch).countDown();

@@ -14,8 +14,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.construct.Flow;
 import org.mule.context.notification.ClusterNodeNotification;
-import org.mule.source.ClusterizableMessageSourceWrapper;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.source.ClusterizableMessageSourceWrapper;
 import org.mule.transport.PollingController;
 
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class ClusterizableMessageSourceFlowTestCase extends FunctionalTestCase
         muleContext.start();
 
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.request("vm://testOut", 5000);
+        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
         assertEquals("TEST", response.getPayload());
     }
 
@@ -73,7 +73,7 @@ public class ClusterizableMessageSourceFlowTestCase extends FunctionalTestCase
         muleContext.fireNotification(new ClusterNodeNotification("primary", ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED));
 
         LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.request("vm://testOut", 5000);
+        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
         assertEquals("TEST", response.getPayload());
     }
 

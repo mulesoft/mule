@@ -7,13 +7,13 @@
 package org.mule.test.integration.interceptor;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.api.interceptor.Interceptor;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.processor.AbstractInterceptingMessageProcessor;
 
 import org.junit.Test;
 
@@ -27,20 +27,16 @@ public class SharedInterceptorStackTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testSharedInterceptorOnServiceOne() throws MuleException
+    public void testSharedInterceptorOnServiceOne() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send("vm://stackOne", TEST_MESSAGE, null);
+        MuleMessage response = flowRunner("serviceOne").withPayload(getTestMuleMessage(TEST_MESSAGE)).run().getMessage();
         assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentOne", response.getPayload());
     }
 
     @Test
-    public void testSharedInterceptorOnServiceTwo() throws MuleException
+    public void testSharedInterceptorOnServiceTwo() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send("vm://stackTwo", TEST_MESSAGE, null);
+        MuleMessage response = flowRunner("serviceTwo").withPayload(getTestMuleMessage(TEST_MESSAGE)).run().getMessage();
         assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentTwo", response.getPayload());
     }
 

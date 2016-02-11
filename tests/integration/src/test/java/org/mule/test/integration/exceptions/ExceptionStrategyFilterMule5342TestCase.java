@@ -6,15 +6,10 @@
  */
 package org.mule.test.integration.exceptions;
 
-import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.FilterUnacceptedException;
-import org.mule.api.transport.DispatchException;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.ExceptionUtils;
 
 import org.junit.Test;
 
@@ -26,24 +21,10 @@ public class ExceptionStrategyFilterMule5342TestCase extends FunctionalTestCase
         return "org/mule/test/integration/exceptions/exception-strategy-filter-mule-5342.xml";
     }
 
-    @Test
+    @Test(expected = FilterUnacceptedException.class)
     public void exceptionThrownFromMessageFilterIsHandledByExceptionHandler() throws Exception
     {
-        try
-        {
-            MuleClient client = muleContext.getClient();
-            client.send("vm://in", TEST_MESSAGE, null);
-        }
-        catch (DispatchException e)
-        {
-            assertThatRootCauseIsFilterUnacceptedException(e);
-        }
-    }
-
-    private void assertThatRootCauseIsFilterUnacceptedException(DispatchException e)
-    {
-        int index = ExceptionUtils.indexOfThrowable(e, FilterUnacceptedException.class);
-        assertTrue(index > -1);
+        flowRunner("filter").withPayload(TEST_MESSAGE).run();
     }
 
     public static class FalseFilter implements Filter

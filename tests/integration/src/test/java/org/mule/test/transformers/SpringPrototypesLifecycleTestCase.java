@@ -30,7 +30,7 @@ public class SpringPrototypesLifecycleTestCase extends FunctionalTestCase
     @Test
     public void registersTransformerOnce() throws Exception
     {
-        final MuleEvent muleEvent = runFlow("testFlow", new A(TEST_MESSAGE));
+        final MuleEvent muleEvent = flowRunner("testFlow").withPayload(new A(TEST_MESSAGE)).run();
         final MuleMessage response = muleEvent.getMessage();
 
         assertThat(response.getPayload(), is(instanceOf(B.class)));
@@ -39,7 +39,7 @@ public class SpringPrototypesLifecycleTestCase extends FunctionalTestCase
     @Test
     public void exceptionHandlerWithTransformerInEndpoint() throws Exception
     {
-        final MuleEvent muleEvent = runFlow("testExceptionHandlerWithTransformerInEndpointFlow", new A(TEST_MESSAGE));
+        final MuleEvent muleEvent = flowRunner("testExceptionHandlerWithTransformerInEndpointFlow").withPayload(new A(TEST_MESSAGE)).run();
         final MuleMessage response = muleEvent.getMessage();
 
         assertThat(response.getPayload(), is(instanceOf(B.class)));

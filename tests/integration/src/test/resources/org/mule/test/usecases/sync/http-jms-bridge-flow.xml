@@ -3,10 +3,8 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
@@ -16,12 +14,11 @@
         <http:listener path="in" config-ref="listenerConfig"/>
         <object-to-string-transformer/>
         <test:component logMessageDetails="true"/>
-        <vm:outbound-endpoint path="out" exchange-pattern="one-way">
-            <message-properties-transformer>
-                <!-- TODO this should be replaced with enhanced MPT: copy-property syntax -->
-                <add-message-property key="X-Custom-Header" value="#[message.inboundProperties['X-Custom-Header']]"/>
-            </message-properties-transformer>
-        </vm:outbound-endpoint>
+        <message-properties-transformer>
+            <!-- TODO this should be replaced with enhanced MPT: copy-property syntax -->
+            <add-message-property key="X-Custom-Header" value="#[message.inboundProperties['X-Custom-Header']]"/>
+        </message-properties-transformer>
+        <test:queue name="out"/>
     </flow>
 
 </mule>

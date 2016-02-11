@@ -8,18 +8,18 @@ package org.mule.test.integration.client;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
+import org.junit.ClassRule;
 import org.junit.Test;
 
 /**
@@ -28,16 +28,18 @@ import org.junit.Test;
  */
 public class MuleClientDispatchWithoutLosingVariablesTestCase extends FunctionalTestCase
 {
+    @ClassRule
+    public static DynamicPort port = new DynamicPort("port");
+
     @Override
     protected String getConfigFile()
     {
         return "org/mule/test/integration/client/client-flow-session-vars-when-dispatch-flow.xml";
     }
 
-    private void doSendMessageToVMEndpoint(String flowName) throws Exception
+    private void doSendMessageToHttp(String flowName) throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://" + flowName, "TEST1", null);
+        MuleMessage result = flowRunner(flowName).withPayload("TEST1").run().getMessage();
         assertThat(result, notNullValue(MuleMessage.class));
         FlowAssert.verify(flowName);
     }
@@ -53,13 +55,13 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends Functional
     @Test
     public void testFlowVarsAfterDispatchFromMessageProcessor() throws Exception
     {
-        doSendMessageToVMEndpoint("flowVarsFlowUsingProcessor");
+        doSendMessageToHttp("flowVarsFlowUsingProcessor");
     }
 
     @Test
     public void testSessionVarsAfterDispatchFromMessageProcessor() throws Exception
     {
-        doSendMessageToVMEndpoint("sessionVarsFlowUsingProcessor");
+        doSendMessageToHttp("sessionVarsFlowUsingProcessor");
     }
 
     /**
@@ -73,19 +75,19 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends Functional
     @Test
     public void testFlowVarsAfterDispatchFromJavaComponent() throws Exception
     {
-        doSendMessageToVMEndpoint("flowVarsFlowUsingJavaComponent");
+        doSendMessageToHttp("flowVarsFlowUsingJavaComponent");
     }
 
     @Test
     public void testSessionVarsAfterDispatchFromJavaComponent() throws Exception
     {
-        doSendMessageToVMEndpoint("sessionVarsFlowUsingJavaComponent");
+        doSendMessageToHttp("sessionVarsFlowUsingJavaComponent");
     }
 
     @Test
     public void testSessionVarsFlowUsingJavaComponentRequestResponse() throws Exception
     {
-        doSendMessageToVMEndpoint("sessionVarsFlowUsingJavaComponentRequestResponse");
+        doSendMessageToHttp("sessionVarsFlowUsingJavaComponentRequestResponse");
     }
 
     public static class MessageProcessorDispatchFlowUsingNewMuleClient implements MessageProcessor
@@ -93,7 +95,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends Functional
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            event.getMuleContext().getClient().dispatch("vm://vminnertest", new DefaultMuleMessage("payload", event.getMuleContext()));
+            event.getMuleContext().getClient().dispatch(getUrl("innertest"), new DefaultMuleMessage("payload", event.getMuleContext()));
             return event;
 
         }
@@ -104,7 +106,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends Functional
         @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
-            eventContext.getMuleContext().getClient().dispatch("vm://vminnertest", new DefaultMuleMessage("payload", eventContext.getMuleContext()));
+            eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), new DefaultMuleMessage("payload", eventContext.getMuleContext()));
             return eventContext.getMessage();
         }
     }
@@ -114,9 +116,14 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends Functional
         @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
-            eventContext.sendEvent(new DefaultMuleMessage("payload", eventContext.getMuleContext()), "vm://vminnerrequestresponsetest");
+            eventContext.sendEvent(new DefaultMuleMessage("payload", eventContext.getMuleContext()), getUrl("innerrequestresponsetest"));
             return eventContext.getMessage();
         }
+    }
+
+    private static String getUrl(String path)
+    {
+        return String.format("http://localhost:%s/%s", port.getValue(), path);
     }
 
 }

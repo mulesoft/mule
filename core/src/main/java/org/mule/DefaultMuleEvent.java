@@ -7,6 +7,7 @@
 package org.mule;
 
 import static org.mule.util.ClassUtils.isConsumable;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -441,6 +442,39 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.flowCallStack = rewriteEvent.getFlowCallStack() == null ? new DefaultFlowCallStack() : rewriteEvent.getFlowCallStack().clone();
         // We want parallel paths of the same flows (i.e.: async events) to contribute to this list and be available at the end, so we copy only the reference.
         this.processorsTrace = rewriteEvent.getProcessorsTrace();
+    }
+
+    public DefaultMuleEvent(MuleMessage message,
+                            URI messageSourceURI,
+                            String messageSourceName,
+                            MessageExchangePattern exchangePattern,
+                            FlowConstruct flowConstruct,
+                            MuleSession session,
+                            int timeout,
+                            Credentials credentials,
+                            OutputStream outputStream,
+                            String encoding,
+                            boolean transacted,
+                            Object replyToDestination,
+                            ReplyToHandler replyToHandler)
+    {
+        this.id = generateEventId(message.getMuleContext());
+        this.flowConstruct = flowConstruct;
+        this.session = session;
+        setMessage(message);
+
+        this.credentials = credentials;
+        this.encoding = encoding;
+        this.exchangePattern = exchangePattern;
+        this.messageSourceURI = messageSourceURI;
+        this.messageSourceName = messageSourceName;
+        this.processingTime = ProcessingTime.newInstance(this);
+        this.replyToHandler = replyToHandler;
+        this.replyToDestination = replyToDestination;
+        this.transacted = transacted;
+        this.synchronous = resolveEventSynchronicity() && replyToHandler == null;
+        this.timeout = timeout;
+        this.outputStream = outputStream;
     }
 
     // Constructor with everything just in case

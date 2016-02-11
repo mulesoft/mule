@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
     xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
@@ -15,33 +15,28 @@
 
     <flow name="test-async-block-before-outbound">
 
-        <vm:inbound-endpoint path="test.before.sync.in"
-            exchange-pattern="request-response" />
-
         <async>
             <flow-ref name="set-async-thread-property" />
-            <vm:outbound-endpoint path="test.before.async.out" />
+            <test:queue name="test.before.async.out" />
         </async>
 
         <flow-ref name="set-rr-thread-property" />
 
-        <vm:outbound-endpoint path="test.before.out" />
+        <test:queue name="test.before.out" />
 
         <echo-component />
 
     </flow>
 
     <flow name="test-async-block-after-outbound">
-        <vm:inbound-endpoint path="test.after.sync.in"
-            exchange-pattern="request-response" />
 
         <flow-ref name="set-rr-thread-property" />
 
-        <vm:outbound-endpoint path="test.after.out" />
+        <test:queue name="test.after.out" />
 
         <async>
             <flow-ref name="set-async-thread-property" />
-            <vm:outbound-endpoint path="test.after.async.out" />
+            <test:queue name="test.after.async.out" />
         </async>       
 
         <echo-component />

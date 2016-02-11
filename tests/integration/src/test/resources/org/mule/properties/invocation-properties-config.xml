@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test" xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
@@ -58,30 +56,6 @@
         <test:assert expression="#[P2]" />
     </flow>
 
-    <flow name="noPropagationInDifferentFlowVMOneWay">
-        <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
-        <vm:outbound-endpoint path="noPropagationInDifferentFlowVMOneWay-2"
-            exchange-pattern="one-way" />
-    </flow>
-    <flow name="noPropagationInDifferentFlowVMOneWay-2">
-        <vm:inbound-endpoint path="noPropagationInDifferentFlowVMOneWay-2"
-            exchange-pattern="one-way" />
-        <test:assert expression="#[flowVars['P1'] == null]" />
-    </flow>
-
-    <flow name="noPropagationInDifferentFlowVMRequestResponse">
-        <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
-        <vm:outbound-endpoint path="noPropagationInDifferentFlowVMRequestResponse-2"
-            exchange-pattern="request-response" />
-    </flow>
-    <flow name="noPropagationInDifferentFlowVMRequestResponse-2">
-        <vm:inbound-endpoint path="noPropagationInDifferentFlowVMRequestResponse-2"
-            exchange-pattern="request-response" />
-        <test:assert expression="#[flowVars['P1'] == null]" />
-    </flow>
-
     <flow name="noPropagationInDifferentFlowHttp">
         <processor ref="addP1" />
         <test:assert expression="#[P1]" />
@@ -98,16 +72,6 @@
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
         <test:assert expression="#[flowVars.P3]" />
-    </flow>
-
-    <flow name="VMRequestResponseEndpointFlowMidFlow">
-        <processor ref="addP1" />
-        <vm:outbound-endpoint path="echo" exchange-pattern="request-response" />
-        <test:assert expression="#[P1]" />
-    </flow>
-    <flow name="VMEchoFlow">
-        <vm:inbound-endpoint path="echo" exchange-pattern="request-response" />
-        <echo-component />
     </flow>
 
     <flow name="HTTPRequestResponseEndpointFlowMidFlow">
@@ -281,8 +245,8 @@
         <processor ref="addP1" />
         <test:assert expression="#[P1]" />
         <all>
-            <vm:outbound-endpoint path="tmp" />
-            <vm:outbound-endpoint path="tmp2" />
+            <test:queue name="tmp" />
+            <test:queue name="tmp2" />
         </all>
         <test:assert expression="#[P1]" />
     </flow>
@@ -309,7 +273,7 @@
         <all>
             <processor-chain>
                 <processor ref="addP1" />
-                <vm:outbound-endpoint path="tmp3" />
+                <test:queue name="tmp3" />
             </processor-chain>
         </all>
         <test:assert expression="#[P1]" />
@@ -373,7 +337,6 @@
     </flow>
 
     <flow name="defaultExceptionStrategyAfterCallingSubflow">
-        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
         <message-properties-transformer scope="invocation">
             <add-message-property key="P1" value="P1_VALUE"/>
         </message-properties-transformer>

@@ -9,7 +9,6 @@ package org.mule.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -27,8 +26,7 @@ public class ManySendsMule1758TestCase extends FunctionalTestCase
     @Test
     public void testSingleSend() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://s-in", "Marco", null);
+        MuleMessage response = flowRunner("mySynchService").withPayload("Marco").run().getMessage();
         assertNotNull("Response is null", response);
         assertEquals("Polo", response.getPayload());
     }
@@ -37,11 +35,10 @@ public class ManySendsMule1758TestCase extends FunctionalTestCase
     public void testManySends() throws Exception
     {
         long then = System.currentTimeMillis();
-        MuleClient client = muleContext.getClient();
         for (int i = 0; i < NUM_MESSAGES; ++i)
         {
             logger.debug("Message " + i);
-            MuleMessage response = client.send("vm://s-in", "Marco", null);
+            MuleMessage response = flowRunner("mySynchService").withPayload("Marco").run().getMessage();
             assertNotNull("Response is null", response);
             assertEquals("Polo", response.getPayload());
         }

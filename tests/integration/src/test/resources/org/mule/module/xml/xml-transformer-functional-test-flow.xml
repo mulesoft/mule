@@ -3,12 +3,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <mxml:dom-to-xml-transformer name="domToXml"/>
     <mxml:xml-to-dom-transformer name="xmlToDom" returnClass="org.w3c.dom.Document"/>
@@ -48,77 +48,44 @@
     </mxml:xslt-transformer>
 <!--// START SNIPPET: xml-transformers2 -->
 
-    <vm:endpoint name="xml-in" path="xml-in" exchange-pattern="one-way"/>
-    <vm:endpoint name="object-in" path="object-in" exchange-pattern="one-way"/>
-    <vm:endpoint name="object-in-2" path="object-in-2" exchange-pattern="one-way"/>
-    <vm:endpoint name="dom-in" path="dom-in" exchange-pattern="one-way">
-        <transformer ref="xmlToDom"/>
-    </vm:endpoint>
-
-    <vm:endpoint name="xml-out" path="xml-out" 
-        exchange-pattern="one-way"/>
-    <vm:endpoint name="xml-xslt-out" path="xml-xslt-out"
-        exchange-pattern="one-way"/>
-    <vm:endpoint name="xml-xslt-out-string" path="xml-xslt-out-string"
-        exchange-pattern="one-way"/>
-    <vm:endpoint name="xml-dom-out" path="xml-dom-out"
-        exchange-pattern="one-way"/>
-    <vm:endpoint name="xml-object-out" path="xml-object-out"
-        exchange-pattern="one-way"/>
-    <vm:endpoint name="object-out" path="object-out"
-        exchange-pattern="one-way"/>
-    <vm:endpoint name="object-xml-out" path="object-xml-out"
-        exchange-pattern="one-way"/>
-    <vm:endpoint name="dom-xml-out" path="dom-xml-out"
-        exchange-pattern="one-way"/>
-
-    
     <flow name="xml to ...">
-        
-        <inbound-endpoint ref="xml-in"/>        
-        
         <all>
-            <outbound-endpoint ref="xml-out" />
-            <vm:outbound-endpoint ref="xml-xslt-out">
+            <test:queue name="xml-out"/>
+            <processor-chain>
                 <transformer ref="xslt"/>
-            </vm:outbound-endpoint>
-            <vm:outbound-endpoint ref="xml-xslt-out-string">
+                <test:queue name="xml-xslt-out"/>
+            </processor-chain>
+            <processor-chain>
                 <transformer ref="xslt-string"/>
-            </vm:outbound-endpoint>
-            <outbound-endpoint ref="xml-dom-out">
+                <test:queue name="xml-xslt-out-string"/>
+            </processor-chain>
+            <processor-chain>
                 <transformer ref="xmlToDom "/>
-            </outbound-endpoint>
-            <vm:outbound-endpoint ref="dom-in"/>
+                <test:queue name="xml-dom-out"/>
+            </processor-chain>
+            <flow-ref name="dom to xml"/>
         </all>
-        
     </flow>
 
     <flow name="object to xml">
-        
-        <inbound-endpoint ref="object-in"/>                
-        
         <all>
-            <outbound-endpoint ref="object-out"/>
-            <vm:outbound-endpoint ref="object-xml-out">
+            <test:queue name="object-out"/>
+            <processor-chain>
                 <transformer ref="objectToXml"/>
-            </vm:outbound-endpoint>
-            <outbound-endpoint ref="xml-in">
+                <test:queue name="object-xml-out"/>
+            </processor-chain>
+            <processor-chain>
                 <transformer ref="objectToXml"/>
-            </outbound-endpoint>
+                <flow-ref name="xml to ..."/>
+            </processor-chain>
         </all>
-        
     </flow>
 
     <flow name="dom to xml">
-        
-        <inbound-endpoint ref="dom-in"/>        
-        
         <all>
-            <outbound-endpoint ref="dom-xml-out">
-                <transformer ref="domToXml"/>
-            </outbound-endpoint>
+            <transformer ref="domToXml"/>
+            <test:queue name="dom-xml-out"/>
         </all>
-        
     </flow>
 
 

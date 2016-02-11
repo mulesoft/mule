@@ -7,19 +7,21 @@
 package org.mule.test.usecases.routing.response;
 
 import static java.lang.String.format;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
@@ -48,7 +50,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
         final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).build();
         MuleMessage message = client.send(format("http://localhost:%s", port.getNumber()), getTestMuleMessage("request"), httpRequestOptions);
         assertNotNull(message);
-        assertEquals("Received: request", new String(getPayloadAsBytes(message)));
+        assertThat(new String(getPayloadAsBytes(message)), is("Received: request"));
     }
 
     @Test

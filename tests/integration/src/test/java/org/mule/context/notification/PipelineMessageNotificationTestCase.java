@@ -7,10 +7,18 @@
 package org.mule.context.notification;
 
 import static org.junit.Assert.assertNotNull;
+
+import org.mule.api.MessagingException;
 import org.mule.api.client.MuleClient;
+
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 public class PipelineMessageNotificationTestCase extends AbstractNotificationTestCase
 {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
     protected String getConfigFile()
@@ -22,13 +30,19 @@ public class PipelineMessageNotificationTestCase extends AbstractNotificationTes
     public void doTest() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        assertNotNull(client.send("vm://rr", "hello sweet world", null));
-        assertNotNull(client.send("vm://rrException", "hello sweet world", null));
-        assertNotNull(client.send("vm://rrResponseException", "hello sweet world", null));
-        client.dispatch("vm://ow", "goodbye cruel world", null);
-        client.request("vm://ow-out", RECEIVE_TIMEOUT);
-        client.dispatch("vm://owException", "goodbye cruel world", null);
-        client.request("vm://owException-out", RECEIVE_TIMEOUT);
+        assertNotNull(flowRunner("service-1").withPayload("hello sweet world").run());
+        expectedException.expect(MessagingException.class);
+        assertNotNull(flowRunner("service-2").withPayload("hello sweet world").run());
+        assertNotNull(flowRunner("service-3").withPayload("hello sweet world").run());
+        flowRunner("service-4").withPayload("goodbye cruel world")
+                               .asynchronously()
+                               .run();
+        client.request("test://ow-out", RECEIVE_TIMEOUT);
+        flowRunner("service-5").withPayload("goodbye cruel world")
+                               .withInboundProperty("fail", "true")
+                               .asynchronously()
+                               .run();
+        client.request("test://owException-out", RECEIVE_TIMEOUT);
     }
 
     @Override

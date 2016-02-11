@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.LinkedList;
@@ -29,12 +28,11 @@ public class TransformerOnMessageCollectionTestCase extends FunctionalTestCase
     @Test
     public void testIssue() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
         List<String> values = new LinkedList<String>();
         values.add("One");
         values.add("Two");
 
-        MuleMessage response = client.send("vm://testInput", values, null);
+        MuleMessage response = flowRunner("test").withPayload(values).run().getMessage();
         assertEquals("foo", response.getPayload());
         assertFalse(response.getPayload() instanceof List);
     }

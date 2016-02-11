@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="test-foreachFlow1">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="in"/>
-
         <set-payload value="#[ [ 'A', 'B' ]  ]"/>
         <set-session-variable variableName="mySessionList" value="#[new ArrayList()]"/>
 
         <foreach>
-            <vm:outbound-endpoint exchange-pattern="request-response" path="out" />
+            <flow-ref name="secondFlow"/>
             <object-to-string-transformer />
             <expression-transformer expression="#[sessionVars['mySessionList'].add(payload)]"/>
         </foreach>
@@ -23,7 +18,6 @@
 
 
     <flow name="secondFlow">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="out" />
         <object-to-string-transformer />
         <set-payload value="Hello World #[payload]" />
     </flow>

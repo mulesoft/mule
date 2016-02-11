@@ -1,29 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <vm:connector name="vmQueues"/>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
 
     <flow name="innerFlow">
-        <vm:inbound-endpoint exchange-pattern="one-way" path="vminnertest"/>
+        <http:listener path="innertest" config-ref="listenerConfig"/>
         <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$InnerFlowCountDownProcessor"/>
     </flow>
 
     <flow name="innerFlowRequestResponse">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="vminnerrequestresponsetest"/>
+        <http:listener path="innerrequestresponsetest" config-ref="listenerConfig"/>
         <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$InnerFlowCountDownProcessor"/>
     </flow>
 
     <flow name="catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow"/>
+        <http:listener path="catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow" config-ref="listenerConfig"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$SendInnerFlowThrowExceptionJavaComponent"/>
         <catch-exception-strategy>
             <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$AssertEventComponent"/>
@@ -32,7 +30,7 @@
     </flow>
 
     <flow name="catchExceptionJavaComponentToJavaComponent">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="catchExceptionJavaComponentToJavaComponent"/>
+        <http:listener path="catchExceptionJavaComponentToJavaComponent" config-ref="listenerConfig"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$DispatchInnerFlowThrowExceptionJavaComponent"/>
         <catch-exception-strategy>
             <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$AssertEventComponent"/>
@@ -41,7 +39,7 @@
     </flow>
 
     <flow name="catchExceptionJavaComponentToMessageProcessor">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="catchExceptionJavaComponentToMessageProcessor"/>
+        <http:listener path="catchExceptionJavaComponentToMessageProcessor" config-ref="listenerConfig"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$DispatchInnerFlowThrowExceptionJavaComponent"/>
         <catch-exception-strategy>
             <processor ref="assertEventProcessor"/>
@@ -57,7 +55,7 @@
     </spring:beans>
 
     <flow name="catchExceptionMessageProcessorToJavaComponent">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="catchExceptionMessageProcessorToJavaComponent"/>
+        <http:listener path="catchExceptionMessageProcessorToJavaComponent" config-ref="listenerConfig"/>
         <processor ref="myProcessor"/>
         <catch-exception-strategy>
             <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$AssertEventComponent"/>
@@ -66,7 +64,7 @@
     </flow>
 
     <flow name="catchExceptionMessageProcessorToMessageProcessor">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="catchExceptionMessageProcessorToMessageProcessor"/>
+        <http:listener path="catchExceptionMessageProcessorToMessageProcessor" config-ref="listenerConfig"/>
         <processor ref="myProcessor"/>
         <catch-exception-strategy>
             <processor ref="assertEventProcessor"/>

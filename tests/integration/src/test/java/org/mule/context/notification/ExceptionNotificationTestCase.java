@@ -7,14 +7,17 @@
 package org.mule.context.notification;
 
 import static org.junit.Assert.assertNull;
-
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.component.ComponentException;
 import org.mule.functional.listener.ExceptionListener;
+
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
 {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
     protected String getConfigFile()
@@ -26,8 +29,8 @@ public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
     public void doTest() throws Exception
     {
         ExceptionListener exceptionListener = new ExceptionListener(muleContext);
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://in-1", new DefaultMuleMessage("hello world", muleContext));
+        expectedException.expect(ComponentException.class);
+        MuleMessage result = flowRunner("the-service").withPayload(getTestMuleMessage()).run().getMessage();
         // processing is async, give time for the exception notificator to run
         exceptionListener.waitUntilAllNotificationsAreReceived();
 

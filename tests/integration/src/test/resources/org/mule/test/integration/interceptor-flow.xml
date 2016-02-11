@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xsi:schemaLocation="
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       		   http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <vm:endpoint name="in" path="in" exchange-pattern="one-way"/>
-    <vm:endpoint name="out" path="out" exchange-pattern="one-way"/>
-    
     <flow name="interceptorFlow">
-        <inbound-endpoint ref="in"/>
         <custom-interceptor class="org.mule.test.integration.interceptor.MyCustomInterceptor"/>
-        <outbound-endpoint ref="out"/>
+        <test:queue name="out"/>
     </flow>
 </mule>

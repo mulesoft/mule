@@ -3,32 +3,28 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
       xmlns:json="http://www.mulesoft.org/schema/mule/json"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
                http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
                http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
     <flow name="minimal-config">
-        <vm:inbound-endpoint path="input-1" exchange-pattern="request-response"/>
         <foreach>
             <test:component/>
-            <vm:outbound-endpoint path="out"/>
+            <test:queue name="out"/>
         </foreach>
     </flow>
 
     <flow name="minimal-config-plus-mp">
-        <vm:inbound-endpoint path="input-2" exchange-pattern="request-response"/>
         <foreach>
             <test:component/>
-            <vm:outbound-endpoint path="out"/>
+            <test:queue name="out"/>
         </foreach>
         <script:transformer>
             <script:script engine="groovy">
@@ -39,23 +35,20 @@
     </flow>
 
     <flow name="minimal-config-expression">
-        <vm:inbound-endpoint path="input-3" exchange-pattern="request-response"/>
         <foreach collection="#[message.inboundProperties.names]">
             <test:component/>
-            <vm:outbound-endpoint path="out"/>
+            <test:queue name="out"/>
         </foreach>
     </flow>
 
     <flow name="partitioned-config">
-        <vm:inbound-endpoint path="input-4" exchange-pattern="request-response"/>
         <foreach batchSize="${batch.size}">
             <test:component/>
-            <vm:outbound-endpoint path="out"/>
+            <test:queue name="out"/>
         </foreach>
     </flow>
 
     <flow name="parent-message-config">
-        <vm:inbound-endpoint path="input-5" exchange-pattern="request-response"/>
         <foreach rootMessageVariableName="parent">
             <test:component/>
             <message-properties-transformer scope="invocation">
@@ -68,7 +61,6 @@
     </flow>
 
     <flow name="counter-config">
-        <vm:inbound-endpoint path="input-6" exchange-pattern="request-response"/>
         <foreach counterVariableName="index">
             <test:component/>
             <message-properties-transformer scope="session">
@@ -81,9 +73,8 @@
     </flow>
 
     <flow name="message-collection-config">
-        <vm:inbound-endpoint path="input-7" exchange-pattern="request-response"/>
         <foreach>
-            <test:assert expression="#[message.inboundProperties['out']=='out'+counter]" />
+            <test:assert expression="#[message.outboundProperties['out']=='out'+counter]" />
             <set-variable variableName="totalMessages" value="#[counter]"/>
         </foreach>
         <test:assert expression="#[totalMessages==10]" />
@@ -100,7 +91,6 @@
     </flow>
 
     <flow name="map-config">
-        <vm:inbound-endpoint path="input-8" exchange-pattern="request-response"/>
         <foreach>
             <test:component/>
             <message-properties-transformer scope="invocation">
@@ -114,7 +104,6 @@
     </flow>
 
     <flow name="map-expression-config">
-        <vm:inbound-endpoint path="input-9" exchange-pattern="request-response"/>
         <foreach collection="#[message.inboundProperties.names]">
             <test:component/>
             <message-properties-transformer scope="invocation">
@@ -133,7 +122,6 @@
     </flow>
 
     <flow name="process-json-update">
-        <vm:inbound-endpoint path="input-11" exchange-pattern="request-response"/>
         <json:json-to-object-transformer returnClass="java.util.Map"/>
         <test:assert expression="#[payload.order.items.size() == 2]" />
         <foreach collection="#[payload.order.items]">
@@ -152,7 +140,6 @@
     </flow>
 
     <flow name="array-expression-config">
-        <vm:inbound-endpoint path="input-12" exchange-pattern="request-response"/>
         <message-properties-transformer scope="invocation">
             <add-message-property key="loops" value="0"/>
         </message-properties-transformer>
@@ -169,7 +156,6 @@
     </flow>
 
     <flow name="counter-scope">
-        <vm:inbound-endpoint path="input-13" exchange-pattern="request-response"/>
         <foreach>
             <test:component/>
         </foreach>
@@ -177,7 +163,6 @@
     </flow>
 
     <flow name="counter-two-foreach-independence">
-        <vm:inbound-endpoint path="input-14" exchange-pattern="request-response"/>
         <foreach>
             <test:component/>
             <message-properties-transformer scope="invocation">
@@ -196,78 +181,71 @@
     </flow>
 
     <flow name="nested-foreach">
-        <vm:inbound-endpoint path="input-15" exchange-pattern="request-response"/>
         <foreach>
             <foreach>
                 <test:component/>
-                <vm:outbound-endpoint path="out"/>
+                <test:queue name="out"/>
             </foreach>
         </foreach>
     </flow>
 
     <flow name="nested-foreach-counters">
-        <vm:inbound-endpoint path="input-16" exchange-pattern="request-response"/>
         <foreach>
             <foreach>
                 <test:component/>
                 <message-properties-transformer scope="outbound">
                     <add-message-property key="j" value="#[flowVars.counter]"/>
                 </message-properties-transformer>
-                <vm:outbound-endpoint path="out"/>
+                <test:queue name="out"/>
             </foreach>
             <message-properties-transformer scope="outbound">
                 <add-message-property key="i" value="#[flowVars.counter]"/>
             </message-properties-transformer>
-            <vm:outbound-endpoint path="out"/>
+            <test:queue name="out"/>
         </foreach>
     </flow>
 
     <flow name="foreach-properties-restored">
-        <vm:inbound-endpoint path="input-17" exchange-pattern="request-response"/>
         <message-properties-transformer scope="invocation">
             <add-message-property key="counter" value="hello"/>
             <add-message-property key="rootMessage" value="world"/>
         </message-properties-transformer>
         <foreach>
             <test:component/>
-            <vm:outbound-endpoint path="out"/>
+            <test:queue name="out"/>
         </foreach>
         <test:assert expression="#[counter == 'hello']" />
         <test:assert expression="#[rootMessage == 'world']" />
     </flow>
 
     <flow name="mvel-list">
-        <vm:inbound-endpoint path="input-18" exchange-pattern="request-response"/>
         <foreach collection="#[['foo', 'bar']]">
             <test:component/>
-            <vm:outbound-endpoint path="out"/>
+            <test:queue name="out"/>
         </foreach>
     </flow>
 
     <flow name="mvel-map">
-        <vm:inbound-endpoint path="input-19" exchange-pattern="request-response"/>
         <foreach collection="#[['key1' : 'val1', 'key2':'val2']]">
             <test:component/>
             <logger level="ERROR" message="message-#[counter]: #[payload]"/>
-            <vm:outbound-endpoint path="out"/>
+            <test:queue name="out"/>
         </foreach>
     </flow>
 
     <flow name="mvel-collection">
-        <vm:inbound-endpoint path="input-20" exchange-pattern="request-response"/>
         <foreach collection="#[['key1' : 'val1', 'key2':'val2'].values()]">
             <test:component/>
-            <vm:outbound-endpoint path="out"/>
+            <test:queue name="out"/>
         </foreach>
     </flow>
 
     <flow name="mvel-array">
-        <vm:inbound-endpoint path="input-21" exchange-pattern="request-response"/>
         <foreach collection="#[{'foo', 'bar'}]">
             <test:component/>
             <test:assert expression="#[payload instanceof String]"  message="hoal"/>
             <logger level="ERROR" message="message-#[counter]: #[payload]"/>
-            <vm:outbound-endpoint path="out"/>
+            <test:queue name="out"/>
         </foreach>
     </flow>
     
@@ -275,24 +253,6 @@
         <foreach collection="#[invalid]">
             <test:component/>
         </foreach>
-    </flow>
-    
-    <flow name="request-reply">
-        <vm:inbound-endpoint path="input-22" exchange-pattern="request-response"/>
-        <set-session-variable variableName="processedMessages" value="0"/>
-        <foreach collection="#[{'foo', 'bar', 'baz'}]">
-            <set-session-variable variableName="processedMessages" value="#[processedMessages]#[counter]"/>
-            <request-reply timeout="5000">
-                <vm:outbound-endpoint path="middle" exchange-pattern="one-way"/>
-                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
-            </request-reply>
-            <vm:outbound-endpoint path="out"/>
-        </foreach>
-    </flow>
-
-    <flow name="request-reply-meddle" processingStrategy="synchronous">
-        <vm:inbound-endpoint path="middle" exchange-pattern="one-way"/>
-        <vm:outbound-endpoint path="in" exchange-pattern="one-way"/>
     </flow>
     
     <flow name="foreachWithAsync">

@@ -9,6 +9,7 @@ package org.mule.test.integration.routing.outbound;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.functional.functional.FlowAssert;
@@ -32,21 +33,21 @@ public class MulticasterAsyncTestCase extends FunctionalTestCase
     @Test
     public void testSplitter() throws Exception
     {
-        MuleClient client = muleContext.getClient();
         Apple apple = new Apple();
-        client.dispatch("vm://distributor.queue", apple, null);
+        flowRunner("Distributor").withPayload(apple).asynchronously().run();
 
         List<Apple> results = new ArrayList<>(3);
 
-        MuleMessage result = client.request("vm://collector.queue", RECEIVE_TIMEOUT);
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
         assertNotNull(result);
         results.add((Apple) result.getPayload());
 
-        result = client.request("vm://collector.queue", RECEIVE_TIMEOUT);
+        result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
         assertNotNull(result);
         results.add((Apple) result.getPayload());
 
-        result = client.request("vm://collector.queue", RECEIVE_TIMEOUT);
+        result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
         assertNotNull(result);
         results.add((Apple) result.getPayload());
 

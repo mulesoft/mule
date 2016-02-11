@@ -10,11 +10,12 @@ package org.mule.test.integration.domain.db;
 import static java.lang.Boolean.TRUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
-import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
+import org.mule.construct.Flow;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
+import org.mule.tck.MuleTestUtils;
 
 import org.junit.Test;
 
@@ -43,8 +44,8 @@ public class DomainTransformerRegistrationTestCase extends DomainFunctionalTestC
     public void registerTransformerOnce() throws Exception
     {
         final MuleContext app1Context = getMuleContextForApp(APP1);
-        final LocalMuleClient client = app1Context.getClient();
-        final MuleMessage response = client.send("vm://testIn", new DefaultMuleMessage(TRUE.toString(), app1Context));
+        Flow flow = (Flow) app1Context.getRegistry().lookupFlowConstruct("main");
+        final MuleMessage response = flow.process(MuleTestUtils.getTestEvent(TRUE.toString(), MessageExchangePattern.REQUEST_RESPONSE, app1Context)).getMessage();
 
         assertThat(response.getPayload(), instanceOf(Boolean.class));
     }

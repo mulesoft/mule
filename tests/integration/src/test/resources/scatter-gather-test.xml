@@ -2,13 +2,10 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <spring:bean id="testMergeStrategy"
@@ -75,7 +72,7 @@
 
     <flow name="customMergeStrategyByRef">
         <scatter-gather>
-            <custom-aggregation-strategy ref="testMergeStrategy" doc:name="aggregation strategy"/>
+            <custom-aggregation-strategy ref="testMergeStrategy"/>
 
             <set-payload value="apple"/>
             <set-payload value="banana"/>
@@ -171,7 +168,6 @@
     </flow>
 
     <flow name="requestResponseInboundEndpoint">
-        <vm:inbound-endpoint path="requestResponseInboundEndpoint" exchange-pattern="request-response"/>
         <scatter-gather>
             <set-payload value="apple"/>
             <set-payload value="banana"/>
@@ -182,7 +178,6 @@
     </flow>
 
     <flow name="oneWayInboundEndpoint">
-        <vm:inbound-endpoint path="oneWayInboundEndpoint" exchange-pattern="one-way"/>
         <scatter-gather>
             <set-payload value="apple"/>
             <set-payload value="banana"/>
@@ -193,7 +188,6 @@
     </flow>
 
     <flow name="routesWithForeachAndInboundEndpoint">
-        <vm:inbound-endpoint path="routesWithForeachAndInboundEndpoint" exchange-pattern="request-response"/>
         <scatter-gather>
             <foreach>
                 <set-property propertyName="timeStamp" value="#[server.dateTime]"/>
@@ -210,24 +204,25 @@
     </flow>
 
     <flow name="oneWayRouteWithSingleResponse">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="oneWayRouteWithSingleResponse"/>
         <set-session-variable variableName="stuff" value="apple"/>
         <scatter-gather>
-            <vm:outbound-endpoint exchange-pattern="one-way" path="propertyToPayload"/>
-            <vm:outbound-endpoint exchange-pattern="request-response" path="propertyToPayload"/>
+            <async>
+                <flow-ref name="propertyToPayload"/>
+            </async>
+            <flow-ref name="propertyToPayload"/>
         </scatter-gather>
 
         <test:assert expression="#[payload == 'apple']"/>
     </flow>
 
     <flow name="oneWayRouteWithMultipleResponses">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="oneWayRouteWithMultipleResponses"/>
-
         <scatter-gather>
             <set-payload value="apple"/>
             <set-payload value="banana"/>
             <set-payload value="orange"/>
-            <vm:outbound-endpoint exchange-pattern="one-way" path="log"/>
+            <async>
+                <flow-ref name="log"/>
+            </async>
         </scatter-gather>
 
         <flow-ref name="testRoutes"/>
@@ -235,19 +230,21 @@
     </flow>
 
     <flow name="oneWayRoutesOnly">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="oneWayRoutesOnly"/>
         <set-payload value="apple" />
 
         <scatter-gather>
-            <vm:outbound-endpoint exchange-pattern="one-way" path="log"/>
-            <vm:outbound-endpoint exchange-pattern="one-way" path="log"/>
+            <async>
+                <flow-ref name="log"/>
+            </async>
+            <async>
+                <flow-ref name="log"/>
+            </async>
         </scatter-gather>
 
         <test:assert expression="#[payload == 'apple']"/>
     </flow>
 
     <flow name="expressionFilterRoute">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="expressionFilterRoute"/>
         <set-payload value="apple" />
 
         <scatter-gather>
@@ -265,7 +262,6 @@
     </flow>
 
     <flow name="propertyToPayload">
-        <vm:inbound-endpoint exchange-pattern="request-response" path="propertyToPayload"/>
         <set-payload value="#[sessionVars.stuff]"/>
     </flow>
 
@@ -308,7 +304,6 @@
     </sub-flow>
 
     <flow name="log">
-        <vm:inbound-endpoint exchange-pattern="one-way" path="log"/>
         <logger level="INFO" message="one-way vm"/>
     </flow>
 

@@ -45,6 +45,6 @@ public class NotSharedHttpConnectorInDomain extends DomainFunctionalTestCase
         MuleContext muleContext = getMuleContextForApp(APP);
         muleContext.getClient().send(url, new DefaultMuleMessage("", muleContext));
 
-        assertThat(muleContext.getClient().request(url, 5000), is(notNullValue()));
+        assertThat(muleContext.getClient().request("test://in", 5000), is(notNullValue()));
     }
 }

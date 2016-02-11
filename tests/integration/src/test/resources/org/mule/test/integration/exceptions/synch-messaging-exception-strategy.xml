@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
@@ -29,54 +24,21 @@
         org.mule.component.ComponentException(org.mule.config.i18n.MessageFactory.createStaticMessage("dummyException"));
     </script:script>
 
-
-    <flow name="InboundTransformer">
-        <vm:inbound-endpoint path="in1" exchange-pattern="request-response">
-            <transformer ref="exceptionTransformer"/>
-        </vm:inbound-endpoint>
+    <flow name="Transformer">
+        <transformer ref="exceptionTransformer"/>
         <log-component/>
-    </flow>
-
-    <flow name="InboundResponseTransformer">
-        <vm:inbound-endpoint path="in2" exchange-pattern="request-response">
-            <response>
-                <transformer ref="exceptionTransformer"/>
-            </response>
-        </vm:inbound-endpoint>
-        <log-component/>
-    </flow>
-
-    <flow name="OutboundTransformer">
-        <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
-        <log-component/>
-        <vm:outbound-endpoint path="out3" exchange-pattern="request-response">
-            <transformer ref="exceptionTransformer"/>
-        </vm:outbound-endpoint>
-    </flow>
-
-    <flow name="OutboundResponseTransformer">
-        <vm:inbound-endpoint path="in4" exchange-pattern="request-response"/>
-        <log-component/>
-        <vm:outbound-endpoint path="out4" exchange-pattern="request-response">
-            <response>
-                <transformer ref="exceptionTransformer"/>
-            </response>
-        </vm:outbound-endpoint>
     </flow>
 
     <flow name="Component">
-        <vm:inbound-endpoint path="in5" exchange-pattern="request-response"/>
         <script:component script-ref="throwException"/>
     </flow>
 
-    <flow name="InboundRouter">
-        <vm:inbound-endpoint path="in6" exchange-pattern="request-response"/>
+    <flow name="ProcessorInboundRouter">
         <custom-processor class="org.mule.test.integration.exceptions.ExceptionThrowingInboundRouter"/>
         <log-component/>
     </flow>
 
-    <flow name="OutboundRouter">
-        <vm:inbound-endpoint path="in7" exchange-pattern="request-response"/>
+    <flow name="ProcessorOutboundRouter">
         <log-component/>
         <custom-processor class="org.mule.test.integration.exceptions.ExceptionThrowingOutboundRouter"/>
     </flow>

@@ -1,37 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans" 
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <spring:bean name="target" class="org.mule.tck.services.MatchingMethodsComponent"/>
 
     <flow name="Service">
-        <vm:inbound-endpoint path="service" exchange-pattern="request-response"/>
         <component>
             <spring-object bean="target"/>
         </component>
         <!-- This test will report errors, don't clutter the log -->
     </flow>
-
-    <flow name="Service2">
-        <composite-source>
-            <vm:inbound-endpoint path="service2-reverseString" exchange-pattern="request-response">
-                <property key="method" value="reverseString"/>
-            </vm:inbound-endpoint>
-            <vm:inbound-endpoint path="service2-upperCaseString" exchange-pattern="request-response">
-                <property key="method" value="upperCaseString"/>
-            </vm:inbound-endpoint>
-        </composite-source>
-        <component>
-            <spring-object bean="target"/>
-        </component>
-        <!-- This test will report errors, don't clutter the log -->
-        <custom-exception-strategy class="org.mule.functional.functional.QuietExceptionStrategy"/>
-    </flow>
-
 </mule>

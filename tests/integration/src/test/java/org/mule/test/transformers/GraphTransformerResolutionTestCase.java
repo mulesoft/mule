@@ -61,7 +61,7 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
     @Test
     public void resolvesNonDirectTransformation() throws Exception
     {
-        final MuleEvent muleEvent = runFlow("stringEchoService", new A("Hello"));
+        final MuleEvent muleEvent = flowRunner("stringEchoService").withPayload(new A("Hello")).run();
         MuleMessage response = muleEvent.getMessage();
         assertTrue(response.getPayload() instanceof C);
         assertEquals("HelloAFromB", ((C)response.getPayload()).value);

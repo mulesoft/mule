@@ -1,22 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:https="http://www.mulesoft.org/schema/mule/https"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
-      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:json="http://www.mulesoft.org/schema/mule/json"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-       http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
-       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
@@ -49,8 +43,7 @@
         </catch-exception-strategy>
     </flow>
 
-    <flow name="vmContinueProcessingActualMessage">
-        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+    <flow name="continueProcessingActualMessage">
         <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$NewsRequest"/>
         <custom-processor class="org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
@@ -61,9 +54,6 @@
     </flow>
 
     <flow name="catchWithComponent">
-      <vm:inbound-endpoint path="in2">
-          <vm:transaction action="ALWAYS_BEGIN"/>
-      </vm:inbound-endpoint>
       <test:component throwException="true"/>
       <catch-exception-strategy>
         <script:component>
@@ -75,7 +65,6 @@
     </flow>
 
     <flow name="fullyDefinedCatchExceptionStrategyWithComponent">
-        <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
         <append-string-transformer message=" apt1"/>
         <test:component throwException="true"/>
         <catch-exception-strategy>

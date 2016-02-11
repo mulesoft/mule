@@ -6,9 +6,11 @@
  */
 package org.mule.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -32,22 +34,22 @@ public class NoArgsCallWrapperFunctionalTestCase extends FunctionalTestCase
     public void testNoArgsCallWrapper() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://invoke", "test", null);
-        MuleMessage reply = client.request("vm://out", RECEIVE_TIMEOUT);
+        flowRunner("WrapperUMO").withPayload("test").asynchronously().run();
+        MuleMessage reply = client.request("test://out", RECEIVE_TIMEOUT);
         assertNotNull(reply);
         assertNull(reply.getExceptionPayload());
-        assertEquals("Just an apple.", reply.getPayload());
+        assertThat(reply.getPayload(), is("Just an apple."));
     }
 
     @Test
     public void testWithInjectedDelegate() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://invokeWithInjected", "test", null);
-        MuleMessage reply = client.request("vm://outWithInjected", RECEIVE_TIMEOUT);
+        flowRunner("WrapperUMOInjected").withPayload("test").asynchronously().run();
+        MuleMessage reply = client.request("test://outWithInjected", RECEIVE_TIMEOUT);
         assertNotNull(reply);
         assertNull(reply.getExceptionPayload());
         // same as original input
-        assertEquals("test", reply.getPayload());
+        assertThat(reply.getPayload(), is("test"));
     }
 }

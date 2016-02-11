@@ -40,7 +40,7 @@ public class ExpressionLanguageConcurrencyTestCase extends FunctionalTestCase
                     try
                     {
                         start.await();
-                        testFlow("slowRequestHandler", getTestEvent("foo"));
+                        flowRunner("slowRequestHandler").withPayload("foo").run();
                     }
                     catch (Exception e)
                     {

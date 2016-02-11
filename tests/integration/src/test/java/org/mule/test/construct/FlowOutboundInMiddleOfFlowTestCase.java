@@ -12,7 +12,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class FlowOutboundInMiddleOfFlowTestCase extends FunctionalTestCase
@@ -24,20 +23,19 @@ public class FlowOutboundInMiddleOfFlowTestCase extends FunctionalTestCase
     }
 
     @Test
-    @Ignore("MULE-6926: flaky test")
     public void testOutboundInMiddleOfFlow() throws Exception
     {
         MuleClient client = muleContext.getClient();
         
-        client.dispatch("vm://test.in", "message", null);
+        flowRunner("flowTest").withPayload("message").asynchronously().run();
         
-        MuleMessage msg = client.request("vm://test.out.1", 1000);
+        MuleMessage msg = client.request("test://test.out.1", 1000);
         assertEquals("messagehello", getPayloadAsString(msg));
         
-        MuleMessage msg2 = client.request("vm://test.out.2", 5000);
+        MuleMessage msg2 = client.request("test://test.out.2", RECEIVE_TIMEOUT);
         assertEquals("messagebye", getPayloadAsString(msg2));
         
-        MuleMessage msg3 = client.request("vm://test.out.3", 5000);
+        MuleMessage msg3 = client.request("test://test.out.3", RECEIVE_TIMEOUT);
         assertEquals("egassem", getPayloadAsString(msg3));
     }
 }

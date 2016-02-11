@@ -51,7 +51,7 @@ public class XSLTWikiDocsTestCase extends FunctionalTestCase
 
         //Invoke the service
         final DefaultMuleMessage muleMessage = new DefaultMuleMessage(srcData, props, null, null, muleContext);
-        final MuleEvent muleEvent = runFlow("Echo", muleMessage);
+        final MuleEvent muleEvent = flowRunner("Echo").withPayload(muleMessage).run();
         MuleMessage message = muleEvent.getMessage();
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
