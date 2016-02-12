@@ -9,7 +9,7 @@ package org.mule.test.integration.transaction.xa;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
+import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
 
 import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;

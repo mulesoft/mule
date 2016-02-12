@@ -51,7 +51,9 @@ public class InvocationPropertiesTestCase extends FunctionalTestCase
     @Test
     public void setInvocationPropertyUsingAPIGetInFlow() throws Exception
     {
-        FlowRunner runner = flowRunner("GetInvocationPropertyInFlow").withPayload("data").withInvocationProperty("P1", "P1_VALUE").asynchronously();
+        FlowRunner runner = flowRunner("GetInvocationPropertyInFlow").withPayload("data")
+                                                                     .withFlowVariable("P1", "P1_VALUE")
+                                                                     .asynchronously();
         runner.run();
     }
 
@@ -68,7 +70,9 @@ public class InvocationPropertiesTestCase extends FunctionalTestCase
     @Test
     public void overwritePropertyValueInFlow() throws Exception
     {
-        FlowRunner runner = flowRunner("OverwritePropertyValueInFlow").withPayload("data").withInvocationProperty("P1", "P1_VALUE").asynchronously();
+        FlowRunner runner = flowRunner("OverwritePropertyValueInFlow").withPayload("data")
+                                                                      .withFlowVariable("P1", "P1_VALUE")
+                                                                      .asynchronously();
         MuleEvent event = runner.buildEvent();
         runner.run();
         
@@ -92,9 +96,9 @@ public class InvocationPropertiesTestCase extends FunctionalTestCase
     {
         Object nonSerializable = new Object();
         FlowRunner runner = flowRunner("AsyncFlow").withPayload("data")
-                                                   .withInvocationProperty("P1", "value")
-                                                   .withInvocationProperty("P2", nonSerializable)
-                                                   .withInvocationProperty("testThread", Thread.currentThread())
+                                                   .withFlowVariable("P1", "value")
+                                                   .withFlowVariable("P2", nonSerializable)
+                                                   .withFlowVariable("testThread", Thread.currentThread())
                                                    .asynchronously();
         MuleMessage message = runner.buildEvent().getMessage();
         runner.run();
