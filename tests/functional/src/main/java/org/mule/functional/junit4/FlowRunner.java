@@ -15,7 +15,6 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
@@ -27,25 +26,19 @@ import org.mule.functional.functional.FlowAssert;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.transaction.MuleTransactionConfig;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.Transformer;
-import org.mockito.Mockito;
 
 /**
  * Provides a fluent API for running events through flows.
  * 
  * This runner is <b>not</b> thread-safe.
  */
-public class FlowRunner
+public class FlowRunner extends FlowConstructRunner<FlowRunner>
 {
 
-    private MuleContext muleContext;
-
     private String flowName;
-
-    private TestEventBuilder eventBuilder = new TestEventBuilder();
 
     private ExecutionTemplate<MuleEvent> txExecutionTemplate = new ExecutionTemplate<MuleEvent>()
     {
@@ -60,7 +53,6 @@ public class FlowRunner
 
     private Transformer responseEventTransformer = new Transformer()
     {
-
         @Override
         public Object transform(Object input)
         {
@@ -76,121 +68,24 @@ public class FlowRunner
      */
     public FlowRunner(MuleContext muleContext, String flowName)
     {
-        this.muleContext = muleContext;
+        super(muleContext);
         this.flowName = flowName;
     }
 
     /**
-     * Prepares the given data to be sent as the payload of the {@link MuleEvent} to the configured flow.
+     * Configures the flow to run inside a transaction.
      * 
-     * @param payload the payload to use in the message
+     * @param action The action to do at the start of the transactional block. See {@link TransactionConfig} constants.
+     * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
      * @return this {@link FlowRunner}
      */
-    public FlowRunner withPayload(Object payload)
+    public FlowRunner transactionally(TransactionConfigEnum action, TransactionFactory factory)
     {
-        eventBuilder.withPayload(payload);
+        MuleTransactionConfig transactionConfig = new MuleTransactionConfig(action.getAction());
+        transactionConfig.setFactory(factory);
 
-        return this;
-    }
-
-    /**
-     * Prepares a property with the given key and value to be sent as an inbound property of the {@link MuleMessage} to
-     * the configured flow.
-     * 
-     * @param key the key of the inbound property to add
-     * @param value the value of the inbound property to add
-     * @return this {@link FlowRunner}
-     */
-    public FlowRunner withInboundProperty(String key, Object value)
-    {
-        eventBuilder.withInboundProperty(key, value);
-
-        return this;
-    }
-
-    /**
-     * Prepares the given properties map to be sent as inbound properties of the {@link MuleMessage} to the configured
-     * flow.
-     * 
-     * @param properties the inbound properties to add
-     * @return this {@link FlowRunner}
-     */
-    public FlowRunner withInboundProperties(Map<String, Object> properties)
-    {
-        eventBuilder.withInboundProperties(properties);
-
-        return this;
-    }
-
-    /**
-     * Prepares a property with the given key and value to be sent as an outbound property of the {@link MuleMessage} to
-     * the configured flow.
-     * 
-     * @param key the key of the outbound property to add
-     * @param value the value of the outbound property to add
-     * @return this {@link FlowRunner}
-     */
-    public FlowRunner withOutboundProperty(String key, Object value)
-    {
-        eventBuilder.withOutboundProperty(key, value);
-
-        return this;
-    }
-
-    /**
-     * Prepares a property with the given key and value to be sent as a session property of the {@link MuleMessage} to
-     * the configured flow.
-     * 
-     * @param key the key of the session property to add
-     * @param value the value of the session property to add
-     * @return this {@link FlowRunner}
-     */
-    public FlowRunner withSessionProperty(String key, Object value)
-    {
-        eventBuilder.withSessionProperty(key, value);
-
-        return this;
-    }
-
-    /**
-     * Prepares a property with the given key and value to be sent as an invocation property of the {@link MuleMessage}
-     * to the configured flow.
-     * 
-     * @param key the key of the invocation property to add
-     * @param value the value of the invocation property to add
-     * @return this {@link FlowRunner}
-     */
-    public FlowRunner withInvocationProperty(String key, Object value)
-    {
-        eventBuilder.withInvocationProperty(key, value);
-
-        return this;
-    }
-
-
-    /**
-     * Prepares a flow variable with the given key and value to be set in the {@link MuleMessage} to the configured
-     * flow.
-     * 
-     * @param key the key of the flow variable to put
-     * @param value the value of the flow variable to put
-     * @return this {@link FlowRunner}
-     */
-    public FlowRunner withFlowVariable(String key, Object value)
-    {
-        eventBuilder.withFlowVariable(key, value);
-
-        return this;
-    }
-
-    /**
-     * Configures this runner to run this flow as one-way.
-     * 
-     * @return this {@link FlowRunner}
-     */
-    public FlowRunner asynchronously()
-    {
-        eventBuilder.asynchronously();
+        txExecutionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
+        eventBuilder.transactionally();
 
         return this;
     }
@@ -233,37 +128,6 @@ public class FlowRunner
                 return nullSensingReplyToHandler.event;
             }
         };
-
-
-        return this;
-    }
-
-    /**
-     * Configures the flow to run inside a transaction.
-     * 
-     * @param action See {@link TransactionConfig} constants
-     * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
-     * @return this {@link FlowRunner}
-     */
-    public FlowRunner transactionally(byte action, TransactionFactory factory)
-    {
-        MuleTransactionConfig transactionConfig = new MuleTransactionConfig(action);
-        transactionConfig.setFactory(factory);
-
-        txExecutionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
-        eventBuilder.transactionally();
-
-        return this;
-    }
-
-    /**
-     * Will spy the built {@link MuleMessage} and {@link MuleEvent}. See {@link Mockito#spy(Object) spy}.
-     * 
-     * @return this {@link FlowRunner}
-     */
-    public FlowRunner spyObjects()
-    {
-        eventBuilder.spyObjects();
 
         return this;
     }
@@ -310,13 +174,13 @@ public class FlowRunner
      */
     public MuleEvent runAndVerify(String... flowNamesToVerify) throws MuleException, Exception
     {
-        Flow flow = getFlowConstruct(flowName);
+        Flow flow = (Flow) getFlowConstruct();
         MuleEvent responseEvent = txExecutionTemplate.execute(new ExecutionCallback<MuleEvent>()
         {
             @Override
             public MuleEvent process() throws Exception
             {
-                return flow.process(buildEvent());
+                return flow.process(getOrBuildEvent());
             }
         });
         for (String flowNameToVerify : flowNamesToVerify)
@@ -348,33 +212,9 @@ public class FlowRunner
         }
     }
 
-    private MuleEvent requestEvent;
-
-    /**
-     * Builds a new event based on this runner's config. If one has already been built, it will return that one.
-     * 
-     * @return an event that would be used to go through the flow.
-     */
-    public MuleEvent buildEvent()
+    @Override
+    public String getFlowConstructName()
     {
-        if (requestEvent == null)
-        {
-            Flow flow = getFlowConstruct(flowName);
-            requestEvent = eventBuilder.build(muleContext, flow);
-        }
-        return requestEvent;
-    }
-
-    protected Flow getFlowConstruct(String flowName)
-    {
-        return (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
-    }
-
-    /**
-     * Clears the last built requestEvent, allowing for reuse of this runner.
-     */
-    public void reset()
-    {
-        requestEvent = null;
+        return flowName;
     }
 }

@@ -15,9 +15,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.PropertyScope;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.TransactionConfigEnum;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
     public void requestResponseTransacted() throws Exception
     {
         flowRunner("Flow").withPayload(TEST_PAYLOAD)
-                          .transactionally(TransactionConfig.ACTION_NONE, new TestTransactionFactory())
+                          .transactionally(TransactionConfigEnum.ACTION_NONE, new TestTransactionFactory())
                           .run();
 
         MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
@@ -66,7 +66,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
     public void oneWayTransacted() throws Exception
     {
         flowRunner("Flow").withPayload(TEST_PAYLOAD)
-                          .transactionally(TransactionConfig.ACTION_NONE, new TestTransactionFactory())
+                          .transactionally(TransactionConfigEnum.ACTION_NONE, new TestTransactionFactory())
                           .asynchronously()
                           .run();
 
@@ -77,7 +77,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
     protected void testTransacted(MessageExchangePattern mep) throws Exception
     {
         flowRunner("Flow").withPayload(TEST_PAYLOAD)
-                          .transactionally(TransactionConfig.ACTION_NONE, new TestTransactionFactory())
+                          .transactionally(TransactionConfigEnum.ACTION_NONE, new TestTransactionFactory())
                           .run();
 
         MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);

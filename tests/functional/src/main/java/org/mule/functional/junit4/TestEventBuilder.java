@@ -9,7 +9,6 @@ package org.mule.functional.junit4;
 import static org.mockito.Mockito.spy;
 import static org.mule.MessageExchangePattern.ONE_WAY;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.api.transport.PropertyScope.INVOCATION;
 import static org.mule.api.transport.PropertyScope.SESSION;
 
 import org.mule.DefaultMuleEvent;
@@ -18,8 +17,8 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.transport.ReplyToHandler;
-import org.mule.construct.Flow;
 import org.mule.session.DefaultMuleSession;
 
 import java.net.URI;
@@ -42,7 +41,6 @@ public class TestEventBuilder
     private Map<String, Object> inboundProperties = new HashMap<>();
     private Map<String, Object> outboundProperties = new HashMap<>();
     private Map<String, Object> sessionProperties = new HashMap<>();
-    private Map<String, Object> invocationProperties = new HashMap<>();
 
     private Map<String, Object> flowVariables = new HashMap<>();
 
@@ -131,20 +129,6 @@ public class TestEventBuilder
     }
 
     /**
-     * Prepares a property with the given key and value to be sent as an invocation property of the product.
-     * 
-     * @param key the key of the invocation property to add
-     * @param value the value of the invocation property to add
-     * @return this {@link TestEventBuilder}
-     */
-    public TestEventBuilder withInvocationProperty(String key, Object value)
-    {
-        invocationProperties.put(key, value);
-
-        return this;
-    }
-
-    /**
      * Prepares a flow variable with the given key and value to be set in the product.
      * 
      * @param key the key of the flow variable to put
@@ -216,7 +200,7 @@ public class TestEventBuilder
      * @param flow the recipient for the event to be built.
      * @return an event with the specified configuration.
      */
-    public MuleEvent build(MuleContext muleContext, Flow flow)
+    public MuleEvent build(MuleContext muleContext, FlowConstruct flow)
     {
         final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, Collections.emptyMap(), muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(
@@ -227,10 +211,6 @@ public class TestEventBuilder
         for (Entry<String, Object> sessionPropertyEntry : sessionProperties.entrySet())
         {
             muleMessage.setProperty(sessionPropertyEntry.getKey(), sessionPropertyEntry.getValue(), SESSION);
-        }
-        for (Entry<String, Object> invocationPropertyEntry : invocationProperties.entrySet())
-        {
-            muleMessage.setProperty(invocationPropertyEntry.getKey(), invocationPropertyEntry.getValue(), INVOCATION);
         }
 
         for (Entry<String, Object> flowVarEntry : flowVariables.entrySet())

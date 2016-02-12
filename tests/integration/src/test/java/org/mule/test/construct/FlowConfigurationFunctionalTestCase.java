@@ -26,11 +26,11 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
-import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.TransactionConfigEnum;
 import org.mule.source.StartableCompositeMessageSource;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -445,7 +445,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testAsyncTransactionalEndpoint() throws Exception
     {
         Exception e = flowRunner("async-tx").withPayload("0")
-                                            .transactionally(TransactionConfig.ACTION_NONE, new TestTransactionFactory())
+                                            .transactionally(TransactionConfigEnum.ACTION_NONE, new TestTransactionFactory())
                                             .asynchronously()
                                             .runExpectingException();
 
