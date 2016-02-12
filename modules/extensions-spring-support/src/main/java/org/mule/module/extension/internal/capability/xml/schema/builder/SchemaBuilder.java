@@ -15,8 +15,8 @@ import static org.mule.extension.api.introspection.DataQualifier.POJO;
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.CONFIG_ATTRIBUTE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
@@ -276,8 +276,6 @@ public final class SchemaBuilder
         extension.setBase(MULE_ABSTRACT_EXTENSION_TYPE);
         complexContent.setExtension(extension);
 
-        final ExplicitGroup all = new ExplicitGroup();
-        extension.setSequence(all);
 
         for (Field field : getExposedFields(type.getRawType()))
         {
@@ -298,12 +296,15 @@ public final class SchemaBuilder
                 @Override
                 public void onList()
                 {
+                    final ExplicitGroup all = getOrCreateSequenceGroup(extension);
+
                     generateCollectionElement(all, name, EMPTY, fieldType, required);
                 }
 
                 @Override
                 public void onMap()
                 {
+                    final ExplicitGroup all = getOrCreateSequenceGroup(extension);
                     generateMapElement(all, name, EMPTY, fieldType, required);
                 }
 
@@ -312,13 +313,23 @@ public final class SchemaBuilder
                 {
                     if (TlsContextFactory.class.isAssignableFrom(fieldType.getRawType()))
                     {
+                        final ExplicitGroup all = getOrCreateSequenceGroup(extension);
                         addTlsSupport(extension, all);
                         return;
                     }
 
                     if (shouldGeneratePojoChildElements(fieldType.getRawType()))
                     {
-                        registerComplexTypeChildElement(all, name, EMPTY, fieldType, false);
+                        if (ExpressionSupport.REQUIRED != expressionSupport)
+                        {
+                            final ExplicitGroup all = getOrCreateSequenceGroup(extension);
+                            registerComplexTypeChildElement(all, name, EMPTY, fieldType, false);
+                        }
+                        else
+                        {
+                            defaultOperation();
+                            registerPojoType(fieldType, EMPTY);
+                        }
                     }
                 }
 
@@ -333,6 +344,17 @@ public final class SchemaBuilder
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
         return complexType;
+    }
+
+    private ExplicitGroup getOrCreateSequenceGroup(ExtensionType extension)
+    {
+        ExplicitGroup all = extension.getSequence();
+        if (all == null)
+        {
+            all = new ExplicitGroup();
+            extension.setSequence(all);
+        }
+        return all;
     }
 
     public SchemaBuilder registerEnums()
@@ -719,10 +741,10 @@ public final class SchemaBuilder
             @Override
             public void onList()
             {
-                forceOptional = true;
+                forceOptional = shouldForceOptional();
                 defaultOperation();
                 DataType genericType = parameterModel.getType().getGenericTypes()[0];
-                if (genericType != null && shouldGenerateListChildElements(genericType))
+                if (shouldGenerateDataTypeChildElements(genericType, parameterModel))
                 {
                     generateCollectionElement(all, parameterModel, true);
                 }
@@ -731,10 +753,10 @@ public final class SchemaBuilder
             @Override
             public void onMap()
             {
-                forceOptional = true;
+                forceOptional = shouldForceOptional();
                 defaultOperation();
                 DataType genericType = parameterModel.getType().getGenericTypes()[0];
-                if (genericType != null && shouldGenerateListChildElements(genericType))
+                if (shouldGenerateDataTypeChildElements(genericType, parameterModel))
                 {
                     generateMapElement(all, parameterModel, true);
                 }
@@ -743,22 +765,30 @@ public final class SchemaBuilder
             @Override
             public void onPojo()
             {
-                forceOptional = true;
+
+                forceOptional = shouldForceOptional();
 
                 if (TlsContextFactory.class.isAssignableFrom(parameterModel.getType().getRawType()))
                 {
                     addTlsSupport(extensionType, all);
                     return;
                 }
-
                 defaultOperation();
-                if (shouldGeneratePojoChildElements(parameterModel.getType().getRawType()))
+                if (ExpressionSupport.REQUIRED != parameterModel.getExpressionSupport())
                 {
-                    registerComplexTypeChildElement(all,
-                                                    parameterModel.getName(),
-                                                    parameterModel.getDescription(),
-                                                    parameterModel.getType(),
-                                                    false);
+                    if (shouldGeneratePojoChildElements(parameterModel.getType().getRawType()))
+                    {
+                        registerComplexTypeChildElement(all,
+                                                        parameterModel.getName(),
+                                                        parameterModel.getDescription(),
+                                                        parameterModel.getType(),
+                                                        false);
+                    }
+                }
+                else
+                {
+                    //We need to register the type, just in case people want to use it as global elements
+                    registerPojoType(parameterModel.getType(), parameterModel.getDescription());
                 }
             }
 
@@ -768,11 +798,26 @@ public final class SchemaBuilder
                 extensionType.getAttributeOrAttributeGroup().add(createAttribute(parameterModel, isRequired(parameterModel, forceOptional)));
             }
 
-            private boolean shouldGenerateListChildElements(DataType type)
+            private boolean shouldGenerateDataTypeChildElements(DataType type, ParameterModel parameterModel)
             {
+                if (type == null)
+                {
+                    return false;
+                }
+                boolean isExpressionRequired = ExpressionSupport.REQUIRED == parameterModel.getExpressionSupport();
                 boolean isPojo = type.getQualifier().equals(POJO);
                 boolean isPrimitive = type.getRawType().isPrimitive() || ClassUtils.isPrimitiveWrapper(type.getRawType());
-                return isPrimitive || (isPojo && shouldGeneratePojoChildElements(type.getRawType())) || (!isPojo && isInstantiable(type.getRawType()));
+                return !isExpressionRequired && (isPrimitive || (isPojo && shouldGeneratePojoChildElements(type.getRawType())) || (!isPojo && isInstantiable(type.getRawType())));
+            }
+
+            private boolean shouldGeneratePojoChildElements(Class<?> type)
+            {
+                return IntrospectionUtils.isInstantiable(type) && !getExposedFields(type).isEmpty();
+            }
+
+            private boolean shouldForceOptional()
+            {
+                return !parameterModel.isRequired() || ExpressionSupport.REQUIRED != parameterModel.getExpressionSupport();
             }
         };
     }
