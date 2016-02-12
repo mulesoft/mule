@@ -21,7 +21,6 @@ import static org.reflections.ReflectionUtils.withTypeAssignableTo;
 import org.mule.api.NestedProcessor;
 import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Expression;
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.param.Ignore;
@@ -36,6 +35,8 @@ import org.mule.extension.api.runtime.source.Source;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
+
+import com.google.common.base.Predicates;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -316,7 +317,7 @@ public class IntrospectionUtils
 
     public static Collection<Method> getOperationMethods(Class<?> declaringClass)
     {
-        return getAllMethods(declaringClass, withAnnotation(Operation.class), withModifier(Modifier.PUBLIC));
+        return getAllMethods(declaringClass, withModifier(Modifier.PUBLIC), Predicates.not(withAnnotation(Ignore.class)));
     }
 
     public static Collection<Field> getExposedFields(Class<?> extensionType)
@@ -357,5 +358,4 @@ public class IntrospectionUtils
 
         return sourceType.getSimpleName();
     }
-
 }

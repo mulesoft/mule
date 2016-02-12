@@ -6,13 +6,10 @@
  */
 package org.mule.module.extension.internal.runtime.connector.basic;
 
-import org.mule.extension.annotation.api.Operation;
-
 public class VoidOperations
 {
 
     //Dummy operation to avoid errors on the model
-    @Operation
     public void foo()
     {
 

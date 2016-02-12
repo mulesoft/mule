@@ -14,7 +14,6 @@ import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.annotation.api.Extension;
 import org.mule.extension.annotation.api.ExtensionOf;
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
@@ -87,7 +86,6 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
     private static class ClassLevelExtensionOfOperation
     {
 
-        @Operation
         public String sayHello()
         {
             return "Hello!";
@@ -99,7 +97,6 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
     {
 
         @ExtensionOf(ExtensibleExtension.class)
-        @Operation
         public String sayBye()
         {
             return "Bye!";
@@ -109,7 +106,6 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
     private static class ExtensibleExtensionOperation
     {
 
-        @Operation
         public String sayHello()
         {
             return "Hello!";

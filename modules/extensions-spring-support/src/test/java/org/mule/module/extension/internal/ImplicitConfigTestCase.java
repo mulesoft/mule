@@ -19,12 +19,11 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.capability.Xml;
-import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
 import org.junit.Test;
@@ -125,7 +124,6 @@ public class ImplicitConfigTestCase extends ExtensionFunctionalTestCase
     public static class ImplicitOperations
     {
 
-        @Operation
         public ImplicitConfigExtension getConfig(@UseConfig ImplicitConfigExtension config)
         {
             return config;

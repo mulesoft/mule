@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
@@ -30,7 +31,6 @@ import org.mule.config.MuleManifest;
 import org.mule.extension.annotation.api.Configuration;
 import org.mule.extension.annotation.api.Configurations;
 import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
@@ -57,6 +57,8 @@ import org.mule.module.extension.HeisenbergOperations;
 import org.mule.module.extension.HeisenbergSource;
 import org.mule.module.extension.MoneyLaunderingOperation;
 import org.mule.module.extension.exception.CureCancerExceptionEnricher;
+import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
+import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.model.ExtendedPersonalInfo;
@@ -112,6 +114,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String CALL_GUS_FRING = "callGusFring";
     private static final String CURE_CANCER = "cureCancer";
     private static final String GET_SAUL_PHONE = "getSaulPhone";
+    private static final String IGNORED_OPERATION = "ignoredOperation";
     private static final String EXTENSION_VERSION = MuleManifest.getProductVersion();
 
     @Before
@@ -158,10 +161,10 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(configuration.getParameters(), "extendedProperty", "", DataType.of(String.class), true, SUPPORTED, null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalConfigurationModelDefinitionException.class)
     public void heisenbergWithOperationsConfig() throws Exception
     {
-        describerFor(HeisenbergWithOperations.class).describe(new DefaultDescribingContext());
+        describerFor(HeisenbergWithSameOperationsAndConfigs.class).describe(new DefaultDescribingContext());
     }
 
     @Test(expected = IllegalModelDefinitionException.class)
@@ -174,6 +177,18 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     public void heisenbergWithMoreThanOneConfigInOperation() throws Exception
     {
         describerFor(HeisenbergWithInvalidOperation.class).describe(new DefaultDescribingContext());
+    }
+
+    @Test(expected = IllegalOperationModelDefinitionException.class)
+    public void heisenbergWithOperationPointingToExtension() throws Exception
+    {
+        describerFor(HeisenbergWithOperationsPointingToExtension.class).describe(new DefaultDescribingContext());
+    }
+
+    @Test(expected = IllegalConfigurationModelDefinitionException.class)
+    public void heisenbergWithOperationPointingToExtensionAndDefaultConfig() throws Exception
+    {
+        describerFor(HeisenbergWithOperationsPointingToExtensionAndDefaultConfig.class).describe(new DefaultDescribingContext());
     }
 
     private void assertTestModuleConfiguration(Declaration declaration) throws Exception
@@ -320,6 +335,9 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(operation.getParameters(), is(empty()));
         java.util.Optional<ExceptionEnricherFactory> exceptionEnricherFactory2 = operation.getExceptionEnricherFactory();
         assertThat(exceptionEnricherFactory2.isPresent(), is(false));
+
+        operation = getOperation(declaration, IGNORED_OPERATION);
+        assertThat(operation, is(nullValue()));
     }
 
     private void assertTestModuleConnectionProviders(Declaration declaration) throws Exception
@@ -438,19 +456,31 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     }
 
     @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
-    public static class HeisenbergWithOperations extends HeisenbergExtension
+    @Operations(HeisenbergAlternateConfig.class)
+    @Configurations(HeisenbergAlternateConfig.class)
+    public static class HeisenbergWithSameOperationsAndConfigs extends HeisenbergExtension
     {
 
-        @Operation
-        public void invalid()
-        {
-        }
+    }
+
+    @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
+    @Operations(HeisenbergExtension.class)
+    @Configurations(HeisenbergIsolatedConfig.class)
+    public static class HeisenbergWithOperationsPointingToExtension extends HeisenbergExtension
+    {
+
+    }
+
+    @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
+    @Operations(HeisenbergExtension.class)
+    public static class HeisenbergWithOperationsPointingToExtensionAndDefaultConfig extends HeisenbergExtension
+    {
+
     }
 
     public static class DuplicateConfigOperation
     {
 
-        @Operation
         public Long launder(@UseConfig HeisenbergExtension config, @UseConfig HeisenbergExtension config2)
         {
             return 10L;
@@ -458,6 +488,23 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     }
 
     public static class HeisenbergAlternateConfig extends HeisenbergExtension
+    {
+
+        @Parameter
+        private String extendedProperty;
+
+        public String getExtendedProperty()
+        {
+            return extendedProperty;
+        }
+
+        public void setExtendedProperty(String extendedProperty)
+        {
+            this.extendedProperty = extendedProperty;
+        }
+    }
+
+    public static class HeisenbergIsolatedConfig
     {
 
         @Parameter

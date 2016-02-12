@@ -52,7 +52,9 @@ import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.extension.api.introspection.property.PasswordModelProperty;
 import org.mule.extension.api.introspection.property.TextModelProperty;
 import org.mule.extension.api.runtime.source.Source;
+import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.module.extension.internal.introspection.ImmutablePasswordModelProperty;
 import org.mule.module.extension.internal.introspection.ImmutableTextModelProperty;
@@ -69,6 +71,7 @@ import org.mule.module.extension.internal.runtime.exception.DefaultExceptionEnri
 import org.mule.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.module.extension.internal.runtime.source.DefaultSourceFactory;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
+import org.mule.util.ArrayUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.collection.ImmutableSetCollector;
 
@@ -155,18 +158,24 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareConfigurations(DeclarationDescriptor declaration, Class<?> extensionType)
     {
-        Configurations configurations = extensionType.getAnnotation(Configurations.class);
-        if (configurations != null)
-        {
-            for (Class<?> declaringClass : configurations.value())
-            {
-                declareConfiguration(declaration, declaringClass);
-            }
-        }
-        else
+        Class<?>[] configurationClasses = getConfigurationClasses(extensionType);
+        if (ArrayUtils.isEmpty(configurationClasses))
         {
             declareConfiguration(declaration, extensionType);
         }
+        else
+        {
+            for (Class<?> configurationClass : configurationClasses)
+            {
+                declareConfiguration(declaration, configurationClass);
+            }
+        }
+    }
+
+    private Class<?>[] getConfigurationClasses(Class<?> extensionType)
+    {
+        Configurations configs = extensionType.getAnnotation(Configurations.class);
+        return configs == null ? ArrayUtils.EMPTY_CLASS_ARRAY : configs.value();
     }
 
     private void declareMessageSources(DeclarationDescriptor declaration, Class<?> extensionType)
@@ -183,9 +192,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareConfiguration(DeclarationDescriptor declaration, Class<?> configurationType)
     {
-        //TODO: MULE-9220
-        checkArgument(CollectionUtils.isEmpty(getOperationMethods(configurationType)), String.format("Class %s can't declare a configuration and operations at the same time", configurationType.getName()));
-
+        checkConfigurationIsNotAnOperation(configurationType);
         ConfigurationDescriptor configuration;
 
         Configuration configurationAnnotation = configurationType.getAnnotation(Configuration.class);
@@ -202,6 +209,28 @@ public final class AnnotationsBasedDescriber implements Describer
                 .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(configurationType));
 
         declareAnnotatedParameters(configurationType, configuration, configuration.with());
+    }
+
+    private void checkConfigurationIsNotAnOperation(Class<?> configurationType)
+    {
+        Class<?>[] operationClasses = getOperationClasses(extensionType);
+        for (Class<?> operationClass : operationClasses)
+        {
+            if (configurationType.isAssignableFrom(operationClass) || operationClass.isAssignableFrom(configurationType))
+            {
+                throw new IllegalConfigurationModelDefinitionException(String.format("Configuration class '%s' cannot be the same class (nor a derivative) of any operation class '%s",
+                                                                                     configurationType.getName(), operationClass.getName()));
+            }
+        }
+    }
+
+    private void checkOperationIsNotAnExtension(Class<?> operationType)
+    {
+        if (operationType.isAssignableFrom(extensionType) || extensionType.isAssignableFrom(operationType))
+        {
+            throw new IllegalOperationModelDefinitionException(String.format("Operation class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
+                                                                             operationType.getName(), extensionType.getName()));
+        }
     }
 
     private void declareMessageSource(DeclarationDescriptor declaration, Class<? extends Source> sourceType)
@@ -308,18 +337,23 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareOperations(DeclarationDescriptor declaration, Class<?> extensionType)
     {
-        Operations operations = extensionType.getAnnotation(Operations.class);
-        if (operations != null)
+        Class<?>[] operations = getOperationClasses(extensionType);
+        for (Class<?> actingClass : operations)
         {
-            for (Class<?> actingClass : operations.value())
-            {
-                declareOperation(declaration, actingClass);
-            }
+            declareOperation(declaration, actingClass);
         }
+    }
+
+    private Class<?>[] getOperationClasses(Class<?> extensionType)
+    {
+        Operations operations = extensionType.getAnnotation(Operations.class);
+        return operations == null ? ArrayUtils.EMPTY_CLASS_ARRAY : operations.value();
     }
 
     private <T> void declareOperation(DeclarationDescriptor declaration, Class<T> actingClass)
     {
+        checkOperationIsNotAnExtension(actingClass);
+
         for (Method method : getOperationMethods(actingClass))
         {
             OperationDescriptor operation = declaration.withOperation(method.getName())

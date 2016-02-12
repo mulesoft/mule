@@ -8,7 +8,6 @@ package org.mule.extension.validation.internal;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.registry.MuleRegistry;
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
@@ -51,7 +50,6 @@ public final class CustomValidatorOperation extends ValidationSupport
         }
     });
 
-    @Operation
     public void customValidator(@ParameterGroup ObjectSource<Validator> source,
                                 @ParameterGroup ValidationOptions options,
                                 MuleEvent event,

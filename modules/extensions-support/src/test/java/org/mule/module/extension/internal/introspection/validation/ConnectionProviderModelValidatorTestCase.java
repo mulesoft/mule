@@ -15,7 +15,6 @@ import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Configuration;
 import org.mule.extension.annotation.api.Configurations;
 import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Connection;
@@ -76,13 +75,11 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
     public static class ValidTestOperations
     {
 
-        @Operation
         public void foo(@Connection ValidatorTestConnection connection)
         {
 
         }
 
-        @Operation
         public void bar(@Connection ValidatorTestConnection connection)
         {
 
@@ -100,7 +97,6 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
     public static class InvalidConnectionOperation
     {
 
-        @Operation
         public void invalid(@Connection Apple apple)
         {
         }
