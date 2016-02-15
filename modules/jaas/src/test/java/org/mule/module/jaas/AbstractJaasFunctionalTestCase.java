@@ -6,30 +6,60 @@
  */
 package org.mule.module.jaas;
 
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertThat;
 import org.mule.api.EncryptionStrategy;
+import org.mule.api.MessagingException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.security.CryptoFailureException;
-import org.mule.security.MuleCredentials;
+import org.mule.api.security.UnauthorisedException;
 import org.mule.functional.junit4.FunctionalTestCase;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.mule.security.MuleCredentials;
 
 public abstract class AbstractJaasFunctionalTestCase extends FunctionalTestCase
 {
 
-    protected Map<String, Object> createMessagePropertiesWithCredentials(String username, String password)
+    protected static final String TEST_FLOW_NAME = "TestUMO";
+    protected static final String TEST_PAYLOAD = "Test";
+
+    protected SecurityHeader createSecurityHeader(String username, String password)
         throws CryptoFailureException
     {
-        Map<String, Object> props = new HashMap<String, Object>();
         String header = createEncryptedHeader(username, password);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        return props;
+        return new SecurityHeader(MuleProperties.MULE_USER_PROPERTY, header);
     }
 
     private String createEncryptedHeader(String username, String password) throws CryptoFailureException
     {
         EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
         return MuleCredentials.createHeader(username, password, "PBE", strategy);
+    }
+
+    protected void runFlowAndExpectUnauthorizedException(SecurityHeader securityHeader) throws Exception
+    {
+        MessagingException exception = flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue()).withPayload(TEST_PAYLOAD).runExpectingException();
+        assertThat(exception, instanceOf(UnauthorisedException.class));
+    }
+
+    public static class SecurityHeader {
+
+        private String key;
+        private String value;
+
+        public SecurityHeader(String key, String value)
+        {
+            this.key = key;
+            this.value = value;
+        }
+
+        public String getKey()
+        {
+            return key;
+        }
+
+        public String getValue()
+        {
+            return value;
+        }
     }
 }

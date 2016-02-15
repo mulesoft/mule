@@ -79,12 +79,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-vm</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jms_1.1_spec</artifactId>
         </dependency>
