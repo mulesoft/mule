@@ -15,4 +15,9 @@
         <file:write path="#[path]" mode="#[mode]" createParentDirectory="#[createParent]"/>
     </flow>
 
+    <flow name="readAndWrite">
+        <file:read path="#[path]" />
+        <set-payload value="Hello World!" />
+        <file:write mode="OVERWRITE"/>
+    </flow>
 </mule>

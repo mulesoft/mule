@@ -29,14 +29,16 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
     public void renameFile() throws Exception
     {
         createHelloWorldFile();
-
         doRename(HELLO_PATH);
+        assertRenamedFile();
+    }
 
-        final String targetPath = Paths.get(HELLO_PATH).getParent().resolve(RENAME_TO).toString();
-
-        assertThat(ftpClient.fileExists(targetPath), is((true)));
-        assertThat(ftpClient.fileExists(HELLO_PATH), is((false)));
-        assertThat(readPathAsString(targetPath), is(HELLO_WORLD));
+    @Test
+    public void renameReadFile() throws Exception
+    {
+        createHelloWorldFile();
+        doRename("readAndRename", HELLO_PATH);
+        assertRenamedFile();
     }
 
     @Test
@@ -70,9 +72,23 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
         doRename(sourceFile);
     }
 
+    private void assertRenamedFile() throws Exception
+    {
+        final String targetPath = Paths.get(HELLO_PATH).getParent().resolve(RENAME_TO).toString();
+
+        assertThat(ftpClient.fileExists(targetPath), is((true)));
+        assertThat(ftpClient.fileExists(HELLO_PATH), is((false)));
+        assertThat(readPathAsString(targetPath), is(HELLO_WORLD));
+    }
+
     private void doRename(String source) throws Exception
     {
-        flowRunner("rename")
+        doRename("rename", source);
+    }
+
+    private void doRename(String flow, String source) throws Exception
+    {
+        flowRunner(flow)
                 .withFlowVariable("path", source)
                 .withFlowVariable("to", RENAME_TO)
                 .run();

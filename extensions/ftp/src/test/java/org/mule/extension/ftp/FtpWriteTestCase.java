@@ -6,12 +6,14 @@
  */
 package org.mule.extension.ftp;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.file.api.FileWriteMode.APPEND;
 import static org.mule.module.extension.file.api.FileWriteMode.CREATE_NEW;
 import static org.mule.module.extension.file.api.FileWriteMode.OVERWRITE;
+import org.mule.api.MuleEvent;
 import org.mule.module.extension.file.api.FileWriteMode;
 
 import java.nio.file.Paths;
@@ -106,6 +108,20 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
     public void createNewNotExistingFileWithCreatedParent() throws Exception
     {
         doWriteNotExistingFileWithCreatedParent(CREATE_NEW);
+    }
+
+    @Test
+    public void writeOnReadFile() throws Exception
+    {
+        final String filePath = "file";
+
+        ftpClient.putFile(filePath, ".", "overwrite me!");
+
+        MuleEvent event = flowRunner("readAndWrite")
+                .withFlowVariable("path", filePath)
+                .run();
+
+        assertThat(event.getMessageAsString(), equalTo(HELLO_WORLD));
     }
 
     private void doWriteNotExistingFileWithCreatedParent(FileWriteMode mode) throws Exception

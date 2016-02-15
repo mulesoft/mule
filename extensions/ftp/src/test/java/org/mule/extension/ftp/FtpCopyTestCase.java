@@ -65,6 +65,16 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
     }
 
     @Test
+    public void copyReadFile() throws Exception
+    {
+        ftpClient.makeDir(TARGET_DIRECTORY);
+        final String path = getPath(TARGET_DIRECTORY);
+        doExecute("readAndDo", path, false, false);
+
+        assertCopy(format("%s/%s", path, SOURCE_FILE_NAME));
+    }
+
+    @Test
     public void toNonExistingFolderWithoutCreateParent() throws Exception
     {
         ftpClient.makeDir(TARGET_DIRECTORY);
@@ -170,7 +180,12 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
 
     private void doExecute(String target, boolean overwrite, boolean createParentFolder) throws Exception
     {
-        flowRunner(getFlowName())
+        doExecute(getFlowName(), target, overwrite, createParentFolder);
+    }
+
+    private void doExecute(String flowName, String target, boolean overwrite, boolean createParentFolder) throws Exception
+    {
+        flowRunner(flowName)
                 .withFlowVariable(SOURCE_DIRECTORY_NAME, sourcePath)
                 .withFlowVariable("target", target)
                 .withFlowVariable("overwrite", overwrite)

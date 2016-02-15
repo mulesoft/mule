@@ -16,4 +16,9 @@
                   createParentFolder="#[createParent]"/>
     </flow>
 
+    <flow name="readAndDo">
+        <ftp:read path="#[source]" />
+        <ftp:copy targetPath="#[target]" overwrite="#[overwrite]" createParentFolder="#[createParent]"/>
+    </flow>
+
 </mule>

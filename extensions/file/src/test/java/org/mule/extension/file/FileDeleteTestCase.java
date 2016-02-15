@@ -36,6 +36,17 @@ public class FileDeleteTestCase extends FileConnectorTestCase
     }
 
     @Test
+    public void deleteReadFile() throws Exception
+    {
+        File file = temporaryFolder.newFile();
+
+        flowRunner("readAndDelete").withFlowVariable(DELETE, file.getAbsolutePath()).run();
+
+        assertExists(false, file);
+    }
+
+
+    @Test
     public void deleteFolder() throws Exception
     {
         File directory = temporaryFolder.newFolder();

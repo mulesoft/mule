@@ -15,4 +15,10 @@
         <ftp:write path="#[path]" mode="#[mode]" createParentDirectory="#[createParent]"/>
     </flow>
 
+    <flow name="readAndWrite">
+        <ftp:read path="#[path]" />
+        <set-payload value="Hello World!" />
+        <ftp:write mode="OVERWRITE"/>
+    </flow>
+
 </mule>
