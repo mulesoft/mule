@@ -300,6 +300,7 @@ public class DefaultMuleContext implements MuleContext
         startDate = System.currentTimeMillis();
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTING));
+        initTransactionManager();
         getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
         overridePollingController();
         overrideClusterConfiguration();
@@ -688,6 +689,7 @@ public class DefaultMuleContext implements MuleContext
     {
         //checkLifecycleForPropertySet(MuleProperties.OBJECT_TRANSACTION_MANAGER, Initialisable.PHASE_NAME);
         registryBroker.registerObject(MuleProperties.OBJECT_TRANSACTION_MANAGER, manager);
+        transactionManager = manager;
     }
 
     /**
@@ -700,40 +702,40 @@ public class DefaultMuleContext implements MuleContext
     @Override
     public TransactionManager getTransactionManager()
     {
-        if (transactionManager == null)
+        return transactionManager;
+    }
+
+    private void initTransactionManager()
+    {
+        TransactionManager innerTxMgr = null;
+        Collection temp = registryBroker.lookupObjects(TransactionManagerFactory.class);
+        if (temp.size() > 1)
         {
-            transactionManager = registryBroker.lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER);
-            if (transactionManager == null)
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage("More than one TX manager has been configured - Only one TX manager can be defined per application. " +
+                                                                            "Validate your app configuration or if your app belongs to a domain and the domains defines a TX manager then you should use that one."));
+        }
+        if (temp.size() > 0)
+        {
+            try
             {
-                Collection temp = registryBroker.lookupObjects(TransactionManagerFactory.class);
-                if (temp.size() > 1)
-                {
-                    throw new MuleRuntimeException(CoreMessages.createStaticMessage("More than one TX manager has been configured - Only one TX manager can be defined per application. " +
-                                                                                    "Validate your app configuration or if your app belongs to a domain and the domains defines a TX manager then you should use that one."));
-                }
-                if (temp.size() > 0)
-                {
-                    try
-                    {
-                        transactionManager = (((TransactionManagerFactory) temp.iterator().next()).create(config));
-                        registryBroker.registerObject(MuleProperties.OBJECT_TRANSACTION_MANAGER, transactionManager);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new MuleRuntimeException(CoreMessages.failedToCreate("transaction manager"), e);
-                    }
-                }
-                else
-                {
-                    temp = registryBroker.lookupObjects(TransactionManager.class);
-                    if (temp.size() > 0)
-                    {
-                        transactionManager = (((TransactionManager) temp.iterator().next()));
-                    }
-                }
+                innerTxMgr = (((TransactionManagerFactory) temp.iterator().next()).create(config));
+                registryBroker.registerObject(MuleProperties.OBJECT_TRANSACTION_MANAGER, innerTxMgr);
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(CoreMessages.failedToCreate("transaction manager"), e);
             }
         }
-        return transactionManager;
+        else
+        {
+            temp = registryBroker.lookupObjects(TransactionManager.class);
+            if (temp.size() > 0)
+            {
+                innerTxMgr = (((TransactionManager) temp.iterator().next()));
+            }
+        }
+
+        transactionManager = innerTxMgr;
     }
 
     protected void checkLifecycleForPropertySet(String propertyName, String phase) throws IllegalStateException

@@ -53,6 +53,13 @@ public class ApplicationContextBuilder
     public MuleContext build() throws Exception
     {
         // Should we set up the manager for every method?
+        MuleContext context = doBuildContext();
+        context.start();
+        return context;
+    }
+
+    protected MuleContext doBuildContext() throws Exception
+    {
         MuleContext context;
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
@@ -66,7 +73,6 @@ public class ApplicationContextBuilder
         builders.add(getAppBuilder(this.applicationResources));
         configureMuleContext(muleContextBuilder);
         context = muleContextFactory.createMuleContext(builders, muleContextBuilder);
-        context.start();
         return context;
     }
 
@@ -88,5 +94,4 @@ public class ApplicationContextBuilder
     {
         contextBuilder.setWorkListener(new TestingWorkListener());
     }
-
 }

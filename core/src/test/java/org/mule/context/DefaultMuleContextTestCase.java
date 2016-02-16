@@ -18,6 +18,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
+
 import org.mule.DataTypeConversionResolver;
 import org.mule.DefaultMuleContext;
 import org.mule.DynamicDataTypeConversionResolver;
@@ -44,13 +45,14 @@ import java.net.URL;
 
 import javax.transaction.TransactionManager;
 
-import junit.framework.Assert;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.verification.VerificationModeFactory;
+
+import junit.framework.Assert;
 
 public class DefaultMuleContextTestCase extends AbstractMuleTestCase
 {
@@ -208,6 +210,8 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
         context.getRegistry().registerObject("Test Transaction Manager Factory", new TestTransactionManagerFactory());
         assertThat(context.getRegistry().lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER), is(IsNull.nullValue()));
+
+        context.start();
         TransactionManager transactionManager = context.getTransactionManager();
         assertThat(transactionManager, not(is(IsNull.nullValue())));
         assertThat((TransactionManager)context.getRegistry().lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER), is(CoreMatchers.sameInstance(transactionManager)));
