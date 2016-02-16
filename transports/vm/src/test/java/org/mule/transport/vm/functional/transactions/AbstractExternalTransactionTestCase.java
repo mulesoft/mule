@@ -155,6 +155,7 @@ public abstract class AbstractExternalTransactionTestCase extends AbstractServic
             return val == null ? persistentValue : val;
         }
 
+        @Override
         public void commit(Xid id, boolean onePhase) throws XAException
         {
             logger.debug("XA_COMMIT[" + id + "]");
@@ -163,28 +164,33 @@ public abstract class AbstractExternalTransactionTestCase extends AbstractServic
             persistentValue = transientValue.get(tx);
         }
 
+        @Override
         public void end(Xid xid, int flags) throws XAException
         {
             logger.debug("XA_END[" + xid + "] Flags=" + flags);
             dumpStackTrace();
         }
 
+        @Override
         public void forget(Xid xid) throws XAException
         {
             logger.debug("XA_FORGET[" + xid + "]");
             dumpStackTrace();
         }
 
+        @Override
         public int getTransactionTimeout() throws XAException
         {
             return (_timeout);
         }
 
+        @Override
         public boolean isSameRM(XAResource xares) throws XAException
         {
             return (xares.equals(this));
         }
 
+        @Override
         public int prepare(Xid xid) throws XAException
         {
             logger.debug("XA_PREPARE[" + xid + "]");
@@ -193,6 +199,7 @@ public abstract class AbstractExternalTransactionTestCase extends AbstractServic
             return (XA_OK);
         }
 
+        @Override
         public Xid[] recover(int flag) throws XAException
         {
             logger.debug("RECOVER[" + flag + "]");
@@ -200,6 +207,7 @@ public abstract class AbstractExternalTransactionTestCase extends AbstractServic
             return (null);
         }
 
+        @Override
         public void rollback(Xid xid) throws XAException
         {
             logger.debug("XA_ROLLBACK[" + xid + "]");
@@ -209,12 +217,14 @@ public abstract class AbstractExternalTransactionTestCase extends AbstractServic
             transientValue.remove(tx);
         }
 
+        @Override
         public boolean setTransactionTimeout(int seconds) throws XAException
         {
             _timeout = seconds;
             return (true);
         }
 
+        @Override
         public void start(Xid xid, int flags) throws XAException
         {
             logger.debug("XA_START[" + xid + "] Flags=" + flags);

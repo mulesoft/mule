@@ -36,6 +36,8 @@
 
     </mule:mule>
 
+    <bean name="_muleTransactionManager" class="org.mule.config.spring.factories.TransactionManagerFactoryBean" autowire="byType"/>
+
     <bean name="_defaultInMemoryQueueStore,_simpleMemoryQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryQueueStore"/>
 
     <bean name="_defaultPersistentQueueStore,_fileQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentQueueStore"/>
