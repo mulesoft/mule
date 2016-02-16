@@ -6,7 +6,10 @@
  */
 package org.mule.test.integration.domain.xa;
 
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 
 import org.junit.Test;
@@ -31,8 +34,23 @@ public class XaTransactionManagerTestCase extends DomainFunctionalTestCase
     }
 
     @Test(expected = MuleRuntimeException.class)
-    public void validateOnlyOneTxManagerCanBeUsed()
+    public void validateOnlyOneTxManagerCanBeUsed() throws MuleException
     {
-         getMuleContextForApp(APPLICATION_NAME).getTransactionManager();
+        getMuleContextForApp(APPLICATION_NAME).start();
+    }
+
+    @Override
+    protected MuleContext createAppMuleContext(String[] configResource) throws Exception
+    {
+        ApplicationContextBuilder appContextBuilder = new ApplicationContextBuilder()
+        {
+            @Override
+            public MuleContext build() throws Exception
+            {
+                // Do not start the context for this test.
+                return doBuildContext();
+            }
+        }.setDomainContext(getMuleContextForDomain()).setApplicationResources(configResource);
+        return appContextBuilder.build();
     }
 }

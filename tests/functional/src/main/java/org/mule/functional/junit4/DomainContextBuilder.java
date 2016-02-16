@@ -23,7 +23,6 @@ public class DomainContextBuilder
 {
 
     private String domainConfig;
-    private boolean disableMuleContextStart = false;
     private MuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder()
     {
         @Override
@@ -48,10 +47,7 @@ public class DomainContextBuilder
         builders.add(cfgBuilder);
         DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         MuleContext domainContext = muleContextFactory.createMuleContext(builders, muleContextBuilder);
-        if (!disableMuleContextStart)
-        {
-            domainContext.start();
-        }
+        domainContext.start();
         return domainContext;
     }
 
@@ -59,10 +55,4 @@ public class DomainContextBuilder
     {
         return new SpringXmlDomainConfigurationBuilder(configResource);
     }
-
-    public void disableMuleContextStart()
-    {
-        this.disableMuleContextStart = true;
-    }
-
 }
