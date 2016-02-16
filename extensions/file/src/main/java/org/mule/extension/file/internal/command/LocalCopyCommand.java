@@ -37,9 +37,9 @@ public final class LocalCopyCommand extends AbstractLocalCopyCommand implements 
      * {@inheritDoc}
      */
     @Override
-    public void copy(String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectory, MuleEvent event)
+    public void copy(String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectories, MuleEvent event)
     {
-        execute(sourcePath, targetDirectory, overwrite, createParentDirectory);
+        execute(sourcePath, targetDirectory, overwrite, createParentDirectories);
     }
 
     /**

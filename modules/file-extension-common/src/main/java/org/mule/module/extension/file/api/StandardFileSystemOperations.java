@@ -126,13 +126,13 @@ public class StandardFileSystemOperations
      * {@code lock} argument, but following the same rules and considerations
      * as described in the read operation.
      *
-     * @param fileSystem            a reference to the host {@link FileSystem}
-     * @param path                  the path of the file to be written
-     * @param content               the content to be written into the file. Defaults to the current {@link MuleMessage} payload
-     * @param mode                  a {@link FileWriteMode}. Defaults to {@code OVERWRITE}
-     * @param lock                  whether or not to lock the file. Defaults to {@code false}
-     * @param createParentDirectory whether or not to attempt creating the parent directory if it doesn't exists.
-     * @param event                 The current {@link MuleEvent}
+     * @param fileSystem              a reference to the host {@link FileSystem}
+     * @param path                    the path of the file to be written
+     * @param content                 the content to be written into the file. Defaults to the current {@link MuleMessage} payload
+     * @param mode                    a {@link FileWriteMode}. Defaults to {@code OVERWRITE}
+     * @param lock                    whether or not to lock the file. Defaults to {@code false}
+     * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
+     * @param event                   The current {@link MuleEvent}
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
     public void write(@Connection FileSystem fileSystem,
@@ -140,7 +140,7 @@ public class StandardFileSystemOperations
                       @Optional(defaultValue = "#[payload]") Object content,
                       @Optional(defaultValue = "OVERWRITE") FileWriteMode mode,
                       @Optional(defaultValue = "false") boolean lock,
-                      @Optional(defaultValue = "true") boolean createParentDirectory,
+                      @Optional(defaultValue = "true") boolean createParentDirectories,
                       MuleEvent event)
     {
         if (content == null || content instanceof NullPayload)
@@ -149,7 +149,7 @@ public class StandardFileSystemOperations
         }
 
         path = resolvePath(path, event, "path");
-        fileSystem.write(path, content, mode, event, lock, createParentDirectory);
+        fileSystem.write(path, content, mode, event, lock, createParentDirectories);
     }
 
     /**
@@ -179,23 +179,23 @@ public class StandardFileSystemOperations
      * As for the {@code sourcePath}, it can either be a file or a directory.
      * If it points to a directory, then it will be copied recursively.
      *
-     * @param fileSystem         a reference to the host {@link FileSystem}
-     * @param sourcePath         the path to the file to be copied
-     * @param targetPath         the target directory
-     * @param overwrite          whether or not overwrite the file if the target destination already exists.
-     * @param createParentFolder whether or not to attempt creating the parent directory if it doesn't exists.
-     * @param event              the {@link MuleEvent} which triggered this operation
+     * @param fileSystem              a reference to the host {@link FileSystem}
+     * @param sourcePath              the path to the file to be copied
+     * @param targetPath              the target directory
+     * @param overwrite               whether or not overwrite the file if the target destination already exists.
+     * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
+     * @param event                   the {@link MuleEvent} which triggered this operation
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
     public void copy(@Connection FileSystem fileSystem,
                      @Optional String sourcePath,
                      String targetPath,
                      @Optional(defaultValue = "false") boolean overwrite,
-                     @Optional(defaultValue = "true") boolean createParentFolder,
+                     @Optional(defaultValue = "true") boolean createParentDirectories,
                      MuleEvent event)
     {
         sourcePath = resolvePath(sourcePath, event, "sourcePath");
-        fileSystem.copy(sourcePath, targetPath, overwrite, createParentFolder, event);
+        fileSystem.copy(sourcePath, targetPath, overwrite, createParentDirectories, event);
     }
 
     /**
@@ -225,23 +225,23 @@ public class StandardFileSystemOperations
      * As for the {@code sourcePath}, it can either be a file or a directory.
      * If it points to a directory, then it will be moved recursively.
      *
-     * @param fileSystem         a reference to the host {@link FileSystem}
-     * @param sourcePath         the path to the file to be copied
-     * @param targetPath         the target directory
-     * @param overwrite          whether or not overwrite the file if the target destination already exists.
-     * @param createParentFolder whether or not to attempt creating the parent directory if it doesn't exists.
-     * @param event              The current {@link MuleEvent}
+     * @param fileSystem              a reference to the host {@link FileSystem}
+     * @param sourcePath              the path to the file to be copied
+     * @param targetPath              the target directory
+     * @param overwrite               whether or not overwrite the file if the target destination already exists.
+     * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
+     * @param event                   The current {@link MuleEvent}
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
     public void move(@Connection FileSystem fileSystem,
                      @Optional String sourcePath,
                      String targetPath,
                      @Optional(defaultValue = "false") boolean overwrite,
-                     @Optional(defaultValue = "true") boolean createParentFolder,
+                     @Optional(defaultValue = "true") boolean createParentDirectories,
                      MuleEvent event)
     {
         sourcePath = resolvePath(sourcePath, event, "sourcePath");
-        fileSystem.move(sourcePath, targetPath, overwrite, createParentFolder);
+        fileSystem.move(sourcePath, targetPath, overwrite, createParentDirectories);
     }
 
     /**

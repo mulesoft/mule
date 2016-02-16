@@ -46,9 +46,9 @@ public final class FtpCopyCommand extends AbstractFtpCopyCommand implements Copy
      * {@inheritDoc}
      */
     @Override
-    public void copy(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectory, MuleEvent event)
+    public void copy(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories, MuleEvent event)
     {
-        execute(sourcePath, targetPath, overwrite, createParentDirectory, event);
+        execute(sourcePath, targetPath, overwrite, createParentDirectories, event);
     }
 
     /**

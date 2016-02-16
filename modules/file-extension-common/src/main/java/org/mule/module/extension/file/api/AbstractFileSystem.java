@@ -99,27 +99,27 @@ public abstract class AbstractFileSystem implements FileSystem
      * {@inheritDoc}
      */
     @Override
-    public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event, boolean lock, boolean createParentDirectory)
+    public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event, boolean lock, boolean createParentDirectories)
     {
-        getWriteCommand().write(filePath, content, mode, event, lock, createParentDirectory);
+        getWriteCommand().write(filePath, content, mode, event, lock, createParentDirectories);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void copy(String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectory, MuleEvent event)
+    public void copy(String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectories, MuleEvent event)
     {
-        getCopyCommand().copy(sourcePath, targetDirectory, overwrite, createParentDirectory, event);
+        getCopyCommand().copy(sourcePath, targetDirectory, overwrite, createParentDirectories, event);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void move(String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectory)
+    public void move(String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectories)
     {
-        getMoveCommand().move(sourcePath, targetDirectory, overwrite, createParentDirectory);
+        getMoveCommand().move(sourcePath, targetDirectory, overwrite, createParentDirectories);
     }
 
     /**

@@ -12,12 +12,12 @@
     </spring:beans>
 
     <flow name="move">
-        <file:move sourcePath="#[source]" targetPath="#[target]" overwrite="#[overwrite]" createParentFolder="#[createParent]"/>
+        <file:move sourcePath="#[source]" targetPath="#[target]" overwrite="#[overwrite]" createParentDirectories="#[createParent]"/>
     </flow>
 
     <flow name="readAndDo">
         <file:read path="#[source]" />
-        <file:move targetPath="#[target]" overwrite="#[overwrite]" createParentFolder="#[createParent]"/>
+        <file:move targetPath="#[target]" overwrite="#[overwrite]" createParentDirectories="#[createParent]"/>
     </flow>
 
 </mule>
