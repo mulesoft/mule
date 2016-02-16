@@ -6,13 +6,13 @@
  */
 package org.mule.module.json.transformers;
 
+import static org.junit.Assert.fail;
+
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.transformer.types.DataTypeFactory;
-
-import static org.junit.Assert.fail;
 
 /**
  * For this test I picked difficult beans in that they are not real beans, so I could test how to use
@@ -25,7 +25,8 @@ import static org.junit.Assert.fail;
 public class JsonBeanRoundTripTestCase extends AbstractTransformerTestCase
 {
     //Note that Banana has been excluded
-    public static final String JSON_STRING = "{\"apple\":{\"bitten\":true,\"washed\":false},\"orange\":{\"brand\":\"JuicyFruit\",\"segments\":8,\"radius\":3.45,\"listProperties\":null,\"mapProperties\":null,\"arrayProperties\":null}}";
+    public static final String JSON_STRING =
+            "{\"apple\":{\"bitten\":true,\"washed\":false,\"seed\":null},\"orange\":{\"brand\":\"JuicyFruit\",\"segments\":8,\"radius\":3.45,\"listProperties\":null,\"mapProperties\":null,\"arrayProperties\":null}}";
 
     //Note that Banana is null
     public static final FruitCollection JSON_OBJECT = new FruitCollection(new Apple(true), null, new Orange(8, 3.45, "JuicyFruit"));
