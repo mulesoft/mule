@@ -10,12 +10,10 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
 import org.junit.Test;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 public class TransactionManagerInjectTestCase extends FunctionalTestCase
 {
@@ -42,7 +40,6 @@ public class TransactionManagerInjectTestCase extends FunctionalTestCase
             return txMgr;
         }
 
-        @Inject
         public void setTxMgr(TransactionManager txMgr)
         {
             this.txMgr = txMgr;
