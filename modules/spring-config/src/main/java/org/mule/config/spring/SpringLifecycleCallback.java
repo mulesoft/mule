@@ -14,9 +14,11 @@ import org.mule.lifecycle.RegistryLifecycleManager;
 import com.google.common.collect.TreeTraverser;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A {@link RegistryLifecycleCallback} to be used with instances
@@ -80,12 +82,21 @@ class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry>
 
     private void addDependency(DependencyNode parent, String key, Object object)
     {
+        addDependency(parent, key, object, new HashSet<String>());
+    }
+
+    private void addDependency(DependencyNode parent, String key, Object object, Set<String> processedKeys)
+    {
         final DependencyNode node = new DependencyNode(object);
         parent.addChild(node);
 
-        for (Map.Entry<String, Object> dependency : getSpringRegistry().getDependencies(key).entrySet())
+        if (!processedKeys.contains(key))
         {
-            addDependency(node, dependency.getKey(), dependency.getValue());
+            processedKeys.add(key);
+            for (Map.Entry<String, Object> dependency : getSpringRegistry().getDependencies(key).entrySet())
+            {
+                addDependency(node, dependency.getKey(), dependency.getValue(), processedKeys);
+            }
         }
     }
 
