@@ -7,7 +7,7 @@
 package org.mule.extension.file;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import org.mule.api.MuleEvent;
+import org.mule.functional.junit4.FlowRunner;
 
 import java.io.File;
 
@@ -52,20 +52,17 @@ public class FileCreateDirectoryTestCase extends FileConnectorTestCase
 
     private void doCreateDirectory(String basePath, String directory) throws Exception
     {
-        String flowName;
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("directory", directory);
+        FlowRunner runner;
         if (basePath != null)
         {
-            flowName = "renameWithBasePath";
-            event.setFlowVariable("basePath", basePath);
+            runner = flowRunner("renameWithBasePath").withFlowVariable("basePath", basePath);
         }
         else
         {
-            flowName = "rename";
+            runner = flowRunner("rename");
         }
 
-        runFlow(flowName, event);
+        runner.withFlowVariable("directory", directory).run();
     }
 
 }

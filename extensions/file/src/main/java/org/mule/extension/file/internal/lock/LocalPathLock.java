@@ -6,7 +6,7 @@
  */
 package org.mule.extension.file.internal.lock;
 
-import org.mule.module.extension.file.api.PathLock;
+import org.mule.module.extension.file.api.lock.PathLock;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;

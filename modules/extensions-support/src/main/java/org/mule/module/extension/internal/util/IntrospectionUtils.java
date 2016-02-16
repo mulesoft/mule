@@ -224,10 +224,6 @@ public class IntrospectionUtils
         DataType[] types = new DataType[resolvableTypes.length];
         for (int i = 0; i < resolvableTypes.length; i++)
         {
-            if (logger.isWarnEnabled() && resolvableTypes[i].getRawClass() == null)
-            {
-                logger.warn(String.format("WildCard used in extension definition: '%s'", resolvableTypes[i].toString()));
-            }
             Class<?> rawClass = resolvableTypes[i].resolve(Object.class);
             if (isOperation(rawClass))
             {

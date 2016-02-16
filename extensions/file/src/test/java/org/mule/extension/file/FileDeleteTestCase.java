@@ -6,7 +6,6 @@
  */
 package org.mule.extension.file;
 
-import org.mule.api.MuleEvent;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -31,9 +30,7 @@ public class FileDeleteTestCase extends FileConnectorTestCase
         File file = temporaryFolder.newFile();
         assertExists(true, file);
 
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable(DELETE, file.getAbsolutePath());
-        runFlow(DELETE, event);
+        flowRunner(DELETE).withFlowVariable(DELETE, file.getAbsolutePath()).run();
 
         assertExists(false, file);
     }
@@ -52,10 +49,7 @@ public class FileDeleteTestCase extends FileConnectorTestCase
 
         assertExists(true, child, subFolder, grandChild);
 
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable(DELETE, directory.getAbsolutePath());
-        runFlow(DELETE, event);
-
+        flowRunner(DELETE).withFlowVariable(DELETE, directory.getAbsolutePath()).run();
         assertExists(false, directory, child, subFolder, grandChild);
     }
 

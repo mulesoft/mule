@@ -8,11 +8,9 @@ package org.mule.extension.file.api;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.module.extension.file.api.FilePayload;
-import org.mule.module.extension.file.api.PathLock;
-import org.mule.module.extension.file.api.AbstractFilePayload;
+import org.mule.module.extension.file.api.AbstractFileAttributes;
+import org.mule.module.extension.file.api.FileAttributes;
 
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -21,13 +19,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * Implementation of {@link FilePayload} for files obtained
+ * Implementation of {@link FileAttributes} for files obtained
  * from a local file system.
  *
  * @since 4.0
  */
-//TODO: MULE-9232
-public final class LocalFilePayload extends AbstractFilePayload
+public final class LocalFileAttributes extends AbstractFileAttributes
 {
 
     private BasicFileAttributes attributes = null;
@@ -35,17 +32,9 @@ public final class LocalFilePayload extends AbstractFilePayload
     /**
      * {@inheritDoc}
      */
-    public LocalFilePayload(Path path)
+    public LocalFileAttributes(Path path)
     {
         super(path);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public LocalFilePayload(Path path, PathLock lock)
-    {
-        super(path, lock);
     }
 
     /**
@@ -109,12 +98,6 @@ public final class LocalFilePayload extends AbstractFilePayload
     public boolean isSymbolicLink()
     {
         return getAttributes().isSymbolicLink();
-    }
-
-    @Override
-    protected InputStream doGetContent() throws Exception
-    {
-        return new FileInputStream(Files.newBufferedReader(path), lock);
     }
 
     private synchronized BasicFileAttributes getAttributes()

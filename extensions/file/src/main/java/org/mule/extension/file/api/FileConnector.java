@@ -8,7 +8,6 @@ package org.mule.extension.file.api;
 
 import static java.lang.String.format;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.extension.annotation.api.Extension;
@@ -22,8 +21,6 @@ import org.mule.module.extension.file.api.StandardFileSystemOperations;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import javax.inject.Inject;
 
 /**
  * File connector used to manipulate file systems mounted on the host
@@ -39,9 +36,6 @@ import javax.inject.Inject;
 @Providers(LocalFileConnectionProvider.class)
 public class FileConnector implements Initialisable, FileConnectorConfig
 {
-
-    @Inject
-    private MuleContext muleContext;
 
     /**
      * The directory to be considered as the root of every

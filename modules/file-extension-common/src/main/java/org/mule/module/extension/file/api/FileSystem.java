@@ -10,12 +10,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.api.transport.OutputHandler;
+import org.mule.module.extension.file.api.lock.PathLock;
 import org.mule.transport.NullPayload;
 
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Predicate;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -44,11 +44,12 @@ public interface FileSystem
      *
      * @param directoryPath the path to the directory to be listed
      * @param recursive     whether to include the contents of sub-directories
-     * @param matcher       a {@link Predicate} of {@link FilePayload} used to filter the output list
-     * @return a {@link List} of {@link FilePayload}. Might be empty but will never be null
+     * @param message       the {@link MuleMessage} on which this operation was triggered
+     * @param matcher       a {@link Predicate} of {@link FileAttributes} used to filter the output list
+     * @return a {@link TreeNode} object representing the listed directory
      * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
      */
-    List<FilePayload> list(String directoryPath, boolean recursive, Predicate<FilePayload> matcher);
+    TreeNode list(String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher);
 
     /**
      * Obtains the content and metadata of a file at a given path.
@@ -57,7 +58,7 @@ public interface FileSystem
      * however, the extent of such lock will depend on the implementation.
      * What is guaranteed by passing {@code true} on the {@code lock} argument
      * is that {@code this} instance will not attempt to modify this file
-     * until the {@link InputStream} returned by the {@link FilePayload#getContent()}
+     * until the {@link InputStream} returned by {@link MuleMessage#getPayload()}
      * this method returns is closed or fully consumed. Some implementation might
      * actually perform a file system level locking which goes beyond the extend
      * of {@code this} instance or even mule. For some other file systems that
@@ -67,13 +68,14 @@ public interface FileSystem
      * file being read. a {@link MimetypesFileTypeMap} will be used to
      * make an educated guess on the file's mime type
      *
-     * @param message         the incoming {@link MuleMessage}
-     * @param filePath        the path of the file you want to read
-     * @param lock            whether or not to lock the file
-     * @return a MuleMessage with the file's content and metadata on a {@link FilePayload} instance
+     * @param message  the incoming {@link MuleMessage}
+     * @param filePath the path of the file you want to read
+     * @param lock     whether or not to lock the file
+     * @return A {@link MuleMessage} with an {@link InputStream} with the file's content as payload
+     * and a {@link FileAttributes} object as {@link MuleMessage#getAttributes()}
      * @throws IllegalArgumentException if the file at the given path doesn't exists
      */
-    MuleMessage read(MuleMessage message, String filePath, boolean lock);
+    MuleMessage<InputStream, FileAttributes> read(MuleMessage<?, ?> message, String filePath, boolean lock);
 
     /**
      * Writes the {@code content} into the file pointed by {@code filePath}.
@@ -218,14 +220,20 @@ public interface FileSystem
     PathLock lock(Path path, Object... params);
 
     /**
-     * it tries to update the mymeType with a best guess mimeType
-     * derived from the given {@code filePayload}
+     * Creates a new {@link DataType} to be associated with a {@link MuleMessage} which payload
+     * is a {@link InputStream} and the attributes an instance of {@link FileAttributes}
+     * <p>
+     * It will try to update the {@link DataType#getMimeType()} with a best guess derived
+     * from the given {@code attributes}. If no best-guess is possible, then the {@code originalDataType}'s
+     * mimeType is honoured.
+     * <p>
+     * As for the {@link DataType#getEncoding()}, the {@code dataType} one is respected
      *
-     * @param dataType        the {@link DataType} associated to the incoming {@link MuleMessage}
-     * @param filePayload     a {@link FilePayload}
-     * @return a {@link DataType} with the new mymeType if modified
+     * @param originalDataType the original {@link DataType} that the {@link MuleMessage} had before executing the operation
+     * @param attributes       the {@link FileAttributes} of the file being processed
+     * @return a {@link DataType} the resulting {@link DataType}.
      */
-    DataType<FilePayload> updateDataType(DataType<FilePayload> dataType, FilePayload filePayload);
+    DataType<InputStream> getFileMessageDataType(DataType<?> originalDataType, FileAttributes attributes);
 
     /**
      * Verify that the given {@code path} is not locked

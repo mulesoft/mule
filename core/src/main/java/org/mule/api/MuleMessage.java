@@ -39,7 +39,6 @@ public interface MuleMessage extends org.mule.api.temporary.MuleMessage<Object, 
      */
     void clearProperties(PropertyScope scope);
 
-
     /**
      * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
      */
@@ -450,4 +449,12 @@ public interface MuleMessage extends org.mule.api.temporary.MuleMessage<Object, 
      * {@link org.mule.api.transport.PropertyScope#OUTBOUND}.
      */
     void clearAttachments();
+
+    /**
+     * Temporary method used to get {@code this} same instance as the new {@link org.mule.api.temporary.MuleMessage} API,
+     * supporting generics. This is a temporal, transitional method which will not
+     * survive the immutability refactor
+     */
+    @Deprecated
+    <Payload, Attributes extends Serializable> org.mule.api.temporary.MuleMessage<Payload, Attributes> asNewMessage();
 }

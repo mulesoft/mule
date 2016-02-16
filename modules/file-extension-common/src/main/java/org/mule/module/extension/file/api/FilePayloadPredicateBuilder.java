@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
 /**
- * Builds a {@link Predicate} which verifies that a {@link FilePayload} instance
+ * Builds a {@link Predicate} which verifies that a {@link FileAttributes} instance
  * is compliant with a number of criterias. This builder is stateful and not
  * thread-safe. A new instance should be use per each desired {@link Predicate}.
  * <p>
@@ -147,9 +147,9 @@ public class FilePayloadPredicateBuilder
      *
      * @return a {@link Predicate}
      */
-    public Predicate<FilePayload> build()
+    public Predicate<FileAttributes> build()
     {
-        Predicate<FilePayload> predicate = payload -> true;
+        Predicate<FileAttributes> predicate = payload -> true;
         if (filenamePattern != null)
         {
             PathMatcherPredicate pathMatcher = new PathMatcherPredicate(filenamePattern);

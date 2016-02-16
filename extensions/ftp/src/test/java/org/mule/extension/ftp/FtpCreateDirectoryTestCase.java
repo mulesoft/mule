@@ -9,12 +9,13 @@ package org.mule.extension.ftp;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
+import org.mule.functional.junit4.FlowRunner;
 
 import org.junit.Test;
 
 public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase
 {
+
     private static final String DIRECTORY = "a/b/c";
 
     @Override
@@ -51,19 +52,16 @@ public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase
 
     private void doCreateDirectory(String basePath, String directory) throws Exception
     {
-        String flowName;
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("directory", directory);
+        FlowRunner runner;
         if (basePath != null)
         {
-            flowName = "renameWithBasePath";
-            event.setFlowVariable("basePath", basePath);
+            runner = flowRunner("renameWithBasePath").withFlowVariable("basePath", basePath);
         }
         else
         {
-            flowName = "rename";
+            runner = flowRunner("rename");
         }
 
-        runFlow(flowName, event);
+        runner.withFlowVariable("directory", directory).run();
     }
 }

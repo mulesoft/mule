@@ -8,7 +8,7 @@ package org.mule.extension.ftp.internal.command;
 
 import static java.lang.String.format;
 import org.mule.extension.ftp.internal.FtpConnector;
-import org.mule.extension.ftp.internal.FtpFilePayload;
+import org.mule.extension.ftp.internal.FtpFileAttributes;
 import org.mule.extension.ftp.internal.FtpFileSystem;
 import org.mule.module.extension.file.api.FileSystem;
 import org.mule.module.extension.file.api.command.FileCommand;
@@ -73,27 +73,27 @@ abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
      * doesn't exists
      *
      * @param filePath the path to the file you want
-     * @return a {@link FtpFilePayload}
+     * @return a {@link FtpFileAttributes}
      * @throws IllegalArgumentException if the {@code filePath} doesn't exists
      */
-    protected FtpFilePayload getExistingFile(String filePath)
+    protected FtpFileAttributes getExistingFile(String filePath)
     {
         return getFile(filePath, true);
     }
 
     /**
-     * Obtains a {@link FtpFilePayload} for the given {@code filePath}
+     * Obtains a {@link FtpFileAttributes} for the given {@code filePath}
      * by using the {@link FTPClient#mlistFile(String)} FTP command
      *
      * @param filePath the path to the file you want
-     * @return a {@link FtpFilePayload} or {@code null} if it doesn't exists
+     * @return a {@link FtpFileAttributes} or {@code null} if it doesn't exists
      */
-    protected FtpFilePayload getFile(String filePath)
+    protected FtpFileAttributes getFile(String filePath)
     {
         return getFile(filePath, false);
     }
 
-    private FtpFilePayload getFile(String filePath, boolean requireExistence)
+    private FtpFileAttributes getFile(String filePath, boolean requireExistence)
     {
         Path path = resolvePath(filePath);
         FTPFile ftpFile;
@@ -108,7 +108,7 @@ abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
 
         if (ftpFile != null)
         {
-            return new FtpFilePayload(path, ftpFile, config);
+            return new FtpFileAttributes(path, ftpFile);
         }
         else
         {

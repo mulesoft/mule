@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import org.mule.api.MuleEvent;
 import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.extension.ftp.internal.FtpFileSystem;
-import org.mule.module.extension.file.api.FilePayload;
+import org.mule.module.extension.file.api.FileAttributes;
 import org.mule.module.extension.file.api.command.MoveCommand;
 
 import java.nio.file.Path;
@@ -45,13 +45,13 @@ public final class FtpMoveCommand extends AbstractFtpCopyCommand implements Move
     /**
      * Performs a recursive move
      *
-     * @param source     the {@link FilePayload} for the file to be copied
+     * @param source     the {@link FileAttributes} for the file to be copied
      * @param targetPath the {@link Path} to the target destination
      * @param overwrite  whether to overwrite existing target paths
      * @param event      the {@link MuleEvent} which triggered this operation
      */
     @Override
-    protected void doExecute(FilePayload source, Path targetPath, boolean overwrite, MuleEvent event)
+    protected void doExecute(FileAttributes source, Path targetPath, boolean overwrite, MuleEvent event)
     {
         try
         {

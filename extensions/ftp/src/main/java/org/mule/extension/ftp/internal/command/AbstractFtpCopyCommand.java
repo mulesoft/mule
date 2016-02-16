@@ -10,7 +10,7 @@ package org.mule.extension.ftp.internal.command;
 import org.mule.api.MuleEvent;
 import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.extension.ftp.internal.FtpFileSystem;
-import org.mule.module.extension.file.api.FilePayload;
+import org.mule.module.extension.file.api.FileAttributes;
 import org.mule.module.extension.file.api.FileSystem;
 
 import java.nio.file.Path;
@@ -43,7 +43,7 @@ abstract class AbstractFtpCopyCommand extends FtpCommand
     }
 
     /**
-     * Performs the base logic and delegates into {@link #doExecute(FilePayload, Path, boolean, MuleEvent)}
+     * Performs the base logic and delegates into {@link #doExecute(FileAttributes, Path, boolean, MuleEvent)}
      * to perform the actual copying logic
      *
      * @param sourcePath            the path to be copied
@@ -54,9 +54,9 @@ abstract class AbstractFtpCopyCommand extends FtpCommand
      */
     protected final void execute(String sourcePath, String target, boolean overwrite, boolean createParentDirectory, MuleEvent event)
     {
-        FilePayload sourceFile = getExistingFile(sourcePath);
+        FileAttributes sourceFile = getExistingFile(sourcePath);
         Path targetPath = resolvePath(target);
-        FilePayload targetFile = getFile(targetPath.toString());
+        FileAttributes targetFile = getFile(targetPath.toString());
 
         if (targetFile != null)
         {
@@ -107,10 +107,10 @@ abstract class AbstractFtpCopyCommand extends FtpCommand
     /**
      * Implement this method with the corresponding copying logic
      *
-     * @param source     the {@link FilePayload} for the file to be copied
+     * @param source     the {@link FileAttributes} for the file to be copied
      * @param targetPath the {@link Path} to the target destination
      * @param overwrite  whether to overwrite existing target paths
      * @param event      the {@link MuleEvent} which triggered this operation
      */
-    protected abstract void doExecute(FilePayload source, Path targetPath, boolean overwrite, MuleEvent event);
+    protected abstract void doExecute(FileAttributes source, Path targetPath, boolean overwrite, MuleEvent event);
 }

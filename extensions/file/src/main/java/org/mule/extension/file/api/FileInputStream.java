@@ -6,16 +6,19 @@
  */
 package org.mule.extension.file.api;
 
-import org.mule.module.extension.file.api.AbstractFileInputStream;
-import org.mule.module.extension.file.api.PathLock;
+import org.mule.api.MuleRuntimeException;
+import org.mule.module.extension.file.api.lock.PathLock;
+import org.mule.module.extension.file.api.stream.AbstractFileInputStream;
+import org.mule.module.extension.file.api.stream.LazyStreamSupplier;
 
-import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.commons.io.input.ReaderInputStream;
 
 /**
- * {@link InputStream} implementation used to obtain
+ * {@link AbstractFileInputStream} implementation used to obtain
  * a file's content based on a {@link Reader}.
  * <p>
  * This stream will automatically close itself once fully
@@ -30,16 +33,27 @@ import org.apache.commons.io.input.ReaderInputStream;
  *
  * @since 4.0
  */
-final class FileInputStream extends AbstractFileInputStream
+public final class FileInputStream extends AbstractFileInputStream
 {
+
     /**
      * Creates a new instance
      *
-     * @param reader a {@link Reader}
-     * @param lock   a {@link PathLock}
+     * @param path
+     * @param lock a {@link PathLock}
      */
-    public FileInputStream(Reader reader, PathLock lock)
+    public FileInputStream(Path path, PathLock lock)
     {
-        super(new ReaderInputStream(reader), lock);
+        super(new LazyStreamSupplier(() -> {
+            try
+            {
+                return new ReaderInputStream(Files.newBufferedReader(path));
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
+            }
+        }), lock);
     }
+
 }

@@ -6,17 +6,17 @@
  */
 package org.mule.extension.file.internal.command;
 
+import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.file.api.FileConnector;
-import org.mule.extension.file.api.LocalFilePayload;
+import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.api.LocalFileSystem;
-import org.mule.module.extension.file.api.FilePayload;
+import org.mule.module.extension.file.api.FileAttributes;
+import org.mule.module.extension.file.api.TreeNode;
 import org.mule.module.extension.file.api.command.ListCommand;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -26,6 +26,7 @@ import java.util.function.Predicate;
  */
 public final class LocalListCommand extends LocalFileCommand implements ListCommand
 {
+
     /**
      * {@inheritDoc}
      */
@@ -38,7 +39,7 @@ public final class LocalListCommand extends LocalFileCommand implements ListComm
      * {@inheritDoc}
      */
     @Override
-    public List<FilePayload> list(String directoryPath, boolean recursive, Predicate<FilePayload> matcher)
+    public TreeNode list(String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher)
     {
         Path path = resolveExistingPath(directoryPath);
         if (!Files.isDirectory(path))
@@ -46,26 +47,36 @@ public final class LocalListCommand extends LocalFileCommand implements ListComm
             throw cannotListFileException(path);
         }
 
-        List<FilePayload> accumulator = new LinkedList<>();
-        doList(path.toFile(), accumulator, recursive, matcher);
+        TreeNode.Builder treeNodeBuilder = TreeNode.Builder.forDirectory(new LocalFileAttributes(path));
+        doList(path.toFile(), treeNodeBuilder, recursive, message, matcher);
 
-        return accumulator;
+        return treeNodeBuilder.build();
     }
 
-    private void doList(File parent, List<FilePayload> accumulator, boolean recursive, Predicate<FilePayload> matcher)
+    private void doList(File parent, TreeNode.Builder treeNodeBuilder, boolean recursive, MuleMessage message, Predicate<FileAttributes> matcher)
     {
         for (File child : parent.listFiles())
         {
-            FilePayload payload = new LocalFilePayload(child.toPath());
-            if (!matcher.test(payload))
+            Path path = child.toPath();
+            FileAttributes attributes = new LocalFileAttributes(path);
+            if (!matcher.test(attributes))
             {
                 continue;
             }
 
-            accumulator.add(payload);
-            if (child.isDirectory() && recursive)
+            if (child.isDirectory())
             {
-                doList(child, accumulator, recursive, matcher);
+                TreeNode.Builder childNodeBuilder = TreeNode.Builder.forDirectory(attributes);
+                treeNodeBuilder.addChild(childNodeBuilder);
+
+                if (recursive)
+                {
+                    doList(child, childNodeBuilder, recursive, message, matcher);
+                }
+            }
+            else
+            {
+                treeNodeBuilder.addChild(TreeNode.Builder.forFile(fileSystem.read(message, child.getAbsolutePath(), false)));
             }
         }
     }

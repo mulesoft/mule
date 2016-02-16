@@ -6,21 +6,18 @@
  */
 package org.mule.module.extension.file.api;
 
-import org.mule.api.Closeable;
-
-import java.io.InputStream;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * Canonical representation of a file.
+ * Canonical representation of a file's metadata attributes.
  * <p>
- * It allows access to the file content through the {@link #getContent()} method,
- * as well as various other methods which supply file metadata.
+ * It contains information such as a file's name, size, timestamp,
+ * properties, etc.
  *
  * @since 4.0
  */
-//TODO: MULE-9232
-public interface FilePayload extends Closeable
+public interface FileAttributes extends Serializable
 {
 
     /**
@@ -67,14 +64,4 @@ public interface FilePayload extends Closeable
      * @return The file's name
      */
     String getName();
-
-    /**
-     * @return The file's content as a {@link InputStream}
-     */
-    InputStream getContent();
-
-    /**
-     * @return Whether the file is locked.
-     */
-    boolean isLocked();
 }

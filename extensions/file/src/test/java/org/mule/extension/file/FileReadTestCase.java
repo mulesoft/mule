@@ -12,7 +12,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.transformer.types.MimeTypes.JSON;
 import org.mule.api.MuleEvent;
-import org.mule.extension.file.api.LocalFilePayload;
+import org.mule.api.temporary.MuleMessage;
+import org.mule.extension.file.api.LocalFileAttributes;
+import org.mule.module.extension.file.api.stream.AbstractFileInputStream;
 import org.mule.util.IOUtils;
 
 import java.nio.file.Files;
@@ -48,17 +50,15 @@ public class FileReadTestCase extends FileConnectorTestCase
 
         assertThat(response.getMessage().getDataType().getMimeType(), is(JSON));
 
-        LocalFilePayload payload = (LocalFilePayload) response.getMessage().getPayload();
+        AbstractFileInputStream payload = (AbstractFileInputStream) response.getMessage().getPayload();
         assertThat(payload.isLocked(), is(false));
-        assertThat(IOUtils.toString(payload.getContent()), is(HELLO_WORLD));
+        assertThat(IOUtils.toString(payload), is(HELLO_WORLD));
     }
 
     @Test
     public void readWithForcedMimeType() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("path", HELLO_PATH);
-        event = runFlow("readWithForcedMimeType", event);
+        MuleEvent event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
         assertThat(event.getMessage().getDataType().getMimeType(), equalTo("test/test"));
     }
 
@@ -79,25 +79,25 @@ public class FileReadTestCase extends FileConnectorTestCase
     @Test
     public void readLockReleasedOnContentConsumed() throws Exception
     {
-        LocalFilePayload payload = readWithLock();
-        IOUtils.toString(payload.getContent());
+        MuleMessage<AbstractFileInputStream, LocalFileAttributes> message = readWithLock();
+        IOUtils.toString(message.getPayload());
 
-        assertThat(payload.isLocked(), is(false));
+        assertThat(message.getPayload().isLocked(), is(false));
     }
 
     @Test
     public void readLockReleasedOnEarlyClose() throws Exception
     {
-        LocalFilePayload payload = readWithLock();
-        payload.close();
+        MuleMessage<AbstractFileInputStream, LocalFileAttributes> message = readWithLock();
+        message.getPayload().close();
 
-        assertThat(payload.isLocked(), is(false));
+        assertThat(message.getPayload().isLocked(), is(false));
     }
 
     @Test
     public void getProperties() throws Exception
     {
-        LocalFilePayload filePayload = (LocalFilePayload) readHelloWorld().getMessage().getPayload();
+        LocalFileAttributes filePayload = (LocalFileAttributes) readHelloWorld().getMessage().getAttributes();
         Path file = Paths.get(baseDir.getValue()).resolve(HELLO_PATH);
         assertExists(true, file.toFile());
 
@@ -113,12 +113,12 @@ public class FileReadTestCase extends FileConnectorTestCase
         assertThat(filePayload.isRegularFile(), is(true));
     }
 
-    private LocalFilePayload readWithLock() throws Exception
+    private MuleMessage<AbstractFileInputStream, LocalFileAttributes> readWithLock() throws Exception
     {
-        LocalFilePayload payload = (LocalFilePayload) runFlow("readWithLock").getMessage().getPayload();
-        assertThat(payload.isLocked(), is(true));
+        MuleMessage<AbstractFileInputStream, LocalFileAttributes> message = flowRunner("readWithLock").run().getMessage().asNewMessage();
+        assertThat(message.getPayload().isLocked(), is(true));
 
-        return payload;
+        return message;
     }
 
     private void assertTime(LocalDateTime dateTime, FileTime fileTime)

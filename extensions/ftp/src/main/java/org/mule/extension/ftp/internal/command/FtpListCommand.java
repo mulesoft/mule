@@ -7,18 +7,18 @@
 package org.mule.extension.ftp.internal.command;
 
 import static java.lang.String.format;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.ftp.internal.FtpConnector;
-import org.mule.extension.ftp.internal.FtpFilePayload;
+import org.mule.extension.ftp.internal.FtpFileAttributes;
 import org.mule.extension.ftp.internal.FtpFileSystem;
-import org.mule.module.extension.file.api.FilePayload;
+import org.mule.module.extension.file.api.FileAttributes;
+import org.mule.module.extension.file.api.TreeNode;
 import org.mule.module.extension.file.api.command.ListCommand;
 import org.mule.util.ArrayUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Predicate;
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -48,12 +48,12 @@ public final class FtpListCommand extends FtpCommand implements ListCommand
      * {@inheritDoc}
      */
     @Override
-    public List<FilePayload> list(String directoryPath, boolean recursive, Predicate<FilePayload> matcher)
+    public TreeNode list(String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher)
     {
-        FilePayload filePayload = getExistingFile(directoryPath);
-        Path path = Paths.get(filePayload.getPath());
+        FileAttributes fileAttributes = getExistingFile(directoryPath);
+        Path path = Paths.get(fileAttributes.getPath());
 
-        if (!filePayload.isDirectory())
+        if (!fileAttributes.isDirectory())
         {
             throw cannotListFileException(path);
         }
@@ -63,10 +63,10 @@ public final class FtpListCommand extends FtpCommand implements ListCommand
             throw exception(format("Could not change working directory to '%s' while trying to list that directory", path));
         }
 
-        List<FilePayload> accumulator = new LinkedList<>();
+        TreeNode.Builder treeNodeBuilder = TreeNode.Builder.forDirectory(fileAttributes);
         try
         {
-            doList(path, accumulator, recursive, matcher);
+            doList(path, treeNodeBuilder, recursive, message, matcher);
 
             if (!FTPReply.isPositiveCompletion(client.getReplyCode()))
             {
@@ -80,10 +80,10 @@ public final class FtpListCommand extends FtpCommand implements ListCommand
             throw exception(format("Failed to list files on directory '%s'", path), e);
         }
 
-        return accumulator;
+        return treeNodeBuilder.build();
     }
 
-    private void doList(Path path, List<FilePayload> accumulator, boolean recursive, Predicate<FilePayload> matcher) throws IOException
+    private void doList(Path path, TreeNode.Builder treeNodeBuilder, boolean recursive, MuleMessage message, Predicate<FileAttributes> matcher) throws IOException
     {
         FTPListParseEngine engine = client.initiateListParsing();
         while (engine.hasNext())
@@ -96,27 +96,36 @@ public final class FtpListCommand extends FtpCommand implements ListCommand
 
             for (FTPFile file : files)
             {
-                FilePayload payload = new FtpFilePayload(path.resolve(file.getName()), file, config);
+                final Path filePath = path.resolve(file.getName());
+                FileAttributes attributes = new FtpFileAttributes(filePath, file);
 
-                if (isVirtualDirectory(payload.getName()) || !matcher.test(payload))
+                if (isVirtualDirectory(attributes.getName()) || !matcher.test(attributes))
                 {
                     continue;
                 }
 
-                accumulator.add(payload);
-
-                if (payload.isDirectory() && recursive)
+                if (attributes.isDirectory())
                 {
-                    Path recursionPath = path.resolve(payload.getName());
-                    if (!client.changeWorkingDirectory(payload.getName()))
+                    TreeNode.Builder childNodeBuilder = TreeNode.Builder.forDirectory(attributes);
+                    treeNodeBuilder.addChild(childNodeBuilder);
+
+                    if (recursive)
                     {
-                        throw exception(format("Could not change working directory to '%s' while performing recursion on list operation", recursionPath));
+                        Path recursionPath = path.resolve(attributes.getName());
+                        if (!client.changeWorkingDirectory(attributes.getName()))
+                        {
+                            throw exception(format("Could not change working directory to '%s' while performing recursion on list operation", recursionPath));
+                        }
+                        doList(recursionPath, childNodeBuilder, recursive, message, matcher);
+                        if (!client.changeToParentDirectory())
+                        {
+                            throw exception(format("Could not return to parent working directory '%s' while performing recursion on list operation", recursionPath.getParent()));
+                        }
                     }
-                    doList(recursionPath, accumulator, recursive, matcher);
-                    if (!client.changeToParentDirectory())
-                    {
-                        throw exception(format("Could not return to parent working directory '%s' while performing recursion on list operation", recursionPath.getParent()));
-                    }
+                }
+                else
+                {
+                    treeNodeBuilder.addChild(TreeNode.Builder.forFile(fileSystem.read(message, filePath.toString(), false)));
                 }
             }
         }

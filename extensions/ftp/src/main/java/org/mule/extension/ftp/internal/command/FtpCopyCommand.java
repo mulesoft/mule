@@ -12,9 +12,9 @@ import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionHandler;
 import org.mule.api.connector.ConnectionManager;
 import org.mule.extension.ftp.internal.FtpConnector;
-import org.mule.extension.ftp.internal.FtpFilePayload;
+import org.mule.extension.ftp.internal.FtpFileAttributes;
 import org.mule.extension.ftp.internal.FtpFileSystem;
-import org.mule.module.extension.file.api.FilePayload;
+import org.mule.module.extension.file.api.FileAttributes;
 import org.mule.module.extension.file.api.FileWriteMode;
 import org.mule.module.extension.file.api.command.CopyCommand;
 
@@ -54,13 +54,13 @@ public final class FtpCopyCommand extends AbstractFtpCopyCommand implements Copy
     /**
      * Performs a recursive copy
      *
-     * @param source     the {@link FilePayload} for the file to be copied
+     * @param source     the {@link FileAttributes} for the file to be copied
      * @param targetPath the {@link Path} to the target destination
      * @param overwrite  whether to overwrite existing target paths
      * @param event      the {@link MuleEvent} which triggered this operation
      */
     @Override
-    protected void doExecute(FilePayload source, Path targetPath, boolean overwrite, MuleEvent event)
+    protected void doExecute(FileAttributes source, Path targetPath, boolean overwrite, MuleEvent event)
     {
         ConnectionHandler<FtpFileSystem> writerConnectionHandler;
         final FtpFileSystem writerConnection;
@@ -115,23 +115,23 @@ public final class FtpCopyCommand extends AbstractFtpCopyCommand implements Copy
                 continue;
             }
 
-            FilePayload filePayload = new FtpFilePayload(sourcePath.resolve(file.getName()), file, config);
+            FileAttributes fileAttributes = new FtpFileAttributes(sourcePath.resolve(file.getName()), file);
 
-            if (filePayload.isDirectory())
+            if (fileAttributes.isDirectory())
             {
-                Path targetPath = target.resolve(filePayload.getName());
-                copyDirectory(Paths.get(filePayload.getPath()), targetPath, overwrite, writerConnection, event);
+                Path targetPath = target.resolve(fileAttributes.getName());
+                copyDirectory(Paths.get(fileAttributes.getPath()), targetPath, overwrite, writerConnection, event);
             }
             else
             {
-                copyFile(filePayload, target.resolve(filePayload.getName()), overwrite, writerConnection, event);
+                copyFile(fileAttributes, target.resolve(fileAttributes.getName()), overwrite, writerConnection, event);
             }
         }
     }
 
-    private void copyFile(FilePayload source, Path target, boolean overwrite, FtpFileSystem writerConnection, MuleEvent event)
+    private void copyFile(FileAttributes source, Path target, boolean overwrite, FtpFileSystem writerConnection, MuleEvent event)
     {
-        FilePayload targetFile = getFile(target.toString());
+        FileAttributes targetFile = getFile(target.toString());
         if (targetFile != null)
         {
             if (overwrite)

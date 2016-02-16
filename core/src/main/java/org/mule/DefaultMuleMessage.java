@@ -1497,6 +1497,12 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         return properties.getPropertyDataType(name, scope);
     }
 
+    @Override
+    public <Payload, Attributes extends Serializable> org.mule.api.temporary.MuleMessage<Payload, Attributes> asNewMessage()
+    {
+        return (org.mule.api.temporary.MuleMessage<Payload, Attributes>) this;
+    }
+
     /**
      * Find property in one of the specified scopes, in order
      */

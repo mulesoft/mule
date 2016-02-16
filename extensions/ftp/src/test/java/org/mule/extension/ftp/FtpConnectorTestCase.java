@@ -8,14 +8,14 @@ package org.mule.extension.ftp;
 
 import static org.junit.rules.ExpectedException.none;
 import org.mule.api.MuleEvent;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.module.extension.file.api.FilePayload;
 import org.mule.module.extension.file.api.FileWriteMode;
+import org.mule.module.extension.file.api.stream.AbstractFileInputStream;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.infrastructure.client.ftp.FTPTestClient;
 import org.mule.test.infrastructure.process.rules.FtpServer;
-import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +41,6 @@ public abstract class FtpConnectorTestCase extends ExtensionFunctionalTestCase
 
     @Rule
     public FtpServer ftpServer = new FtpServer("ftpPort", new File(FTP_SERVER_BASE_DIR, BASE_DIR));
-
 
     private String ftpUser = "anonymous";
     private String ftpPassword = "password";
@@ -89,30 +88,35 @@ public abstract class FtpConnectorTestCase extends ExtensionFunctionalTestCase
         return getPath(HELLO_PATH);
     }
 
-    protected FilePayload readPath(String path) throws Exception
+    protected org.mule.api.MuleMessage readPath(String path) throws Exception
     {
-        return (FilePayload) getPath(path).getMessage().getPayload();
+        return getPath(path).getMessage();
     }
 
     protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception
     {
-        MuleEvent event = getTestEvent(content);
-        event.setFlowVariable("path", path);
-        event.setFlowVariable("createParent", createParent);
-        event.setFlowVariable("mode", mode);
-
-        runFlow("write", event);
+        flowRunner("write")
+                .withFlowVariable("path", path)
+                .withFlowVariable("createParent", createParent)
+                .withFlowVariable("mode", mode)
+                .withPayload(content)
+                .run();
     }
 
     private MuleEvent getPath(String path) throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("path", path);
-        return runFlow("read", event);
+        return flowRunner("read")
+                .withFlowVariable("path", path)
+                .run();
     }
 
     protected String readPathAsString(String path) throws Exception
     {
-        return IOUtils.toString(readPath(path).getContent());
+        return getPayloadAsString(readPath(path));
+    }
+
+    protected boolean isLocked(MuleMessage message)
+    {
+        return ((AbstractFileInputStream) message.getPayload()).isLocked();
     }
 }

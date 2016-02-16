@@ -14,7 +14,6 @@ import static org.mule.module.extension.file.api.FileWriteMode.CREATE_NEW;
 import static org.mule.module.extension.file.api.FileWriteMode.OVERWRITE;
 import org.mule.module.extension.file.api.FileWriteMode;
 import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
 
 import java.io.File;
 
@@ -115,7 +114,7 @@ public class FileWriteTestCase extends FileConnectorTestCase
 
         doWrite(path, HELLO_WORLD, mode, true);
 
-        String content = IOUtils.toString(readPath(path).getContent());
+        String content = readPathAsString(path);
         assertThat(content, is(HELLO_WORLD));
     }
 
@@ -125,7 +124,7 @@ public class FileWriteTestCase extends FileConnectorTestCase
         String path = temporaryFolder.newFolder().getPath() + "/test.txt";
         doWrite(path, HELLO_WORLD, mode, false);
 
-        String content = IOUtils.toString(readPath(path).getContent());
+        String content = readPathAsString(path);
         assertThat(content, is(HELLO_WORLD));
     }
 
@@ -143,6 +142,6 @@ public class FileWriteTestCase extends FileConnectorTestCase
         FileUtils.writeStringToFile(file, HELLO_WORLD);
 
         doWrite(file.getAbsolutePath(), HELLO_WORLD, mode, false);
-        return IOUtils.toString(readPath(file.getAbsolutePath()).getContent());
+        return readPathAsString(file.getAbsolutePath());
     }
 }
