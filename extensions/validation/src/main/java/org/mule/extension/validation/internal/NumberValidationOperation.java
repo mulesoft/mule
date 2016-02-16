@@ -7,7 +7,6 @@
 package org.mule.extension.validation.internal;
 
 import org.mule.api.MuleEvent;
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.ParameterGroup;
 import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.annotation.api.param.Optional;
@@ -40,7 +39,6 @@ public class NumberValidationOperation extends ValidationSupport
      * @param options    the {@link ValidationOptions}
      * @param event      the current {@link MuleEvent}
      */
-    @Operation
     public void isNumber(String value,
                          @Optional String locale,
                          @Optional String pattern,

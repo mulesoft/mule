@@ -31,7 +31,7 @@ import java.util.Map;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 
@@ -70,19 +70,19 @@ final class SchemaDocumenter
     {
         declaration.setDescription(getJavaDocSummary(processingEnv, extensionElement));
         documentConfigurations(declaration, extensionElement, roundEnvironment);
-        documentOperations(declaration, roundEnvironment);
+        documentOperations(roundEnvironment, processingEnv, declaration);
     }
 
 
-    private void documentOperations(Declaration declaration, RoundEnvironment roundEnvironment)
+    private void documentOperations(RoundEnvironment roundEnv, ProcessingEnvironment processingEnv, Declaration declaration)
     {
-        final Map<String, ExecutableElement> methods = getOperationMethods(roundEnvironment);
+        final Map<String,Element> methods = getOperationMethods(roundEnv, processingEnv);
 
         try
         {
             for (OperationDeclaration operation : declaration.getOperations())
             {
-                ExecutableElement method = methods.get(operation.getName());
+                Element method = methods.get(operation.getName());
 
                  // there are two cases in which method can be null:
                  //   * A synthetic operation which was not defined in any class but added by a model property

@@ -6,9 +6,12 @@
  */
 package org.mule.module.extension.internal.capability.xml.schema;
 
-import org.mule.extension.annotation.api.Operation;
+import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.ParameterGroup;
+import org.mule.extension.annotation.api.param.Ignore;
+import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ClassUtils;
 
 import com.google.common.collect.ImmutableMap;
@@ -17,13 +20,17 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -44,6 +51,7 @@ public final class AnnotationProcessorUtils
     private static final char NEW_LINE_CHAR = '\n';
     private static final char AT_CHAR = '@';
     public static final String PARAM = "@param";
+    public static final String VALUE = "value";
 
     /**
      * Returns the {@link Class} object that is associated to the {@code typeElement}
@@ -84,27 +92,56 @@ public final class AnnotationProcessorUtils
     }
 
     /**
-     * Scans all classes in the {@code roundEnvironment} looking
-     * for methods annotated with {@link Operation}.
+     * Scans all the classes annotated with {@link Extension}, takes
+     * the {@link Operations} from those and returns the methods
+     * which are public and are not annotated with {@link Ignore}
      *
      * @param roundEnvironment the current {@link RoundEnvironment}
      * @return a {@link Map} which keys are the method names and the values are the
      * method represented as a {@link ExecutableElement}
      */
-    static Map<String, ExecutableElement> getOperationMethods(RoundEnvironment roundEnvironment)
+    static Map<String, Element> getOperationMethods(RoundEnvironment roundEnvironment, ProcessingEnvironment processingEnvironment)
     {
-        ImmutableMap.Builder<String, ExecutableElement> methods = ImmutableMap.builder();
-        for (Element rootElement : roundEnvironment.getRootElements())
+        ImmutableMap.Builder<String, Element> methods = ImmutableMap.builder();
+        for (Element rootElement : roundEnvironment.getElementsAnnotatedWith(Extension.class))
         {
             if (!(rootElement instanceof TypeElement))
             {
                 continue;
             }
 
-            methods.putAll(getMethodsAnnotatedWith((TypeElement) rootElement, Operation.class));
+            Class<?>[] operationsClasses = ((Operations) getAnnotationFromType(processingEnvironment, (TypeElement) rootElement, Operations.class)).value();
+            List<AnnotationValue> annotationValues = getAnnotationFieldValue(rootElement, Operations.class, VALUE);
+
+            for (Class<?> operationClass : operationsClasses)
+            {
+                Element operationClassElement = getElementForClass(annotationValues, operationClass);
+                if (operationClassElement != null)
+                {
+                    for (Method operation : IntrospectionUtils.getOperationMethods(operationClass))
+                    {
+                        operationClassElement.getEnclosedElements().stream()
+                                .filter(e -> e.getSimpleName().toString().equals(operation.getName()))
+                                .findFirst().ifPresent(operationMethodElement -> methods.put(operation.getName(), operationMethodElement));
+                    }
+                }
+            }
+
         }
 
         return methods.build();
+    }
+
+    private static <T> T getAnnotationFromType(ProcessingEnvironment processingEnvironment, TypeElement rootElement, Class<? extends Annotation> annotationClass)
+    {
+        return (T) classFor(rootElement, processingEnvironment).getAnnotation(annotationClass);
+    }
+
+    private static Element getElementForClass(List<AnnotationValue> annotationValues, Class<?> clazz)
+    {
+        return annotationValues.stream()
+                            .map(e -> ((DeclaredType) e.getValue()).asElement())
+                            .filter(e -> e.getSimpleName().toString().equals(clazz.getSimpleName())).findFirst().orElse(null);
     }
 
     static Map<String, VariableElement> getFieldsAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation)
@@ -313,9 +350,19 @@ public final class AnnotationProcessorUtils
     {
         param = param.replaceFirst(PARAM, StringUtils.EMPTY).trim();
         int descriptionIndex = param.indexOf(" ");
-        String paramName = param.substring(0, descriptionIndex).trim();
-        String description = param.substring(descriptionIndex).trim();
+        String paramName;
+        String description;
+        if (descriptionIndex != -1)
+        {
+            paramName = param.substring(0, descriptionIndex).trim();
+            description = param.substring(descriptionIndex).trim();
 
+        }
+        else
+        {
+            paramName = param;
+            description = "";
+        }
         parameters.put(paramName, description);
     }
 
@@ -338,5 +385,37 @@ public final class AnnotationProcessorUtils
 
         abstract void onBodyLine(String bodyLine);
 
+    }
+
+    /**
+     * Returns the content of a field for a given annotation.
+     */
+    public static <T> T getAnnotationFieldValue(Element rootElement, Class<? extends Annotation> anAnnotation, String annotationField)
+    {
+        if (rootElement.getAnnotation(anAnnotation) != null)
+        {
+            final String fullQualifiedAnnotationName = anAnnotation.getName();
+            T annotationFieldValue = null;
+            List<? extends AnnotationMirror> annotationMirrors = rootElement.getAnnotationMirrors();
+            for (AnnotationMirror annotationMirror : annotationMirrors)
+            {
+                if (fullQualifiedAnnotationName.equals(annotationMirror.getAnnotationType().toString()))
+                {
+                    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet())
+                    {
+                        if (annotationField.equals(entry.getKey().getSimpleName().toString()))
+                        {
+                            annotationFieldValue = (T) entry.getValue().getValue();
+                            break;
+                        }
+                    }
+                }
+            }
+            return annotationFieldValue;
+        }
+        else
+        {
+            return null;
+        }
     }
 }

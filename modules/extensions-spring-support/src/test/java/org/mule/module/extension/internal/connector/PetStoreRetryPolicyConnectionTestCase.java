@@ -17,7 +17,6 @@ import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.capability.Xml;
 import org.mule.extension.annotation.api.connector.Providers;
@@ -130,19 +129,16 @@ public class PetStoreRetryPolicyConnectionTestCase extends ExtensionFunctionalTe
 
     public static class PetStoreOperationsWithFailures extends PetStoreOperations
     {
-        @Operation
         public Integer failConnection(@Connection PetStoreClient client) throws ConnectionException
         {
             throw new ConnectionException(CONNECTION_FAIL);
         }
 
-        @Operation
         public Integer failOperationWithException(@Connection PetStoreClient client) throws Exception
         {
             throw new Exception(CONNECTION_FAIL);
         }
 
-        @Operation
         public Integer failOperationWithThrowable(@Connection PetStoreClient client) throws Throwable
         {
             throw new Throwable(CONNECTION_FAIL);

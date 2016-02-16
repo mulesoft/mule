@@ -9,7 +9,6 @@ package org.mule.extension.validation.internal;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
 import org.mule.api.MuleEvent;
 import org.mule.api.NestedProcessor;
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.RestrictedTo;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
@@ -47,7 +46,6 @@ public final class ValidationStrategies
      * @return the same {@code muleEvent} that was passed as argument
      * @throws MultipleValidationException if at least one validator fails and {@code throwsException} is {@code true}
      */
-    @Operation
     public void all(@RestrictedTo(ValidationExtension.class) List<NestedProcessor> validations,
                          MuleEvent muleEvent) throws MultipleValidationException
     {

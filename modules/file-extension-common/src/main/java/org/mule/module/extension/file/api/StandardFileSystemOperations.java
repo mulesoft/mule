@@ -10,7 +10,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.api.transport.OutputHandler;
 import org.mule.extension.annotation.api.DataTypeParameters;
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.module.extension.file.api.matcher.NullFilePayloadPredicate;
@@ -49,7 +48,6 @@ public class StandardFileSystemOperations
      * @return a {@link TreeNode} object representing the listed directory
      * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
      */
-    @Operation
     public TreeNode list(@Connection FileSystem fileSystem,
                          @Optional String directoryPath,
                          @Optional(defaultValue = "false") boolean recursive,
@@ -85,7 +83,6 @@ public class StandardFileSystemOperations
      * @return the file's content and metadata on a {@link FileAttributes} instance
      * @throws IllegalArgumentException if the file at the given path doesn't exists
      */
-    @Operation
     @DataTypeParameters
     public MuleMessage<InputStream, FileAttributes> read(@Connection FileSystem fileSystem,
                                                          MuleMessage<?, ?> message,
@@ -138,7 +135,6 @@ public class StandardFileSystemOperations
      * @param event                 The current {@link MuleEvent}
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    @Operation
     public void write(@Connection FileSystem fileSystem,
                       @Optional String path,
                       @Optional(defaultValue = "#[payload]") Object content,
@@ -191,7 +187,6 @@ public class StandardFileSystemOperations
      * @param event              the {@link MuleEvent} which triggered this operation
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    @Operation
     public void copy(@Connection FileSystem fileSystem,
                      @Optional String sourcePath,
                      String targetPath,
@@ -238,7 +233,6 @@ public class StandardFileSystemOperations
      * @param event              The current {@link MuleEvent}
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    @Operation
     public void move(@Connection FileSystem fileSystem,
                      @Optional String sourcePath,
                      String targetPath,
@@ -264,7 +258,6 @@ public class StandardFileSystemOperations
      * @param event      The current {@link MuleEvent}
      * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
      */
-    @Operation
     public void delete(@Connection FileSystem fileSystem, @Optional String path, MuleEvent event)
     {
         path = resolvePath(path, event, "path");
@@ -286,7 +279,6 @@ public class StandardFileSystemOperations
      * @param to         the file's new name
      * @param event      The current {@link MuleEvent}
      */
-    @Operation
     public void rename(@Connection FileSystem fileSystem, @Optional String path, String to, MuleEvent event)
     {
         path = resolvePath(path, event, "path");
@@ -301,7 +293,6 @@ public class StandardFileSystemOperations
      * @param basePath      the directory which contains the directory to be created
      * @param directoryName the new directory's new name
      */
-    @Operation
     public void createDirectory(@Connection FileSystem fileSystem, @Optional String basePath, String directoryName)
     {
         fileSystem.createDirectory(basePath, directoryName);

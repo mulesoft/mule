@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.capability.xml;
 
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.ParameterGroup;
+import org.mule.extension.annotation.api.param.Ignore;
 
 public class TestDocumentedExtensionOperations
 {
@@ -17,8 +17,39 @@ public class TestDocumentedExtensionOperations
      *
      * @param value test value
      */
-    @Operation
-    public void operation(String value, @ParameterGroup TestDocumentedParameterGroup group) {
+    public void operation(String value, @ParameterGroup TestDocumentedParameterGroup group)
+    {
+
+    }
+
+    /**
+     * Test Operation with blank parameter description
+     *
+     * @param value
+     */
+    public void operationWithBlankParameterDescription(String value)
+    {
+
+    }
+
+    /**
+     * This operation should not be documented
+     *
+     * @param value test value
+     */
+    @Ignore
+    public void ignoreOperationShouldBeIgnored(String value)
+    {
+
+    }
+
+    /**
+     * Private operation should not be documented
+     *
+     * @param value test value
+     */
+    private void privateOperationShouldBeIgnored(String value)
+    {
 
     }
 }

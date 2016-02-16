@@ -9,7 +9,6 @@ package org.mule.module.extension.internal.introspection.validation;
 import org.mule.extension.annotation.api.Configuration;
 import org.mule.extension.annotation.api.Configurations;
 import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.Operation;
 import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
@@ -74,13 +73,11 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase
     public static class ValidTestOperations
     {
 
-        @Operation
         public void foo(@UseConfig Config connection)
         {
 
         }
 
-        @Operation
         public void bar(@UseConfig Config connection)
         {
 
@@ -90,13 +87,11 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase
     public static class InvalidTestOperations
     {
 
-        @Operation
         public void foo(@UseConfig Config connection)
         {
 
         }
 
-        @Operation
         public void bar(@UseConfig TestConfig2 connection)
         {
 
