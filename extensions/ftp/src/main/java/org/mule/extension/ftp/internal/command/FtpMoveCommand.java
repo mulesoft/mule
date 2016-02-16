@@ -37,9 +37,9 @@ public final class FtpMoveCommand extends AbstractFtpCopyCommand implements Move
      * {@inheritDoc}
      */
     @Override
-    public void move(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectory)
+    public void move(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories)
     {
-        execute(sourcePath, targetPath, overwrite, createParentDirectory, null);
+        execute(sourcePath, targetPath, overwrite, createParentDirectories, null);
     }
 
     /**

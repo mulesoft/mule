@@ -13,12 +13,12 @@
 
     <flow name="copy">
         <ftp:copy sourcePath="#[source]" targetPath="#[target]" overwrite="#[overwrite]"
-                  createParentFolder="#[createParent]"/>
+                  createParentDirectories="#[createParent]"/>
     </flow>
 
     <flow name="readAndDo">
         <ftp:read path="#[source]" />
-        <ftp:copy targetPath="#[target]" overwrite="#[overwrite]" createParentFolder="#[createParent]"/>
+        <ftp:copy targetPath="#[target]" overwrite="#[overwrite]" createParentDirectories="#[createParent]"/>
     </flow>
 
 </mule>

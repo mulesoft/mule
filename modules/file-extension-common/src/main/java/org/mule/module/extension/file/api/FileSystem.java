@@ -110,7 +110,7 @@ public interface FileSystem
      * @param mode                  a {@link FileWriteMode}
      * @param event                 the {@link MuleEvent} which processing triggers this operation
      * @param lock                  whether or not to lock the file
-     * @param createParentDirectory whether or not to attempt creating the parent directory if it doesn't exists.
+     * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
     void write(String filePath,
@@ -118,7 +118,7 @@ public interface FileSystem
                FileWriteMode mode,
                MuleEvent event,
                boolean lock,
-               boolean createParentDirectory);
+               boolean createParentDirectories);
 
     /**
      * Copies the file at the {@code sourcePath} into the {@code targetPath}.
@@ -144,11 +144,11 @@ public interface FileSystem
      * @param sourcePath            the path to the file to be copied
      * @param targetPath            the target directory
      * @param overwrite             whether or not overwrite the file if the target destination already exists.
-     * @param createParentDirectory whether or not to attempt creating the parent directory if it doesn't exists.
+     * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
      * @param event                 whether or not to attempt creating the parent directory if it doesn't exists.
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    void copy(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectory, MuleEvent event);
+    void copy(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories, MuleEvent event);
 
     /**
      * Moves the file at the {@code sourcePath} into the {@code targetPath}.
@@ -174,10 +174,10 @@ public interface FileSystem
      * @param sourcePath            the path to the file to be copied
      * @param targetPath            the target directory
      * @param overwrite             whether or not overwrite the file if the target destination already exists.
-     * @param createParentDirectory whether or not to attempt creating the parent directory if it doesn't exists.
+     * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    void move(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectory);
+    void move(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories);
 
     /**
      * Deletes the file pointed by {@code filePath}, provided that it's not locked

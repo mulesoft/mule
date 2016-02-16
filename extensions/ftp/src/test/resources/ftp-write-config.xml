@@ -12,7 +12,7 @@
     </spring:beans>
 
     <flow name="write">
-        <ftp:write path="#[path]" mode="#[mode]" createParentDirectory="#[createParent]"/>
+        <ftp:write path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]"/>
     </flow>
 
     <flow name="readAndWrite">

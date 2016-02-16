@@ -24,9 +24,9 @@ public interface CopyCommand
      * @param sourcePath            the path to the file to be copied
      * @param targetPath            the target directory
      * @param overwrite             whether or not overwrite the file if the target destination already exists.
-     * @param createParentDirectory whether or not to attempt creating the parent directory if it doesn't exists.
+     * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
      * @param event                 whether or not to attempt creating the parent directory if it doesn't exists.
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    void copy(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectory, MuleEvent event);
+    void copy(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories, MuleEvent event);
 }

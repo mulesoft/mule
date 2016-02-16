@@ -12,7 +12,7 @@
     </spring:beans>
 
     <flow name="write">
-        <file:write path="#[path]" mode="#[mode]" createParentDirectory="#[createParent]"/>
+        <file:write path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]"/>
     </flow>
 
     <flow name="readAndWrite">
