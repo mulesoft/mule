@@ -6,12 +6,14 @@
  */
 package org.mule.extension.file;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.extension.file.api.FileWriteMode.APPEND;
 import static org.mule.module.extension.file.api.FileWriteMode.CREATE_NEW;
 import static org.mule.module.extension.file.api.FileWriteMode.OVERWRITE;
+import org.mule.api.MuleEvent;
 import org.mule.module.extension.file.api.FileWriteMode;
 import org.mule.util.FileUtils;
 
@@ -21,6 +23,8 @@ import org.junit.Test;
 
 public class FileWriteTestCase extends FileConnectorTestCase
 {
+
+    private static final String TEST_FILENAME = "test.txt";
 
     @Override
     protected String getConfigFile()
@@ -44,7 +48,7 @@ public class FileWriteTestCase extends FileConnectorTestCase
     public void createNewOnNotExistingFile() throws Exception
     {
 
-        doWriteOnNotExistingFile(FileWriteMode.CREATE_NEW);
+        doWriteOnNotExistingFile(CREATE_NEW);
     }
 
     @Test
@@ -107,10 +111,23 @@ public class FileWriteTestCase extends FileConnectorTestCase
         doWriteNotExistingFileWithCreatedParent(CREATE_NEW);
     }
 
+    @Test
+    public void writeOnReadFile() throws Exception
+    {
+        File file = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(file, "overwrite me!");
+
+        MuleEvent event = flowRunner("readAndWrite")
+                .withFlowVariable("path", file.getAbsolutePath())
+                .run();
+
+        assertThat(event.getMessageAsString(), equalTo(HELLO_WORLD));
+    }
+
     private void doWriteNotExistingFileWithCreatedParent(FileWriteMode mode) throws Exception
     {
         File folder = temporaryFolder.newFolder();
-        final String path = folder.getAbsolutePath() + "/a/b/test.txt";
+        final String path = String.format("%s/a/b/%s", folder.getAbsolutePath(), TEST_FILENAME);
 
         doWrite(path, HELLO_WORLD, mode, true);
 
@@ -121,7 +138,7 @@ public class FileWriteTestCase extends FileConnectorTestCase
 
     private void doWriteOnNotExistingFile(FileWriteMode mode) throws Exception
     {
-        String path = temporaryFolder.newFolder().getPath() + "/test.txt";
+        String path = String.format("%s/%s", temporaryFolder.newFolder().getPath(), TEST_FILENAME);
         doWrite(path, HELLO_WORLD, mode, false);
 
         String content = readPathAsString(path);
@@ -131,7 +148,7 @@ public class FileWriteTestCase extends FileConnectorTestCase
     private void doWriteOnNotExistingParentWithoutCreateFolder(FileWriteMode mode) throws Exception
     {
         File folder = temporaryFolder.newFolder();
-        final String path = folder.getAbsolutePath() + "/a/b/test.txt";
+        final String path = String.format("%s/a/b/%s", folder.getAbsolutePath(), TEST_FILENAME);
 
         doWrite(path, HELLO_WORLD, mode, false);
     }

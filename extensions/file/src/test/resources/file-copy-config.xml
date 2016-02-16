@@ -15,4 +15,9 @@
         <file:copy sourcePath="#[source]" targetPath="#[target]" overwrite="#[overwrite]" createParentFolder="#[createParent]"/>
     </flow>
 
+    <flow name="readAndDo">
+        <file:read path="#[source]" />
+        <file:copy targetPath="#[target]" overwrite="#[overwrite]" createParentFolder="#[createParent]"/>
+    </flow>
+
 </mule>

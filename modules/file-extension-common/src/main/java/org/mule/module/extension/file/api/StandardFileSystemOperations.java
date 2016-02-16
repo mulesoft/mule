@@ -15,6 +15,7 @@ import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.module.extension.file.api.matcher.NullFilePayloadPredicate;
 import org.mule.transport.NullPayload;
+import org.mule.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.Iterator;
@@ -95,7 +96,7 @@ public class StandardFileSystemOperations
     }
 
     /**
-     * Writes the {@code content} into the file pointed by {@code filePath}.
+     * Writes the {@code content} into the file pointed by {@code path}.
      * <p>
      * The {@code content} can be of any of the given types:
      * <ul>
@@ -110,6 +111,12 @@ public class StandardFileSystemOperations
      * <p>
      * {@code null} or {@link NullPayload} contents are not allowed and will result
      * in an {@link IllegalArgumentException}.
+     * <p>
+     * To support pass-through scenarios, the {@code path} attribute is optional. If not provided,
+     * then the current {@link MuleMessage#getAttributes()} value will be tested to be an
+     * instance of {@link FileAttributes}, in which case {@link FileAttributes#getPath()}
+     * will be used. If that's not the case, then an {@link IllegalArgumentException} will
+     * be thrown.
      * <p>
      * If the directory on which the file is attempting to be written doesn't
      * exist, then the operation will either throw {@link IllegalArgumentException}
@@ -133,7 +140,7 @@ public class StandardFileSystemOperations
      */
     @Operation
     public void write(@Connection FileSystem fileSystem,
-                      String path,
+                      @Optional String path,
                       @Optional(defaultValue = "#[payload]") Object content,
                       @Optional(defaultValue = "OVERWRITE") FileWriteMode mode,
                       @Optional(defaultValue = "false") boolean lock,
@@ -145,11 +152,18 @@ public class StandardFileSystemOperations
             throw new IllegalArgumentException("Cannot write a null content");
         }
 
+        path = resolvePath(path, event, "path");
         fileSystem.write(path, content, mode, event, lock, createParentDirectory);
     }
 
     /**
      * Copies the file at the {@code sourcePath} into the {@code targetPath}.
+     * <p>
+     * To support pass-through scenarios, the {@code sourcePath} attribute is optional. If not provided,
+     * then the current {@link MuleMessage#getAttributes()} value will be tested to be an
+     * instance of {@link FileAttributes}, in which case {@link FileAttributes#getPath()}
+     * will be used. If that's not the case, then an {@link IllegalArgumentException} will
+     * be thrown.
      * <p>
      * If {@code targetPath} doesn't exists, and neither does its parent,
      * then an attempt will be made to create depending on the value of the
@@ -179,17 +193,24 @@ public class StandardFileSystemOperations
      */
     @Operation
     public void copy(@Connection FileSystem fileSystem,
-                     String sourcePath,
+                     @Optional String sourcePath,
                      String targetPath,
                      @Optional(defaultValue = "false") boolean overwrite,
                      @Optional(defaultValue = "true") boolean createParentFolder,
                      MuleEvent event)
     {
+        sourcePath = resolvePath(sourcePath, event, "sourcePath");
         fileSystem.copy(sourcePath, targetPath, overwrite, createParentFolder, event);
     }
 
     /**
      * Moves the file at the {@code sourcePath} into the {@code targetPath}.
+     * <p>
+     * To support pass-through scenarios, the {@code sourcePath} attribute is optional. If not provided,
+     * then the current {@link MuleMessage#getAttributes()} value will be tested to be an
+     * instance of {@link FileAttributes}, in which case {@link FileAttributes#getPath()}
+     * will be used. If that's not the case, then an {@link IllegalArgumentException} will
+     * be thrown.
      * <p>
      * If {@code targetPath} doesn't exists, and neither does its parent,
      * then an attempt will be made to create depending on the value of the
@@ -211,45 +232,64 @@ public class StandardFileSystemOperations
      *
      * @param fileSystem         a reference to the host {@link FileSystem}
      * @param sourcePath         the path to the file to be copied
-     * @param targetDirectory    the target directory
+     * @param targetPath         the target directory
      * @param overwrite          whether or not overwrite the file if the target destination already exists.
      * @param createParentFolder whether or not to attempt creating the parent directory if it doesn't exists.
+     * @param event              The current {@link MuleEvent}
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
     @Operation
     public void move(@Connection FileSystem fileSystem,
-                     String sourcePath,
-                     String targetDirectory,
+                     @Optional String sourcePath,
+                     String targetPath,
                      @Optional(defaultValue = "false") boolean overwrite,
-                     @Optional(defaultValue = "true") boolean createParentFolder)
+                     @Optional(defaultValue = "true") boolean createParentFolder,
+                     MuleEvent event)
     {
-        fileSystem.move(sourcePath, targetDirectory, overwrite, createParentFolder);
+        sourcePath = resolvePath(sourcePath, event, "sourcePath");
+        fileSystem.move(sourcePath, targetPath, overwrite, createParentFolder);
     }
 
     /**
      * Deletes the file pointed by {@code path}, provided that it's not locked
+     * <p>
+     * To support pass-through scenarios, the {@code path} attribute is optional. If not provided,
+     * then the current {@link MuleMessage#getAttributes()} value will be tested to be an
+     * instance of {@link FileAttributes}, in which case {@link FileAttributes#getPath()}
+     * will be used. If that's not the case, then an {@link IllegalArgumentException} will
+     * be thrown.
      *
      * @param fileSystem a reference to the host {@link FileSystem}
      * @param path       the path to the file to be deleted
+     * @param event      The current {@link MuleEvent}
      * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
      */
     @Operation
-    public void delete(@Connection FileSystem fileSystem, String path)
+    public void delete(@Connection FileSystem fileSystem, @Optional String path, MuleEvent event)
     {
+        path = resolvePath(path, event, "path");
         fileSystem.delete(path);
     }
 
     /**
      * Renames the file pointed by {@code path} to the name provided on
      * the {@code to} parameter
+     * <p>
+     * To support pass-through scenarios, the {@code path} attribute is optional. If not provided,
+     * then the current {@link MuleMessage#getAttributes()} value will be tested to be an
+     * instance of {@link FileAttributes}, in which case {@link FileAttributes#getPath()}
+     * will be used. If that's not the case, then an {@link IllegalArgumentException} will
+     * be thrown.
      *
      * @param fileSystem a reference to the host {@link FileSystem}
      * @param path       the path to the file to be renamed
      * @param to         the file's new name
+     * @param event      The current {@link MuleEvent}
      */
     @Operation
-    public void rename(@Connection FileSystem fileSystem, String path, String to)
+    public void rename(@Connection FileSystem fileSystem, @Optional String path, String to, MuleEvent event)
     {
+        path = resolvePath(path, event, "path");
         fileSystem.rename(path, to);
     }
 
@@ -270,6 +310,22 @@ public class StandardFileSystemOperations
     private Predicate<FileAttributes> getPredicate(FilePayloadPredicateBuilder builder)
     {
         return builder != null ? builder.build() : new NullFilePayloadPredicate();
+    }
+
+    private String resolvePath(String path, MuleEvent event, String attributeName)
+    {
+        if (!StringUtils.isBlank(path))
+        {
+            return path;
+        }
+
+        MuleMessage<?, ?> message = event.getMessage().asNewMessage();
+        if (message.getAttributes() instanceof FileAttributes)
+        {
+            return ((FileAttributes) message.getAttributes()).getPath();
+        }
+
+        throw new IllegalArgumentException(String.format("A %s was not specified and a default one could not be obtained from the current message attributes", attributeName));
     }
 
 }

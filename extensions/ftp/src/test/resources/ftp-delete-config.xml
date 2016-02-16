@@ -14,4 +14,9 @@
     <flow name="delete">
         <ftp:delete path="#[delete]" />
     </flow>
+
+    <flow name="readAndDelete">
+        <ftp:read path="#[delete]" />
+        <ftp:delete />
+    </flow>
 </mule>

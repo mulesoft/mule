@@ -31,11 +31,16 @@ public class FileRenameTestCase extends FileConnectorTestCase
         File origin = createHelloWorldFile();
 
         doRename(origin.getAbsolutePath());
-        File expected = new File(origin.getParent(), RENAME_TO);
+        assertRenamedFile(origin);
+    }
 
-        assertExists(false, origin);
-        assertExists(true, expected);
-        assertThat(readPathAsString(expected.getAbsolutePath()), is(HELLO_WORLD));
+    @Test
+    public void renameReadFile() throws Exception
+    {
+        File origin = createHelloWorldFile();
+
+        doRename("readAndRename", origin.getAbsolutePath());
+        assertRenamedFile(origin);
     }
 
     @Test
@@ -67,12 +72,25 @@ public class FileRenameTestCase extends FileConnectorTestCase
 
         expectedException.expectCause(instanceOf(IllegalArgumentException.class));
         doRename(origin.getAbsolutePath());
+    }
 
+    private void assertRenamedFile(File origin) throws Exception
+    {
+        File expected = new File(origin.getParent(), RENAME_TO);
+
+        assertExists(false, origin);
+        assertExists(true, expected);
+        assertThat(readPathAsString(expected.getAbsolutePath()), is(HELLO_WORLD));
     }
 
     private void doRename(String source) throws Exception
     {
-        flowRunner("rename")
+        doRename("rename", source);
+    }
+
+    private void doRename(String flow, String source) throws Exception
+    {
+        flowRunner(flow)
                 .withFlowVariable("path", source)
                 .withFlowVariable("to", RENAME_TO)
                 .run();

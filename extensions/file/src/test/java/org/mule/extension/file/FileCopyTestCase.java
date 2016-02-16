@@ -51,6 +51,15 @@ public class FileCopyTestCase extends FileConnectorTestCase
     }
 
     @Test
+    public void copyReadFile() throws Exception
+    {
+        String target = temporaryFolder.newFolder().getAbsolutePath();
+        doExecute("readAndDo", target, false, false);
+
+        assertCopy(format("%s/%s", target, SOURCE_FILE_NAME));
+    }
+
+    @Test
     public void toNonExistingFolder() throws Exception
     {
         String target = format("%s/%s", temporaryFolder.newFolder().getAbsolutePath(), "a/b/c");
@@ -163,7 +172,12 @@ public class FileCopyTestCase extends FileConnectorTestCase
 
     private void doExecute(String target, boolean overwrite, boolean createParentFolder) throws Exception
     {
-        flowRunner(getFlowName())
+        doExecute(getFlowName(), target, overwrite, createParentFolder);
+    }
+
+    private void doExecute(String flowName, String target, boolean overwrite, boolean createParentFolder) throws Exception
+    {
+        flowRunner(flowName)
                 .withFlowVariable(SOURCE_DIRECTORY_NAME, sourcePath)
                 .withFlowVariable("target", target)
                 .withFlowVariable("overwrite", overwrite)

@@ -15,4 +15,9 @@
         <file:rename path="#[path]" to="#[to]"/>
     </flow>
 
+    <flow name="readAndRename">
+        <file:read path="#[path]" />
+        <file:rename to="#[to]"/>
+    </flow>
+
 </mule>

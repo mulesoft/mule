@@ -15,4 +15,9 @@
         <ftp:rename path="#[path]" to="#[to]"/>
     </flow>
 
+    <flow name="readAndRename">
+        <ftp:read path="#[path]" />
+        <ftp:rename to="#[to]"/>
+    </flow>
+
 </mule>
