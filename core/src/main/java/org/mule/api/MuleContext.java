@@ -52,7 +52,9 @@ public interface MuleContext extends Lifecycle
      *
      * @param manager the manager to use
      * @throws Exception
+     * @deprecated Use only for test cases.
      */
+    @Deprecated
     void setTransactionManager(TransactionManager manager) throws Exception;
 
     /**

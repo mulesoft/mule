@@ -13,6 +13,8 @@
 
     <jms:activemq-connector name="jmsConn" maxRedelivery="1" brokerURL="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
 
+<!-- MULE-2931 -->
+<!-- jms:transaction inside endpoints is using it’s own transaction mechanism instead of joining with the configured transaction manager -->
     <jboss-transaction-manager/>
 
     <model name="dev">

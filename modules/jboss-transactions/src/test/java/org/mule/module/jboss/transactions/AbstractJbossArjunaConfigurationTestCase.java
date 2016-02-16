@@ -6,23 +6,26 @@
  */
 package org.mule.module.jboss.transactions;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory.OS_ROOT;
 import static org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory.PROPERTY_ENVIRONMENT_OBJECTSTORE_DIR;
 import static org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory.PROPERTY_OBJECTSTORE_DIR;
 import static org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory.PROPERTY_USER_DIR;
+
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory;
 import org.mule.tck.AbstractTxThreadAssociationTestCase;
 
+import java.util.Properties;
+
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import com.arjuna.common.util.propertyservice.PropertiesFactory;
-
-import java.util.Properties;
 
 public abstract class AbstractJbossArjunaConfigurationTestCase extends AbstractTxThreadAssociationTestCase
 {
@@ -49,8 +52,8 @@ public abstract class AbstractJbossArjunaConfigurationTestCase extends AbstractT
 
     protected void assertObjectStoreDir(String objectStoreDir, String workingDirectory)
     {
-        assertEquals(arjPropertyManager.getObjectStoreEnvironmentBean().getObjectStoreDir(), objectStoreDir);
-        assertEquals(arjPropertyManager.getObjectStoreEnvironmentBean().getLocalOSRoot(), OS_ROOT);
+        assertThat(objectStoreDir, is(arjPropertyManager.getObjectStoreEnvironmentBean().getObjectStoreDir()));
+        assertThat(OS_ROOT, is(arjPropertyManager.getObjectStoreEnvironmentBean().getLocalOSRoot()));
 
         Properties props = PropertiesFactory.getDefaultProperties();
         assertEquals(props.getProperty(PROPERTY_ENVIRONMENT_OBJECTSTORE_DIR), objectStoreDir);

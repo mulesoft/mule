@@ -6,6 +6,13 @@
  */
 package org.mule.tck;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.transaction.TransactionConfig;
@@ -22,13 +29,6 @@ import javax.transaction.TransactionManager;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 /**
  * Validate certain expectations when working with JTA API. It is called to catch discrepancies in TM implementations
  * and alert early. Subclasses are supposed to plug in specific transaction managers for tests.
@@ -39,6 +39,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
     private TransactionManager tm;
     protected static final int TRANSACTION_TIMEOUT_SECONDS = 3;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -63,7 +64,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
 
         tx = tm.getTransaction();
         assertNotNull("Committing via TX handle should NOT disassociated TX from the current thread.",
-                      tx);
+                tx);
         assertEquals("TX status should have been COMMITTED.", Status.STATUS_COMMITTED, tx.getStatus());
 
         // Remove the TX-thread association. The only public API to achieve it is suspend(),
@@ -93,7 +94,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         tm.commit();
 
         assertNull("Committing via TX Manager should have disassociated TX from the current thread.",
-                   tm.getTransaction());
+                tm.getTransaction());
     }
 
     @Test
@@ -110,7 +111,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         tm.rollback();
 
         assertNull("Committing via TX Manager should have disassociated TX from the current thread.",
-                   tm.getTransaction());
+                tm.getTransaction());
     }
 
     /**
@@ -139,6 +140,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // start the call chain
         executionTemplate.execute(new ExecutionCallback<Void>()
         {
+            @Override
             public Void process() throws Exception
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
@@ -149,6 +151,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                 assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
                 return innerExecutionTemplate.execute(new ExecutionCallback<Void>()
                 {
+                    @Override
                     public Void process() throws Exception
                     {
                         Transaction secondTx = tm.getTransaction();
@@ -159,12 +162,13 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                         {
                             tm.resume(firstTx);
                             fail("Second transaction must be active");
-                        } catch (java.lang.IllegalStateException e)
+                        }
+                        catch (java.lang.IllegalStateException e)
                         {
                             // expected
 
-                            //Thrown if the thread is already associated with another transaction.
-                            //Second tx is associated with the current thread
+                            // Thrown if the thread is already associated with another transaction.
+                            // Second tx is associated with the current thread
                         }
                         try
                         {
@@ -177,7 +181,8 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                             Transaction a = tm.suspend();
                             assertTrue(a.equals(firstTx));
                             tm.resume(secondTx);
-                        } catch (Exception e)
+                        }
+                        catch (Exception e)
                         {
                             fail("Error: " + e);
                         }
@@ -189,7 +194,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
             }
         });
         assertNull("Committing via TX Manager should have disassociated TX from the current thread.",
-                   tm.getTransaction());
+                tm.getTransaction());
     }
 
     /**
@@ -218,6 +223,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // start the call chain
         executionTemplate.execute(new ExecutionCallback<Void>()
         {
+            @Override
             public Void process() throws Exception
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
@@ -228,6 +234,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                 assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
                 return nestedExecutionTemplate.execute(new ExecutionCallback<Void>()
                 {
+                    @Override
                     public Void process() throws Exception
                     {
                         Transaction secondTx = tm.getTransaction();
@@ -240,7 +247,8 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                             assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
                             Transaction a = tm.suspend();
                             assertTrue(a.equals(firstTx));
-                        } catch (Exception e)
+                        }
+                        catch (Exception e)
                         {
                             fail("Error: " + e);
                         }
@@ -252,9 +260,9 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
             }
         });
         assertNull("Committing via TX Manager should have disassociated TX from the current thread.",
-                   tm.getTransaction());
+                tm.getTransaction());
     }
-    
+
     /**
      * This is a former XaTransactionTestCase.
      *
@@ -284,8 +292,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
     }
 
     /**
-     * This is a former TransactionTemplateTestCase.
-     * http://mule.mulesoft.org/jira/browse/MULE-1494
+     * This is a former TransactionTemplateTestCase. http://mule.mulesoft.org/jira/browse/MULE-1494
      *
      * @throws Exception in case of any error
      */
@@ -310,6 +317,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // start the call chain
         executionTemplate.execute(new ExecutionCallback<Void>()
         {
+            @Override
             public Void process() throws Exception
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
@@ -317,6 +325,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                 ExecutionTemplate<Void> nestedExecutionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, nestedConfig);
                 return nestedExecutionTemplate.execute(new ExecutionCallback<Void>()
                 {
+                    @Override
                     public Void process() throws Exception
                     {
                         // do not care about the return really
