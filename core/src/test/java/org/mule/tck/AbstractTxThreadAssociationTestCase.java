@@ -6,6 +6,13 @@
  */
 package org.mule.tck;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.transaction.TransactionConfig;
@@ -22,13 +29,6 @@ import javax.transaction.TransactionManager;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 /**
  * Validate certain expectations when working with JTA API. It is called to catch discrepancies in TM implementations
  * and alert early. Subclasses are supposed to plug in specific transaction managers for tests.
@@ -39,13 +39,22 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
     private TransactionManager tm;
     protected static final int TRANSACTION_TIMEOUT_SECONDS = 3;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         TransactionManagerFactory factory = getTransactionManagerFactory();
         tm = factory.create(muleContext.getConfiguration());
+        muleContext.start();
         assertNotNull("Transaction Manager should be available.", tm);
         assertNull("There should be no current transaction associated.", tm.getTransaction());
+    }
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        super.doTearDown();
+        muleContext.stop();
     }
 
     @Test
@@ -139,6 +148,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // start the call chain
         executionTemplate.execute(new ExecutionCallback<Void>()
         {
+            @Override
             public Void process() throws Exception
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
@@ -149,6 +159,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                 assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
                 return innerExecutionTemplate.execute(new ExecutionCallback<Void>()
                 {
+                    @Override
                     public Void process() throws Exception
                     {
                         Transaction secondTx = tm.getTransaction();
@@ -218,6 +229,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // start the call chain
         executionTemplate.execute(new ExecutionCallback<Void>()
         {
+            @Override
             public Void process() throws Exception
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
@@ -228,6 +240,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                 assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
                 return nestedExecutionTemplate.execute(new ExecutionCallback<Void>()
                 {
+                    @Override
                     public Void process() throws Exception
                     {
                         Transaction secondTx = tm.getTransaction();
@@ -310,6 +323,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         // start the call chain
         executionTemplate.execute(new ExecutionCallback<Void>()
         {
+            @Override
             public Void process() throws Exception
             {
                 // the callee executes within its own TX template, but uses the same global XA transaction,
@@ -317,6 +331,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                 ExecutionTemplate<Void> nestedExecutionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, nestedConfig);
                 return nestedExecutionTemplate.execute(new ExecutionCallback<Void>()
                 {
+                    @Override
                     public Void process() throws Exception
                     {
                         // do not care about the return really
