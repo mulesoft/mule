@@ -171,7 +171,8 @@ public class DefaultMuleContext implements MuleContext
 
     private SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager = new SingleResourceTransactionFactoryManager();
 
-    private TransactionManager transactionManager;
+    private volatile TransactionManager transactionManager;
+    private Object transactionManagerInitLock = new Object();
 
     private LockFactory lockFactory;
 
@@ -708,38 +709,50 @@ public class DefaultMuleContext implements MuleContext
     {
         if (transactionManager == null)
         {
-            transactionManager = registryBroker.lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER);
-            if (transactionManager == null)
-            {
-                Collection temp = registryBroker.lookupObjects(TransactionManagerFactory.class);
-                if (temp.size() > 1)
-                {
-                    throw new MuleRuntimeException(CoreMessages.createStaticMessage("More than one TX manager has been configured - Only one TX manager can be defined per application. " +
-                                                                                    "Validate your app configuration or if your app belongs to a domain and the domains defines a TX manager then you should use that one."));
-                }
-                if (temp.size() > 0)
-                {
-                    try
-                    {
-                        transactionManager = (((TransactionManagerFactory) temp.iterator().next()).create(config));
-                        registryBroker.registerObject(MuleProperties.OBJECT_TRANSACTION_MANAGER, transactionManager);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new MuleRuntimeException(CoreMessages.failedToCreate("transaction manager"), e);
-                    }
-                }
-                else
-                {
-                    temp = registryBroker.lookupObjects(TransactionManager.class);
-                    if (temp.size() > 0)
-                    {
-                        transactionManager = (((TransactionManager) temp.iterator().next()));
-                    }
-                }
-            }
+            initTransactionManager();
         }
         return transactionManager;
+    }
+
+    private void initTransactionManager()
+    {
+        synchronized (transactionManagerInitLock)
+        {
+            if (transactionManager == null)
+            {
+                TransactionManager innerTxMgr = registryBroker.lookupObject(MuleProperties.OBJECT_TRANSACTION_MANAGER);
+                if (innerTxMgr == null)
+                {
+                    Collection temp = registryBroker.lookupObjects(TransactionManagerFactory.class);
+                    if (temp.size() > 1)
+                    {
+                        throw new MuleRuntimeException(CoreMessages.createStaticMessage("More than one TX manager has been configured - Only one TX manager can be defined per application. " +
+                                                                                        "Validate your app configuration or if your app belongs to a domain and the domains defines a TX manager then you should use that one."));
+                    }
+                    if (temp.size() > 0)
+                    {
+                        try
+                        {
+                            innerTxMgr = (((TransactionManagerFactory) temp.iterator().next()).create(config));
+                            registryBroker.registerObject(MuleProperties.OBJECT_TRANSACTION_MANAGER, innerTxMgr);
+                        }
+                        catch (Exception e)
+                        {
+                            throw new MuleRuntimeException(CoreMessages.failedToCreate("transaction manager"), e);
+                        }
+                    }
+                    else
+                    {
+                        temp = registryBroker.lookupObjects(TransactionManager.class);
+                        if (temp.size() > 0)
+                        {
+                            innerTxMgr = (((TransactionManager) temp.iterator().next()));
+                        }
+                    }
+                }
+                transactionManager = innerTxMgr;
+            }
+        }
     }
 
     protected void checkLifecycleForPropertySet(String propertyName, String phase) throws IllegalStateException
