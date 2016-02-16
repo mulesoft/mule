@@ -30,6 +30,8 @@ public class Apple implements Fruit, Callable
 
     private FruitCleaner cleaner;
 
+    private Seed seed;
+
     public Apple()
     {
     }
@@ -68,6 +70,16 @@ public class Apple implements Fruit, Callable
     public boolean isBitten()
     {
         return bitten;
+    }
+
+    public Seed getSeed()
+    {
+        return seed;
+    }
+
+    public void setSeed(Seed seed)
+    {
+        this.seed = seed;
     }
 
     @Override

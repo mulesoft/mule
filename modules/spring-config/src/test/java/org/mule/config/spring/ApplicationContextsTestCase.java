@@ -6,15 +6,25 @@
  */
 package org.mule.config.spring;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.tck.testmodels.fruit.Seed;
+
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Test;
@@ -25,6 +35,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class ApplicationContextsTestCase extends AbstractMuleTestCase
 {
 
+    private static final int INIT_WAIT_TIMEOUT_MILLIS = 5000;
     private MuleContext context;
 
     @After
@@ -75,6 +86,26 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
         assertNotNull(orange);
         assertTrue(orange instanceof Orange);
         assertEquals("Pirulo", ((Orange) orange).getBrand());
+    }
+
+    @Test
+    public void springConfigurationBuilderCircularRefs() throws Exception
+    {
+        context = new DefaultMuleContextFactory().createMuleContext();
+
+        ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context-circular-ref.xml");
+        ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
+        builder.configure(context);
+
+        context.start();
+
+        Object seed = context.getRegistry().lookupObject("seed");
+        ((Seed) seed).awaitInitialize(INIT_WAIT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+
+        Object apple = context.getRegistry().lookupObject("apple");
+        assertThat(apple, not(nullValue()));
+        assertThat(apple, instanceOf(Apple.class));
+        assertThat(((Apple) apple).getSeed(), sameInstance(seed));
     }
 
     /**
