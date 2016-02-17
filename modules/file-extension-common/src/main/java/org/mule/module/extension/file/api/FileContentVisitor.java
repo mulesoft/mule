@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.file.api;
 
-import org.mule.api.transport.OutputHandler;
+import org.mule.message.OutputHandler;
 
 import java.io.InputStream;
 import java.util.Iterator;

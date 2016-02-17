@@ -9,7 +9,7 @@ package org.mule.transformers.xml;
 import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.OutputHandler;
+import org.mule.message.OutputHandler;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.transformer.XmlToXMLStreamReader;
 import org.mule.module.xml.util.XMLUtils;

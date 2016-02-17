@@ -17,7 +17,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.MessageProcessorPathResolver;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.processor.NonBlockingMessageProcessor;

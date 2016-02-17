@@ -11,7 +11,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextAware;
-import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.ClassUtils;
 
 import java.util.EventObject;
@@ -138,11 +137,6 @@ public abstract class ServerNotification extends EventObject implements MuleCont
     public long getTimestamp()
     {
         return timestamp;
-    }
-
-    public boolean isResourceIdentifierAnUri()
-    {
-        return MuleEndpointURI.isMuleUri(resourceIdentifier);
     }
 
     @Override

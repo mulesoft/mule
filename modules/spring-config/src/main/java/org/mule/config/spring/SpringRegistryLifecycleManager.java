@@ -25,7 +25,6 @@ import org.mule.api.routing.OutboundRouter;
 import org.mule.api.source.MessageSource;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.Connector;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.runtime.ConfigurationProvider;
@@ -80,7 +79,6 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
             initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguage.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
             initOrderedObjects.add(new NotificationLifecycleObject(Config.class));
-            initOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
             initOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
             initOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
             initOrderedObjects.add(new NotificationLifecycleObject(Initialisable.class));

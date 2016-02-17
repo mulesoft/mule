@@ -14,7 +14,7 @@ import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 
 import java.io.Serializable;
 

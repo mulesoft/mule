@@ -15,18 +15,12 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.construct.Flow;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.simple.ByteArrayToObject;
@@ -38,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -54,7 +49,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         // provide the username, but not the password, as is the case for SMTP
         // cannot set SMTP endpoint type, because the module doesn't have this
         // dependency
-        ImmutableEndpoint endpoint = getTestOutboundEndpoint("AuthTest", "test://john.doe@xyz.fr");
         MuleEvent event = getTestEvent(new Object());
         Credentials credentials = event.getCredentials();
         assertNull("Credentials must not be created for endpoints without a password.", credentials);
@@ -63,10 +57,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
     @Test
     public void testEventSerialization() throws Exception
     {
-        InboundEndpoint endpoint = getTestInboundEndpoint("Test", null, null,
-                                                          new PayloadTypeFilter(Object.class), null, null);
-
-        MuleEvent event = RequestContext.setEvent(getTestEvent("payload", endpoint));
+        MuleEvent event = RequestContext.setEvent(getTestEvent("payload"));
 
         Transformer transformer = createSerializableToByteArrayTransformer();
         transformer.setMuleContext(muleContext);
@@ -147,17 +138,17 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
 
     }
 
+    @Ignore("Credentials were provided by the inbound endpoint")
     @Test
     public void testMuleCredentialsSerialization() throws Exception
     {
         String username = "mule";
         String password = "rulez";
         String url = "test://" + username + ":" + password + "@localhost";
-        InboundEndpoint endpoint = getTestInboundEndpoint("Test", url);
         ByteArrayToObject trans = new ByteArrayToObject();
         trans.setMuleContext(muleContext);
 
-        MuleEvent event = RequestContext.setEvent(getTestEvent("payload", endpoint));
+        MuleEvent event = RequestContext.setEvent(getTestEvent("payload"));
         Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(event);
         assertNotNull(serialized);
 
@@ -173,8 +164,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
     private MuleEvent createEventToSerialize() throws Exception
     {
         createAndRegisterTransformersEndpointBuilderService();
-        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
-            muleContext.getRegistry().lookupEndpointBuilder("epBuilderTest"));
         Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleService");
         return getTestEvent(TEST_PAYLOAD);
     }
@@ -210,13 +199,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         transformers.add(trans2);
 
         Filter filter = new PayloadTypeFilter(Object.class);
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://serializationTest",
-            muleContext);
-        endpointBuilder.setTransformers(transformers);
-        endpointBuilder.setName("epBuilderTest");
-        endpointBuilder.addMessageProcessor(new MessageFilter(filter));
-        muleContext.getRegistry().registerEndpointBuilder("epBuilderTest", endpointBuilder);
-
         getTestFlow();
     }
 

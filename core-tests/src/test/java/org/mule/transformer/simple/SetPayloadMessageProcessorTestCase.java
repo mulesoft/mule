@@ -26,7 +26,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.transformer.types.MimeTypes;
 import org.mule.transformer.types.TypedValue;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 
 import org.junit.Before;
 import org.junit.Test;

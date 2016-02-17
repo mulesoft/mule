@@ -7,7 +7,7 @@
 
 package org.mule.el.mvel.datatype;
 
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 
 import org.junit.Test;
 

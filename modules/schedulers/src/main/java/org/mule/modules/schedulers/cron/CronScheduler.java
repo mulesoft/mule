@@ -18,8 +18,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.transport.polling.PollingWorker;
-import org.mule.transport.polling.schedule.PollScheduler;
+import org.mule.source.polling.PollingWorker;
+import org.mule.source.polling.schedule.PollScheduler;
 
 import java.util.Properties;
 

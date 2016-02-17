@@ -6,23 +6,14 @@
  */
 package org.mule.module.cxf.support;
 
-import org.mule.api.endpoint.EndpointNotFoundException;
-
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.SoapVersionFactory;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
-import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.ChainInitiationObserver;
-import org.apache.cxf.transport.Destination;
-import org.apache.cxf.transport.DestinationFactory;
-import org.apache.cxf.transport.MessageObserver;
 
 public final class CxfUtils
 {
@@ -46,36 +37,6 @@ public final class CxfUtils
         }
 
         return false;
-    }
-
-
-    public static Endpoint getEndpoint(DestinationFactory df, String uri)
-        throws IOException, EndpointNotFoundException
-    {
-        int idx = uri.indexOf('?');
-        if (idx != -1)
-        {
-            uri = uri.substring(0, idx);
-        }
-
-        EndpointInfo ei = new EndpointInfo();
-        ei.setAddress(uri);
-
-        Destination d = df.getDestination(ei);
-        if (d.getMessageObserver() == null)
-        {
-            // TODO is this the right Mule exception?
-            throw new EndpointNotFoundException(uri);
-        }
-
-        MessageObserver mo = d.getMessageObserver();
-        if (!(mo instanceof ChainInitiationObserver))
-        {
-            throw new EndpointNotFoundException(uri);
-        }
-
-        ChainInitiationObserver co = (ChainInitiationObserver) mo;
-        return co.getEndpoint();
     }
 
     public static String getBindingIdForSoapVersion(String version)

@@ -6,10 +6,7 @@
  */
 package org.mule.transformers.xml;
 
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.Transformer;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.module.xml.transformer.DomDocumentToXml;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.transformer.types.DataTypeFactory;
@@ -40,13 +37,6 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
     {
         Transformer trans = createObject(DomDocumentToXml.class);
         trans.setReturnDataType(DataTypeFactory.STRING);
-
-        EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
-        builder.setEncoding("US-ASCII");
-        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
-            builder);
-
-        trans.setEndpoint(endpoint);
         return trans;
     }
 

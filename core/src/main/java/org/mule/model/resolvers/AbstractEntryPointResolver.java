@@ -11,7 +11,7 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.InvocationResult;
 import org.mule.api.transformer.TransformerException;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 

@@ -8,7 +8,7 @@ package org.mule.transformer.simple;
 
 import org.mule.RequestContext;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.OutputHandler;
+import org.mule.message.OutputHandler;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
@@ -17,7 +17,7 @@ import java.io.ByteArrayOutputStream;
 /**
  * <code>ObjectToInputStream</code> converts Serializable objects to an InputStream
  * but treats <code>java.lang.String</code>, <code>byte[]</code> and
- * <code>org.mule.api.transport.OutputHandler</code> differently by using their
+ * <code>org.mule.message.OutputHandler</code> differently by using their
  * byte[] content rather thqn Serializing them.
  */
 public class ObjectToInputStream extends SerializableToByteArray

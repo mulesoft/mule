@@ -10,7 +10,6 @@ import org.mule.TransformationService;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Converter;
 import org.mule.api.metadata.DataType;
@@ -141,26 +140,11 @@ public class CompositeConverter implements Converter
     }
 
     @Override
-    public ImmutableEndpoint getEndpoint()
-    {
-        return chain.peekFirst().getEndpoint();
-    }
-
-    @Override
     public void dispose()
     {
         for (Converter converter : chain)
         {
             converter.dispose();
-        }
-    }
-
-    @Override
-    public void setEndpoint(ImmutableEndpoint ep)
-    {
-        for (Converter converter : chain)
-        {
-            converter.setEndpoint(ep);
         }
     }
 

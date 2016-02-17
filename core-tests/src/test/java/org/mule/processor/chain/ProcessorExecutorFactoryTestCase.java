@@ -11,7 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
 import org.mule.api.processor.ProcessorExecutor;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.construct.Flow;
 import org.mule.processor.BlockingProcessorExecutor;
 import org.mule.processor.NonBlockingProcessorExecutor;

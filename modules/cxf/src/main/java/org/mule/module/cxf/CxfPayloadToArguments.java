@@ -6,8 +6,7 @@
  */
 package org.mule.module.cxf;
 
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 
 /**
  * This enum defines the strategies to convert a Payload to an array of arguments

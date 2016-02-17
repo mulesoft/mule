@@ -8,7 +8,7 @@ package org.mule.util;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 
 import java.io.UnsupportedEncodingException;

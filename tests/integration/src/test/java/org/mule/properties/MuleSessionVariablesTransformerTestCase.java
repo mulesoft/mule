@@ -74,7 +74,7 @@ public class MuleSessionVariablesTransformerTestCase extends FunctionalTestCase
     public void runScenario(String flowName) throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
+        DefaultMuleEvent event = new DefaultMuleEvent(message, getTestFlow());
         Flow flow = (Flow) getFlowConstruct(flowName);
         flow.process(event);
         FlowAssert.verify(flowName);

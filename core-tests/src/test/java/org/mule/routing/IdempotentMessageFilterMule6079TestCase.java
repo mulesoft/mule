@@ -13,7 +13,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
@@ -32,7 +31,6 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
 {
     private MuleSession session;
     private Flow flow;
-    private InboundEndpoint inboundEndpoint;
     private ObjectStore<String> objectStore;
     private IdempotentMessageFilter idempotentMessageFilter;
     private Integer processedEvents = 0;
@@ -46,7 +44,6 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
     @Test
     public void testRaceConditionOnAcceptAndProcess() throws Exception
     {
-        inboundEndpoint = getTestInboundEndpoint("Test", "test://Test?exchangePattern=one-way");
         flow = getTestFlow();
 
         session = Mockito.mock(MuleSession.class);
@@ -79,7 +76,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
         {
             MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
             okMessage.setOutboundProperty("id", "1");
-            MuleEvent event = new DefaultMuleEvent(okMessage, inboundEndpoint, flow, session);
+            MuleEvent event = new DefaultMuleEvent(okMessage, flow, session);
 
             try
             {

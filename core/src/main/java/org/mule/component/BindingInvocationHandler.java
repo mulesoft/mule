@@ -16,7 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.component.InterfaceBinding;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 import org.mule.util.StringMessageUtils;
 
 import java.lang.reflect.InvocationHandler;
@@ -38,9 +38,10 @@ public class BindingInvocationHandler implements InvocationHandler
 
     protected MuleContext muleContext;
 
-    public BindingInvocationHandler(InterfaceBinding router)
+    public BindingInvocationHandler(InterfaceBinding router, MuleContext muleContext)
     {
-        routers = new ConcurrentHashMap<String, InterfaceBinding>();
+        this.muleContext = muleContext;
+        this.routers = new ConcurrentHashMap<String, InterfaceBinding>();
         addRouterForInterface(router);
     }
 
@@ -61,7 +62,6 @@ public class BindingInvocationHandler implements InvocationHandler
         {
             routers.put(router.getMethod(), router);
         }
-        muleContext = router.getEndpoint().getMuleContext();
     }
 
     @Override

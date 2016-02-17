@@ -24,11 +24,11 @@ import org.mule.module.pgp.PGPCryptInfo;
 import org.mule.module.pgp.PGPKeyRing;
 import org.mule.module.pgp.SignedMessage;
 import org.mule.module.pgp.i18n.PGPMessages;
-import org.mule.security.AbstractEndpointSecurityFilter;
+import org.mule.security.AbstractOperationSecurityFilter;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
 
-public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
+public class PGPSecurityFilter extends AbstractOperationSecurityFilter
 {
     private EncryptionStrategy strategy;
 
@@ -125,33 +125,6 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         else
         {
             throw new Exception("Wrong data");
-        }
-    }
-
-    @Override
-    protected void authenticateOutbound(MuleEvent event) throws SecurityException, UnauthorisedException
-    {
-        logger.debug("authenticateOutbound:" + event.getId());
-
-        if (!isAuthenticate())
-        {
-            return;
-        }
-
-        MuleMessage message = event.getMessage();
-
-        PGPPublicKey userKeyBundle = keyManager.getPublicKey((String)getCredentialsAccessor().getCredentials(
-            event));
-
-        final PGPCryptInfo cryptInfo = new PGPCryptInfo(userKeyBundle, signRequired);
-
-        try
-        {
-            updatePayload(event.getMessage(), strategy.encrypt(event.getMessageAsBytes(), cryptInfo), event);
-        }
-        catch (Exception e1)
-        {
-            throw new UnauthorisedException(CoreMessages.failedToReadPayload(), event, e1);
         }
     }
 

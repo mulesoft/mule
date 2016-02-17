@@ -10,12 +10,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
-import org.mule.construct.builder.AbstractFlowConstructWithSingleInboundEndpointBuilder;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
@@ -60,16 +58,7 @@ public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<Fl
     public void setMessageSource(MessageSource messageSource)
     {
         final AbstractFlowConstructBuilder<?, ?> flowConstructBuilder = getFlowConstructBuilder();
-
-        if ((flowConstructBuilder instanceof AbstractFlowConstructWithSingleInboundEndpointBuilder<?, ?>)
-            && (messageSource instanceof InboundEndpoint))
-        {
-            ((AbstractFlowConstructWithSingleInboundEndpointBuilder<?, ?>) flowConstructBuilder).inboundEndpoint((InboundEndpoint) messageSource);
-        }
-        else
-        {
-            flowConstructBuilder.messageSource(messageSource);
-        }
+        flowConstructBuilder.messageSource(messageSource);
     }
 
     public void setExceptionListener(MessagingExceptionHandler exceptionListener)

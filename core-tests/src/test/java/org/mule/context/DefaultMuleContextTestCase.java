@@ -33,7 +33,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.registry.MuleRegistryHelper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
-import org.mule.transport.PollingController;
+import org.mule.connector.PollingController;
 import org.mule.util.SpiUtils;
 import org.mule.util.store.MuleObjectStoreManager;
 

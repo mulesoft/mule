@@ -8,9 +8,8 @@ package org.mule.api;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.transaction.Transaction;
 import org.mule.api.metadata.DataType;
+import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.TransformerException;
 
 import java.io.OutputStream;
@@ -122,19 +121,6 @@ public interface MuleEventContext
      *             the transport for the endpoint
      */
     MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException;
-
-    /**
-     * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule component in the pool or via the endpoint
-     * configured for the event
-     * 
-     * @param message the event message payload to send
-     * @param endpoint The endpoint to disptch the event through.
-     * @return the return Message from the call or null if there was no result
-     * @throws MuleException if the event fails to be processed by the service or
-     *             the transport for the endpoint
-     */
-    MuleMessage sendEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException;
 
     /**
      * Requests a synchronous receive of an event on the service.

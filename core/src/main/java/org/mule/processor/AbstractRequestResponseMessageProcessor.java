@@ -14,7 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NonBlockingSupported;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.connector.ReplyToHandler;
 
 /**
  * Base implementation of a {@link org.mule.api.processor.MessageProcessor} that may performs processing during both the

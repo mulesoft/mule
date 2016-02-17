@@ -6,19 +6,18 @@
  */
 package org.mule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextException;
-import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 public class ExceptionsTestCase extends AbstractMuleTestCase
 {
@@ -40,10 +39,9 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
     @Test
     public final void testRoutingExceptionNullMessageValidEndpoint() throws MuleException
     {
-        OutboundEndpoint endpoint = Mockito.mock(OutboundEndpoint.class);
-
-        RoutingException rex = new RoutingException(null, endpoint);
-        assertSame(endpoint, rex.getRoute());
+        MessageProcessor processor = Mockito.mock(MessageProcessor.class);
+        RoutingException rex = new RoutingException(null, processor);
+        assertSame(processor, rex.getRoute());
     }
 
 }

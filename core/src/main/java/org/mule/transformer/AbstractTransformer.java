@@ -11,17 +11,16 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DataType;
+import org.mule.api.metadata.SimpleDataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.api.metadata.SimpleDataType;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
@@ -62,11 +61,6 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
      * the transformer is used
      */
     protected String name = null;
-
-    /**
-     * The endpoint that this transformer instance is configured on
-     */
-    protected ImmutableEndpoint endpoint = null;
 
     /**
      * A list of supported Class types that the source payload passed into this
@@ -320,7 +314,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
             else
             {
                 Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(),
-                    payload.getClass(), endpoint);
+                    payload.getClass());
                 /// FIXME
                 throw new TransformerException(msg, this);
             }
@@ -369,11 +363,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
             enc = ((MuleMessage) src).getEncoding();
         }
 
-        if (enc == null && endpoint != null)
-        {
-            enc = endpoint.getEncoding();
-        }
-        else if (enc == null)
+        if (enc == null)
         {
             enc = SystemUtils.getDefaultEncoding(muleContext);
         }
@@ -383,18 +373,6 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     protected boolean isConsumed(Class<?> srcCls)
     {
         return InputStream.class.isAssignableFrom(srcCls) || StreamSource.class.isAssignableFrom(srcCls);
-    }
-
-    @Override
-    public ImmutableEndpoint getEndpoint()
-    {
-        return endpoint;
-    }
-
-    @Override
-    public void setEndpoint(ImmutableEndpoint endpoint)
-    {
-        this.endpoint = endpoint;
     }
 
     protected abstract Object doTransform(Object src, String enc) throws TransformerException;

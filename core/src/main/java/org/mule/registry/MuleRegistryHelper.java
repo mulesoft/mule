@@ -11,33 +11,24 @@ import org.mule.api.MuleException;
 import org.mule.api.NameableObject;
 import org.mule.api.agent.Agent;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.registry.AbstractServiceDescriptor;
+import org.mule.api.metadata.DataType;
 import org.mule.api.registry.LifecycleRegistry;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.registry.RegistryProvider;
 import org.mule.api.registry.ResolverException;
-import org.mule.api.registry.ServiceDescriptor;
-import org.mule.api.registry.ServiceDescriptorFactory;
-import org.mule.api.registry.ServiceException;
-import org.mule.api.registry.ServiceType;
 import org.mule.api.registry.TransformerResolver;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.transformer.Converter;
-import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.Predicate;
-import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
@@ -49,7 +40,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
@@ -133,38 +123,6 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
         else
         {
             registry.fireLifecycle(phase);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Connector lookupConnector(String name)
-    {
-        return (Connector) registry.lookupObject(name);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public EndpointBuilder lookupEndpointBuilder(String name)
-    {
-        Object o = registry.lookupObject(name);
-        if (o instanceof EndpointBuilder)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Global endpoint EndpointBuilder for name: " + name + " found");
-            }
-            return (EndpointBuilder) o;
-        }
-        else
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("No endpoint builder with the name: " + name + " found.");
-            }
-            return null;
         }
     }
 
@@ -366,82 +324,11 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     }
 
     /**
-     * Looks up the service descriptor from a singleton cache and creates a new one if not found.
-     */
-    public ServiceDescriptor lookupServiceDescriptor(ServiceType type, String name, Properties overrides) throws ServiceException
-    {
-        String key = new AbstractServiceDescriptor.Key(name, overrides).getKey();
-        // TODO If we want these descriptors loaded form Spring we need to change the key mechanism
-        // and the scope, and then deal with circular reference issues.
-
-        synchronized (this)
-        {
-            ServiceDescriptor sd = registry.lookupObject(key);
-            if (sd == null)
-            {
-                sd = createServiceDescriptor(type, name, overrides);
-                try
-                {
-                    registry.registerObject(key, sd, ServiceDescriptor.class);
-                }
-                catch (RegistrationException e)
-                {
-                    throw new ServiceException(e.getI18nMessage(), e);
-                }
-            }
-            return sd;
-        }
-    }
-
-    protected ServiceDescriptor createServiceDescriptor(ServiceType type, String name, Properties overrides) throws ServiceException
-    {
-        //Stripe off and use the meta-scheme if present
-        String scheme = name;
-        if (name.contains(":"))
-        {
-            scheme = name.substring(0, name.indexOf(":"));
-        }
-
-        Properties props = SpiUtils.findServiceDescriptor(type, scheme);
-        if (props == null)
-        {
-            throw new ServiceException(CoreMessages.failedToLoad(type + " " + scheme));
-        }
-
-        return ServiceDescriptorFactory.create(type, name, props, overrides, muleContext,
-                                               muleContext.getExecutionClassLoader());
-    }
-
-    /**
      * {@inheritDoc}
      */
     public void registerAgent(Agent agent) throws MuleException
     {
         registry.registerObject(getName(agent), agent, Agent.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void registerConnector(Connector connector) throws MuleException
-    {
-        registry.registerObject(getName(connector), connector, Connector.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void registerEndpoint(ImmutableEndpoint endpoint) throws MuleException
-    {
-        registry.registerObject(getName(endpoint), endpoint, ImmutableEndpoint.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void registerEndpointBuilder(String name, EndpointBuilder builder) throws MuleException
-    {
-        registry.registerObject(name, builder, EndpointBuilder.class);
     }
 
     /**

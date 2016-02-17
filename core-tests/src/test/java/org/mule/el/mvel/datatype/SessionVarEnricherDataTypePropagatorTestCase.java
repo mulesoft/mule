@@ -8,7 +8,7 @@
 package org.mule.el.mvel.datatype;
 
 import static org.mule.el.mvel.MessageVariableResolverFactory.SESSION_VARS;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 
 public class SessionVarEnricherDataTypePropagatorTestCase extends AbstractScopedVarAssignmentDataTypePropagatorTestCase
 {

@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.execution.ExceptionHandlingReplyToHandlerDecorator;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

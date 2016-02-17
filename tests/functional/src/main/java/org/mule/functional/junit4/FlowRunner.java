@@ -20,7 +20,7 @@ import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.construct.Flow;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.tck.SensingNullReplyToHandler;

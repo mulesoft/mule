@@ -24,7 +24,7 @@ import org.mule.module.oauth2.internal.TokenResponseProcessor;
 import org.mule.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 
 import java.util.HashMap;
 import java.util.Map;

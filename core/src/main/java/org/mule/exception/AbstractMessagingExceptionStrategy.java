@@ -18,7 +18,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.context.notification.ExceptionStrategyNotification;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.message.DefaultExceptionPayload;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 
 /**
  * Fire a notification, log exception, increment statistics, route the problematic message to a destination 

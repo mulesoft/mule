@@ -10,7 +10,6 @@ import static org.mule.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
-
 import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -26,7 +25,6 @@ import org.mule.api.context.notification.FlowTraceManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
@@ -66,8 +64,8 @@ import org.mule.management.stats.AllStatistics;
 import org.mule.management.stats.ProcessingTimeWatcher;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
-import org.mule.transport.DefaultPollingController;
-import org.mule.transport.PollingController;
+import org.mule.connector.DefaultPollingController;
+import org.mule.connector.PollingController;
 import org.mule.util.ApplicationShutdownSplashScreen;
 import org.mule.util.ApplicationStartupSplashScreen;
 import org.mule.util.JdkVersionUtils;
@@ -926,12 +924,6 @@ public class DefaultMuleContext implements MuleContext
     public void setExceptionListener(SystemExceptionHandler exceptionListener)
     {
         this.exceptionListener = exceptionListener;
-    }
-
-    @Override
-    public EndpointFactory getEndpointFactory()
-    {
-        return (EndpointFactory) registryBroker.lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 
     @Override

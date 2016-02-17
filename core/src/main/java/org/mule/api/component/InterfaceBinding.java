@@ -9,7 +9,6 @@ package org.mule.api.component;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
 
 public interface InterfaceBinding extends MessageProcessor
@@ -37,10 +36,6 @@ public interface InterfaceBinding extends MessageProcessor
      */
     @Override
     MuleEvent process(MuleEvent event) throws MuleException;
-
-    void setEndpoint(ImmutableEndpoint endpoint) throws MuleException;
-
-    ImmutableEndpoint getEndpoint();
 
     Class<?> getInterface();
 

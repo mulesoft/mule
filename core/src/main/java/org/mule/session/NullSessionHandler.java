@@ -9,7 +9,7 @@ package org.mule.session;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.transport.SessionHandler;
+import org.mule.message.SessionHandler;
 
 /**
  * A session handler that ignores any session information

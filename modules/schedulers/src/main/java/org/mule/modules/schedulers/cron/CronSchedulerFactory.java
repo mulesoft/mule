@@ -8,7 +8,7 @@ package org.mule.modules.schedulers.cron;
 
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.SchedulerFactory;
-import org.mule.transport.polling.PollingWorker;
+import org.mule.source.polling.PollingWorker;
 
 
 /**

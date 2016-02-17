@@ -13,8 +13,8 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.api.transport.DispatchException;
-import org.mule.module.http.api.HttpConstants;
+import org.mule.api.connector.DispatchException;
+import org.mule.api.routing.RoutingException;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.rule.SystemProperty;
 

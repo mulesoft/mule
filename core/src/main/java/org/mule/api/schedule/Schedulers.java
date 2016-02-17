@@ -7,7 +7,7 @@
 package org.mule.api.schedule;
 
 
-import static org.mule.transport.polling.PollingMessageSource.POLLING_SCHEME;
+import static org.mule.source.polling.PollingMessageSource.POLLING_SCHEME;
 
 import org.mule.util.Predicate;
 

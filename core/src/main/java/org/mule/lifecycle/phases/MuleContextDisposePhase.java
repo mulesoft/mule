@@ -19,7 +19,6 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.lifecycle.LifecycleObject;
@@ -45,7 +44,7 @@ import javax.annotation.PreDestroy;
  *
  * This phase is responsible for disposing objects. Any object that implements {@link org.mule.api.lifecycle.Disposable} will
  * have its {@link org.mule.api.lifecycle.Disposable#dispose()} method called.  Objects are initialised in the order based on type:
- * {@link org.mule.api.construct.FlowConstruct}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.transport.Connector}, followed
+ * {@link org.mule.api.construct.FlowConstruct}, {@link org.mule.api.agent.Agent} followed
  * by any other object that implements {@link org.mule.api.lifecycle.Disposable}.
  *
  * @see org.mule.api.MuleContext
@@ -64,7 +63,6 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase
         // Stop in the opposite order to start
         orderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         orderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        orderedObjects.add(new NotificationLifecycleObject(Connector.class));
         orderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
         orderedObjects.add(new NotificationLifecycleObject(Config.class));
         orderedObjects.add(new NotificationLifecycleObject(Stoppable.class));

@@ -7,7 +7,7 @@
 package org.mule.context.notification;
 
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.transport.Connectable;
+import org.mule.api.connector.Connectable;
 
 /**
  * Is fired by a connector when a connection is made or disconnected.

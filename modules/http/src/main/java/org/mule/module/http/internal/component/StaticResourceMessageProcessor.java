@@ -25,7 +25,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.HttpConstants;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 

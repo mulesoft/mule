@@ -12,18 +12,15 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.construct.Flow;
 import org.mule.routing.correlation.CorrelationSequenceComparator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.routing.correlation.ResequenceMessagesCorrelatorCallback;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -59,11 +56,9 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         message2.setCorrelationId(correlationId);
         message3.setCorrelationId(correlationId);
 
-        InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY,
-                                                                        muleContext);
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, getTestFlow(), session);
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, getTestFlow(), session);
-        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, getTestFlow(), session);
+        MuleEvent event1 = new DefaultMuleEvent(message1, getTestFlow(), session);
+        MuleEvent event2 = new DefaultMuleEvent(message2, getTestFlow(), session);
+        MuleEvent event3 = new DefaultMuleEvent(message3, getTestFlow(), session);
 
         assertNull(router.process(event2));
         assertNull(router.process(event3));
@@ -99,11 +94,9 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         message2.setCorrelationId(correlationId);
         message3.setCorrelationId(correlationId);
 
-        InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY,
-                                                                        muleContext);
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, getTestFlow(), session);
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, getTestFlow(), session);
-        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, getTestFlow(), session);
+        MuleEvent event1 = new DefaultMuleEvent(message1, getTestFlow(), session);
+        MuleEvent event2 = new DefaultMuleEvent(message2, getTestFlow(), session);
+        MuleEvent event3 = new DefaultMuleEvent(message3, getTestFlow(), session);
 
         // set a resequencing comparator. We need to reset the router since it will
         // not process the same event group

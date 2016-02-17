@@ -6,7 +6,6 @@
  */
 package org.mule.management.stats;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.management.stats.Statistics;
 import org.mule.management.stats.printers.SimplePrinter;
 
@@ -118,14 +117,7 @@ public class RouterStatistics implements Statistics
         }
 
         String name;
-        if (endpoint instanceof ImmutableEndpoint)
-        {
-            name = ((ImmutableEndpoint)endpoint).getName();
-        }
-        else
-        {
-            name = endpoint.toString();
-        }
+        name = endpoint.toString();
 
         Long cpt = (Long) routed.get(name);
         long count = 0;

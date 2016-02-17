@@ -7,8 +7,8 @@
 
 package org.mule.el.mvel.datatype;
 
-import static org.mule.api.transport.PropertyScope.INVOCATION;
-import static org.mule.api.transport.PropertyScope.SESSION;
+import static org.mule.PropertyScope.INVOCATION;
+import static org.mule.PropertyScope.SESSION;
 import org.mule.api.MuleMessage;
 import org.mule.api.metadata.DataType;
 import org.mule.mvel2.ast.ASTNode;

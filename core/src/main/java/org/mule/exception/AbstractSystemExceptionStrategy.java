@@ -13,10 +13,7 @@ import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transport.AbstractConnector;
-import org.mule.transport.ConnectException;
-
-import javax.resource.spi.work.Work;
+import org.mule.connector.ConnectException;
 
 /**
  * Fire a notification, log exception, clean up transaction if any, and trigger reconnection strategy 
@@ -77,66 +74,7 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionListener i
     
     protected void handleReconnection(ConnectException ex)
     {
-        final AbstractConnector connector = (AbstractConnector) ex.getFailed();
-
-        // Make sure the connector is not already being reconnected by another receiver thread.
-        if (connector.isConnecting())
-        {
-            return;
-        }
-            
-        logger.info("Exception caught is a ConnectException, attempting to reconnect...");
-        
-        // Disconnect
-        try
-        {
-            logger.debug("Disconnecting " + connector.getName());
-            connector.stop();
-            connector.disconnect();
-        }
-        catch (Exception e1)
-        {
-            logger.error(e1.getMessage());
-        }
-
-        // Reconnect (retry policy will go into effect here if configured)
-        try
-        {
-            connector.getMuleContext().getWorkManager().scheduleWork(new Work()
-            {
-                @Override
-                public void release()
-                {
-                }
-
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        logger.debug("Reconnecting " + connector.getName());
-                        connector.start();
-                    }
-                    catch (Exception e)
-                    {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Error reconnecting", e);
-                        }
-                        logger.error(e.getMessage());
-                    }
-                }
-            });
-        }
-        catch (Exception e)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Error executing reconnect work", e);
-            }
-            logger.error(e.getMessage());
-        }
-
+        //TODO See MULE-9307 - read reconnection behaviour for configs and sources
     }
 }
 

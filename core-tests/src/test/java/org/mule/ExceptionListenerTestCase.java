@@ -6,7 +6,9 @@
  */
 package org.mule;
 
-import org.mule.api.endpoint.OutboundEndpoint;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.exception.AbstractExceptionListener;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
@@ -18,10 +20,6 @@ import java.util.List;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class ExceptionListenerTestCase extends AbstractMuleTestCase
 {
 
@@ -29,24 +27,24 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase
     public void testAddGoodEndpoint() throws Exception
     {
         AbstractExceptionListener router = new DefaultMessagingExceptionStrategy(null);
-        OutboundEndpoint endpoint = Mockito.mock(OutboundEndpoint.class);
-        router.addEndpoint(endpoint);
+        MessageProcessor messageProcessor = Mockito.mock(MessageProcessor.class);
+        router.addEndpoint(messageProcessor);
         assertNotNull(router.getMessageProcessors());
-        assertTrue(router.getMessageProcessors().contains(endpoint));
+        assertTrue(router.getMessageProcessors().contains(messageProcessor));
     }
 
     @Test
     public void testSetGoodEndpoints() throws Exception
     {
         List<MessageProcessor> list = new ArrayList<MessageProcessor>();
-        list.add(Mockito.mock(OutboundEndpoint.class));
-        list.add(Mockito.mock(OutboundEndpoint.class));
+        list.add(Mockito.mock(MessageProcessor.class));
+        list.add(Mockito.mock(MessageProcessor.class));
 
         AbstractExceptionListener router = new DefaultMessagingExceptionStrategy(null);
         assertNotNull(router.getMessageProcessors());
         assertEquals(0, router.getMessageProcessors().size());
 
-        router.addEndpoint(Mockito.mock(OutboundEndpoint.class));
+        router.addEndpoint(Mockito.mock(MessageProcessor.class));
         assertEquals(1, router.getMessageProcessors().size());
 
         router.setMessageProcessors(list);

@@ -9,7 +9,7 @@ package org.mule.functional.junit4;
 import static org.mockito.Mockito.spy;
 import static org.mule.MessageExchangePattern.ONE_WAY;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.api.transport.PropertyScope.SESSION;
+import static org.mule.PropertyScope.SESSION;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -18,7 +18,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.session.DefaultMuleSession;
 
 import java.net.URI;

@@ -7,7 +7,7 @@
 
 package org.mule.el.mvel.datatype;
 
-import static org.mule.api.transport.PropertyScope.INVOCATION;
+import static org.mule.PropertyScope.INVOCATION;
 import static org.mule.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 
 /**
