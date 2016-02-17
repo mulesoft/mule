@@ -32,7 +32,7 @@ import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
 import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 
 import java.util.Collections;
 

@@ -14,7 +14,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.transport.polling.PollingMessageSource;
+import org.mule.source.polling.PollingMessageSource;
 
 import java.util.ArrayList;
 import java.util.List;

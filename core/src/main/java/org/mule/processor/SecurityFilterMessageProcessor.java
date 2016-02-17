@@ -9,12 +9,10 @@ package org.mule.processor;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.NonBlockingSupported;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.security.SecurityFilter;
-import org.mule.endpoint.EndpointAware;
 
 /**
  * Filters the flow using the specified {@link SecurityFilter}. 
@@ -22,7 +20,7 @@ import org.mule.endpoint.EndpointAware;
  * message is not send or dispatched by the transport. When unauthorised the request
  * message is returned as the response.
  */
-public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor implements EndpointAware, Initialisable, NonBlockingSupported
+public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor implements Initialisable, NonBlockingSupported
 {
     private SecurityFilter filter;
 
@@ -65,11 +63,4 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
         this.filter = filter;
     }
 
-    public void setEndpoint(ImmutableEndpoint ep)
-    {
-        if (filter instanceof EndpointAware)
-        {
-            ((EndpointAware) filter).setEndpoint(ep);
-        }
-    }
 }

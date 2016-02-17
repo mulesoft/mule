@@ -16,7 +16,6 @@ import org.mule.api.context.notification.FlowTraceManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
@@ -266,13 +265,6 @@ public interface MuleContext extends Lifecycle
      * @see org.mule.api.expression.ExpressionManager
      */
     ExpressionManager getExpressionManager();
-
-    /**
-     * Returns the EndpointFactory configured for this instance of Mule
-     * @return the EndpointFactory configured for this instance of Mule
-     * @see EndpointFactory
-     */
-    EndpointFactory getEndpointFactory();
 
     void setExecutionClassLoader(ClassLoader cl);
 

@@ -9,7 +9,7 @@ package org.mule.routing;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;

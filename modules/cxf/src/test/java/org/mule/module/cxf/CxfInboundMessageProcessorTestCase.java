@@ -6,11 +6,10 @@
  */
 package org.mule.module.cxf;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transport.OutputHandler;
+import org.mule.message.OutputHandler;
 import org.mule.module.cxf.builder.WebServiceMessageProcessorBuilder;
 import org.mule.module.cxf.testmodels.Echo;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -51,7 +50,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         };
         processor.setListener(messageProcessor);
         
-        MuleEvent event = getTestEvent(msg, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent(msg);
         
         MuleEvent response = processor.process(event);
         
@@ -80,7 +79,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         };
         processor.setListener(messageProcessor);
         
-        MuleEvent event = getTestEvent(msg, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
+        MuleEvent event = getTestEvent(msg);
         
         MuleEvent response = processor.process(event);
         

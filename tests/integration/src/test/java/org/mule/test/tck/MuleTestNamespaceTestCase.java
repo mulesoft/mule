@@ -11,16 +11,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.transport.Connector;
 import org.mule.functional.functional.CounterCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.functional.ResponseWriterCallback;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.transport.ConfigurableKeyedObjectPool;
-import org.mule.transport.ConfigurableKeyedObjectPoolFactory;
-import org.mule.transport.DefaultConfigurableKeyedObjectPool;
-import org.mule.transport.DefaultConfigurableKeyedObjectPoolFactory;
 
 import java.io.IOException;
 
@@ -89,39 +83,4 @@ public class MuleTestNamespaceTestCase extends FunctionalTestCase
         assertNull(ftc.getEventCallback());
     }
 
-    @Test
-    public void testConnectorUsingDefaultDispatcherPoolFactory()
-    {
-        Connector connector = muleContext.getRegistry().lookupConnector("testConnectorWithDefaultFactory");
-
-        assertTrue(connector instanceof TestConnector);
-        TestConnector testConnector = (TestConnector) connector;
-        assertEquals(DefaultConfigurableKeyedObjectPoolFactory.class, testConnector.getDispatcherPoolFactory().getClass());
-        assertEquals(DefaultConfigurableKeyedObjectPool.class, testConnector.getDispatchers().getClass());
-    }
-
-    @Test
-    public void testConnectorUsingOverriddenDispatcherPoolFactory()
-    {
-        Connector connector = muleContext.getRegistry().lookupConnector("testConnectorWithOverriddenFactory");
-
-        assertTrue(connector instanceof TestConnector);
-        TestConnector testConnector = (TestConnector) connector;
-        assertEquals(StubDispatcherPoolFactory.class, testConnector.getDispatcherPoolFactory().getClass());
-        assertEquals(StubConfigurableKeyedObjectPool.class, testConnector.getDispatchers().getClass());
-    }
-
-    public static class StubConfigurableKeyedObjectPool extends DefaultConfigurableKeyedObjectPool
-    {
-        // no custom methods
-    }
-
-    public static class StubDispatcherPoolFactory implements ConfigurableKeyedObjectPoolFactory
-    {
-        @Override
-        public ConfigurableKeyedObjectPool createObjectPool()
-        {
-            return new StubConfigurableKeyedObjectPool();
-        }
-    }
 }

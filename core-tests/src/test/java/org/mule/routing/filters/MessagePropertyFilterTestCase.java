@@ -9,15 +9,14 @@ package org.mule.routing.filters;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mule.api.transport.PropertyScope.INVOCATION;
-import static org.mule.api.transport.PropertyScope.OUTBOUND;
-import static org.mule.api.transport.PropertyScope.SESSION;
-
+import static org.mule.PropertyScope.INVOCATION;
+import static org.mule.PropertyScope.OUTBOUND;
+import static org.mule.PropertyScope.SESSION;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;
@@ -42,8 +41,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     {
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
         // An event/session is needed otherwise the session properties set on the message go nowhere.
-        new DefaultMuleEvent(message, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY),
-            getTestFlow());
+        new DefaultMuleEvent(message, getTestFlow());
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
         filter.setScope(PropertyScope.SESSION_NAME);
         assertFalse(filter.accept(message));

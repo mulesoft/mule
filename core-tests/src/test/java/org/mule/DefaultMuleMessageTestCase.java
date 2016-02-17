@@ -13,15 +13,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mule.api.transport.PropertyScope.OUTBOUND;
-import static org.mule.api.transport.PropertyScope.SESSION;
+import static org.mule.PropertyScope.OUTBOUND;
+import static org.mule.PropertyScope.SESSION;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.types.MimeTypes;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -311,7 +310,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         message.removeProperty("MuleMessage", OUTBOUND);
 
         // We need a session and current event for this test
-        RequestContext.setEvent(new DefaultMuleEvent(message, getTestInboundEndpoint(FOO_PROPERTY), getTestFlow()));
+        RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
 
         message.setOutboundProperty(FOO_PROPERTY, "fooOutbound");
         message.setInvocationProperty("bar", "barInvocation");

@@ -6,9 +6,9 @@
  */
 package org.mule.module.scripting.component;
 
-import static org.mule.api.transport.PropertyScope.INBOUND;
-import static org.mule.api.transport.PropertyScope.INVOCATION;
-import static org.mule.api.transport.PropertyScope.SESSION;
+import static org.mule.PropertyScope.INBOUND;
+import static org.mule.PropertyScope.INVOCATION;
+import static org.mule.PropertyScope.SESSION;
 import static org.mule.config.i18n.CoreMessages.cannotLoadFromClasspath;
 import static org.mule.config.i18n.CoreMessages.propertiesNotSet;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
@@ -21,8 +21,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transport.PropertyScope;
-import org.mule.transport.NullPayload;
+import org.mule.PropertyScope;
+import org.mule.api.temporary.NullPayload;
 import org.mule.util.CollectionUtils;
 import org.mule.util.StringUtils;
 

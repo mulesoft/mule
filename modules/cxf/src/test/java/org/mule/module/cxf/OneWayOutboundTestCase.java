@@ -18,7 +18,7 @@ import org.mule.api.MuleEvent;
 import org.mule.module.cxf.testmodels.AsyncService;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 
 import org.junit.Rule;
 import org.junit.Test;

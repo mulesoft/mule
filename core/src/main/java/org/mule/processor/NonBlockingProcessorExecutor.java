@@ -17,7 +17,7 @@ import org.mule.api.NonBlockingSupported;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.execution.MessageProcessorExecutionTemplate;
 
 import java.util.List;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * .mule.processor.NonBlockingMessageProcessor}
  * is invoked and the flow is executing using non-blocking.  Processor execution is then continued when the {@link
  * org.mule.processor.NonBlockingMessageProcessor}
- * invokes the {@link org.mule.api.transport.ReplyToHandler}.
+ * invokes the {@link org.mule.api.connector.ReplyToHandler}.
  */
 public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
 {

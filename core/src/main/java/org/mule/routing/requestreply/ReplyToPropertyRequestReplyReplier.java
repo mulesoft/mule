@@ -7,14 +7,6 @@
 package org.mule.routing.requestreply;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.RequestReplyReplierMessageProcessor;
-import org.mule.api.transport.ReplyToHandler;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
-
-import org.apache.commons.lang.BooleanUtils;
 
 public class ReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier
 {

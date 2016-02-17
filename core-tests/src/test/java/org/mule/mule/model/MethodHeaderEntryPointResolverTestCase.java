@@ -8,12 +8,12 @@ package org.mule.mule.model;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.model.InvocationResult;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.model.resolvers.MethodHeaderPropertyEntryPointResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 
 import org.junit.Test;
 

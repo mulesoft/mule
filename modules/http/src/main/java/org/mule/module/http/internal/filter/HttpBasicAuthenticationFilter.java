@@ -13,11 +13,12 @@ import static org.apache.commons.codec.binary.Base64.encodeBase64;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.Authentication;
+import org.mule.api.security.CryptoFailureException;
+import org.mule.api.security.EncryptionStrategyNotFoundException;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.security.SecurityException;
 import org.mule.api.security.SecurityProviderNotFoundException;
@@ -25,18 +26,18 @@ import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.api.security.UnsupportedAuthenticationSchemeException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.security.AbstractEndpointSecurityFilter;
+import org.mule.security.AbstractAuthenticationFilter;
+import org.mule.security.AbstractOperationSecurityFilter;
 import org.mule.security.DefaultMuleAuthentication;
 import org.mule.security.MuleCredentials;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Filter for basic authentication over an HTTP request
  */
-public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilter
+public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter
 {
     /**
      * logger used by this class
@@ -50,11 +51,6 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
     public HttpBasicAuthenticationFilter()
     {
         super();
-    }
-
-    public HttpBasicAuthenticationFilter(String realm)
-    {
-        this.realm = realm;
     }
 
     @Override
@@ -93,6 +89,24 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         this.realmRequired = realmRequired;
     }
 
+
+    protected Authentication createAuthentication(String username, String password, MuleEvent event)
+    {
+        return new DefaultMuleAuthentication(new MuleCredentials(username, password.toCharArray()), event);
+    }
+
+    protected void setUnauthenticated(MuleEvent event)
+    {
+        String realmHeader = "Basic realm=";
+        if (realm != null)
+        {
+            realmHeader += "\"" + realm + "\"";
+        }
+        MuleMessage msg = event.getMessage();
+        msg.setOutboundProperty(WWW_AUTHENTICATE, realmHeader);
+        msg.setOutboundProperty(HTTP_STATUS_PROPERTY, UNAUTHORIZED.getStatusCode());
+    }
+
     /**
      * Authenticates the current message if authenticate is set to true. This method
      * will always populate the secure context in the session
@@ -101,8 +115,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
      * @throws org.mule.api.security.SecurityException if authentication fails
      */
     @Override
-    public void authenticateInbound(MuleEvent event)
-            throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException
+    public void authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException
     {
         String header = event.getMessage().getInboundProperty(AUTHORIZATION);
 
@@ -164,64 +177,5 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
             setUnauthenticated(event);
             throw new UnsupportedAuthenticationSchemeException(createStaticMessage("Http Basic filter doesn't know how to handle header " + header), event);
         }
-    }
-
-    protected Authentication createAuthentication(String username, String password, MuleEvent event)
-    {
-        return new DefaultMuleAuthentication(new MuleCredentials(username, password.toCharArray()), event);
-    }
-
-    protected void setUnauthenticated(MuleEvent event)
-    {
-        String realmHeader = "Basic realm=";
-        if (realm != null)
-        {
-            realmHeader += "\"" + realm + "\"";
-        }
-        MuleMessage msg = event.getMessage();
-        msg.setOutboundProperty(WWW_AUTHENTICATE, realmHeader);
-        msg.setOutboundProperty(HTTP_STATUS_PROPERTY, UNAUTHORIZED.getStatusCode());
-    }
-
-    /**
-     * Authenticates the current message if authenticate is set to true. This method
-     * will always populate the secure context in the session
-     *
-     * @param event the current event being dispatched
-     * @throws org.mule.api.security.SecurityException if authentication fails
-     */
-    @Override
-    public void authenticateOutbound(MuleEvent event)
-            throws SecurityException, SecurityProviderNotFoundException
-    {
-        SecurityContext securityContext = event.getSession().getSecurityContext();
-        if (securityContext == null)
-        {
-            if (isAuthenticate())
-            {
-                throw new UnauthorisedException(event, securityContext, this);
-            }
-            else
-            {
-                return;
-            }
-        }
-
-        Authentication auth = securityContext.getAuthentication();
-        if (isAuthenticate())
-        {
-            auth = getSecurityManager().authenticate(auth);
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Authentication success: " + auth.toString());
-            }
-        }
-
-        StringBuilder header = new StringBuilder(128);
-        header.append("Basic ");
-        String token = auth.getCredentials().toString();
-        header.append(new String(encodeBase64(token.getBytes())));
-
-        event.getMessage().setOutboundProperty(AUTHORIZATION, header.toString());
     }
 }

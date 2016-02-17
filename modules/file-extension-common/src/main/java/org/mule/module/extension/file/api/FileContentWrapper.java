@@ -12,7 +12,7 @@ import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.OutputHandler;
+import org.mule.message.OutputHandler;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;

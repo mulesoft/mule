@@ -24,12 +24,11 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NonBlockingSupported;
-import org.mule.api.endpoint.EndpointNotFoundException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.OutputHandler;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.message.OutputHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.module.cxf.support.DelegatingOutputStream;
@@ -37,7 +36,7 @@ import org.mule.module.cxf.transport.MuleUniversalDestination;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -188,7 +187,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     }
 
     protected MuleEvent generateWSDLOrXSD(MuleEvent event, String req)
-        throws EndpointNotFoundException, IOException
+        throws IOException
     {
         // TODO: Is there a way to make this not so ugly?
         String ctxUri = requestPropertyManager.getBasePath(event.getMessage());

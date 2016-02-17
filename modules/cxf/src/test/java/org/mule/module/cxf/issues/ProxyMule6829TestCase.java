@@ -13,7 +13,7 @@ import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptio
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;

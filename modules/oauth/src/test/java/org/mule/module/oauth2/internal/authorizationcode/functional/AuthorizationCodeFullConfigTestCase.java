@@ -25,7 +25,7 @@ import org.mule.module.oauth2.asserter.AuthorizationRequestAsserter;
 import org.mule.module.oauth2.asserter.OAuthContextFunctionAsserter;
 import org.mule.module.oauth2.internal.OAuthConstants;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 import org.mule.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.api.tls.TlsContextFactory;
 

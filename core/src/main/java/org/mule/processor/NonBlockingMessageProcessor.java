@@ -16,12 +16,12 @@ import org.mule.api.processor.MessageProcessor;
  *
  * If the current {@link org.mule.api.MuleEvent} is not synchronous and a {@link org.mule.MessageExchangePattern} that
  * expects a response then the implementations of this message processor should return an instance of
- * {@link org.mule.NonBlockingVoidMuleEvent} and invoke the events {@link org.mule.api.transport.ReplyToHandler} when
+ * {@link org.mule.NonBlockingVoidMuleEvent} and invoke the events {@link org.mule.api.connector.ReplyToHandler} when
  * a response is available or an exception errors.
  * <br />
  *
  * Alternatively if the {@link org.mule.api.MuleEvent} is synchronous, then the response should be returned and the
- * {@link org.mule.api.transport.ReplyToHandler} not used.
+ * {@link org.mule.api.connector.ReplyToHandler} not used.
  *
  * @since 3.7
  */

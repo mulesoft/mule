@@ -27,7 +27,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.functional.junit4.TransactionConfigEnum;

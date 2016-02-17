@@ -13,12 +13,12 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.component.ComponentException;
 import org.mule.config.ExceptionHelper;
 import org.mule.execution.ErrorHandlingExecutionTemplate;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

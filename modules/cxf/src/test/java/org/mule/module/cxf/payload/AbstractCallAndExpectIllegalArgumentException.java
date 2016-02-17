@@ -13,8 +13,11 @@ import static org.junit.Assert.fail;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.client.MuleClient;
-import org.mule.api.transport.DispatchException;
+import org.mule.api.connector.DispatchException;
+import org.mule.api.routing.RoutingException;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
+
+import java.security.spec.RSAOtherPrimeInfo;
 
 /**
  * This is an abstract utility class that helps the testing of

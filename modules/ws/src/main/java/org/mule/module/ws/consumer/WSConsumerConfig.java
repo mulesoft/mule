@@ -7,15 +7,16 @@
 package org.mule.module.ws.consumer;
 
 
+import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
+import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.config.ConfigurationException;
 import org.mule.api.connector.ConnectorOperationLocator;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transport.Connector;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
@@ -23,11 +24,6 @@ import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.util.Preconditions;
 import org.mule.util.StringUtils;
-
-import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
-import static org.mule.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 public class WSConsumerConfig implements MuleContextAware
 {
@@ -38,7 +34,6 @@ public class WSConsumerConfig implements MuleContextAware
     private String service;
     private String port;
     private String serviceAddress;
-    private Connector connector;
     private HttpRequesterConfig connectorConfig;
     private WSSecurity security;
 
@@ -54,12 +49,6 @@ public class WSConsumerConfig implements MuleContextAware
     public MessageProcessor createOutboundMessageProcessor() throws MuleException
     {
         Preconditions.checkState(StringUtils.isNotEmpty(serviceAddress), "No serviceAddress provided in WS consumer config");
-
-        if (connectorConfig != null && connector != null)
-        {
-            throw new ConfigurationException(CoreMessages.createStaticMessage("Cannot set both connector-config and connector-ref attributes. Set either one of them, or none for default behavior."));
-        }
-
         return createHttpRequester();
     }
 
@@ -146,16 +135,6 @@ public class WSConsumerConfig implements MuleContextAware
     public void setServiceAddress(String serviceAddress)
     {
         this.serviceAddress = serviceAddress;
-    }
-
-    public Connector getConnector()
-    {
-        return connector;
-    }
-
-    public void setConnector(Connector connector)
-    {
-        this.connector = connector;
     }
 
     public HttpRequesterConfig getConnectorConfig()

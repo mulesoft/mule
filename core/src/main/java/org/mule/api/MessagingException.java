@@ -18,7 +18,7 @@ import org.mule.config.i18n.Message;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

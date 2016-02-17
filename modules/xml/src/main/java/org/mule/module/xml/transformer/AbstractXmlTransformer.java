@@ -11,6 +11,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.message.OutputHandler;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
@@ -59,7 +60,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         registerSourceType(DataTypeFactory.create(org.w3c.dom.Document.class));
         registerSourceType(DataTypeFactory.create(org.w3c.dom.Element.class));
         registerSourceType(DataTypeFactory.create(java.io.InputStream.class));
-        registerSourceType(DataTypeFactory.create(org.mule.api.transport.OutputHandler.class));
+        registerSourceType(DataTypeFactory.create(OutputHandler.class));
         registerSourceType(DataTypeFactory.create(javax.xml.stream.XMLStreamReader.class));
         registerSourceType(DataTypeFactory.create(org.mule.module.xml.transformer.DelayedResult.class));
         setReturnDataType(DataTypeFactory.create(byte[].class, MimeTypes.XML));

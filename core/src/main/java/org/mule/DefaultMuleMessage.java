@@ -7,11 +7,10 @@
 package org.mule;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.PropertyScope.INBOUND;
+import static org.mule.PropertyScope.INVOCATION;
+import static org.mule.PropertyScope.OUTBOUND;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.api.transport.PropertyScope.INBOUND;
-import static org.mule.api.transport.PropertyScope.INVOCATION;
-import static org.mule.api.transport.PropertyScope.OUTBOUND;
-
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -20,15 +19,14 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.metadata.DataType;
+import org.mule.api.temporary.NullPayload;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.ds.ByteArrayDataSource;
 import org.mule.message.ds.StringDataSource;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.TypedValue;
-import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringMessageUtils;

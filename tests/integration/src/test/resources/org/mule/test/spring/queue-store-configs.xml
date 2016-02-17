@@ -7,19 +7,16 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="serviceDefault">
-        <inbound-endpoint address="test://foo1"/>
         <echo-component/>
         <!-- no explicit queue-profile configured -->
     </flow>
 
     <flow name="serviceNoObjectStore" processingStrategy="serviceNoObjectStorePS">
-        <inbound-endpoint address="test://foo2"/>
         <echo-component/>
     </flow>
     <queued-asynchronous-processing-strategy name="serviceNoObjectStorePS" maxQueueSize="42"/>
 
     <flow name="serviceExplicitDefaultMemoryObjectStore" processingStrategy="serviceExplicitDefaultMemoryObjectStorePS">
-        <inbound-endpoint address="test://foo3"/>
         <echo-component/>
     </flow>
     <queued-asynchronous-processing-strategy name="serviceExplicitDefaultMemoryObjectStorePS">
@@ -28,7 +25,6 @@
 
     <flow name="serviceExplicitDefaultPersistentObjectStore"
           processingStrategy="serviceExplicitDefaultPersistentObjectStorePS">
-        <inbound-endpoint address="test://foo4"/>
         <echo-component/>
     </flow>
     <queued-asynchronous-processing-strategy name="serviceExplicitDefaultPersistentObjectStorePS">
@@ -36,7 +32,6 @@
     </queued-asynchronous-processing-strategy>
 
     <flow name="serviceExplicitObjectStore" processingStrategy="serviceExplicitObjectStorePS">
-        <inbound-endpoint address="test://foo5"/>
         <echo-component/>
     </flow>
     <queued-asynchronous-processing-strategy name="serviceExplicitObjectStorePS">
@@ -44,17 +39,14 @@
     </queued-asynchronous-processing-strategy>
 
     <flow name="flowDefault">
-        <inbound-endpoint address="test://foo6"/>
         <echo-component/>
     </flow>
 
     <flow name="flowQueuedAsync" processingStrategy="queued-asynchronous">
-        <inbound-endpoint address="test://foo7"/>
         <echo-component/>
     </flow>
 
     <flow name="flowQueuedAsyncPersistentStore" processingStrategy="queuedAsyncStrategyPersistentStore">
-        <inbound-endpoint address="test://foo8"/>
         <echo-component/>
     </flow>
     <queued-asynchronous-processing-strategy name="queuedAsyncStrategyPersistentStore">

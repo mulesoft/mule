@@ -7,7 +7,7 @@
 package org.mule.api;
 
 import org.mule.api.metadata.DataType;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -35,27 +35,27 @@ public interface MuleMessage extends org.mule.api.temporary.MuleMessage<Object, 
      * read-only, so attempting to clear this scopee will result in an UnsupportedOperationException.
      *
      * @param scope the property scope to clear
-     * @throws UnsupportedOperationException if scope specified is {@link org.mule.api.transport.PropertyScope#INBOUND}
+     * @throws UnsupportedOperationException if scope specified is {@link org.mule.PropertyScope#INBOUND}
      */
     void clearProperties(PropertyScope scope);
 
     /**
-     * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
+     * @see #setProperty(String, Object, org.mule.PropertyScope)
      */
     void setInvocationProperty(String key, Object value);
 
     /**
-     * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
+     * @see #setProperty(String, Object, org.mule.PropertyScope)
      */
     void setInvocationProperty(String key, Object value, DataType<?> dataType);
 
     /**
-     * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
+     * @see #setProperty(String, Object, org.mule.PropertyScope)
      */
     void setOutboundProperty(String key, Object value);
 
     /**
-     * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
+     * @see #setProperty(String, Object, org.mule.PropertyScope)
      */
     void setOutboundProperty(String key, Object value, DataType<?> dataType);
 
@@ -150,32 +150,32 @@ public interface MuleMessage extends org.mule.api.temporary.MuleMessage<Object, 
     <T> T getProperty(String name, PropertyScope scope);
 
     /**
-     * @see #getProperty(String, org.mule.api.transport.PropertyScope, Object)
+     * @see #getProperty(String, org.mule.PropertyScope, Object)
      */
     <T> T getInboundProperty(String name, T defaultValue);
 
     /**
-     * @see #getProperty(String, org.mule.api.transport.PropertyScope, Object)
+     * @see #getProperty(String, org.mule.PropertyScope, Object)
      */
     <T> T getInboundProperty(String name);
 
     /**
-     * @see #getProperty(String, org.mule.api.transport.PropertyScope, Object)
+     * @see #getProperty(String, org.mule.PropertyScope, Object)
      */
     <T> T getInvocationProperty(String name, T defaultValue);
 
     /**
-     * @see #getProperty(String, org.mule.api.transport.PropertyScope, Object)
+     * @see #getProperty(String, org.mule.PropertyScope, Object)
      */
     <T> T getInvocationProperty(String name);
 
     /**
-     * @see #getProperty(String, org.mule.api.transport.PropertyScope, Object)
+     * @see #getProperty(String, org.mule.PropertyScope, Object)
      */
     <T> T getOutboundProperty(String name, T defaultValue);
 
     /**
-     * @see #getProperty(String, org.mule.api.transport.PropertyScope, Object)
+     * @see #getProperty(String, org.mule.PropertyScope, Object)
      */
     <T> T getOutboundProperty(String name);
 
@@ -446,7 +446,7 @@ public interface MuleMessage extends org.mule.api.temporary.MuleMessage<Object, 
 
     /**
      * Removes all outbound attachments on this message.  Note: inbound attachments are immutable.
-     * {@link org.mule.api.transport.PropertyScope#OUTBOUND}.
+     * {@link org.mule.PropertyScope#OUTBOUND}.
      */
     void clearAttachments();
 

@@ -8,7 +8,7 @@ package org.mule.transformer.simple;
 
 import org.mule.RequestContext;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.OutputHandler;
+import org.mule.message.OutputHandler;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 

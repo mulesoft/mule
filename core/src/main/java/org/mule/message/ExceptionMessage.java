@@ -7,7 +7,7 @@
 package org.mule.message;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 
 import java.io.IOException;
 import java.io.NotSerializableException;

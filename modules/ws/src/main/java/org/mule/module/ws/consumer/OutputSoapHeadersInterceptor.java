@@ -13,7 +13,7 @@ import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.transformer.types.DataTypeFactory;

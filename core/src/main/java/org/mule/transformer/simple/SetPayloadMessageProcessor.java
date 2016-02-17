@@ -19,7 +19,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.metadata.DataType;
 import org.mule.api.metadata.SimpleDataType;
 import org.mule.transformer.types.TypedValue;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 import org.mule.util.AttributeEvaluator;
 import org.mule.util.StringUtils;
 

@@ -10,12 +10,12 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.TypedValue;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -346,7 +346,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
     /**
      * For XML-based config
      *
-     * @return The string value name for a {@link org.mule.api.transport.PropertyScope}
+     * @return The string value name for a {@link org.mule.PropertyScope}
      */
     public String getScopeName()
     {
@@ -355,7 +355,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
 
     /**
      * For XML-based config
-     * @param scopeName The string value name for a {@link org.mule.api.transport.PropertyScope}
+     * @param scopeName The string value name for a {@link org.mule.PropertyScope}
      */
     public void setScopeName(String scopeName)
     {

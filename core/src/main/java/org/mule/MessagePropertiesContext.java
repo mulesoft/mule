@@ -10,7 +10,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.TypedValue;
@@ -34,13 +33,13 @@ import org.apache.commons.logging.LogFactory;
  * This object maintains a scoped map of properties. This means that certain properties will only be visible
  * under some scopes. The scopes supported by Mule are:
  * <ol>
- * <li> {@link org.mule.api.transport.PropertyScope#INBOUND} Contains properties that were on the message when
+ * <li> {@link PropertyScope#INBOUND} Contains properties that were on the message when
  * it was received by Mule. This scope is read-only.</li>
- * <li>{@link org.mule.api.transport.PropertyScope#INVOCATION} Any properties set on the invocation scope will
+ * <li>{@link PropertyScope#INVOCATION} Any properties set on the invocation scope will
  * be available to the current service but will not be attached to any outbound messages.</li>
- * <li>{@link org.mule.api.transport.PropertyScope#OUTBOUND} Any properties set in this scope will be attached
+ * <li>{@link PropertyScope#OUTBOUND} Any properties set in this scope will be attached
  * to any outbound messages resulting from this message. This is the default scope.</li>
- * <li>{@link org.mule.api.transport.PropertyScope#SESSION} Any properties set on this scope will be added to
+ * <li>{@link PropertyScope#SESSION} Any properties set on this scope will be added to
  * the session. Note Session properties are not stored on the {@link MuleMessage}. This scope should only be
  * used once a {@link MuleEvent} has been created as there is no {@link MuleSession} and therefore Session
  * scope properties before this time</li>
@@ -209,7 +208,7 @@ public class MessagePropertiesContext implements Serializable
      * @param key the key on which to associate the value
      * @param value the property value
      * @param scope the scope to se the property on
-     * @see org.mule.api.transport.PropertyScope
+     * @see PropertyScope
      */
     public void setProperty(String key, Object value, PropertyScope scope)
     {
@@ -222,7 +221,7 @@ public class MessagePropertiesContext implements Serializable
      * @param key the key on which to associate the value
      * @param value the property value
      * @param scope the scope to se the property on
-     * @see org.mule.api.transport.PropertyScope
+     * @see PropertyScope
      */
     public void setProperty(String key, Object value, PropertyScope scope, DataType<?> dataType)
     {

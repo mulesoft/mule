@@ -6,22 +6,15 @@
  */
 package org.mule.config.i18n;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.metadata.DataType;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.api.routing.OutboundRouter;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.MuleManifest;
 import org.mule.context.notification.ListenerSubscriptionPair;
-import org.mule.exception.AbstractExceptionListener;
 import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
@@ -135,34 +128,9 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 30, target);
     }
 
-    public static Message lifecycleErrorCannotUseConnector(String name, String lifecyclePhase)
-    {
-        return factory.createMessage(BUNDLE_PATH, 32, name, lifecyclePhase);
-    }
-
-    public static Message connectorCausedError()
-    {
-        return connectorCausedError(null);
-    }
-
     public static Message connectorCausedError(Object connector)
     {
         return factory.createMessage(BUNDLE_PATH, 33, connector);
-    }
-
-    public static Message endpointIsNullForListener()
-    {
-        return factory.createMessage(BUNDLE_PATH, 34);
-    }
-
-    public static Message listenerAlreadyRegistered(EndpointURI endpointUri)
-    {
-        return factory.createMessage(BUNDLE_PATH, 35, endpointUri);
-    }
-
-    public static Message objectAlreadyInitialised(String name)
-    {
-        return factory.createMessage(BUNDLE_PATH, 37, name);
     }
 
     public static Message componentCausedErrorIs(Object component)
@@ -237,11 +205,9 @@ public class CoreMessages extends MessageFactory
     }
 
     public static Message transformOnObjectUnsupportedTypeOfEndpoint(String name,
-                                                                     Class<?> class1,
-                                                                     ImmutableEndpoint endpoint)
+                                                                     Class<?> class1)
     {
-        return factory.createMessage(BUNDLE_PATH, 54, name, StringMessageUtils.toString(class1),
-            (endpoint != null ? endpoint.getEndpointURI() : null));
+        return factory.createMessage(BUNDLE_PATH, 54, name, StringMessageUtils.toString(class1));
     }
 
     public static Message transformFailedFrom(Class<?> clazz)
@@ -321,29 +287,10 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 70, type);
     }
 
-    public static Message cannotInstanciateFinder(String serviceFinder)
-    {
-        return factory.createMessage(BUNDLE_PATH, 73, serviceFinder);
-    }
-
-    public static Message failedToCreateObjectWith(String string, Object arg)
-    {
-        return factory.createMessage(BUNDLE_PATH, 74, string, arg);
-    }
-
-    public static Message objectNotSetInService(Object object, Object service)
-    {
-        return factory.createMessage(BUNDLE_PATH, 75, object, service);
-    }
 
     public static Message objectNotFound(Object object)
     {
         return factory.createMessage(BUNDLE_PATH, 76, object);
-    }
-
-    public static Message objectNotFound(String type, String object)
-    {
-        return factory.createMessage(BUNDLE_PATH, 76, type + ": " + object);
     }
 
     public static Message transactionMarkedForRollback()
@@ -374,16 +321,6 @@ public class CoreMessages extends MessageFactory
     public static Message objectNotRegistered(String type, String name)
     {
         return factory.createMessage(BUNDLE_PATH, 82, type, name);
-    }
-
-    public static Message failedToSetPropertiesOn(String string)
-    {
-        return factory.createMessage(BUNDLE_PATH, 83, string);
-    }
-
-    public static Message failedToCreateConnectorFromUri(EndpointURI uri)
-    {
-        return factory.createMessage(BUNDLE_PATH, 84, uri);
     }
 
     public static Message initialisationFailure(String string)
@@ -507,11 +444,6 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 112);
     }
 
-    public static Message schemeNotCompatibleWithConnector(String scheme, Class<?> expectedClass)
-    {
-        return factory.createMessage(BUNDLE_PATH, 115, scheme, expectedClass);
-    }
-
     public static Message noEntryPointFoundWithArgs(Object object, Object args)
     {
         return factory.createMessage(BUNDLE_PATH, 116, StringMessageUtils.toString(object),
@@ -546,11 +478,6 @@ public class CoreMessages extends MessageFactory
     public static Message eventProcessingFailedFor(String name)
     {
         return factory.createMessage(BUNDLE_PATH, 127, name);
-    }
-
-    public static Message failedToDispatchToReplyto(ImmutableEndpoint endpoint)
-    {
-        return factory.createMessage(BUNDLE_PATH, 128, endpoint);
     }
 
     public static Message authTypeNotRecognised(String string)
@@ -865,61 +792,14 @@ public class CoreMessages extends MessageFactory
             StringMessageUtils.toString(returnType));
     }
 
-    public static Message moreThanOneConnectorWithProtocol(String protocol, String connectors)
-    {
-        return factory.createMessage(BUNDLE_PATH, 221, protocol, connectors);
-    }
-
-    public static Message failedToGetOutputStream()
-    {
-        return factory.createMessage(BUNDLE_PATH, 223);
-    }
-
     public static Message noEntryPointFoundForNoArgsMethod(final Object component, final String methodName)
     {
         return factory.createMessage(BUNDLE_PATH, 224, component, methodName);
     }
 
-    public static Message noDelegateClassAndMethodProvidedForNoArgsWrapper()
-    {
-        return factory.createMessage(BUNDLE_PATH, 225);
-    }
-
-    public static Message noDelegateClassIfDelegateInstanceSpecified()
-    {
-        return factory.createMessage(BUNDLE_PATH, 226);
-    }
-
-    public static Message noServiceTransportDescriptor(String protocol)
-    {
-        return factory.createMessage(BUNDLE_PATH, 227, protocol);
-    }
-
     public static Message failedToInvokeLifecycle(String phaseName, Object object)
     {
         return factory.createMessage(BUNDLE_PATH, 228, phaseName, object);
-    }
-
-    public static Message unrecognisedServiceType(ServiceType type)
-    {
-        return factory.createMessage(BUNDLE_PATH, 229, type);
-    }
-
-    public static Message serviceFinderCantFindService(String name)
-    {
-        return factory.createMessage(BUNDLE_PATH, 230, name);
-    }
-
-    public static Message outboundRouterMustUseOutboudEndpoints(OutboundRouter router,
-                                                                ImmutableEndpoint endpoint)
-    {
-        return factory.createMessage(BUNDLE_PATH, 233, endpoint, router);
-    }
-
-    public static Message exceptionListenerMustUseOutboundEndpoint(AbstractExceptionListener exceptionListener,
-                                                                   ImmutableEndpoint endpoint)
-    {
-        return factory.createMessage(BUNDLE_PATH, 235, endpoint, exceptionListener);
     }
 
     /**
@@ -1211,26 +1091,6 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 311, processor, transactionConfig);
     }
 
-    private static String getEndpointDescription(InboundEndpoint endpoint)
-    {
-        String endpointString = endpoint.getName();
-        if (endpointString == null)
-        {
-            endpointString = endpoint.getEndpointURI().getUri().toString();
-        }
-        return endpointString;
-    }
-
-    public static Message failedToStartInboundEndpoint(InboundEndpoint endpoint)
-    {
-        return factory.createMessage(BUNDLE_PATH, 312, getEndpointDescription(endpoint));
-    }
-
-    public static Message failedToStopInboundEndpoint(InboundEndpoint endpoint)
-    {
-        return factory.createMessage(BUNDLE_PATH, 313, getEndpointDescription(endpoint));
-    }
-
     public static Message messageRejectedByFilter()
     {
         return factory.createMessage(BUNDLE_PATH, 314);
@@ -1274,13 +1134,6 @@ public class CoreMessages extends MessageFactory
     public static Message failedToFindEntrypointForComponent(String message)
     {
         return factory.createMessage(BUNDLE_PATH, 322, message);
-    }
-
-    public static Message exchangePatternForEndpointNotSupported(MessageExchangePattern mep,
-                                                                 String direction,
-                                                                 EndpointURI endpointURI)
-    {
-        return factory.createMessage(BUNDLE_PATH, 323, mep.name(), direction, endpointURI);
     }
 
     public static Message illegalMIMEType(String badMIMIEType)

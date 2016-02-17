@@ -9,7 +9,6 @@ package org.mule.config.spring.processors;
 import org.mule.api.NameableObject;
 import org.mule.api.agent.Agent;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.Connector;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -25,7 +24,6 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
     private boolean overwrite = false;
     private final Class<? extends NameableObject> managedTypes[] = new Class[]
             {
-                    Connector.class,
                     Transformer.class,
                     Agent.class
             };

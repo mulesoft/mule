@@ -20,7 +20,7 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.exception.CatchMessagingExceptionStrategy;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.exception.MessagingExceptionHandlerToSystemAdapter;

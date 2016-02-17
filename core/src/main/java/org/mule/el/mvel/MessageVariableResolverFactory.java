@@ -11,7 +11,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.VariableAssignmentCallback;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.el.context.MessageContext;
 import org.mule.el.context.MessagePropertyMapContext;
 import org.mule.mvel2.ParserConfiguration;

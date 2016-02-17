@@ -10,7 +10,7 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.model.InvocationResult;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 

@@ -7,7 +7,6 @@
 package org.mule;
 
 import static org.mule.util.ClassUtils.isConsumable;
-
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -20,13 +19,11 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.context.notification.FlowCallStack;
 import org.mule.api.context.notification.ProcessorsTrace;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.metadata.DataType;
 import org.mule.api.processor.ProcessingDescriptor;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.PropertyScope;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.DefaultFlowCallStack;
 import org.mule.context.notification.DefaultProcessorsTrace;
@@ -37,7 +34,7 @@ import org.mule.session.DefaultMuleSession;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.TypedValue;
-import org.mule.transport.DefaultReplyToHandler;
+import org.mule.connector.DefaultReplyToHandler;
 import org.mule.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.util.store.DeserializationPostInitialisable;
 
@@ -49,7 +46,6 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -134,7 +130,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     /**
      * Constructor used to create an event with no message source with minimal arguments and a
-     * {@link org.mule.api.transport.ReplyToHandler}
+     * {@link org.mule.api.connector.ReplyToHandler}
      */
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
@@ -242,7 +238,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     /**
      *  Constructor used to create an event with a identifiable message source with all additional arguments except
-     *  a {@link org.mule.api.transport.ReplyToHandler}
+     *  a {@link org.mule.api.connector.ReplyToHandler}
      */
     public DefaultMuleEvent(MuleMessage message,
                             URI messageSourceURI,
@@ -259,20 +255,18 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     // Constructors for inbound endpoint
 
     public DefaultMuleEvent(MuleMessage message,
-                            InboundEndpoint endpoint,
                             FlowConstruct flowConstruct,
                             MuleSession session)
     {
-        this(message, endpoint, flowConstruct, session, null, null, null);
+        this(message, flowConstruct, session, null, null, null);
     }
 
-    public DefaultMuleEvent(MuleMessage message, InboundEndpoint endpoint, FlowConstruct flowConstruct)
+    public DefaultMuleEvent(MuleMessage message, FlowConstruct flowConstruct)
     {
-        this(message, endpoint, flowConstruct, new DefaultMuleSession(), null, null, null);
+        this(message, flowConstruct, new DefaultMuleSession(), null, null, null);
     }
 
     public DefaultMuleEvent(MuleMessage message,
-                            InboundEndpoint endpoint,
                             FlowConstruct flowConstruct,
                             MuleSession session,
                             ReplyToHandler replyToHandler,
@@ -288,14 +282,14 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.processingTime = ProcessingTime.newInstance(this);
         this.replyToHandler = replyToHandler;
         this.replyToDestination = replyToDestination;
-        this.credentials = extractCredentials(endpoint);
-        this.encoding = endpoint.getEncoding();
-        this.exchangePattern = endpoint.getExchangePattern();
-        this.messageSourceName = endpoint.getName();
-        this.messageSourceURI = endpoint.getEndpointURI().getUri();
-        this.timeout = endpoint.getResponseTimeout();
-        this.transacted = endpoint.getTransactionConfig().isTransacted();
-        fillProperties(endpoint);
+        //TODO See MULE-9307 - define where to get these values from
+        this.credentials = null;
+        this.encoding = getMuleContext().getConfiguration().getDefaultEncoding();
+        this.exchangePattern = MessageExchangePattern.REQUEST_RESPONSE;
+        this.messageSourceName = null;
+        this.messageSourceURI = null;
+        this.timeout = 0;
+        this.transacted = false;
         this.synchronous = resolveEventSynchronicity();
     }
 
@@ -534,25 +528,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                 NonBlockingProcessingStrategy;
     }
 
-    protected void fillProperties(InboundEndpoint endpoint)
-    {
-        if (endpoint != null && endpoint.getProperties() != null)
-        {
-            for (Iterator<?> iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
-            {
-                String prop = (String) iterator.next();
-
-                // don't overwrite property on the message
-                if (!ignoreProperty(prop))
-                {
-                    // inbound endpoint flowVariables are in the invocation scope
-                    Object value = endpoint.getProperties().get(prop);
-                    message.setInvocationProperty(prop, value);
-                }
-            }
-        }
-    }
-
     /**
      * This method is used to determine if a property on the previous event should be ignored for the next
      * event. This method is here because we don't have proper scoped handling of meta data yet The rules are
@@ -581,21 +556,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         }
 
         return null != message.getOutboundProperty(key);
-    }
-
-    protected Credentials extractCredentials(InboundEndpoint endpoint)
-    {
-        if (null != endpoint && null != endpoint.getEndpointURI()
-            && null != endpoint.getEndpointURI().getUserInfo())
-        {
-            final String userName = endpoint.getEndpointURI().getUser();
-            final String password = endpoint.getEndpointURI().getPassword();
-            if (password != null && userName != null)
-            {
-                return new MuleCredentials(userName, password.toCharArray());
-            }
-        }
-        return null;
     }
 
     @Override

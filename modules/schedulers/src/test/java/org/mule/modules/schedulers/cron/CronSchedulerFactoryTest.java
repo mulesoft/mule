@@ -12,8 +12,8 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.schedule.Scheduler;
-import org.mule.transport.polling.PollingTask;
-import org.mule.transport.polling.PollingWorker;
+import org.mule.source.polling.PollingTask;
+import org.mule.source.polling.PollingWorker;
 
 import org.junit.Test;
 

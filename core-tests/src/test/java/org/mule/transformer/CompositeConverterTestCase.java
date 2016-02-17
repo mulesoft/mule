@@ -16,14 +16,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.TransformationService;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transformer.Converter;
 import org.mule.api.metadata.DataType;
+import org.mule.api.transformer.Converter;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.types.MimeTypes;
 
@@ -123,29 +121,6 @@ public class CompositeConverterTestCase
         assertEquals("UTF-8", compositeConverter.getEncoding());
     }
 
-
-    @Test
-    public void getEndpoint()
-    {
-        ImmutableEndpoint mockImmutableEndpoint = mock(ImmutableEndpoint.class);
-        doReturn(mockImmutableEndpoint).when(mockConverterA).getEndpoint();
-        doReturn(mockImmutableEndpoint).when(mockConverterB).getEndpoint();
-        CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
-
-        assertEquals(mockImmutableEndpoint, compositeConverter.getEndpoint());
-    }
-
-    @Test
-    public void setEndpoint()
-    {
-        ImmutableEndpoint mockImmutableEndpoint = mock(ImmutableEndpoint.class);
-        CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
-
-        compositeConverter.setEndpoint(mockImmutableEndpoint);
-
-        verify(mockConverterA, atLeastOnce()).setEndpoint(mockImmutableEndpoint);
-        verify(mockConverterB, atLeastOnce()).setEndpoint(mockImmutableEndpoint);
-    }
 
     @Test
     public void priorityWeighting() throws Exception

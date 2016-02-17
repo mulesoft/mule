@@ -13,13 +13,13 @@ import static org.mule.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.endpoint.URIBuilder;
+import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.HttpEntity;
@@ -28,12 +28,13 @@ import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.session.DefaultMuleSession;
-import org.mule.transport.NullPayload;
+import org.mule.api.temporary.NullPayload;
 import org.mule.util.IOUtils;
 
 import com.google.common.net.MediaType;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashMap;
@@ -134,11 +135,22 @@ public class HttpRequestToMuleEvent
 
     private static URI resolveUri(final HttpRequestContext requestContext)
     {
-        URIBuilder uriBuilder = new URIBuilder();
-        uriBuilder.setProtocol(requestContext.getScheme());
-        uriBuilder.setHost(resolveTargetHost(requestContext.getRequest()));
-        uriBuilder.setPath(requestContext.getRequest().getPath());
-        return uriBuilder.getEndpoint().getUri();
+        try
+        {
+            String hostAndPort = resolveTargetHost(requestContext.getRequest());
+            String[] hostAndPortParts = hostAndPort.split(":");
+            String host = hostAndPortParts[0];
+            int port = requestContext.getScheme().equals(HttpConstants.Protocols.HTTP) ? 80 : 4343;
+            if (hostAndPortParts.length > 1)
+            {
+                port = Integer.valueOf(hostAndPortParts[1]);
+            }
+            return new URI(requestContext.getScheme(), null, host, port, requestContext.getRequest().getPath(), null, null);
+        }
+        catch (URISyntaxException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
     }
 
     /**

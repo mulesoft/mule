@@ -9,12 +9,11 @@ package org.mule.properties;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
 
@@ -33,7 +32,7 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     public void setSessionPropertyUsingAPIGetInFlow() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
+        MuleEvent event = new DefaultMuleEvent(message, getTestFlow());
 
         message.setProperty("key", "value", PropertyScope.SESSION);
 
@@ -47,7 +46,7 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     public void setSessionPropertyInFlowGetUsingAPI() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
+        MuleEvent event = new DefaultMuleEvent(message, getTestFlow());
 
         Flow flowA = (Flow) muleContext.getRegistry().lookupFlowConstruct("B");
         MuleEvent result = flowA.process(event);
@@ -63,7 +62,7 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     {
 
         MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint(""), getTestFlow());
+        MuleEvent event = new DefaultMuleEvent(message, getTestFlow());
 
         Object nonSerializable = new Object();
         message.setProperty("keyNonSerializable", nonSerializable, PropertyScope.SESSION);

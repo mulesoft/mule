@@ -13,7 +13,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.RequestReplyReplierMessageProcessor;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 
 import org.apache.commons.lang.BooleanUtils;

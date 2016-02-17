@@ -14,7 +14,7 @@ import static org.junit.Assert.fail;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.transformer.TransformerMessagingException;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.functional.functional.EventCallback;
 

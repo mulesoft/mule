@@ -7,10 +7,6 @@
 package org.mule.module.tls.internal.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.ProtocolHandlerDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
-import org.mule.endpoint.URIBuilder;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><tls:connector></code> elements.

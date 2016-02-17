@@ -8,7 +8,7 @@ package org.mule.functional.property;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.api.transport.PropertyScope.SESSION;
+import static org.mule.PropertyScope.SESSION;
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 

@@ -8,7 +8,7 @@
 package org.mule.el.mvel.datatype;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.ast.AssignmentNode;
 import org.mule.transformer.types.TypedValue;

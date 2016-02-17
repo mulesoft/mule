@@ -133,7 +133,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
             new HashMap<String, Object>(), null, muleContext);
         CollectionSplitter splitter = new CollectionSplitter();
         splitter.setMuleContext(muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(toSplit, getTestInboundEndpoint("ep"), fc, session);
+        DefaultMuleEvent event = new DefaultMuleEvent(toSplit, fc, session);
         assertSame(VoidMuleEvent.getInstance(), splitter.process(event));
     }
 
@@ -178,7 +178,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         splitter.setMuleContext(muleContext);
         Grabber grabber = new Grabber();
         splitter.setListener(grabber);
-        DefaultMuleEvent event = new DefaultMuleEvent(toSplit, getTestInboundEndpoint("ep"), fc, session);
+        DefaultMuleEvent event = new DefaultMuleEvent(toSplit, fc, session);
         splitter.process(event);
         List<MuleMessage> splits = grabber.getMessages();
         assertEquals(count, splits.size());

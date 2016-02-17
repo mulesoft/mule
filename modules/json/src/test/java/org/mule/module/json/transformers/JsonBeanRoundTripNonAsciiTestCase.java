@@ -6,19 +6,15 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import static org.junit.Assert.fail;
+import org.mule.api.metadata.SimpleDataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.LocaleMessageHandler;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.api.metadata.SimpleDataType;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
-
-import static org.junit.Assert.fail;
 
 public class JsonBeanRoundTripNonAsciiTestCase extends JsonBeanRoundTripTestCase
 {
@@ -53,11 +49,6 @@ public class JsonBeanRoundTripNonAsciiTestCase extends JsonBeanRoundTripTestCase
     public Transformer getRoundTripTransformer() throws Exception
     {
         Transformer trans = super.getRoundTripTransformer();
-        EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
-        builder.setEncoding(ENCODING);
-        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
-            builder);
-        trans.setEndpoint(endpoint);
         return trans;
     }
 
@@ -66,11 +57,6 @@ public class JsonBeanRoundTripNonAsciiTestCase extends JsonBeanRoundTripTestCase
     {
         Transformer trans = super.getTransformer();
         trans.setReturnDataType(new SimpleDataType<byte[]>(byte[].class));
-        EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
-        builder.setEncoding(ENCODING);
-        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
-            builder);
-        trans.setEndpoint(endpoint);
         return trans;
     }
     

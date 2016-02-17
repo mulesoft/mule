@@ -9,7 +9,7 @@ package org.mule.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import org.mule.api.MuleEvent;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.construct.Flow;
 
 import org.junit.Test;

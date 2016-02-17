@@ -6,13 +6,10 @@
  */
 package org.mule;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextFactory;
-import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -33,10 +30,6 @@ public class EmbeddedMuleTestCase extends AbstractMuleTestCase
         assertFalse(context.isStarted());
         context.start();
         assertTrue(context.isStarted());
-
-        final EndpointBuilder endpoint = context.getRegistry().lookupEndpointBuilder("endpoint");
-        assertNotNull(endpoint);
-        assertEquals("test://value", endpoint.buildInboundEndpoint().getEndpointURI().toString());
 
         context.dispose();
     }

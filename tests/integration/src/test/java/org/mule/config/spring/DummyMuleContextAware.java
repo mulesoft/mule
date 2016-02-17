@@ -10,7 +10,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
@@ -59,16 +58,6 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
     public Class getReturnClass()
     {
         return null;
-    }
-
-    public ImmutableEndpoint getEndpoint()
-    {
-        return null;
-    }
-
-    public void setEndpoint(ImmutableEndpoint endpoint)
-    {
-        // empty
     }
 
     public void initialise() throws InitialisationException

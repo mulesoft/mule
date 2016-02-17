@@ -9,18 +9,14 @@ package org.mule.api.registry;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.schedule.Scheduler;
 import org.mule.api.metadata.DataType;
+import org.mule.api.schedule.Scheduler;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.Connector;
 import org.mule.util.Predicate;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard
@@ -55,18 +51,6 @@ public interface MuleRegistry extends LifecycleRegistry
     // Lookup methods - these should NOT create a new object, only return existing ones
     // /////////////////////////////////////////////////////////////////////////
 
-    Connector lookupConnector(String name);
-
-    /**
-     * Looks-up endpoint builders which can be used to repeatably create endpoints with the same configuration.
-     * These endpoint builder are either global endpoints or they are builders used to create named
-     * endpoints configured on routers and exception strategies.
-     *
-     * @param name the name of the endpointBuilder to find
-     * @return An endpointBuilder with the name specified or null if there is no endpoint builder with that name
-     */
-    EndpointBuilder lookupEndpointBuilder(String name);
-
     Transformer lookupTransformer(String name);
 
     FlowConstruct lookupFlowConstruct(String name);
@@ -100,13 +84,6 @@ public interface MuleRegistry extends LifecycleRegistry
     // /////////////////////////////////////////////////////////////////////////
     // Registration methods
     // /////////////////////////////////////////////////////////////////////////
-
-    void registerConnector(Connector connector) throws MuleException;
-
-    //TODO MULE-2494
-    void registerEndpoint(ImmutableEndpoint endpoint) throws MuleException;
-
-    void registerEndpointBuilder(String name, EndpointBuilder builder) throws MuleException;
 
     void registerTransformer(Transformer transformer) throws MuleException;
 
@@ -153,8 +130,4 @@ public interface MuleRegistry extends LifecycleRegistry
     // Creation methods
     // /////////////////////////////////////////////////////////////////////////
 
-    // TODO These methods are a mess (they blur lookup with creation, uris with names). Need to clean this up.
-
-    ServiceDescriptor lookupServiceDescriptor(ServiceType type, String name, Properties overrides)
-            throws ServiceException;
 }

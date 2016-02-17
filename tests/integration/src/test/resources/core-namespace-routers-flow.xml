@@ -19,9 +19,8 @@
     </flow>
 
     <flow name="CustomRouter">
-        <inbound-endpoint address="test://in"/>
         <custom-router class="org.mule.config.spring.CoreNamespaceRoutersFlowTestCase$CustomRouter">
-            <outbound-endpoint address="test://out"/>
+            <set-payload value="hi"/>
         </custom-router>
     </flow>
     

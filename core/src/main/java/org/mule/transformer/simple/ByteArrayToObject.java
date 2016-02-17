@@ -81,7 +81,7 @@ public class ByteArrayToObject extends ByteArrayToSerializable
         else
         {
             throw new TransformerException(CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(
-                this.getName(), src.getClass(), endpoint));
+                this.getName(), src.getClass()));
         }
     }
 

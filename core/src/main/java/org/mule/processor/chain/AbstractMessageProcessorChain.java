@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.lifecycle.Disposable;
@@ -26,7 +25,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
-import org.mule.endpoint.EndpointAware;
 import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.util.NotificationUtils;
 import org.mule.util.StringUtils;
@@ -45,7 +43,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject
         implements NonBlockingMessageProcessor, MessageProcessorChain, Lifecycle, FlowConstructAware,
-        MuleContextAware, EndpointAware, MessageProcessorContainer, MessagingExceptionHandlerAware
+        MuleContextAware, MessageProcessorContainer, MessagingExceptionHandlerAware
 {
 
     protected final transient Log log = LogFactory.getLog(getClass());
@@ -188,18 +186,6 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         }
 
         return string.toString();
-    }
-
-    @Override
-    public void setEndpoint(ImmutableEndpoint endpoint)
-    {
-        for (MessageProcessor processor : processors)
-        {
-            if (processor instanceof EndpointAware)
-            {
-                ((EndpointAware) processor).setEndpoint(endpoint);
-            }
-        }
     }
 
     @Override
