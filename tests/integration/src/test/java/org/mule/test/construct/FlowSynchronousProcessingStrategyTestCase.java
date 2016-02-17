@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 
 public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase
 {

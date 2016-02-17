@@ -6,7 +6,7 @@
  */
 package org.mule.api.transformer;
 
-import org.mule.api.endpoint.EndpointException;
+import org.mule.api.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.transformer.TransformerUtils;
 
@@ -17,7 +17,7 @@ import java.util.List;
  * transformers.
  */
 
-public class TransformerException extends EndpointException
+public class TransformerException extends MuleException
 {
     private static final String TRANSFORMER = "Transformer";
     

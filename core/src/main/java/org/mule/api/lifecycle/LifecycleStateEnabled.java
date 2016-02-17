@@ -6,11 +6,9 @@
  */
 package org.mule.api.lifecycle;
 
-import org.mule.api.transport.Connector;
-
 /**
- * Objects that have an associated lifecycle manager such as {@link org.mule.api.construct.FlowConstruct} or
- * {@link Connector} should implement this interface so that the registry lifecycle
+ * Objects that have an associated lifecycle manager such as {@link org.mule.api.construct.FlowConstruct}
+ * should implement this interface so that the registry lifecycle
  * manager can introspect the lifecycle state of an object. This allows objects to
  * have a different lifecycle state to the registry. Typically objects that have
  * their own lifecycle manager can be controlled externally through JMX which means

@@ -9,7 +9,7 @@ package org.mule.transformer.simple;
 import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;

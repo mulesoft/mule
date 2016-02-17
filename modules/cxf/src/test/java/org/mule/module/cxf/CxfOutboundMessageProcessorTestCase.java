@@ -71,7 +71,7 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
         };
         processor.setListener(messageProcessor);
         
-        MuleEvent event = getTestEvent("hello", getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent("hello");
         MuleEvent response = processor.process(event);
         assertThat(processor.getClient().getRequestContext().isEmpty(), Is.is(true));
         assertThat(processor.getClient().getResponseContext().isEmpty(), Is.is(true));

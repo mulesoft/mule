@@ -12,7 +12,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 import org.mule.util.AttributeEvaluator;
 
 /**

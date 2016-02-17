@@ -7,14 +7,8 @@
 package org.mule.module.ws.consumer;
 
 
-import static org.mockito.Mockito.mock;
-
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.endpoint.DefaultEndpointFactory;
-import org.mule.endpoint.DefaultOutboundEndpoint;
 import org.mule.module.ws.security.WSSecurity;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -90,21 +84,4 @@ public class WSConsumerTestCase extends AbstractMuleContextTestCase
         return wsConsumer;
     }
 
-    private class TestEndpointFactory extends DefaultEndpointFactory
-    {
-
-        private DefaultOutboundEndpoint createdEndpoint = mock(DefaultOutboundEndpoint.class);
-
-        @Override
-        public OutboundEndpoint getOutboundEndpoint(EndpointBuilder builder) throws MuleException
-        {
-            return createdEndpoint;
-        }
-
-        public DefaultOutboundEndpoint getCreatedEndpoint()
-        {
-            return createdEndpoint;
-        }
-
-    }
 }

@@ -6,13 +6,13 @@
  */
 package org.mule.processor;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.Transaction;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.transaction.TransactionCoordination;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class LaxSedaStageInterceptingMessageProcessorTestCase extends
@@ -20,18 +20,9 @@ public class LaxSedaStageInterceptingMessageProcessorTestCase extends
 {
 
     @Test
-    public void testProcessOneWay() throws Exception
-    {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
-
-        assertAsync(messageProcessor, event);
-    }
-
-    @Test
     public void testProcessRequestResponse() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE,
-            getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
 
         assertSync(messageProcessor, event);
     }
@@ -39,8 +30,7 @@ public class LaxSedaStageInterceptingMessageProcessorTestCase extends
     @Test
     public void testProcessOneWayWithTx() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE,
-            getTestTransactedInboundEndpoint(MessageExchangePattern.ONE_WAY));
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
         Transaction transaction = new TestTransaction(muleContext);
         TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -57,8 +47,7 @@ public class LaxSedaStageInterceptingMessageProcessorTestCase extends
     @Test
     public void testProcessRequestResponseWithTx() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE,
-            getTestTransactedInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
         Transaction transaction = new TestTransaction(muleContext);
         TransactionCoordination.getInstance().bindTransaction(transaction);
 

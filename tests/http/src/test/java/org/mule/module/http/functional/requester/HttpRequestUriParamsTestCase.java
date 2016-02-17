@@ -14,7 +14,7 @@ import static org.junit.rules.ExpectedException.none;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 
 import java.util.HashMap;
 import java.util.Map;

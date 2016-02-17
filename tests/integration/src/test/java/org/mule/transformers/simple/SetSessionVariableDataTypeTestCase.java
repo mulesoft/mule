@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.transformer.types.MimeTypes;

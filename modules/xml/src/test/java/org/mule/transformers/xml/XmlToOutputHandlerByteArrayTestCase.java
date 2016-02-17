@@ -6,11 +6,9 @@
  */
 package org.mule.transformers.xml;
 
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import static org.junit.Assert.fail;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.OutputHandler;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.message.OutputHandler;
 import org.mule.module.xml.transformer.XmlToOutputHandler;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
@@ -20,8 +18,6 @@ import java.io.InputStream;
 
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.DOMWriter;
-
-import static org.junit.Assert.fail;
 
 public class XmlToOutputHandlerByteArrayTestCase extends AbstractXmlTransformerTestCase
 {
@@ -42,13 +38,6 @@ public class XmlToOutputHandlerByteArrayTestCase extends AbstractXmlTransformerT
     {
         Transformer trans = createObject(XmlToOutputHandler.class);
         trans.setReturnDataType(DataTypeFactory.create(OutputHandler.class));
-
-        EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
-        builder.setEncoding("UTF-8");
-        ImmutableEndpoint endpoint =
-            muleContext.getEndpointFactory().getInboundEndpoint(builder);
-
-        trans.setEndpoint(endpoint);
         return trans;
     }
 

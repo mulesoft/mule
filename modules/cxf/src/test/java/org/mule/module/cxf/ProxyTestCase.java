@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -411,6 +412,7 @@ public class ProxyTestCase extends FunctionalTestCase
         assertTrue(component.getLatch().await(1000, TimeUnit.MILLISECONDS));
     }
 
+    @Ignore
     @Test
     public void testOneWaySendWithSoapActionSpoofing() throws Exception
     {

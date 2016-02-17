@@ -28,7 +28,7 @@ import org.mule.module.http.api.requester.HttpRequesterConfigBuilder;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;

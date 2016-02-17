@@ -9,7 +9,6 @@ package org.mule.registry;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.InjectProcessor;
@@ -18,7 +17,6 @@ import org.mule.api.registry.ObjectProcessor;
 import org.mule.api.registry.PreInitProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.Connector;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.util.CollectionUtils;
@@ -76,9 +74,7 @@ public class TransientRegistry extends AbstractRegistry
     @Override
     protected void doInitialise() throws InitialisationException
     {
-        applyProcessors(lookupObjects(Connector.class), null);
         applyProcessors(lookupObjects(Transformer.class), null);
-        applyProcessors(lookupObjects(ImmutableEndpoint.class), null);
         applyProcessors(lookupObjects(Agent.class), null);
         applyProcessors(lookupObjects(Object.class), null);
     }

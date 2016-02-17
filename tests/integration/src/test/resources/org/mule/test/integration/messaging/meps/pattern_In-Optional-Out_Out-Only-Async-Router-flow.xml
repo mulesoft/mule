@@ -29,21 +29,21 @@
     
     <flow name="In-Out_Out-Only-Async-Service">
         <script:component>
-            <script:script engine="groovy">                
-                if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND) != null)
-                    return message
+            <script:script engine="groovy">
+                if (message.getProperty("foo", org.mule.PropertyScope.INBOUND) != null)
+                return message
                 else
                 {
-                    //This shouldn't be needed but null does not stop the async-reply...
-                    eventContext.setStopFurtherProcessing(true)
-                    return null
+                //This shouldn't be needed but null does not stop the async-reply...
+                eventContext.setStopFurtherProcessing(true)
+                return null
                 }
             </script:script>
         </script:component>
         
         <mule:message-filter>
             <mule:not-filter>
-                <mule:payload-type-filter expectedType="org.mule.transport.NullPayload"></mule:payload-type-filter>
+                <mule:payload-type-filter expectedType="org.mule.api.message.NullPayload"></mule:payload-type-filter>
             </mule:not-filter>
         </mule:message-filter>
                 

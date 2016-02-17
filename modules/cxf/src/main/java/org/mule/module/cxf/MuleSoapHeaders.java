@@ -8,7 +8,7 @@ package org.mule.module.cxf;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 
 import java.util.Iterator;
 

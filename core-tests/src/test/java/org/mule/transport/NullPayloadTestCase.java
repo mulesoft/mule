@@ -6,6 +6,7 @@
  */
 package org.mule.transport;
 
+import org.mule.api.message.NullPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

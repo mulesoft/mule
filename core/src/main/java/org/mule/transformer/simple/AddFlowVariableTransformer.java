@@ -6,7 +6,7 @@
  */
 package org.mule.transformer.simple;
 
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 
 public class AddFlowVariableTransformer extends AbstractAddVariablePropertyTransformer
 {

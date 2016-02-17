@@ -11,10 +11,10 @@ import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.store.ObjectStore;
-import org.mule.transport.polling.watermark.UpdateExpressionWatermark;
-import org.mule.transport.polling.watermark.Watermark;
-import org.mule.transport.polling.watermark.selector.SelectorWatermark;
-import org.mule.transport.polling.watermark.selector.WatermarkSelectorBroker;
+import org.mule.source.polling.watermark.UpdateExpressionWatermark;
+import org.mule.source.polling.watermark.Watermark;
+import org.mule.source.polling.watermark.selector.SelectorWatermark;
+import org.mule.source.polling.watermark.selector.WatermarkSelectorBroker;
 import org.mule.util.store.MuleObjectStoreManager;
 
 import java.io.Serializable;

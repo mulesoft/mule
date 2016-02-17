@@ -34,7 +34,7 @@ import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.transformer.types.MimeTypes;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 import org.mule.util.AttributeEvaluator;
 import org.mule.util.DataTypeUtils;
 import org.mule.util.StringUtils;

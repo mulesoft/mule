@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 
 /**
  *  Test implementation of {@link org.mule.processor.NonBlockingMessageProcessor} that simply uses a @{link Executor} to
- *  invoke the {@link org.mule.api.transport.ReplyToHandler} in another thread.
+ *  invoke the {@link org.mule.api.connector.ReplyToHandler} in another thread.
  */
 public class TestNonBlockingProcessor implements NonBlockingMessageProcessor
 {

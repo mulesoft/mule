@@ -8,7 +8,6 @@ package org.mule.module.cxf.builder;
 
 import org.mule.api.lifecycle.CreateException;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
-import org.mule.module.cxf.endpoint.CxfEndpointBuilder;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
@@ -37,7 +36,6 @@ import org.apache.cxf.transport.MessageObserver;
  * <p>
  * This only works if the server and client are in the same Mule instance.
  * 
- * @see CxfEndpointBuilder
  */
 public class LocalClientMessageProcessorBuilder extends AbstractOutboundMessageProcessorBuilder
 {

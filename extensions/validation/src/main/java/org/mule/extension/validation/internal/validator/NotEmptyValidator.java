@@ -12,7 +12,7 @@ import org.mule.config.i18n.Message;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
 import org.mule.mvel2.compiler.BlankLiteral;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 import org.mule.util.ArrayUtils;
 
 import java.util.Collection;

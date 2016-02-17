@@ -20,14 +20,10 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.metadata.DataType;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.routing.filter.Filter;
-import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.Connector;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
@@ -39,7 +35,6 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.TestingWorkListener;
 import org.mule.tck.TriggerableMessageSource;
-import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
@@ -343,64 +338,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         // template method
     }
 
-    public static InboundEndpoint getTestInboundEndpoint(String name) throws Exception
-    {
-        return MuleTestUtils.getTestInboundEndpoint(name, muleContext);
-    }
-
-    public static OutboundEndpoint getTestOutboundEndpoint(String name) throws Exception
-    {
-        return MuleTestUtils.getTestOutboundEndpoint(name, muleContext);
-    }
-
-    public static InboundEndpoint getTestInboundEndpoint(MessageExchangePattern mep) throws Exception
-    {
-        return MuleTestUtils.getTestInboundEndpoint(mep, muleContext);
-    }
-
-    public static InboundEndpoint getTestTransactedInboundEndpoint(MessageExchangePattern mep) throws Exception
-    {
-        return MuleTestUtils.getTestTransactedInboundEndpoint(mep, muleContext);
-    }
-
-    public static InboundEndpoint getTestInboundEndpoint(String name, String uri) throws Exception
-    {
-        return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, null, null, null, null);
-    }
-
-    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri) throws Exception
-    {
-        return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, null, null, null);
-    }
-
-    public static InboundEndpoint getTestInboundEndpoint(String name, List<Transformer> transformers) throws Exception
-    {
-        return MuleTestUtils.getTestInboundEndpoint(name, muleContext, null, transformers, null, null, null);
-    }
-
-    public static OutboundEndpoint getTestOutboundEndpoint(String name, List<Transformer> transformers) throws Exception
-    {
-        return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, null, transformers, null, null);
-    }
-
-    public static InboundEndpoint getTestInboundEndpoint(String name, String uri,
-                                                         List<Transformer> transformers, Filter filter, Map<Object, Object> properties, Connector connector) throws Exception
-    {
-        return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);
-    }
-
-    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri,
-                                                           List<Transformer> transformers, Filter filter, Map<Object, Object> properties) throws Exception
-    {
-        return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties);
-    }
-
-    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri,
-                                                           List<Transformer> transformers, Filter filter, Map<Object, Object> properties, Connector connector) throws Exception
-    {
-        return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);
-    }
-
     /**
      * @return creates a new {@link org.mule.api.MuleMessage} with a test payload
      */
@@ -443,11 +380,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         return MuleTestUtils.getTestEvent(data, mep, muleContext);
     }
 
-    public static MuleEvent getTestEvent(Object data, MuleSession session) throws Exception
-    {
-        return MuleTestUtils.getTestEvent(data, session, muleContext);
-    }
-
     public static MuleEventContext getTestEventContext(Object data) throws Exception
     {
         return MuleTestUtils.getTestEventContext(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
@@ -463,27 +395,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         return MuleTestUtils.getTestTransformer();
     }
 
-    public static MuleEvent getTestEvent(Object data, InboundEndpoint endpoint) throws Exception
-    {
-        return MuleTestUtils.getTestEvent(data, endpoint, muleContext);
-    }
-
-    public static MuleEvent getTestEvent(Object data, Flow flow, InboundEndpoint endpoint)
-            throws Exception
-    {
-        return MuleTestUtils.getTestEvent(data, flow, endpoint, muleContext);
-    }
-
     public static MuleSession getTestSession(Flow flow, MuleContext context)
     {
         return MuleTestUtils.getTestSession(flow, context);
     }
-
-    public static TestConnector getTestConnector() throws Exception
-    {
-        return MuleTestUtils.getTestConnector(muleContext);
-    }
-
     public static Flow getTestFlow() throws Exception
     {
         return MuleTestUtils.getTestFlow(muleContext);

@@ -17,7 +17,6 @@ import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.construct.Pipeline;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.DefaultMessageProcessorPathElement;
@@ -273,7 +272,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             && (!isMessageSourceCompatibleWithAsync(messageSource) || (redeliveryHandlerConfigured)))
         {
             throw new FlowConstructInvalidException(
-                    CoreMessages.createStaticMessage("One of the inbound endpoint configured on this Flow is not " +
+                    CoreMessages.createStaticMessage("One of the message sources configured on this Flow is not " +
                                                      "compatible with an asynchronous processing strategy.  Either " +
                                                      "because it is request-response, has a transaction defined, or " +
                                                      "messaging redelivered is configured."),
@@ -324,27 +323,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     private boolean isMessageSourceCompatibleWithAsync(MessageSource source)
     {
-        if (source instanceof InboundEndpoint)
-        {
-            InboundEndpoint endpoint = ((InboundEndpoint) source);
-            return !endpoint.getExchangePattern().hasResponse()
-                    && !endpoint.getTransactionConfig().isConfigured();
-        }
-        else if (messageSource instanceof CompositeMessageSource)
-        {
-            for (MessageSource childSource : ((CompositeMessageSource) source).getSources())
-            {
-                if (!isMessageSourceCompatibleWithAsync(childSource))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-        else
-        {
-            return true;
-        }
+        //TODO See MULE-9307 - check conditions over sources to define if it supports async processing strategies or not
+        return true;
     }
 
     @Override

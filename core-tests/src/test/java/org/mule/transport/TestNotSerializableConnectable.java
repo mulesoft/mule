@@ -10,7 +10,7 @@ package org.mule.transport;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryContext;
-import org.mule.api.transport.Connectable;
+import org.mule.api.connector.Connectable;
 
 public class TestNotSerializableConnectable implements Connectable
 {

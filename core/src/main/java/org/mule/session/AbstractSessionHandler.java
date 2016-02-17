@@ -10,7 +10,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.serialization.DefaultObjectSerializer;
 import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.serialization.SerializationException;
-import org.mule.api.transport.SessionHandler;
+import org.mule.message.SessionHandler;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import javax.inject.Inject;

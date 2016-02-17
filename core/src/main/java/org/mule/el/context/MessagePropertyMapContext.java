@@ -7,7 +7,7 @@
 package org.mule.el.context;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 
 import java.util.HashMap;

@@ -8,7 +8,7 @@ package org.mule.routing.filters;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;

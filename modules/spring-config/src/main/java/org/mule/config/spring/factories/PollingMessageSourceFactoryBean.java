@@ -10,9 +10,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.schedule.SchedulerFactory;
-import org.mule.transport.polling.MessageProcessorPollingOverride;
-import org.mule.transport.polling.PollingMessageSource;
-import org.mule.transport.polling.schedule.FixedFrequencySchedulerFactory;
+import org.mule.source.polling.MessageProcessorPollingOverride;
+import org.mule.source.polling.PollingMessageSource;
+import org.mule.source.polling.schedule.FixedFrequencySchedulerFactory;
 
 import org.springframework.beans.factory.FactoryBean;
 

@@ -15,11 +15,11 @@ import org.mule.api.security.SecurityProviderNotFoundException;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.security.AbstractEndpointSecurityFilter;
+import org.mule.security.AbstractOperationSecurityFilter;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 
-public class CustomSecurityFilter extends AbstractEndpointSecurityFilter
+public class CustomSecurityFilter extends AbstractOperationSecurityFilter
 {
 
     public CustomSecurityFilter()
@@ -31,16 +31,6 @@ public class CustomSecurityFilter extends AbstractEndpointSecurityFilter
     protected void authenticateInbound(MuleEvent event)
         throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
         EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException
-    {
-        if (!isValid(event))
-        {
-            throw new UnauthorisedException(CoreMessages.authFailedForUser("a"));
-        }
-    }
-
-    @Override
-    protected void authenticateOutbound(MuleEvent event)
-        throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
     {
         if (!isValid(event))
         {

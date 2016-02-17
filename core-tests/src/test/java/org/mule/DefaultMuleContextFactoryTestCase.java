@@ -46,7 +46,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
     private static String TEST_STRING_KEY2 = "test2";
     private static String TEST_STRING_VALUE2 = "test_value2";
     private static String TEST_OBJECT_NAME = "testObject";
-    private static String TEST_MODEL_NAME = "testModel";
 
     private MuleContext context;
 
@@ -201,7 +200,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
-        assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
     }
 

@@ -21,7 +21,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 
 import org.junit.Before;
 import org.junit.Test;

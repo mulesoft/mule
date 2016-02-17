@@ -19,7 +19,7 @@ import org.mule.tck.testmodels.fruit.FruitLover;
 import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 
 import java.lang.reflect.Method;
 

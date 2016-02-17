@@ -8,12 +8,12 @@ package org.mule.module.extension.file.api;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.temporary.MuleMessage;
-import org.mule.api.transport.OutputHandler;
+import org.mule.message.OutputHandler;
 import org.mule.extension.annotation.api.DataTypeParameters;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
 import org.mule.module.extension.file.api.matcher.NullFilePayloadPredicate;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;

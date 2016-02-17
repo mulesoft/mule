@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.store.InMemoryObjectStore;
@@ -31,8 +30,6 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
     @Test
     public void testIdempotentReceiver() throws Exception
     {
-        InboundEndpoint endpoint1 = getTestInboundEndpoint("Test1Provider",
-            "test://Test1Provider?exchangePattern=one-way");
         Flow flow = getTestFlow();
 
         MuleSession session = mock(MuleSession.class);
@@ -45,7 +42,7 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
         ir.setMuleContext(muleContext);
 
         MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
-        MuleEvent event = new DefaultMuleEvent(okMessage, endpoint1, getTestFlow(), session);
+        MuleEvent event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
 
         // This one will process the event on the target endpoint
         event = ir.process(event);
@@ -53,13 +50,13 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
 
          // This will not process, because the message is a duplicate
         okMessage = new DefaultMuleMessage("OK", muleContext);
-        event = new DefaultMuleEvent(okMessage, endpoint1, getTestFlow(), session);
+        event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
         event = ir.process(event);
         assertNull(event);
 
         // This will process, because the message  is not a duplicate
         okMessage = new DefaultMuleMessage("Not OK", muleContext);
-        event = new DefaultMuleEvent(okMessage, endpoint1, getTestFlow(), session);
+        event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
         event = ir.process(event);
         assertNotNull(event);
     }

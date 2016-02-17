@@ -10,7 +10,6 @@ import org.mule.VoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
@@ -61,22 +60,19 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter
             for (int i = 0; i < routes.size(); i++)
             {
                 MessageProcessor mp = getRoute(i,event);
-                OutboundEndpoint endpoint = mp instanceof OutboundEndpoint ? (OutboundEndpoint)mp : null;
-                if (endpoint == null || endpoint.getFilter() == null || (endpoint.getFilter() != null && endpoint.getFilter().accept(message)))
+
+                AbstractRoutingStrategy.validateMessageIsNotConsumable(event,message);
+                MuleMessage clonedMessage = cloneMessage(event, message);
+
+                MuleEvent result = sendRequest(event, createEventToRoute(event, clonedMessage), mp, true);
+                if (result != null && !VoidMuleEvent.getInstance().equals(result))
                 {
-                    AbstractRoutingStrategy.validateMessageIsNotConsumable(event,message);
-                    MuleMessage clonedMessage = cloneMessage(event, message);
+                    results.add(result);
+                }
 
-                    MuleEvent result = sendRequest(event, createEventToRoute(event, clonedMessage), mp, true);
-                    if (result != null && !VoidMuleEvent.getInstance().equals(result))
-                    {
-                        results.add(result);
-                    }
-
-                    if (!continueRoutingMessageAfter(result))
-                    {
-                        break;
-                    }
+                if (!continueRoutingMessageAfter(result))
+                {
+                    break;
                 }
             }
         }

@@ -17,10 +17,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.connector.DispatchException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringMessageUtils;
 
@@ -76,10 +75,6 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
     {
         if (logger.isDebugEnabled())
         {
-            if (route instanceof OutboundEndpoint)
-            {
-                logger.debug("Message being sent to: " + ((OutboundEndpoint) route).getEndpointURI());
-            }
             logger.debug(message);
         }
 
@@ -89,18 +84,10 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
             {
                 logger.trace("Request payload: \n"
                              + StringMessageUtils.truncate(muleContext.getTransformationService().getPayloadForLogging(message), 100, false));
-                if (route instanceof OutboundEndpoint)
-                {
-                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
-                }
             }
             catch (Exception e)
             {
                 logger.trace("Request payload: \n(unable to retrieve payload: " + e.getMessage());
-                if (route instanceof OutboundEndpoint)
-                {
-                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
-                }
             }
         }
 
@@ -148,7 +135,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
     {
         if (route == null)
         {
-            throw new DispatchException(CoreMessages.objectIsNull("Outbound Endpoint"), routedEvent, null);
+            throw new DispatchException(CoreMessages.objectIsNull("route"), routedEvent, null);
         }
 
         MuleEvent event = createEventToRoute(routedEvent, message, route);

@@ -20,7 +20,7 @@ import org.mule.api.security.SecurityProviderNotFoundException;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.security.AbstractEndpointSecurityFilter;
+import org.mule.security.AbstractOperationSecurityFilter;
 import org.mule.security.DefaultMuleAuthentication;
 import org.mule.security.MuleCredentials;
 import org.mule.security.MuleHeaderCredentialsAccessor;
@@ -29,7 +29,7 @@ import org.mule.security.MuleHeaderCredentialsAccessor;
  * <code>MuleEncryptionEndpointSecurityFilter</code> provides password-based
  * encryption
  */
-public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecurityFilter
+public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecurityFilter
 {
     private EncryptionStrategy strategy;
 
@@ -39,9 +39,8 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
     }
 
     @Override
-    protected final void authenticateInbound(MuleEvent event)
-        throws SecurityException, CryptoFailureException, EncryptionStrategyNotFoundException,
-        UnknownAuthenticationTypeException
+    protected void authenticateInbound(MuleEvent event)
+            throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException
     {
         String userHeader = (String) getCredentialsAccessor().getCredentials(event);
         if (userHeader == null)
@@ -62,10 +61,10 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
             if (logger.isDebugEnabled())
             {
                 logger.debug("Authentication request for user: " + user.getUsername()
-                    + " failed: " + e.toString());
+                             + " failed: " + e.toString());
             }
             throw new UnauthorisedException(
-                CoreMessages.authFailedForUser(user.getUsername()), event, e);
+                    CoreMessages.authFailedForUser(user.getUsername()), event, e);
         }
 
         // Authentication success
@@ -77,39 +76,6 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         SecurityContext context = getSecurityManager().createSecurityContext(authentication);
         context.setAuthentication(authentication);
         event.getSession().setSecurityContext(context);
-    }
-
-    @Override
-    protected void authenticateOutbound(MuleEvent event)
-        throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
-    {
-        SecurityContext securityContext = event.getSession().getSecurityContext();
-        if (securityContext == null)
-        {
-            if (isAuthenticate())
-            {
-                throw new UnauthorisedException(event, securityContext, this);
-            }
-            else
-            {
-                return;
-            }
-        }
-
-        Authentication auth = securityContext.getAuthentication();
-        if (isAuthenticate())
-        {
-            auth = getSecurityManager().authenticate(auth);
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Authentication success: " + auth.toString());
-            }
-        }
-
-        String token = auth.getCredentials().toString();
-        String header = new String(strategy.encrypt(token.getBytes(), null));
-        getCredentialsAccessor().setCredentials(event, header);
-
     }
 
     @Override

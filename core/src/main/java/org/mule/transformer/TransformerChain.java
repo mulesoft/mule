@@ -9,7 +9,6 @@ package org.mule.transformer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
@@ -100,16 +99,6 @@ public class TransformerChain extends AbstractMessageTransformer
         for (Transformer transformer : transformers)
         {
             transformer.setMuleContext(muleContext);
-        }
-    }
-
-    @Override
-    public void setEndpoint(ImmutableEndpoint endpoint)
-    {
-        super.setEndpoint(endpoint);
-        for (Transformer transformer : transformers)
-        {
-            transformer.setEndpoint(endpoint);
         }
     }
 

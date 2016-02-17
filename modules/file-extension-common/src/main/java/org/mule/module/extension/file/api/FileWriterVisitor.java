@@ -9,7 +9,7 @@ package org.mule.module.extension.file.api;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.transport.OutputHandler;
+import org.mule.message.OutputHandler;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;

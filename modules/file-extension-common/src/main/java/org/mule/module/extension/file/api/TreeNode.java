@@ -9,7 +9,7 @@ package org.mule.module.extension.file.api;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 import org.mule.util.collection.ImmutableListCollector;
 
 import java.io.InputStream;

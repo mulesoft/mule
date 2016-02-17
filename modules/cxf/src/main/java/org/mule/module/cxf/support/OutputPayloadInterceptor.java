@@ -10,7 +10,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.DelayedResult;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 
 import java.util.ArrayList;
 import java.util.Collections;

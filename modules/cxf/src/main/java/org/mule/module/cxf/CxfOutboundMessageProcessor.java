@@ -6,7 +6,7 @@
  */
 package org.mule.module.cxf;
 
-import static org.mule.api.transport.PropertyScope.OUTBOUND;
+import static org.mule.PropertyScope.OUTBOUND;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import org.mule.DefaultMuleMessage;
 import org.mule.NonBlockingVoidMuleEvent;
@@ -17,10 +17,11 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NonBlockingSupported;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.connector.DispatchException;
 import org.mule.api.processor.CloneableMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.routing.RoutingException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.DispatchException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.i18n.CxfMessages;

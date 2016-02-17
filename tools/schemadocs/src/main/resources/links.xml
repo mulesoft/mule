@@ -32,7 +32,6 @@
     <link><item>mule:properties</item><page>Additional+Configuration</page></link>
     <link><item>mule:jndi-provider-property</item><page>Additional+Configuration</page></link>
     <link><item>mule:jndi-provider-properties</item><page>Additional+Configuration</page></link>
-    <link><item>mule:custom-transaction</item><page>Additional+Configuration</page></link>
     <link><item>mule:filter</item><page>Additional+Configuration</page></link>
     <link><item>mule:not-filter</item><page>Additional+Configuration</page></link>
     <link><item>mule:and-filter</item><page>Additional+Configuration</page></link>
@@ -72,82 +71,14 @@
     <link><item>mule:expression-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:encryption-security-filter</item><page>Additional+Configuration</page></link>
 
-    <link><item>mule:inbound-endpoint</item><page>Configuring+Endpoints</page></link>
-    <link><item>mule:outbound-endpoint</item><page>Configuring+Endpoints</page></link>
-    <link><item>mule:endpoint</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:transformers</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:response-transformers</item><page>Configuring+Endpoints</page></link>
 
-    <link><item>mule:receiver-threading-profile</item><page>General+Transport+Configuration</page></link>
-    <link><item>mule:dispatcher-threading-profile</item><page>General+Transport+Configuration</page></link>
-    <link><item>mule:service-overrides</item><page>General+Transport+Configuration</page></link>
+    <link><item>cxf:features</item><page>CXF+Module</page></link>
 
-    <link><item>bpm:connector</item><page>BPM+Transport</page></link>
-    <link><item>bpm:inbound-endpoint</item><page>BPM+Transport</page></link>
-    <link><item>bpm:outbound-endpoint</item><page>BPM+Transport</page></link>
-    <link><item>bpm:endpoint</item><page>BPM+Transport</page></link>
-
-    <link><item>cxf:connector</item><page>CXF+Transport</page></link>
-    <link><item>cxf:inbound-endpoint</item><page>CXF+Transport</page></link>
-    <link><item>cxf:outbound-endpoint</item><page>CXF+Transport</page></link>
-    <link><item>cxf:endpoint</item><page>CXF+Transport</page></link>
-    <link><item>cxf:features</item><page>CXF+Transport</page></link>
-    <link><item>wsdl-cxf:inbound-endpoint</item><page>CXF+Transport</page></link>
-    <link><item>wsdl-cxf:outbound-endpoint</item><page>CXF+Transport</page></link>
-    <link><item>wsdl-cxf:endpoint</item><page>CXF+Transport</page></link>
-
-    <link><item>http:connector</item><page>HTTP+Transport</page></link>
-    <link><item>http:rest-service-component</item><page>HTTP+Transport</page></link>
-    <link><item>http:payloadParameterName</item><page>HTTP+Transport</page></link>
-    <link><item>http:requiredParameter</item><page>HTTP+Transport</page></link>
-    <link><item>http:optionalParameter</item><page>HTTP+Transport</page></link>
-    <link><item>http:http-client-response-to-object-transformer</item><page>HTTP+Transport</page></link>
-    <link><item>http:http-response-to-string-transformer</item><page>HTTP+Transport</page></link>
-    <link><item>http:object-to-http-client-request-transformer</item><page>HTTP+Transport</page></link>
-    <link><item>http:message-to-http-response-transformer</item><page>HTTP+Transport</page></link>
-    <link><item>http:inbound-endpoint</item><page>HTTP+Transport</page></link>
-    <link><item>http:outbound-endpoint</item><page>HTTP+Transport</page></link>
-    <link><item>http:endpoint</item><page>HTTP+Transport</page></link>
-
-    <link><item>https:connector</item><page>HTTPS+Transport</page></link>
-    <link><item>https:tls-client</item><page>HTTPS+Transport</page></link>
-    <link><item>https:tls-key-store</item><page>HTTPS+Transport</page></link>
-    <link><item>https:tls-server</item><page>HTTPS+Transport</page></link>
-    <link><item>https:tls-protocol-handler</item><page>HTTPS+Transport</page></link>
-    <link><item>https:inbound-endpoint</item><page>HTTPS+Transport</page></link>
-    <link><item>https:outbound-endpoint</item><page>HTTPS+Transport</page></link>
-    <link><item>https:endpoint</item><page>HTTPS+Transport</page></link>
-
-    <link><item>jnp:connector</item><page>JNP+Transport</page></link>
-    <link><item>jnp:inbound-endpoint</item><page>JNP+Transport</page></link>
-    <link><item>jnp:outbound-endpoint</item><page>JNP+Transport</page></link>
-    <link><item>jnp:endpoint</item><page>JNP+Transport</page></link>
-
-    <link><item>multicast:connector</item><page>Multicast+Transport</page></link>
-    <link><item>multicast:inbound-endpoint</item><page>Multicast+Transport</page></link>
-    <link><item>multicast:outbound-endpoint</item><page>Multicast+Transport</page></link>
-    <link><item>multicast:endpoint</item><page>Multicast+Transport</page></link>
-
-    <link><item>rmi:connector</item><page>RMI+Transport</page></link>
-    <link><item>rmi:inbound-endpoint</item><page>RMI+Transport</page></link>
-    <link><item>rmi:outbound-endpoint</item><page>RMI+Transport</page></link>
-    <link><item>rmi:endpoint</item><page>RMI+Transport</page></link>
-
-    <link><item>soap:http-to-soap-request-transformer</item><page>SOAP+Transport</page></link>
-
-    <link><item>stdio:connector</item><page>STDIO+Transport</page></link>
-    <link><item>stdio:inbound-endpoint</item><page>STDIO+Transport</page></link>
-    <link><item>stdio:outbound-endpoint</item><page>STDIO+Transport</page></link>
-    <link><item>stdio:endpoint</item><page>STDIO+Transport</page></link>
-
-    <link><item>tls:key-store</item><page>TLS+Transport</page></link>
-    <link><item>tls:trust-store</item><page>TLS+Transport</page></link>
-    <link><item>tls:context</item><page>TLS+Transport</page></link>
-
-    <link><item>udp:connector</item><page>UDP+Transport</page></link>
-    <link><item>udp:inbound-endpoint</item><page>UDP+Transport</page></link>
-    <link><item>udp:outbound-endpoint</item><page>UDP+Transport</page></link>
-    <link><item>udp:endpoint</item><page>UDP+Transport</page></link>
+    <link><item>tls:key-store</item><page>TLS+Module</page></link>
+    <link><item>tls:trust-store</item><page>TLS+Module</page></link>
+    <link><item>tls:context</item><page>TLS+Module</page></link>
 
     <link><item>client:remote-dispatcher-agent</item><page>Client+Module</page></link>
     <link><item>client:remote-endpoint</item><page>Client+Module</page></link>

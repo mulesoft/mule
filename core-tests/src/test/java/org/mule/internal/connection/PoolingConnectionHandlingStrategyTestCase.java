@@ -25,7 +25,6 @@ import static org.mule.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.api.config.PoolingProfile.WHEN_EXHAUSTED_FAIL;
 import static org.mule.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
 import static org.mule.tck.MuleTestUtils.spyInjector;
-
 import org.mule.api.Injector;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionException;

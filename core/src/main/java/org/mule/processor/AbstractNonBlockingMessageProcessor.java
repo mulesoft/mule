@@ -15,7 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.construct.Flow;
 
 /**

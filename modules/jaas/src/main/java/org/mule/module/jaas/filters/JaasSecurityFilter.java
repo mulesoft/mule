@@ -20,11 +20,11 @@ import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.jaas.JaasAuthentication;
-import org.mule.security.AbstractEndpointSecurityFilter;
+import org.mule.security.AbstractOperationSecurityFilter;
 import org.mule.security.MuleCredentials;
 import org.mule.security.MuleHeaderCredentialsAccessor;
 
-public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
+public class JaasSecurityFilter extends AbstractOperationSecurityFilter
 {
 
     public JaasSecurityFilter()
@@ -82,38 +82,6 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
         SecurityContext context = getSecurityManager().createSecurityContext(authResult);
         context.setAuthentication(authResult);
         event.getSession().setSecurityContext(context);
-    }
-
-    @Override
-    protected void authenticateOutbound(MuleEvent event)
-        throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
-    {
-        SecurityContext securityContext = event.getSession().getSecurityContext();
-        if (securityContext == null)
-        {
-            if (isAuthenticate())
-            {
-                throw new UnauthorisedException(event, securityContext, this);
-            }
-            else
-            {
-                return;
-            }
-        }
-
-        Authentication auth = securityContext.getAuthentication();
-        if (isAuthenticate())
-        {
-            auth = getSecurityManager().authenticate(auth);
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Authentication success: " + auth.toString());
-            }
-        }
-
-        String token = auth.getCredentials().toString();
-        getCredentialsAccessor().setCredentials(event, token);
-
     }
 
     @Override

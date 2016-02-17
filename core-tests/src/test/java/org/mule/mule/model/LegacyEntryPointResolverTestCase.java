@@ -115,46 +115,6 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
         }
     }
 
-//    public ComponentMethodMapping[] getComponentMappings()
-//    {
-//        ComponentMethodMapping[] mappings = new ComponentMethodMapping[5];
-//        mappings[0] = new ComponentMethodMapping(WaterMelon.class, "myEventHandler", MuleEvent.class);
-//        mappings[1] = new ComponentMethodMapping(FruitBowl.class, "consumeFruit", FruitLover.class);
-//        // see testArrayArgumentResolution
-//        mappings[2] = new ComponentMethodMapping(FruitBowl.class, "setFruit", Fruit[].class);
-//        // see testListArgumentResolution
-//        mappings[3] = new ComponentMethodMapping(FruitBowl.class, "setFruit", Collection.class);
-//        mappings[4] = new ComponentMethodMapping(Banana.class, "peelEvent", EventObject.class);
-//
-//        // TODO This fails because "implementation" can no longer be a container reference, it must be
-//        // an actual object and InvocationHandler does not have a default constructor.
-//
-//        // test proxy objects
-//        //mappings[5] = new ComponentMethodMapping(InvocationHandler.class, "invoke", FruitLover.class, true);
-//
-//        return mappings;
-//    }
-
-//    @Override
-//    public UMODescriptor getDescriptorToResolve(String className) throws Exception
-//    {
-//        UMODescriptor descriptor = super.getDescriptorToResolve(className);
-//        descriptor.setInboundRouter(new DefaultInboundRouterCollection());
-//        Endpoint endpoint = new MuleEndpoint("test://foo", true);
-//
-//        if (className.equals(FruitBowl.class.getName()))
-//        {
-//            endpoint.setTransformers(CollectionUtils.singletonList(new ObjectToFruitLover()));
-//            descriptor.getInboundRouter().addEndpoint(endpoint);
-//        }
-//        else if (className.equals(InvocationHandler.class.getName()))
-//        {
-//            endpoint.setTransformers(CollectionUtils.singletonList(new ObjectToFruitLover()));
-//            descriptor.getInboundRouter().addEndpoint(endpoint);
-//        }
-//        return descriptor;
-//    }
-
     /**
      * Tests entrypoint discovery when there is more than one discoverable method
      * with MuleEventContext parameter.

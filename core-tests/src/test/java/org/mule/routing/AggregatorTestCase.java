@@ -11,17 +11,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.construct.Flow;
 import org.mule.routing.correlation.EventCorrelatorCallback;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -54,10 +51,9 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
         message2.setCorrelationId(message1.getUniqueId());
         message3.setCorrelationId(message1.getUniqueId());
 
-        InboundEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext);
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, flow, session);
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, flow, session);
-        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, flow, session);
+        MuleEvent event1 = new DefaultMuleEvent(message1, flow, session);
+        MuleEvent event2 = new DefaultMuleEvent(message2, flow, session);
+        MuleEvent event3 = new DefaultMuleEvent(message3, flow, session);
 
         assertNull(router.process(event1));
         assertNull(router.process(event2));

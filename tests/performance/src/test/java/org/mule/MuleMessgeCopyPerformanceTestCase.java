@@ -8,7 +8,6 @@ package org.mule;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 

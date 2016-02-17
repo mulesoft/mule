@@ -8,13 +8,13 @@ package org.mule.test.components;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.api.transport.MessageReceiver;
-import org.mule.construct.AbstractFlowConstruct;
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.source.MessageSource;
+import org.mule.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.transport.AbstractConnector;
 
 import org.junit.Test;
 
@@ -40,48 +40,51 @@ public class FlowStateTestCase extends FunctionalTestCase
 
     protected void doTestStarted(String flowName) throws Exception
     {
-        AbstractFlowConstruct f = (AbstractFlowConstruct) muleContext.getRegistry().lookupFlowConstruct(
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(
             flowName + "Flow");
         // Flow initially started
-        assertTrue(f.isStarted());
-        assertFalse(f.isStopped());
-
-        // The listeners should be registered and started.
-        doListenerTests(flowName, 1, true);
+        assertTrue(flow.isStarted());
+        assertFalse(flow.isStopped());
+        assertTrue(((TestMessageSource) flow.getMessageSource()).isStarted());
     }
 
     @Test
     public void testInitialStateStopped() throws Exception
     {
-        AbstractFlowConstruct f = (AbstractFlowConstruct) muleContext.getRegistry().lookupFlowConstruct(
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(
             "stoppedFlow");
-        assertEquals("stopped", f.getInitialState());
+        assertEquals("stopped", flow.getInitialState());
         // Flow initially stopped
-        assertFalse(f.isStarted());
-        assertTrue(f.isStopped());
+        assertFalse(flow.isStarted());
+        assertTrue(flow.isStopped());
+        assertFalse(((TestMessageSource) flow.getMessageSource()).isStarted());
 
-        // The connector should be started, but with no listeners registered.
-        doListenerTests("stopped", 0, true);
-
-        f.start();
-        assertTrue(f.isStarted());
-        assertFalse(f.isStopped());
-
-        // The listeners should now be registered and started.
-        doListenerTests("stopped", 1, true);
+        flow.start();
+        assertTrue(flow.isStarted());
+        assertFalse(flow.isStopped());
+        assertTrue(((TestMessageSource) flow.getMessageSource()).isStarted());
     }
 
-    protected void doListenerTests(String receiverName, int expectedCount, boolean isConnected)
+    public static class TestMessageSource implements MessageSource, Startable
     {
-        AbstractConnector connector = (AbstractConnector) muleContext.getRegistry().lookupConnector(
-            "connector.test.mule.default");
-        assertNotNull(connector);
-        assertTrue(connector.isStarted());
-        MessageReceiver[] receivers = connector.getReceivers("*" + receiverName + "*");
-        assertEquals(expectedCount, receivers.length);
-        for (int i = 0; i < expectedCount; i++)
+
+        private boolean started;
+
+        @Override
+        public void setListener(MessageProcessor listener)
         {
-            assertEquals(isConnected, receivers[0].isConnected());
+
+        }
+
+        @Override
+        public void start() throws MuleException
+        {
+            started = true;
+        }
+
+        public boolean isStarted()
+        {
+            return started;
         }
     }
 
