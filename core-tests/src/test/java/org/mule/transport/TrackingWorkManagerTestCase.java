@@ -22,6 +22,10 @@ import org.mule.api.context.WorkManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
+import org.mule.work.TrackingWorkManager;
+import org.mule.work.WorkListenerWrapperFactory;
+import org.mule.work.WorkManagerHolder;
+import org.mule.work.WorkTracker;
 
 import java.util.Collections;
 import java.util.List;

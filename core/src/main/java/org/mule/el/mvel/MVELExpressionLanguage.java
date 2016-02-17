@@ -29,7 +29,7 @@ import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.mvel2.util.CompilerTools;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.TypedValue;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;

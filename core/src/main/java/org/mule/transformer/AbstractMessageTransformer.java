@@ -19,7 +19,7 @@ import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 
@@ -108,7 +108,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
             else
             {
                 Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(),
-                    src.getClass(), endpoint);
+                    src.getClass());
                 /// FIXME
                 throw new TransformerMessagingException(msg, event, this);
             }

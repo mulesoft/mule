@@ -9,7 +9,7 @@ package org.mule.transformer.simple;
 import org.mule.api.MuleEvent;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.OutputHandler;
+import org.mule.message.OutputHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;

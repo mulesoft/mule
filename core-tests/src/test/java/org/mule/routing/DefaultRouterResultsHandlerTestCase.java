@@ -16,20 +16,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleConfiguration;
-import org.mule.api.endpoint.EndpointException;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.construct.Flow;
-import org.mule.endpoint.MuleEndpointURI;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transaction.MuleTransactionConfig;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,15 +39,11 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
     protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
     protected MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     protected MuleSession session = mock(MuleSession.class);
-    protected InboundEndpoint endpoint = mock(InboundEndpoint.class);
     protected Flow flow = mock(Flow.class);
 
     @Before
-    public void setupMocks() throws EndpointException
+    public void setupMocks() throws Exception
     {
-        when(endpoint.getEndpointURI()).thenReturn(new MuleEndpointURI("test://test", muleContext));
-        when(endpoint.getTransactionConfig()).thenReturn(new MuleTransactionConfig());
-        when(endpoint.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
         when(flow.getProcessingStrategy()).thenReturn(new SynchronousProcessingStrategy());
         when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
     }
@@ -71,12 +62,12 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
         message1.setInvocationProperty("key1", "value1");
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, flow);
+        MuleEvent event1 = new DefaultMuleEvent(message1, flow);
         event1.getSession().setProperty("key", "value");
 
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
         message2.setInvocationProperty("key2", "value2");
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, flow);
+        MuleEvent event2 = new DefaultMuleEvent(message2, flow);
         event2.getSession().setProperty("key", "valueNEW");
         event2.getSession().setProperty("key1", "value1");
 
@@ -103,10 +94,10 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         message2.setInvocationProperty("key2", "value2");
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
         message3.setInvocationProperty("key3", "value3");
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, flow);
+        MuleEvent event1 = new DefaultMuleEvent(message1, flow);
         MuleSession session = event1.getSession();
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, flow, session);
-        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, flow, session);
+        MuleEvent event2 = new DefaultMuleEvent(message2, flow, session);
+        MuleEvent event3 = new DefaultMuleEvent(message3, flow, session);
         event1.getSession().setProperty("key", "value");
         event2.getSession().setProperty("key1", "value1");
         event2.getSession().setProperty("key2", "value2");
@@ -148,8 +139,8 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         message1.setInvocationProperty("key", "value");
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
         message2.setInvocationProperty("key2", "value2");
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, flow);
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, flow);
+        MuleEvent event1 = new DefaultMuleEvent(message1, flow);
+        MuleEvent event2 = new DefaultMuleEvent(message2, flow);
         List<MuleEvent> events = new ArrayList<MuleEvent>();
         events.add(null);
         events.add(event2);
@@ -168,7 +159,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
     {
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
         message1.setInvocationProperty("key1", "value1");
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, flow);
+        MuleEvent event1 = new DefaultMuleEvent(message1, flow);
 
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
@@ -178,7 +169,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         list.add(message3);
         MuleMessage messageCollection = new DefaultMuleMessage(list, muleContext);
         messageCollection.setInvocationProperty("key2", "value2");
-        MuleEvent event2 = new DefaultMuleEvent(messageCollection, endpoint, flow);
+        MuleEvent event2 = new DefaultMuleEvent(messageCollection, flow);
 
         MuleEvent result = resultsHandler.aggregateResults(Collections.<MuleEvent> singletonList(event2),
             event1, muleContext);
@@ -195,7 +186,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
     {
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
         message1.setInvocationProperty("key1", "value1");
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, flow);
+        MuleEvent event1 = new DefaultMuleEvent(message1, flow);
 
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
@@ -207,14 +198,14 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         list.add(message3);
         MuleMessage messageCollection = new DefaultMuleMessage(list, muleContext);
         messageCollection.setInvocationProperty("key2", "value2");
-        MuleEvent event2 = new DefaultMuleEvent(messageCollection, endpoint, flow);
+        MuleEvent event2 = new DefaultMuleEvent(messageCollection, flow);
 
         List<MuleMessage> list2 = new ArrayList<>();
         list.add(message4);
         list.add(message5);
         MuleMessage messageCollection2 = new DefaultMuleMessage(list2, muleContext);
         messageCollection.setInvocationProperty("key3", "value3");
-        MuleEvent event3 = new DefaultMuleEvent(messageCollection2, endpoint, flow);
+        MuleEvent event3 = new DefaultMuleEvent(messageCollection2, flow);
 
         List<MuleEvent> events = new ArrayList<MuleEvent>();
         events.add(event2);

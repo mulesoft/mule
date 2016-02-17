@@ -19,7 +19,7 @@
                     <not-filter>
                         <or-filter>
                             <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Apple"/>
-                            <payload-type-filter expectedType="org.mule.transport.NullPayload"/>
+                            <payload-type-filter expectedType="org.mule.api.message.NullPayload"/>
                         </or-filter>
                     </not-filter>
                 </and-filter>

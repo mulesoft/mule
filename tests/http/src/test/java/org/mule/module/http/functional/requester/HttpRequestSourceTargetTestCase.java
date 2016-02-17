@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;

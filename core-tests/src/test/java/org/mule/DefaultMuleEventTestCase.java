@@ -16,14 +16,9 @@ import static org.mule.transformer.types.MimeTypes.APPLICATION_XML;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.EndpointException;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
-import org.mule.endpoint.MuleEndpointURI;
 import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
@@ -173,33 +168,4 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase
         assertThat(event.isTransacted(), equalTo(false));
     }
 
-    @Test
-    public void transactedRequestResponse() throws Exception
-    {
-        Flow flow = mock(Flow.class);
-        when(flow.isSynchronous()).thenReturn(false);
-        DefaultMuleEvent event = new DefaultMuleEvent(muleMessage,  createMockTransactionalInboundEndpoint(), flow);
-        assertThat(event.isSynchronous(), equalTo(true));
-        assertThat(event.isTransacted(), equalTo(true));
-    }
-
-    @Test
-    public void transactedOneWay() throws Exception
-    {
-        Flow flow = mock(Flow.class);
-        when(flow.isSynchronous()).thenReturn(false);
-        DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, createMockTransactionalInboundEndpoint(), flow);
-        assertThat(event.isSynchronous(), equalTo(true));
-        assertThat(event.isTransacted(), equalTo(true));
-    }
-
-    private InboundEndpoint createMockTransactionalInboundEndpoint() throws EndpointException
-    {
-        InboundEndpoint inboundEndpoint = mock(InboundEndpoint.class);
-        TransactionConfig transactionConfig = mock(TransactionConfig.class);
-        when(transactionConfig.isTransacted()).thenReturn(true);
-        when(inboundEndpoint.getTransactionConfig()).thenReturn(transactionConfig);
-        when(inboundEndpoint.getEndpointURI()).thenReturn(new MuleEndpointURI("test://test", muleContext));
-        return inboundEndpoint;
-    }
 }

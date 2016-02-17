@@ -8,7 +8,6 @@
       version="mule3.2">
 
     <flow name="service">
-        <inbound-endpoint address="test://foo"/>
         <component>
             <spring-object bean="orange">
                 <property key="brand" value="Tutti Frutti"/>

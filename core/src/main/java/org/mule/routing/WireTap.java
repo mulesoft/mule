@@ -13,7 +13,7 @@ import org.mule.api.MuleException;
 import org.mule.api.NonBlockingSupported;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.util.ObjectUtils;

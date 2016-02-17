@@ -14,6 +14,7 @@ import static org.mule.transport.WorkEventMatcher.anAcceptedWorkEventFor;
 import static org.mule.transport.WorkEventMatcher.aCompletedWorkEventFor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.work.TrackerWorkListener;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;

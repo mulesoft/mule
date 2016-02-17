@@ -8,7 +8,6 @@ package org.mule.module.cxf.transport;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.NonBlockingVoidMuleEvent;
@@ -21,17 +20,16 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.OutputHandler;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.message.OutputHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.support.DelegatingOutputStream;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,8 +38,6 @@ import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.ws.BindingProvider;
@@ -81,8 +77,6 @@ public class MuleUniversalConduit extends AbstractConduit
 
     private boolean closeInput = true;
 
-    private Map<String,OutboundEndpoint> endpoints = new HashMap<String, OutboundEndpoint>();
-    
     /**
      * @param ei The Endpoint being invoked by this destination.
      * @param t The EPR associated with this Conduit - i.e. the reply destination.
@@ -151,8 +145,6 @@ public class MuleUniversalConduit extends AbstractConduit
         // are we sending an out of band response for a server side request?
         boolean decoupled = event != null && message.getExchange().getInMessage() != null;
         
-        OutboundEndpoint ep = null;
-        
         if (event == null || VoidMuleEvent.getInstance().equals(event) || decoupled)
         {
             // we've got an out of band WS-RM message or a message from a standalone client
@@ -163,8 +155,7 @@ public class MuleUniversalConduit extends AbstractConduit
             
             try
             {
-                ep = getEndpoint(muleContext, url);
-                event = new DefaultMuleEvent(muleMsg, ep.getExchangePattern(), (FlowConstruct) null);
+                event = new DefaultMuleEvent(muleMsg, (FlowConstruct) null);
             }
             catch (Exception e)
             {
@@ -183,14 +174,13 @@ public class MuleUniversalConduit extends AbstractConduit
         message.put(CxfConstants.MULE_EVENT, event);
         
         final MuleEvent finalEvent = event;
-        final OutboundEndpoint finalEndpoint = ep;
         AbstractPhaseInterceptor<Message> i = new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM)
         {
             public void handleMessage(Message m) throws Fault
             {
                 try
                 {
-                    dispatchMuleMessage(m, finalEvent, finalEndpoint);
+                    dispatchMuleMessage(m, finalEvent);
                 }
                 catch (MuleException e)
                 {
@@ -201,18 +191,6 @@ public class MuleUniversalConduit extends AbstractConduit
         message.getInterceptorChain().add(i);
     }
 
-    protected synchronized OutboundEndpoint getEndpoint(MuleContext muleContext, String uri) throws MuleException
-    {
-        if (endpoints.get(uri) != null)
-        {
-            return endpoints.get(uri);
-        }
-
-        OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(uri);
-        endpoints.put(uri, endpoint);
-        return endpoint;
-    }
-    
     public String setupURL(Message message) throws MalformedURLException
     {
         String value = (String) message.get(Message.ENDPOINT_ADDRESS);
@@ -242,7 +220,7 @@ public class MuleUniversalConduit extends AbstractConduit
         return result;
     }
     
-    protected void dispatchMuleMessage(final Message m, MuleEvent reqEvent, OutboundEndpoint endpoint) throws MuleException {
+    protected void dispatchMuleMessage(final Message m, MuleEvent reqEvent) throws MuleException {
         try
         {
             if (reqEvent.isAllowNonBlocking())
@@ -276,7 +254,7 @@ public class MuleUniversalConduit extends AbstractConduit
             // Update RequestContext ThreadLocal for backwards compatibility
             OptimizedRequestContext.unsafeSetEvent(reqEvent);
 
-            MuleEvent resEvent = processNext(reqEvent, m.getExchange(), endpoint);
+            MuleEvent resEvent = processNext(reqEvent, m.getExchange());
 
             if (!resEvent.equals(NonBlockingVoidMuleEvent.getInstance()))
             {
@@ -372,22 +350,14 @@ public class MuleUniversalConduit extends AbstractConduit
     }
     
     protected MuleEvent processNext(MuleEvent event,
-                                    Exchange exchange, OutboundEndpoint endpoint) throws MuleException
+                                    Exchange exchange) throws MuleException
     {
         CxfOutboundMessageProcessor processor = (CxfOutboundMessageProcessor) exchange.get(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR);
         MuleEvent response;
-        if (processor == null)
-        {
-            response = endpoint.process(event);
-        }
-        else
-        {
-           response = processor.processNext(event);
-           
-           Holder<MuleEvent> holder = (Holder<MuleEvent>) exchange.get("holder");
-           holder.value = response;
-        }
-        
+        response = processor.processNext(event);
+
+        Holder<MuleEvent> holder = (Holder<MuleEvent>) exchange.get("holder");
+        holder.value = response;
         return response;
     }
 

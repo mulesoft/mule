@@ -20,10 +20,10 @@
     <flow name="In-Only_Out-Only-Service">
         <script:component>
             <script:script engine="groovy">
-                if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND)!=null)
-                    return "foo header received"
+                if (message.getProperty("foo", org.mule.PropertyScope.INBOUND)!=null)
+                return "foo header received"
                 else
-                    return "foo header not received"
+                return "foo header not received"
             </script:script>
         </script:component>
         

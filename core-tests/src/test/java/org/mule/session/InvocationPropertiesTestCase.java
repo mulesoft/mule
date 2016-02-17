@@ -19,7 +19,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.serialization.SerializationException;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
 import org.mule.tck.SensingNullMessageProcessor;

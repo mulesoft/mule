@@ -7,7 +7,7 @@
 package org.mule.util;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.transport.OutputHandler;
+import org.mule.message.OutputHandler;
 import org.mule.routing.filters.WildcardFilter;
 
 import com.google.common.primitives.Primitives;

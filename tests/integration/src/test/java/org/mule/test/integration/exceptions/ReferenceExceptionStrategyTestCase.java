@@ -17,7 +17,7 @@ import org.mule.component.ComponentException;
 import org.mule.exception.AbstractExceptionListener;
 import org.mule.exception.ChoiceMessagingExceptionStrategy;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;

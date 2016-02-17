@@ -9,10 +9,6 @@ package org.mule.routing.outbound;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.EndpointException;
-import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
@@ -23,15 +19,10 @@ import org.mule.api.routing.TransformingMatchable;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.endpoint.DynamicURIOutboundEndpoint;
-import org.mule.endpoint.MuleEndpointURI;
-import org.mule.routing.AbstractRoutingStrategy;
 import org.mule.util.TemplateParser;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <code>FilteringRouter</code> is a router that accepts events based on a filter
@@ -119,23 +110,6 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
         this.transformers = transformers;
     }
 
-    @Override
-    public synchronized void addRoute(MessageProcessor target) throws MuleException
-    {
-        if (!useTemplates)
-        {
-            if (target instanceof ImmutableEndpoint)
-            {
-                ImmutableEndpoint endpoint = (ImmutableEndpoint) target;
-                if (parser.isContainsTemplate(endpoint.getEndpointURI().toString()))
-                {
-                    useTemplates = true;
-                }
-            }
-        }
-        super.addRoute(target);
-    }
-
     /**
      * Will Return the target at the given index and will resolve any template tags
      * on the Endpoint URI if necessary
@@ -149,80 +123,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
      */
     public MessageProcessor getRoute(int index, MuleEvent event) throws CouldNotRouteOutboundMessageException
     {
-        if (!useTemplates)
-        {
-            return routes.get(index);
-        }
-        else
-        {
-            MuleMessage message = event.getMessage();
-            MessageProcessor mp = routes.get(index);
-            if (!(mp instanceof ImmutableEndpoint))
-            {
-                return routes.get(index);
-            }
-            OutboundEndpoint ep = (OutboundEndpoint) mp;
-            String uri = ep.getAddress();
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Uri before parsing is: " + uri);
-            }
-
-            AbstractRoutingStrategy.propagateMagicProperties(message,message);
-
-            if (!parser.isContainsTemplate(uri))
-            {
-                logger.debug("Uri does not contain template(s)");
-                return ep;
-            }
-            else
-            {
-                Map<String, Object> props = new HashMap<String, Object>();
-                // Also add the endpoint properties so that users can set fallback values
-                // when the property is not set on the event
-                props.putAll(ep.getProperties());
-                for (String propertyKey : message.getOutboundPropertyNames())
-                {
-                    Object value = message.getOutboundProperty(propertyKey);
-                    props.put(propertyKey, value);
-                }
-
-                String newUriString = parser.parse(props, uri);
-                if (parser.isContainsTemplate(newUriString))
-                {
-                    newUriString = this.getMuleContext().getExpressionManager().parse(newUriString, event, true);
-                }
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Uri after parsing is: " + uri);
-                }
-                try
-                {
-                    EndpointURI newUri = new MuleEndpointURI(newUriString, muleContext);
-                    EndpointURI endpointURI = ep.getEndpointURI();
-                    if (endpointURI != null && !newUri.getScheme().equalsIgnoreCase(endpointURI.getScheme()))
-                    {
-                        throw new CouldNotRouteOutboundMessageException(
-                            CoreMessages.schemeCannotChangeForRouter(ep.getEndpointURI().getScheme(),
-                                newUri.getScheme()), event, ep);
-                    }
-                    newUri.initialise();
-
-                    return new DynamicURIOutboundEndpoint(ep, newUri);
-                }
-                catch (EndpointException e)
-                {
-                    throw new CouldNotRouteOutboundMessageException(
-                        CoreMessages.templateCausedMalformedEndpoint(uri, newUriString), event, ep, e);
-                }
-                catch (InitialisationException e)
-                {
-                    throw new CouldNotRouteOutboundMessageException(
-                        CoreMessages.templateCausedMalformedEndpoint(uri, newUriString), event, ep, e);
-                }
-            }
-        }
+        return routes.get(index);
     }
 
     public boolean isUseTemplates()

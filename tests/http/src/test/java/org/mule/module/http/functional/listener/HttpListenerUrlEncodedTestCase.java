@@ -19,7 +19,7 @@ import org.mule.module.http.functional.matcher.ParamMapMatcher;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 import org.mule.util.StringUtils;
 
 import com.google.common.base.Charsets;

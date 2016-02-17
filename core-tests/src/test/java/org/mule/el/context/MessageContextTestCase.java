@@ -23,7 +23,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.metadata.DataType;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 
 import org.junit.Before;
 import org.junit.Test;

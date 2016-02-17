@@ -18,7 +18,6 @@ import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.connector.MuleConnectorOperationLocator;
 import org.mule.el.mvel.MVELExpressionLanguageWrapper;
-import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.execution.MuleMessageProcessingManager;
 import org.mule.internal.connection.DefaultConnectionManager;
 import org.mule.management.stats.DefaultProcessingTimeWatcher;
@@ -44,8 +43,6 @@ import org.mule.util.store.MuleObjectStoreManager;
  * <li> {@link QueueManager}
  * <li> {@link SecurityManager}
  * <li> {@link ObjectStore}
- * <li> {@link DefaultEndpointFactory}
- * <li> {@link Model} systemModel
  * <li> {@link ThreadingProfile} defaultThreadingProfile
  * <li> {@link ThreadingProfile} defaultMessageDispatcherThreadingProfile
  * <li> {@link ThreadingProfile} defaultMessageRequesterThreadingProfile
@@ -88,7 +85,6 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER,
             new MuleMessageProcessingManager());
 
-        registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
         registry.registerObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE,
             new DefaultStreamCloserService());
 

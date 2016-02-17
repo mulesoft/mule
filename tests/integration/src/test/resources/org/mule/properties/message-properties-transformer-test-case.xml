@@ -32,14 +32,14 @@
 
     <scripting:transformer name="addInboundProperty">
         <scripting:script engine="groovy">
-            message.setProperty('inbPropKey','inbPropValue',org.mule.api.transport.PropertyScope.INBOUND);
+            message.setProperty('inbPropKey','inbPropValue',org.mule.PropertyScope.INBOUND);
             message
         </scripting:script>
     </scripting:transformer>
 
     <scripting:transformer name="addInboundProperty2">
         <scripting:script engine="groovy">
-            message.setProperty('inbPropKey2','inbPropValue2',org.mule.api.transport.PropertyScope.INBOUND);
+            message.setProperty('inbPropKey2','inbPropValue2',org.mule.PropertyScope.INBOUND);
             message
         </scripting:script>
     </scripting:transformer>

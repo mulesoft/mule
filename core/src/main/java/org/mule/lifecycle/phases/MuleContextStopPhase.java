@@ -17,7 +17,6 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.Registry;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.source.MessageSource;
-import org.mule.api.transport.Connector;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
@@ -36,7 +35,7 @@ import java.util.Set;
  *
  * This phase is responsible for disposing objects. Any object that implements {@link org.mule.api.lifecycle.Stoppable} will
  * have its {@link org.mule.api.lifecycle.Stoppable#stop()} ()} method called.  Objects are initialised in the order based on type:
- * {@link org.mule.api.construct.FlowConstruct}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.transport.Connector}, followed
+ * {@link org.mule.api.construct.FlowConstruct}, {@link org.mule.api.agent.Agent} followed
  * by any other object that implements {@link org.mule.api.lifecycle.Stoppable}.
  *
  * @see org.mule.api.MuleContext
@@ -60,7 +59,6 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
         // Stop in the opposite order to start
         stopOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        stopOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Config.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));

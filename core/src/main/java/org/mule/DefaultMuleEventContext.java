@@ -14,7 +14,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -157,22 +156,6 @@ public class DefaultMuleEventContext implements MuleEventContext
     public Transaction getCurrentTransaction()
     {
         return TransactionCoordination.getInstance().getTransaction();
-    }
-
-    /**
-     * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule component in the pool or via the
-     * endpoint configured for the event
-     *
-     * @param message the event message payload to send
-     * @param endpoint The endpoint to disptch the event through.
-     * @return the return Message from the call or null if there was no result
-     * @throws org.mule.api.MuleException if the event fails to be processed by the
-     *             service or the transport for the endpoint
-     */
-    public MuleMessage sendEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
-    {
-        return clientInterface.process(endpoint, message);
     }
 
     /**

@@ -17,8 +17,8 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.transport.polling.PollingTask;
-import org.mule.transport.polling.PollingWorker;
+import org.mule.source.polling.PollingTask;
+import org.mule.source.polling.PollingWorker;
 
 import org.junit.Test;
 

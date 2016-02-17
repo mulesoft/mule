@@ -31,7 +31,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.oauth2.internal.MuleEventLogger;

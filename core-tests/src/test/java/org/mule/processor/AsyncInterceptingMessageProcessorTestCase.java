@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
@@ -39,6 +38,7 @@ import org.mule.util.concurrent.Latch;
 import java.beans.ExceptionListener;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleContextTestCase
@@ -65,18 +65,9 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     }
 
     @Test
-    public void testProcessOneWay() throws Exception
-    {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
-
-        assertAsync(messageProcessor, event);
-    }
-
-    @Test
     public void testProcessRequestResponse() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE,
-            getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
 
         try
         {
@@ -91,8 +82,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     @Test
     public void testProcessOneWayWithTx() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE,
-            getTestTransactedInboundEndpoint(MessageExchangePattern.ONE_WAY));
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
         Transaction transaction = new TestTransaction(muleContext);
         TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -113,8 +103,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     @Test
     public void testProcessRequestResponseWithTx() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE,
-            getTestTransactedInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
         Transaction transaction = new TestTransaction(muleContext);
         TransactionCoordination.getInstance().bindTransaction(transaction);
 

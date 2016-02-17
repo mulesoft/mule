@@ -8,19 +8,13 @@ package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.ThreadSafeAccess;
-import org.mule.api.component.Component;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.ProcessorExecutor;
-import org.mule.api.transformer.Transformer;
 import org.mule.execution.MessageProcessorExecutionTemplate;
-import org.mule.routing.MessageFilter;
 
 import java.util.List;
 
@@ -115,13 +109,8 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
 
     private boolean processorMayReturnVoidEvent(MessageProcessor processor)
     {
-        if (processor instanceof OutboundEndpoint)
-        {
-            MessageExchangePattern exchangePattern = ((OutboundEndpoint) processor).getExchangePattern();
-            return exchangePattern == null ? true : !exchangePattern.hasResponse();
-        }
-        return !(processor instanceof Component || processor instanceof Transformer
-                 || processor instanceof MessageFilter);
+        //TODO See MULE-9307 - re-add behaviour when we know if a processor may return null
+        return true;
     }
 
 }

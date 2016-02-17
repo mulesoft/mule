@@ -9,9 +9,9 @@ package org.mule.module.extension.file.api;
 import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
-import org.mule.api.transport.OutputHandler;
+import org.mule.message.OutputHandler;
 import org.mule.module.extension.file.api.lock.PathLock;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 
 import java.io.InputStream;
 import java.nio.file.Path;

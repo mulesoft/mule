@@ -14,12 +14,11 @@ import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.FlowCallStack;
 import org.mule.api.context.notification.ProcessorsTrace;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.metadata.DataType;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.management.stats.ProcessingTime;
 
 import java.io.OutputStream;
@@ -28,7 +27,6 @@ import java.util.Set;
 
 /**
  * A {@link VoidMuleEvent} represents a void return from a {@link MessageProcessor} such as a ONE_WAY
- * {@link OutboundEndpoint}.
  */
 public class VoidMuleEvent implements MuleEvent
 {

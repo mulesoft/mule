@@ -19,7 +19,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.processor.chain.ProcessorExecutorFactory;
 

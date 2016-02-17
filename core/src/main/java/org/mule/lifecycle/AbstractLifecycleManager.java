@@ -16,8 +16,6 @@ import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.transport.AbstractConnector;
-import org.mule.transport.ConnectException;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -138,12 +136,7 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
             callback.onTransition(phase, object);
             setCurrentPhase(phase);
         }
-        // In the case of a connection exception, trigger the reconnection strategy.
-        catch (ConnectException ce)
-        {
-            MuleContext muleContext = ((AbstractConnector) ce.getFailed()).getMuleContext();
-            muleContext.getExceptionListener().handleException(ce);
-        }
+        //TODO See MULE-9307 - previously when there was a ConnectionException the system exception handler was invoked. Read that functionality if it makes sense.
         catch (LifecycleException le)
         {
             throw le;

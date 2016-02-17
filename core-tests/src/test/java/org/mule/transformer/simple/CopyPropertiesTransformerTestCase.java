@@ -17,7 +17,7 @@ import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.PropertyScope;
+import org.mule.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.api.metadata.SimpleDataType;

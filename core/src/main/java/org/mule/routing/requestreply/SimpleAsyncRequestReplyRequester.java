@@ -12,7 +12,6 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
@@ -44,18 +43,8 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
 
     private String getReplyTo()
     {
-        InboundEndpoint endpoint = ((InboundEndpoint) replyMessageSource);
-        return endpoint.getConnector().getCanonicalURI(endpoint.getEndpointURI());
-    }
-
-    @Override
-    protected void verifyReplyMessageSource(MessageSource messageSource)
-    {
-        if (!(messageSource instanceof InboundEndpoint))
-        {
-            throw new IllegalArgumentException(
-                "Only an InboundEndpoint reply MessageSource is supported with SimpleAsyncRequestReplyRequester");
-        }
+        //TODO See MULE-9307 - re-add logic to get reply to destination for request-reply
+        return null;
     }
 
     public void setMessageProcessor(MessageProcessor processor)

@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.construct.Flow;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 
 import java.io.IOException;
 

@@ -6,7 +6,6 @@
  */
 package org.mule.api.client;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 
@@ -172,36 +171,5 @@ public interface MuleClient
      */
     // void receive(String url, MessageProcessor processor, long frequency) throws
     // MuleException;
-
-    /**
-     * Processes a message with an outbound endpoint using the specified
-     * {@link MessageExchangePattern}
-     * 
-     * @param uri
-     * @param mep the {@link MessageExchangePattern} that should be used
-     * @param payload the message payload
-     * @param messageProperties and message properties that should be used (optional,
-     *            use null otherwise)
-     * @return the result of endpoint invocation if the
-     *         {@link MessageExchangePattern} defines a response else null.
-     * @throws MuleException
-     */
-    MuleMessage process(String uri,
-                        MessageExchangePattern mep,
-                        Object payload,
-                        Map<String, Object> messageProperties) throws MuleException;
-
-    /**
-     * Processes a messsage with an outbound endpoint using the specified
-     * {@link MessageExchangePattern}
-     * 
-     * @param uri
-     * @param mep the {@link MessageExchangePattern} that should be used
-     * @param message the message to be processed
-     * @return the result of endpoint invocation if the
-     *         {@link MessageExchangePattern} defines a response else null.
-     * @throws MuleException
-     */
-    MuleMessage process(String uri, MessageExchangePattern mep, MuleMessage message) throws MuleException;
 
 }

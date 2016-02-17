@@ -26,7 +26,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.TemplateParser;
 import org.mule.util.TemplateParser.PatternInfo;

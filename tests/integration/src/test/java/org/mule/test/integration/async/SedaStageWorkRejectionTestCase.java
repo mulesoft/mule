@@ -17,7 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.functional.listener.FlowExecutionListener;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 
 import org.junit.Test;
 

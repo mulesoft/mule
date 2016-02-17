@@ -8,7 +8,7 @@ package org.mule.module.xml.transformer;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.api.transport.OutputHandler;
+import org.mule.message.OutputHandler;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.types.DataTypeFactory;
 

@@ -16,7 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.component.ComponentException;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 
 import org.junit.Test;
 

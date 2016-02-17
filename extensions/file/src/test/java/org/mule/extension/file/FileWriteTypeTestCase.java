@@ -9,7 +9,7 @@ package org.mule.extension.file;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
-import org.mule.api.transport.OutputHandler;
+import org.mule.message.OutputHandler;
 import org.mule.module.extension.file.api.FileWriteMode;
 import org.mule.util.IOUtils;
 

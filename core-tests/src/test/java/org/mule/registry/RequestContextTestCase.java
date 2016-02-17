@@ -25,7 +25,7 @@ import org.mule.api.context.notification.ProcessorsTrace;
 import org.mule.api.metadata.DataType;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.management.stats.ProcessingTime;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;

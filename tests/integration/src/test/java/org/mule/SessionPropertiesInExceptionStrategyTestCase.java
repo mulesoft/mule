@@ -10,11 +10,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.api.transport.PropertyScope.SESSION;
+import static org.mule.PropertyScope.SESSION;
 
 import org.mule.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.transport.NullPayload;
+import org.mule.api.message.NullPayload;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -15,10 +15,10 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.connector.DispatchException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.Disposable;
@@ -32,7 +32,6 @@ import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.execution.MessageProcessorExecutionTemplate;
 import org.mule.execution.TransactionalExecutionTemplate;
@@ -137,10 +136,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
         if (logger.isDebugEnabled())
         {
-            if (route instanceof OutboundEndpoint)
-            {
-                logger.debug("Message being sent to: " + ((OutboundEndpoint) route).getEndpointURI());
-            }
             logger.debug(eventToRoute.getMessage());
         }
 
@@ -150,18 +145,10 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
             {
                 logger.trace("Request payload: \n"
                              + StringMessageUtils.truncate(muleContext.getTransformationService().getPayloadForLogging(eventToRoute.getMessage()), 100, false));
-                if (route instanceof OutboundEndpoint)
-                {
-                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
-                }
             }
             catch (Exception e)
             {
                 logger.trace("Request payload: \n(unable to retrieve payload: " + e.getMessage());
-                if (route instanceof OutboundEndpoint)
-                {
-                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
-                }
             }
         }
 
@@ -220,11 +207,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
             // well
             message.setReplyTo(replyTo);
             message.setOutboundProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, service.getName());
-            if (logger.isDebugEnabled() && route instanceof OutboundEndpoint)
-            {
-                logger.debug("Setting replyTo=" + replyTo + " for outbound route: "
-                             + ((OutboundEndpoint) route).getEndpointURI());
-            }
         }
         if (enableCorrelation != CorrelationMode.NEVER)
         {
@@ -265,10 +247,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
             {
                 StringBuilder buf = new StringBuilder();
                 buf.append("Setting Correlation info on Outbound router");
-                if (route instanceof OutboundEndpoint)
-                {
-                    buf.append(" for endpoint: ").append(((OutboundEndpoint) route).getEndpointURI());
-                }
                 buf.append(SystemUtils.LINE_SEPARATOR).append("Id=").append(correlation);
                 // buf.append(", ").append("Seq=").append(seq);
                 // buf.append(", ").append("Group Size=").append(group);
@@ -415,26 +393,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         return false;
     }
 
-    /**
-     * @param name the route identifier
-     * @return the route or null if the endpoint's Uri is not registered
-     */
-    public MessageProcessor getRoute(String name)
-    {
-        for (MessageProcessor route : routes)
-        {
-            if (route instanceof OutboundEndpoint)
-            {
-                OutboundEndpoint endpoint = (OutboundEndpoint) route;
-                if (endpoint.getName().equals(name))
-                {
-                    return endpoint;
-                }
-            }
-        }
-        return null;
-    }
-
     public RouterResultsHandler getResultsHandler()
     {
         return resultsHandler;
@@ -455,7 +413,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     {
         if (route == null)
         {
-            throw new DispatchException(CoreMessages.objectIsNull("Outbound Endpoint"), originalEvent, null);
+            throw new DispatchException(CoreMessages.objectIsNull("connector operation"), originalEvent, null);
         }
 
         if (awaitResponse)

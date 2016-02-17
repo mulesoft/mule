@@ -10,7 +10,6 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.construct.Pipeline;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.source.MessageSource;
 import org.mule.module.cxf.CxfConstants;
@@ -104,11 +103,6 @@ public class WebServiceMessageProcessorBuilder
         if (flowConstruct != null)
         {
             MessageSource source = ((Pipeline) flowConstruct).getMessageSource();
-
-            if (source instanceof InboundEndpoint)
-            {
-                return ((InboundEndpoint) source).getEndpointURI().toString();
-            }
         }
         return "http://internalMuleCxfRegistry/" + hashCode();
     }
