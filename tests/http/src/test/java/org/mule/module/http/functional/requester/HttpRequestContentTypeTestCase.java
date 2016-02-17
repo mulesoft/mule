@@ -11,11 +11,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,6 +30,9 @@ public class HttpRequestContentTypeTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
+
+    @Rule
+    public SystemProperty strictContentType = new SystemProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType", Boolean.TRUE.toString());
 
     @Override
     protected String getConfigFile()

@@ -6,10 +6,12 @@
  */
 package org.mule;
 
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.api.transport.PropertyScope.INBOUND;
 import static org.mule.api.transport.PropertyScope.INVOCATION;
 import static org.mule.api.transport.PropertyScope.OUTBOUND;
-import static org.mule.util.SystemUtils.LINE_SEPARATOR;
+
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -45,6 +47,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -563,7 +566,17 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
             }
             catch (MimeTypeParseException e)
             {
-                throw new IllegalArgumentException("Invalid Content-Type property value", e);
+                if (Boolean.parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType")))
+                {
+                    throw new IllegalArgumentException("Invalid Content-Type property value", e);
+                }
+                else
+                {
+                    String encoding = Charset.defaultCharset().name();
+                    logger.warn(String.format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), value, e.getMessage()));
+                    logger.warn(String.format("Using defualt encoding: %s", encoding));
+                    getDataType().setEncoding(encoding);
+                }
             }
         }
     }
