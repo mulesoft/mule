@@ -6,11 +6,13 @@
  */
 package org.mule.module.http.internal.request;
 
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -40,6 +42,9 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Maps an HTTP response into a Mule event. A new message is set in the event with the contents of the response.
  * The body will be set as payload by default (except that the target attribute is set in the requester, in that case
@@ -48,6 +53,8 @@ import javax.activation.DataHandler;
  */
 public class HttpResponseToMuleEvent
 {
+    private static final Log logger = LogFactory.getLog(HttpResponseToMuleEvent.class);
+
     private static final String MULTI_PART_PREFIX = "multipart/";
 
     private DefaultHttpRequester requester;
@@ -119,10 +126,25 @@ public class HttpResponseToMuleEvent
 
         if (responseContentType != null)
         {
-            MediaType mediaType = MediaType.parse(responseContentType);
-            if (mediaType.charset().isPresent())
+            try
             {
-                encoding = mediaType.charset().get().name();
+                MediaType mediaType = MediaType.parse(responseContentType);
+                if (mediaType.charset().isPresent())
+                {
+                    encoding = mediaType.charset().get().name();
+                }
+            }
+            catch (IllegalArgumentException e)
+            {
+                if (Boolean.parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "laxContentType")))
+                {
+                    logger.warn(String.format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), responseContentType, e.getMessage()));
+                    logger.warn(String.format("Using defualt encoding: %s", encoding));
+                }
+                else
+                {
+                    throw e;
+                }
             }
         }
 

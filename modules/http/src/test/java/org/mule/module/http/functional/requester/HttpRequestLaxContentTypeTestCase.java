@@ -7,49 +7,52 @@
 
 package org.mule.module.http.functional.requester;
 
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpRequestContentTypeTestCase extends FunctionalTestCase
+public class HttpRequestLaxContentTypeTestCase extends FunctionalTestCase
 {
-
-    private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=UTF-8";
 
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
 
+    @Rule
+    public SystemProperty laxContentType = new SystemProperty(SYSTEM_PROPERTY_PREFIX + "laxContentType", Boolean.TRUE.toString());
+
     @Override
     protected String getConfigFile()
     {
-        return "http-request-content-type-config.xml";
+        return "http-request-lax-content-type-config.xml";
     }
 
     @Test
-    public void sendsContentTypeOnRequest() throws Exception
+    public void sendsInvalidContentTypeOnRequest() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        final String url = String.format("http://localhost:%s/requestClient", httpPort.getNumber());
+        final String url = String.format("http://localhost:%s/requestClientInvalid", httpPort.getNumber());
 
         MuleMessage response = client.send(url, TEST_MESSAGE, null);
 
-        assertContentTypeProperty(response);
-        assertThat(response.getPayloadAsString(), equalTo(EXPECTED_CONTENT_TYPE));
+        assertNoContentTypeProperty(response);
+        assertThat(response.getPayloadAsString(), equalTo("invalidMimeType"));
     }
 
-    private void assertContentTypeProperty(MuleMessage response)
+    private void assertNoContentTypeProperty(MuleMessage response)
     {
-        assertThat(response.getInboundPropertyNames(), hasItem(equalToIgnoringCase(MuleProperties.CONTENT_TYPE_PROPERTY)));
-        assertThat((String) response.getInboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY), equalTo(EXPECTED_CONTENT_TYPE));
+        assertThat(response.getInboundPropertyNames(), not(hasItem(equalToIgnoringCase(MuleProperties.CONTENT_TYPE_PROPERTY))));
     }
 }
