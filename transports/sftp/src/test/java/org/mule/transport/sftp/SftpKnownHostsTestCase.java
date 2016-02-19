@@ -10,51 +10,21 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.api.MessagingException;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.sftp.SftpServer;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collection;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
 public class SftpKnownHostsTestCase extends AbstractSftpFunctionalTestCase
 {
-
-    @Rule
-    public SystemProperty sftpKnownHostsFile;
-
-    public String expectedMessage;
 
     @Override
     protected String getConfigFile()
     {
         return "sftp-known_hosts-config.xml";
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                                             {new SystemProperty("mule.sftp.knownHostsFile", "src/test/resources/empty_known_hosts"),
-                                              "Error during login to muletest1@localhost: UnknownHostKey: localhost. DSA key fingerprint is "},
-                                             {new SystemProperty("mule.sftp.knownHostsFile", "src/test/resources/invalid_known_hosts"),
-                                              "Error during login to muletest1@localhost: Known hosts file src/test/resources/invalid_known_hosts not found"}
-        });
-    }
-
-    public SftpKnownHostsTestCase(SystemProperty sftpKnownHostsFile, String expectedMessage)
-    {
-        this.sftpKnownHostsFile = sftpKnownHostsFile;
-        this.expectedMessage = expectedMessage;
     }
 
     @Test
@@ -63,25 +33,67 @@ public class SftpKnownHostsTestCase extends AbstractSftpFunctionalTestCase
         try
         {
             createSftpClient(sftpPort.getNumber(), new File(ClassLoader.getSystemResource("empty_known_hosts").toURI()));
-            fail("Expected IOException");
+            fail("Expected IOException: UnknownHostKey");
         }
         catch (IOException e)
         {
-            assertTrue(e.getMessage(), e.getMessage().startsWith("Error during login to muletest1@localhost: UnknownHostKey: localhost. DSA key fingerprint is "));
+            assertTrue(e.getMessage().startsWith("Error during login to muletest1@localhost: UnknownHostKey: localhost. DSA key fingerprint is "));
         }
     }
 
     @Test
-    public void knownHostsInSysProp() throws Exception
+    public void knownHostsInConnector() throws Exception
     {
         try
         {
-            runFlow("knownHostsInSysProp", "");
-            fail("Expected IOException");
+            runFlow("knownHostsInConnector", "");
+            fail("Expected IOException: UnknownHostKey");
         }
         catch (MessagingException e)
         {
-            assertTrue(e.getCause().getMessage(), e.getCause().getMessage().startsWith(expectedMessage));
+            assertTrue(e.getCause().getMessage().startsWith("Error during login to muletest1@localhost: UnknownHostKey: localhost. DSA key fingerprint is "));
+        }
+    }
+
+    @Test
+    public void knownHostsInEndpoint() throws Exception
+    {
+        try
+        {
+            runFlow("knownHostsInEndpoint", "");
+            fail("Expected IOException: UnknownHostKey");
+        }
+        catch (MessagingException e)
+        {
+            assertTrue(e.getCause().getMessage().startsWith("Error during login to muletest1@localhost: UnknownHostKey: localhost. DSA key fingerprint is "));
+        }
+    }
+
+    @Test
+    public void invalidKnownHostsInConnector() throws Exception
+    {
+        try
+        {
+            runFlow("invalidKnownHostsInConnector", "");
+            fail("Expected IOException: java.io.FileNotFoundException");
+        }
+        catch (MessagingException e)
+        {
+            assertTrue(e.getCause().getMessage(), e.getCause().getMessage().startsWith("Error during login to muletest1@localhost: Known hosts file src/test/resources/invalid_known_hosts not found"));
+        }
+    }
+
+    @Test
+    public void invalidKnownHostsInEndpoint() throws Exception
+    {
+        try
+        {
+            runFlow("invalidKnownHostsInEndpoint", "");
+            fail("Expected IOException: java.io.FileNotFoundException");
+        }
+        catch (MessagingException e)
+        {
+            assertTrue(e.getCause().getMessage(), e.getCause().getMessage().startsWith("Error during login to muletest1@localhost: Known hosts file src/test/resources/invalid_known_hosts not found"));
         }
     }
 
