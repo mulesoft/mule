@@ -84,11 +84,15 @@ public class SftpConnectionFactory implements PoolableObjectFactory
 
             SftpUtil sftpUtil = new SftpUtil(endpoint);
             String identityFile = sftpUtil.getIdentityFile();
-            String sftpKnownHostsFile = endpoint.getMuleContext().getConfiguration().getSftpKnownHostsFile();
-            if (sftpKnownHostsFile != null)
+            if (sftpUtil.getKnownHostsFile() != null)
             {
-                client.setKnownHostsFile(new File(sftpKnownHostsFile));
+                client.setKnownHostsFile(new File(sftpUtil.getKnownHostsFile()));
             }
+            // String sftpKnownHostsFile = endpoint.getMuleContext().getConfiguration().getSftpKnownHostsFile();
+            // if (sftpKnownHostsFile != null)
+            // {
+            // client.setKnownHostsFile(new File(sftpKnownHostsFile));
+            // }
 
             /*
              * TODO: There is a problem if the SSHd uses a low value of

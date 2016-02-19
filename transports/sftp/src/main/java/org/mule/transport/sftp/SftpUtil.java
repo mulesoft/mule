@@ -258,6 +258,23 @@ public class SftpUtil
         return null;
     }
 
+    public String getKnownHostsFile()
+    {
+        String endpointValue = (String) endpoint.getProperty(SftpConnector.PROPERTY_KNOWN_HOSTS_FILE);
+        if (endpointValue != null)
+        {
+            return endpointValue;
+        }
+
+        String connectorValue = connector.getKnownHostsFile();
+        if (connectorValue != null)
+        {
+            return connectorValue;
+        }
+
+        return null;
+    }
+
     /**
      * Changes the directory to the temp-dir on the <b>outbound</b> endpoint. Will
      * create the directory if it not already exists.

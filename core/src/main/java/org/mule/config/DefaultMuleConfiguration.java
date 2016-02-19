@@ -146,8 +146,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      */
     private boolean disableTimeouts = false;
 
-    private String sftpKnownHostsFile = null;
-
     protected transient Log logger = LogFactory.getLog(DefaultMuleConfiguration.class);
 
     private MuleContext muleContext;
@@ -370,12 +368,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         if (p != null)
         {
             disableTimeouts = Boolean.valueOf(p);
-        }
-
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "sftp.knownHostsFile");
-        if (p != null)
-        {
-            sftpKnownHostsFile = p;
         }
     }
 
@@ -769,12 +761,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public boolean isDisableTimeouts()
     {
         return disableTimeouts;
-    }
-
-    @Override
-    public String getSftpKnownHostsFile()
-    {
-        return sftpKnownHostsFile;
     }
 
     /**
