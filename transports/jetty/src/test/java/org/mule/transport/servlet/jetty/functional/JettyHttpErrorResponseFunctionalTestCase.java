@@ -9,9 +9,12 @@ package org.mule.transport.servlet.jetty.functional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
 import org.mule.api.config.MuleProperties;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -24,6 +27,9 @@ public class JettyHttpErrorResponseFunctionalTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
+
+    @Rule
+    public SystemProperty strictContentType = new SystemProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType", Boolean.TRUE.toString());
 
     @Override
     protected String getConfigFile()
