@@ -53,6 +53,7 @@ public class SftpConnector extends AbstractConnector
     public static final String PROPERTY_INCLUDE_SUBFOLDERS = "includeSubfolders";
     public static final String PROPERTY_IDENTITY_FILE = "identityFile";
     public static final String PROPERTY_PASS_PHRASE = "passphrase";
+    public static final String PROPERTY_KNOWN_HOSTS_FILE = "knownHostsFile";
     public static final String PROPERTY_FILE_AGE = "fileAge";
     public static final String PROPERTY_TEMP_DIR = "tempDir";
     public static final String PROPERTY_SIZE_CHECK_WAIT_TIME = "sizeCheckWaitTime";
@@ -83,6 +84,8 @@ public class SftpConnector extends AbstractConnector
 
     private String identityFile;
     private String passphrase;
+
+    private String knownHostsFile;
 
     private boolean checkFileAge = false;
     private long fileAge = 0;
@@ -430,6 +433,16 @@ public class SftpConnector extends AbstractConnector
     public void setPassphrase(String passphrase)
     {
         this.passphrase = passphrase;
+    }
+
+    public String getKnownHostsFile()
+    {
+        return knownHostsFile;
+    }
+
+    public void setKnownHostsFile(String knownHostsFile)
+    {
+        this.knownHostsFile = knownHostsFile;
     }
 
     /**
