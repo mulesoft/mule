@@ -17,6 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationHandler;
+import org.mule.api.source.MessageSource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -43,6 +44,9 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleMessage message;
+
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private MessageSource messageSource;
 
     private NotificationHelper helper;
 
@@ -85,8 +89,8 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase
         final FlowConstruct flowConstruct = mock(FlowConstruct.class);
         final int action = 100;
 
-        helper.fireNotification(event, uri, flowConstruct, action);
-        assertConnectorMessageNotification(eventNotificationHandler, uri, flowConstruct, action);
+        helper.fireNotification(messageSource, event, uri, flowConstruct, action);
+        assertConnectorMessageNotification(eventNotificationHandler, messageSource, uri, flowConstruct, action);
     }
 
     @Test
@@ -105,12 +109,13 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase
         verify(defaultNotificationHandler).fireNotification(notification);
     }
 
-    private void assertConnectorMessageNotification(ServerNotificationHandler notificationHandler, String uri, FlowConstruct flowConstruct, int action)
+    private void assertConnectorMessageNotification(ServerNotificationHandler notificationHandler, MessageSource messageSource, String uri, FlowConstruct flowConstruct, int action)
     {
         ArgumentCaptor<ConnectorMessageNotification> notificationCaptor = ArgumentCaptor.forClass(ConnectorMessageNotification.class);
         verify(notificationHandler).fireNotification(notificationCaptor.capture());
 
         ConnectorMessageNotification notification = notificationCaptor.getValue();
+        assertThat(notification.getComponent(), is(messageSource));
         assertThat(notification.getAction(), is(action));
         assertThat(notification.getFlowConstruct(), is(flowConstruct));
         assertThat(notification.getEndpoint(), is(uri));

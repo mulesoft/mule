@@ -232,7 +232,7 @@ public class PollingMessageSource implements MessageSource, FlowConstructAware, 
                     MuleEvent sourceEvent = sourceMessageProcessor.process(event);
                     if (isNewMessage(sourceEvent))
                     {
-                        muleContext.getNotificationManager().fireNotification(new ConnectorMessageNotification(sourceEvent.getMessage(), getPollingUniqueName(), flowConstruct, ConnectorMessageNotification.MESSAGE_RECEIVED));
+                        muleContext.getNotificationManager().fireNotification(new ConnectorMessageNotification(this, sourceEvent.getMessage(), getPollingUniqueName(), flowConstruct, ConnectorMessageNotification.MESSAGE_RECEIVED));
                         event = interceptor.prepareRouting(sourceEvent, new DefaultMuleEvent(sourceEvent.getMessage(), sourceEvent));
                         listener.process(event);
                         interceptor.postProcessRouting(event);
