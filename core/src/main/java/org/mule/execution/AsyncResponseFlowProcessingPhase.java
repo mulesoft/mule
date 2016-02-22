@@ -6,9 +6,9 @@
  */
 package org.mule.execution;
 
-import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
-import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RECEIVED;
-import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RESPONSE;
+import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
+import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
+import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
@@ -16,8 +16,9 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.connector.ReplyToHandler;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.source.MessageSource;
 import org.mule.transaction.MuleTransactionConfig;
 
 import javax.resource.spi.work.Work;
@@ -58,6 +59,7 @@ public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessi
             {
                 try
                 {
+                    MessageSource messageSource = messageProcessContext.getMessageSource();
                     try
                     {
                         final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
@@ -67,7 +69,7 @@ public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessi
                                                             exceptionHandler);
                         final MuleEvent response = transactionTemplate.execute(() -> {
                             MuleEvent muleEvent = template.getMuleEvent();
-                            fireNotification(muleEvent, MESSAGE_RECEIVED);
+                            fireNotification(messageSource, muleEvent, MESSAGE_RECEIVED);
                             if (muleEvent.isAllowNonBlocking())
                             {
                                 muleEvent = new DefaultMuleEvent(muleEvent, new ExceptionHandlingReplyToHandlerDecorator(new FlowProcessingNonBlockingReplyToHandler(template, phaseResultNotifier, exceptionHandler),
@@ -80,13 +82,13 @@ public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessi
 
                         if (response != NonBlockingVoidMuleEvent.getInstance())
                         {
-                            fireNotification(response, MESSAGE_RESPONSE);
+                            fireNotification(messageSource, response, MESSAGE_RESPONSE);
                             template.sendResponseToClient(response, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
                         }
                     }
                     catch (final MessagingException e)
                     {
-                        fireNotification(e.getEvent(), MESSAGE_ERROR_RESPONSE);
+                        fireNotification(messageSource, e.getEvent(), MESSAGE_ERROR_RESPONSE);
                         template.sendFailureResponseToClient(e, createSendFailureResponseCompletationCallback(phaseResultNotifier));
                     }
                 }
@@ -202,7 +204,7 @@ public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessi
         @Override
         public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
         {
-            fireNotification(event, MESSAGE_RESPONSE);
+            fireNotification(null, event, MESSAGE_RESPONSE);
             template.sendResponseToClient(event, createResponseCompletationCallback(phaseResultNotifier,
                                                                                     exceptionHandler));
         }
@@ -212,7 +214,7 @@ public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessi
         {
             try
             {
-                fireNotification(exception.getEvent(), MESSAGE_ERROR_RESPONSE);
+                fireNotification(null, exception.getEvent(), MESSAGE_ERROR_RESPONSE);
                 template.sendFailureResponseToClient(exception, createSendFailureResponseCompletationCallback(phaseResultNotifier));
             }
             catch (MuleException e)

@@ -32,7 +32,7 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
 
     private MuleContext muleContext;
 
-    protected void fireNotification(MuleEvent event, int action)
+    protected void fireNotification(Object source, MuleEvent event, int action)
     {
         try
         {
@@ -49,6 +49,7 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
                 }
             }
             getNotificationHelper(muleContext.getNotificationManager()).fireNotification(
+                    source,
                     event,
                     event.getMessageSourceURI() != null ? event.getMessageSourceURI().toString() : null,
                     event.getFlowConstruct(),

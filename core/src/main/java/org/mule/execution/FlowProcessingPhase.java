@@ -6,12 +6,13 @@
  */
 package org.mule.execution;
 
-import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
-import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RESPONSE;
+import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
+import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.source.MessageSource;
 import org.mule.transaction.MuleTransactionConfig;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -72,7 +73,7 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
                                 muleEvent = flowProcessingPhaseTemplate.beforeRouteEvent(muleEvent);
                                 muleEvent = flowProcessingPhaseTemplate.routeEvent(muleEvent);
                                 muleEvent = flowProcessingPhaseTemplate.afterRouteEvent(muleEvent);
-                                sendResponseIfNeccessary(muleEvent, flowProcessingPhaseTemplate);
+                                sendResponseIfNeccessary(messageProcessContext.getMessageSource(), muleEvent, flowProcessingPhaseTemplate);
                                 return muleEvent;
                             }
                             catch (Exception e)
@@ -83,7 +84,7 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
                         });
                         if (exceptionThrownDuringFlowProcessing.get() != null && !(exceptionThrownDuringFlowProcessing.get() instanceof ResponseDispatchException))
                         {
-                            sendResponseIfNeccessary(response, flowProcessingPhaseTemplate);
+                            sendResponseIfNeccessary(messageProcessContext.getMessageSource(), response, flowProcessingPhaseTemplate);
                         }
                         flowProcessingPhaseTemplate.afterSuccessfulProcessingFlow(response);
                     }
@@ -93,7 +94,7 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
                     }
                     catch (MessagingException e)
                     {
-                        sendFailureResponseIfNeccessary(e, flowProcessingPhaseTemplate);
+                        sendFailureResponseIfNeccessary(messageProcessContext.getMessageSource(), e, flowProcessingPhaseTemplate);
                         flowProcessingPhaseTemplate.afterFailureProcessingFlow(e);
                     }
                     phaseResultNotifier.phaseSuccessfully();
@@ -134,20 +135,20 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
         }
     }
 
-    private void sendFailureResponseIfNeccessary(MessagingException messagingException, FlowProcessingPhaseTemplate flowProcessingPhaseTemplate) throws MuleException
+    private void sendFailureResponseIfNeccessary(MessageSource messageSource, MessagingException messagingException, FlowProcessingPhaseTemplate flowProcessingPhaseTemplate) throws MuleException
     {
         if (flowProcessingPhaseTemplate instanceof RequestResponseFlowProcessingPhaseTemplate)
         {
-            fireNotification(messagingException.getEvent(), MESSAGE_ERROR_RESPONSE);
+            fireNotification(messageSource, messagingException.getEvent(), MESSAGE_ERROR_RESPONSE);
             ((RequestResponseFlowProcessingPhaseTemplate) flowProcessingPhaseTemplate).sendFailureResponseToClient(messagingException);
         }
     }
 
-    private void sendResponseIfNeccessary(MuleEvent muleEvent, FlowProcessingPhaseTemplate flowProcessingPhaseTemplate) throws MuleException
+    private void sendResponseIfNeccessary(MessageSource messageSource, MuleEvent muleEvent, FlowProcessingPhaseTemplate flowProcessingPhaseTemplate) throws MuleException
     {
         if (flowProcessingPhaseTemplate instanceof RequestResponseFlowProcessingPhaseTemplate)
         {
-            fireNotification(muleEvent, MESSAGE_RESPONSE);
+            fireNotification(messageSource, muleEvent, MESSAGE_RESPONSE);
             ((RequestResponseFlowProcessingPhaseTemplate) flowProcessingPhaseTemplate).sendResponseToClient(muleEvent);
         }
     }

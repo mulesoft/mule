@@ -93,14 +93,15 @@ public class NotificationHelper
      * Fires a {@link ConnectorMessageNotification} for the given arguments
      * using the {@link ServerNotificationHandler} associated to the given {@code event}
      *
-     * @param event         a {@link MuleEvent}
+     * @param source
+     * @param event         a {@link org.mule.api.MuleEvent}
      * @param uri           the uri of the firing endpoint
-     * @param flowConstruct the {@link FlowConstruct} that generated the notification
+     * @param flowConstruct the {@link org.mule.api.construct.FlowConstruct} that generated the notification
      * @param action        the action code for the notification
      */
-    public void fireNotification(MuleEvent event, String uri, FlowConstruct flowConstruct, int action)
+    public void fireNotification(Object source, MuleEvent event, String uri, FlowConstruct flowConstruct, int action)
     {
-        doFireNotification(getNotificationHandler(event), event.getMessage(), uri, flowConstruct, action);
+        doFireNotification(getNotificationHandler(event), source, event.getMessage(), uri, flowConstruct, action);
     }
 
     /**
@@ -128,6 +129,7 @@ public class NotificationHelper
     }
 
     private void doFireNotification(ServerNotificationHandler serverNotificationHandler,
+                                    Object source,
                                     MuleMessage message,
                                     String uri,
                                     FlowConstruct flowConstruct,
@@ -139,6 +141,7 @@ public class NotificationHelper
             {
                 serverNotificationHandler.fireNotification(
                         new ConnectorMessageNotification(
+                                source,
                                 message,
                                 uri,
                                 flowConstruct,
