@@ -153,7 +153,7 @@ final class LoggerContextConfigurer
 
     private void addDefaultAppender(MuleLoggerContext context, String logFilePath)
     {
-        RollingFileAppender appender = createRollingFileAppender(logFilePath, "'.'%d{yyyy-MM-dd}", PER_APP_FILE_APPENDER_NAME, context.getConfiguration());
+        RollingFileAppender appender = createRollingFileAppender(logFilePath, ".%d{yyyy-MM-dd}", PER_APP_FILE_APPENDER_NAME, context.getConfiguration());
         doAddAppender(context, appender);
     }
 
