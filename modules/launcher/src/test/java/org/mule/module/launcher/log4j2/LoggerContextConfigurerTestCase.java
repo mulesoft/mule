@@ -62,6 +62,8 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase
     private static final String SHUTDOWN_HOOK_PROPERTY = "isShutdownHookEnabled";
     private static final int MONITOR_INTERVAL = 60000;
     private static final String CONVERTER_COMPONENT = "Converter";
+    private static final String FILE_PATTERN_PROPERTY = "filePattern";
+    private static final String FILE_PATTERN_TEMPLATE_DATE_SECTION = "%d{yyyy-MM-dd}";
 
     private LoggerContextConfigurer contextConfigurer;
 
@@ -149,7 +151,7 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void perAppDefaultAppender()
+    public void perAppDefaultAppender() throws Exception
     {
         when(context.isArtifactClassloader()).thenReturn(true);
         contextConfigurer.configure(context);
@@ -161,6 +163,11 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase
         assertThat(perAppAppender, notNullValue());
         assertThat(perAppAppender.getName(), equalTo(PER_APP_FILE_APPENDER_NAME));
         assertThat(perAppAppender.isStarted(), is(true));
+
+        String filePattern = ClassUtils.getFieldValue(perAppAppender, FILE_PATTERN_PROPERTY, true);
+        String filePatternTemplate = filePattern.substring(filePattern.lastIndexOf('/') + 1);
+        String filePatternTemplateDateSuffix = filePatternTemplate.substring(filePatternTemplate.lastIndexOf('.') + 1);
+        assertThat(filePatternTemplateDateSuffix, equalTo(FILE_PATTERN_TEMPLATE_DATE_SECTION));
 
         LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
         verify(rootLogger).addAppender(perAppAppender, Level.ALL, null);
