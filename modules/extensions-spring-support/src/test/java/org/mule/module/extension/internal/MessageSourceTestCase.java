@@ -9,7 +9,7 @@ package org.mule.module.extension.internal;
 import org.mule.construct.Flow;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
 import java.math.BigDecimal;
@@ -18,6 +18,9 @@ import org.junit.Test;
 
 public class MessageSourceTestCase extends ExtensionFunctionalTestCase
 {
+
+    public static final int TIMEOUT_MILLIS = 5000;
+    public static final int POLL_DELAY_MILLIS = 100;
 
     @Override
     protected Class<?>[] getAnnotatedExtensionClasses()
@@ -37,15 +40,7 @@ public class MessageSourceTestCase extends ExtensionFunctionalTestCase
         startFlow("source");
         HeisenbergExtension heisenberg = locateConfig();
 
-        PollingProber prober = new PollingProber(5000, 100);
-        prober.check(new JUnitProbe()
-        {
-            @Override
-            protected boolean test() throws Exception
-            {
-                return new BigDecimal(100).compareTo(heisenberg.getMoney()) < 0;
-            }
-        });
+        new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitLambdaProbe(() -> new BigDecimal(POLL_DELAY_MILLIS).compareTo(heisenberg.getMoney()) < 0));
     }
 
     @Test
@@ -54,15 +49,7 @@ public class MessageSourceTestCase extends ExtensionFunctionalTestCase
         startFlow("sourceFailed");
         HeisenbergExtension heisenberg = locateConfig();
 
-        PollingProber prober = new PollingProber(5000, 100);
-        prober.check(new JUnitProbe()
-        {
-            @Override
-            protected boolean test() throws Exception
-            {
-                return heisenberg.getMoney().longValue() == -1;
-            }
-        });
+        new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitLambdaProbe(() -> heisenberg.getMoney().longValue() == -1));
     }
 
     private HeisenbergExtension locateConfig() throws Exception

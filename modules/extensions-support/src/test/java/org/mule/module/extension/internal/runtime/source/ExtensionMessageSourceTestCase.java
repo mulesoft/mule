@@ -6,6 +6,8 @@
  */
 package org.mule.module.extension.internal.runtime.source;
 
+import static org.assertj.core.api.ThrowableAssert.catchThrowable;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -23,9 +25,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.tck.MuleTestUtils.spyInjector;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.connection.ConnectionException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.WorkManager;
 import org.mule.api.execution.CompletionHandler;
@@ -33,15 +38,19 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.execution.MessageProcessingManager;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.extension.api.runtime.source.SourceContext;
 import org.mule.extension.api.runtime.source.SourceFactory;
+import org.mule.retry.RetryPolicyExhaustedException;
+import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.resource.spi.work.Work;
@@ -61,6 +70,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
 {
 
     private static final String CONFIG_NAME = "myConfig";
+    private static final String ERROR_MESSAGE = "ERROR";
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -97,6 +107,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
 
     private ExtensionMessageSource messageSource;
 
+    public final RetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
+
     @Before
     public void before() throws Exception
     {
@@ -105,7 +117,9 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         when(sourceFactory.createSource()).thenReturn(source);
         when(muleMessage.getMuleContext()).thenReturn(muleContext);
 
-        messageSource = new ExtensionMessageSource(extensionModel, sourceFactory, CONFIG_NAME, threadingProfile);
+        LifecycleUtils.initialiseIfNeeded(retryPolicyTemplate, muleContext);
+
+        messageSource = new ExtensionMessageSource(extensionModel, sourceFactory, CONFIG_NAME, threadingProfile, retryPolicyTemplate);
         messageSource.setListener(messageProcessor);
         messageSource.setFlowConstruct(flowConstruct);
 
@@ -141,12 +155,11 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         messageSource.initialise();
         messageSource.start();
 
-        messageSource.onException(new RuntimeException());
+        messageSource.onException(new ConnectionException(ERROR_MESSAGE));
         verify((Stoppable) source).stop();
         verify(workManager, never()).dispose();
         verify((Disposable) source).dispose();
-
-        verify((Initialisable) source, times(2)).initialise();
+        verify((Initialisable) source, times(3)).initialise();
         verify((Startable) source, times(2)).start();
         handleMessage();
     }
@@ -168,6 +181,65 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         expectedException.expect(is(sameInstance(e)));
 
         messageSource.initialise();
+    }
+
+    @Test
+    public void failWithConnectionExceptionWhenStartingAndGetRetryPolicyExhausted() throws Exception
+    {
+        doThrow(new RuntimeException(new ConnectionException(ERROR_MESSAGE))).when(source).start();
+
+        final Throwable throwable = catchThrowable(messageSource::start);
+        assertThat(throwable, is(instanceOf(MuleRuntimeException.class)));
+        assertThat(throwable.getCause(), is(instanceOf(RetryPolicyExhaustedException.class)));
+        verify(source, times(3)).start();
+    }
+
+    @Test
+    public void failWithNonConnectionExceptionWhenStartingAndGetRetryPolicyExhausted() throws Exception
+    {
+        doThrow(new RuntimeException()).when(source).start();
+
+        final Throwable throwable = catchThrowable(messageSource::start);
+        assertThat(throwable, is(instanceOf(MuleRuntimeException.class)));
+        assertThat(throwable.getCause(), is(instanceOf(RuntimeException.class)));
+        verify(source, times(1)).start();
+    }
+
+    @Test
+    public void failWithConnectionExceptionWhenStartingAndGetsReconnected() throws Exception
+    {
+        doThrow(new RuntimeException(new ConnectionException(ERROR_MESSAGE)))
+                .doThrow(new RuntimeException(new ConnectionException(ERROR_MESSAGE)))
+                .doNothing()
+                .when(source)
+                .start();
+
+        messageSource.initialise();
+        messageSource.start();
+        verify(source, times(3)).start();
+        verify(source, times(2)).stop();
+    }
+
+    @Test
+    public void failOnExceptionWithConnectionExceptionAndGetsReconnected() throws Exception
+    {
+        messageSource.initialise();
+        messageSource.start();
+        messageSource.onException(new ConnectionException(ERROR_MESSAGE));
+
+        verify(source, times(2)).start();
+        verify(source, times(1)).stop();
+    }
+
+    @Test
+    public void failOnExceptionWithNonConnectionExceptionAndGetsExhausted() throws Exception
+    {
+        initialise();
+        messageSource.start();
+        messageSource.onException(new RuntimeException(ERROR_MESSAGE));
+
+        verify(source, times(1)).start();
+        verify(source, times(1)).stop();
     }
 
     @Test
@@ -195,10 +267,10 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
     {
         Exception e = new RuntimeException();
         when(threadingProfile.createWorkManager(anyString(), eq(muleContext.getConfiguration().getShutdownTimeout()))).thenThrow(e);
-        expectedException.expect(is(sameInstance(e)));
-
         initialise();
-        messageSource.start();
+
+        final Throwable throwable = catchThrowable(messageSource::start);
+        assertThat(throwable, is(sameInstance(e)));
         verify((Startable) source, never()).start();
     }
 

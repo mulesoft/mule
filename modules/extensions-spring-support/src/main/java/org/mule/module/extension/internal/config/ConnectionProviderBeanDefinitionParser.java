@@ -6,8 +6,9 @@
  */
 package org.mule.module.extension.internal.config;
 
+import static org.mule.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_NAMESPACE;
+
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.util.StringUtils;
 

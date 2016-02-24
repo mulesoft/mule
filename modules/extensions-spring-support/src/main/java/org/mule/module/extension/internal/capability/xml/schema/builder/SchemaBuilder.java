@@ -9,6 +9,8 @@ package org.mule.module.extension.internal.capability.xml.schema.builder;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_NAMESPACE;
+import static org.mule.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
 import static org.mule.extension.api.introspection.DataQualifier.LIST;
 import static org.mule.extension.api.introspection.DataQualifier.OPERATION;
 import static org.mule.extension.api.introspection.DataQualifier.POJO;
@@ -24,10 +26,9 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_NAMESPACE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_NAMESPACE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_TLS_NAMESPACE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
@@ -48,6 +49,7 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefa
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.annotation.api.Extensible;
 import org.mule.extension.api.introspection.ConfigurationModel;
@@ -187,6 +189,16 @@ public final class SchemaBuilder
         schema.getIncludeOrImportOrRedefine().add(tlsImport);
 
         return this;
+    }
+
+    protected void addRetryPolicy(ExplicitGroup sequence)
+    {
+        TopLevelElement providerElementRetry = new TopLevelElement();
+        providerElementRetry.setMinOccurs(ZERO);
+        providerElementRetry.setMaxOccurs("1");
+        providerElementRetry.setRef(MULE_ABSTRACT_RECONNECTION_STRATEGY);
+
+        sequence.getParticle().add(objectFactory.createElement(providerElementRetry));
     }
 
     public SchemaBuilder registerConnectionProviderElement(ConnectionProviderModel providerModel)

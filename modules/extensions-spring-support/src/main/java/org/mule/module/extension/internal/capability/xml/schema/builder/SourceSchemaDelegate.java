@@ -7,12 +7,15 @@
 package org.mule.module.extension.internal.capability.xml.schema.builder;
 
 import static org.apache.commons.lang.StringUtils.capitalize;
+import static org.mule.config.spring.parsers.specific.NameConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.TYPE_SUFFIX;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
+
 import org.mule.extension.api.introspection.SourceModel;
 import org.mule.module.extension.internal.capability.xml.schema.model.Element;
+import org.mule.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
+import org.mule.module.extension.internal.capability.xml.schema.model.ExtensionType;
 import org.mule.module.extension.internal.capability.xml.schema.model.Schema;
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
@@ -56,6 +59,15 @@ class SourceSchemaDelegate
 
     private void registerSourceType(String name, SourceModel sourceModel)
     {
-        builder.registerExecutableType(name, sourceModel, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE);
+        final ExtensionType extensionType = builder.registerExecutableType(name, sourceModel, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE);
+        ExplicitGroup sequence = extensionType.getSequence();
+
+        if (sequence == null)
+        {
+            sequence = new ExplicitGroup();
+            extensionType.setSequence(sequence);
+        }
+
+        builder.addRetryPolicy(sequence);
     }
 }

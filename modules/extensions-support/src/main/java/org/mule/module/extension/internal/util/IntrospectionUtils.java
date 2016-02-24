@@ -18,6 +18,7 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
+
 import org.mule.api.NestedProcessor;
 import org.mule.extension.annotation.api.Alias;
 import org.mule.extension.annotation.api.Expression;
@@ -50,6 +51,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -197,6 +199,8 @@ public class IntrospectionUtils
     {
         Class<?> searchClass = type;
 
+        checkArgument(searchClass.getSuperclass().equals(superClass), String.format("Class '%s' does not extend the '%s' class", type.getName(), superClass.getName()));
+
         while (!Object.class.equals(searchClass))
         {
             if (searchClass.getSuperclass().equals(superClass))
@@ -211,8 +215,7 @@ public class IntrospectionUtils
             }
             searchClass = searchClass.getSuperclass();
         }
-
-        throw new IllegalArgumentException(String.format("Class '%s' does not extend the '%s' class", type.getName(), superClass.getName()));
+        return new LinkedList<>();
     }
 
     private static boolean isOperation(Class<?> rawClass)

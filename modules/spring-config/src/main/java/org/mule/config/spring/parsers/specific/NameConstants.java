@@ -6,6 +6,8 @@
  */
 package org.mule.config.spring.parsers.specific;
 
+import javax.xml.namespace.QName;
+
 /**
  * Utils to share name constants between definition parser
  *
@@ -13,6 +15,11 @@ package org.mule.config.spring.parsers.specific;
  */
 public class NameConstants
 {
+    public static final String MULE_NAMESPACE = "http://www.mulesoft.org/schema/mule/core";
+    public static final String MULE_PREFIX = "mule";
     public static final String MULE_EXTENSION_NAMESPACE = "http://www.mulesoft.org/schema/mule/extension";
     public static final String MULE_EXTENSION_PREFIX = "extension";
+
+    public static final QName MULE_ABSTRACT_MESSAGE_SOURCE_TYPE = new QName(MULE_NAMESPACE, "abstractMessageSourceType", MULE_PREFIX);
+    public static final QName MULE_EXTENSION_CONNECTION_PROVIDER_TYPE = new QName(MULE_EXTENSION_NAMESPACE, "abstractConnectionProviderType", MULE_EXTENSION_PREFIX);
 }
