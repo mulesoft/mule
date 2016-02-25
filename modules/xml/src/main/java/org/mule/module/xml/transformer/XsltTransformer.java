@@ -6,6 +6,7 @@
  */
 package org.mule.module.xml.transformer;
 
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
@@ -230,7 +231,15 @@ public class XsltTransformer extends AbstractXmlTransformer
                 for (Entry<String, Object> parameter : contextProperties.entrySet())
                 {
                     String key = parameter.getKey();
-                    transformer.setParameter(key, evaluateTransformParameter(key, parameter.getValue(), message));
+                    Object value = evaluateTransformParameter(key, parameter.getValue(), message);
+                    if (value != null)
+                    {
+                        transformer.setParameter(key, value);
+                    }
+                    else
+                    {
+                        throw new DefaultMuleException(CoreMessages.contextPropertyValueIsNull(key));
+                    }
                 }
             }
 

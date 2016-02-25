@@ -6,6 +6,7 @@ Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for mo
 
 Migration changes from 3.6.0 to 3.6.x
 MULE-9337: TLSv1 is no longer listed as an enabled protocol, by default only TLSv1.1 and TLSv1.2 will be enabled. If you wish to use TLSv1 you can edit the TLS configuration file (tls-default.conf) and add it back to the enabled protocols entry.
+MULE-9405: MuleException instead of NPE is now thrown when setting a null value for a context-property in an XstlTransformation.
 
 Migration changes from 3.5.x to 3.6.x
 

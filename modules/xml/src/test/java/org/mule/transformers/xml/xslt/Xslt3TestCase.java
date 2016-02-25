@@ -10,11 +10,15 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+
+import org.mule.api.MuleException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class Xslt3TestCase extends FunctionalTestCase
 {
@@ -24,6 +28,9 @@ public class Xslt3TestCase extends FunctionalTestCase
     {
         return "xsl/xslt3-config.xml";
     }
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
     protected void doSetUp() throws Exception
@@ -65,5 +72,13 @@ public class Xslt3TestCase extends FunctionalTestCase
 
         assertThat(response, containsString("<cities>"));
         assertThat(response, containsString("<BOOKS>"));
+    }
+
+    @Test
+    public void nullParameter() throws Exception
+    {
+        expectedException.expect(MuleException.class);
+        expectedException.expectMessage(containsString("null"));
+        runFlow("nullParam", "<parameter/>").getMessage().getPayloadAsString();
     }
 }
