@@ -13,6 +13,7 @@ MULE-9020: BouncyCastle was upgraded to version 1.50.
     Note: DESede algorithm now requires keys of 16 or 24 bytes unlike the prior version which required 16 or 22 bytes.
 MULE-9337: TLSv1 is no longer listed as an enabled protocol, by default only TLSv1.1 and TLSv1.2 will be enabled. If you wish to use TLSv1 you can edit the TLS configuration file (tls-default.conf) and add it back to the enabled protocols entry.
 MULE-9306: Losing flow and session variables when using MuleClient to dispatch/send an event. Exception strategy not caching exceptions after using MuleClient on a JavaComponent.
+MULE-9405: MuleException instead of NPE is now thrown when setting a null value for a context-property in an XstlTransformation.
 
 Migration changes from 3.6.x to 3.7.x
 
