@@ -1429,4 +1429,9 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 350);
     }
+
+    public static Message contextPropertyValueIsNull(String propertyKey)
+    {
+        return factory.createMessage(BUNDLE_PATH, 351, propertyKey);
+    }
 }
