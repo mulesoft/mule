@@ -15,6 +15,7 @@
                        recipe="recipes"
                        initialHealth="CANCER"
                        finalHealth="CANCER"
+                       monthlyIncomes="monthlyIncomes"
                        candidateDoors="candidateDoors"
                        enemies="#[[]]">
     </heisenberg:config>

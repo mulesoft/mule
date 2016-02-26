@@ -23,6 +23,7 @@
                        money="100000"
                        recipe="recipes"
                        initialHealth="CANCER"
+                       monthlyIncomes="monthlyIncomes"
                        finalHealth="CANCER">
         <extension:dynamic-config-policy>
             <extension:expiration-policy maxIdleTime="100" timeUnit="MILLISECONDS" />

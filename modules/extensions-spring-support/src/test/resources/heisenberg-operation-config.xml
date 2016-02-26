@@ -22,6 +22,7 @@
                        money="1000000"
                        recipe="recipes"
                        finalHealth="CANCER"
+                       monthlyIncomes="monthlyIncomes"
                        candidateDoors="candidateDoors">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
@@ -35,6 +36,10 @@
         <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
             <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
         </heisenberg:next-door>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
     </heisenberg:config>
 
     <flow name="sayMyName">

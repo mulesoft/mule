@@ -20,5 +20,6 @@
                        initialHealth="CANCER"
                        finalHealth="DEAD"
                        candidateDoors="candidateDoors"
+                       monthlyIncomes="monthlyIncomes"
                        firstEndevour="#['random company']" />
 </mule>
