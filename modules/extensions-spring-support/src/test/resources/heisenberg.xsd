@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/heisenberg" attributeFormDefault="unqualified" elementFormDefault="qualified">
     <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
     <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
@@ -149,7 +150,7 @@
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.module.extension.model.HealthStatusEnumType" use="optional" default="CANCER" name="initialHealth"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="wildCardWeaponMap"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" default="#[payload]" name="literalExpressionWithDefault"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="monthlyIncomes"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="required" name="monthlyIncomes"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="literalExpressionWithoutDefault"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="candidateDoors"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="firstEndevour"></xs:attribute>
@@ -474,7 +475,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionList" use="optional" name="wildCardWeapons"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="required" name="wildCardWeapons"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -492,7 +493,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionList" use="optional" name="weaponList"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="required" name="weaponList"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -510,7 +511,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionObject" use="optional" name="weapon"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="required" name="weapon"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
