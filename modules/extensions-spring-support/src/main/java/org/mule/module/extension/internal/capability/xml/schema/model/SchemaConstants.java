@@ -7,6 +7,11 @@
 
 package org.mule.module.extension.internal.capability.xml.schema.model;
 
+import static org.mule.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_NAMESPACE;
+import static org.mule.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_PREFIX;
+import static org.mule.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
+import static org.mule.config.spring.parsers.specific.NameConstants.MULE_PREFIX;
+
 import org.mule.module.extension.internal.ExtensionProperties;
 
 import javax.xml.namespace.QName;
@@ -18,14 +23,10 @@ public final class SchemaConstants
     public static final String XSD_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
     public static final String SPRING_FRAMEWORK_NAMESPACE = "http://www.springframework.org/schema/beans";
     public static final String SPRING_FRAMEWORK_SCHEMA_LOCATION = "http://www.springframework.org/schema/beans/spring-beans-3.0.xsd";
-    public static final String MULE_NAMESPACE = "http://www.mulesoft.org/schema/mule/core";
     public static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
-    public static final String MULE_EXTENSION_NAMESPACE = "http://www.mulesoft.org/schema/mule/extension";
     public static final String MULE_EXTENSION_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd";
     public static final String MULE_TLS_NAMESPACE = "http://www.mulesoft.org/schema/mule/tls";
     public static final String MULE_TLS_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd";
-    public static final String MULE_PREFIX = "mule";
-    public static final String MULE_EXTENSION_PREFIX = "extension";
     public static final String OPERATION_SUBSTITUTION_GROUP_SUFFIX = "-OperationGroup";
     public static final String GROUP_SUFFIX = "-group";
 
@@ -40,7 +41,6 @@ public final class SchemaConstants
     public static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR = new QName(MULE_NAMESPACE, "abstract-message-processor", MULE_PREFIX);
     public static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE = new QName(MULE_NAMESPACE, "abstractMessageProcessorType", MULE_PREFIX);
     public static final QName MULE_ABSTRACT_MESSAGE_SOURCE = new QName(MULE_NAMESPACE, "abstract-message-source", MULE_PREFIX);
-    public static final QName MULE_ABSTRACT_MESSAGE_SOURCE_TYPE = new QName(MULE_NAMESPACE, "abstractMessageSourceType", MULE_PREFIX);
     public static final QName MULE_ABSTRACT_RECONNECTION_STRATEGY = new QName(MULE_NAMESPACE, "abstract-reconnection-strategy", MULE_PREFIX);
     public static final QName MULE_ABSTRACT_RECONNECTION_STRATEGY_TYPE = new QName(MULE_NAMESPACE, "abstractReconnectionStrategyType", MULE_PREFIX);
     public static final QName MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE = new QName(MULE_NAMESPACE, "messageProcessorOrOutboundEndpoint", MULE_PREFIX);
@@ -79,11 +79,6 @@ public final class SchemaConstants
     public static final String ATTRIBUTE_NAME_NAME = "name";
     public static final String XSD_EXTENSION = ".xsd";
     public static final String DISABLE_VALIDATION = "disableValidation";
-    public static final String POOLING_PROFILE = "poolingProfile";
-    public static final String RETRY_POLICY_TEMPLATE = "retryPolicyTemplate";
-
-    // DESCRIPTIONS
-    public static final String DISABLE_VALIDATION_DESCRIPTION = "Connection Provider attribute to disable connection validation";
 
     /**
      * Human friendly description for {@link ExtensionProperties#TARGET_ATTRIBUTE}

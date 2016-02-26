@@ -10,15 +10,18 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.config.ImmutableThreadingProfile;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.extension.api.runtime.source.SourceFactory;
+import org.mule.internal.connection.ConnectionManagerAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.module.extension.internal.runtime.source.SourceConfigurer;
@@ -26,6 +29,8 @@ import org.mule.module.extension.internal.runtime.source.SourceConfigurer;
 import com.google.common.base.Joiner;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import org.springframework.beans.factory.FactoryBean;
 
@@ -42,6 +47,10 @@ final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryB
     private final SourceModel sourceModel;
     private final String configurationProviderName;
     private final MuleContext muleContext;
+    private RetryPolicyTemplate retryPolicyTemplate;
+
+    @Inject
+    private ConnectionManagerAdapter connectionManagerAdapter;
 
     ExtensionMessageSourceFactoryBean(ElementDescriptor element,
                                       ExtensionModel extensionModel,
@@ -65,7 +74,13 @@ final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryB
             throw dynamicParameterException(resolverSet, sourceModel, element);
         }
 
-        ExtensionMessageSource messageSource = new ExtensionMessageSource(extensionModel, getSourceFactory(resolverSet), configurationProviderName, getThreadingProfile());
+        retryPolicyTemplate = parserDelegate.getInfrastructureParameter(RetryPolicyTemplate.class);
+        if (retryPolicyTemplate == null)
+        {
+            retryPolicyTemplate = connectionManagerAdapter.getDefaultRetryPolicyTemplate();
+        }
+
+        ExtensionMessageSource messageSource = new ExtensionMessageSource(extensionModel, getSourceFactory(resolverSet), configurationProviderName, getThreadingProfile(), retryPolicyTemplate);
         muleContext.getInjector().inject(messageSource);
 
         return messageSource;
@@ -117,5 +132,10 @@ final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryB
         return new ConfigurationException(createStaticMessage(format("The '%s' message source on flow '%s' is using expressions, which are not allowed on message sources. " +
                                                                      "Offending parameters are: [%s]",
                                                                      model.getName(), element.getSourceElement().getParentNode().getLocalName(), Joiner.on(',').join(dynamicParams))));
+    }
+
+    public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
+    {
+        this.retryPolicyTemplate = retryPolicyTemplate;
     }
 }

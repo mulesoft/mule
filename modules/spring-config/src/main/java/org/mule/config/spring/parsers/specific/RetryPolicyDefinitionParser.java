@@ -8,13 +8,12 @@ package org.mule.config.spring.parsers.specific;
 
 import static org.mule.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
-import static org.mule.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_NAMESPACE;
-import static org.mule.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_PREFIX;
+import static org.mule.config.spring.parsers.specific.NameConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
+import static org.mule.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
 import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
+
 import org.mule.config.spring.parsers.generic.OptionalChildDefinitionParser;
 import org.mule.retry.async.AsynchronousRetryTemplate;
-
-import javax.xml.namespace.QName;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -29,8 +28,6 @@ import org.w3c.dom.Element;
  */
 public class RetryPolicyDefinitionParser extends OptionalChildDefinitionParser
 {
-
-    public static final QName MULE_EXTENSION_CONNECTION_PROVIDER_TYPE = new QName(MULE_EXTENSION_NAMESPACE, "abstractConnectionProviderType", MULE_EXTENSION_PREFIX);
 
     boolean asynchronous = false;
 
@@ -53,6 +50,10 @@ public class RetryPolicyDefinitionParser extends OptionalChildDefinitionParser
             return false;
         }
         else if (getParentElement(element).getSchemaTypeInfo().isDerivedFrom(MULE_EXTENSION_CONNECTION_PROVIDER_TYPE.getNamespaceURI(), MULE_EXTENSION_CONNECTION_PROVIDER_TYPE.getLocalPart(), DERIVATION_EXTENSION))
+        {
+            return false;
+        }
+        else if (getParentElement(element).getSchemaTypeInfo().isDerivedFrom(MULE_ABSTRACT_MESSAGE_SOURCE_TYPE.getNamespaceURI(), MULE_ABSTRACT_MESSAGE_SOURCE_TYPE.getLocalPart(), DERIVATION_EXTENSION))
         {
             return false;
         }

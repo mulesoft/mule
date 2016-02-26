@@ -8,9 +8,10 @@ package org.mule.module.extension.internal.config;
 
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
+import static org.mule.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_NAMESPACE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_NAMESPACE;
 import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
+
 import org.mule.api.registry.Registry;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;

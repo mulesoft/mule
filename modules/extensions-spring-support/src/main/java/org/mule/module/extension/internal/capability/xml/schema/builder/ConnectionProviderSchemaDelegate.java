@@ -74,7 +74,7 @@ final class ConnectionProviderSchemaDelegate
             if (connectionHandlingType.isPooled() || connectionHandlingType.isCached())
             {
                 addValidationFlag(providerType);
-                addConnectionProviderRetryPolicy(choice);
+                builder.addRetryPolicy(choice);
             }
             if (connectionHandlingType.isPooled())
             {
@@ -102,14 +102,5 @@ final class ConnectionProviderSchemaDelegate
         providerType.getAttributeOrAttributeGroup().add(builder.createAttribute(DISABLE_VALIDATION, DataType.of(boolean.class), false, NOT_SUPPORTED));
     }
 
-    private void addConnectionProviderRetryPolicy(ExplicitGroup choice)
-    {
-        TopLevelElement providerElementRetry = new TopLevelElement();
-        providerElementRetry.setMinOccurs(ZERO);
-        providerElementRetry.setMaxOccurs("1");
-        providerElementRetry.setRef(MULE_ABSTRACT_RECONNECTION_STRATEGY);
-
-        choice.getParticle().add(objectFactory.createElement(providerElementRetry));
-    }
 
 }

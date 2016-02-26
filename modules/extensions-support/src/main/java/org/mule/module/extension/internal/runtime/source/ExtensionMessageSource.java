@@ -12,12 +12,15 @@ import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.util.concurrent.ThreadNameHelper.getPrefix;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.connection.ConnectionException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.WorkManager;
@@ -25,6 +28,9 @@ import org.mule.api.execution.CompletionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.retry.RetryCallback;
+import org.mule.api.retry.RetryContext;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.source.MessageSource;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.api.transaction.TransactionConfig;
@@ -38,9 +44,11 @@ import org.mule.extension.api.runtime.MessageHandler;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.extension.api.runtime.source.SourceContext;
 import org.mule.extension.api.runtime.source.SourceFactory;
+import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -70,16 +78,18 @@ public class ExtensionMessageSource implements MessageSource,
     private final SourceFactory sourceFactory;
     private final String configurationProviderName;
     private final ThreadingProfile threadingProfile;
+    private final RetryPolicyTemplate retryPolicyTemplate;
 
     private SourceWrapper source;
     private WorkManager workManager;
 
-    public ExtensionMessageSource(ExtensionModel extensionModel, SourceFactory sourceFactory, String configurationProviderName, ThreadingProfile threadingProfile)
+    public ExtensionMessageSource(ExtensionModel extensionModel, SourceFactory sourceFactory, String configurationProviderName, ThreadingProfile threadingProfile, RetryPolicyTemplate retryPolicyTemplate)
     {
         this.extensionModel = extensionModel;
         this.sourceFactory = sourceFactory;
         this.configurationProviderName = configurationProviderName;
         this.threadingProfile = threadingProfile;
+        this.retryPolicyTemplate = retryPolicyTemplate;
     }
 
     private MessageProcessor messageProcessor;
@@ -102,10 +112,36 @@ public class ExtensionMessageSource implements MessageSource,
     }
 
     @Override
+    public void handle(MuleMessage<Object, Serializable> message)
+    {
+        MuleEvent event = new DefaultMuleEvent((org.mule.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
+        messageProcessingManager.processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, new NullCompletionHandler()), createProcessingContext());
+    }
+
+    //TODO: MULE-9397 - Add support for @OnException for sources
+    @Override
     public void onException(Throwable exception)
     {
-        LOGGER.warn(String.format("Message source '%s' on flow '%s' threw exception. Restarting...", source.getName(), flowConstruct.getName()), exception);
-        restartSource();
+        Optional<ConnectionException> connectionException = ExceptionUtils.extractRootConnectionException(exception);
+
+        if (connectionException.isPresent())
+        {
+            try
+            {
+                LOGGER.warn(String.format("Message source '%s' on flow '%s' threw exception. Restarting...", source.getName(), flowConstruct.getName()), exception);
+                stopSource();
+                disposeSource();
+                startSource();
+            }
+            catch (Throwable e)
+            {
+                notifyExceptionAndShutDown(e);
+            }
+        }
+        else
+        {
+            notifyExceptionAndShutDown(exception);
+        }
     }
 
     @Override
@@ -125,6 +161,7 @@ public class ExtensionMessageSource implements MessageSource,
         }
     }
 
+    //TODO: MULE-9397 - Add support for @OnException for sources
     @Override
     public void start() throws MuleException
     {
@@ -134,7 +171,7 @@ public class ExtensionMessageSource implements MessageSource,
             workManager.start();
         }
 
-        source.start();
+        startSource();
     }
 
     @Override
@@ -154,23 +191,6 @@ public class ExtensionMessageSource implements MessageSource,
     public void dispose()
     {
         disposeSource();
-    }
-
-    private void restartSource()
-    {
-        try
-        {
-            stopSource();
-            disposeSource();
-
-            createSource();
-            source.start();
-        }
-        catch (Exception e)
-        {
-            LOGGER.error(String.format("Failed to restart source '%s' on flow '%s'. Source will be permanently stopped", source.getName(), flowConstruct.getName()), e);
-            shutdown();
-        }
     }
 
     private void shutdown()
@@ -238,6 +258,63 @@ public class ExtensionMessageSource implements MessageSource,
         initialiseIfNeeded(source, true, muleContext);
     }
 
+    private void startSource()
+    {
+        try
+        {
+            final RetryContext execute = retryPolicyTemplate.execute(new SourceRetryCallback(), workManager);
+
+            if (!execute.isOk())
+            {
+                throw execute.getLastFailure();
+            }
+        }
+        catch (Throwable e)
+        {
+            throw new MuleRuntimeException(e);
+        }
+    }
+
+    private class SourceRetryCallback implements RetryCallback
+    {
+
+        @Override
+        public void doWork(RetryContext context) throws Exception
+        {
+            try
+            {
+                createSource();
+                source.start();
+            }
+            catch (Exception e)
+            {
+                stopSource();
+                disposeSource();
+                Optional<ConnectionException> connectionException = ExceptionUtils.extractRootConnectionException(e);
+                if (connectionException.isPresent())
+                {
+                    throw e;
+                }
+                else
+                {
+                    context.setFailed(e);
+                }
+            }
+        }
+
+        @Override
+        public String getWorkDescription()
+        {
+            return "Message Source Reconnection";
+        }
+
+        @Override
+        public Object getWorkOwner()
+        {
+            return this;
+        }
+    }
+
     //TODO: MULE-9320
     private WorkManager createWorkManager()
     {
@@ -287,7 +364,6 @@ public class ExtensionMessageSource implements MessageSource,
         };
     }
 
-
     @Override
     public void setListener(MessageProcessor listener)
     {
@@ -298,5 +374,12 @@ public class ExtensionMessageSource implements MessageSource,
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
+    }
+
+
+    private void notifyExceptionAndShutDown(Throwable exception)
+    {
+        LOGGER.error(String.format("Message source '%s' on flow '%s' threw exception. Shutting down it forever...", source.getName(), flowConstruct.getName()), exception);
+        shutdown();
     }
 }
