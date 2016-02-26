@@ -753,9 +753,9 @@ public final class SchemaBuilder
             @Override
             public void onList()
             {
-                forceOptional = shouldForceOptional();
-                defaultOperation();
                 DataType genericType = parameterModel.getType().getGenericTypes()[0];
+                forceOptional = shouldForceOptional(genericType.getRawType());
+                defaultOperation();
                 if (shouldGenerateDataTypeChildElements(genericType, parameterModel))
                 {
                     generateCollectionElement(all, parameterModel, true);
@@ -765,9 +765,10 @@ public final class SchemaBuilder
             @Override
             public void onMap()
             {
-                forceOptional = shouldForceOptional();
-                defaultOperation();
                 DataType genericType = parameterModel.getType().getGenericTypes()[0];
+                forceOptional = shouldForceOptional(genericType.getRawType());
+                defaultOperation();
+
                 if (shouldGenerateDataTypeChildElements(genericType, parameterModel))
                 {
                     generateMapElement(all, parameterModel, true);
@@ -778,7 +779,7 @@ public final class SchemaBuilder
             public void onPojo()
             {
 
-                forceOptional = shouldForceOptional();
+                forceOptional = shouldForceOptional(parameterModel.getType().getRawType());
 
                 if (TlsContextFactory.class.isAssignableFrom(parameterModel.getType().getRawType()))
                 {
@@ -827,9 +828,9 @@ public final class SchemaBuilder
                 return IntrospectionUtils.isInstantiable(type) && !getExposedFields(type).isEmpty();
             }
 
-            private boolean shouldForceOptional()
+            private boolean shouldForceOptional(Class<?> type)
             {
-                return !parameterModel.isRequired() || ExpressionSupport.REQUIRED != parameterModel.getExpressionSupport();
+                return !parameterModel.isRequired() || (IntrospectionUtils.isInstantiable(type) && ExpressionSupport.REQUIRED !=  parameterModel.getExpressionSupport());
             }
         };
     }
