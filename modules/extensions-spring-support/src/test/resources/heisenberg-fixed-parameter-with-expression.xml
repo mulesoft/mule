@@ -18,6 +18,7 @@
                        money="1000000"
                        recipe="recipes"
                        initialHealth="CANCER"
+                       monthlyIncomes="monthlyIncomes"
                        finalHealth="DEAD"
                        candidateDoors="candidateDoors"
                        firstEndevour="#['random company']" />

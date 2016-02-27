@@ -25,6 +25,7 @@
                        firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
                        moneyFunction="#[money]"
+                       monthlyIncomes="monthlyIncomes"
                        literalExpressionWithoutDefault="#[money]">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
@@ -96,6 +97,10 @@
         <heisenberg:next-door address="${pollosHermanos}" victim="${fring}">
             <heisenberg:previous victim="${krazy8}" address="${jesseAddress}"/>
         </heisenberg:next-door>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
     </heisenberg:config>
 
     <heisenberg:config name="heisenbergByRef"
