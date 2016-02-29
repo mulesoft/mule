@@ -19,7 +19,7 @@ abstract class AbstractValidateSchemaFunctionalTestCase extends FunctionalTestCa
     {
         try
         {
-            runFlow(VALIDATE_FLOW, payload);
+            flowRunner(VALIDATE_FLOW).withPayload(payload).run();
             fail("was expecting a failure");
         }
         catch (MessagingException e)

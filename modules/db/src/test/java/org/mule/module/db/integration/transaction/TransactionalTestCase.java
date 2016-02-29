@@ -84,7 +84,7 @@ public class TransactionalTestCase extends AbstractDbIntegrationTestCase
     {
         try
         {
-            runFlow(flowName, TEST_MESSAGE);
+            flowRunner(flowName).withPayload(TEST_MESSAGE).run();
             fail("Exception expected");
         }
         catch (Exception e)

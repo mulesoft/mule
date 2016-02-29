@@ -15,7 +15,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.module.oauth2.internal.OAuthConstants;
@@ -80,11 +79,9 @@ public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends Abstrac
         resourceOwnerOauthContext.setRefreshToken(REFRESH_TOKEN);
         configOAuthContext.updateResourceOwnerOAuthContext(resourceOwnerOauthContext);
 
-
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        final MuleEvent testEvent = getTestEvent("message");
-        testEvent.setFlowVariable("userId", userId);
-        final MuleEvent result = flow.process(testEvent);
+        final MuleEvent result = flowRunner(flowName).withPayload("message")
+                                                     .withFlowVariable("userId", userId)
+                                                     .run();
         assertThat(getPayloadAsString(result.getMessage()), is(RESOURCE_RESULT));
 
         wireMockRule.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))

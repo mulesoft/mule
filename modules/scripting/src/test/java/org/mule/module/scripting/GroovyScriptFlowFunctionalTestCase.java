@@ -6,8 +6,6 @@
  */
 package org.mule.module.scripting;
 
-import org.mule.api.MuleEvent;
-
 import org.junit.Test;
 
 public class GroovyScriptFlowFunctionalTestCase extends GroovyScriptServiceFunctionalTestCase
@@ -16,63 +14,52 @@ public class GroovyScriptFlowFunctionalTestCase extends GroovyScriptServiceFunct
     @Test
     public void inlineScriptMutateProperty() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.getMessage().setOutboundProperty("foo", "bar");
-        testFlow("inlineScriptMutateProperty", event);
+        flowRunner("inlineScriptMutateProperty").withPayload("").withOutboundProperty("foo", "bar").run();
     }
 
     @Test
     public void inlineScriptAddProperty() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        testFlow("inlineScriptAddProperty", event);
+        flowRunner("inlineScriptAddProperty").withPayload("").run();
     }
 
     @Test
     public void inlineScriptMutatePropertiesMap() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.getMessage().setOutboundProperty("foo", "bar");
-        testFlow("inlineScriptMutatePropertiesMap", event);
+        flowRunner("inlineScriptMutatePropertiesMap").withPayload("").withOutboundProperty("foo", "bar").run();
     }
 
     @Test
     public void inlineScriptMutateVariable() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.getMessage().setInvocationProperty("foo", "bar");
-        testFlow("inlineScriptMutateVariable", event);
+        flowRunner("inlineScriptMutateVariable").withPayload("").withFlowVariable("foo", "bar").run();
     }
 
     @Test
     public void inlineScriptAddVariable() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        testFlow("inlineScriptAddVariable", event);
+        flowRunner("inlineScriptAddVariable").withPayload("").run();
     }
 
     @Test
     public void inlineScriptMutateVariablesMap() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.getMessage().setInvocationProperty("foo", "bar");
-        testFlow("inlineScriptMutateVariablesMap", event);
+        flowRunner("inlineScriptMutateVariablesMap").withPayload("").withFlowVariable("foo", "bar").run();
     }
 
     @Test
     public void inlineScriptMutatePayload() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        testFlow("inlineScriptMutatePayload", event);
+        flowRunner("inlineScriptMutatePayload").withPayload("").run();
     }
 
     @Test
     public void scriptExpressionVariables() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("prop1", "Received");
-        event.setFlowVariable("prop2", "A-OK");
-        testFlow("scriptExpressionVariables", event);
+        flowRunner("scriptExpressionVariables").withPayload("")
+                                               .withFlowVariable("prop1", "Received")
+                                               .withFlowVariable("prop2", "A-OK")
+                                               .run();
     }
 
     @Override

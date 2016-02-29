@@ -9,9 +9,8 @@ package org.mule.module.ws.functional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
-import org.mule.api.MuleEvent;
+
 import org.mule.api.MuleEventContext;
-import org.mule.construct.Flow;
 import org.mule.functional.functional.EventCallback;
 
 import java.util.regex.Matcher;
@@ -61,9 +60,6 @@ public class SoapActionFunctionalTestCase extends AbstractWSConsumerFunctionalTe
     private void assertSoapAction(String flowName, final String expectedSoapActionHeader,
                                   final String expectedActionInContentType) throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        MuleEvent event = getTestEvent("<test/>");
-
         getFunctionalTestComponent("server").setEventCallback(new EventCallback()
         {
             @Override
@@ -79,7 +75,7 @@ public class SoapActionFunctionalTestCase extends AbstractWSConsumerFunctionalTe
             }
         });
 
-        flow.process(event);
+        flowRunner(flowName).withPayload("<test/>").run();
     }
 
     private String extractAction(String contentType)

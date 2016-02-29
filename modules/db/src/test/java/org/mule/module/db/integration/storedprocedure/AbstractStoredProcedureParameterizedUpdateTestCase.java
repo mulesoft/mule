@@ -38,7 +38,7 @@ public abstract class AbstractStoredProcedureParameterizedUpdateTestCase extends
     @Test
     public void testRequestResponse() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("defaultQueryRequestResponse", "foo");
+        final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload("foo").run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(Map.class)));

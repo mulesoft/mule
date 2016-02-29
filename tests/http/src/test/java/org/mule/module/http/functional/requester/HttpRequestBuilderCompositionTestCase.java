@@ -8,7 +8,6 @@ package org.mule.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.construct.Flow;
 
 import org.junit.Test;
 
@@ -24,9 +23,7 @@ public class HttpRequestBuilderCompositionTestCase extends AbstractHttpRequestTe
     @Test
     public void parameterOverrideInRequestBuilderComposition() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("testFlow");
-
-        flow.process(getTestEvent(TEST_MESSAGE));
+        flowRunner("testFlow").withPayload(TEST_MESSAGE).run();
 
         assertThat(uri, equalTo("/testPath?queryParam1=testValue1&queryParam2=testValue2&queryParam2=newTestValue2&queryParam3=testValue3"));
         assertThat(getFirstReceivedHeader("testHeader1"), equalTo("headerValue1"));

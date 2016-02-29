@@ -44,7 +44,7 @@ public class DeleteSourceTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesDefaultSource() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("delete", VENUS.getName());
+        final MuleEvent responseEvent = flowRunner("delete").withPayload(VENUS.getName()).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertDelete(response);
@@ -53,7 +53,7 @@ public class DeleteSourceTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesCustomSource() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("deleteCustomSource", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("deleteCustomSource").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertDelete(response);

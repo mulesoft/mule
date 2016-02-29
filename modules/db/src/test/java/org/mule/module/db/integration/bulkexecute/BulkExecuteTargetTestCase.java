@@ -42,7 +42,7 @@ public class BulkExecuteTargetTestCase extends AbstractBulkExecuteTestCase
     @Test
     public void usesCustomTarget() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("bulkUpdateCustomTarget", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("bulkUpdateCustomTarget").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));

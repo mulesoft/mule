@@ -56,7 +56,7 @@ public class InsertBulkTestCase extends AbstractDbIntegrationTestCase
         planetNames.add("Pluto");
         planetNames.add("Saturn");
 
-        final MuleEvent responseEvent = runFlow("insertBulk", planetNames);
+        final MuleEvent responseEvent = flowRunner("insertBulk").withPayload(planetNames).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertBulkInsert(response.getPayload());
@@ -65,7 +65,7 @@ public class InsertBulkTestCase extends AbstractDbIntegrationTestCase
     @Test(expected = MessagingException.class)
     public void requiresCollectionPayload() throws Exception
     {
-        runFlow("insertBulk", TEST_MESSAGE);
+        flowRunner("insertBulk").withPayload(TEST_MESSAGE).run();
     }
 
     private void assertBulkInsert(Object payload) throws SQLException

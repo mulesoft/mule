@@ -22,18 +22,18 @@ public class ValidateSchemaWithDifferentLocationStylesFunctionalTestCase extends
     @Test
     public void withRelativePath() throws Exception
     {
-        runFlow("withRelativePath", getGoodFstab());
+        flowRunner("withRelativePath").withPayload(getGoodFstab()).run();
     }
 
     @Test
     public void withRelativePathStartingWithSlash() throws Exception
     {
-        runFlow("withRelativePathStartingWithSlash", getGoodFstab());
+        flowRunner("withRelativePathStartingWithSlash").withPayload(getGoodFstab()).run();
     }
 
     @Test
     public void withUri() throws Exception
     {
-        runFlow("withUri", getGoodFstab());
+        flowRunner("withUri").withPayload(getGoodFstab()).run();
     }
 }

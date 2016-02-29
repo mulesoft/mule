@@ -30,14 +30,14 @@ public class HttpRequestCustomTlsConfigTestCase extends AbstractHttpRequestTestC
     @Test
     public void configureTlsFromGlobalContext() throws Exception
     {
-        runFlow("testFlowGlobalContext", TEST_MESSAGE);
+        flowRunner("testFlowGlobalContext").withPayload(TEST_MESSAGE).run();
         assertThat(body, equalTo(TEST_MESSAGE));
     }
 
     @Test
     public void configureTlsFromNestedContext() throws Exception
     {
-        runFlow("testFlowNestedContext", TEST_MESSAGE);
+        flowRunner("testFlowNestedContext").withPayload(TEST_MESSAGE).run();
         assertThat(body, equalTo(TEST_MESSAGE));
     }
 

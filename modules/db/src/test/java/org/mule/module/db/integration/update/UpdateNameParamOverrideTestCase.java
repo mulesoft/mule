@@ -10,9 +10,7 @@ package org.mule.module.db.integration.update;
 import static org.junit.Assert.assertEquals;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
@@ -21,8 +19,6 @@ import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +48,7 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
     @Test
     public void usesDefaultParams() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("defaultParams", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("defaultParams").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
@@ -63,7 +59,7 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
     @Test
     public void usesOverriddenParams() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("overriddenParams", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("overriddenParams").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
@@ -73,7 +69,7 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
 
     public void usesInlineOverriddenParams() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("inlineOverriddenParams", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("inlineOverriddenParams").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
@@ -84,7 +80,7 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
     @Test
     public void usesParamsInInlineQuery() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("inlineQuery", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("inlineQuery").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
@@ -95,13 +91,9 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
     @Test
     public void usesExpressionParam() throws Exception
     {
-        Map<String, Object> props = new HashMap<>();
-        props.put("type", 3);
-
-        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, props, Collections.emptyMap(), Collections.emptyMap(), muleContext);
-        final DefaultMuleEvent muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, null);
-
-        final MuleEvent responseEvent = runFlow("expressionParam", muleEvent);
+        final MuleEvent responseEvent = flowRunner("expressionParam").withPayload(TEST_MESSAGE)
+                                                                     .withInboundProperty("type", 3)
+                                                                     .run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());

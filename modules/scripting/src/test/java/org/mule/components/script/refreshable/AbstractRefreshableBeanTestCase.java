@@ -44,7 +44,7 @@ public abstract class AbstractRefreshableBeanTestCase extends FunctionalTestCase
         writeScript(script, nameToPath(name));
         Thread.sleep(WAIT_TIME); // wait for bean to refresh
 
-        MuleMessage m = runFlow(flowName, payload).getMessage();
+        MuleMessage m = flowRunner(flowName).withPayload(payload).run().getMessage();
         assertNotNull(m);
         assertEquals(payload + result, getPayloadAsString(m));
     }

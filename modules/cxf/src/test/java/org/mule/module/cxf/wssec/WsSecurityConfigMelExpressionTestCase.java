@@ -36,7 +36,7 @@ public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase
     public void testSuccessfulAuthentication() throws Exception
     {
         ClientPasswordCallback.setPassword("secret");
-        MuleMessage received = runFlow("cxfClient", getTestMuleMessage("PasswordText")).getMessage();
+        MuleMessage received = flowRunner("cxfClient").withPayload(getTestMuleMessage("PasswordText")).run().getMessage();
 
         assertNotNull(received);
         assertEquals("Hello PasswordText", getPayloadAsString(received));
@@ -48,6 +48,6 @@ public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase
         ClientPasswordCallback.setPassword("secret");
         expectedException.expectCause(instanceOf(SOAPFaultException.class));
         expectedException.expectMessage("Security exception occurred invoking web service");
-        runFlow("cxfClient", getTestMuleMessage("UnknownPasswordEncoding")).getMessage();
+        flowRunner("cxfClient").withPayload(getTestMuleMessage("UnknownPasswordEncoding")).run().getMessage();
     }
 }

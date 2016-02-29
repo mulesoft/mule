@@ -10,6 +10,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -55,7 +56,7 @@ public class ClientCredentialsTokenRequestTestCase extends AbstractOAuthAuthoriz
 
     private void testFlowAndExpectCredentialsInBody(String flowName, boolean credentialsInBody) throws Exception
     {
-        runFlow(flowName, getTestEvent(TEST_MESSAGE));
+        flowRunner(flowName).withPayload(TEST_MESSAGE).run();
         verifyRequestDoneToTokenUrlForClientCredentials(scopes.getValue(), credentialsInBody);
     }
 }

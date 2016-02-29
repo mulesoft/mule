@@ -8,8 +8,8 @@ package org.mule.transformers.xml.xslt;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
-import org.mule.PropertyScope;
+
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
@@ -52,15 +52,14 @@ public class XsltResultDocumentTestCase extends FunctionalTestCase
     private void executeFlowAndValidateOutput(String payload, File outputFile) throws Exception
     {
         outputFile.delete();
-        runFlow(FLOW_NAME, createEventWithPayloadAndSessionProperty(payload, OUTPUT_FILE_PROPERTY, outputFile.getAbsolutePath()));
+        withPayloadAndSessionProperty(flowRunner(FLOW_NAME), payload, OUTPUT_FILE_PROPERTY, outputFile.getAbsolutePath()).run();
         assertThat(FileUtils.readFileToString(outputFile), is(EXPECTED_OUTPUT));
     }
 
-    private MuleEvent createEventWithPayloadAndSessionProperty(Object payload, String propertyName, Object propertyValue) throws Exception
+    private FlowRunner withPayloadAndSessionProperty(FlowRunner runner, Object payload, String propertyName, Object propertyValue) throws Exception
     {
-        MuleEvent muleEvent = getTestEvent(payload);
-        muleEvent.getMessage().setProperty(propertyName, propertyValue, PropertyScope.SESSION);
-        return muleEvent;
+        return runner.withPayload(payload)
+                     .withSessionProperty(propertyName, propertyValue);
     }
 
 }

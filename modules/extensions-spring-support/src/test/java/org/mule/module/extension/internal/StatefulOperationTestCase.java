@@ -9,10 +9,11 @@ package org.mule.module.extension.internal;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
 import java.math.BigDecimal;
 
@@ -79,14 +80,11 @@ public class StatefulOperationTestCase extends ExtensionFunctionalTestCase
 
     private long doDynamicLaunder(String name, long amount) throws Exception
     {
-        MuleEvent event = getTestEvent(amount);
-        event.setFlowVariable("myName", name);
-
-        return (Long) runFlow("laundry", event).getMessage().getPayload();
+        return (Long) flowRunner("laundry").withPayload(amount).withFlowVariable("myName", name).run().getMessage().getPayload();
     }
 
     private long staticLounder(long amount) throws Exception
     {
-        return (Long) runFlow("staticLaundry", getTestEvent(amount)).getMessage().getPayload();
+        return (Long) flowRunner("staticLaundry").withPayload(amount).run().getMessage().getPayload();
     }
 }

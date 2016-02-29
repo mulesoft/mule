@@ -15,6 +15,8 @@ import org.mule.api.construct.FlowConstruct;
 
 import java.util.Map;
 
+import javax.activation.DataHandler;
+
 import org.mockito.Mockito;
 
 /**
@@ -83,6 +85,50 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
     {
         eventBuilder.withOutboundProperty(key, value);
     
+        return (R) this;
+    }
+
+    /**
+     * Prepares an attachment with the given key and value to be sent in the {@link MuleMessage} to the configured flow.
+     * 
+     * @param key the key of the attachment to add
+     * @param value the {@link DataHandler} for the attachment to add
+     * @return this {@link FlowRunner}
+     */
+    public R withOutboundAttachment(String key, DataHandler value)
+    {
+        eventBuilder.withOutboundAttachment(key, value);
+
+        return (R) this;
+    }
+
+    /**
+     * Prepares an attachment with the given key and value to be sent in the {@link MuleMessage} to the configured flow.
+     * 
+     * @param key the key of the attachment to add
+     * @param object the content of the attachment to add
+     * @param contentType the content type of the attachment to add. Note that the charset attribute can be specifed too
+     *            i.e. text/plain;charset=UTF-8
+     * @return this {@link FlowRunner}
+     */
+    public R withOutboundAttachment(String key, Object object, String contentType)
+    {
+        eventBuilder.withOutboundAttachment(key, object, contentType);
+
+        return (R) this;
+    }
+
+    /**
+     * Prepares an attachment with the given key and value to be sent in the {@link MuleMessage} to the configured flow.
+     * 
+     * @param key the key of the attachment to add
+     * @param value the {@link DataHandler} for the attachment to add
+     * @return this {@link FlowRunner}
+     */
+    public R withInboundAttachment(String key, DataHandler value)
+    {
+        eventBuilder.withInboundAttachment(key, value);
+
         return (R) this;
     }
 

@@ -24,7 +24,7 @@ public class HttpRequestSocketConfigTestCase extends AbstractHttpRequestTestCase
     public void globalClientSocketProperties() throws Exception
     {
         // For now, just test that the context is parsed correctly.
-        runFlow("globalConfigFlow", TEST_MESSAGE);
+        flowRunner("globalConfigFlow").withPayload(TEST_MESSAGE).run();
         assertThat(body, equalTo(TEST_MESSAGE));
     }
 
@@ -32,7 +32,7 @@ public class HttpRequestSocketConfigTestCase extends AbstractHttpRequestTestCase
     public void nestedClientSocketProperties() throws Exception
     {
         // For now, just test that the context is parsed correctly.
-        runFlow("nestedConfigFlow", TEST_MESSAGE);
+        flowRunner("nestedConfigFlow").withPayload(TEST_MESSAGE).run();
         assertThat(body, equalTo(TEST_MESSAGE));
     }
 

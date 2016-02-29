@@ -43,7 +43,7 @@ public class InsertBulkTargetTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesCustomTarget() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("insertCustomTarget", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("insertCustomTarget").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertInsert(response.getOutboundProperty("updateCount"));

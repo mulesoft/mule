@@ -43,7 +43,7 @@ public class SelectDynamicQueryTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesDynamicQuery() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("selectDynamicQuery", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("selectDynamicQuery").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());

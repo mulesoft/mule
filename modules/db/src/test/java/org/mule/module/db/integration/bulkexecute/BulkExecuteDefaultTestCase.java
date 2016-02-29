@@ -41,7 +41,7 @@ public class BulkExecuteDefaultTestCase extends AbstractBulkExecuteTestCase
     @Test
     public void updatesDataRequestResponse() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("bulkUpdateRequestResponse", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("bulkUpdateRequestResponse").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertBulkModeResult(response.getPayload());
@@ -50,7 +50,7 @@ public class BulkExecuteDefaultTestCase extends AbstractBulkExecuteTestCase
     @Test
     public void testOneWay() throws Exception
     {
-        runFlowAsync("bulkUpdateOneWay", TEST_MESSAGE);
+        flowRunner("bulkUpdateOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);

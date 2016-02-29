@@ -11,9 +11,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.construct.Flow;
 import org.mule.api.message.NullPayload;
 
 import java.io.IOException;
@@ -39,17 +39,13 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
     @Test
     public void processInboundAttachments() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("requestFlow");
-
-        MuleEvent event = flow.process(getTestEvent(TEST_MESSAGE));
+        MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
 
         assertThat(event.getMessage().getPayload(), is(instanceOf(NullPayload.class)));
 
         assertThat(event.getMessage().getInboundAttachmentNames().size(), is(2));
         assertAttachment(event.getMessage(), "partName1", "Test part 1", "text/plain");
         assertAttachment(event.getMessage(), "partName2", "Test part 2", "text/html");
-
-
     }
 
     private void assertAttachment(MuleMessage message, String attachmentName, String attachmentContents, String contentType) throws IOException
@@ -60,11 +56,9 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
         assertThat(handler.getContentType(), equalTo(contentType));
 
         assertThat(IOUtils.toString(handler.getInputStream()), equalTo(attachmentContents));
-
     }
 
-
-
+    @Override
     protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         MultiPartWriter multiPartWriter = new MultiPartWriter(response.getWriter());
@@ -81,6 +75,5 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
         multiPartWriter.endPart();
 
         multiPartWriter.close();
-
     }
 }

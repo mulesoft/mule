@@ -33,7 +33,7 @@ public class MultipleNamespacesFunctionalTestCase extends AbstractWSConsumerFunc
     @Test
     public void validRequestReturnsExpectedAnswer() throws Exception
     {
-        MuleMessage response = runFlow("client", ECHO_REQUEST).getMessage();
+        MuleMessage response = flowRunner("client").withPayload(ECHO_REQUEST).run().getMessage();
 
         XMLUnit.setIgnoreWhitespace(true);
         assertXMLEqual(EXPECTED_RESPONSE, getPayloadAsString(response));

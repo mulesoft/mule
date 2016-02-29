@@ -15,8 +15,8 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.api.MuleEvent;
-import org.mule.module.cxf.testmodels.AsyncService;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.module.cxf.testmodels.AsyncService;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.api.message.NullPayload;
 
@@ -38,7 +38,7 @@ public class OneWayOutboundTestCase extends FunctionalTestCase
     @Test
     public void jaxwsClientSupportsOneWayCall() throws Exception
     {
-        MuleEvent event = runFlow("jaxwsClient", getTestEvent(TEST_MESSAGE));
+        MuleEvent event = flowRunner("jaxwsClient").withPayload(TEST_MESSAGE).run();
         assertOneWayResponse(event);
     }
 
@@ -46,7 +46,7 @@ public class OneWayOutboundTestCase extends FunctionalTestCase
     public void proxyClientSupportsOneWayCall() throws Exception
     {
         String message = "<ns:send xmlns:ns=\"http://testmodels.cxf.module.mule.org/\"><text>hello</text></ns:send>";
-        MuleEvent event = runFlow("proxyClient", getTestEvent(message));
+        MuleEvent event = flowRunner("proxyClient").withPayload(message).run();
         assertOneWayResponse(event);
     }
 

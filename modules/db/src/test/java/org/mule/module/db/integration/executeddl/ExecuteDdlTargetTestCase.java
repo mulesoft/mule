@@ -42,7 +42,7 @@ public class ExecuteDdlTargetTestCase extends AbstractExecuteDdlTestCase
     @Test
     public void usesCustomTarget() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("executeDdlCustomTarget", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("executeDdlCustomTarget").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));

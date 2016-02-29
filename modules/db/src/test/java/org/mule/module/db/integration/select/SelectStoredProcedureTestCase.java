@@ -46,7 +46,7 @@ public class SelectStoredProcedureTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void selectsFromStoredProcedure() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("selectStoredProcedure", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("selectStoredProcedure").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());

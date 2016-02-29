@@ -43,7 +43,7 @@ public class SelectNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
     @Test
     public void usesParamOverriddenByName() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("overriddenParamsByName", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("overriddenParamsByName").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, TestRecordUtil.getMarsRecord());
@@ -52,7 +52,7 @@ public class SelectNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
     @Test
     public void usesInlineParamOverriddenByName() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("inlineOverriddenParamsByName", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("inlineOverriddenParamsByName").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, TestRecordUtil.getEarthRecord());

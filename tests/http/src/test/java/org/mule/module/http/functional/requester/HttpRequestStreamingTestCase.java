@@ -15,8 +15,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -46,75 +46,77 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase
     @Test
     public void streamsWhenPayloadIsInputStreamAndStreamingModeAuto() throws Exception
     {
-        MuleEvent event = getTestEvent(new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
-        assertStreaming("streamingAuto", event);
+        assertStreaming(flowRunner("streamingAuto").withPayload(new ByteArrayInputStream(TEST_MESSAGE.getBytes()))
+                                                   .run());
     }
 
     @Test
     public void doesNotStreamWhenPayloadIsStringAndStreamingModeAuto() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        assertNoStreaming("streamingAuto", event);
+        assertNoStreaming(flowRunner("streamingAuto").withPayload(TEST_MESSAGE)
+                                                     .run());
     }
 
     @Test
     public void doesNotStreamWithContentLengthHeaderAndStreamingModeAuto() throws Exception
     {
-        MuleEvent event = getTestEvent(new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
-        event.getMessage().setOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length());
-        assertNoStreaming("streamingAuto", event);
+        assertNoStreaming(flowRunner("streamingAuto").withPayload(new ByteArrayInputStream(TEST_MESSAGE.getBytes()))
+                                                     .withOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length())
+                                                     .run());
     }
 
     @Test
     public void doesNotStreamStringWithContentLengthHeaderAndStreamingModeAuto() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length());
-        assertNoStreaming("streamingAuto", event);
+        assertNoStreaming(flowRunner("streamingAuto").withPayload(TEST_MESSAGE)
+                                                     .withOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length())
+                                                     .run());
     }
 
     @Test
     public void doesNotStreamWithContentLengthTransferEncodingHeadersAndStreamingModeAuto() throws Exception
     {
-        MuleEvent event = getTestEvent(new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
-        event.getMessage().setOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length());
-        assertNoStreaming("streamingAutoHeader", event);
+        assertNoStreaming(flowRunner("streamingAutoHeader").withPayload(new ByteArrayInputStream(TEST_MESSAGE.getBytes()))
+                                                           .withOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length())
+                                                           .run());
     }
 
     @Test
     public void doesNotStreamStringWithContentLengthTransferEncodingHeadersAndStreamingModeAuto() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length());
-        assertNoStreaming("streamingAutoHeader", event);
+        assertNoStreaming(flowRunner("streamingAutoHeader").withPayload(TEST_MESSAGE)
+                                                           .withOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length())
+                                                           .run());
     }
 
     @Test
     public void streamsWhenPayloadIsStringTransferEncodingHeaderAndStreamingModeAuto() throws Exception
     {
-        assertStreaming("streamingAutoHeader", getTestEvent(TEST_MESSAGE));
+        assertStreaming(flowRunner("streamingAutoHeader").withPayload(TEST_MESSAGE)
+                                                         .run());
     }
 
     @Test
     public void doesNotStreamWhenPayloadIsStringTransferEncodingPropertyAndStreamingModeAuto() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty(TRANSFER_ENCODING, CHUNKED);
-        assertNoStreaming("streamingAuto", event);
+        assertNoStreaming(flowRunner("streamingAuto").withPayload(TEST_MESSAGE)
+                                                     .withOutboundProperty(TRANSFER_ENCODING, CHUNKED)
+                                                     .run());
     }
 
     @Test
     public void streamsWhenPayloadIsInputStreamTransferEncodingHeaderAndStreamingModeAuto() throws Exception
     {
-        assertStreaming("streamingAutoHeader", getTestEvent(new ByteArrayInputStream(TEST_MESSAGE.getBytes())));
+        assertStreaming(flowRunner("streamingAutoHeader").withPayload(new ByteArrayInputStream(TEST_MESSAGE.getBytes()))
+                                                         .run());
     }
 
     @Test
     public void streamsWhenPayloadIsInputStreamTransferEncodingPropertyAndStreamingModeAuto() throws Exception
     {
-        MuleEvent event = getTestEvent(new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
-        event.getMessage().setOutboundProperty(TRANSFER_ENCODING, CHUNKED);
-        assertStreaming("streamingAutoHeader", event);
+        assertStreaming(flowRunner("streamingAutoHeader").withPayload(new ByteArrayInputStream(TEST_MESSAGE.getBytes()))
+                                                         .withOutboundProperty(TRANSFER_ENCODING, CHUNKED)
+                                                         .run());
     }
 
     //ALWAYS
@@ -122,31 +124,33 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase
     @Test
     public void streamsWhenStreamingModeAlways() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        assertStreaming("streamingAlways", event);
+        assertStreaming(flowRunner("streamingAlways").withPayload(TEST_MESSAGE)
+                                                     .run());
     }
 
     @Test
     public void streamsWhenPayloadIsInputStreamAndStreamingModeAlways() throws Exception
     {
-        MuleEvent event = getTestEvent(new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
-        assertStreaming("streamingAlways", event);
+        assertStreaming(flowRunner("streamingAlways").withPayload(new ByteArrayInputStream(TEST_MESSAGE.getBytes()))
+                                                     .run());
     }
 
     @Test
     public void streamsWithContentLengthHeaderAndStreamingModeAlways() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length());
-        assertStreaming("streamingAlways", event);
+        assertStreaming(
+                flowRunner("streamingAlways").withPayload(TEST_MESSAGE)
+                                             .withOutboundProperty(CONTENT_LENGTH, TEST_MESSAGE.length())
+                                             .run());
     }
 
     @Test
     public void streamsWithTransferEncodingInvalidValueAndStreamingModeAlways() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty(TRANSFER_ENCODING, "Invalid value");
-        assertStreaming("streamingAlways", event);
+        assertStreaming(
+                flowRunner("streamingAlways").withPayload(TEST_MESSAGE)
+                                             .withOutboundProperty(TRANSFER_ENCODING, "Invalid value")
+                                             .run());
     }
 
     //NEVER
@@ -154,51 +158,44 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase
     @Test
     public void doesNotStreamWhenStreamingModeNever() throws Exception
     {
-        MuleEvent event = getTestEvent(new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
-        assertNoStreaming("streamingNever", event);
+        assertNoStreaming(flowRunner("streamingNever").withPayload(new ByteArrayInputStream(TEST_MESSAGE.getBytes()))
+                                                      .run());
     }
 
     @Test
     public void doesNotStreamWithTransferEncodingHeaderAndStreamingModeNever() throws Exception
     {
-        MuleEvent event = getTestEvent(new ByteArrayInputStream(TEST_MESSAGE.getBytes()));
-        event.getMessage().setOutboundProperty(TRANSFER_ENCODING, CHUNKED);
-        assertNoStreaming("streamingNever", event);
+        assertNoStreaming(flowRunner("streamingNever").withPayload(new ByteArrayInputStream(TEST_MESSAGE.getBytes()))
+                                                      .withOutboundProperty(TRANSFER_ENCODING, CHUNKED)
+                                                      .run());
     }
 
     @Test
     public void doesNotStreamWhenPayloadIsStringAndStreamingModeNever() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        assertNoStreaming("streamingNever", event);
+        assertNoStreaming(flowRunner("streamingNever").withPayload(TEST_MESSAGE)
+                                                      .run());
     }
 
     @Test
     public void doesNotStreamWhenPayloadIsStringTransferEncodingHeaderAndStreamingModeNever() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty(TRANSFER_ENCODING, CHUNKED);
-        assertNoStreaming("streamingNever", event);
+        assertNoStreaming(
+                flowRunner("streamingNever").withPayload(TEST_MESSAGE)
+                                            .withOutboundProperty(TRANSFER_ENCODING, CHUNKED)
+                                            .run());
     }
 
-
-
-    private void assertNoStreaming(String flowName, MuleEvent event) throws Exception
+    private void assertNoStreaming(MuleEvent response) throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        MuleEvent response = flow.process(event);
-
         assertNull(transferEncodingHeader);
         assertThat(Integer.parseInt(contentLengthHeader), equalTo(TEST_MESSAGE.length()));
         assertTrue(response.getMessage().getPayload() instanceof InputStream);
         assertThat(getPayloadAsString(response.getMessage()), equalTo(DEFAULT_RESPONSE));
     }
 
-    private void assertStreaming(String flowName, MuleEvent event) throws Exception
+    private void assertStreaming(MuleEvent response) throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        MuleEvent response = flow.process(event);
-
         assertThat(transferEncodingHeader, equalTo(CHUNKED));
         assertNull(contentLengthHeader);
         assertTrue(response.getMessage().getPayload() instanceof InputStream);

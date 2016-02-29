@@ -43,7 +43,7 @@ public class DynamicDataSourceTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testRequestResponse() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("defaultQueryRequestResponse", "dbConfig");
+        final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload("dbConfig").run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());

@@ -52,7 +52,7 @@ public class SelectWithPlaceHolderTestCase  extends AbstractDbIntegrationTestCas
     @Test
     public void replacesPlaceholderInParameterizedQuery() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("placeholderParameterizedQuery", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("placeholderParameterizedQuery").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());
@@ -61,7 +61,7 @@ public class SelectWithPlaceHolderTestCase  extends AbstractDbIntegrationTestCas
     @Test
     public void replacesPlaceholderInDynamicQuery() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("placeholderDynamicQuery", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("placeholderDynamicQuery").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());
@@ -70,7 +70,7 @@ public class SelectWithPlaceHolderTestCase  extends AbstractDbIntegrationTestCas
     @Test
     public void replacesPlaceholderInParameterizedQueryParam() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("placeholderParameterizedQueryParam", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("placeholderParameterizedQueryParam").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getVenusRecord());

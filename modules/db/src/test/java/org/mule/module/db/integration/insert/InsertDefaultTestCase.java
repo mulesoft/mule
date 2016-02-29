@@ -43,7 +43,7 @@ public class InsertDefaultTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testRequestResponse() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("jdbcInsertUpdateCountRequestResponse", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("jdbcInsertUpdateCountRequestResponse").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
@@ -52,7 +52,7 @@ public class InsertDefaultTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void testOneWay() throws Exception
     {
-        runFlowAsync("jdbcInsertUpdateCountOneWay", TEST_MESSAGE);
+        flowRunner("jdbcInsertUpdateCountOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);

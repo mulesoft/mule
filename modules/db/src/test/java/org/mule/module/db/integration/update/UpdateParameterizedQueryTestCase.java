@@ -46,7 +46,7 @@ public class UpdateParameterizedQueryTestCase extends AbstractDbIntegrationTestC
     @Test
     public void usesParameterizedQuery() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("jdbcUpdate", PLUTO);
+        final MuleEvent responseEvent = flowRunner("jdbcUpdate").withPayload(PLUTO).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertUpdate(response);

@@ -10,9 +10,9 @@ import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.construct.Flow;
 import org.mule.util.IOUtils;
 
 import java.io.File;
@@ -46,12 +46,9 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
                                        "<xop:Include xmlns:xop=\"http://www.w3.org/2004/08/xop/include\" href=\"cid:testAttachmentId\"/>" +
                                        "</attachment></ns:uploadAttachment>", TEST_FILE_ATTACHMENT);
 
-        Flow flow = (Flow) getFlowConstruct("clientUploadAttachment");
-        MuleEvent event = getTestEvent(request);
-
-        addAttachment(event.getMessage(), TEST_FILE_ATTACHMENT, "testAttachmentId");
-
-        event = flow.process(event);
+        MuleEvent event = flowRunner("clientUploadAttachment").withPayload(request)
+                                                              .withOutboundAttachment("testAttachmentId", buildDataHandler(TEST_FILE_ATTACHMENT))
+                                                              .run();
 
         String expected = "<ns2:uploadAttachmentResponse xmlns:ns2=\"http://consumer.ws.module.mule.org/\">" +
                           "<result>OK</result></ns2:uploadAttachmentResponse>";
@@ -65,11 +62,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
         String request = String.format("<ns:downloadAttachment xmlns:ns=\"http://consumer.ws.module.mule.org/\">" +
                                        "<fileName>%s</fileName></ns:downloadAttachment>", TEST_FILE_ATTACHMENT);
 
-        Flow flow = (Flow) getFlowConstruct("clientDownloadAttachment");
-        MuleEvent event = getTestEvent(request);
-
-        event = flow.process(event);
-
+        MuleEvent event = flowRunner("clientDownloadAttachment").withPayload(request).run();
         assertAttachmentInResponse(event.getMessage(), TEST_FILE_ATTACHMENT);
     }
 
@@ -80,20 +73,17 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
                          "<xop:Include xmlns:xop=\"http://www.w3.org/2004/08/xop/include\" href=\"cid:testAttachmentId\"/>" +
                          "</attachment></ns:echoAttachment>";
 
-        Flow flow = (Flow) getFlowConstruct("clientEchoAttachment");
-        MuleEvent event = getTestEvent(request);
-
-        addAttachment(event.getMessage(), TEST_FILE_ATTACHMENT, "testAttachmentId");
-        event = flow.process(event);
+        MuleEvent event = flowRunner("clientEchoAttachment").withPayload(request)
+                                                            .withOutboundAttachment("testAttachmentId", buildDataHandler(TEST_FILE_ATTACHMENT))
+                                                            .run();
 
         assertAttachmentInResponse(event.getMessage(), TEST_FILE_ATTACHMENT);
     }
 
-    private void addAttachment(MuleMessage message, String fileName, String attachmentId) throws Exception
+    protected DataHandler buildDataHandler(String fileName)
     {
         File file = new File(IOUtils.getResourceAsUrl(fileName, getClass()).getPath());
-        DataHandler dh = new DataHandler(new FileDataSource(file));
-        message.addOutboundAttachment(attachmentId, dh);
+        return new DataHandler(new FileDataSource(file));
     }
 
     private void assertAttachmentInResponse(MuleMessage message, String fileName) throws Exception

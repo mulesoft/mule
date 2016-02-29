@@ -10,21 +10,21 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mule.module.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.module.extension.model.HealthStatus.DEAD;
 import static org.mule.module.extension.model.KnockeableDoor.knock;
 import static org.mule.module.extension.model.Ricin.RICIN_KILL_MESSAGE;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.connection.ConnectionException;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.module.extension.HeisenbergConnectionProvider;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
@@ -72,22 +72,21 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void operationWithReturnValueAndWithoutParameters() throws Exception
     {
-        runFlowAndExpect("sayMyName", HEISENBERG);
+        assertThat(HEISENBERG, is(runFlow("sayMyName").getMessage().getPayload()));
     }
 
     @Test
     public void operationWithReturnValueOnTarget() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        MuleMessage message = spy(event.getMessage());
-        event.setMessage(message);
-        event = spy(event);
+        FlowRunner runner = flowRunner("sayMyNameOnTarget").withPayload("");
+        runner.spyObjects();
+        MuleEvent event = runner.buildEvent();
 
-        MuleEvent responseEvent = runFlow("sayMyNameOnTarget", event);
+        MuleEvent responseEvent = runner.run();
 
         assertThat(responseEvent.getMessage().getPayload(), is(""));
         verify(event, never()).setMessage(any(MuleMessage.class));
-        verify(message, never()).setPayload(any(Object.class));
+        verify(event.getMessage(), never()).setPayload(any(Object.class));
 
         MuleMessage responseMessage = event.getFlowVariable("myFace");
         assertThat(responseMessage.getPayload(), is(HEISENBERG));
@@ -96,8 +95,8 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void voidOperationWithoutParameters() throws Exception
     {
-        MuleEvent originalEvent = getTestEvent(EMPTY);
-        MuleEvent responseEvent = runFlow("die", originalEvent);
+        MuleEvent responseEvent = flowRunner("die").withPayload(EMPTY).run();
+
         assertThat(responseEvent.getMessageAsString(), is(EMPTY));
         assertThat(getConfig(HEISENBERG).getEndingHealth(), is(DEAD));
     }
@@ -105,13 +104,13 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void operationWithFixedParameter() throws Exception
     {
-        runFlowAndExpect("getFixedEnemy", GUSTAVO_FRING);
+        assertThat(GUSTAVO_FRING, is(runFlow("getFixedEnemy").getMessage().getPayload()));
     }
 
     @Test
     public void operationWithDefaulValueParameter() throws Exception
     {
-        runFlowAndExpect("getDefaultEnemy", GUSTAVO_FRING);
+        assertThat(GUSTAVO_FRING, is(runFlow("getDefaultEnemy").getMessage().getPayload()));
     }
 
     @Test
@@ -129,14 +128,14 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void operationWithInjectedEvent() throws Exception
     {
-        runFlow("collectFromEvent", getTestEvent(Long.valueOf(PAYMENT)));
+        flowRunner("collectFromEvent").withPayload(Long.valueOf(PAYMENT)).run();
         assertThat(getConfig(HEISENBERG).getMoney(), is(MONEY.add(BigDecimal.valueOf(PAYMENT))));
     }
 
     @Test
     public void operationWithInjectedMessage() throws Exception
     {
-        runFlow("collectFromMessage", getTestEvent(Long.valueOf(PAYMENT)));
+        flowRunner("collectFromMessage").withPayload(Long.valueOf(PAYMENT)).run();
         assertThat(getConfig(HEISENBERG).getMoney(), is(MONEY.add(BigDecimal.valueOf(PAYMENT))));
     }
 
@@ -155,10 +154,11 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void optionalParameterWithDefaultOverride() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("goodbye", GOODBYE_MESSAGE);
-        event.setFlowVariable("victim", VICTIM);
-        event = runFlow("customKillWithoutDefault", event);
+        MuleEvent event = flowRunner("customKillWithoutDefault").withPayload("")
+                                                                .withFlowVariable("goodbye", GOODBYE_MESSAGE)
+                                                                .withFlowVariable("victim", VICTIM)
+                                                                .run();
+
         assertKillPayload(event);
     }
 
@@ -237,10 +237,11 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void operationWithInlineListParameter() throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("victim", "Saul");
-
-        List<String> response = (List<String>) runFlow("knockManyWithInlineList", event).getMessage().getPayload();
+        List<String> response = (List<String>) flowRunner("knockManyWithInlineList").withPayload("")
+                                                                                    .withFlowVariable("victim", "Saul")
+                                                                                    .run()
+                                                                                    .getMessage()
+                                                                                    .getPayload();
         assertThat(response, Matchers.contains(knock("Inline Skyler"), knock("Saul")));
     }
 
@@ -248,10 +249,12 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     public void operationWithExpressionListParameter() throws Exception
     {
         List<KnockeableDoor> doors = Arrays.asList(new KnockeableDoor("Skyler"), new KnockeableDoor("Saul"));
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("doors", doors);
 
-        List<String> response = (List<String>) runFlow("knockManyByExpression", event).getMessage().getPayload();
+        List<String> response = (List<String>) flowRunner("knockManyByExpression").withPayload("")
+                                                                                  .withFlowVariable("doors", doors)
+                                                                                  .run()
+                                                                                  .getMessage()
+                                                                                  .getPayload();
         assertThat(response, Matchers.contains(knock("Skyler"), knock("Saul")));
     }
 
@@ -279,26 +282,16 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
 
     private void runFlowAndThrowCause(String callGus) throws Throwable
     {
-        try
-        {
-            runFlow(callGus);
-            fail("An exception was expected");
-        }
-        catch (MuleException me)
-        {
-            throw me.getCause();
-        }
+        throw flowRunner(callGus).runExpectingException().getCause();
     }
 
     @Test
     public void operationWhichConsumesANonInstantiableArgument() throws Exception
     {
-        MuleEvent event = getTestEvent(EMPTY);
         Ricin ricinWeapon = new Ricin();
         ricinWeapon.setMicrogramsPerKilo(10L);
-        event.setFlowVariable("weapon", ricinWeapon);
 
-        event = runFlow("killWithWeapon", event);
+        MuleEvent event = flowRunner("killWithWeapon").withPayload(EMPTY).withFlowVariable("weapon", ricinWeapon).run();
         assertThat(event.getMessageAsString(), is(RICIN_KILL_MESSAGE));
     }
 
@@ -313,16 +306,14 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void operationWhichConsumesAListOfNonInstantiableArgument() throws Exception
     {
-        MuleEvent event = getTestEvent(EMPTY);
         Ricin ricinWeapon1 = new Ricin();
         ricinWeapon1.setMicrogramsPerKilo(10L);
         Ricin ricinWeapon2 = new Ricin();
         ricinWeapon2.setMicrogramsPerKilo(10L);
 
         List<Weapon> weaponList = Arrays.asList(ricinWeapon1, ricinWeapon2);
-        event.setFlowVariable("weapons", weaponList);
+        MuleEvent event = flowRunner("killWithMultipleWeapons").withPayload(EMPTY).withFlowVariable("weapons", weaponList).run();
 
-        event = runFlow("killWithMultipleWeapons", event);
         List<String> result = weaponList.stream().map(Weapon::kill).collect(Collectors.toList());
         assertThat(event.getMessage().getPayload(), is(result));
     }
@@ -330,8 +321,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void operationWithLiteralArgument() throws Exception
     {
-        MuleEvent event = getTestEvent(EMPTY);
-        event = runFlow("literalEcho", event);
+        MuleEvent event = flowRunner("literalEcho").withPayload(EMPTY).run();
         assertThat(event.getMessage().getPayload(), is("#[money]"));
     }
 
@@ -343,10 +333,11 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
 
     private void assertDynamicVictim(String flowName, String victim) throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("victim", victim);
-
-        assertKnockedDoor(getPayloadAsString(runFlow(flowName, event).getMessage()), victim);
+        assertKnockedDoor(getPayloadAsString(flowRunner(flowName).withPayload("")
+                                                                 .withFlowVariable("victim", victim)
+                                                                 .run()
+                                                                 .getMessage()),
+                victim);
     }
 
     private void assertKnockedDoor(String actual, String expected)
@@ -361,17 +352,13 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
 
     private void assertKillByPayload(String flowName) throws Exception
     {
-        MuleEvent event = getTestEvent(VICTIM);
-        event.setFlowVariable("goodbye", GOODBYE_MESSAGE);
-        event = runFlow(flowName, event);
-        assertKillPayload(event);
+        assertKillPayload(flowRunner(flowName).withPayload(VICTIM).withFlowVariable("goodbye", GOODBYE_MESSAGE).run());
     }
 
     private void doTestExpressionEnemy(Object enemyIndex) throws Exception
     {
-        MuleEvent event = getTestEvent(EMPTY);
-        event.setFlowVariable("enemy", enemyIndex);
-        event = runFlow("expressionEnemy", event);
+        MuleEvent event = flowRunner("expressionEnemy").withPayload(EMPTY).withFlowVariable("enemy", enemyIndex).run();
+
         assertThat(event.getMessageAsString(), is(GUSTAVO_FRING));
     }
 

@@ -11,9 +11,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
-
 import org.junit.Test;
 
 public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase
@@ -68,11 +65,9 @@ public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase
 
     private void assertEmptyBody(String flowName, Object payload, String method) throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        MuleEvent event = getTestEvent(payload);
-        event.getMessage().setInvocationProperty("method", method);
-
-        flow.process(event);
+        flowRunner(flowName).withPayload(payload)
+                            .withFlowVariable("method", method)
+                            .run();
 
         assertThat(body, equalTo(""));
         assertThat(headers.containsKey("Content-Length"), is(false));
@@ -80,11 +75,9 @@ public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase
 
     private void assertNotEmptyBody(String flowName, Object payload, String method) throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        MuleEvent event = getTestEvent(payload);
-        event.getMessage().setInvocationProperty("method", method);
-
-        flow.process(event);
+        flowRunner(flowName).withPayload(payload)
+                            .withFlowVariable("method", method)
+                            .run();
 
         assertThat(body, equalTo(TEST_MESSAGE));
         assertThat(headers.containsKey("Content-Length"), is(true));

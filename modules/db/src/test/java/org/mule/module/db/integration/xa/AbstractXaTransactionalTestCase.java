@@ -10,7 +10,7 @@ package org.mule.module.db.integration.xa;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mule.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
+import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
 import static org.mule.module.db.integration.DbTestUtil.selectData;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.model.Planet.MARS;
@@ -56,7 +56,9 @@ public abstract class AbstractXaTransactionalTestCase extends AbstractDbIntegrat
     @Test
     public void commitsChanges() throws Exception
     {
-        MuleMessage response = runTransactionalFlow("jdbcCommit", ACTION_ALWAYS_BEGIN, new XaTransactionFactory()).getMessage();
+        MuleMessage response = flowRunner("jdbcCommit").transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory())
+                                                       .run()
+                                                       .getMessage();
 
         assertEquals(1, response.getPayload());
 
@@ -67,7 +69,8 @@ public abstract class AbstractXaTransactionalTestCase extends AbstractDbIntegrat
     @Test
     public void rollbacksChanges() throws Exception
     {
-        MessagingException e = runTransactionalFlowExpectingException("jdbcRollback", ACTION_ALWAYS_BEGIN, new XaTransactionFactory());
+        MessagingException e = flowRunner("jdbcRollback").transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory())
+                                                         .runExpectingException();
 
         assertThat(e.getCause(), instanceOf(IllegalStateException.class));
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
@@ -77,7 +80,8 @@ public abstract class AbstractXaTransactionalTestCase extends AbstractDbIntegrat
     @Test
     public void commitsChangesWhenMpIsNotTransactionalOnRollback() throws Exception
     {
-        MessagingException e = runTransactionalFlowExpectingException("rollbackWithNonTransactionalMP", ACTION_ALWAYS_BEGIN, new XaTransactionFactory());
+        MessagingException e = flowRunner("rollbackWithNonTransactionalMP").transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory())
+                                                                           .runExpectingException();
 
         assertThat(e.getCause(), instanceOf(IllegalStateException.class));
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
@@ -87,7 +91,8 @@ public abstract class AbstractXaTransactionalTestCase extends AbstractDbIntegrat
     @Test
     public void commitsChangesWhenMpIsNotTransactionalOnCommit() throws Exception
     {
-        MessagingException e = runTransactionalFlowExpectingException("commitWithNonTransactionalMP", ACTION_ALWAYS_BEGIN, new XaTransactionFactory());
+        MessagingException e = flowRunner("commitWithNonTransactionalMP").transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory())
+                                                                         .runExpectingException();
 
         assertThat(e.getCause(), instanceOf(IllegalStateException.class));
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());

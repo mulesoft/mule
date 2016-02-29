@@ -43,7 +43,7 @@ public class InsertParameterizedQueryTestCase extends AbstractDbIntegrationTestC
     @Test
     public void usesParameterizedQuery() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("insertParameterizedQuery", "Pluto");
+        final MuleEvent responseEvent = flowRunner("insertParameterizedQuery").withPayload("Pluto").run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertInsert(response);

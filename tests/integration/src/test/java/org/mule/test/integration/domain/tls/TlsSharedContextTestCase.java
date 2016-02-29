@@ -8,18 +8,17 @@ package org.mule.test.integration.domain.tls;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.construct.Flow;
+import org.mule.api.tls.TlsContextFactory;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
-import org.mule.api.tls.TlsContextFactory;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -92,9 +91,7 @@ public class TlsSharedContextTestCase extends DomainFunctionalTestCase
 
     private void testFlowForApp(String flowName, String appName, String expected) throws Exception
     {
-        MuleContext appContext = getMuleContextForApp(appName);
-        Flow helloWorldFlow = (Flow) appContext.getRegistry().lookupFlowConstruct(flowName);
-        MuleEvent response = helloWorldFlow.process(MuleTestUtils.getTestEvent(DATA, MessageExchangePattern.REQUEST_RESPONSE, appContext));
+        MuleEvent response = new FlowRunner(getMuleContextForApp(appName), flowName).withPayload(DATA).run();
         assertThat(response.getMessageAsString(), is(expected));
     }
 }

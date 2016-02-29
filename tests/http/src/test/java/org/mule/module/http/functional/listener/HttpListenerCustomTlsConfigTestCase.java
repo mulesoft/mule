@@ -9,8 +9,8 @@ package org.mule.module.http.functional.listener;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -36,16 +36,14 @@ public class HttpListenerCustomTlsConfigTestCase extends FunctionalTestCase
     @Test
     public void customTlsGlobalContext() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("testFlowGlobalContextClient");
-        final MuleEvent res = flow.process(getTestEvent("data"));
+        final MuleEvent res = flowRunner("testFlowGlobalContextClient").withPayload("data").run();
         assertThat(getPayloadAsString(res.getMessage()), is("ok"));
     }
 
     @Test
     public void customTlsNestedContext() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("testFlowNestedContextClient");
-        final MuleEvent res = flow.process(getTestEvent("data"));
+        final MuleEvent res = flowRunner("testFlowNestedContextClient").withPayload("data").run();
         assertThat(getPayloadAsString(res.getMessage()), is("all right"));
     }
 

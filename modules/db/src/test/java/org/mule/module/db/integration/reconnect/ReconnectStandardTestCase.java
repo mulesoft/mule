@@ -54,7 +54,7 @@ public class ReconnectStandardTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void reconnectsAfterConnectionFailure() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("testReconnection", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("testReconnection").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());

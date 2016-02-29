@@ -44,7 +44,7 @@ public class GenericDriverDbConfigTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesGenericJdbcConfig() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("defaultQueryRequestResponse", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());

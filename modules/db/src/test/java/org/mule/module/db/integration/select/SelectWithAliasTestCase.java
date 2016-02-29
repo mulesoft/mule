@@ -47,7 +47,7 @@ public class SelectWithAliasTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void returnsAliasInResultSet() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("usesAlias", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("usesAlias").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getExpectedRecords());

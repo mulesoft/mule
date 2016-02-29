@@ -63,7 +63,7 @@ public class OracleUpdateXmlTypeTestCase extends AbstractOracleXmlTypeTestCase
             }
         }
 
-        final MuleEvent responseEvent = runFlow("updateWithXmlTypeParam", xmlType);
+        final MuleEvent responseEvent = flowRunner("updateWithXmlTypeParam").withPayload(xmlType).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertEquals(2, response.getPayload());

@@ -49,7 +49,7 @@ public class MergeTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void mergesTables() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("merge", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("merge").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMergeResult(response);

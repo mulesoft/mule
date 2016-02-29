@@ -40,7 +40,7 @@ public class ExecuteDdlSourceTestCase extends AbstractExecuteDdlTestCase
     @Test
     public void usesCustomSource() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("executeDdlCustomSource", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("executeDdlCustomSource").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertTableCreation(response.getPayload());

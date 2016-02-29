@@ -117,14 +117,14 @@ public class CxfErrorBehaviorTestCase extends FunctionalTestCase
     public void testClientWithSOAPFault() throws Exception
     {
         expectedException.expectCause(instanceOf(Fault.class));
-        runFlow("FlowWithClientAndSOAPFault", getTestMuleMessage("hello")).getMessage();
+        flowRunner("FlowWithClientAndSOAPFault").withPayload(getTestMuleMessage("hello")).run().getMessage();
     }
 
     @Test
     public void testClientWithTransformerException() throws Exception
     {
         expectedException.expect(MessagingException.class);
-        runFlow("FlowWithClientAndTransformerException", getTestMuleMessage("hello"));
+        flowRunner("FlowWithClientAndTransformerException").withPayload(getTestMuleMessage("hello")).run();
     }
 
     @Test

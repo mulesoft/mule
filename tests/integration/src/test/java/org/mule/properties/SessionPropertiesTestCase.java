@@ -6,15 +6,14 @@
  */
 package org.mule.properties;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import static org.junit.Assert.assertThat;
+
 import org.mule.PropertyScope;
-import org.mule.construct.Flow;
+import org.mule.api.MuleEvent;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -31,27 +30,18 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     @Test
     public void setSessionPropertyUsingAPIGetInFlow() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestFlow());
+        MuleEvent result = flowRunner("A").withPayload("data")
+                                          .withSessionProperty("key", "value")
+                                          .run();
 
-        message.setProperty("key", "value", PropertyScope.SESSION);
-
-        Flow flowA = (Flow) muleContext.getRegistry().lookupFlowConstruct("A");
-        MuleEvent result = flowA.process(event);
-
-        assertEquals("value", result.getMessageAsString());
+        assertThat(result.getMessageAsString(), is("value"));
     }
 
     @Test
     public void setSessionPropertyInFlowGetUsingAPI() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestFlow());
-
-        Flow flowA = (Flow) muleContext.getRegistry().lookupFlowConstruct("B");
-        MuleEvent result = flowA.process(event);
-
-        assertEquals("value", result.getMessage().getProperty("key", PropertyScope.SESSION));
+        MuleEvent result = flowRunner("B").withPayload("data").run();
+        assertThat(result.getMessage().getProperty("key", PropertyScope.SESSION), is("value"));
     }
 
     /**
@@ -60,25 +50,21 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     @Test
     public void flowRefSessionPropertyPropagation() throws Exception
     {
-
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        MuleEvent event = new DefaultMuleEvent(message, getTestFlow());
-
         Object nonSerializable = new Object();
-        message.setProperty("keyNonSerializable", nonSerializable, PropertyScope.SESSION);
-        message.setProperty("key", "value", PropertyScope.SESSION);
 
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("FlowRefWithSessionProperties");
-        MuleEvent result = flow.process(event);
+        FlowRunner runner = flowRunner("FlowRefWithSessionProperties").withPayload("data")
+                                                                    .withSessionProperty("keyNonSerializable", nonSerializable)
+                                                                    .withSessionProperty("key", "value");
+        MuleEvent event = runner.buildEvent();
+        MuleEvent result = runner.run();
 
         assertSame(event.getSession(), result.getSession());
 
         assertNotNull(result);
-        assertEquals("value", result.getMessage().getProperty("key", PropertyScope.SESSION));
-        assertEquals("value1", result.getMessage().getProperty("key1", PropertyScope.SESSION));
-        assertEquals("value2", result.getMessage().getProperty("key2", PropertyScope.SESSION));
-        assertEquals(nonSerializable,
-                     result.getMessage().getProperty("keyNonSerializable", PropertyScope.SESSION));
+        assertThat(result.getMessage().getProperty("key", PropertyScope.SESSION), is("value"));
+        assertThat(result.getMessage().getProperty("key1", PropertyScope.SESSION), is("value1"));
+        assertThat(result.getMessage().getProperty("key2", PropertyScope.SESSION), is("value2"));
+        assertThat(result.getMessage().getProperty("keyNonSerializable", PropertyScope.SESSION), is(nonSerializable));
     }
 
 

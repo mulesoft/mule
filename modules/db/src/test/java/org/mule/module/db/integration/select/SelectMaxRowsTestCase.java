@@ -44,7 +44,7 @@ public class SelectMaxRowsTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void limitsRows() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("selectMaxRows", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("selectMaxRows").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getVenusRecord(), getEarthRecord());
@@ -53,7 +53,7 @@ public class SelectMaxRowsTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void limitsStreamedRows() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("selectMaxStreamedRows", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("selectMaxStreamedRows").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getVenusRecord(), getEarthRecord());

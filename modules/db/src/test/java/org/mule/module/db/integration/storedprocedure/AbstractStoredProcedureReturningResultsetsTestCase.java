@@ -35,7 +35,7 @@ public abstract class AbstractStoredProcedureReturningResultsetsTestCase extends
     @Test
     public void testRequestResponse() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("defaultQueryRequestResponse", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         Map payload = (Map) response.getPayload();

@@ -8,9 +8,11 @@ package org.mule.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.FlowRunner;
 
 import java.nio.charset.Charset;
 
@@ -48,8 +50,10 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase
     @Test
     public void maintainsContentType() throws Exception
     {
-        MuleEvent requestEvent = getTestEvent("");
-        MuleEvent response = runFlow("defaultContentType", requestEvent);
+        FlowRunner runner = flowRunner("defaultContentType").withPayload("");
+
+        MuleEvent requestEvent = runner.buildEvent();
+        MuleEvent response = runner.run();
 
         final DataType requestDataType = requestEvent.getMessage().getDataType();
         final DataType responseDataType = response.getMessage().getDataType();

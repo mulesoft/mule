@@ -6,12 +6,13 @@
  */
 package org.mule.module.http.functional.requester;
 
-import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
@@ -41,18 +42,17 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
         Flow flow = (Flow) getFlowConstruct("limitedConnections");
         Thread t1 = processAsynchronously(flow);
         messageArrived.await();
-        try
-        {
-            // Process an event with a very small timeout, this should fail because there is already one
-            // active connection, and maxConnections=1
-            flow.process(createEvent(SMALL_RESPONSE_TIMEOUT));
-            fail("Max connections should be reached.");
-        }
-        catch(MessagingException e)
-        {
-            // Expected
-            assertThat(e.getCause(), instanceOf(IOException.class));
-        }
+
+        FlowRunner runner = flowRunner("limitedConnections");
+
+        // Process an event with a very small timeout, this should fail because there is already one
+        // active connection, and maxConnections=1
+        setEventTimeout(runner.buildEvent(), SMALL_RESPONSE_TIMEOUT);
+
+        MessagingException e = runner.runExpectingException();
+        // Max connections should be reached
+        assertThat(e.getCause(), instanceOf(IOException.class));
+
         messageHold.release();
         t1.join();
     }
@@ -66,7 +66,9 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
             {
                 try
                 {
-                    flow.process(createEvent(RECEIVE_TIMEOUT));
+                    FlowRunner runner = flowRunner("limitedConnections");
+                    setEventTimeout(runner.buildEvent(), RECEIVE_TIMEOUT);
+                    runner.run();
                 }
                 catch (Exception e)
                 {
@@ -78,11 +80,9 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
         return thread;
     }
 
-    private MuleEvent createEvent(int timeout) throws Exception
+    private void setEventTimeout(MuleEvent event, int timeout) throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
         event.setTimeout(timeout);
-        return event;
     }
 
     @Override

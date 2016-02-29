@@ -10,12 +10,11 @@ package org.mule.module.ws.functional;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.module.ws.consumer.SoapFaultException;
 
 import java.util.Arrays;
@@ -43,8 +42,7 @@ public class BasicAuthFunctionalTestCase extends AbstractWSConsumerFunctionalTes
     @Test
     public void requestWithValidCredentialsReturnsExpectedAnswer() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("clientValidCredentials");
-        MuleEvent event = flow.process(getTestEvent(ECHO_REQUEST));
+        MuleEvent event = flowRunner("clientValidCredentials").withPayload(ECHO_REQUEST).run();
         assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
         assertThat(event.getMessage().<String>getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(String.valueOf(OK.getStatusCode())));
     }
@@ -52,21 +50,11 @@ public class BasicAuthFunctionalTestCase extends AbstractWSConsumerFunctionalTes
     @Test
     public void requestWithInvalidCredentialsThrowsException() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("clientInvalidCredentials");
-
         // The unauthorized response contains an error message in the payload (which is not a SOAP Fault), then WSConsumer
         // should fail to parse the response and throw a SoapFaultException because of this.
-
-        try
-        {
-            flow.process(getTestEvent(ECHO_REQUEST));
-            fail();
-        }
-        catch (SoapFaultException e)
-        {
-            MuleEvent event = e.getEvent();
-            assertThat(event.getMessage().<String>getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(String.valueOf(UNAUTHORIZED.getStatusCode())));
-        }
+        SoapFaultException e = (SoapFaultException) flowRunner("clientInvalidCredentials").withPayload(ECHO_REQUEST).runExpectingException();
+        MuleEvent event = e.getEvent();
+        assertThat(event.getMessage().<String> getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(String.valueOf(UNAUTHORIZED.getStatusCode())));
     }
 
     @Test
@@ -74,9 +62,7 @@ public class BasicAuthFunctionalTestCase extends AbstractWSConsumerFunctionalTes
     {
         // The unauthorized response contains an empty response, then no exception is thrown, and the payload is NullPayload.
         // The response message still contains inbound properties from the HTTP response.
-
-        Flow flow = (Flow) getFlowConstruct("clientInvalidCredentialsEmptyResponse");
-        MuleEvent event = flow.process(getTestEvent(ECHO_REQUEST));
+        MuleEvent event = flowRunner("clientInvalidCredentialsEmptyResponse").withPayload(ECHO_REQUEST).run();
         assertThat(event.getMessage().<String>getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(String.valueOf(UNAUTHORIZED.getStatusCode())));
     }
 

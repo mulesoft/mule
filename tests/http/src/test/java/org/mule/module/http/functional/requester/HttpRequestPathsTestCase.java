@@ -8,8 +8,6 @@ package org.mule.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 
 import org.junit.Test;
 
@@ -101,20 +99,12 @@ public class HttpRequestPathsTestCase extends AbstractHttpRequestTestCase
         assertRequestUri("requestWithBasePath", "base Path%25", "test Path%25?k1=v%25&k2=v2", "/base%20Path%25/test%20Path%25?k1=v%25&k2=v2");
     }
 
-
-
-
-
     private void assertRequestUri(String flowName, String basePath, String requestPath, String expectedUri) throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
-        event.getMessage().setInvocationProperty("basePath", basePath);
-        event.getMessage().setInvocationProperty("requestPath", requestPath);
-        flow.process(event);
+        flowRunner(flowName).withPayload(TEST_MESSAGE)
+                            .withFlowVariable("basePath", basePath)
+                            .withFlowVariable("requestPath", requestPath)
+                            .run();
         assertThat(uri, equalTo(expectedUri));
-
     }
-
 }

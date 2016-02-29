@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.module.http.api.HttpHeaders;
 
 import java.io.IOException;
@@ -36,15 +36,10 @@ public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase
     @Test
     public void sendsMapAsUrlEncodedBody() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("formParam");
         Map<String, String> params = new HashMap<>();
-
         params.put("testName1", "testValue1");
         params.put("testName2", "testValue2");
-
-        MuleEvent event = getTestEvent(params);
-
-        flow.process(event);
+        flowRunner("formParam").withPayload(params).run();
 
         assertThat(uri, equalTo("/testPath"));
         assertThat(body, equalTo("testName1=testValue1&testName2=testValue2"));
@@ -55,8 +50,7 @@ public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase
     @Test
     public void convertsUrlEncodedResponseToMap() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("formParam");
-        MuleEvent event = flow.process(getTestEvent(TEST_MESSAGE));
+        MuleEvent event = flowRunner("formParam").withPayload(TEST_MESSAGE).run();
 
         assertThat(event.getMessage().getPayload(), instanceOf(Map.class));
 

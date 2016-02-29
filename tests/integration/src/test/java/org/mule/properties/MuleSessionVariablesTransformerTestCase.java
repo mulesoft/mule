@@ -6,11 +6,6 @@
  */
 package org.mule.properties;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.construct.Flow;
-import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -73,10 +68,6 @@ public class MuleSessionVariablesTransformerTestCase extends FunctionalTestCase
 
     public void runScenario(String flowName) throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(message, getTestFlow());
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        flow.process(event);
-        FlowAssert.verify(flowName);
+        flowRunner(flowName).withPayload("data").run();
     }
 }

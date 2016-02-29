@@ -48,7 +48,7 @@ public class InsertBulkSourceTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void insertsInBulkModeFromCustomSource() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("insertBulkCustomSource", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("insertBulkCustomSource").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertBulkInsert(response.getPayload());

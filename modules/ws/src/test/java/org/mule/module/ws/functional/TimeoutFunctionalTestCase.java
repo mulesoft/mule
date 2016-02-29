@@ -8,11 +8,11 @@ package org.mule.module.ws.functional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.construct.Flow;
 import org.mule.functional.functional.EventCallback;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
@@ -46,12 +46,9 @@ public class TimeoutFunctionalTestCase extends FunctionalTestCase
             }
         });
 
-        Flow flow = (Flow) getFlowConstruct("client");
-
-        MuleEvent event = getTestEvent("<echo/>");
-        event.setTimeout(1);
-
-        flow.process(event);
+        FlowRunner runner = flowRunner("client").withPayload("<echo/>");
+        runner.buildEvent().setTimeout(1);
+        runner.run();
         serverLatch.release();
 
         MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);

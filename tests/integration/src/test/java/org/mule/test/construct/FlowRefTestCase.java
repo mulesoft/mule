@@ -12,14 +12,15 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.Flow;
-import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
@@ -61,21 +62,20 @@ public class FlowRefTestCase extends FunctionalTestCase
     public void twoFlowRefsToSubFlow() throws Exception
     {
         final MuleEvent muleEvent = flowRunner("flow1").withPayload("0").run();
-        final MuleMessage msg = muleEvent.getMessage();
-
-        assertEquals("012xyzabc312xyzabc3", getPayloadAsString(msg));
+        assertThat(getPayloadAsString(muleEvent.getMessage()), is("012xyzabc312xyzabc3"));
     }
 
     @Test
     public void dynamicFlowRef() throws Exception
     {
-        MuleEvent eventA = getTestEvent("0");
-        eventA.setFlowVariable("letter", "A");
-        MuleEvent eventB = getTestEvent("0");
-        eventB.setFlowVariable("letter", "B");
-
-        assertEquals("0A", ((Flow) getFlowConstruct("flow2")).process(eventA).getMessageAsString());
-        assertEquals("0B", ((Flow) getFlowConstruct("flow2")).process(eventB).getMessageAsString());
+        assertEquals("0A", flowRunner("flow2").withPayload("0")
+                                              .withFlowVariable("letter", "A")
+                                              .run()
+                                              .getMessageAsString());
+        assertEquals("0B", flowRunner("flow2").withPayload("0")
+                                              .withFlowVariable("letter", "B")
+                                              .run()
+                                              .getMessageAsString());
     }
 
     public static class ProcessorPathAssertingProcessor implements MessageProcessor
@@ -94,10 +94,9 @@ public class FlowRefTestCase extends FunctionalTestCase
     @Test
     public void dynamicFlowRefProcessorPath() throws Exception
     {
-        MuleEvent eventJ = getTestEvent("0");
-        eventJ.setFlowVariable("letter", "J");
-
-        ((Flow) getFlowConstruct("flow2")).process(eventJ);
+        flowRunner("flow2").withPayload("0")
+                           .withFlowVariable("letter", "J")
+                           .run();
 
         assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(1));
         assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0), is("/flow2/processors/0/sub-flow-J/subprocessors/0"));
@@ -106,10 +105,9 @@ public class FlowRefTestCase extends FunctionalTestCase
     @Test
     public void dynamicFlowRefProcessorPathSameSubflowFromSingleFlow() throws Exception
     {
-        MuleEvent eventJ = getTestEvent("0");
-        eventJ.setFlowVariable("letter", "J");
-
-        ((Flow) getFlowConstruct("flow3")).process(eventJ);
+        flowRunner("flow3").withPayload("0")
+                           .withFlowVariable("letter", "J")
+                           .run();
 
         assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(2));
         assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0), is("/flow3/processors/0/sub-flow-J/subprocessors/0"));
@@ -119,15 +117,13 @@ public class FlowRefTestCase extends FunctionalTestCase
     @Test
     public void dynamicFlowRefProcessorPathSameSubflowFromDifferentFlow() throws Exception
     {
-        MuleEvent eventJ1 = getTestEvent("0");
-        eventJ1.setFlowVariable("letter", "J");
+        flowRunner("flow2").withPayload("0")
+                           .withFlowVariable("letter", "J")
+                           .run();
 
-        ((Flow) getFlowConstruct("flow2")).process(eventJ1);
-
-        MuleEvent eventJ2 = getTestEvent("0");
-        eventJ2.setFlowVariable("letter", "J");
-
-        ((Flow) getFlowConstruct("flow3")).process(eventJ2);
+        flowRunner("flow3").withPayload("0")
+                           .withFlowVariable("letter", "J")
+                           .run();
 
         assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(3));
         assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0), is("/flow2/processors/0/sub-flow-J/subprocessors/0"));
@@ -138,19 +134,20 @@ public class FlowRefTestCase extends FunctionalTestCase
     @Test
     public void dynamicFlowRefWithChoice() throws Exception
     {
-        MuleEvent eventC = getTestEvent("0");
-        eventC.setFlowVariable("letter", "C");
-
-        assertEquals("0A", ((Flow) getFlowConstruct("flow2")).process(eventC).getMessageAsString());
+        assertEquals("0A", flowRunner("flow2").withPayload("0")
+                                              .withFlowVariable("letter", "C")
+                                              .run()
+                                              .getMessageAsString());
     }
 
     @Test
     public void dynamicFlowRefWithScatterGather() throws Exception
     {
-        MuleEvent eventSG = getTestEvent("0");
-        eventSG.setFlowVariable("letter", "SG");
-
-        List<MuleMessage> messageList = (List<MuleMessage>) ((Flow) getFlowConstruct("flow2")).process(eventSG).getMessage().getPayload();
+        List<MuleMessage> messageList = (List<MuleMessage>) flowRunner("flow2").withPayload("0")
+                                                                               .withFlowVariable("letter", "SG")
+                                                                               .run()
+                                                                               .getMessage()
+                                                                               .getPayload();
 
         List payloads = messageList.stream().map(MuleMessage::getPayload).collect(toList());
         assertEquals("0A", payloads.get(0));
@@ -160,10 +157,10 @@ public class FlowRefTestCase extends FunctionalTestCase
     @Test(expected=MessagingException.class)
     public void flowRefNotFound() throws Exception
     {
-        MuleEvent eventC = getTestEvent("0");
-        eventC.setFlowVariable("letter", "Z");
-
-        assertEquals("0C", ((Flow) getFlowConstruct("flow2")).process(eventC).getMessageAsString());
+        assertEquals("0C", flowRunner("flow2").withPayload("0")
+                                              .withFlowVariable("letter", "Z")
+                                              .run()
+                                              .getMessageAsString());
     }
 
     @Test

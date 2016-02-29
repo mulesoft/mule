@@ -19,8 +19,6 @@ import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Arrays;
@@ -49,14 +47,10 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
     @Test
     public void sendsHeadersFromList() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("headerList");
-
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
-        event.getMessage().setInvocationProperty("headerName", "testName2");
-        event.getMessage().setInvocationProperty("headerValue", "testValue2");
-
-        flow.process(event);
+        flowRunner("headerList").withPayload(TEST_MESSAGE)
+                                .withFlowVariable("headerName", "testName2")
+                                .withFlowVariable("headerValue", "testValue2")
+                                .run();
 
         assertThat(getFirstReceivedHeader("testName1"), equalTo("testValue1"));
         assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
@@ -65,18 +59,12 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
     @Test
     public void sendsHeadersFromMap() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("headerMap");
-
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
         Map<String, String> params = new HashMap<>();
-
         params.put("testName1", "testValue1");
         params.put("testName2", "testValue2");
-
-        event.getMessage().setInvocationProperty("headers", params);
-
-        flow.process(event);
+        flowRunner("headerMap").withPayload(TEST_MESSAGE)
+                               .withFlowVariable("headers", params)
+                               .run();
 
         assertThat(getFirstReceivedHeader("testName1"), equalTo("testValue1"));
         assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
@@ -85,18 +73,12 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
     @Test
     public void overridesHeaders() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("headerOverride");
-
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
         Map<String, String> params = new HashMap<>();
-
         params.put("testName1", "testValueNew");
         params.put("testName2", "testValue2");
-
-        event.getMessage().setInvocationProperty("headers", params);
-
-        flow.process(event);
+        flowRunner("headerOverride").withPayload(TEST_MESSAGE)
+                                    .withFlowVariable("headers", params)
+                                    .run();
 
         final Collection<String> values = headers.get("testName1");
         assertThat(values, Matchers.containsInAnyOrder(Arrays.asList("testValue1", "testValueNew").toArray(new String[2])));
@@ -106,17 +88,12 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
     @Test
     public void sendsOutboundPropertiesAsHeaders() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("headerMap");
-
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
         Map<String, String> params = new HashMap<>();
         params.put("testName1", "testValue1");
-
-        event.getMessage().setInvocationProperty("headers", params);
-        event.getMessage().setOutboundProperty("testName2", "testValue2");
-
-        flow.process(event);
+        flowRunner("headerMap").withPayload(TEST_MESSAGE)
+                               .withFlowVariable("headers", params)
+                               .withOutboundProperty("testName2", "testValue2")
+                               .run();
 
         assertThat(getFirstReceivedHeader("testName1"), equalTo("testValue1"));
         assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
@@ -125,15 +102,11 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
     @Test
     public void allowsUserAgentOverride() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("headerMap");
-
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
         Map<String, String> params = new HashMap<>();
         params.put("User-Agent", "TEST");
-        event.getMessage().setInvocationProperty("headers", params);
-
-        flow.process(event);
+        flowRunner("headerMap").withPayload(TEST_MESSAGE)
+                               .withFlowVariable("headers", params)
+                               .run();
 
         assertThat(getFirstReceivedHeader("User-Agent"), equalTo("TEST"));
     }
@@ -141,9 +114,9 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
     @Test
     public void ignoresHttpOutboundPropertiesButAcceptsHeaders() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty(HTTP_LISTENER_PATH, "listenerPath");
-        processEventInFlow(event, "httpHeaders");
+        flowRunner("httpHeaders").withPayload(TEST_MESSAGE)
+                                 .withOutboundProperty(HTTP_LISTENER_PATH, "listenerPath")
+                                 .run();
 
         assertThat(getFirstReceivedHeader(HTTP_SCHEME), is("testValue1"));
         assertThat(headers.asMap(), not(hasKey(HTTP_LISTENER_PATH)));
@@ -152,35 +125,32 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
     @Test
     public void acceptsConnectionHeader() throws Exception
     {
-        processEventInFlow(getTestEvent(TEST_MESSAGE), "connectionHeader");
-
+        flowRunner("connectionHeader").withPayload(TEST_MESSAGE).run();
         assertThat(getFirstReceivedHeader(CONNECTION), is(CLOSE));
     }
 
     @Test
     public void ignoresConnectionOutboundProperty() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty(CONNECTION, CLOSE);
-        processEventInFlow(event, "outboundProperties");
-
+        flowRunner("outboundProperties").withPayload(TEST_MESSAGE)
+                                        .withOutboundProperty(CONNECTION, CLOSE)
+                                        .run();
         assertThat(getFirstReceivedHeader(CONNECTION), is(not(CLOSE)));
     }
 
     @Test
     public void acceptsHostHeader() throws Exception
     {
-        processEventInFlow(getTestEvent(TEST_MESSAGE), "hostHeader");
-
+        flowRunner("hostHeader").withPayload(TEST_MESSAGE).run();
         assertThat(getFirstReceivedHeader(HOST), is(host.getValue()));
     }
 
     @Test
     public void ignoresHostOutboundProperty() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty(HOST, host.getValue());
-        processEventInFlow(event, "outboundProperties");
+        flowRunner("outboundProperties").withPayload(TEST_MESSAGE)
+                                        .withOutboundProperty(HOST, host.getValue())
+                                        .run();
 
         assertThat(getFirstReceivedHeader(HOST), is(not(host.getValue())));
     }
@@ -188,28 +158,18 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
     @Test
     public void acceptsTransferEncodingHeader() throws Exception
     {
-        processEventInFlow(getTestEvent(TEST_MESSAGE), "transferEncodingHeader");
-
+        flowRunner("transferEncodingHeader").withPayload(TEST_MESSAGE).run();
         assertThat(getFirstReceivedHeader(TRANSFER_ENCODING), is(encoding.getValue()));
     }
 
     @Test
     public void ignoresTransferEncodingOutboundProperty() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty(TRANSFER_ENCODING, encoding.getValue());
-        processEventInFlow(event, "outboundProperties");
-
+        flowRunner("outboundProperties").withPayload(TEST_MESSAGE)
+                                        .withOutboundProperty(TRANSFER_ENCODING, encoding.getValue())
+                                        .run();
         assertThat(headers.asMap(), not(hasKey(TRANSFER_ENCODING)));
     }
-
-    private void processEventInFlow(MuleEvent event, String flowName) throws Exception
-    {
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        flow.process(event);
-    }
-
-
 }
 
 

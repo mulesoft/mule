@@ -10,9 +10,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
-import org.mule.module.xml.xpath.XPathReturnType;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.module.xml.xpath.XPathReturnType;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -83,7 +84,7 @@ public class XPath3TestCase extends FunctionalTestCase
     public void concatOverResultNode() throws Exception
     {
         Node line = (Node) findLines(HANDKERCHIEF, XPathReturnType.NODE);
-        String result = getPayloadAsString(runFlow("actTitles", line).getMessage());
+        String result = getPayloadAsString(flowRunner("actTitles").withPayload(line).run().getMessage());
         assertThat(result, equalTo("ACT III SCENE III.  The garden of the castle."));
     }
 
@@ -91,14 +92,14 @@ public class XPath3TestCase extends FunctionalTestCase
     public void getAncestorOverResultNode() throws Exception
     {
         Node line = (Node) findLines(HANDKERCHIEF, XPathReturnType.NODE);
-        String result = getPayloadAsString(runFlow("findSpeaker", line).getMessage());
+        String result = getPayloadAsString(flowRunner("findSpeaker").withPayload(line).run().getMessage());
         assertThat(result, equalTo("EMILIA"));
     }
 
     @Test
     public void countLines() throws Exception
     {
-        Object result = runFlow("countLines", getOthello()).getMessage().getPayload();
+        Object result = flowRunner("countLines").withPayload(getOthello()).run().getMessage().getPayload();
         assertThat(result, instanceOf(Double.class));
         assertThat((Double) result, equalTo(LINES_COUNT));
     }
@@ -106,7 +107,7 @@ public class XPath3TestCase extends FunctionalTestCase
     @Test
     public void payloadConsumed() throws Exception
     {
-        MuleEvent event = runFlow("payloadConsumed", getOthello());
+        MuleEvent event = flowRunner("payloadConsumed").withPayload(getOthello()).run();
         assertThat((String) event.getFlowVariable("result"), equalTo("3556"));
         assertThat(event.getMessage().getPayload(), instanceOf(Node.class));
     }
@@ -115,20 +116,19 @@ public class XPath3TestCase extends FunctionalTestCase
     public void foreach() throws Exception
     {
         List<Node> nodes = new ArrayList<>();
-        MuleEvent event = getTestEvent(getOthello());
-        event.setFlowVariable("nodes", nodes);
-        runFlow("foreach", event);
+        flowRunner("foreach").withPayload(getOthello()).withFlowVariable("nodes", nodes).run();
 
         assertThat(nodes.size(), is(LINES_COUNT.intValue()));
     }
 
     private Object findLines(String word, XPathReturnType type) throws Exception
     {
-        MuleEvent event = getTestEvent(getOthello());
-        event.setFlowVariable("word", word);
-        event.setFlowVariable("returnType", type.name());
-
-        return runFlow("shakespeareLines", event).getMessage().getPayload();
+        return flowRunner("shakespeareLines").withPayload(getOthello())
+                                             .withFlowVariable("word", word)
+                                             .withFlowVariable("returnType", type.name())
+                                             .run()
+                                             .getMessage()
+                                             .getPayload();
     }
 
     private InputStream getOthello() throws IOException

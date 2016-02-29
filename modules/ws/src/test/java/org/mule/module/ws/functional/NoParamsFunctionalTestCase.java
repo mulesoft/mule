@@ -8,9 +8,8 @@ package org.mule.module.ws.functional;
 
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+
 import org.mule.api.MuleEvent;
-import org.mule.PropertyScope;
-import org.mule.construct.Flow;
 
 import org.junit.Test;
 
@@ -26,11 +25,7 @@ public class NoParamsFunctionalTestCase extends AbstractWSConsumerFunctionalTest
     @Test
     public void payloadIsIgnoredOperationNoParams() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("noParams");
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
-        event = flow.process(event);
-
+        MuleEvent event = flowRunner("noParams").withPayload(TEST_MESSAGE).run();
         String expectedResponse = "<ns:noParamsResponse xmlns:ns=\"http://consumer.ws.module.mule.org/\">" +
                                   "<text>TEST</text></ns:noParamsResponse>";
         assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
@@ -39,17 +34,13 @@ public class NoParamsFunctionalTestCase extends AbstractWSConsumerFunctionalTest
     @Test
     public void payloadIsIgnoredOperationNoParamsWithHeaders() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("noParamsWithHeader");
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        String header = "<header xmlns=\"http://consumer.ws.module.mule.org/\">HEADER_VALUE</header>";
+        MuleEvent event = flowRunner("noParamsWithHeader").withPayload(TEST_MESSAGE)
+                                                          .withOutboundProperty("soap.header", header)
+                                                          .run();
 
         String expectedResponse = "<ns2:noParamsWithHeaderResponse xmlns:ns2=\"http://consumer.ws.module.mule.org/\">" +
                                   "<text>HEADER_VALUE</text></ns2:noParamsWithHeaderResponse>";
-
-        String header = "<header xmlns=\"http://consumer.ws.module.mule.org/\">HEADER_VALUE</header>";
-        event.getMessage().setProperty("soap.header", header, PropertyScope.OUTBOUND);
-
-        event = flow.process(event);
-
         assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
     }
 

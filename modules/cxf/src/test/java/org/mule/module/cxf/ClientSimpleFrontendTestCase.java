@@ -29,7 +29,7 @@ public class ClientSimpleFrontendTestCase extends FunctionalTestCase
     @Test
     public void testEchoWsdl() throws Exception
     {
-        MuleMessage result = runFlow("PopulateData", getTestMuleMessage("some payload")).getMessage();
+        MuleMessage result = flowRunner("PopulateData").withPayload(getTestMuleMessage("some payload")).run().getMessage();
 
         assertNotNull(result.getPayload());
         assertEquals("Hello some payload", result.getPayload());

@@ -58,7 +58,7 @@ public class UpdateBulkTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void updatesInBulkModeWithCollection() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("updateBulk", getPlanetNames());
+        final MuleEvent responseEvent = flowRunner("updateBulk").withPayload(getPlanetNames()).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertBulkModeResult(response);
@@ -67,7 +67,7 @@ public class UpdateBulkTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void updatesInBulkModeWithIterator() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("updateBulk", getPlanetNames().iterator());
+        final MuleEvent responseEvent = flowRunner("updateBulk").withPayload(getPlanetNames().iterator()).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertBulkModeResult(response);
@@ -86,7 +86,7 @@ public class UpdateBulkTestCase extends AbstractDbIntegrationTestCase
             }
         };
 
-        final MuleEvent responseEvent = runFlow("updateBulk", iterable);
+        final MuleEvent responseEvent = flowRunner("updateBulk").withPayload(iterable).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertBulkModeResult(response);
@@ -95,7 +95,7 @@ public class UpdateBulkTestCase extends AbstractDbIntegrationTestCase
     @Test(expected = MessagingException.class)
     public void requiresSplittableType() throws Exception
     {
-        runFlow("updateBulk", TEST_MESSAGE);
+        flowRunner("updateBulk").withPayload(TEST_MESSAGE).run();
     }
 
     private void assertBulkModeResult(MuleMessage response) throws SQLException

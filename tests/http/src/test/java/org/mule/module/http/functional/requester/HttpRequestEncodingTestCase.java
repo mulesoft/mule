@@ -8,8 +8,8 @@ package org.mule.module.http.functional.requester;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.module.http.api.HttpHeaders;
 
 import java.io.IOException;
@@ -70,8 +70,7 @@ public class HttpRequestEncodingTestCase extends AbstractHttpRequestTestCase
     @Test
     public void testEncoding() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("encodingTest");
-        MuleEvent result = flow.process(getTestEvent(TEST_MESSAGE));
+        MuleEvent result = flowRunner("encodingTest").withPayload(TEST_MESSAGE).run();
         assertThat(getPayloadAsString(result.getMessage()), is(testMessage));
     }
 

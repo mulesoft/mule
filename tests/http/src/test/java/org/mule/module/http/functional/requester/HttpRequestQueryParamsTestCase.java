@@ -8,8 +8,6 @@ package org.mule.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,14 +26,10 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase
     @Test
     public void sendsQueryParamsFromList() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("queryParamList");
-
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
-        event.getMessage().setInvocationProperty("paramName", "testName2");
-        event.getMessage().setInvocationProperty("paramValue", "testValue2");
-
-        flow.process(event);
+        flowRunner("queryParamList").withPayload(TEST_MESSAGE)
+                                    .withFlowVariable("paramName", "testName2")
+                                    .withFlowVariable("paramValue", "testValue2")
+                                    .run();
 
         assertThat(uri, equalTo("/testPath?testName1=testValue1&testName2=testValue2"));
     }
@@ -43,37 +37,20 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase
     @Test
     public void sendsQueryParamsFromMap() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("queryParamMap");
-
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
         Map<String, String> params = new HashMap<>();
-
         params.put("testName1", "testValue1");
         params.put("testName2", "testValue2");
-
-        event.getMessage().setInvocationProperty("params", params);
-
-        flow.process(event);
-
+        flowRunner("queryParamMap").withPayload(TEST_MESSAGE).withFlowVariable("params", params).run();
         assertThat(uri, equalTo("/testPath?testName1=testValue1&testName2=testValue2"));
     }
 
     @Test
     public void queryParamsOverride() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("multipleQueryParam");
-
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
         Map<String, String> params = new HashMap<>();
-
         params.put("testName1", "testValueNew");
         params.put("testName2", "testValue2");
-
-        event.getMessage().setInvocationProperty("params", params);
-
-        flow.process(event);
+        flowRunner("multipleQueryParam").withPayload(TEST_MESSAGE).withFlowVariable("params", params).run();
 
         assertThat(uri, equalTo("/testPath?testName1=testValue1&testName1=testValueNew&testName2=testValue2"));
     }
@@ -81,12 +58,7 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase
     @Test
     public void sendsQueryParamsNulls() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("queryParamNulls");
-
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
-        flow.process(event);
-
+        flowRunner("queryParamNulls").withPayload(TEST_MESSAGE).run();
         assertThat(uri, equalTo("/testPath?testName1&testName2"));
     }
 

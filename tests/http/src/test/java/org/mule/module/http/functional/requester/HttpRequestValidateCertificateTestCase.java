@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 
@@ -37,22 +37,15 @@ public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestT
     @Test
     public void rejectsMissingCertificate() throws Exception
     {
-        try
-        {
-            runFlow("missingCertFlow", TEST_MESSAGE);
-            fail("Failure expected as no valid certificate was provided for client");
-        }
-        catch (MessagingException e)
-        {
-            assertThat(e, is(instanceOf(MessagingException.class)));
-            assertThat(e.getCauseException(), is(instanceOf(GeneralSecurityException.class)));
-        }
+        MessagingException e = flowRunner("missingCertFlow").withPayload(TEST_MESSAGE).runExpectingException();
+        assertThat(e, is(instanceOf(MessagingException.class)));
+        assertThat(e.getCauseException(), is(instanceOf(GeneralSecurityException.class)));
     }
 
     @Test
     public void acceptsValidCertificate() throws Exception
     {
-        MuleEvent result = runFlow("validCertFlow", TEST_MESSAGE);
+        MuleEvent result = flowRunner("validCertFlow").withPayload(TEST_MESSAGE).run();
         assertThat(getPayloadAsString(result.getMessage()), equalTo(DEFAULT_RESPONSE));
     }
 }

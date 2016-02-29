@@ -35,7 +35,7 @@ public class DynamicFirstSuccessfulTestCase extends DynamicRouterTestCase
     {
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_A));
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_B));
-        runFlowAndAssertResponse(getTestFlow(DYNAMIC_FIRST_SUCCESSFUL), LETTER_A);
+        runFlowAndAssertResponse(DYNAMIC_FIRST_SUCCESSFUL, LETTER_A);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class DynamicFirstSuccessfulTestCase extends DynamicRouterTestCase
     {
         CustomRouteResolver.routes.add(new CustomRouteResolver.FailingMessageProcessor());
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_B));
-        runFlowAndAssertResponse(getTestFlow(DYNAMIC_FIRST_SUCCESSFUL), LETTER_B);
+        runFlowAndAssertResponse(DYNAMIC_FIRST_SUCCESSFUL, LETTER_B);
     }
 
     @Test(expected = MessagingException.class)
@@ -51,7 +51,7 @@ public class DynamicFirstSuccessfulTestCase extends DynamicRouterTestCase
     {
         CustomRouteResolver.routes.add(new CustomRouteResolver.FailingMessageProcessor());
         CustomRouteResolver.routes.add(new CustomRouteResolver.FailingMessageProcessor());
-        runFlowAndAssertResponse(getTestFlow(DYNAMIC_FIRST_SUCCESSFUL), LETTER_B);
+        runFlowAndAssertResponse(DYNAMIC_FIRST_SUCCESSFUL, LETTER_B);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class DynamicFirstSuccessfulTestCase extends DynamicRouterTestCase
     {
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterTHenFailsMessageProcessor(LETTER_A));
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_B));
-        runFlowAndAssertResponse(getTestFlow(DYNAMIC_FIRST_SUCCESSFUL), LETTER_B);
+        runFlowAndAssertResponse(DYNAMIC_FIRST_SUCCESSFUL, LETTER_B);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class DynamicFirstSuccessfulTestCase extends DynamicRouterTestCase
     {
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_A));
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_B));
-        runFlowAndAssertResponse(getTestFlow(DYNAMIC_FIRST_SUCCESSFUL_WITH_EXPRESSION), LETTER_A);
+        runFlowAndAssertResponse(DYNAMIC_FIRST_SUCCESSFUL_WITH_EXPRESSION, LETTER_A);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class DynamicFirstSuccessfulTestCase extends DynamicRouterTestCase
     {
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_F));
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_B));
-        runFlowAndAssertResponse(getTestFlow(DYNAMIC_FIRST_SUCCESSFUL_WITH_EXPRESSION), LETTER_B);
+        runFlowAndAssertResponse(DYNAMIC_FIRST_SUCCESSFUL_WITH_EXPRESSION, LETTER_B);
     }
 
     @Test(expected = MessagingException.class)
@@ -83,7 +83,7 @@ public class DynamicFirstSuccessfulTestCase extends DynamicRouterTestCase
     {
         CustomRouteResolver.routes.add(new CustomRouteResolver.FailingMessageProcessor());
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_F));
-        runFlowAndAssertResponse(getTestFlow(DYNAMIC_FIRST_SUCCESSFUL_WITH_EXPRESSION), DOES_NOT_MATTER);
+        runFlowAndAssertResponse(DYNAMIC_FIRST_SUCCESSFUL_WITH_EXPRESSION, DOES_NOT_MATTER);
     }
 
     @Test(expected = MessagingException.class)
@@ -91,7 +91,7 @@ public class DynamicFirstSuccessfulTestCase extends DynamicRouterTestCase
     {
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(RANDOM_TEXT_1));
         CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(RANDOM_TEXT_2));
-        runFlowAndAssertResponse(getTestFlow(DYNAMIC_FIRST_SUCCESSFUL_WITH_EXPRESSION), DOES_NOT_MATTER);
+        runFlowAndAssertResponse(DYNAMIC_FIRST_SUCCESSFUL_WITH_EXPRESSION, DOES_NOT_MATTER);
     }
 
 }

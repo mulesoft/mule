@@ -12,8 +12,6 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.PropertyScope;
-import org.mule.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -45,9 +43,10 @@ public class HttpRequestRecipientListTestCase extends FunctionalTestCase
     @Test
     public void recipientListWithHttpUrlsWithResponse() throws Exception
     {
-        final MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
-        testEvent.getMessage().setProperty("urls", Arrays.asList(getUrlForPort(port1), getUrlForPort(port2), getUrlForPort(port3)), PropertyScope.INBOUND);
-        final MuleEvent response = ((Flow) getFlowConstruct("recipientListFlow")).process(testEvent);
+        final MuleEvent response = flowRunner("recipientListFlow").withPayload(TEST_MESSAGE)
+                                                                  .withInboundProperty("urls", Arrays.asList(getUrlForPort(port1), getUrlForPort(port2), getUrlForPort(port3)))
+                                                                  .run();
+
         assertThat(response, notNullValue());
         assertThat(response.getMessage().getPayload(), IsInstanceOf.instanceOf(List.class));
         MuleMessage aggregatedResponse = response.getMessage();

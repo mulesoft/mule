@@ -54,7 +54,7 @@ public class StoredProcedureSourceTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesCustomSource() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("storedProcedureCustomSource", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("storedProcedureCustomSource").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertThat(response.getPayload(), is(instanceOf(Map.class)));

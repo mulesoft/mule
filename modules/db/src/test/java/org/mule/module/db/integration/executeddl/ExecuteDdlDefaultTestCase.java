@@ -42,7 +42,7 @@ public class ExecuteDdlDefaultTestCase extends AbstractExecuteDdlTestCase
     @Test
     public void updatesDataRequestResponse() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("executeDdl", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("executeDdl").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertTableCreation(response.getPayload());
@@ -51,7 +51,7 @@ public class ExecuteDdlDefaultTestCase extends AbstractExecuteDdlTestCase
     @Test
     public void updatesDataOneWay() throws Exception
     {
-        runFlowAsync("executeDdlOneWay", TEST_MESSAGE);
+        flowRunner("executeDdlOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);

@@ -17,15 +17,17 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.connector.ReplyToHandler;
 import org.mule.session.DefaultMuleSession;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.activation.DataHandler;
 
 import org.apache.commons.collections.Transformer;
 import org.mockito.Mockito;
@@ -40,6 +42,8 @@ public class TestEventBuilder
 
     private Map<String, Object> inboundProperties = new HashMap<>();
     private Map<String, Object> outboundProperties = new HashMap<>();
+    private Map<String, DataHandler> inboundAttachments = new HashMap<>();
+    private Map<String, Attachment> outboundAttachments = new HashMap<>();
     private Map<String, Object> sessionProperties = new HashMap<>();
 
     private Map<String, Object> flowVariables = new HashMap<>();
@@ -110,6 +114,50 @@ public class TestEventBuilder
     public TestEventBuilder withOutboundProperty(String key, Object value)
     {
         outboundProperties.put(key, value);
+
+        return this;
+    }
+
+    /**
+     * Prepares an attachment with the given key and value to be sent in the product.
+     * 
+     * @param key the key of the attachment to add
+     * @param value the {@link DataHandler} for the attachment to add
+     * @return this {@link TestEventBuilder}
+     */
+    public TestEventBuilder withOutboundAttachment(String key, DataHandler value)
+    {
+        outboundAttachments.put(key, new DataHandlerAttachment(value));
+
+        return this;
+    }
+
+    /**
+     * Prepares an attachment with the given key and value to be sent in the product.
+     * 
+     * @param key the key of the attachment to add
+     * @param object the content of the attachment to add
+     * @param contentType the content type of the attachment to add. Note that the charset attribute can be specifed too
+     *            i.e. text/plain;charset=UTF-8
+     * @return this {@link TestEventBuilder}
+     */
+    public TestEventBuilder withOutboundAttachment(String key, Object object, String contentType)
+    {
+        outboundAttachments.put(key, new ObjectAttachment(object, contentType));
+
+        return this;
+    }
+
+    /**
+     * Prepares an attachment with the given key and value to be sent in the product.
+     * 
+     * @param key the key of the attachment to add
+     * @param value the {@link DataHandler} for the attachment to add
+     * @return this {@link TestEventBuilder}
+     */
+    public TestEventBuilder withInboundAttachment(String key, DataHandler value)
+    {
+        inboundAttachments.put(key, value);
 
         return this;
     }
@@ -202,12 +250,16 @@ public class TestEventBuilder
      */
     public MuleEvent build(MuleContext muleContext, FlowConstruct flow)
     {
-        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, Collections.emptyMap(), muleContext);
+        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(
                 (DefaultMuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern, flow, new DefaultMuleSession(),
                 muleContext.getConfiguration().getDefaultResponseTimeout(), null, null, "UTF-8", transacted,
                 null, replyToHandler);
 
+        for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet())
+        {
+            outboundAttachmentEntry.getValue().addOutboundTo(muleMessage, outboundAttachmentEntry.getKey());
+        }
         for (Entry<String, Object> sessionPropertyEntry : sessionProperties.entrySet())
         {
             muleMessage.setProperty(sessionPropertyEntry.getKey(), sessionPropertyEntry.getValue(), SESSION);
@@ -221,4 +273,56 @@ public class TestEventBuilder
         return (MuleEvent) spyTransformer.transform(event);
     }
 
+    private interface Attachment
+    {
+        void addOutboundTo(MuleMessage msg, String key);
+    }
+
+    private class DataHandlerAttachment implements Attachment
+    {
+        private DataHandler dataHandler;
+
+        public DataHandlerAttachment(DataHandler dataHandler)
+        {
+            this.dataHandler = dataHandler;
+        }
+
+        @Override
+        public void addOutboundTo(MuleMessage msg, String key)
+        {
+            try
+            {
+                msg.addOutboundAttachment(key, dataHandler);
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
+            }
+        }
+    }
+
+    private class ObjectAttachment implements Attachment
+    {
+        private Object object;
+        private String contentType;
+
+        public ObjectAttachment(Object object, String contentType)
+        {
+            this.object = object;
+            this.contentType = contentType;
+        }
+
+        @Override
+        public void addOutboundTo(MuleMessage msg, String key)
+        {
+            try
+            {
+                msg.addOutboundAttachment(key, object, contentType);
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
+            }
+        }
+    }
 }

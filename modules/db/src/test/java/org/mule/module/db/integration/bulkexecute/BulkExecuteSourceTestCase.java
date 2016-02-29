@@ -40,7 +40,7 @@ public class BulkExecuteSourceTestCase extends AbstractBulkExecuteTestCase
     @Test
     public void usesCustomSource() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("bulkUpdateCustomSource", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("bulkUpdateCustomSource").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertBulkModeResult(response.getPayload());

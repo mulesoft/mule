@@ -12,8 +12,8 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.EXPECTATION_FAIL
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.module.http.functional.AbstractHttpExpectHeaderServerTestCase;
 
 import java.io.IOException;
@@ -38,11 +38,7 @@ public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderSer
     {
         startExpectContinueServer();
 
-        Flow flow = (Flow) getFlowConstruct(REQUEST_FLOW_NAME);
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty(EXPECT, CONTINUE);
-
-        flow.process(event);
+        flowRunner(REQUEST_FLOW_NAME).withPayload(TEST_MESSAGE).withOutboundProperty(EXPECT, CONTINUE).run();
         assertThat(requestBody, equalTo(TEST_MESSAGE));
 
         stopServer();
@@ -53,22 +49,17 @@ public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderSer
     {
         startExpectFailedServer();
 
-        Flow flow = (Flow) getFlowConstruct(REQUEST_FLOW_NAME);
-
         // Set a payload that will fail when consumed. As the server rejects the request after processing
         // the header, the client should not send the body.
-
-        MuleEvent event = getTestEvent(new InputStream()
+        MuleEvent response = flowRunner(REQUEST_FLOW_NAME).withPayload(new InputStream()
         {
             @Override
             public int read() throws IOException
             {
                 throw new IOException("Payload should not be consumed");
             }
-        });
-        event.getMessage().setOutboundProperty(EXPECT, CONTINUE);
+        }).withOutboundProperty(EXPECT, CONTINUE).run();
 
-        MuleEvent response = flow.process(event);
         assertThat(response.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY),
                    equalTo(EXPECTATION_FAILED.getStatusCode()));
 

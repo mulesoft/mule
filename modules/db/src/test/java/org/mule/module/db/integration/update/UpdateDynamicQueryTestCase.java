@@ -47,7 +47,7 @@ public class UpdateDynamicQueryTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesDynamicQuery() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("updateDynamicQuery", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("updateDynamicQuery").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());

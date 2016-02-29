@@ -35,15 +35,14 @@ public abstract class DynamicRouterTestCase extends FunctionalTestCase
     @Test(expected = MessagingException.class)
     public void noRoutes() throws Exception
     {
-        Flow flow = getTestFlow(getFlowName());
-        flow.process(getTestEvent(TEST_MESSAGE));
+        flowRunner(getFlowName()).withPayload(TEST_MESSAGE).run();
     }
 
     public abstract String getFlowName();
 
-    protected MuleEvent runFlowAndAssertResponse(Flow flow, Object expectedMessage) throws Exception
+    protected MuleEvent runFlowAndAssertResponse(String flowName, Object expectedMessage) throws Exception
     {
-        MuleEvent event = flow.process(getTestEvent(TEST_MESSAGE));
+        MuleEvent event = flowRunner(flowName).withPayload(TEST_MESSAGE).run();
         assertThat(event.getMessageAsString(), is(expectedMessage));
         return event;
     }

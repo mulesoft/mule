@@ -40,7 +40,7 @@ public class BulkExecuteFileTestCase extends AbstractBulkExecuteTestCase
     @Test
     public void readQueriesFromFile() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("bulkUpdateFile", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("bulkUpdateFile").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertBulkModeResult(response.getPayload());

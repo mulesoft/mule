@@ -6,15 +6,7 @@
  */
 package org.mule.properties;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.construct.Flow;
-import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.activation.DataHandler;
 
@@ -103,18 +95,11 @@ public class AttachmentTransformerTestCase extends FunctionalTestCase
 
     public void runScenario(String flowName) throws Exception
     {
-        DataHandler attach = new DataHandler("attachContent","plain/text");
-        DataHandler attach2 = new DataHandler("attachContent","plain/text");
-        DataHandler attach22 = new DataHandler("attachContent","plain/text");
-        HashMap<String, DataHandler> attachments = new HashMap<String, DataHandler>();
-        attachments.put("attach",attach);
-        attachments.put("attach2",attach2);
-        attachments.put("attach22",attach22);
-        MuleMessage message = new DefaultMuleMessage("data", (Map<String, Object>) null, attachments, muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(message, getTestFlow());
-        Flow flow = (Flow) getFlowConstruct(flowName);
-        flow.process(event);
-        FlowAssert.verify(flowName);
+        flowRunner(flowName).withPayload("data")
+                            .withInboundAttachment("attach", new DataHandler("attachContent", "plain/text"))
+                            .withInboundAttachment("attach2", new DataHandler("attachContent", "plain/text"))
+                            .withInboundAttachment("attach22", new DataHandler("attachContent", "plain/text"))
+                            .run();
     }
 
 }

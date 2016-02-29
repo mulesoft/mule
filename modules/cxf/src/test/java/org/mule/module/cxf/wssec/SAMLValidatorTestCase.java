@@ -36,7 +36,7 @@ public class SAMLValidatorTestCase extends FunctionalTestCase
     @Test
     public void testSAMLUnsignedAssertion() throws Exception
     {
-        MuleMessage received = runFlow("cxfClient", getTestMuleMessage("me")).getMessage();
+        MuleMessage received = flowRunner("cxfClient").withPayload(getTestMuleMessage("me")).run().getMessage();
 
         assertNotNull(received);
         assertEquals("Hello me", getPayloadAsString(received));
@@ -45,7 +45,7 @@ public class SAMLValidatorTestCase extends FunctionalTestCase
     @Test
     public void testSAMLSignedAssertion() throws Exception
     {
-        MuleMessage received = runFlow("cxfClientSigned", getTestMuleMessage("me")).getMessage();
+        MuleMessage received = flowRunner("cxfClientSigned").withPayload(getTestMuleMessage("me")).run().getMessage();
 
         assertNotNull(received);
         assertEquals("Hello me", getPayloadAsString(received));

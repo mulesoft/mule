@@ -49,7 +49,7 @@ public class UpdateDefaultTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void updatesDataRequestResponse() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("jdbcUpdate", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("jdbcUpdate").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertEquals(1, response.getPayload());
@@ -59,7 +59,7 @@ public class UpdateDefaultTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void updatesDataOneWay() throws Exception
     {
-        runFlowAsync("jdbcUpdateOneWay", TEST_MESSAGE);
+        flowRunner("jdbcUpdateOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);

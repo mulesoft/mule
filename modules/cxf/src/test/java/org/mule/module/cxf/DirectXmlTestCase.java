@@ -55,14 +55,14 @@ public class DirectXmlTestCase extends FunctionalTestCase
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         assertNotNull(xml);
 
-        MuleMessage result = runFlow("echoWithTransform", getTestMuleMessage(xml)).getMessage();
+        MuleMessage result = flowRunner("echoWithTransform").withPayload(getTestMuleMessage(xml)).run().getMessage();
         String resultStr = getPayloadAsString(result);
         assertTrue("echoResponse not found in result: " + resultStr, resultStr.indexOf("echoResponse") != -1);
     }
 
     private void test(Object xml) throws Exception
     {
-        MuleMessage result = runFlow("echoService", getTestMuleMessage(xml)).getMessage();
+        MuleMessage result = flowRunner("echoService").withPayload(getTestMuleMessage(xml)).run().getMessage();
         assertTrue(getPayloadAsString(result).indexOf("echoResponse") != -1);
     }
 

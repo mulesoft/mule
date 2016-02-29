@@ -6,15 +6,14 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
-import static org.junit.rules.ExpectedException.none;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -22,7 +21,6 @@ import java.io.IOException;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Sets up two HTTPS servers with regular trust-stores, except one is insecure.
@@ -35,8 +33,6 @@ public class HttpListenerTlsInsecureTestCase extends FunctionalTestCase
     public DynamicPort port1 = new DynamicPort("port1");
     @Rule
     public DynamicPort port2 = new DynamicPort("port2");
-    @Rule
-    public ExpectedException expectedException = none();
 
     @Override
     protected String getConfigFile()
@@ -47,18 +43,15 @@ public class HttpListenerTlsInsecureTestCase extends FunctionalTestCase
     @Test
     public void acceptsInvalidCertificateIfInsecure() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("testRequestToInsecure");
-        final MuleEvent res = flow.process(getTestEvent(TEST_PAYLOAD));
+        final MuleEvent res = flowRunner("testRequestToInsecure").withPayload(TEST_PAYLOAD).run();
         assertThat(res.getMessageAsString(), is(TEST_PAYLOAD));
     }
 
     @Test
     public void rejectsInvalidCertificateIfSecure() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("testRequestToSecure");
-        expectedException.expect(MessagingException.class);
-        expectedException.expectCause(isA(IOException.class));
-        expectedException.expectCause(hasMessage(containsString("Remotely close")));
-        flow.process(getTestEvent("data"));
+        MessagingException expecteException = flowRunner("testRequestToSecure").withPayload("data").runExpectingException();
+        assertThat(expecteException.getCause(), instanceOf(IOException.class));
+        assertThat(expecteException.getCause(), hasMessage(containsString("Remotely close")));
     }
 }

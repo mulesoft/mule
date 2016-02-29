@@ -11,8 +11,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -71,10 +71,7 @@ public class HttpListenerMethodRoutingTestCase extends FunctionalTestCase
 
     private void sendRequestAndAssertMethod(String payload) throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("requestFlow");
-        MuleEvent event = getTestEvent(payload);
-        event.setFlowVariable("method", method);
-        event = flow.process(event);
+        MuleEvent event = flowRunner("requestFlow").withPayload(payload).withFlowVariable("method", method).run();
 
         assertThat(event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(OK.getStatusCode()));
         assertThat(event.getMessageAsString(), is(expectedContent));

@@ -42,7 +42,7 @@ public abstract class AbstractStoredProcedureStreamingReturningResultsetTestCase
     @Test
     public void testOneWay() throws Exception
     {
-        runFlowAsync("messagePerRecordOneWay", TEST_MESSAGE);
+        flowRunner("messagePerRecordOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
         LocalMuleClient client = muleContext.getClient();
         List<MuleMessage> responses = new LinkedList<MuleMessage>();
@@ -60,7 +60,7 @@ public abstract class AbstractStoredProcedureStreamingReturningResultsetTestCase
     @Test
     public void testRequestResponse() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("defaultQueryRequestResponse", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllPlanetRecords());

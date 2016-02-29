@@ -42,7 +42,7 @@ public class OracleSelectXmlTypeTestCase extends AbstractOracleXmlTypeTestCase
     @Test
     public void returnsXmlTypeColumn() throws Exception
     {
-        final MuleEvent responseEvent = runFlow("managesXmlType", TEST_MESSAGE);
+        final MuleEvent responseEvent = flowRunner("managesXmlType").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
         assertMessageContains(response, getAllAlienRecords());

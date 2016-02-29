@@ -16,8 +16,8 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.transformer.types.MimeTypes.HTML;
 import static org.mule.transformer.types.MimeTypes.TEXT;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.message.ds.ByteArrayDataSource;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
@@ -64,13 +64,10 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     @Test
     public void payloadIsIgnoredWhenSendingOutboundAttachments() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("requestFlow");
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
-        event.getMessage().addOutboundAttachment("attachment1", "Contents 1", TEXT);
-        event.getMessage().addOutboundAttachment("attachment2", "Contents 2", HTML);
-
-        flow.process(event);
+        flowRunner("requestFlow").withPayload(TEST_MESSAGE)
+                                 .withOutboundAttachment("attachment1", "Contents 1", TEXT)
+                                 .withOutboundAttachment("attachment2", "Contents 2", HTML)
+                                 .run();
 
         assertThat(requestContentType, startsWith("multipart/form-data; boundary="));
         assertThat(parts.size(), equalTo(2));
@@ -82,13 +79,11 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     @Test
     public void outboundAttachmentsCustomContentType() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("requestFlow");
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
-        event.getMessage().addOutboundAttachment("attachment1", "Contents 1", TEXT);
-        event.getMessage().addOutboundAttachment("attachment2", "Contents 2", HTML);
-        event.getMessage().setOutboundProperty("Content-Type", "multipart/form-data2");
-        flow.process(event);
+        flowRunner("requestFlow").withPayload(TEST_MESSAGE)
+                                 .withOutboundAttachment("attachment1", "Contents 1", TEXT)
+                                 .withOutboundAttachment("attachment2", "Contents 2", HTML)
+                                 .withOutboundProperty("Content-Type", "multipart/form-data2")
+                                 .run();
 
         assertThat(requestContentType, startsWith("multipart/form-data2; boundary="));
         assertThat(parts.size(), equalTo(2));
@@ -100,13 +95,12 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     @Test
     public void fileOutboundAttachmentSetsContentDispositionWithFileName() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
         File file = new File(IOUtils.getResourceAsUrl(TEST_FILE_NAME, getClass()).getPath());
         DataHandler dataHandler = new DataHandler(new FileDataSource(file));
-        event.getMessage().addOutboundAttachment(TEST_PART_NAME, dataHandler);
 
-        Flow flow = (Flow) getFlowConstruct("requestFlow");
-        flow.process(event);
+        flowRunner("requestFlow").withPayload(TEST_MESSAGE)
+                                 .withOutboundAttachment(TEST_PART_NAME, dataHandler)
+                                 .run();
 
         Part part = getPart(TEST_PART_NAME);
         assertFormDataContentDisposition(part, TEST_PART_NAME, TEST_FILE_NAME);
@@ -115,12 +109,11 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     @Test
     public void byteArrayOutboundAttachmentSetsContentDispositionWithFileName() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
         DataHandler dataHandler = new DataHandler(new ByteArrayDataSource(TEST_MESSAGE.getBytes(), TEXT, TEST_FILE_NAME));
-        event.getMessage().addOutboundAttachment(TEST_PART_NAME, dataHandler);
 
-        Flow flow = (Flow) getFlowConstruct("requestFlow");
-        flow.process(event);
+        flowRunner("requestFlow").withPayload(TEST_MESSAGE)
+                                 .withOutboundAttachment(TEST_PART_NAME, dataHandler)
+                                 .run();
 
         Part part = getPart(TEST_PART_NAME);
         assertFormDataContentDisposition(part, TEST_PART_NAME, TEST_FILE_NAME);
@@ -129,11 +122,9 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     @Test
     public void stringOutboundAttachmentSetsContentDispositionWithoutFileName() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().addOutboundAttachment(TEST_PART_NAME, TEST_MESSAGE, TEXT);
-
-        Flow flow = (Flow) getFlowConstruct("requestFlow");
-        flow.process(event);
+        flowRunner("requestFlow").withPayload(TEST_MESSAGE)
+                                 .withOutboundAttachment(TEST_PART_NAME, TEST_MESSAGE, TEXT)
+                                 .run();
 
         Part part = getPart(TEST_PART_NAME);
         assertFormDataContentDisposition(part, TEST_PART_NAME, null);
@@ -142,16 +133,13 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     @Test
     public void sendingAttachmentBiggerThanAsyncWriteQueueSizeWorksOverHttps() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        
         // Grizzly defines the maxAsyncWriteQueueSize as 4 times the sendBufferSize (org.glassfish.grizzly.nio.transport.TCPNIOConnection).
         int maxAsyncWriteQueueSize = Integer.valueOf(sendBufferSize.getValue()) * 4;
 
-        // Set an attachment bigger than the queue size.
-        event.getMessage().addOutboundAttachment(TEST_PART_NAME, new byte[maxAsyncWriteQueueSize * 2], TEXT);
-
-        Flow flow = (Flow) getFlowConstruct("requestFlowTls");
-        MuleEvent response = flow.process(event);
+        MuleEvent response = flowRunner("requestFlowTls").withPayload(TEST_MESSAGE)
+                                                         // Set an attachment bigger than the queue size.
+                                                         .withOutboundAttachment(TEST_PART_NAME, new byte[maxAsyncWriteQueueSize * 2], TEXT)
+                                                         .run();
         
         assertThat((Integer) response.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(OK.getStatusCode()));
     }

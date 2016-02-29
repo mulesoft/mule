@@ -9,8 +9,8 @@ package org.mule.module.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
 import org.mule.api.message.NullPayload;
 import org.mule.util.IOUtils;
 
@@ -30,8 +30,7 @@ public class HttpRequestSourceTargetTestCase extends AbstractHttpRequestTestCase
     @Test
     public void requestBodyFromPayloadSource() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("payloadSourceFlow");
-        flow.process(getTestEvent(TEST_MESSAGE));
+        flowRunner("payloadSourceFlow").withPayload(TEST_MESSAGE).run();
         assertThat(body, equalTo(TEST_MESSAGE));
     }
 
@@ -49,26 +48,23 @@ public class HttpRequestSourceTargetTestCase extends AbstractHttpRequestTestCase
 
     private void sendRequestFromCustomSourceAndAssertResponse(Object payload) throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("customSourceFlow");
-        MuleEvent event = getTestEvent(payload);
-        event.setFlowVariable("customSource", "customValue");
-        flow.process(event);
+        flowRunner("customSourceFlow").withPayload(payload)
+                                      .withFlowVariable("customSource", "customValue")
+                                      .run();
         assertThat(body, equalTo("customValue"));
     }
 
     @Test
     public void responseBodyToPayloadTarget() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("payloadTargetFlow");
-        MuleEvent event = flow.process(getTestEvent(TEST_MESSAGE));
+        MuleEvent event = flowRunner("payloadTargetFlow").withPayload(TEST_MESSAGE).run();
         assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
     }
 
     @Test
     public void responseBodyToCustomTarget() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("customTargetFlow");
-        MuleEvent event = flow.process(getTestEvent(TEST_MESSAGE));
+        MuleEvent event = flowRunner("customTargetFlow").withPayload(TEST_MESSAGE).run();
         InputStream customTarget = event.getMessage().getOutboundProperty("customTarget");
         assertThat(customTarget, notNullValue());
         assertThat(IOUtils.toString(customTarget), equalTo(DEFAULT_RESPONSE));
