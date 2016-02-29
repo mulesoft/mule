@@ -7,18 +7,16 @@
 package org.mule.module.extension.file.api;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.message.NullPayload;
 import org.mule.api.temporary.MuleMessage;
-import org.mule.message.OutputHandler;
 import org.mule.extension.annotation.api.DataTypeParameters;
 import org.mule.extension.annotation.api.param.Connection;
 import org.mule.extension.annotation.api.param.Optional;
-import org.mule.module.extension.file.api.matcher.NullFilePayloadPredicate;
-import org.mule.api.message.NullPayload;
+import org.mule.message.OutputHandler;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.Iterator;
-import java.util.function.Predicate;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -31,31 +29,6 @@ import javax.activation.MimetypesFileTypeMap;
 //TODO: MULE-9215
 public class StandardFileSystemOperations
 {
-
-    /**
-     * Lists all the files in the {@code directoryPath} which match the given {@code matcher}.
-     * <p>
-     * If the listing encounters a directory, the output list will include its contents depending
-     * on the value of the {@code recursive} parameter.
-     * <p>
-     * If {@code recursive} is set to {@code true} but a found directory is rejected by the
-     * {@code matcher}, then there won't be any recursion into such directory.
-     *
-     * @param directoryPath the path to the directory to be listed
-     * @param recursive     whether to include the contents of sub-directories. Defaults to {@code false}
-     * @param message       the {@link MuleMessage} on which this operation was triggered
-     * @param matcher       a matcher used to filter the output list
-     * @return a {@link TreeNode} object representing the listed directory
-     * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
-     */
-    public TreeNode list(@Connection FileSystem fileSystem,
-                         @Optional String directoryPath,
-                         @Optional(defaultValue = "false") boolean recursive,
-                         MuleMessage<?, ?> message,
-                         @Optional FilePayloadPredicateBuilder matcher)
-    {
-        return fileSystem.list(directoryPath, recursive, message, getPredicate(matcher));
-    }
 
     /**
      * Obtains the content and metadata of a file at a given path. The operation itself
@@ -296,11 +269,6 @@ public class StandardFileSystemOperations
     public void createDirectory(@Connection FileSystem fileSystem, @Optional String basePath, String directoryName)
     {
         fileSystem.createDirectory(basePath, directoryName);
-    }
-
-    private Predicate<FileAttributes> getPredicate(FilePayloadPredicateBuilder builder)
-    {
-        return builder != null ? builder.build() : new NullFilePayloadPredicate();
     }
 
     private String resolvePath(String path, MuleEvent event, String attributeName)

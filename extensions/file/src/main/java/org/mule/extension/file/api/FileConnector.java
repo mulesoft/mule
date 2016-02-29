@@ -15,6 +15,7 @@ import org.mule.extension.annotation.api.Operations;
 import org.mule.extension.annotation.api.Parameter;
 import org.mule.extension.annotation.api.connector.Providers;
 import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.file.internal.FileListOperation;
 import org.mule.module.extension.file.api.FileConnectorConfig;
 import org.mule.module.extension.file.api.StandardFileSystemOperations;
 
@@ -32,7 +33,7 @@ import java.nio.file.Paths;
  * @since 4.0
  */
 @Extension(name = "File Connector", description = "Connector to manipulate files on a locally mounted file system")
-@Operations(StandardFileSystemOperations.class)
+@Operations({StandardFileSystemOperations.class, FileListOperation.class})
 @Providers(LocalFileConnectionProvider.class)
 public class FileConnector implements Initialisable, FileConnectorConfig
 {

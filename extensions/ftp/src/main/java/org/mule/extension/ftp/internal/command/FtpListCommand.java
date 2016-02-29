@@ -8,9 +8,9 @@ package org.mule.extension.ftp.internal.command;
 
 import static java.lang.String.format;
 import org.mule.api.temporary.MuleMessage;
-import org.mule.extension.ftp.internal.FtpConnector;
-import org.mule.extension.ftp.internal.FtpFileAttributes;
-import org.mule.extension.ftp.internal.FtpFileSystem;
+import org.mule.extension.ftp.api.FtpConnector;
+import org.mule.extension.ftp.api.FtpFileAttributes;
+import org.mule.extension.ftp.api.FtpFileSystem;
 import org.mule.module.extension.file.api.FileAttributes;
 import org.mule.module.extension.file.api.TreeNode;
 import org.mule.module.extension.file.api.command.ListCommand;

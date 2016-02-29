@@ -7,7 +7,6 @@
 package org.mule.module.extension.file.api;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * Canonical representation of a file's metadata attributes.
@@ -19,21 +18,6 @@ import java.time.LocalDateTime;
  */
 public interface FileAttributes extends Serializable
 {
-
-    /**
-     * @return The last time the file was modified
-     */
-    LocalDateTime getLastModifiedTime();
-
-    /**
-     * @return The last time the file was accessed
-     */
-    LocalDateTime getLastAccessTime();
-
-    /**
-     * @return the time at which the file was created
-     */
-    LocalDateTime getCreationTime();
 
     /**
      * @return The file size in bytes

@@ -11,42 +11,44 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.module.extension.file.api.FileAttributes;
-import org.mule.module.extension.file.api.FilePayloadPredicateBuilder;
+import org.mule.module.extension.file.api.FilePredicateBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.time.LocalDateTime;
 
 import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
+public class FilePredicateBuilderTestCase<T extends FilePredicateBuilder, Attributes extends FileAttributes> extends AbstractMuleTestCase
 {
 
     private static final String FILENAME = "Mule.java";
     private static final String PATH = "a/b/c/" + FILENAME;
-    private static final LocalDateTime CREATION_TIME = LocalDateTime.of(1983, 4, 20, 21, 15);
-    private static final LocalDateTime MODIFIED_TIME = LocalDateTime.of(2011, 2, 5, 22, 00);
-    private static final LocalDateTime ACCESSED_TIME = LocalDateTime.of(2015, 4, 20, 00, 00);
     private static final long SIZE = 1024;
 
-    private FilePayloadPredicateBuilder builder = new FilePayloadPredicateBuilder();
-    private FileAttributes payload;
+    protected T builder = createPredicateBuilder();
+    protected Attributes attributes;
 
     @Before
     public void before()
     {
-        payload = mock(FileAttributes.class);
-        when(payload.getName()).thenReturn(FILENAME);
-        when(payload.getPath()).thenReturn(PATH);
-        when(payload.getCreationTime()).thenReturn(CREATION_TIME);
-        when(payload.getLastModifiedTime()).thenReturn(MODIFIED_TIME);
-        when(payload.getLastAccessTime()).thenReturn(ACCESSED_TIME);
-        when(payload.getSize()).thenReturn(SIZE);
-        when(payload.isRegularFile()).thenReturn(true);
-        when(payload.isSymbolicLink()).thenReturn(false);
-        when(payload.isDirectory()).thenReturn(false);
+        attributes = mock(getFileAttributesClass());
+        when(attributes.getName()).thenReturn(FILENAME);
+        when(attributes.getPath()).thenReturn(PATH);
+        when(attributes.getSize()).thenReturn(SIZE);
+        when(attributes.isRegularFile()).thenReturn(true);
+        when(attributes.isSymbolicLink()).thenReturn(false);
+        when(attributes.isDirectory()).thenReturn(false);
+    }
+
+    protected T createPredicateBuilder()
+    {
+        return (T) new FilePredicateBuilder();
+    }
+
+    protected Class<Attributes> getFileAttributesClass()
+    {
+        return (Class<Attributes>) FileAttributes.class;
     }
 
     @Test
@@ -55,12 +57,6 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
         builder
                 .setFilenamePattern("glob:*.{java, js}")
                 .setPathPattern("glob:**.{java, js}")
-                .setCreatedSince(LocalDateTime.of(1980, 1, 1, 0, 0))
-                .setCreatedUntil(LocalDateTime.of(1990, 1, 1, 0, 0))
-                .setUpdatedSince(LocalDateTime.of(2010, 9, 24, 0, 0))
-                .setUpdatedUntil(LocalDateTime.of(2013, 11, 3, 6, 0))
-                .setAccessedSince(LocalDateTime.of(2013, 11, 3, 0, 0))
-                .setAccessedUntil(LocalDateTime.of(2015, 4, 20, 0, 0))
                 .setRegularFile(true)
                 .setDirectory(false)
                 .setSymbolicLink(false)
@@ -110,7 +106,7 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void matchFilenameByRegex()
     {
-        when(payload.getName()).thenReturn("20060101_test.csv");
+        when(attributes.getName()).thenReturn("20060101_test.csv");
         builder.setFilenamePattern("regex:[0-9]*_test.csv");
         assertMatch();
     }
@@ -118,7 +114,7 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void rejectFilenameByRegex()
     {
-        when(payload.getName()).thenReturn("20060101_TEST.csv");
+        when(attributes.getName()).thenReturn("20060101_TEST.csv");
         builder.setFilenamePattern("regex:[0-9]*_test.csv");
         assertReject();
     }
@@ -154,7 +150,7 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void matchPathByRegex()
     {
-        when(payload.getPath()).thenReturn("a/b/c/20060101_test.csv");
+        when(attributes.getPath()).thenReturn("a/b/c/20060101_test.csv");
         builder.setPathPattern("regex:a/b/c/[0-9]*_test.csv");
         assertMatch();
     }
@@ -162,92 +158,8 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void rejectPathByRegex()
     {
-        when(payload.getName()).thenReturn("20060101_TEST.csv");
+        when(attributes.getName()).thenReturn("20060101_TEST.csv");
         builder.setFilenamePattern("regex:[0-9]*_test.csv");
-        assertReject();
-    }
-
-    @Test
-    public void createdSince()
-    {
-        builder.setCreatedSince(LocalDateTime.of(1980, 1, 1, 0, 0));
-        assertMatch();
-    }
-
-    @Test
-    public void createdUntil()
-    {
-        builder.setCreatedUntil(LocalDateTime.of(1990, 1, 1, 0, 0));
-        assertMatch();
-    }
-
-    @Test
-    public void rejectCreatedSince()
-    {
-        builder.setCreatedSince(LocalDateTime.of(1984, 1, 1, 0, 0));
-        assertReject();
-    }
-
-    @Test
-    public void rejectCreatedUntil()
-    {
-        builder.setCreatedUntil(LocalDateTime.of(1982, 4, 2, 0, 0));
-        assertReject();
-    }
-
-    @Test
-    public void updateSince()
-    {
-        builder.setUpdatedSince(LocalDateTime.of(2010, 9, 24, 0, 0));
-        assertMatch();
-    }
-
-    @Test
-    public void updatedUntil()
-    {
-        builder.setUpdatedUntil(LocalDateTime.of(2013, 11, 3, 6, 0));
-        assertMatch();
-    }
-
-    @Test
-    public void rejectUpdatedSince()
-    {
-        builder.setUpdatedSince(LocalDateTime.of(2015, 1, 1, 0, 0));
-        assertReject();
-    }
-
-    @Test
-    public void rejectUpdatedUntil()
-    {
-        builder.setUpdatedUntil(LocalDateTime.of(2010, 9, 24, 0, 0));
-        assertReject();
-    }
-
-    @Test
-    public void accessedSince()
-    {
-        builder.setAccessedSince(LocalDateTime.of(2013, 11, 3, 0, 0));
-        assertMatch();
-    }
-
-    @Test
-    public void accessedUntil()
-    {
-        builder.setAccessedUntil(LocalDateTime.of(2015, 4, 20, 0, 0));
-        assertMatch();
-    }
-
-    @Test
-    public void rejectAccessedSince()
-    {
-        builder.setAccessedSince(LocalDateTime.of(2016, 1, 1, 0, 0));
-        assertReject();
-    }
-
-    @Test
-    public void rejectAccessedUntil()
-    {
-        builder.setUpdatedUntil(LocalDateTime.of(2010, 9, 24, 0, 0));
         assertReject();
     }
 
@@ -282,7 +194,7 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void regularFile()
     {
-        when(payload.isRegularFile()).thenReturn(true);
+        when(attributes.isRegularFile()).thenReturn(true);
         builder.setRegularFile(true);
         assertMatch();
     }
@@ -290,7 +202,7 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void rejectNotRegularFile()
     {
-        when(payload.isRegularFile()).thenReturn(false);
+        when(attributes.isRegularFile()).thenReturn(false);
         builder.setRegularFile(true);
         assertReject();
     }
@@ -298,7 +210,7 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void rejectRegularFile()
     {
-        when(payload.isRegularFile()).thenReturn(true);
+        when(attributes.isRegularFile()).thenReturn(true);
         builder.setRegularFile(false);
         assertReject();
     }
@@ -306,7 +218,7 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void isDirectory()
     {
-        when(payload.isDirectory()).thenReturn(true);
+        when(attributes.isDirectory()).thenReturn(true);
         builder.setDirectory(true);
         assertMatch();
     }
@@ -314,7 +226,7 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void rejectNotDirectory()
     {
-        when(payload.isDirectory()).thenReturn(false);
+        when(attributes.isDirectory()).thenReturn(false);
         builder.setDirectory(true);
         assertReject();
     }
@@ -322,7 +234,7 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void rejectDirectory()
     {
-        when(payload.isDirectory()).thenReturn(true);
+        when(attributes.isDirectory()).thenReturn(true);
         builder.setDirectory(false);
         assertReject();
     }
@@ -331,7 +243,7 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void isSymbolicLink()
     {
-        when(payload.isSymbolicLink()).thenReturn(true);
+        when(attributes.isSymbolicLink()).thenReturn(true);
         builder.setSymbolicLink(true);
         assertMatch();
     }
@@ -339,7 +251,7 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void rejectNotSymbolicLink()
     {
-        when(payload.isSymbolicLink()).thenReturn(false);
+        when(attributes.isSymbolicLink()).thenReturn(false);
         builder.setSymbolicLink(true);
         assertReject();
     }
@@ -347,18 +259,18 @@ public class FileAttributesPredicateBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void rejectSymbolicLink()
     {
-        when(payload.isSymbolicLink()).thenReturn(true);
+        when(attributes.isSymbolicLink()).thenReturn(true);
         builder.setSymbolicLink(false);
         assertReject();
     }
 
-    private void assertMatch()
+    protected void assertMatch()
     {
-        assertThat(builder.build().test(payload), is(true));
+        assertThat(builder.build().test(attributes), is(true));
     }
 
-    private void assertReject()
+    protected void assertReject()
     {
-        assertThat(builder.build().test(payload), is(false));
+        assertThat(builder.build().test(attributes), is(false));
     }
 }
