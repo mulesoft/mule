@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ftp.internal;
+package org.mule.extension.ftp.api;
 
 import org.mule.module.extension.file.api.AbstractFileAttributes;
 
@@ -20,7 +20,7 @@ import org.apache.commons.net.ftp.FTPFile;
  * @since 4.0
  */
 //TODO: MULE-9232
-public final class FtpFileAttributes extends AbstractFileAttributes
+public class FtpFileAttributes extends AbstractFileAttributes
 {
 
     private final FTPFile ftpFile;
@@ -28,8 +28,8 @@ public final class FtpFileAttributes extends AbstractFileAttributes
     /**
      * Creates a new instance
      *
-     * @param path         the file's {@link Path}
-     * @param ftpFile      the {@link FTPFile} which represents the file on the FTP server
+     * @param path    the file's {@link Path}
+     * @param ftpFile the {@link FTPFile} which represents the file on the FTP server
      */
     public FtpFileAttributes(Path path, FTPFile ftpFile)
     {
@@ -37,31 +37,9 @@ public final class FtpFileAttributes extends AbstractFileAttributes
         this.ftpFile = ftpFile;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LocalDateTime getLastModifiedTime()
+    public LocalDateTime getTimestamp()
     {
         return asDateTime(ftpFile.getTimestamp().toInstant());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LocalDateTime getLastAccessTime()
-    {
-        return getLastModifiedTime();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LocalDateTime getCreationTime()
-    {
-        return getLastModifiedTime();
     }
 
     /**

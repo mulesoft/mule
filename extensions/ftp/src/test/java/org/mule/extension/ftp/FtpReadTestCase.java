@@ -13,8 +13,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.transformer.types.MimeTypes.JSON;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.module.extension.file.api.stream.AbstractFileInputStream;
-import org.mule.module.extension.file.api.FileAttributes;
 
 import java.io.InputStream;
 import java.nio.file.Paths;
@@ -95,13 +95,13 @@ public class FtpReadTestCase extends FtpConnectorTestCase
     @Test
     public void getProperties() throws Exception
     {
-        FileAttributes fileAttributes = (FileAttributes) readHelloWorld().getMessage().getAttributes();
+        FtpFileAttributes fileAttributes = (FtpFileAttributes) readHelloWorld().getMessage().getAttributes();
         FTPFile file = ftpClient.get(HELLO_PATH);
 
         assertThat(fileAttributes.getName(), equalTo(file.getName()));
         assertThat(fileAttributes.getPath(), equalTo(Paths.get("/", BASE_DIR, HELLO_PATH).toString()));
         assertThat(fileAttributes.getSize(), is(file.getSize()));
-        assertTime(fileAttributes.getLastModifiedTime(), file.getTimestamp());
+        assertTime(fileAttributes.getTimestamp(), file.getTimestamp());
         assertThat(fileAttributes.isDirectory(), is(false));
         assertThat(fileAttributes.isSymbolicLink(), is(false));
         assertThat(fileAttributes.isRegularFile(), is(true));

@@ -24,7 +24,7 @@ import java.time.ZoneId;
  *
  * @since 4.0
  */
-public final class LocalFileAttributes extends AbstractFileAttributes
+public class LocalFileAttributes extends AbstractFileAttributes
 {
 
     private BasicFileAttributes attributes = null;
@@ -38,27 +38,24 @@ public final class LocalFileAttributes extends AbstractFileAttributes
     }
 
     /**
-     * {@inheritDoc}
+     * @return The last time the file was modified
      */
-    @Override
     public LocalDateTime getLastModifiedTime()
     {
         return asDateTime(getAttributes().lastModifiedTime());
     }
 
     /**
-     * {@inheritDoc}
+     * @return The last time the file was accessed
      */
-    @Override
     public LocalDateTime getLastAccessTime()
     {
         return asDateTime(getAttributes().lastAccessTime());
     }
 
     /**
-     * {@inheritDoc}
+     * @return the time at which the file was created
      */
-    @Override
     public LocalDateTime getCreationTime()
     {
         return asDateTime(getAttributes().creationTime());
