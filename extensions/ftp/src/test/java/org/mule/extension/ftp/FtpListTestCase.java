@@ -109,6 +109,15 @@ public class FtpListTestCase extends FtpConnectorTestCase
         assertThat(file.getName(), equalTo(SUB_DIRECTORY_NAME));
     }
 
+    @Test
+    public void listWithoutPath() throws Exception
+    {
+        TreeNode node = (TreeNode) flowRunner("listWithoutPath").run().getMessage().getPayload();
+
+        assertThat(node.getAttributes().getPath(), is(equalTo(Paths.get("/", BASE_DIR).toAbsolutePath().toString())));
+        assertThat(node.getChilds(), hasSize(6));
+    }
+
     private boolean assertListedFiles(List<TreeNode> nodes) throws Exception
     {
         boolean directoryWasFound = false;

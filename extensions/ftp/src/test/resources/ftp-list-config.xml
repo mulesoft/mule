@@ -27,4 +27,8 @@
         <ftp:list directoryPath="#[path]" recursive="#[recursive]" matcher="globalMatcher"/>
     </flow>
 
+    <flow name="listWithoutPath">
+        <ftp:list />
+    </flow>
+
 </mule>

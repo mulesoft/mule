@@ -117,6 +117,15 @@ public class FileListTestCase extends FileConnectorTestCase
         assertThat(file.getName(), equalTo(SUB_DIRECTORY_NAME));
     }
 
+    @Test
+    public void listWithoutPath() throws Exception
+    {
+        TreeNode node = (TreeNode) flowRunner("listWithoutPath").run().getMessage().getPayload();
+
+        assertThat(node.getAttributes().getPath(), is(equalTo(temporaryFolder.getRoot().getAbsolutePath())));
+        assertThat(node.getChilds(), hasSize(6));
+    }
+
     private boolean assertListedFiles(List<TreeNode> nodes) throws Exception
     {
         boolean directoryWasFound = false;
