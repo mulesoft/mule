@@ -6,7 +6,6 @@
  */
 package org.mule.routing;
 
-import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -62,8 +61,7 @@ public class Resequencer extends AbstractAggregator
     @Override
     protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
     {
-        return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext, persistentStores,
-            storePrefix);
+        return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext, storePrefix);
     }
 
     @Override

@@ -29,11 +29,10 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
     protected Comparator<MuleEvent> eventComparator;
 
     public ResequenceCorrelatorCallback(Comparator<MuleEvent> eventComparator,
-                                        MuleContext muleContext,
-                                        boolean persistentStores,
-                                        String storePrefix)
+            MuleContext muleContext,
+            String storePrefix)
     {
-        super(muleContext, persistentStores, storePrefix);
+        super(muleContext, storePrefix);
         this.eventComparator = eventComparator;
         this.muleContext = muleContext;
     }

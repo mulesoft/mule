@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
@@ -135,8 +136,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         @Override
         protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
         {
-            return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext, false,
-                storePrefix)
+            return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext, storePrefix)
             {
                 @Override
                 public boolean shouldAggregateEvents(EventGroup events)
@@ -156,6 +156,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
     public static class EventPayloadComparator implements Comparator
     {
 
+        @Override
         public int compare(Object o1, Object o2)
         {
             try

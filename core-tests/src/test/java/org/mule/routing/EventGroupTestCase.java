@@ -6,11 +6,21 @@
  */
 package org.mule.routing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
+import org.mule.api.registry.RegistrationException;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.PartitionableObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.UUID;
+import org.mule.util.store.DefaultObjectStoreFactoryBean;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,20 +28,25 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class EventGroupTestCase extends AbstractMuleContextTestCase
 {
+
+    private PartitionableObjectStore<MuleEvent> objectStore;
+
+    @Before
+    public void before() throws RegistrationException
+    {
+        objectStore = (PartitionableObjectStore) muleContext.getRegistry().lookupObject(DefaultObjectStoreFactoryBean.class).createDefaultInMemoryObjectStore();
+    }
+
     @Test
     public void concurrentIteration() throws Exception
     {
         EventGroup eg = new EventGroup(UUID.getUUID(),muleContext);
+        eg.initEventsStore(objectStore);
         assertFalse(eg.iterator().hasNext());
 
         // add to events to start with
@@ -52,11 +67,14 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void eventGroupEquality()
+    public void eventGroupEquality() throws ObjectStoreException
     {
         EventGroup g1 = new EventGroup("foo",muleContext);
+        g1.initEventsStore(objectStore);
         EventGroup g2 = new EventGroup("foo",muleContext);
+        g2.initEventsStore(objectStore);
         EventGroup g3 = new EventGroup("bar",muleContext);
+        g3.initEventsStore(objectStore);
 
         assertEquals(g1, g2);
         assertFalse(g1.equals(g3));
@@ -71,12 +89,15 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void eventGroupHashCode()
+    public void eventGroupHashCode() throws ObjectStoreException
     {
         String uuid = UUID.getUUID();
         EventGroup g1 = new EventGroup(uuid,muleContext);
+        g1.initEventsStore(objectStore);
         EventGroup g2 = new EventGroup(uuid,muleContext);
+        g2.initEventsStore(objectStore);
         EventGroup g3 = new EventGroup(UUID.getUUID(),muleContext);
+        g3.initEventsStore(objectStore);
 
         assertEquals(g1.hashCode(), g2.hashCode());
         assertEquals(g1, g2);
@@ -109,12 +130,15 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void eventGroupComparison() throws InterruptedException
+    public void eventGroupComparison() throws InterruptedException, ObjectStoreException
     {
         String uuid = UUID.getUUID();
         EventGroup g1 = new EventGroup(uuid,muleContext);
+        g1.initEventsStore(objectStore);
         EventGroup g2 = new EventGroup(uuid,muleContext);
+        g2.initEventsStore(objectStore);
         EventGroup g3 = new EventGroup(UUID.getUUID(),muleContext);
+        g3.initEventsStore(objectStore);
 
         // test comparison against null
         try
@@ -153,6 +177,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
     public void eventGroupConversionToArray() throws Exception
     {
         EventGroup eg = new EventGroup(UUID.getUUID(),muleContext);
+        eg.initEventsStore(objectStore);
         eg.addEvent(getTestEvent("foo1"));
         eg.addEvent(getTestEvent("foo2"));
 
@@ -165,6 +190,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
     public void eventGroupConversionToString() throws Exception
     {
         EventGroup eg = new EventGroup(UUID.getUUID(), muleContext);
+        eg.initEventsStore(objectStore);
         String es = eg.toString();
         assertTrue(es.endsWith("events=0}"));
 
@@ -189,6 +215,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
     public void mergedSessions() throws Exception
     {
         EventGroup eg = new EventGroup(UUID.getUUID(),muleContext);
+        eg.initEventsStore(objectStore);
         assertFalse(eg.iterator().hasNext());
 
         MuleEvent event1 = getTestEvent("foo1"); 
@@ -226,7 +253,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
 
         public MyEventGroup(Object groupId, int expectedSize)
         {
-            super(groupId,muleContext, expectedSize,false,"EventGroupTestCase");
+            super(groupId, muleContext, expectedSize, "EventGroupTestCase");
         }
     }
 }

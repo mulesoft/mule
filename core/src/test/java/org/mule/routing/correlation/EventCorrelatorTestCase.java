@@ -12,6 +12,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mule.DefaultMessageCollection;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -32,7 +33,6 @@ import org.mule.tck.probe.Prober;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.store.PartitionedInMemoryObjectStore;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
@@ -68,7 +68,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private ListableObjectStore mockProcessedGroups;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MuleMessage mockMessageCollection;
+    private DefaultMessageCollection mockMessageCollection;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleEvent mockMuleEvent;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -101,7 +101,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     @Test
     public void initAfterDeserializationAfterProcess() throws Exception
     {
-        when(mockMessagingInfoMapping.getCorrelationId(isA(MuleEvent.class))).thenReturn(TEST_GROUP_ID);
+        when(mockMessagingInfoMapping.getCorrelationId(isA(MuleMessage.class))).thenReturn(TEST_GROUP_ID);
         when(mockEventCorrelatorCallback.shouldAggregateEvents(mockEventGroup)).thenReturn(false);
         EventCorrelator eventCorrelator = createEventCorrelator();
         eventCorrelator.process(mockMuleEvent);
@@ -109,7 +109,6 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    @Ignore("MULE-7311")
     public void processesExpiredGroupInPrimaryNode() throws Exception
     {
         doExpiredGroupMonitoringTest(true);

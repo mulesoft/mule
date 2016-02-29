@@ -7,9 +7,9 @@
 package org.mule.processor;
 
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.exception.MessageRedeliveredException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -24,6 +24,7 @@ import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.util.lock.LockFactory;
 import org.mule.util.store.ObjectStorePartition;
+import org.mule.util.store.ProvidedObjectStoreWrapper;
 
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -31,6 +32,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
+import org.apache.commons.collections.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,18 +104,26 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         String flowName = flowConstruct.getName();
         idrId = String.format("%s-%s-%s",appName,flowName,"idr");
         lockFactory = muleContext.getLockFactory();
-        store = createStore();
+        if (store == null)
+        {
+            store = new ProvidedObjectStoreWrapper<>(null, internalObjectStoreFactory());
+        }
         initialiseIfNeeded(objectToByteArray, muleContext);
         initialiseIfNeeded(byteArrayToHexString, muleContext);
     }
 
-    private ObjectStore<AtomicInteger> createStore() throws InitialisationException
+    protected Factory internalObjectStoreFactory()
     {
-        ObjectStoreManager objectStoreManager = (ObjectStoreManager) muleContext.getRegistry().get(
-                                MuleProperties.OBJECT_STORE_MANAGER);
-        return objectStoreManager.getObjectStore(flowConstruct.getName() + "." + getClass().getName(), false, -1,  60 * 5 * 1000, 6000 );
+        return new Factory()
+        {
+            @Override
+            public Object create()
+            {
+                ObjectStoreManager objectStoreManager = muleContext.getObjectStoreManager();
+                return objectStoreManager.getObjectStore(flowConstruct.getName() + "." + getClass().getName(), false, -1, 60 * 5 * 1000, 6000);
+            }
+        };
     }
-
 
     @Override
     public void dispose()
@@ -320,6 +330,11 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
         this.idExpression = idExpression;
     }
     
+    public void setObjectStore(ObjectStore<AtomicInteger> store)
+    {
+        this.store = new ProvidedObjectStoreWrapper<>(store, internalObjectStoreFactory());
+    }
+
     public void setMessageProcessor(MessageProcessor processor)
     {
         this.deadLetterQueue = processor;

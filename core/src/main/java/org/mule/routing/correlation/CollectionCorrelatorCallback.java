@@ -30,13 +30,11 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
     protected transient final Log logger = LogFactory.getLog(getClass());
 
     protected MuleContext muleContext;
-    private final boolean persistantStores;
     private final String storePrefix;
 
-    public CollectionCorrelatorCallback(MuleContext muleContext, boolean persistantStores, String storePrefix)
+    public CollectionCorrelatorCallback(MuleContext muleContext, String storePrefix)
     {
         this.muleContext = muleContext;
-        this.persistantStores = persistantStores;
         this.storePrefix = storePrefix;
     }
 
@@ -49,6 +47,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
      * @throws org.mule.routing.AggregationException if the aggregation fails. in this scenario the whole
      *             event group is removed and passed to the exception handler for this componenet
      */
+    @Override
     public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
     {
         return events.getMessageCollectionEvent();
@@ -71,10 +70,10 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
      * Creates a new EventGroup that will expect the number of events as returned by
      * {@link MuleMessage#getCorrelationGroupSize()}.
      */
+    @Override
     public EventGroup createEventGroup(MuleEvent event, Object groupId)
     {
-        return new EventGroup(groupId, muleContext, event.getMessage().getCorrelationGroupSize(),
-            persistantStores, storePrefix);
+        return new EventGroup(groupId, muleContext, event.getMessage().getCorrelationGroupSize(), storePrefix);
     }
 
     /**
@@ -82,6 +81,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
      *         group.
      * @see org.mule.routing.correlation.EventCorrelatorCallback#shouldAggregateEvents(org.mule.routing.EventGroup)
      */
+    @Override
     public boolean shouldAggregateEvents(EventGroup events)
     {
         int size = events.expectedSize();

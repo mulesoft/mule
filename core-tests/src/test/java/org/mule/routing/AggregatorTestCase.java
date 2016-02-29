@@ -9,6 +9,7 @@ package org.mule.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
@@ -81,6 +82,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
         {
             return new EventCorrelatorCallback()
             {
+                @Override
                 public boolean shouldAggregateEvents(EventGroup events)
                 {
                     eventCount++;
@@ -92,11 +94,13 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
                     return false;
                 }
 
+                @Override
                 public EventGroup createEventGroup(MuleEvent event, Object groupId)
                 {
-                    return new EventGroup(groupId,muleContext, eventThreshold,false,this.getClass().getName());
+                    return new EventGroup(groupId, muleContext, eventThreshold, storePrefix);
                 }
 
+                @Override
                 public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
                 {
                     if (events.size() != eventThreshold)

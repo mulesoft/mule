@@ -105,7 +105,7 @@ public class AggregationTestCase extends FunctionalTestCase
     {
         public MyCollectionCorrelatorCallback(MuleContext muleContext, boolean persistentStores, String storePrefix)
         {
-            super(muleContext, persistentStores, storePrefix);
+            super(muleContext, storePrefix);
         }
 
         @Override

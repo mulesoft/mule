@@ -38,7 +38,7 @@ public class MessageChunkAggregator extends AbstractAggregator
     @Override
     protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
     {
-        return new CollectionCorrelatorCallback(muleContext, persistentStores, storePrefix)
+        return new CollectionCorrelatorCallback(muleContext, storePrefix)
         {
             /**
              * This method is invoked if the shouldAggregate method is called and
