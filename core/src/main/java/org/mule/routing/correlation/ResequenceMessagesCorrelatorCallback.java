@@ -31,11 +31,10 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
     protected MuleContext muleContext;
 
     public ResequenceMessagesCorrelatorCallback(Comparator eventComparator,
-                                                MuleContext muleContext,
-                                                boolean persistantStore,
-                                                String storePrefix)
+            MuleContext muleContext,
+            String storePrefix)
     {
-        super(muleContext, persistantStore, storePrefix);
+        super(muleContext, storePrefix);
         this.eventComparator = eventComparator;
         this.muleContext = muleContext;
     }

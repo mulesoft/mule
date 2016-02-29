@@ -6,6 +6,8 @@
  */
 package org.mule.security.oauth;
 
+import org.mule.api.store.ObjectStore;
+
 public interface RefreshTokenManager
 {
 
@@ -28,5 +30,16 @@ public interface RefreshTokenManager
      * @param minRefreshIntervalInMillis a number of milliseconds
      */
     public void setMinRefreshIntervalInMillis(int minRefreshIntervalInMillis);
+
+    /**
+     * Sets the {@link ObjectStore} to use for the tokens refresh state.
+     * <p/>
+     * This can only be set during initialization. If this is set, the value given to
+     * {@link #setMinRefreshIntervalInMillis(int)} will be ignored.
+     * 
+     * @param refreshedTokens
+     * @throws IllegalStateException if called after initialization.
+     */
+    void setRefreshedTokensStore(ObjectStore<Boolean> refreshedTokens) throws IllegalStateException;
 
 }

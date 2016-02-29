@@ -37,9 +37,13 @@
         <test:component/>
     </flow>
 
+    <spring:beans>
+        <spring:bean id="custom" class="org.mule.test.config.RedeliveryPolicyNamespaceHandlerTestCase.CustomObjectStore"/>
+    </spring:beans>
+
     <flow name="customObjectStore">
         <inbound-endpoint address="test://foo">
-            <idempotent-redelivery-policy>
+            <idempotent-redelivery-policy object-store-ref="custom">
                 <dead-letter-queue>
                     <outbound-endpoint address="test://dead-letter-queue"/>
                 </dead-letter-queue>

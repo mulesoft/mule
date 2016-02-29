@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <spring:beans>
+        <spring:bean id="processed-groups-object-store" class="org.mule.util.store.SimpleMemoryObjectStore"/>
+        <spring:bean id="event-groups-object-store" class="org.mule.test.routing.CollectionAggregatorRouterCustomStoreTestCase.CustomPartitionableObjectStore"/>
+    </spring:beans>
+
+    <flow name="splitter">
+        <collection-splitter/>
+        <test:component/>
+        <collection-aggregator timeout="2000" failOnTimeout="false"
+            processed-groups-object-store-ref="processed-groups-object-store"
+            event-groups-object-store-ref="event-groups-object-store"/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
+    </flow>
+
+</mule>

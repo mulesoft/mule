@@ -31,7 +31,7 @@ public abstract class AbstractCorrelationAggregator extends AbstractAggregator
     {
         public DelegateCorrelatorCallback(MuleContext muleContext)
         {
-            super(muleContext, persistentStores, storePrefix);
+            super(muleContext, storePrefix);
         }
 
         @Override

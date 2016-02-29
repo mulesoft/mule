@@ -7,13 +7,11 @@
 package org.mule.routing.correlation;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.isA;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.DefaultMessageCollection;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -26,13 +24,14 @@ import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreManager;
+import org.mule.api.store.PartitionableObjectStore;
 import org.mule.routing.EventGroup;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.store.SimpleMemoryObjectStore;
+import org.mule.util.store.PartitionedInMemoryObjectStore;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -67,8 +66,6 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private EventGroup mockEventGroup;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private ListableObjectStore mockExpireGroupsObjectStore;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private ListableObjectStore mockProcessedGroups;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private DefaultMessageCollection mockMessageCollection;
@@ -77,7 +74,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private FlowConstruct mockFlowConstruct;
 
-    private ListableObjectStore<EventGroup> memoryObjectStore = new SimpleMemoryObjectStore<EventGroup>();
+    private PartitionableObjectStore memoryObjectStore = new PartitionedInMemoryObjectStore();
 
     @Test(expected = CorrelationTimeoutException.class)
     public void initAfterDeserializationAfterForceGroupExpiry() throws Exception
@@ -105,22 +102,10 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     public void initAfterDeserializationAfterProcess() throws Exception
     {
         when(mockMessagingInfoMapping.getCorrelationId(isA(MuleMessage.class))).thenReturn(TEST_GROUP_ID);
-        when(mockProcessedGroups.contains(TEST_GROUP_ID)).thenReturn(false);
         when(mockEventCorrelatorCallback.shouldAggregateEvents(mockEventGroup)).thenReturn(false);
         EventCorrelator eventCorrelator = createEventCorrelator();
         eventCorrelator.process(mockMuleEvent);
         verify(mockEventGroup, times(1)).initAfterDeserialisation(mockMuleContext);
-    }
-
-    @Test
-    public void disposeObjectStoresIfDisposable() throws Exception
-    {
-        mockExpireGroupsObjectStore = mock(DisposableListableObjectStore.class, RETURNS_DEEP_STUBS);
-        mockProcessedGroups = mock(DisposableListableObjectStore.class, RETURNS_DEEP_STUBS);
-        EventCorrelator eventCorrelator = createEventCorrelator();
-        eventCorrelator.dispose();
-        verify((Disposable) mockExpireGroupsObjectStore, times(1)).dispose();
-        verify((Disposable) mockProcessedGroups, times(1)).dispose();
     }
 
     @Test
@@ -157,11 +142,12 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         {
             Prober prober = new PollingProber(1000, 50);
             prober.check(new Probe() {
+                @Override
                 public boolean isSatisfied()
                 {
                     try
                     {
-                        return !memoryObjectStore.contains(TEST_GROUP_ID);
+                        return !memoryObjectStore.contains(TEST_GROUP_ID, "prefix.eventGroups");
                     }
                     catch (ObjectStoreException e)
                     {
@@ -170,6 +156,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
                     }
                 }
 
+                @Override
                 public String describeFailure()
                 {
                     return "Event group not expired.";
@@ -195,14 +182,12 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     private EventCorrelator createEventCorrelator() throws Exception
     {
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
-        when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".expiredAndDispatchedGroups", USE_PERSISTENT_STORE)).thenReturn(mockExpireGroupsObjectStore);
-        when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".processedGroups", USE_PERSISTENT_STORE, EventCorrelator.MAX_PROCESSED_GROUPS, -1, 1000)).thenReturn(mockProcessedGroups);
-        doReturn(memoryObjectStore).when(mockObjectStoreManager).getObjectStore(OBJECT_STOR_NAME_PREFIX + ".eventGroups", USE_PERSISTENT_STORE);
-        memoryObjectStore.store(TEST_GROUP_ID, mockEventGroup);
+        memoryObjectStore.store(TEST_GROUP_ID, mockEventGroup, "prefix.eventGroups");
         when(mockEventGroup.getGroupId()).thenReturn(TEST_GROUP_ID);
         when(mockEventGroup.toMessageCollection()).thenReturn(null);
         when(mockFlowConstruct.getName()).thenReturn("flowName");
-        return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, mockFlowConstruct, USE_PERSISTENT_STORE, OBJECT_STOR_NAME_PREFIX);
+        return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, mockFlowConstruct, memoryObjectStore,
+                "prefix", mockProcessedGroups);
     }
 
     public interface DisposableListableObjectStore extends ListableObjectStore, Disposable
