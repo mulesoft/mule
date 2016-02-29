@@ -611,15 +611,21 @@ public final class SchemaBuilder
             @Override
             public void onPojo()
             {
-                entryComplexType.getAttributeOrAttributeGroup().add(createAttribute(ATTRIBUTE_NAME_VALUE, valueType, false, SUPPORTED));
-                ExplicitGroup singleItemSequence = new ExplicitGroup();
-                singleItemSequence.setMaxOccurs("1");
+                final boolean shouldGenerateChildElement = shouldGeneratePojoChildElements(valueType.getRawType());
 
-                LocalComplexType itemComplexType = newLocalComplexTypeWithBase(valueType, description);
-                TopLevelElement itemElement = createTopLevelElement(NameUtils.getTopLevelTypeName(valueType), ZERO, "1", itemComplexType);
-                singleItemSequence.getParticle().add(objectFactory.createElement(itemElement));
+                entryComplexType.getAttributeOrAttributeGroup().add(createAttribute(ATTRIBUTE_NAME_VALUE, valueType, !shouldGenerateChildElement, SUPPORTED));
 
-                entryComplexType.setSequence(singleItemSequence);
+                if (shouldGenerateChildElement)
+                {
+                    ExplicitGroup singleItemSequence = new ExplicitGroup();
+                    singleItemSequence.setMaxOccurs("1");
+
+                    LocalComplexType itemComplexType = newLocalComplexTypeWithBase(valueType, description);
+                    TopLevelElement itemElement = createTopLevelElement(NameUtils.getTopLevelTypeName(valueType), ZERO, "1", itemComplexType);
+                    singleItemSequence.getParticle().add(objectFactory.createElement(itemElement));
+
+                    entryComplexType.setSequence(singleItemSequence);
+                }
             }
 
             @Override
