@@ -34,16 +34,12 @@ abstract class LocalFileCommand extends FileCommand<FileConnector, LocalFileSyst
     }
 
     /**
-     * Returns a {@link Path} which composes the {@link FileConnector#getBaseDir()}
-     * with the given {@code filePath}
-     *
-     * @param filePath the path to a file or directory
-     * @return an absolute {@link Path}
+     * @return a {@link Path} derived from {@link FileConnector#getBaseDir()}
      */
     @Override
-    protected Path resolvePath(String filePath)
+    protected Path getBasePath()
     {
-        return Paths.get(config.getBaseDir()).resolve(filePath).toAbsolutePath();
+        return Paths.get(config.getBaseDir());
     }
 
     /**

@@ -45,14 +45,11 @@ abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
     }
 
     /**
-     * Returns a {@link Path} which composes the {@link #client}
-     * current working directory with the given {@code filePath}
-     *
-     * @param filePath the filePath to a file or directory
-     * @return an absolute {@link Path}
+     * {@inheritDoc}
+     * @return A {@link Path} derived from the the {@link #client}'s current working directory
      */
     @Override
-    protected Path resolvePath(String filePath)
+    protected Path getBasePath()
     {
         String cwd;
         try
@@ -64,7 +61,7 @@ abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
             throw exception("Failed to determine current working directory");
         }
 
-        return Paths.get(cwd).resolve(filePath);
+        return Paths.get(cwd);
     }
 
     /**

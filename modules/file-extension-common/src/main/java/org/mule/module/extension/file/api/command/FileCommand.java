@@ -9,6 +9,7 @@ package org.mule.module.extension.file.api.command;
 import static java.lang.String.format;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.module.extension.file.api.FileConnectorConfig;
 import org.mule.module.extension.file.api.FileSystem;
 
@@ -56,7 +57,23 @@ public abstract class FileCommand<C extends FileConnectorConfig, F extends FileS
      * @param filePath the path to a file or directory
      * @return an absolute {@link Path}
      */
-    protected abstract Path resolvePath(String filePath);
+    protected Path resolvePath(String filePath)
+    {
+        Path path = getBasePath();
+        if (filePath != null)
+        {
+            path = path.resolve(filePath);
+        }
+
+        return path.toAbsolutePath();
+    }
+
+    /**
+     * Returns a {@link Path} to which all non absolute paths are relative to
+     *
+     * @return a not {@code null} {@link Path}
+     */
+    protected abstract Path getBasePath();
 
     /**
      * Similar to {@link #resolvePath(String)} only that it throws a
@@ -106,7 +123,7 @@ public abstract class FileCommand<C extends FileConnectorConfig, F extends FileS
 
     /**
      * Returns an {@link IllegalArgumentException} explaining that
-     * a {@link FileSystem#read(String, boolean, ContentMetadata)} operation
+     * a {@link FileSystem#read(MuleMessage, String, boolean)} operation
      * was attempted on a {@code path} pointing to a directory
      *
      * @param path the {@link Path} on which a read was attempted
@@ -119,8 +136,8 @@ public abstract class FileCommand<C extends FileConnectorConfig, F extends FileS
 
     /**
      * Returns a {@link IllegalArgumentException} explaining that
-     * a {@link FileSystem#list(String, boolean, Predicate)} operation
-     * was attempted on a {@code path} pointing to a file.
+     * a {@link FileSystem#list(String, boolean, MuleMessage, Predicate)}
+     * operation was attempted on a {@code path} pointing to a file.
      *
      * @param path the {@link Path} on which a list was attempted
      * @return {@link RuntimeException}
@@ -132,7 +149,7 @@ public abstract class FileCommand<C extends FileConnectorConfig, F extends FileS
 
     /**
      * Returns a {@link IllegalArgumentException} explaining that
-     * a {@link FileSystem#list(String, boolean, Predicate)} operation
+     * a {@link FileSystem#list(String, boolean, MuleMessage, Predicate)} operation
      * was attempted on a {@code path} pointing to a file.
      *
      * @param path the {@link Path} on which a list was attempted
