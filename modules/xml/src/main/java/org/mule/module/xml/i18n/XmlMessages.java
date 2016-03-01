@@ -69,4 +69,10 @@ public class XmlMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 11, paramType);
     }
+
+    public static Message contextPropertyValueIsNull(String propertyKey)
+    {
+        return factory.createMessage(BUNDLE_PATH, 12, propertyKey);
+    }
+
 }
