@@ -936,7 +936,7 @@ public class CoreMessages extends MessageFactory
 
     /**
      * Returns a message that is a product informatin.
-     * 
+     *
      * @return message
      */
     public static Message productInformation()
@@ -1436,10 +1436,5 @@ public class CoreMessages extends MessageFactory
     public static Message nullWatermark()
     {
         return factory.createMessage(BUNDLE_PATH, 350);
-    }
-
-    public static Message contextPropertyValueIsNull(String propertyKey)
-    {
-        return factory.createMessage(BUNDLE_PATH, 352, propertyKey);
     }
 }
