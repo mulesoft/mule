@@ -9,7 +9,7 @@
     </parent>
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-file-extension-common</artifactId>
-    <name>Mule Extensions Support</name>
+    <name>Mule File Extension Common</name>
     <packaging>jar</packaging>
     <description>
         Reusable components for extensions built using Mule's SDK which operate over file systems (e.g: file, ftp, sftp, etc)
