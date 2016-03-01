@@ -15,6 +15,12 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSo
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
+import org.mule.extension.api.introspection.ImmutableConfigurationModel;
+import org.mule.extension.api.introspection.ImmutableConnectionProviderModel;
+import org.mule.extension.api.introspection.ImmutableExtensionModel;
+import org.mule.extension.api.introspection.ImmutableOperationModel;
+import org.mule.extension.api.introspection.ImmutableParameterModel;
+import org.mule.extension.api.introspection.ImmutableSourceModel;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionFactory;
@@ -260,7 +266,6 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                 throw new IllegalParameterModelDefinitionException(String.format("Parameter '%s' requires expressions yet it contains a constant as a default value. Please fix this", parameter.getName()));
             }
         }
-
         return new ImmutableParameterModel(parameter.getName(),
                                            parameter.getDescription(),
                                            parameter.getType(),

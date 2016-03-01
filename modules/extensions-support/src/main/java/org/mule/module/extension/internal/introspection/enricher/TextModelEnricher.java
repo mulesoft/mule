@@ -7,9 +7,10 @@
 package org.mule.module.extension.internal.introspection.enricher;
 
 import org.mule.extension.annotation.api.param.display.Text;
+import org.mule.extension.api.introspection.property.ImmutableTextModelProperty;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.property.TextModelProperty;
-import org.mule.module.extension.internal.introspection.ImmutableTextModelProperty;
+
 
 import java.lang.annotation.Annotation;
 

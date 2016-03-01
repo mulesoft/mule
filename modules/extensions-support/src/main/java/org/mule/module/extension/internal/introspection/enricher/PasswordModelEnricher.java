@@ -7,9 +7,9 @@
 package org.mule.module.extension.internal.introspection.enricher;
 
 import org.mule.extension.annotation.api.param.display.Password;
+import org.mule.extension.api.introspection.property.ImmutablePasswordModelProperty;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.property.PasswordModelProperty;
-import org.mule.module.extension.internal.introspection.ImmutablePasswordModelProperty;
 
 import java.lang.annotation.Annotation;
 
