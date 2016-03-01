@@ -8,6 +8,7 @@ package org.mule.config.spring;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -29,6 +30,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanFactoryUtils;
@@ -58,6 +62,11 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     //This is used to track the Spring context lifecycle since there is no way to confirm the
     //lifecycle phase from the application context
     protected AtomicBoolean springContextInitialised = new AtomicBoolean(false);
+
+    // This is to avoid a race condition when looking beans up by type. For other cases, Spring behaves correctly.
+    private final ReadWriteLock registryLock = new ReentrantReadWriteLock();
+    private final Lock readLock = registryLock.readLock();
+    private final Lock writeLock = registryLock.writeLock();
 
     public SpringRegistry(ApplicationContext applicationContext, MuleContext muleContext)
     {
@@ -326,7 +335,15 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     {
         try
         {
-            return BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, type, nonSingletons, eagerInit);
+            try
+            {
+                readLock.lock();
+                return BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, type, nonSingletons, eagerInit);
+            }
+            finally
+            {
+                readLock.unlock();
+            }
         }
         catch (FatalBeanException fbex)
         {
@@ -345,7 +362,15 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     {
         try
         {
-            return applicationContext.getBeansOfType(type, nonSingletons, eagerInit);
+            try
+            {
+                readLock.lock();
+                return applicationContext.getBeansOfType(type, nonSingletons, eagerInit);
+            }
+            finally
+            {
+                readLock.unlock();
+            }
         }
         catch (FatalBeanException fbex)
         {
@@ -432,7 +457,16 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
 
             if (applicationContext.getBeanFactory().containsBeanDefinition(key))
             {
-                ((BeanDefinitionRegistry) applicationContext.getBeanFactory()).removeBeanDefinition(key);
+                boolean wasRWLockUpgraded = false;
+                try
+                {
+                    wasRWLockUpgraded = upgradeLock();
+                    ((BeanDefinitionRegistry) applicationContext.getBeanFactory()).removeBeanDefinition(key);
+                }
+                finally
+                {
+                    downgradeLock(wasRWLockUpgraded);
+                }
             }
 
             ((DefaultListableBeanFactory) applicationContext.getBeanFactory()).destroySingleton(key);
@@ -455,7 +489,17 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
             {
                 value = initialiseObject(applicationContext, key, value);
                 applyLifecycle(value);
-                applicationContext.getBeanFactory().registerSingleton(key, value);
+
+                boolean wasRWLockUpgraded = false;
+                try
+                {
+                    wasRWLockUpgraded = upgradeLock();
+                    applicationContext.getBeanFactory().registerSingleton(key, value);
+                }
+                finally
+                {
+                    downgradeLock(wasRWLockUpgraded);
+                }
             }
             catch (Exception e)
             {
@@ -467,6 +511,34 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     ////////////////////////////////////////////////////////////////////////////////////
     // Registry meta-data
     ////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @return {@code true} if a readLock was acquired and was upgraded to a writeLock
+     */
+    protected boolean upgradeLock()
+    {
+        boolean wasRWLockUpgraded = false;
+        try
+        {
+            readLock.unlock();
+            wasRWLockUpgraded = true;
+        }
+        catch (IllegalMonitorStateException e)
+        {
+            // Nothing to do, assume there was no lock to upgrade
+        }
+        writeLock.lock();
+        return wasRWLockUpgraded;
+    }
+
+    protected void downgradeLock(boolean wasRWLockUpgraded)
+    {
+        writeLock.unlock();
+        if (wasRWLockUpgraded)
+        {
+            readLock.lock();
+        }
+    }
 
     @Override
     public boolean isReadOnly()
