@@ -35,6 +35,8 @@ import org.mule.extension.annotation.api.param.UseConfig;
 import org.mule.extension.annotation.api.param.display.Password;
 import org.mule.extension.annotation.api.param.display.Text;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.extension.api.introspection.property.ImmutablePasswordModelProperty;
+import org.mule.extension.api.introspection.property.ImmutableTextModelProperty;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
@@ -56,8 +58,6 @@ import org.mule.module.extension.internal.exception.IllegalConfigurationModelDef
 import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
-import org.mule.module.extension.internal.introspection.ImmutablePasswordModelProperty;
-import org.mule.module.extension.internal.introspection.ImmutableTextModelProperty;
 import org.mule.module.extension.internal.introspection.ParameterGroup;
 import org.mule.module.extension.internal.introspection.VersionResolver;
 import org.mule.module.extension.internal.model.property.ConfigTypeModelProperty;

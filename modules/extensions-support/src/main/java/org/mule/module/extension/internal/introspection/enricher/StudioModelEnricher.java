@@ -8,10 +8,10 @@ package org.mule.module.extension.internal.introspection.enricher;
 
 import org.mule.extension.annotation.api.capability.CustomStudioEditor;
 import org.mule.extension.annotation.api.capability.StudioProvidedEditor;
+import org.mule.extension.api.introspection.property.ImmutableStudioModelProperty;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.api.introspection.property.StudioModelProperty;
-import org.mule.module.extension.internal.introspection.ImmutableStudioModelProperty;
 import org.mule.module.extension.internal.model.AbstractAnnotatedModelEnricher;
 
 /**

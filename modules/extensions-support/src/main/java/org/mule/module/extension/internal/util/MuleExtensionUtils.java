@@ -39,14 +39,12 @@ import org.mule.util.collection.ImmutableListCollector;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -59,25 +57,6 @@ public class MuleExtensionUtils
 
     private MuleExtensionUtils()
     {
-    }
-
-    /**
-     * Returns a {@link Map} in which the keys are the {@link Described#getName() names} of the items
-     * in the {@code objects} {@link List}, and the values are the items themselves.
-     *
-     * @param objects a {@link List} with items that implement the {@link Described} interface
-     * @param <T>     the generic type of the items in {@code objects}
-     * @return a {@link Map} in which the keys are the item's names and the values are the items
-     */
-    public static <T extends Described> Map<String, T> toMap(List<T> objects)
-    {
-        ImmutableMap.Builder<String, T> map = ImmutableMap.builder();
-        for (T object : objects)
-        {
-            map.put(object.getName(), object);
-        }
-
-        return map.build();
     }
 
     /**
