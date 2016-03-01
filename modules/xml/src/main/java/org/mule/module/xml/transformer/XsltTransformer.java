@@ -13,6 +13,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.LocalURIResolver;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.ClassUtils;
@@ -240,7 +241,7 @@ public class XsltTransformer extends AbstractXmlTransformer
                     }
                     else
                     {
-                        throw new DefaultMuleException(CoreMessages.contextPropertyValueIsNull(key));
+                        throw new DefaultMuleException(XmlMessages.contextPropertyValueIsNull(key));
                     }
 
                 }
