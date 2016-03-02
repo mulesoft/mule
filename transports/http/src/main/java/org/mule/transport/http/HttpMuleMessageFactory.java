@@ -228,7 +228,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             {
                 putCookieHeaderInMapAsAServer(headersMap, header, uri);
             }
-            else if (HttpConstants.HEADER_COOKIE_SET.equals(header.getName()))
+            else if (HttpConstants.HEADER_COOKIE_SET.equalsIgnoreCase(header.getName()))
             {
                 putCookieHeaderInMapAsAClient(headersMap, header, uri);
             }
