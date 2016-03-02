@@ -6,6 +6,9 @@
  */
 package org.mule.module.extension.internal;
 
+import static org.mule.module.extension.HeisenbergExtension.sourceTimesStarted;
+import static org.mule.module.extension.HeisenbergSource.CORE_POOL_SIZE_ERROR_MESSAGE;
+import static org.mule.module.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import org.mule.construct.Flow;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.module.extension.HeisenbergExtension;
@@ -14,13 +17,18 @@ import org.mule.tck.probe.PollingProber;
 
 import java.math.BigDecimal;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class MessageSourceTestCase extends ExtensionFunctionalTestCase
 {
 
     public static final int TIMEOUT_MILLIS = 5000;
     public static final int POLL_DELAY_MILLIS = 100;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
     protected Class<?>[] getAnnotatedExtensionClasses()
@@ -50,6 +58,21 @@ public class MessageSourceTestCase extends ExtensionFunctionalTestCase
         HeisenbergExtension heisenberg = locateConfig();
 
         new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitLambdaProbe(() -> heisenberg.getMoney().longValue() == -1));
+    }
+
+
+    @Test
+    public void enrichExceptionOnStart() throws Exception
+    {
+        expectedException.expectMessage(ENRICHED_MESSAGE + CORE_POOL_SIZE_ERROR_MESSAGE);
+        startFlow("sourceFailedOnStart");
+    }
+
+    @Test
+    public void reconnectWithEnrichedException() throws Exception
+    {
+        startFlow("sourceFailedOnRuntime");
+        new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitLambdaProbe(() -> sourceTimesStarted > 2));
     }
 
     private HeisenbergExtension locateConfig() throws Exception

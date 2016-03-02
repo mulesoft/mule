@@ -363,7 +363,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(source.getName(), is(SOURCE_NAME));
 
         List<ParameterDeclaration> parameters = source.getParameters();
-        assertThat(parameters, hasSize(1));
+        assertThat(parameters, hasSize(2));
 
         assertParameter(parameters, SOURCE_PARAMETER, "", DataType.of(int.class), true, SUPPORTED, null);
         ImplementingTypeModelProperty typeModelProperty = source.getModelProperty(ImplementingTypeModelProperty.KEY);

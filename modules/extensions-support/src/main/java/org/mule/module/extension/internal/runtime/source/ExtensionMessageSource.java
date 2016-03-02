@@ -12,7 +12,6 @@ import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.util.concurrent.ThreadNameHelper.getPrefix;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -38,12 +37,14 @@ import org.mule.execution.MessageProcessContext;
 import org.mule.execution.MessageProcessingManager;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ExceptionCallback;
 import org.mule.extension.api.runtime.MessageHandler;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.extension.api.runtime.source.SourceContext;
 import org.mule.extension.api.runtime.source.SourceFactory;
+import org.mule.module.extension.internal.runtime.exception.ExceptionEnricherManager;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
 
@@ -58,7 +59,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A {@link MessageSource} which connects the Extensions API with the Mule runtime by
  * connecting a {@link Source} with a flow represented by a {@link #messageProcessor}
- * <p>
+ * <p/>
  * This class implements the {@link Lifecycle} interface and propagates all of its events to
  * the underlying {@link Source}. It will also perform dependency injection on it and will
  * responsible for properly invokin {@link Source#setSourceContext(SourceContext)}
@@ -79,17 +80,24 @@ public class ExtensionMessageSource implements MessageSource,
     private final String configurationProviderName;
     private final ThreadingProfile threadingProfile;
     private final RetryPolicyTemplate retryPolicyTemplate;
+    private final ExceptionEnricherManager exceptionEnricherManager;
 
     private SourceWrapper source;
     private WorkManager workManager;
 
-    public ExtensionMessageSource(ExtensionModel extensionModel, SourceFactory sourceFactory, String configurationProviderName, ThreadingProfile threadingProfile, RetryPolicyTemplate retryPolicyTemplate)
+    public ExtensionMessageSource(ExtensionModel extensionModel,
+                                  SourceModel sourceModel,
+                                  SourceFactory sourceFactory,
+                                  String configurationProviderName,
+                                  ThreadingProfile threadingProfile,
+                                  RetryPolicyTemplate retryPolicyTemplate)
     {
         this.extensionModel = extensionModel;
         this.sourceFactory = sourceFactory;
         this.configurationProviderName = configurationProviderName;
         this.threadingProfile = threadingProfile;
         this.retryPolicyTemplate = retryPolicyTemplate;
+        this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, sourceModel);
     }
 
     private MessageProcessor messageProcessor;
@@ -118,12 +126,11 @@ public class ExtensionMessageSource implements MessageSource,
         messageProcessingManager.processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, new NullCompletionHandler()), createProcessingContext());
     }
 
-    //TODO: MULE-9397 - Add support for @OnException for sources
     @Override
     public void onException(Throwable exception)
     {
+        exception = exceptionEnricherManager.processException(exception);
         Optional<ConnectionException> connectionException = ExceptionUtils.extractRootConnectionException(exception);
-
         if (connectionException.isPresent())
         {
             try
@@ -161,7 +168,6 @@ public class ExtensionMessageSource implements MessageSource,
         }
     }
 
-    //TODO: MULE-9397 - Add support for @OnException for sources
     @Override
     public void start() throws MuleException
     {
@@ -290,14 +296,15 @@ public class ExtensionMessageSource implements MessageSource,
             {
                 stopSource();
                 disposeSource();
-                Optional<ConnectionException> connectionException = ExceptionUtils.extractRootConnectionException(e);
+                Exception exception = exceptionEnricherManager.processException(e);
+                Optional<ConnectionException> connectionException = ExceptionUtils.extractRootConnectionException(exception);
                 if (connectionException.isPresent())
                 {
-                    throw e;
+                    throw exception;
                 }
                 else
                 {
-                    context.setFailed(e);
+                    context.setFailed(exception);
                 }
             }
         }
@@ -382,4 +389,5 @@ public class ExtensionMessageSource implements MessageSource,
         LOGGER.error(String.format("Message source '%s' on flow '%s' threw exception. Shutting down it forever...", source.getName(), flowConstruct.getName()), exception);
         shutdown();
     }
+
 }

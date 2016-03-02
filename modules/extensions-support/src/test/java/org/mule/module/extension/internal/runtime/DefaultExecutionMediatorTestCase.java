@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Matchers.same;
@@ -23,16 +22,15 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.mule.DefaultMuleContext;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.config.DefaultMuleConfiguration;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExceptionEnricher;
+import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.Interceptable;
+import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.OperationContext;
@@ -43,11 +41,9 @@ import org.mule.internal.connection.ConnectionManagerAdapter;
 import org.mule.internal.connection.DefaultConnectionManager;
 import org.mule.module.extension.exception.HeisenbergException;
 import org.mule.module.extension.internal.runtime.config.MutableConfigurationStats;
-import org.mule.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import com.google.common.collect.ImmutableList;
@@ -112,6 +108,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     private ExtensionModel extensionModel;
 
     @Mock
+    private OperationModel operationModel;
+
+    @Mock
     private ConnectionManagerAdapter connectionManagerAdapter;
 
     private ConnectionException connectionException = new ConnectionException("Connection failure");
@@ -130,16 +129,19 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     @Before
     public void before() throws Exception
     {
-        mediator = new DefaultExecutionMediator(new NullExceptionEnricher(), new DefaultConnectionManager(muleContext));
         when(configurationInstance.getStatistics()).thenReturn(configurationStats);
         when(configurationInstance.getName()).thenReturn(DUMMY_NAME);
         when(configurationInstance.getModel()).thenReturn(configurationModel);
         when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
         when(extensionModel.getName()).thenReturn(DUMMY_NAME);
+        when(extensionModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
+        when(operationModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
         when(operationExecutor.execute(operationContext)).thenReturn(result);
         when(operationExceptionExecutor.execute(operationContext)).thenThrow(exception);
         when(operationContext.getConfiguration()).thenReturn(configurationInstance);
         when(operationContext.getConfiguration().getModel().getExtensionModel().getName()).thenReturn(DUMMY_NAME);
+
+        mediator = new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext));
 
         final CachedConnectionProviderWrapper<Object, Object> connectionProviderWrapper = new CachedConnectionProviderWrapper<>(null, false, new SimpleRetryPolicyTemplate(10, RETRY_COUNT));
         LifecycleUtils.initialiseIfNeeded(connectionProviderWrapper, true, muleContext);
@@ -243,7 +245,10 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     {
         expectedException.expect(HeisenbergException.class);
         expectedException.expectMessage(ERROR);
-        new DefaultExecutionMediator(exceptionEnricher, new DefaultConnectionManager(muleContext)).execute(operationExceptionExecutor, operationContext);
+        ExceptionEnricherFactory exceptionEnricherFactory = mock(ExceptionEnricherFactory.class);
+        when(exceptionEnricherFactory.createEnricher()).thenReturn(exceptionEnricher);
+        when(operationModel.getExceptionEnricherFactory()).thenReturn(Optional.of(exceptionEnricherFactory));
+        new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext)).execute(operationExceptionExecutor, operationContext);
     }
 
     public class DummyConnectionInterceptor implements Interceptor

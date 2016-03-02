@@ -7,15 +7,14 @@
 package org.mule.module.extension.internal.runtime;
 
 import static java.lang.String.format;
-
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.extension.api.introspection.ExceptionEnricher;
+import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.Interceptable;
+import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.extension.api.runtime.ConfigurationStats;
 import org.mule.extension.api.runtime.Interceptor;
@@ -25,7 +24,7 @@ import org.mule.extension.api.runtime.RetryRequest;
 import org.mule.internal.connection.ConnectionManagerAdapter;
 import org.mule.internal.connection.ConnectionProviderWrapper;
 import org.mule.module.extension.internal.runtime.config.MutableConfigurationStats;
-import org.mule.util.ExceptionUtils;
+import org.mule.module.extension.internal.runtime.exception.ExceptionEnricherManager;
 import org.mule.util.ValueHolder;
 import org.mule.work.SerialWorkManager;
 
@@ -66,13 +65,13 @@ public final class DefaultExecutionMediator implements ExecutionMediator
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutionMediator.class);
     public static final SerialWorkManager WORK_MANAGER = new SerialWorkManager();
 
-    private final ExceptionEnricher exceptionEnricher;
+    private final ExceptionEnricherManager exceptionEnricherManager;
     private final ConnectionManagerAdapter connectionManager;
 
-    public DefaultExecutionMediator(ExceptionEnricher exceptionEnricher, ConnectionManagerAdapter connectionManager)
+    public DefaultExecutionMediator(ExtensionModel extensionModel, OperationModel operationModel, ConnectionManagerAdapter connectionManager)
     {
         this.connectionManager = connectionManager;
-        this.exceptionEnricher = exceptionEnricher;
+        this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, operationModel);
     }
 
     /**
@@ -147,7 +146,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator
         }
         catch (Throwable e)
         {
-            exception = processException(e);
+            exception = exceptionEnricherManager.processException(e);
             exception = onError(context, retryRequestHolder, exception, interceptors);
         }
         finally
@@ -174,7 +173,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator
         }
         catch (Exception e)
         {
-            return new InterceptorsExecutionResult(handleException(e), interceptorList);
+            return new InterceptorsExecutionResult(exceptionEnricherManager.handleException(e), interceptorList);
         }
         return new InterceptorsExecutionResult(null, interceptorList);
     }
@@ -318,16 +317,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator
                : null;
     }
 
-    private Throwable processException(Throwable e)
-    {
-        Throwable root = handleException(e);
-        if (root instanceof Exception)
-        {
-            Exception exception = exceptionEnricher.enrichException((Exception) root);
-            return exception != null ? exception : e;
-        }
-        return e;
-    }
+
 
     private List<Interceptor> collectInterceptors(Object... interceptableCandidates)
     {
@@ -344,22 +334,5 @@ public final class DefaultExecutionMediator implements ExecutionMediator
         return interceptors.build();
     }
 
-    private Throwable handleException(Throwable e)
-    {
-        Throwable root;
-        Optional<ConnectionException> connectionException = ExceptionUtils.extractRootConnectionException(e);
-        if (connectionException.isPresent())
-        {
-            root = connectionException.get();
-        }
-        else
-        {
-            root = ExceptionUtils.getRootCause(e);
-            if (root == null)
-            {
-                root = e;
-            }
-        }
-        return root;
-    }
+
 }

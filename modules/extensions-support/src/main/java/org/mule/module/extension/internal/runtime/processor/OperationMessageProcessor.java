@@ -12,7 +12,6 @@ import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
-
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -22,8 +21,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.ExceptionEnricher;
-import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
@@ -34,11 +31,8 @@ import org.mule.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.module.extension.internal.runtime.ExecutionMediator;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.util.StringUtils;
-
-import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -134,7 +128,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     {
         returnDelegate = createReturnDelegate();
         operationExecutor = operationModel.getExecutor().createExecutor();
-        executionMediator = new DefaultExecutionMediator(getExceptionEnricher(), connectionManager);
+        executionMediator = new DefaultExecutionMediator(extensionModel, operationModel, connectionManager);
         initialiseIfNeeded(operationExecutor, true, muleContext);
     }
 
@@ -146,16 +140,6 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         }
 
         return StringUtils.isBlank(target) ? new ValueReturnDelegate(muleContext) : new TargetReturnDelegate(target, muleContext);
-    }
-
-    private ExceptionEnricher getExceptionEnricher()
-    {
-        Optional<ExceptionEnricherFactory> exceptionEnricherFactory = operationModel.getExceptionEnricherFactory();
-        if (!exceptionEnricherFactory.isPresent())
-        {
-            exceptionEnricherFactory = extensionModel.getExceptionEnricherFactory();
-        }
-        return exceptionEnricherFactory.isPresent() ? exceptionEnricherFactory.get().createEnricher() : new NullExceptionEnricher();
     }
 
     @Override

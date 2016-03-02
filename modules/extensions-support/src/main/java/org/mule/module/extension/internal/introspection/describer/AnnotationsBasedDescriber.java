@@ -251,6 +251,7 @@ public final class AnnotationsBasedDescriber implements Describer
         source.sourceCreatedBy(new DefaultSourceFactory(sourceType))
                 .whichReturns(DataType.of(sourceGenerics.get(0)))
                 .withAttributesOfType(DataType.of(sourceGenerics.get(1)))
+                .withExceptionEnricherFactory(getExceptionEnricherFactory(sourceType))
                 .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(sourceType));
 
         declareAnnotatedParameters(sourceType, source, source.with());
