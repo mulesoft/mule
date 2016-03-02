@@ -39,6 +39,7 @@ public abstract class AbstractDbProcessorDefinitionParser extends AbstractHierar
         doParseElement(element, context, builder);
 
         BeanAssembler assembler = getBeanAssembler(element, builder);
+        processMetadataAnnotations(element, context, builder);
         assembler.insertBeanInTarget("messageProcessor");
     }
 
