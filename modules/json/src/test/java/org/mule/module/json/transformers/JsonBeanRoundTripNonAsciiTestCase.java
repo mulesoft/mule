@@ -16,6 +16,9 @@ import org.mule.tck.testmodels.fruit.Orange;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
+import org.junit.Ignore;
+
+@Ignore("See MULE-9307")
 public class JsonBeanRoundTripNonAsciiTestCase extends JsonBeanRoundTripTestCase
 {
     private static final String ENCODING = "Windows-31J";
