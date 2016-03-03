@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.introspection.describer;
 
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
-import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.WithParameters;

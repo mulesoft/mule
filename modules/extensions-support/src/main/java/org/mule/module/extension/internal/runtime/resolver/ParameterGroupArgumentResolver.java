@@ -12,8 +12,8 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlia
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.annotation.api.ParameterGroup;
+import org.mule.extension.api.annotation.Parameter;
+import org.mule.extension.api.annotation.ParameterGroup;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.module.extension.internal.runtime.executor.ReflectiveMethodOperationExecutor;
 

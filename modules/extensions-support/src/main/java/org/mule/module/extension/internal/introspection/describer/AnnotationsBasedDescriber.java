@@ -19,21 +19,21 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getSour
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.extension.annotation.api.Alias;
-import org.mule.extension.annotation.api.Configuration;
-import org.mule.extension.annotation.api.Configurations;
-import org.mule.extension.annotation.api.Extensible;
-import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.ExtensionOf;
-import org.mule.extension.annotation.api.OnException;
-import org.mule.extension.annotation.api.Operations;
-import org.mule.extension.annotation.api.Sources;
-import org.mule.extension.annotation.api.connector.Providers;
-import org.mule.extension.annotation.api.param.Connection;
-import org.mule.extension.annotation.api.param.Optional;
-import org.mule.extension.annotation.api.param.UseConfig;
-import org.mule.extension.annotation.api.param.display.Password;
-import org.mule.extension.annotation.api.param.display.Text;
+import org.mule.extension.api.annotation.Alias;
+import org.mule.extension.api.annotation.Configuration;
+import org.mule.extension.api.annotation.Configurations;
+import org.mule.extension.api.annotation.Extensible;
+import org.mule.extension.api.annotation.Extension;
+import org.mule.extension.api.annotation.ExtensionOf;
+import org.mule.extension.api.annotation.OnException;
+import org.mule.extension.api.annotation.Operations;
+import org.mule.extension.api.annotation.Sources;
+import org.mule.extension.api.annotation.connector.Providers;
+import org.mule.extension.api.annotation.param.Connection;
+import org.mule.extension.api.annotation.param.Optional;
+import org.mule.extension.api.annotation.param.UseConfig;
+import org.mule.extension.api.annotation.param.display.Password;
+import org.mule.extension.api.annotation.param.display.Text;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.property.ImmutablePasswordModelProperty;
 import org.mule.extension.api.introspection.property.ImmutableTextModelProperty;
@@ -284,7 +284,7 @@ public final class AnnotationsBasedDescriber implements Describer
             //TODO: MULE-9220
             if (field.isAnnotationPresent(Optional.class))
             {
-                throw new IllegalParameterModelDefinitionException(String.format("@%s can not be applied along with @%s. Affected field [%s] in [%s].", Optional.class.getSimpleName(), org.mule.extension.annotation.api.ParameterGroup.class.getSimpleName(), field.getName(), annotatedType));
+                throw new IllegalParameterModelDefinitionException(String.format("@%s can not be applied along with @%s. Affected field [%s] in [%s].", Optional.class.getSimpleName(), org.mule.extension.api.annotation.ParameterGroup.class.getSimpleName(), field.getName(), annotatedType));
             }
             Set<ParameterDescriptor> parameters = declareSingleParameters(getExposedFields(field.getType()), with);
 

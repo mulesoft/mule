@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.runtime.connector.petstore;
 
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.extension.annotation.api.Alias;
+import org.mule.extension.api.annotation.Alias;
 
 @Alias("poolable")
 public class PoolablePetStoreConnectionProvider extends PetStoreConnectionProvider

@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.introspection.enricher;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
-import org.mule.extension.annotation.api.DataTypeParameters;
+import org.mule.extension.api.annotation.DataTypeParameters;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.declaration.DescribingContext;

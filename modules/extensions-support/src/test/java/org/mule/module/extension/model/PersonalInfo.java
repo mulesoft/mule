@@ -8,9 +8,9 @@ package org.mule.module.extension.model;
 
 import static org.mule.module.extension.HeisenbergExtension.AGE;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
-import org.mule.extension.annotation.api.Alias;
-import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.annotation.Alias;
+import org.mule.extension.api.annotation.Parameter;
+import org.mule.extension.api.annotation.param.Optional;
 
 public class PersonalInfo
 {

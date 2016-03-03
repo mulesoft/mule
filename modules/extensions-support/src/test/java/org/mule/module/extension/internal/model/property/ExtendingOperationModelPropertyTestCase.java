@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.model.property;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import org.mule.extension.annotation.api.Extensible;
+import org.mule.extension.api.annotation.Extensible;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

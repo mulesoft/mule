@@ -7,8 +7,8 @@
 package org.mule.module.extension.internal.runtime.connector.petstore;
 
 import org.mule.api.MuleEvent;
-import org.mule.extension.annotation.api.param.Connection;
-import org.mule.extension.annotation.api.param.UseConfig;
+import org.mule.extension.api.annotation.param.Connection;
+import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.util.concurrent.Latch;
 
 import java.util.List;

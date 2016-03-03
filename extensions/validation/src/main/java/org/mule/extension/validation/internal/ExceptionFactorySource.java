@@ -7,7 +7,7 @@
 package org.mule.extension.validation.internal;
 
 
-import org.mule.extension.annotation.api.Alias;
+import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.validation.api.ExceptionFactory;
 
 /**

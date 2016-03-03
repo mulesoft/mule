@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.manager;
 
-import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.api.annotation.Extension;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 

@@ -6,9 +6,9 @@
  */
 package org.mule.module.extension.internal.runtime.connector.basic;
 
-import org.mule.extension.annotation.api.Expression;
-import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.annotation.Expression;
+import org.mule.extension.api.annotation.Parameter;
+import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.introspection.ExpressionSupport;
 
 public class Owner

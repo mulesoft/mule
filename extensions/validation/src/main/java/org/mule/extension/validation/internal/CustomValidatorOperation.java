@@ -8,8 +8,8 @@ package org.mule.extension.validation.internal;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.registry.MuleRegistry;
-import org.mule.extension.annotation.api.ParameterGroup;
-import org.mule.extension.annotation.api.param.UseConfig;
+import org.mule.extension.api.annotation.ParameterGroup;
+import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.validation.api.Validator;
 

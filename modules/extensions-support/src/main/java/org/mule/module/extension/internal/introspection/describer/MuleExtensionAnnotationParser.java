@@ -11,13 +11,13 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefa
 import static org.mule.util.Preconditions.checkState;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.extension.annotation.api.Alias;
-import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.ParameterGroup;
-import org.mule.extension.annotation.api.RestrictedTo;
-import org.mule.extension.annotation.api.param.Connection;
-import org.mule.extension.annotation.api.param.Optional;
-import org.mule.extension.annotation.api.param.UseConfig;
+import org.mule.extension.api.annotation.Alias;
+import org.mule.extension.api.annotation.Extension;
+import org.mule.extension.api.annotation.ParameterGroup;
+import org.mule.extension.api.annotation.RestrictedTo;
+import org.mule.extension.api.annotation.param.Connection;
+import org.mule.extension.api.annotation.param.Optional;
+import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
@@ -123,7 +123,7 @@ public final class MuleExtensionAnnotationParser
     {
         for (Field field : IntrospectionUtils.getParameterFields(parameterType.getRawType()))
         {
-            if (field.getAnnotation(org.mule.extension.annotation.api.ParameterGroup.class) != null)
+            if (field.getAnnotation(org.mule.extension.api.annotation.ParameterGroup.class) != null)
             {
                 parseGroupParameters(getFieldDataType(field), parsedParameters);
             }

@@ -7,12 +7,12 @@
 package org.mule.module.extension.internal.runtime.connector.petstore;
 
 import org.mule.api.tls.TlsContextFactory;
-import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.Operations;
-import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.annotation.api.capability.Xml;
-import org.mule.extension.annotation.api.connector.Providers;
-import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.annotation.Extension;
+import org.mule.extension.api.annotation.Operations;
+import org.mule.extension.api.annotation.Parameter;
+import org.mule.extension.api.annotation.capability.Xml;
+import org.mule.extension.api.annotation.connector.Providers;
+import org.mule.extension.api.annotation.param.Optional;
 
 import java.util.List;
 

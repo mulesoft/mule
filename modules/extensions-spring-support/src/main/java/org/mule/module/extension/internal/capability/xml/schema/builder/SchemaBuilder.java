@@ -51,7 +51,7 @@ import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
 
 import org.mule.api.tls.TlsContextFactory;
-import org.mule.extension.annotation.api.Extensible;
+import org.mule.extension.api.annotation.Extensible;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.DataQualifier;

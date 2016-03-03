@@ -6,9 +6,7 @@
  */
 package org.mule.module.extension.model;
 
-import org.mule.extension.annotation.api.ParameterGroup;
-import org.mule.module.extension.model.LifetimeInfo;
-import org.mule.module.extension.model.PersonalInfo;
+import org.mule.extension.api.annotation.ParameterGroup;
 
 public class ExtendedPersonalInfo extends PersonalInfo
 {

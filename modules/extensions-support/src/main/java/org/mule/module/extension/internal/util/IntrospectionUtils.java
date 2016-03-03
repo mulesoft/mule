@@ -20,12 +20,12 @@ import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
 
 import org.mule.api.NestedProcessor;
-import org.mule.extension.annotation.api.Alias;
-import org.mule.extension.annotation.api.Expression;
-import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.annotation.api.ParameterGroup;
-import org.mule.extension.annotation.api.param.Ignore;
-import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.annotation.Alias;
+import org.mule.extension.api.annotation.Expression;
+import org.mule.extension.api.annotation.Parameter;
+import org.mule.extension.api.annotation.ParameterGroup;
+import org.mule.extension.api.annotation.param.Ignore;
+import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;

@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.capability.xml;
 
-import org.mule.extension.annotation.api.ParameterGroup;
-import org.mule.extension.annotation.api.param.Ignore;
+import org.mule.extension.api.annotation.ParameterGroup;
+import org.mule.extension.api.annotation.param.Ignore;
 
 public class TestDocumentedExtensionOperations
 {
