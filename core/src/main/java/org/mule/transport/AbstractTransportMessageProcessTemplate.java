@@ -48,14 +48,6 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
             MuleMessage messageFromSource = createMessageFromSource(getOriginalMessage());
             muleEvent = createEventFromMuleMessage(messageFromSource);
         }
-        else
-        {
-            MuleMessage message = muleEvent.getMessage();
-            if(message instanceof ThreadSafeAccess)
-            {
-                ((ThreadSafeAccess)message).resetAccessControl();
-            }
-        }
         return muleEvent;
     }
 
