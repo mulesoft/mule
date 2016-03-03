@@ -14,10 +14,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mule.module.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
+import static org.mule.module.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
+import static org.mule.module.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
+import static org.mule.module.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.module.extension.model.HealthStatus.DEAD;
 import static org.mule.module.extension.model.KnockeableDoor.knock;
 import static org.mule.module.extension.model.Ricin.RICIN_KILL_MESSAGE;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -25,9 +27,7 @@ import org.mule.api.connection.ConnectionException;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.module.extension.HeisenbergConnectionProvider;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.HeisenbergOperations;
 import org.mule.module.extension.exception.HeisenbergException;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.module.extension.model.KnockeableDoor;
@@ -268,7 +268,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     public void extensionWithExceptionEnricher() throws Throwable
     {
         expectedException.expect(ConnectionException.class);
-        expectedException.expectMessage(is(HeisenbergOperations.CALL_GUS_MESSAGE));
+        expectedException.expectMessage(is(ENRICHED_MESSAGE + CALL_GUS_MESSAGE));
         runFlowAndThrowCause("callGus");
     }
 
@@ -276,7 +276,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     public void operationWithExceptionEnricher() throws Throwable
     {
         expectedException.expect(HeisenbergException.class);
-        expectedException.expectMessage(is(HeisenbergOperations.CURE_CANCER_MESSAGE));
+        expectedException.expectMessage(is(CURE_CANCER_MESSAGE));
         runFlowAndThrowCause("cureCancer");
     }
 
@@ -300,7 +300,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     public void connectionProviderDefaultValueSaulPhoneNumber() throws Exception
     {
         MuleEvent getSaulNumber = runFlow("getSaulNumber");
-        assertThat(getSaulNumber.getMessage().getPayload(), is(HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER));
+        assertThat(getSaulNumber.getMessage().getPayload(), is(SAUL_OFFICE_NUMBER));
     }
 
     @Test

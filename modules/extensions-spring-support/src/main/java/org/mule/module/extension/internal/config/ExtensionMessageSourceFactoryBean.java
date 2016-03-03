@@ -80,7 +80,12 @@ final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryB
             retryPolicyTemplate = connectionManagerAdapter.getDefaultRetryPolicyTemplate();
         }
 
-        ExtensionMessageSource messageSource = new ExtensionMessageSource(extensionModel, getSourceFactory(resolverSet), configurationProviderName, getThreadingProfile(), retryPolicyTemplate);
+        ExtensionMessageSource messageSource = new ExtensionMessageSource(extensionModel,
+                                                                          sourceModel,
+                                                                          getSourceFactory(resolverSet),
+                                                                          configurationProviderName,
+                                                                          getThreadingProfile(),
+                                                                          retryPolicyTemplate);
         muleContext.getInjector().inject(messageSource);
 
         return messageSource;

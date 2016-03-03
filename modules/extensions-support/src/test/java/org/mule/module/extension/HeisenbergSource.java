@@ -14,8 +14,10 @@ import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.param.Connection;
+import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.runtime.source.Source;
+import org.mule.extension.api.runtime.source.SourceContext;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -28,6 +30,9 @@ import javax.inject.Inject;
 @Alias("ListenPayments")
 public class HeisenbergSource extends Source<Void, Serializable>
 {
+    public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
+    public static final String INITIAL_BATCH_NUMBER_ERROR_MESSAGE = "initialBatchNumber cannot be a negative value";
+
     private ScheduledExecutorService executor;
 
     @UseConfig
@@ -39,14 +44,30 @@ public class HeisenbergSource extends Source<Void, Serializable>
     @Parameter
     private volatile int initialBatchNumber;
 
+    @Parameter
+    @Optional(defaultValue = "1")
+    private int corePoolSize;
+
     @Inject
     private MuleContext muleContext;
 
     @Override
     public void start()
     {
+        HeisenbergExtension.sourceTimesStarted++;
+
+        if (corePoolSize < 0)
+        {
+            throw new RuntimeException(CORE_POOL_SIZE_ERROR_MESSAGE);
+        }
+
         executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(() -> sourceContext.getMessageHandler().handle(makeMessage(), new CompletionHandler<MuleMessage<Void, Serializable>, Exception>()
+        executor.scheduleAtFixedRate(() -> sourceContext.getMessageHandler().handle(makeMessage(sourceContext), completionHandler()), 0, 100, TimeUnit.MILLISECONDS);
+    }
+
+    private CompletionHandler<MuleMessage<Void, Serializable>, Exception> completionHandler()
+    {
+        return new CompletionHandler<MuleMessage<Void, Serializable>, Exception>()
         {
             @Override
             public void onCompletion(MuleMessage message)
@@ -60,25 +81,33 @@ public class HeisenbergSource extends Source<Void, Serializable>
             {
                 heisenberg.setMoney(BigDecimal.valueOf(-1));
             }
-        }), 0, 100, TimeUnit.MILLISECONDS);
+        };
     }
 
     @Override
     public void stop()
     {
-        executor.shutdownNow();
-        try
+        if (executor != null)
         {
-            executor.awaitTermination(5, TimeUnit.SECONDS);
-        }
-        catch (InterruptedException e)
-        {
-            throw new RuntimeException(e);
+            executor.shutdown();
+            try
+            {
+                executor.awaitTermination(500, TimeUnit.MILLISECONDS);
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    private MuleMessage makeMessage()
+    private MuleMessage makeMessage(SourceContext sourceContext)
     {
+        if (initialBatchNumber < 0)
+        {
+            sourceContext.getExceptionCallback().onException(new RuntimeException(INITIAL_BATCH_NUMBER_ERROR_MESSAGE));
+        }
+
         String payload = String.format("Meth Batch %d. If found by DEA contact %s", ++initialBatchNumber, connection.getSaulPhoneNumber());
         return new DefaultMuleMessage(payload, null, STRING_DATA_TYPE, muleContext);
     }

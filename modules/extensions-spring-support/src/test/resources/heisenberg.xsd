@@ -671,6 +671,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
                 <xs:attribute type="mule:expressionInt" use="required" name="initialBatchNumber"></xs:attribute>
             </xs:extension>
         </xs:complexContent>

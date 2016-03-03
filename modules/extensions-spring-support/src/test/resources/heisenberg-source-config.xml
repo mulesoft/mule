@@ -33,4 +33,18 @@
         <set-payload value="#[new java.lang.Long.valueOf('100')]"/>
     </flow>
 
+    <flow name="sourceFailedOnRuntime" initialState="stopped">
+        <!--invalid initialBatchNumber with negative value -->
+        <heisenberg:listen-payments initialBatchNumber="-1"/>
+
+        <set-payload value="100"/>
+    </flow>
+
+    <flow name="sourceFailedOnStart" initialState="stopped">
+        <!--invalid corePoolSize with negative value -->
+        <heisenberg:listen-payments initialBatchNumber="1" corePoolSize="-1"/>
+
+        <set-payload value="100"/>
+    </flow>
+
 </mule>

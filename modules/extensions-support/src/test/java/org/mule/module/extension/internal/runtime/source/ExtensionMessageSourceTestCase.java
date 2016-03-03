@@ -10,6 +10,7 @@ import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
@@ -24,9 +25,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
+import static org.mule.module.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.tck.MuleTestUtils.spyInjector;
-
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ThreadingProfile;
@@ -45,13 +47,20 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.execution.MessageProcessingManager;
 import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.introspection.ExceptionEnricher;
+import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.extension.api.runtime.source.SourceContext;
 import org.mule.extension.api.runtime.source.SourceFactory;
+import org.mule.module.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.util.ExceptionUtils;
+
+import java.util.Optional;
 
 import javax.resource.spi.work.Work;
 
@@ -79,6 +88,9 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
     private ExtensionModel extensionModel;
 
     @Mock
+    private SourceModel sourceModel;
+
+    @Mock
     private SourceFactory sourceFactory;
 
     @Mock
@@ -103,10 +115,12 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
     private MessageProcessingManager messageProcessingManager;
 
     @Mock
+    private ExceptionEnricherFactory enricherFactory;
+
+    @Mock
     private MuleMessage muleMessage;
 
     private ExtensionMessageSource messageSource;
-
     public final RetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
 
     @Before
@@ -116,15 +130,13 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         when(threadingProfile.createWorkManager(anyString(), eq(muleContext.getConfiguration().getShutdownTimeout()))).thenReturn(workManager);
         when(sourceFactory.createSource()).thenReturn(source);
         when(muleMessage.getMuleContext()).thenReturn(muleContext);
+        when(sourceModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
+        when(extensionModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
 
         LifecycleUtils.initialiseIfNeeded(retryPolicyTemplate, muleContext);
 
-        messageSource = new ExtensionMessageSource(extensionModel, sourceFactory, CONFIG_NAME, threadingProfile, retryPolicyTemplate);
-        messageSource.setListener(messageProcessor);
-        messageSource.setFlowConstruct(flowConstruct);
-
         muleContext.getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
-        muleContext.getInjector().inject(messageSource);
+        messageSource = getNewExtensionMessageSourceInstance();
     }
 
     @Test
@@ -287,6 +299,34 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void enrichExceptionWithSourceExceptionEnricher() throws Exception
+    {
+        when(enricherFactory.createEnricher()).thenReturn(new HeisenbergConnectionExceptionEnricher());
+        when(sourceModel.getExceptionEnricherFactory()).thenReturn(Optional.of(enricherFactory));
+        ExtensionMessageSource messageSource = getNewExtensionMessageSourceInstance();
+        doThrow(new RuntimeException(ERROR_MESSAGE)).when(source).start();
+        Throwable t = catchThrowable(messageSource::start);
+
+        assertThat(ExceptionUtils.containsType(t, ConnectionException.class), is(true));
+        assertThat(t.getMessage(), containsString(ENRICHED_MESSAGE + ERROR_MESSAGE));
+    }
+
+    @Test
+    public void enrichExceptionWithExtensionEnricher() throws Exception
+    {
+        final String enrichedErrorMessage = "Enriched: " + ERROR_MESSAGE;
+        ExceptionEnricher exceptionEnricher = mock(ExceptionEnricher.class);
+        when(exceptionEnricher.enrichException(any(Exception.class))).thenReturn(new Exception(enrichedErrorMessage));
+        when(enricherFactory.createEnricher()).thenReturn(exceptionEnricher);
+        when(extensionModel.getExceptionEnricherFactory()).thenReturn(Optional.of(enricherFactory));
+        ExtensionMessageSource messageSource = getNewExtensionMessageSourceInstance();
+        doThrow(new RuntimeException(ERROR_MESSAGE)).when(source).start();
+        Throwable t = catchThrowable(messageSource::start);
+
+        assertThat(t.getMessage(), containsString(enrichedErrorMessage));
+    }
+
+    @Test
     public void workManagerDisposedIfSourceFailsToStart() throws Exception
     {
         messageSource.initialise();
@@ -309,5 +349,14 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         messageSource.dispose();
 
         verify((Disposable) source).dispose();
+    }
+
+    private ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException
+    {
+        ExtensionMessageSource messageSource = new ExtensionMessageSource(extensionModel, sourceModel, sourceFactory, CONFIG_NAME, threadingProfile, retryPolicyTemplate);
+        messageSource.setListener(messageProcessor);
+        messageSource.setFlowConstruct(flowConstruct);
+        muleContext.getInjector().inject(messageSource);
+        return messageSource;
     }
 }
