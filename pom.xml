@@ -126,12 +126,8 @@
 
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
         <coberturaVersion>2.5</coberturaVersion>
-        <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
         <groovyVersion>2.4.4</groovyVersion>
-        <gmavenPluginVersion>1.4</gmavenPluginVersion>
-        <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
-        <mavenCompilerVersion>3.1</mavenCompilerVersion>
         <xDocLint>-Xdoclint:none</xDocLint>
         <!--
             The above project.url will not be picked up in the manifest,
@@ -208,8 +204,6 @@
         <junitVersion>4.11</junitVersion>
         <log4jVersion>2.1</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
-        <maven.buildnumber.plugin.version>1.1</maven.buildnumber.plugin.version>
-        <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
         <mockitoVersion>1.9.5</mockitoVersion>
         <muleExtensionsApiVersion>1.0.0-SNAPSHOT</muleExtensionsApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
@@ -245,6 +239,35 @@
         <xstreamVersion>1.4.7</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
         <muleCommonVersion>3.8.0-SNAPSHOT</muleCommonVersion>
+
+        <!--Maven plugins versions-->
+        <dependency.plugin.version>2.10</dependency.plugin.version>
+        <deploy.plugin.version>2.8.2</deploy.plugin.version>
+        <assembly.plugin.version>2.6</assembly.plugin.version>
+        <jar.plugin.version>2.6</jar.plugin.version>
+        <jxr.plugin.version>2.5</jxr.plugin.version>
+        <project.info.reports.plugin.version>2.8.1</project.info.reports.plugin.version>
+        <rar.plugin.version>2.4</rar.plugin.version>
+        <release.plugin.version>2.5.3</release.plugin.version>
+        <resources.plugin.version>2.7</resources.plugin.version>
+        <site.plugin.version>3.5</site.plugin.version>
+        <source.plugin.version>3.0.0</source.plugin.version>
+        <war.plugin.version>2.6</war.plugin.version>
+        <shade.plugin.version>2.4.3</shade.plugin.version>
+        <build.helper.maven.plugin.version>1.10</build.helper.maven.plugin.version>
+        <shitty.maven.plugin.version>1.0-alpha-3</shitty.maven.plugin.version>
+        <assembly.verifier.version>1.4</assembly.verifier.version>
+        <antrun.plugin.version>1.8</antrun.plugin.version>
+        <install.plugin.version>2.5.2</install.plugin.version>
+        <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
+        <license.maven.plugin.version>2.11</license.maven.plugin.version>
+        <gpg.plugin.version>1.6</gpg.plugin.version>
+        <gmavenPluginVersion>1.5</gmavenPluginVersion>
+        <javadocPluginVersion>2.10.3</javadocPluginVersion>
+        <mavenCompilerVersion>3.5.1</mavenCompilerVersion>
+        <eclipsePluginVersion>2.10</eclipsePluginVersion>
+        <maven.buildnumber.plugin.version>1.1</maven.buildnumber.plugin.version>
+        <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
     </properties>
 
     <dependencies>
@@ -1387,12 +1410,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>1.3</version>
+                    <version>${antrun.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.2.1</version>
+                    <version>${assembly.plugin.version}</version>
                     <configuration>
                         <skipAssembly>${skipDistributions}</skipAssembly>
                     </configuration>
@@ -1400,7 +1423,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>2.4</version>
+                    <version>${install.plugin.version}</version>
                     <configuration>
                         <skip>${skipInstalls}</skip>
                     </configuration>
@@ -1413,7 +1436,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>2.8</version>
+                    <version>${checkstyle.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1437,42 +1460,42 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>2.9</version>
+                    <version>${dependency.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.1</version>
+                    <version>${deploy.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.3.2</version>
+                    <version>${jar.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jxr-plugin</artifactId>
-                    <version>2.2</version>
+                    <version>${jxr.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>2.4</version>
+                    <version>${project.info.reports.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-rar-plugin</artifactId>
-                    <version>2.2</version>
+                    <version>${rar.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.1</version>
+                    <version>${release.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.4.3</version>
+                    <version>${resources.plugin.version}</version>
                     <configuration>
                         <encoding>ISO-8859-1</encoding>
                     </configuration>
@@ -1480,17 +1503,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>1.4</version>
+                    <version>${shade.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.0</version>
+                    <version>${site.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>2.2.1</version>
+                    <version>${source.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1514,7 +1537,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.1.1</version>
+                    <version>${war.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.gmaven</groupId>
@@ -1531,17 +1554,17 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>${build.helper.maven.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>shitty-maven-plugin</artifactId>
-                    <version>1.0-alpha-3</version>
+                    <version>${shitty.maven.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.mule.tools</groupId>
                     <artifactId>mule-assembly-verifier</artifactId>
-                    <version>1.4</version>
+                    <version>${assembly.verifier.version}</version>
                     <configuration>
                         <skip>${skipDistributions}</skip>
                     </configuration>
@@ -1569,7 +1592,7 @@
                 <plugin>
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>2.8</version>
+                    <version>${license.maven.plugin.version}</version>
                     <configuration>
                         <skip>${skipVerifications}</skip>
                         <header>com/mycila/maven/plugin/license/templates/CPAL.txt</header>
@@ -1692,7 +1715,6 @@
                 <artifactId>maven-eclipse-plugin</artifactId>
                 <version>${eclipsePluginVersion}</version>
                 <configuration>
-                    <!-- by default download all sources when generating project files -->
                     <downloadSources>true</downloadSources>
                     <classpathContainers>
                         <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk8Name}
@@ -2025,7 +2047,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>${gpg.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
