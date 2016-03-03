@@ -45,16 +45,8 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
         super.doSetUp();
         TransactionManagerFactory factory = getTransactionManagerFactory();
         tm = factory.create(muleContext.getConfiguration());
-        muleContext.start();
         assertNotNull("Transaction Manager should be available.", tm);
         assertNull("There should be no current transaction associated.", tm.getTransaction());
-    }
-
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        super.doTearDown();
-        muleContext.stop();
     }
 
     @Test
@@ -170,12 +162,13 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                         {
                             tm.resume(firstTx);
                             fail("Second transaction must be active");
-                        } catch (java.lang.IllegalStateException e)
+                        }
+                        catch (java.lang.IllegalStateException e)
                         {
                             // expected
 
-                            //Thrown if the thread is already associated with another transaction.
-                            //Second tx is associated with the current thread
+                            // Thrown if the thread is already associated with another transaction.
+                            // Second tx is associated with the current thread
                         }
                         try
                         {
@@ -188,7 +181,8 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                             Transaction a = tm.suspend();
                             assertTrue(a.equals(firstTx));
                             tm.resume(secondTx);
-                        } catch (Exception e)
+                        }
+                        catch (Exception e)
                         {
                             fail("Error: " + e);
                         }
@@ -253,7 +247,8 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
                             assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
                             Transaction a = tm.suspend();
                             assertTrue(a.equals(firstTx));
-                        } catch (Exception e)
+                        }
+                        catch (Exception e)
                         {
                             fail("Error: " + e);
                         }
@@ -297,8 +292,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleCo
     }
 
     /**
-     * This is a former TransactionTemplateTestCase.
-     * http://mule.mulesoft.org/jira/browse/MULE-1494
+     * This is a former TransactionTemplateTestCase. http://mule.mulesoft.org/jira/browse/MULE-1494
      *
      * @throws Exception in case of any error
      */
