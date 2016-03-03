@@ -9,6 +9,7 @@ package org.mule.execution;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RESPONSE;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -75,6 +76,7 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
                                         return null;
                                     }
                                     MuleEvent muleEvent = flowProcessingPhaseTemplate.getMuleEvent();
+                                    resetAccessControl(muleEvent);
                                     muleEvent = flowProcessingPhaseTemplate.beforeRouteEvent(muleEvent);
                                     muleEvent = flowProcessingPhaseTemplate.routeEvent(muleEvent);
                                     muleEvent = flowProcessingPhaseTemplate.afterRouteEvent(muleEvent);
@@ -138,6 +140,14 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
         else
         {
             flowExecutionWork.run();
+        }
+    }
+
+    private void resetAccessControl(MuleEvent muleEvent)
+    {
+        if (muleEvent instanceof DefaultMuleEvent)
+        {
+            ((DefaultMuleEvent) muleEvent).resetAccessControl();
         }
     }
 
