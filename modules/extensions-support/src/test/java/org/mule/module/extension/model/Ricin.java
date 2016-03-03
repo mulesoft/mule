@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.model;
 
-import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.annotation.param.Optional;
 
 public class Ricin implements Weapon
 {

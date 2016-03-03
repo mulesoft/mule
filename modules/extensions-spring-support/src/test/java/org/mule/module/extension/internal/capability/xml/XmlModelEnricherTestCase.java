@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.extension.annotation.api.capability.Xml;
+import org.mule.extension.api.annotation.capability.Xml;
 import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.introspection.property.XmlModelProperty;

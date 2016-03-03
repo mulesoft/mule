@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.introspection.describer;
 
 import static org.mule.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import org.mule.api.tls.TlsContextFactory;
-import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.WithParameters;

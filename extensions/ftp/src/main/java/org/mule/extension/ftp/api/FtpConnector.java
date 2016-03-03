@@ -7,11 +7,11 @@
 package org.mule.extension.ftp.api;
 
 import org.mule.api.connector.ConnectionManager;
-import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.Operations;
-import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.annotation.api.connector.Providers;
-import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.annotation.Extension;
+import org.mule.extension.api.annotation.Operations;
+import org.mule.extension.api.annotation.Parameter;
+import org.mule.extension.api.annotation.connector.Providers;
+import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.ftp.internal.FtpListOperation;
 import org.mule.module.extension.file.api.FileConnectorConfig;
 import org.mule.module.extension.file.api.StandardFileSystemOperations;

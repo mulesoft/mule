@@ -7,9 +7,9 @@
 package org.mule.extension.validation.internal;
 
 import static org.mule.extension.api.introspection.ExpressionSupport.LITERAL;
-import org.mule.extension.annotation.api.Expression;
-import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.annotation.Expression;
+import org.mule.extension.api.annotation.Parameter;
+import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.validation.api.Validator;
 
 /**

@@ -6,11 +6,11 @@
  */
 package org.mule.module.extension.internal.capability.xml.schema;
 
-import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.Operations;
-import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.annotation.api.ParameterGroup;
-import org.mule.extension.annotation.api.param.Ignore;
+import org.mule.extension.api.annotation.Extension;
+import org.mule.extension.api.annotation.Operations;
+import org.mule.extension.api.annotation.Parameter;
+import org.mule.extension.api.annotation.ParameterGroup;
+import org.mule.extension.api.annotation.param.Ignore;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ClassUtils;
 

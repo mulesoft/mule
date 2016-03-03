@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.capability.xml;
 
-import org.mule.extension.annotation.api.capability.Xml;
+import org.mule.extension.api.annotation.capability.Xml;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;

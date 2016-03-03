@@ -6,13 +6,13 @@
  */
 package org.mule.module.extension.internal.runtime.connector.secure;
 
-import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.Operations;
-import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.annotation.api.capability.Xml;
-import org.mule.extension.annotation.api.connector.Providers;
-import org.mule.extension.annotation.api.param.display.Password;
-import org.mule.extension.annotation.api.param.display.Text;
+import org.mule.extension.api.annotation.Extension;
+import org.mule.extension.api.annotation.Operations;
+import org.mule.extension.api.annotation.Parameter;
+import org.mule.extension.api.annotation.capability.Xml;
+import org.mule.extension.api.annotation.connector.Providers;
+import org.mule.extension.api.annotation.param.display.Password;
+import org.mule.extension.api.annotation.param.display.Text;
 
 @Extension(name = "secure", description = "Secure Test connector")
 @Operations(SecureOperations.class)

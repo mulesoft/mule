@@ -11,9 +11,9 @@ import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionValidationResult;
-import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.annotation.api.param.display.Password;
-import org.mule.extension.annotation.api.param.display.Text;
+import org.mule.extension.api.annotation.Parameter;
+import org.mule.extension.api.annotation.param.display.Password;
+import org.mule.extension.api.annotation.param.display.Text;
 
 public class SecureConnectionProvider implements ConnectionProvider<SecureConnector, Object>
 {

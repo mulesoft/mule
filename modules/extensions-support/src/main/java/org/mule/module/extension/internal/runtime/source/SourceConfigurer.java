@@ -10,7 +10,7 @@ import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.module.extension.internal.introspection.ParameterGroup;

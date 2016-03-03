@@ -18,7 +18,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.extension.annotation.api.param.Optional;
+import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.Described;
 import org.mule.extension.api.introspection.EnrichableModel;

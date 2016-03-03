@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.model.property;
 
-import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 

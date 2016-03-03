@@ -6,10 +6,10 @@
  */
 package org.mule.module.extension.internal.runtime.connector.basic;
 
-import org.mule.extension.annotation.api.Expression;
-import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.Operations;
-import org.mule.extension.annotation.api.Parameter;
+import org.mule.extension.api.annotation.Expression;
+import org.mule.extension.api.annotation.Extension;
+import org.mule.extension.api.annotation.Operations;
+import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.introspection.ExpressionSupport;
 
 @Extension(name = "Basic", description = "Basic Test connector")

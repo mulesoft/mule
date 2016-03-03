@@ -24,7 +24,7 @@ import static org.mule.module.extension.internal.ExtensionProperties.ENCODING_PA
 import static org.mule.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withReturnType;
-import org.mule.extension.annotation.api.DataTypeParameters;
+import org.mule.extension.api.annotation.DataTypeParameters;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.declaration.DescribingContext;

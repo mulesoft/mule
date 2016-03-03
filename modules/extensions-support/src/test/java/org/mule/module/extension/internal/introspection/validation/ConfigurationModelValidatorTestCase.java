@@ -6,11 +6,11 @@
  */
 package org.mule.module.extension.internal.introspection.validation;
 
-import org.mule.extension.annotation.api.Configuration;
-import org.mule.extension.annotation.api.Configurations;
-import org.mule.extension.annotation.api.Extension;
-import org.mule.extension.annotation.api.Operations;
-import org.mule.extension.annotation.api.param.UseConfig;
+import org.mule.extension.api.annotation.Configuration;
+import org.mule.extension.api.annotation.Configurations;
+import org.mule.extension.api.annotation.Extension;
+import org.mule.extension.api.annotation.Operations;
+import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;

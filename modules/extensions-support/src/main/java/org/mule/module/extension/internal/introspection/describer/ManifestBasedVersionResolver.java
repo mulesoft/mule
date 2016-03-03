@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.introspection.describer;
 
 import org.mule.config.MuleManifest;
-import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.api.annotation.Extension;
 import org.mule.module.extension.internal.introspection.VersionResolver;
 import org.mule.util.ClassUtils;
 

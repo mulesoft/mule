@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.resources;
 
 import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
-import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
@@ -49,7 +49,7 @@ import javax.tools.Diagnostic;
  *
  * @since 3.7.0
  */
-@SupportedAnnotationTypes(value = {"org.mule.extension.annotation.api.Extension"})
+@SupportedAnnotationTypes(value = {"org.mule.extension.api.annotation.Extension"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor
 {

@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import org.mule.extension.annotation.api.Extension;
+import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.introspection.ExtensionModel;
 
 /**

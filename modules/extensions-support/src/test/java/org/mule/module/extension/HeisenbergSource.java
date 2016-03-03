@@ -11,10 +11,10 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.execution.CompletionHandler;
 import org.mule.api.temporary.MuleMessage;
-import org.mule.extension.annotation.api.Alias;
-import org.mule.extension.annotation.api.Parameter;
-import org.mule.extension.annotation.api.param.Connection;
-import org.mule.extension.annotation.api.param.UseConfig;
+import org.mule.extension.api.annotation.Alias;
+import org.mule.extension.api.annotation.Parameter;
+import org.mule.extension.api.annotation.param.Connection;
+import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.runtime.source.Source;
 
 import java.io.Serializable;
