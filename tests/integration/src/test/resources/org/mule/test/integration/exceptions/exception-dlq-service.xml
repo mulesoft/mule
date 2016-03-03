@@ -15,7 +15,7 @@
 
 <!-- MULE-2931 -->
 <!-- jms:transaction inside endpoints is using it’s own transaction mechanism instead of joining with the configured transaction manager -->
-<!--     <jboss-transaction-manager/> -->
+    <jboss-transaction-manager/>
 
     <model name="dev">
         <service name="RollbackComponent">

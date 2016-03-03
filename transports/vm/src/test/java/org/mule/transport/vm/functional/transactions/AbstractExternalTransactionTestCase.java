@@ -85,7 +85,6 @@ public abstract class AbstractExternalTransactionTestCase extends AbstractServic
     protected void init() throws Exception
     {
         context = createMuleContext();
-        context.start();
         tm = context.getTransactionManager();
     }
 
