@@ -30,7 +30,6 @@ MULE-6298: AbstractMessageSequenceSplitter#process will now return null instead 
 MULE-9306: Losing flow and session variables when using MuleClient to dispatch/send an event. Exception strategy not caching exceptions after using MuleClient on a JavaComponent.
 MULE-9383: HTTP Connector will allow invalid Content-Type header values. In order to strictly validate them as before, use the mule.strictContentType=true system property.
 MULE-9405: MuleException instead of NPE is now thrown when setting a null value for a context-property in an XstlTransformation.
-MULE-9389: Transaction manager configuration now occurs during context start. It will not be available during initialize phase.
 
 Migration changes from 3.6.x to 3.7.x
 
