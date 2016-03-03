@@ -10,7 +10,7 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getFiel
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.ParameterGroup;
@@ -18,9 +18,19 @@ import org.mule.extension.api.annotation.RestrictedTo;
 import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
+import org.mule.extension.api.annotation.param.display.Password;
+import org.mule.extension.api.annotation.param.display.Placement;
+import org.mule.extension.api.annotation.param.display.Text;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.HasModelProperties;
+import org.mule.extension.api.introspection.property.display.ImmutablePasswordModelProperty;
+import org.mule.extension.api.introspection.property.display.ImmutablePlacementModelProperty;
+import org.mule.extension.api.introspection.property.display.ImmutableTextModelProperty;
+import org.mule.extension.api.introspection.property.display.PasswordModelProperty;
+import org.mule.extension.api.introspection.property.display.PlacementModelProperty;
+import org.mule.extension.api.introspection.property.display.TextModelProperty;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ClassUtils;
@@ -30,6 +40,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -196,5 +207,23 @@ public final class MuleExtensionAnnotationParser
         return map;
     }
 
+    public static void parseDisplayAnnotations(AnnotatedElement annotatedElement, HasModelProperties parameter)
+    {
+        Password passwordAnnotation = annotatedElement.getAnnotation(Password.class);
+        if (passwordAnnotation != null)
+        {
+            parameter.withModelProperty(PasswordModelProperty.KEY, new ImmutablePasswordModelProperty());
+        }
+        Text textAnnotation = annotatedElement.getAnnotation(Text.class);
+        if (textAnnotation != null)
+        {
+            parameter.withModelProperty(TextModelProperty.KEY, new ImmutableTextModelProperty());
+        }
+        Placement placementAnnotation = annotatedElement.getAnnotation(Placement.class);
+        if (placementAnnotation != null)
+        {
+            parameter.withModelProperty(PlacementModelProperty.KEY, new ImmutablePlacementModelProperty(placementAnnotation.order(), placementAnnotation.group(), placementAnnotation.tab()));
+        }
+    }
 
 }

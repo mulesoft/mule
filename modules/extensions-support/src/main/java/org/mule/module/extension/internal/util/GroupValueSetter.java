@@ -10,8 +10,8 @@ import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleException;
 import org.mule.extension.api.introspection.EnrichableModel;
-import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.introspection.ParameterGroup;
+import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -41,7 +41,7 @@ public final class GroupValueSetter implements ValueSetter
 
     /**
      * Returns a {@link List} containing one {@link ValueSetter} instance per each
-     * {@link ParameterGroup} defined in the {@link ParameterGroupModelProperty} extracted
+     * {@link org.mule.module.extension.internal.introspection.ParameterGroup} defined in the {@link ParameterGroupModelProperty} extracted
      * from the given {@code model}. If {@code model} does not contain such model property
      * then an empty {@link List} is returned
      *
@@ -62,7 +62,7 @@ public final class GroupValueSetter implements ValueSetter
         return ImmutableList.of();
     }
 
-    private final org.mule.module.extension.internal.introspection.ParameterGroup group;
+    private final ParameterGroup group;
     private final List<ValueSetter> childSetters;
 
     /**
@@ -70,7 +70,7 @@ public final class GroupValueSetter implements ValueSetter
      *
      * @param group a {@link ParameterGroup}
      */
-    public GroupValueSetter(org.mule.module.extension.internal.introspection.ParameterGroup group)
+    public GroupValueSetter(ParameterGroup group)
     {
         this.group = group;
         childSetters = settersFor(group);

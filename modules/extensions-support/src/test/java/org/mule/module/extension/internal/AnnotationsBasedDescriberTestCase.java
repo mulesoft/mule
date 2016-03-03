@@ -22,6 +22,8 @@ import static org.mule.module.extension.HeisenbergConnectionProvider.SAUL_OFFICE
 import static org.mule.module.extension.HeisenbergExtension.AGE;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
+import static org.mule.module.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
+import static org.mule.module.extension.HeisenbergExtension.RICIN_GROUP_NAME;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
 import static org.mule.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DEFAULT_CONNECTION_PROVIDER_NAME;
@@ -50,6 +52,7 @@ import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.SourceDeclaration;
+import org.mule.extension.api.introspection.property.display.PlacementModelProperty;
 import org.mule.module.extension.HeisenbergConnection;
 import org.mule.module.extension.HeisenbergConnectionProvider;
 import org.mule.module.extension.HeisenbergExtension;
@@ -136,6 +139,38 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertTestModuleConnectionProviders(declaration);
         assertTestModuleMessageSource(declaration);
         assertModelProperties(declaration);
+    }
+
+    @Test
+    public void parseDisplayAnnotationsOnParameter()
+    {
+        Descriptor descriptor = getDescriber().describe(new DefaultDescribingContext());
+        Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
+        List<ParameterDeclaration> parameters = declaration.getConfigurations().get(0).getParameters();
+        PlacementModelProperty labeledRicinPlacement = findParameter(parameters, "labeledRicin").getModelProperty(PlacementModelProperty.KEY);
+        PlacementModelProperty ricinPacksPlacement = findParameter(parameters, "ricinPacks").getModelProperty(PlacementModelProperty.KEY);
+
+        assertThat(labeledRicinPlacement.getGroupName(), is(RICIN_GROUP_NAME));
+        assertThat(labeledRicinPlacement.getOrder(), is(1));
+        assertThat(ricinPacksPlacement.getGroupName(), is(RICIN_GROUP_NAME));
+        assertThat(ricinPacksPlacement.getOrder(), is(2));
+    }
+
+    @Test
+    public void parseDisplayAnnotationsOnParameterGroup()
+    {
+        Descriptor descriptor = getDescriber().describe(new DefaultDescribingContext());
+        Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
+        List<ParameterDeclaration> parameters = declaration.getConfigurations().get(0).getParameters();
+        PlacementModelProperty dateOfBirthPlacement = findParameter(parameters, "dateOfBirth").getModelProperty(PlacementModelProperty.KEY);
+        PlacementModelProperty dateOfDeathPlacement = findParameter(parameters, "dateOfDeath").getModelProperty(PlacementModelProperty.KEY);
+        PlacementModelProperty agePlacement = findParameter(parameters, "age").getModelProperty(PlacementModelProperty.KEY);
+        PlacementModelProperty namePlacement = findParameter(parameters, "myName").getModelProperty(PlacementModelProperty.KEY);
+
+        assertThat(agePlacement.getGroupName(), is(PERSONAL_INFORMATION_GROUP_NAME));
+        assertThat(namePlacement.getGroupName(), is(PERSONAL_INFORMATION_GROUP_NAME));
+        assertThat(dateOfBirthPlacement.getGroupName(), is(PERSONAL_INFORMATION_GROUP_NAME));
+        assertThat(dateOfDeathPlacement.getGroupName(), is(PERSONAL_INFORMATION_GROUP_NAME));
     }
 
     @Test

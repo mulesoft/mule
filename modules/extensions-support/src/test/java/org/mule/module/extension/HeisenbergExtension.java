@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Expression;
 import org.mule.extension.api.annotation.Extensible;
@@ -27,7 +28,7 @@ import org.mule.extension.api.annotation.Sources;
 import org.mule.extension.api.annotation.capability.Xml;
 import org.mule.extension.api.annotation.connector.Providers;
 import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.annotation.param.display.Placement;
 import org.mule.module.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.module.extension.model.ExtendedPersonalInfo;
 import org.mule.module.extension.model.HealthStatus;
@@ -58,6 +59,8 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     public static final String HEISENBERG = "Heisenberg";
     public static final String AGE = "50";
     public static final String EXTENSION_DESCRIPTION = "My Test Extension just to unit test";
+    public static final String RICIN_GROUP_NAME = "Dangerous-Ricin";
+    public static final String PERSONAL_INFORMATION_GROUP_NAME = "Personal Information";
 
     private int initialise = 0;
     private int start = 0;
@@ -71,6 +74,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     @Inject
     private ExtensionManager extensionManager;
 
+    @Placement(group = PERSONAL_INFORMATION_GROUP_NAME)
     @ParameterGroup
     private ExtendedPersonalInfo personalInfo = new ExtendedPersonalInfo();
 
@@ -79,9 +83,6 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
 
     @Parameter
     private List<Long> monthlyIncomes = new LinkedList<>();
-
-    @Parameter
-    private BigDecimal money;
 
     @Parameter
     private boolean cancer;
@@ -96,15 +97,20 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
 
     @Parameter
     @Optional
+    @Placement(order = 1, group = RICIN_GROUP_NAME)
     private Map<String, Ricin> labeledRicin;
 
     @Parameter
     @Optional
-    private Set<Ricin> ricinPacks;
+    private KnockeableDoor nextDoor;
 
     @Parameter
     @Optional
-    private KnockeableDoor nextDoor;
+    @Placement(order = 2, group = RICIN_GROUP_NAME)
+    private Set<Ricin> ricinPacks;
+
+    @Parameter
+    private BigDecimal money;
 
     @Parameter
     @Optional
