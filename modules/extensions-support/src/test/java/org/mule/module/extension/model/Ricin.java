@@ -6,14 +6,11 @@
  */
 package org.mule.module.extension.model;
 
-import org.mule.extension.api.annotation.param.Optional;
-
 public class Ricin implements Weapon
 {
 
     public static final String RICIN_KILL_MESSAGE = "You have been killed with Ricin";
 
-    @Optional(defaultValue = "22")
     private Long microgramsPerKilo;
 
     private KnockeableDoor destination;

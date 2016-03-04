@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.config;
 
+import static java.util.Calendar.YEAR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -18,6 +19,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
+import static org.mule.module.extension.HeisenbergExtension.AGE;
+import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.api.MuleEvent;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.model.HealthStatus;
@@ -199,8 +202,8 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
 
     private void assertSimpleProperties(HeisenbergExtension heisenberg)
     {
-        assertThat(heisenberg.getPersonalInfo().getName(), equalTo(HeisenbergExtension.HEISENBERG));
-        assertThat(heisenberg.getPersonalInfo().getAge(), equalTo(Integer.valueOf(HeisenbergExtension.AGE)));
+        assertThat(heisenberg.getPersonalInfo().getName(), equalTo(HEISENBERG));
+        assertThat(heisenberg.getPersonalInfo().getAge(), equalTo(Integer.valueOf(AGE)));
 
         List<String> enemies = heisenberg.getEnemies();
         assertThat(enemies, notNullValue());
@@ -218,8 +221,8 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         dayOfBirth.setTime(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfBirth());
 
         //only compare year to avoid timezone related flakyness
-        assertThat(dayOfBirth.get(Calendar.YEAR), equalTo(getDateOfBirth().get(Calendar.YEAR)));
-        assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfDeath().get(Calendar.YEAR), equalTo(getDateOfDeath().get(Calendar.YEAR)));
+        assertThat(dayOfBirth.get(YEAR), equalTo(getDateOfBirth().get(YEAR)));
+        assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfDeath().get(YEAR), equalTo(getDateOfDeath().get(YEAR)));
 
         assertThat(heisenberg.getMoney(), equalTo(new BigDecimal(MONEY)));
     }
@@ -250,7 +253,7 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
     public static Calendar getDateOfBirth()
     {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, 1959);
+        calendar.set(YEAR, 1959);
         calendar.set(Calendar.MONTH, Calendar.SEPTEMBER);
         calendar.set(Calendar.DAY_OF_MONTH, 7);
         calendar.set(Calendar.HOUR, 0);
@@ -264,7 +267,7 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
     public static Calendar getDateOfDeath()
     {
         Calendar calendar = getDateOfBirth();
-        calendar.set(Calendar.YEAR, DEATH_YEAR);
+        calendar.set(YEAR, DEATH_YEAR);
 
         return calendar;
     }

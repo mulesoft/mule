@@ -15,9 +15,9 @@ import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.extension.api.resources.ResourcesGenerator;
 import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils;
-import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.introspection.VersionResolver;
+import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.registry.SpiServiceRegistry;
 import org.mule.util.ExceptionUtils;
 
@@ -39,18 +39,18 @@ import javax.tools.Diagnostic;
  * {@link ExtensionModel} and use a
  * {@link ResourcesGenerator} to generated
  * the required resources.
- * <p/>
+ * <p>
  * This annotation processor will automatically generate and package into the output jar
  * the XSD schema, spring bundles and extension registration files
  * necessary for mule to work with this extension.
- * <p/>
+ * <p>
  * Depending on the model properties declared by each extension, some of those resources
  * might or might not be generated
  *
  * @since 3.7.0
  */
 @SupportedAnnotationTypes(value = {"org.mule.extension.api.annotation.Extension"})
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor
 {
 
@@ -68,9 +68,19 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         ResourcesGenerator generator = new AnnotationProcessorResourceGenerator(processingEnv, new SpiServiceRegistry());
         try
         {
+            final ClassLoader originalCurrentClassLoader = Thread.currentThread().getContextClassLoader();
             findExtensions(roundEnv).forEach(extensionElement -> {
-                ExtensionModel extensionModel = parseExtension(extensionElement, roundEnv);
-                generator.generateFor(extensionModel);
+                final Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
+                try
+                {
+                    Thread.currentThread().setContextClassLoader(extensionClass.getClassLoader());
+                    ExtensionModel extensionModel = parseExtension(extensionElement, roundEnv);
+                    generator.generateFor(extensionModel);
+                }
+                finally
+                {
+                    Thread.currentThread().setContextClassLoader(originalCurrentClassLoader);
+                }
             });
 
             generator.dumpAll();

@@ -11,23 +11,33 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import org.mule.DefaultMuleContext;
-import org.mule.api.Injector;
+import static org.mule.metadata.java.JavaTypeLoader.JAVA;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.config.MuleManifest;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeHandlerManagerFactory;
+import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.builder.ArrayTypeBuilder;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.builder.TypeBuilder;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.DictionaryType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.handler.TypeHandlerManager;
+import org.mule.metadata.java.utils.ParsingContext;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Map;
 import java.util.jar.Manifest;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -35,7 +45,41 @@ import org.apache.commons.lang.ArrayUtils;
 public abstract class ExtensionsTestUtils
 {
 
+    public static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+    public static final BaseTypeBuilder<?> TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
+
     public static final String HELLO_WORLD = "Hello World!";
+
+    public static MetadataType toMetadataType(Class<?> type)
+    {
+        return TYPE_LOADER.load(type);
+    }
+
+    public static ArrayType arrayOf(Class<? extends Collection> clazz, TypeBuilder itemType)
+    {
+        ArrayTypeBuilder<?> arrayTypeBuilder = TYPE_BUILDER.arrayType();
+        arrayTypeBuilder.id(clazz.getName());
+        arrayTypeBuilder.of(itemType);
+
+        return arrayTypeBuilder.build();
+    }
+
+    public static DictionaryType dictionaryOf(Class<? extends Map> clazz, TypeBuilder<?> keyTypeBuilder, TypeBuilder<?> valueTypeBuilder)
+    {
+        return TYPE_BUILDER.dictionaryType().id(clazz.getName())
+                .ofKey(keyTypeBuilder)
+                .ofValue(valueTypeBuilder)
+                .build();
+    }
+
+    public static TypeBuilder<?> objectTypeBuilder(Class<?> clazz)
+    {
+        BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
+        final TypeHandlerManager typeHandlerManager = new ExtensionsTypeHandlerManagerFactory().createTypeHandlerManager(TYPE_LOADER);
+        typeHandlerManager.handle(clazz, new ParsingContext(), typeBuilder);
+
+        return typeBuilder;
+    }
 
     public static ValueResolver getResolver(Object value) throws Exception
     {
@@ -64,7 +108,7 @@ public abstract class ExtensionsTestUtils
     {
         ParameterModel parameterModel = mock(ParameterModel.class);
         when(parameterModel.getName()).thenReturn(name);
-        when(parameterModel.getType()).thenReturn(DataType.of(type));
+        when(parameterModel.getType()).thenReturn(toMetadataType(type));
 
         return parameterModel;
     }

@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.model.property;
 
-import org.mule.extension.api.annotation.Parameter;
+import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 
@@ -16,7 +16,7 @@ import java.lang.reflect.Field;
 /**
  * A custom model property to link a {@link ParameterModel} to the actual member it represents.
  * <p/>
- * The most common use case for this is to support the {@link Parameter#alias()} attribute.
+ * The most common use case for this is to support the {@link Alias} annotation.
  * For example, consider a {@link ConfigurationModel} parameter which is obtained through
  * inspecting fields in a class. This property allows for the introspection model to list
  * the parameter by a given alias, while this parameter still provides the real name of the field

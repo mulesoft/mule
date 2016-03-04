@@ -7,12 +7,12 @@
 package org.mule.module.extension.internal.introspection.describer;
 
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 
@@ -21,7 +21,7 @@ import java.lang.reflect.Field;
 /**
  * Default implementation of {@link FieldDescriber}, capable
  * of handling all {@link Field}s in a generic way.
- *
+ * <p>
  * Although it can handle pretty much any field, it's not suitable
  * for those which need special treatment.
  *
@@ -30,8 +30,16 @@ import java.lang.reflect.Field;
 final class DefaultFieldDescriber implements FieldDescriber
 {
 
+    private final ClassTypeLoader typeLoader;
+
+    DefaultFieldDescriber(ClassTypeLoader typeLoader)
+    {
+        this.typeLoader = typeLoader;
+    }
+
     /**
      * Always returns {@code true}
+     *
      * @return {@code true}
      */
     @Override
@@ -50,7 +58,7 @@ final class DefaultFieldDescriber implements FieldDescriber
 
         String parameterName = MuleExtensionAnnotationParser.getAliasName(field);
         ParameterDescriptor parameterDescriptor;
-        DataType dataType = IntrospectionUtils.getFieldDataType(field);
+        MetadataType dataType = IntrospectionUtils.getFieldMetadataType(field, typeLoader);
         if (optional == null)
         {
             parameterDescriptor = with.requiredParameter(parameterName);
@@ -61,7 +69,7 @@ final class DefaultFieldDescriber implements FieldDescriber
         }
 
         parameterDescriptor.ofType(dataType);
-        parameterDescriptor.withExpressionSupport(getExpressionSupport(field));
+        parameterDescriptor.withExpressionSupport(IntrospectionUtils.getExpressionSupport(field));
         parameterDescriptor.withModelProperty(DeclaringMemberModelProperty.KEY, new DeclaringMemberModelProperty(field));
         parseDisplayAnnotations(field, parameterDescriptor);
 

@@ -15,7 +15,7 @@ public class FruitBox
 {
 
     private List<? extends Fruit> fruitLikeList = new ArrayList<>();
-    private List<Fruit> fruitList = new ArrayList<Fruit>();
+    private List<Fruit> fruitList = new ArrayList<>();
     private List<?> wildCardList = new ArrayList<>();
     private List rawList = new ArrayList<>();
 

@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.introspection.describer;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
@@ -23,6 +24,7 @@ import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Configuration;
 import org.mule.extension.api.annotation.Configurations;
+import org.mule.extension.api.annotation.Expression;
 import org.mule.extension.api.annotation.Extensible;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.ExtensionOf;
@@ -35,7 +37,6 @@ import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.annotation.param.display.Placement;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDescriptor;
@@ -49,9 +50,11 @@ import org.mule.extension.api.introspection.declaration.fluent.ParameterDescript
 import org.mule.extension.api.introspection.declaration.fluent.SourceDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
+import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.extension.api.introspection.property.display.ImmutablePlacementModelProperty;
 import org.mule.extension.api.introspection.property.display.PlacementModelProperty;
 import org.mule.extension.api.runtime.source.Source;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
@@ -100,6 +103,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private final Class<?> extensionType;
     private final VersionResolver versionResolver;
+    private final ClassTypeLoader typeLoader;
 
     /**
      * An ordered {@link List} used to locate a {@link FieldDescriber} that can handle
@@ -117,13 +121,14 @@ public final class AnnotationsBasedDescriber implements Describer
         checkArgument(extensionType != null, String.format("describer %s does not specify an extension type", getClass().getName()));
         this.extensionType = extensionType;
         this.versionResolver = versionResolver;
+        typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(extensionType.getClassLoader());
 
         initialiseFieldDescribers();
     }
 
     private void initialiseFieldDescribers()
     {
-        fieldDescribers = ImmutableList.of(new TlsContextFieldDescriber(), new DefaultFieldDescriber());
+        fieldDescribers = ImmutableList.of(new TlsContextFieldDescriber(), new DefaultFieldDescriber(typeLoader));
     }
 
     /**
@@ -247,8 +252,8 @@ public final class AnnotationsBasedDescriber implements Describer
         }
 
         source.sourceCreatedBy(new DefaultSourceFactory(sourceType))
-                .whichReturns(DataType.of(sourceGenerics.get(0)))
-                .withAttributesOfType(DataType.of(sourceGenerics.get(1)))
+                .whichReturns(typeLoader.load(sourceGenerics.get(0)))
+                .withAttributesOfType(typeLoader.load(sourceGenerics.get(1)))
                 .withExceptionEnricherFactory(getExceptionEnricherFactory(sourceType))
                 .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(sourceType));
 
@@ -314,7 +319,7 @@ public final class AnnotationsBasedDescriber implements Describer
                     ParameterDeclaration parameter = descriptor.getDeclaration();
                     group.addParameter(parameter.getName(), getField(field.getType(),
                                                                      getMemberName(parameter, parameter.getName()),
-                                                                     parameter.getType().getRawType()));
+                                                                     getType(parameter.getType())));
                 }
 
                 List<ParameterGroup> childGroups = declareConfigurationParametersGroups(field.getType(), with, group);
@@ -375,7 +380,7 @@ public final class AnnotationsBasedDescriber implements Describer
             OperationDescriptor operation = declaration.withOperation(method.getName())
                     .withModelProperty(ImplementingMethodModelProperty.KEY, new ImplementingMethodModelProperty(method))
                     .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(actingClass, method))
-                    .whichReturns(IntrospectionUtils.getMethodReturnType(method))
+                    .whichReturns(IntrospectionUtils.getMethodReturnType(method, typeLoader))
                     .withExceptionEnricherFactory(getExceptionEnricherFactory(method));
 
             declareOperationParameters(method, operation);
@@ -452,7 +457,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareOperationParameters(Method method, OperationDescriptor operation)
     {
-        List<ParsedParameter> descriptors = MuleExtensionAnnotationParser.parseParameters(method);
+        List<ParsedParameter> descriptors = MuleExtensionAnnotationParser.parseParameters(method, typeLoader);
 
         //TODO: MULE-9220
         checkAnnotationIsNotUsedMoreThanOnce(method, operation, UseConfig.class);
@@ -466,7 +471,7 @@ public final class AnnotationsBasedDescriber implements Describer
                                                 ? operation.with().requiredParameter(parsedParameter.getName())
                                                 : operation.with().optionalParameter(parsedParameter.getName()).defaultingTo(parsedParameter.getDefaultValue());
 
-                parameter.withExpressionSupport(IntrospectionUtils.getExpressionSupport(parsedParameter));
+                parameter.withExpressionSupport(IntrospectionUtils.getExpressionSupport(parsedParameter.getAnnotation(Expression.class)));
                 parameter.describedAs(EMPTY).ofType(parsedParameter.getType());
                 addTypeRestrictions(parameter, parsedParameter);
                 parseDisplayAnnotations(parsedParameter, parameter);
@@ -475,13 +480,13 @@ public final class AnnotationsBasedDescriber implements Describer
             Connection connectionAnnotation = parsedParameter.getAnnotation(Connection.class);
             if (connectionAnnotation != null)
             {
-                operation.withModelProperty(ConnectionTypeModelProperty.KEY, new ConnectionTypeModelProperty(parsedParameter.getType().getRawType()));
+                operation.withModelProperty(ConnectionTypeModelProperty.KEY, new ConnectionTypeModelProperty(getType(parsedParameter.getType(), typeLoader.getClassLoader())));
             }
 
             UseConfig useConfig = parsedParameter.getAnnotation(UseConfig.class);
             if (useConfig != null)
             {
-                operation.withModelProperty(ConfigTypeModelProperty.KEY, new ConfigTypeModelProperty(parsedParameter.getType().getRawType()));
+                operation.withModelProperty(ConfigTypeModelProperty.KEY, new ConfigTypeModelProperty(getType(parsedParameter.getType())));
             }
         }
     }

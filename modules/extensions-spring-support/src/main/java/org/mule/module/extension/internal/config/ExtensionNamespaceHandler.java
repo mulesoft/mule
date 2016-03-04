@@ -11,12 +11,14 @@ import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.config.spring.MuleArtifactContext;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
-import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
-import org.mule.util.ArrayUtils;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.DictionaryType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -130,15 +132,14 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
         extensionModel.getOperationModels().forEach(operationModel -> registerTopLevelParameter(extensionModel, operationModel.getParameterModels()));
     }
 
-    private void registerTopLevelParameter(final ExtensionModel extensionModel, final DataType parameterType)
+    private void registerTopLevelParameter(final ExtensionModel extensionModel, final MetadataType parameterType)
     {
-        parameterType.getQualifier().accept(new AbstractDataQualifierVisitor()
+        parameterType.accept(new MetadataTypeVisitor()
         {
-
             @Override
-            public void onPojo()
+            public void visitObject(ObjectType objectType)
             {
-                String name = hyphenize(getTopLevelTypeName(parameterType));
+                String name = hyphenize(getTopLevelTypeName(objectType));
                 if (topLevelParameters.put(extensionModel, name))
                 {
                     registerParser(name, new TopLevelParameterTypeBeanDefinitionParser(parameterType));
@@ -146,25 +147,16 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
             }
 
             @Override
-            public void onList()
+            public void visitArrayType(ArrayType arrayType)
             {
-                if (!ArrayUtils.isEmpty(parameterType.getGenericTypes()))
-                {
-                    registerTopLevelParameter(extensionModel, parameterType.getGenericTypes()[0]);
-                }
+                registerTopLevelParameter(extensionModel, arrayType.getType());
             }
 
             @Override
-            public void onMap()
+            public void visitDictionary(DictionaryType dictionaryType)
             {
-                DataType[] genericTypes = parameterType.getGenericTypes();
-                if (ArrayUtils.isEmpty(genericTypes))
-                {
-                    return;
-                }
-
-                DataType keyType = genericTypes[0];
-                keyType.getQualifier().accept(this);
+                MetadataType keyType = dictionaryType.getKeyType();
+                keyType.accept(this);
                 registerTopLevelParameter(extensionModel, keyType);
             }
         });

@@ -35,13 +35,11 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 
-import org.apache.commons.collections.Predicate;
-
 /**
  * Utility class that picks a {@link Declaration}
  * on which a {@link ExtensionModel} has already been described
  * and enriches such description with the javadocs extracted from the extension's acting classes.
- * <p/>
+ * <p>
  * This is necessary because such documentation is not available on runtime, thus this class
  * uses the annotation processor's AST access to extract it
  *
@@ -76,7 +74,7 @@ final class SchemaDocumenter
 
     private void documentOperations(RoundEnvironment roundEnv, ProcessingEnvironment processingEnv, Declaration declaration)
     {
-        final Map<String,Element> methods = getOperationMethods(roundEnv, processingEnv);
+        final Map<String, Element> methods = getOperationMethods(roundEnv, processingEnv);
 
         try
         {
@@ -84,10 +82,10 @@ final class SchemaDocumenter
             {
                 Element method = methods.get(operation.getName());
 
-                 // there are two cases in which method can be null:
-                 //   * A synthetic operation which was not defined in any class but added by a model property
-                 //   * An extension which operations are defined across multiple classes and the one being processed is not
-                 //     the one which defined the operation being processed
+                // there are two cases in which method can be null:
+                //   * A synthetic operation which was not defined in any class but added by a model property
+                //   * An extension which operations are defined across multiple classes and the one being processed is not
+                //     the one which defined the operation being processed
                 if (method == null)
                 {
                     continue;
@@ -158,16 +156,12 @@ final class SchemaDocumenter
         }
     }
 
-    private ConfigurationDeclaration findMatchingConfiguration(Declaration declaration, final TypeElement configurationElement) {
-        return (ConfigurationDeclaration) CollectionUtils.find(declaration.getConfigurations(), new Predicate()
-        {
-            @Override
-            public boolean evaluate(Object object)
-            {
-                Configuration configuration = configurationElement.getAnnotation(Configuration.class);
-                ConfigurationDeclaration configurationDeclaration = (ConfigurationDeclaration) object;
-                return configurationDeclaration.getName().equals(configuration.name());
-            }
+    private ConfigurationDeclaration findMatchingConfiguration(Declaration declaration, final TypeElement configurationElement)
+    {
+        return (ConfigurationDeclaration) CollectionUtils.find(declaration.getConfigurations(), object -> {
+            Configuration configuration = configurationElement.getAnnotation(Configuration.class);
+            ConfigurationDeclaration configurationDeclaration = (ConfigurationDeclaration) object;
+            return configurationDeclaration.getName().equals(configuration.name());
         });
     }
 }

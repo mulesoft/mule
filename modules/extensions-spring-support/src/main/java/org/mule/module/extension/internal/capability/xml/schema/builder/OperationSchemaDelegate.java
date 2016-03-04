@@ -15,7 +15,6 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.TYPE_SUFFIX;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.module.extension.internal.capability.xml.schema.model.Element;
@@ -84,7 +83,7 @@ class OperationSchemaDelegate
     {
         if (!isVoid(operationModel))
         {
-            Attribute attribute = builder.createAttribute(TARGET_ATTRIBUTE, DataType.of(String.class), false, NOT_SUPPORTED);
+            Attribute attribute = builder.createAttribute(TARGET_ATTRIBUTE, builder.load(String.class), false, NOT_SUPPORTED);
             attribute.setAnnotation(builder.createDocAnnotation(TARGET_ATTRIBUTE_DESCRIPTION));
             operationType.getAttributeOrAttributeGroup().add(attribute);
         }

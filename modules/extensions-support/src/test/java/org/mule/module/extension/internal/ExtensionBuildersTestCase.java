@@ -19,13 +19,6 @@ import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.extension.api.introspection.DataQualifier.BOOLEAN;
-import static org.mule.extension.api.introspection.DataQualifier.INTEGER;
-import static org.mule.extension.api.introspection.DataQualifier.LIST;
-import static org.mule.extension.api.introspection.DataQualifier.POJO;
-import static org.mule.extension.api.introspection.DataQualifier.STRING;
-import static org.mule.extension.api.introspection.DataQualifier.VOID;
-import static org.mule.extension.api.introspection.DataType.of;
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
@@ -69,7 +62,11 @@ import static org.mule.extension.api.introspection.declaration.tck.TestWebServic
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WSDL_LOCATION;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WS_CONSUMER;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference.WS_CONSUMER_DESCRIPTION;
+import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.exception.NoSuchConfigurationException;
@@ -77,8 +74,6 @@ import org.mule.extension.api.exception.NoSuchOperationException;
 import org.mule.extension.api.introspection.ConfigurationFactory;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
-import org.mule.extension.api.introspection.DataQualifier;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
@@ -90,6 +85,14 @@ import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarationReference;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.BinaryType;
+import org.mule.metadata.api.model.BooleanType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.NullType;
+import org.mule.metadata.api.model.NumberType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.StringType;
 import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
@@ -159,10 +162,10 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
 
         List<ParameterModel> parameterModels = configurationModel.getParameterModels();
         assertThat(parameterModels, hasSize(4));
-        assertParameter(parameterModels.get(0), ADDRESS, SERVICE_ADDRESS, SUPPORTED, true, of(String.class), STRING, null);
-        assertParameter(parameterModels.get(1), PORT, SERVICE_PORT, SUPPORTED, true, of(String.class), STRING, null);
-        assertParameter(parameterModels.get(2), SERVICE, SERVICE_NAME, SUPPORTED, true, of(String.class), STRING, null);
-        assertParameter(parameterModels.get(3), WSDL_LOCATION, URI_TO_FIND_THE_WSDL, NOT_SUPPORTED, true, of(String.class), STRING, null);
+        assertParameter(parameterModels.get(0), ADDRESS, SERVICE_ADDRESS, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
+        assertParameter(parameterModels.get(1), PORT, SERVICE_PORT, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
+        assertParameter(parameterModels.get(2), SERVICE, SERVICE_NAME, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
+        assertParameter(parameterModels.get(3), WSDL_LOCATION, URI_TO_FIND_THE_WSDL, NOT_SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
     }
 
     @Test
@@ -331,8 +334,8 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         assertThat(connectionProvider.getConnectionType(), is(sameInstance(CONNECTION_PROVIDER_CONNECTOR_TYPE)));
 
         List<ParameterModel> parameters = connectionProvider.getParameterModels();
-        assertParameter(parameters.get(0), USERNAME, USERNAME_DESCRIPTION, SUPPORTED, true, of(String.class), STRING, null);
-        assertParameter(parameters.get(1), PASSWORD, PASSWORD_DESCRIPTION, SUPPORTED, true, of(String.class), STRING, null);
+        assertParameter(parameters.get(0), USERNAME, USERNAME_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
+        assertParameter(parameters.get(1), PASSWORD, PASSWORD_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
     }
 
     @Test
@@ -344,12 +347,12 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         assertThat(sourceModel.getName(), is(LISTENER));
         assertThat(sourceModel.getDescription(), is(LISTEN_DESCRIPTION));
         assertThat(sourceModel.getSourceFactory().createSource(), is(sameInstance(reference.getSource())));
-        assertThat(sourceModel.getReturnType().getRawType(), is(equalTo(InputStream.class)));
-        assertThat(sourceModel.getAttributesType().getRawType(), is(equalTo(Serializable.class)));
+        assertThat(getType(sourceModel.getReturnType()), is(equalTo(InputStream.class)));
+        assertThat(getType(sourceModel.getAttributesType()), is(equalTo(Serializable.class)));
 
         List<ParameterModel> parameters = sourceModel.getParameterModels();
-        assertParameter(parameters.get(0), URL, URL_DESCRIPTION, SUPPORTED, true, of(String.class), STRING, null);
-        assertParameter(parameters.get(1), PORT, PORT_DESCRIPTION, SUPPORTED, false, of(Integer.class), INTEGER, DEFAULT_PORT);
+        assertParameter(parameters.get(0), URL, URL_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
+        assertParameter(parameters.get(1), PORT, PORT_DESCRIPTION, SUPPORTED, false, toMetadataType(Integer.class), NumberType.class, DEFAULT_PORT);
     }
 
     private void assertDescribingContext(ModelEnricher modelEnricher)
@@ -366,38 +369,38 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     {
         OperationModel operationModel = operationModels.get(2);
         assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(CONSUMER))));
-        assertDataType(operationModel.getReturnType(), InputStream.class, POJO);
+        assertDataType(operationModel.getReturnType(), InputStream.class, BinaryType.class);
 
         assertThat(operationModel.getName(), equalTo(CONSUMER));
         assertThat(operationModel.getDescription(), equalTo(GO_GET_THEM_TIGER));
 
         List<ParameterModel> parameterModels = operationModel.getParameterModels();
         assertThat(parameterModels, hasSize(2));
-        assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, SUPPORTED, true, of(String.class), STRING, null);
-        assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, SUPPORTED, false, of(Boolean.class), BOOLEAN, true);
+        assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
+        assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, SUPPORTED, false, toMetadataType(Boolean.class), BooleanType.class, true);
     }
 
     private void assertBroadcastOperation(List<OperationModel> operationModels) throws NoSuchOperationException
     {
         OperationModel operationModel = operationModels.get(1);
         assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(BROADCAST))));
-        assertDataType(operationModel.getReturnType(), void.class, VOID);
+        assertDataType(operationModel.getReturnType(), void.class, NullType.class);
 
         assertThat(operationModel.getName(), equalTo(BROADCAST));
         assertThat(operationModel.getDescription(), equalTo(BROADCAST_DESCRIPTION));
 
         List<ParameterModel> parameterModels = operationModel.getParameterModels();
         assertThat(parameterModels, hasSize(3));
-        assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, SUPPORTED, true, of(List.class, String.class), LIST, null);
-        assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, SUPPORTED, false, of(Boolean.class), BOOLEAN, true);
-        assertParameter(parameterModels.get(2), CALLBACK, CALLBACK_DESCRIPTION, REQUIRED, true, of(OperationModel.class), DataQualifier.OPERATION, null);
+        assertParameter(parameterModels.get(0), OPERATION, THE_OPERATION_TO_USE, SUPPORTED, true, arrayOf(List.class, TYPE_BUILDER.stringType().id(String.class.getName())), ArrayType.class, null);
+        assertParameter(parameterModels.get(1), MTOM_ENABLED, MTOM_DESCRIPTION, SUPPORTED, false, toMetadataType(Boolean.class), BooleanType.class, true);
+        assertParameter(parameterModels.get(2), CALLBACK, CALLBACK_DESCRIPTION, REQUIRED, true, toMetadataType(OperationModel.class), ObjectType.class, null);
     }
 
     private void assertArglessOperation(List<OperationModel> operationModels) throws NoSuchOperationException
     {
         OperationModel operationModel = operationModels.get(0);
         assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(ARG_LESS))));
-        assertDataType(operationModel.getReturnType(), int.class, INTEGER);
+        assertDataType(operationModel.getReturnType(), int.class, NumberType.class);
 
         assertThat(operationModel.getName(), equalTo(ARG_LESS));
         assertThat(operationModel.getDescription(), equalTo(HAS_NO_ARGS));
@@ -412,8 +415,8 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
                                  String description,
                                  ExpressionSupport expressionSupport,
                                  boolean required,
-                                 DataType type,
-                                 DataQualifier qualifier,
+                                 MetadataType metadataType,
+                                 Class<? extends MetadataType> qualifier,
                                  Object defaultValue)
     {
         assertThat(parameterModel, is(notNullValue()));
@@ -421,8 +424,8 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         assertThat(parameterModel.getDescription(), equalTo(description));
         assertThat(parameterModel.getExpressionSupport(), is(expressionSupport));
         assertThat(parameterModel.isRequired(), is(required));
-        assertThat(parameterModel.getType(), equalTo(type));
-        assertThat(parameterModel.getType().getQualifier(), is(qualifier));
+        assertThat(parameterModel.getType(), equalTo(metadataType));
+        assertThat(parameterModel.getType(), is(instanceOf(qualifier)));
 
         if (defaultValue != null)
         {
@@ -434,10 +437,10 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
         }
     }
 
-    private void assertDataType(DataType dataType, Class<?> expectedRawType, DataQualifier expectedQualifier)
+    private void assertDataType(MetadataType metadataType, Class<?> expectedRawType, Class<? extends MetadataType> typeQualifier)
     {
-        assertThat(dataType.getRawType(), equalTo(expectedRawType));
-        assertThat(dataType.getQualifier(), is(expectedQualifier));
+        assertThat(metadataType, is(instanceOf(typeQualifier)));
+        assertThat(expectedRawType.isAssignableFrom(getType(metadataType)), is(true));
     }
 
     private DeclarationDescriptor createDeclarationDescriptor()

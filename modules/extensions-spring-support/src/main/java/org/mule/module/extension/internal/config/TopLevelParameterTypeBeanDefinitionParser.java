@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.config;
 
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
-import org.mule.extension.api.introspection.DataType;
+import org.mule.metadata.api.model.MetadataType;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -20,25 +20,25 @@ import org.w3c.dom.Element;
  * <p/>
  * It produces a {@link TopLevelParameterTypeFactoryBean} which will produce the
  * actual instances. The type of the parameter to produce is represented by
- * a {@link #dataType}
+ * a {@link #metadataType}
  *
  * @since 3.7.0
  */
 final class TopLevelParameterTypeBeanDefinitionParser extends BaseExtensionBeanDefinitionParser
 {
-    private final DataType dataType;
+    private final MetadataType metadataType;
 
-    TopLevelParameterTypeBeanDefinitionParser(DataType dataType)
+    TopLevelParameterTypeBeanDefinitionParser(MetadataType metadataType)
     {
         super(TopLevelParameterTypeFactoryBean.class);
-        this.dataType = dataType;
+        this.metadataType = metadataType;
     }
 
     @Override
     protected void doParse(BeanDefinitionBuilder builder, Element element, XmlExtensionParserDelegate parserDelegate, ParserContext parserContext)
     {
         builder.addConstructorArgValue(parserDelegate.toElementDescriptorBeanDefinition(element));
-        builder.addConstructorArgValue(dataType);
+        builder.addConstructorArgValue(metadataType);
         builder.addConstructorArgReference(OBJECT_MULE_CONTEXT);
     }
 }

@@ -7,8 +7,10 @@
 package org.mule.module.extension.internal.util;
 
 import org.mule.extension.api.annotation.Alias;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.java.utils.JavaTypeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,7 +133,7 @@ public class NameUtils
 
     /**
      * Transforms a hyphenized value into a camel case one.
-     * <p/>
+     * <p>
      * For example:
      * {@code message-processor} would be transformed to {@code messageProcessor}
      *
@@ -153,7 +155,7 @@ public class NameUtils
 
     /**
      * Transforms a camel case value into a hyphenizedone.
-     * <p/>
+     * <p>
      * For example:
      * {@code messageProcessor} would be transformed to {@code message-processor}
      *
@@ -251,19 +253,23 @@ public class NameUtils
     }
 
     /**
-     * Returns the name of the give top level {@code type}.
-     * <p/>
-     * If the {@code type}'s {@link DataType#getRawType()} contains the {@link Alias}
-     * annotation, then the {@link Alias#value()} is returned. Otherwise, the raw
-     * type's {@link Class#getName()} is returned
+     * Returns a hypenized name of the give top level {@code metadataType}.
+     * <p>
+     * It uses {@link JavaTypeUtils#getType(MetadataType)} to obtain the
+     * {@link Class} that the {@code metadataType} represents. Then, it
+     * checks if the  {@link Alias} annotation is present. If so, the
+     * {@link Alias#value()} is used. Otherwise, the class name will
+     * be considered.
      *
-     * @param type the {@link DataType} which name you want
-     * @return the name for the given {@code type}
+     * @param metadataType the {@link ObjectType} which name you want
+     * @return the hypenized name for the given {@code type}
      */
-    public static String getTopLevelTypeName(DataType type)
+    public static String getTopLevelTypeName(ObjectType metadataType)
     {
-        Alias alias = type.getRawType().getAnnotation(Alias.class);
-        String name = alias != null ? alias.value() : type.getRawType().getSimpleName();
+        Class<?> type = JavaTypeUtils.getType(metadataType);
+        Alias alias = type.getAnnotation(Alias.class);
+        String name = alias != null ? alias.value() : type.getSimpleName();
+
         return hyphenize(name);
     }
 

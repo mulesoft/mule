@@ -215,7 +215,7 @@
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
-        <reflectionsVersion>0.9.9</reflectionsVersion>
+        <reflectionsVersion>0.9.10</reflectionsVersion>
         <quartzVersion>2.2.1</quartzVersion>
         <rhinoVersion>1.7R4</rhinoVersion>
         <rhinoJsr223Version>1.1</rhinoJsr223Version>

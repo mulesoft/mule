@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
+import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.util.Preconditions.checkArgument;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -18,8 +19,6 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
-
-import org.mule.api.NestedProcessor;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Expression;
 import org.mule.extension.api.annotation.Parameter;
@@ -27,12 +26,14 @@ import org.mule.extension.api.annotation.ParameterGroup;
 import org.mule.extension.api.annotation.param.Ignore;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.runtime.source.Source;
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.NullType;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -55,8 +56,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.ResolvableType;
 
 /**
@@ -64,79 +63,79 @@ import org.springframework.core.ResolvableType;
  *
  * @since 3.7.0
  */
-public class IntrospectionUtils
+public final class IntrospectionUtils
 {
-
-    private static final Logger logger = LoggerFactory.getLogger(IntrospectionUtils.class);
 
     private IntrospectionUtils()
     {
     }
 
     /**
-     * Returns a {@link DataType} representing
-     * the given {@link java.lang.reflect.Method}'s return type
+     * Returns a {@link MetadataType} representing the given {@link Method}'s return type
      *
-     * @return a {@link DataType}
+     * @param method     the {@link Method} being introspected
+     * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
+     * @return a {@link MetadataType}
      * @throws java.lang.IllegalArgumentException is method is {@code null}
      */
-    public static DataType getMethodReturnType(Method method)
+    public static MetadataType getMethodReturnType(Method method, ClassTypeLoader typeLoader)
     {
         checkArgument(method != null, "Can't introspect a null method");
-        return toDataType(ResolvableType.forMethodReturnType(method));
+        ResolvableType type = ResolvableType.forMethodReturnType(method);
+        return typeLoader.load(type.getType());
     }
 
     /**
-     * Returns an array of {@link DataType}
-     * representing each of the given {@link java.lang.reflect.Method}'s argument
+     * Returns an array of {@link MetadataType} representing each of the given {@link Method}'s argument
      * types.
      *
-     * @param method a not {@code null} {@link java.lang.reflect.Method}
-     * @return an array of {@link DataType} matching
+     * @param method     a not {@code null} {@link Method}
+     * @param typeLoader a {@link ClassTypeLoader} to be used to create the returned {@link MetadataType}s
+     * @return an array of {@link MetadataType} matching
      * the method's arguments. If the method doesn't take any, then the array will be empty
      * @throws java.lang.IllegalArgumentException is method is {@code null}
      */
-    public static DataType[] getMethodArgumentTypes(Method method)
+    public static MetadataType[] getMethodArgumentTypes(Method method, ClassTypeLoader typeLoader)
     {
         checkArgument(method != null, "Can't introspect a null method");
         Class<?>[] parameters = method.getParameterTypes();
         if (ArrayUtils.isEmpty(parameters))
         {
-            return new DataType[] {};
+            return new MetadataType[] {};
         }
 
-        DataType[] types = new DataType[parameters.length];
+        MetadataType[] types = new MetadataType[parameters.length];
         for (int i = 0; i < parameters.length; i++)
         {
             ResolvableType type = ResolvableType.forMethodParameter(method, i);
-            types[i] = toDataType(type);
+            types[i] = typeLoader.load(type.getType());
         }
 
         return types;
     }
 
     /**
-     * Returns a {@link DataType} describing
-     * the given {@link java.lang.reflect.Field}'s type
+     * Returns a {@link MetadataType} describing the given {@link Field}'s type
      *
-     * @param field a not {@code null} {@link java.lang.reflect.Field}
-     * @return a {@link DataType} matching the field's type
+     * @param field      a not {@code null} {@link Field}
+     * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
+     * @return a {@link MetadataType} matching the field's type
      * @throws java.lang.IllegalArgumentException if field is {@code null}
      */
-    public static DataType getFieldDataType(Field field)
+    public static MetadataType getFieldMetadataType(Field field, ClassTypeLoader typeLoader)
     {
         checkArgument(field != null, "Can't introspect a null field");
-        return toDataType(ResolvableType.forField(field));
+        return typeLoader.load(ResolvableType.forField(field).getType());
     }
 
     public static Field getField(Class<?> clazz, ParameterModel parameterModel)
     {
-        return getField(clazz, getMemberName(parameterModel, parameterModel.getName()), parameterModel.getType().getRawType());
+        return getField(clazz, getMemberName(parameterModel, parameterModel.getName()), getType(parameterModel.getType()));
     }
 
     public static Field getField(Class<?> clazz, ParameterDeclaration parameterDeclaration)
     {
-        return getField(clazz, getMemberName(parameterDeclaration, parameterDeclaration.getName()), parameterDeclaration.getType().getRawType());
+        return getField(clazz, getMemberName(parameterDeclaration, parameterDeclaration.getName()), getType(parameterDeclaration.getType()));
     }
 
     public static Field getField(Class<?> clazz, String name, Class<?> type)
@@ -145,28 +144,20 @@ public class IntrospectionUtils
         return CollectionUtils.isEmpty(candidates) ? null : candidates.iterator().next();
     }
 
+    public static Field getFieldByAlias(Class<?> clazz, String alias, Class<?> type)
+    {
+        Collection<Field> candidates = getAllFields(clazz, withAnnotation(Alias.class), withTypeAssignableTo(type));
+        Field field = candidates.stream()
+                .filter(f -> alias.equals(f.getAnnotation(Alias.class).value()))
+                .findFirst()
+                .orElse(null);
+
+        return field != null ? field : getField(clazz, alias, type);
+    }
+
     public static boolean hasDefaultConstructor(Class<?> clazz)
     {
         return ClassUtils.getConstructor(clazz, new Class[] {}) != null;
-    }
-
-    private static DataType toDataType(ResolvableType type)
-    {
-        Class<?> rawClass = type.getRawClass();
-        ResolvableType[] generics = type.getGenerics();
-
-        if (isOperation(rawClass))
-        {
-            return DataType.of(OperationModel.class);
-        }
-        else if (ArrayUtils.isEmpty(generics))
-        {
-            return DataType.of(rawClass);
-        }
-        else
-        {
-            return DataType.of(rawClass, toDataTypes(generics));
-        }
     }
 
     public static List<Class<?>> getInterfaceGenerics(Class<?> type, Class<?> implementedInterface)
@@ -218,34 +209,6 @@ public class IntrospectionUtils
         return new LinkedList<>();
     }
 
-    private static boolean isOperation(Class<?> rawClass)
-    {
-        return NestedProcessor.class.isAssignableFrom(rawClass);
-    }
-
-    private static DataType[] toDataTypes(ResolvableType[] resolvableTypes)
-    {
-        DataType[] types = new DataType[resolvableTypes.length];
-        for (int i = 0; i < resolvableTypes.length; i++)
-        {
-            Class<?> rawClass = resolvableTypes[i].resolve(Object.class);
-            if (isOperation(rawClass))
-            {
-                rawClass = OperationModel.class;
-            }
-
-            if (resolvableTypes[i].getGenerics().length > 0)
-            {
-                types[i] = DataType.of(rawClass, toDataTypes(resolvableTypes[i].getGenerics()));
-            }
-            else
-            {
-                types[i] = DataType.of(rawClass);
-            }
-        }
-        return types;
-    }
-
     public static void checkInstantiable(Class<?> declaringClass)
     {
         checkInstantiable(declaringClass, true);
@@ -272,11 +235,6 @@ public class IntrospectionUtils
                && !Modifier.isAbstract(declaringClass.getModifiers());
     }
 
-    public static boolean isIgnored(AccessibleObject object)
-    {
-        return object.getAnnotation(Ignore.class) != null;
-    }
-
     public static boolean isRequired(AccessibleObject object)
     {
         return object.getAnnotation(Optional.class) == null;
@@ -287,12 +245,6 @@ public class IntrospectionUtils
         return !forceOptional && parameterModel.isRequired();
     }
 
-    public static ExpressionSupport getExpressionSupport(AnnotatedElement object)
-    {
-        Expression expression = object.getAnnotation(Expression.class);
-        return expression != null ? expression.value() : SUPPORTED;
-    }
-
     public static boolean isVoid(Method method)
     {
         return isVoid(method.getReturnType());
@@ -300,7 +252,7 @@ public class IntrospectionUtils
 
     public static boolean isVoid(OperationModel operationModel)
     {
-        return isVoid(operationModel.getReturnType().getRawType());
+        return operationModel.getReturnType() instanceof NullType;
     }
 
     private static boolean isVoid(Class<?> type)
@@ -342,6 +294,16 @@ public class IntrospectionUtils
         {
             throw new IllegalModelDefinitionException("Could not introspect POJO: " + extensionType.getName(), e);
         }
+    }
+
+    public static ExpressionSupport getExpressionSupport(AnnotatedElement object)
+    {
+        return getExpressionSupport(object.getAnnotation(Expression.class));
+    }
+
+    public static ExpressionSupport getExpressionSupport(Expression expressionAnnotation)
+    {
+        return expressionAnnotation != null ? expressionAnnotation.value() : SUPPORTED;
     }
 
     public static String getAlias(Field field)

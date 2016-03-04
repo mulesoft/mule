@@ -26,12 +26,12 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withReturnType;
 import org.mule.extension.api.annotation.DataTypeParameters;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -104,7 +104,7 @@ public class DataTypeModelEnricherTestCase extends AbstractMuleTestCase
     {
         assertThat(parameter, is(notNullValue()));
         assertThat(parameter.getName(), is(name));
-        assertThat(parameter.getType(), equalTo(DataType.of(String.class)));
+        assertThat(parameter.getType(), equalTo(ExtensionsTestUtils.toMetadataType(String.class)));
         assertThat(parameter.isRequired(), is(false));
         assertThat(parameter.getExpressionSupport(), is(SUPPORTED));
         assertThat(parameter.getDefaultValue(), is(nullValue()));

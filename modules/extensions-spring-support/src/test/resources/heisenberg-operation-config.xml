@@ -29,7 +29,7 @@
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
         <heisenberg:ricin-packs>
-            <heisenberg:ricin-pack>
+            <heisenberg:ricin-pack microgramsPerKilo="22">
                 <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
             </heisenberg:ricin-pack>
         </heisenberg:ricin-packs>

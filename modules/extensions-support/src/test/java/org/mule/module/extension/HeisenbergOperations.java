@@ -11,6 +11,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.NestedProcessor;
 import org.mule.api.temporary.MuleMessage;
+import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.annotation.DataTypeParameters;
 import org.mule.extension.api.annotation.Expression;
 import org.mule.extension.api.annotation.OnException;
@@ -20,7 +21,6 @@ import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.annotation.param.Ignore;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
-import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.annotation.param.display.Placement;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.module.extension.exception.CureCancerExceptionEnricher;
@@ -43,9 +43,6 @@ import javax.inject.Inject;
 public class HeisenbergOperations
 {
 
-    private static final String SECRET_PACKAGE = "secretPackage";
-    private static final String CONTENT_TYPE = "contentType";
-    private static final String METH = "meth";
     public static final String CURE_CANCER_MESSAGE = "Can't help you, you are going to die";
     public static final String CALL_GUS_MESSAGE = "You are not allowed to speak with gus.";
     public static final String KILL_WITH_GROUP = "KillGroup";

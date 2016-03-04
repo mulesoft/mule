@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -124,7 +124,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     {
         configureMockEvent(event);
 
-        when(operationModel.getReturnType()).thenReturn(org.mule.extension.api.introspection.DataType.of(String.class));
+        when(operationModel.getReturnType()).thenReturn(toMetadataType(String.class));
         when(operationModel.getExecutor()).thenReturn(operationExecutorFactory);
         when(operationModel.getExceptionEnricherFactory()).thenReturn(Optional.of(exceptionEnricherFactory));
         when(exceptionEnricherFactory.createEnricher()).thenReturn(new NullExceptionEnricher());
@@ -323,7 +323,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     @Test
     public void operationIsVoid() throws Exception
     {
-        when(operationModel.getReturnType()).thenReturn(org.mule.extension.api.introspection.DataType.of(void.class));
+        when(operationModel.getReturnType()).thenReturn(toMetadataType(void.class));
         messageProcessor = createOperationMessageProcessor();
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(null);

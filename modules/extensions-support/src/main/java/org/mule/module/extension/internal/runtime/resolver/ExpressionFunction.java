@@ -9,7 +9,8 @@ package org.mule.module.extension.internal.runtime.resolver;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.api.introspection.DataType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.utils.JavaTypeUtils;
 
 import java.util.function.Function;
 
@@ -26,9 +27,9 @@ final class ExpressionFunction<T> implements Function<MuleEvent, T>
 {
 
     private final String expression;
-    private final DataType type;
+    private final MetadataType type;
 
-    ExpressionFunction(String expression, DataType type)
+    ExpressionFunction(String expression, MetadataType type)
     {
         this.expression = expression;
         this.type = type;
@@ -39,7 +40,7 @@ final class ExpressionFunction<T> implements Function<MuleEvent, T>
     {
         try
         {
-            return new TypeSafeExpressionValueResolver<T>(expression, type).resolve(event);
+            return new TypeSafeExpressionValueResolver<T>(expression, JavaTypeUtils.getType(type)).resolve(event);
         }
         catch (MuleException e)
         {
