@@ -115,6 +115,9 @@
             <includes>
                 <!-- Mule API -->
                 <include>org.mule:mule-api</include>
+                <!--Metadata API-->
+                <include>org.mule:mule-metadata-model-api</include>
+                <include>org.mule:mule-metadata-model-java</include>
                 <!-- extensions API -->
                 <include>org.mule.extensions:mule-extensions-api</include>
                 <!-- Core -->
@@ -170,6 +173,9 @@
             <excludes>
                 <!--Mule API-->
                 <exclude>org.mule:mule-api</exclude>
+                <!--Metadata API-->
+                <exclude>org.mule:mule-metadata-model-api</exclude>
+                <exclude>org.mule:mule-metadata-model-java</exclude>
                 <!--extensions API-->
                 <exclude>org.mule.extensions:mule-extensions-api</exclude>
                 <!-- lib/mule -->
