@@ -11,7 +11,7 @@ import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.config.ExceptionHelper.getRootException;
 
 import org.mule.api.config.ConfigurationException;
-import org.mule.tck.junit4.DomainFunctionalTestCase;
+import org.mule.functional.junit4.DomainFunctionalTestCase;
 
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
