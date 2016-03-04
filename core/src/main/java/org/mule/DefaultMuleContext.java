@@ -8,6 +8,7 @@ package org.mule;
 
 import static org.mule.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
+import static org.mule.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 
 import org.mule.api.Injector;
 import org.mule.api.MuleContext;
@@ -43,7 +44,6 @@ import org.mule.api.security.SecurityManager;
 import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreManager;
-import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.api.util.StreamCloserService;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.ClusterConfiguration;
@@ -170,8 +170,6 @@ public class DefaultMuleContext implements MuleContext
     private Map<QName, Set<Object>> configurationAnnotations = new HashMap<QName, Set<Object>>();
 
     private SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager = new SingleResourceTransactionFactoryManager();
-
-    private TransactionManager transactionManager;
 
     private LockFactory lockFactory;
 
@@ -306,7 +304,6 @@ public class DefaultMuleContext implements MuleContext
         startDate = System.currentTimeMillis();
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTING));
-        initTransactionManager();
         getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
         overridePollingController();
         overrideClusterConfiguration();
@@ -694,8 +691,7 @@ public class DefaultMuleContext implements MuleContext
     public void setTransactionManager(TransactionManager manager) throws RegistrationException
     {
         //checkLifecycleForPropertySet(MuleProperties.OBJECT_TRANSACTION_MANAGER, Initialisable.PHASE_NAME);
-        registryBroker.registerObject(MuleProperties.OBJECT_TRANSACTION_MANAGER, manager);
-        transactionManager = manager;
+        registryBroker.registerObject(OBJECT_TRANSACTION_MANAGER, manager);
     }
 
     /**
@@ -708,40 +704,7 @@ public class DefaultMuleContext implements MuleContext
     @Override
     public TransactionManager getTransactionManager()
     {
-        return transactionManager;
-    }
-
-    private void initTransactionManager()
-    {
-        TransactionManager innerTxMgr = null;
-        Collection temp = registryBroker.lookupObjects(TransactionManagerFactory.class);
-        if (temp.size() > 1)
-        {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage("More than one TX manager has been configured - Only one TX manager can be defined per application. " +
-                                                                            "Validate your app configuration or if your app belongs to a domain and the domains defines a TX manager then you should use that one."));
-        }
-        if (temp.size() > 0)
-        {
-            try
-            {
-                innerTxMgr = (((TransactionManagerFactory) temp.iterator().next()).create(config));
-                registryBroker.registerObject(MuleProperties.OBJECT_TRANSACTION_MANAGER, innerTxMgr);
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(CoreMessages.failedToCreate("transaction manager"), e);
-            }
-        }
-        else
-        {
-            temp = registryBroker.lookupObjects(TransactionManager.class);
-            if (temp.size() > 0)
-            {
-                innerTxMgr = (((TransactionManager) temp.iterator().next()));
-            }
-        }
-
-        transactionManager = innerTxMgr;
+        return getRegistry().lookupObject(OBJECT_TRANSACTION_MANAGER);
     }
 
     protected void checkLifecycleForPropertySet(String propertyName, String phase) throws IllegalStateException
