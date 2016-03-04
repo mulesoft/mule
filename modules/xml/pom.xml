@@ -161,11 +161,4 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>xqj</id>
-            <name>XQJ Maven Repository</name>
-            <url>http://xqj.net/maven</url>
-        </repository>
-    </repositories>
 </project>
