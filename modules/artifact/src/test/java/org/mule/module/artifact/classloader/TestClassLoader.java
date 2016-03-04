@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.application;
+package org.mule.module.artifact.classloader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,10 +19,10 @@ import java.util.Map;
 public class TestClassLoader extends ClassLoader
 {
 
-    private Map<String, Class> classes = new HashMap<String, Class>();
-    private Map<String, URL> resources = new HashMap<String, URL>();
-    private Map<String, InputStream> streamResources = new HashMap<String, InputStream>();
-    private Map<String, String> libraries = new HashMap<String, String>();
+    private Map<String, Class> classes = new HashMap<>();
+    private Map<String, URL> resources = new HashMap<>();
+    private Map<String, InputStream> streamResources = new HashMap<>();
+    private Map<String, String> libraries = new HashMap<>();
 
     @Override
     public Class<?> loadClass(String s) throws ClassNotFoundException
@@ -52,7 +52,7 @@ public class TestClassLoader extends ClassLoader
     @Override
     public Enumeration<URL> getResources(String s) throws IOException
     {
-        return new EnumerationAdapter<URL>(resources.values());
+        return new EnumerationAdapter<>(resources.values());
     }
 
     @Override

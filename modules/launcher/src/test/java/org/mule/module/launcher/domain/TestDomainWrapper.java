@@ -11,7 +11,7 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 
 import java.io.File;
 

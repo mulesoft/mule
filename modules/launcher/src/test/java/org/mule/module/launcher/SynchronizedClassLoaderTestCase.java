@@ -8,6 +8,7 @@
 package org.mule.module.launcher;
 
 import static org.junit.Assert.assertFalse;
+import org.mule.module.artifact.classloader.FineGrainedControlClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.MediumTest;
 

@@ -23,6 +23,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-artifact</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-reboot</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -36,6 +41,12 @@
         </dependency>
 
         <!--Unit Tests-->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-artifact</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>

@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher.descriptor;
 
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import static org.mule.module.reboot.MuleContainerBootstrapUtils.getMuleAppDir;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
@@ -36,6 +36,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
         final Properties p = PropertiesUtils.loadProperties(new FileInputStream(descriptor));
 
         ApplicationDescriptor d = new ApplicationDescriptor();
+        d.setName(applicationName);
         d.setEncoding(p.getProperty(PROPERTY_ENCODING));
         d.setConfigurationBuilder(p.getProperty(PROPERTY_CONFIG_BUILDER));
         d.setDomain(p.getProperty(PROPERTY_DOMAIN));
@@ -63,7 +64,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
         final String overrideString = p.getProperty(PROPERTY_LOADER_OVERRIDE);
         if (StringUtils.isNotBlank(overrideString))
         {
-            Set<String> values = new HashSet<String>();
+            Set<String> values = new HashSet<>();
             final String[] overrides = overrideString.split(",");
             Collections.addAll(values, overrides);
             d.setLoaderOverride(values);
@@ -101,7 +102,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
      */
     protected String toAbsoluteFile(String path, String appName)
     {
-        return MuleContainerBootstrapUtils.getMuleAppDir(appName).getAbsolutePath() + File.separator + path;
+        return getMuleAppDir(appName).getAbsolutePath() + File.separator + path;
     }
 
     public String getSupportedFormat()

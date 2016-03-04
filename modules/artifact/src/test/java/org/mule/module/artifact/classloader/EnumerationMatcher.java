@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.application;
+package org.mule.module.artifact.classloader;
 
 import java.util.Collection;
 import java.util.Enumeration;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.junit.internal.matchers.TypeSafeMatcher;
+import org.hamcrest.TypeSafeMatcher;
 
 /**
  * Matches a {@link Enumeration} against a collection of expected items.
@@ -52,6 +52,6 @@ public class EnumerationMatcher<T> extends TypeSafeMatcher<Enumeration<T>>
 
     public static <T> Matcher<Enumeration<T>> equalTo(Collection<T> items)
     {
-        return new EnumerationMatcher<T>(items);
+        return new EnumerationMatcher<>(items);
     }
 }

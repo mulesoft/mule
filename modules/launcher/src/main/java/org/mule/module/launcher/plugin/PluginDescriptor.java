@@ -6,27 +6,13 @@
  */
 package org.mule.module.launcher.plugin;
 
+import org.mule.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
-import java.util.HashSet;
-import java.util.Set;
-
-public class PluginDescriptor
+public class PluginDescriptor extends ArtifactDescriptor
 {
-    private Set<String> loaderOverride = new HashSet<String>();
-    private ApplicationDescriptor appDescriptor;
-    private String name;
     private PluginClasspath classpath = new PluginClasspath();
-
-    public Set<String> getLoaderOverride()
-    {
-        return loaderOverride;
-    }
-
-    public void setLoaderOverride(Set<String> loaderOverride)
-    {
-        this.loaderOverride = loaderOverride;
-    }
+    private ApplicationDescriptor appDescriptor;
 
     public ApplicationDescriptor getAppDescriptor()
     {
@@ -36,16 +22,6 @@ public class PluginDescriptor
     public void setAppDescriptor(ApplicationDescriptor appDescriptor)
     {
         this.appDescriptor = appDescriptor;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     public PluginClasspath getClasspath()

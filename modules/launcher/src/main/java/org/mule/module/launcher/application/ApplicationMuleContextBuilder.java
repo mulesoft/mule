@@ -42,7 +42,7 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder
     {
         final DefaultMuleConfiguration configuration = new DefaultMuleConfiguration(true);
         PropertiesMuleConfigurationFactory.initializeFromProperties(configuration, desc.getAppProperties());
-        configuration.setId(desc.getAppName());
+        configuration.setId(desc.getName());
         final String encoding = desc.getEncoding();
         if (StringUtils.isNotBlank(encoding))
         {
@@ -55,7 +55,7 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder
     protected MuleWorkManager createWorkManager()
     {
         // use app name in the core Mule thread
-        final String threadName = String.format("[%s].Mule", desc.getAppName());
+        final String threadName = String.format("[%s].Mule", desc.getName());
         return new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, threadName, getMuleConfiguration().getShutdownTimeout());
 
     }

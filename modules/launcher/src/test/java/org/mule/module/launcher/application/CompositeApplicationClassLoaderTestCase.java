@@ -9,7 +9,9 @@ package org.mule.module.launcher.application;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import org.mule.module.launcher.DisposableClassLoader;
+import org.mule.module.artifact.classloader.DisposableClassLoader;
+import org.mule.module.artifact.classloader.EnumerationMatcher;
+import org.mule.module.artifact.classloader.TestClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -34,9 +36,6 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     public static final String RESOURCE_NAME = "dummy.txt";
     public static final String PLUGIN_RESOURCE_NAME = "plugin.txt";
 
-    public static final String LIBRARY_NAME = "dummy.so";
-    public static final String APP_LOADED_LIBRARY = "app.dummy.so";
-    public static final String PLUGIN_LOADED_LIBRARY = "plugin.dummy.so";
     public static final String APP_NAME = "testApp";
 
     public final URL APP_LOADED_RESOURCE;
@@ -179,7 +178,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
         Enumeration<URL> resources = compositeApplicationClassLoader.getResources(RESOURCE_NAME);
 
-        List<URL> expectedResources = new LinkedList<URL>();
+        List<URL> expectedResources = new LinkedList<>();
         expectedResources.add(APP_LOADED_RESOURCE);
         expectedResources.add(PLUGIN_LOADED_RESOURCE);
 
@@ -198,89 +197,13 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
         Enumeration<URL> resources = compositeApplicationClassLoader.getResources(RESOURCE_NAME);
 
-        List<URL> expectedResources = new LinkedList<URL>();
+        List<URL> expectedResources = new LinkedList<>();
         expectedResources.add(APP_LOADED_RESOURCE);
 
         assertThat(resources, EnumerationMatcher.equalTo(expectedResources));
     }
 
-    @Test
-    public void loadsLibraryFromAppFirst() throws Exception
-    {
-        appClassLoader.addLibrary(LIBRARY_NAME, APP_LOADED_LIBRARY);
-        pluginClassLoader.addLibrary(LIBRARY_NAME, PLUGIN_LOADED_LIBRARY);
 
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
-
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
-
-        String library = compositeApplicationClassLoader.findLibrary(LIBRARY_NAME);
-
-        assertThat(library, equalTo(APP_LOADED_LIBRARY));
-    }
-
-    @Test
-    public void loadsLibraryFromPluginWhenIsNotDefinedInApp() throws Exception
-    {
-        pluginClassLoader.addLibrary(LIBRARY_NAME, PLUGIN_LOADED_LIBRARY);
-
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
-
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
-
-        String library = compositeApplicationClassLoader.findLibrary(LIBRARY_NAME);
-
-        assertThat(library, equalTo(PLUGIN_LOADED_LIBRARY));
-    }
-
-    @Test
-    public void returnsNullWhenLibraryIsNotDefinedInAnyClassLoader() throws Exception
-    {
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
-
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
-
-        String library = compositeApplicationClassLoader.findLibrary(LIBRARY_NAME);
-
-        assertThat(library, equalTo(null));
-    }
-
-    @Test
-    public void loadsResolvedClassFromAppFirst() throws Exception
-    {
-        appClassLoader.addClass(CLASS_NAME, APP_LOADED_CLASS);
-        pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
-
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
-
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
-
-        Class<?> aClass = compositeApplicationClassLoader.loadClass(CLASS_NAME, true);
-        assertThat(aClass, equalTo(APP_LOADED_CLASS));
-    }
-
-    @Test
-    public void loadsResolvedClassFromPluginWhenIsNotDefinedInApp() throws Exception
-    {
-        pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
-
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
-
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
-
-        Class<?> aClass = compositeApplicationClassLoader.loadClass(CLASS_NAME, true);
-        assertThat(aClass, equalTo(PLUGIN_LOADED_CLASS));
-    }
-
-    @Test(expected = ClassNotFoundException.class)
-    public void failsToLoadResolvedClassWhenIsNotDefinedInAnyClassLoader() throws Exception
-    {
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
-
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
-
-        compositeApplicationClassLoader.loadClass(CLASS_NAME, true);
-    }
 
     @Test
     public void findsResourceInAppFirst() throws Exception
@@ -333,7 +256,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
     private List<ClassLoader> getClassLoaders(ClassLoader... expectedClassLoaders)
     {
-        List<ClassLoader> classLoaders = new LinkedList<ClassLoader>();
+        List<ClassLoader> classLoaders = new LinkedList<>();
 
         Collections.addAll(classLoaders, expectedClassLoaders);
 

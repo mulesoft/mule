@@ -6,10 +6,10 @@
  */
 package org.mule.module.launcher.application;
 
-import org.mule.module.launcher.GoodCitizenClassLoader;
+import org.mule.module.artifact.classloader.GoodCitizenClassLoader;
 import org.mule.module.launcher.MuleApplicationClassLoader;
 import org.mule.module.launcher.nativelib.NativeLibraryFinderFactory;
-import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.domain.DomainClassLoaderRepository;
 import org.mule.module.launcher.plugin.MulePluginsClassLoader;
@@ -61,6 +61,6 @@ public class MuleApplicationClassLoaderFactory implements ApplicationClassLoader
             parent = new MulePluginsClassLoader(parent, plugins);
         }
 
-        return new MuleApplicationClassLoader(descriptor.getAppName(), parent, descriptor.getLoaderOverride(), nativeLibraryFinderFactory.create(descriptor.getAppName()));
+        return new MuleApplicationClassLoader(descriptor.getName(), parent, descriptor.getLoaderOverrides(), nativeLibraryFinderFactory.create(descriptor.getName()));
     }
 }

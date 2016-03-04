@@ -40,7 +40,7 @@ import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationStatus;
 import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.TestApplicationFactory;
-import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.domain.Domain;
 import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
 import org.mule.module.launcher.domain.TestDomainFactory;

@@ -9,10 +9,10 @@ package org.mule.module.launcher.log4j2;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Disposable;
-import org.mule.module.launcher.DirectoryResourceLocator;
-import org.mule.module.launcher.LocalResourceLocator;
-import org.mule.module.launcher.artifact.ArtifactClassLoader;
-import org.mule.module.launcher.artifact.ShutdownListener;
+import org.mule.module.artifact.classloader.DirectoryResourceLocator;
+import org.mule.module.artifact.classloader.LocalResourceLocator;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.module.artifact.classloader.ShutdownListener;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
@@ -46,7 +46,7 @@ import org.apache.logging.log4j.status.StatusLogger;
  * sense for it</li>
  * </ul>
  * <p/>
- * If the classloader is an artifact one, then it adds a {@link org.mule.module.launcher.artifact.ShutdownListener}
+ * If the classloader is an artifact one, then it adds a {@link ShutdownListener}
  * to destroy the logging context when the app is undeployed, preventing memory leaks.
  * <p/>
  * If mule is running in embedded mode, then all of this logic described above is discarded and it simply logs

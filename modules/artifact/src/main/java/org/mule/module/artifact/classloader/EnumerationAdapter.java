@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.application;
+package org.mule.module.artifact.classloader;
 
 import java.util.Collection;
 import java.util.Enumeration;
@@ -23,7 +23,7 @@ public class EnumerationAdapter<T> implements Enumeration<T>
 
     public EnumerationAdapter(Collection<T> items)
     {
-        this.items = new LinkedList<T>(items);
+        this.items = new LinkedList<>(items);
         this.urlIterator = items.iterator();
     }
 

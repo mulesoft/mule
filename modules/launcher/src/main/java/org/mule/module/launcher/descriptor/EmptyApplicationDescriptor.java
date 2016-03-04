@@ -17,21 +17,13 @@ import java.io.File;
 public class EmptyApplicationDescriptor extends ApplicationDescriptor
 {
 
-    private String appName;
-
     public EmptyApplicationDescriptor(String appName)
     {
-        this.appName = appName;
+        setName(appName);
         setConfigResources(new String[] {MuleServer.DEFAULT_CONFIGURATION});
         File configPathFile = MuleContainerBootstrapUtils.getMuleAppDefaultConfigFile(appName);
         String configPath = String.format(configPathFile.getAbsolutePath());
         setAbsoluteResourcePaths(new String[] {configPath});
         setConfigResourcesFile(new File[] {configPathFile});
     }
-
-    public String getAppName()
-    {
-        return appName;
-    }
-
 }

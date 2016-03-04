@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.artifact;
+package org.mule.module.artifact.classloader;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
@@ -103,7 +103,7 @@ public class DefaultResourceReleaser implements ResourceReleaser
     {
         final ClassLoader cl = this.getClass().getClassLoader();
         final MBeanServer mBeanServer = getPlatformMBeanServer();
-        final Hashtable<String, String> keys = new Hashtable<String, String>();
+        final Hashtable<String, String> keys = new Hashtable<>();
         keys.put("type", DIAGNOSABILITY_BEAN_NAME);
         keys.put("name", cl.getClass().getName() + "@" + toHexString(cl.hashCode()).toLowerCase());
 

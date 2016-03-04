@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher.application;
 
-import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 /**

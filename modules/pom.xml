@@ -15,6 +15,7 @@
 
     <modules>
         <module>all-modules</module>
+        <module>artifact</module>
         <module>builders</module>
         <module>cxf</module>
         <module>db</module>

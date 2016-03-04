@@ -24,7 +24,7 @@ import org.mule.module.launcher.DeploymentStopException;
 import org.mule.module.launcher.MuleDeploymentService;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.NullDeploymentListener;
-import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.MuleContextDeploymentListener;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.util.ClassUtils;
@@ -167,7 +167,7 @@ public class DefaultMuleDomain implements Domain
                 ConfigurationBuilder cfgBuilder = createConfigurationBuilder();
                 if (!cfgBuilder.isConfigured())
                 {
-                    List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
+                    List<ConfigurationBuilder> builders = new ArrayList<>(3);
 
                     // We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder
                     addAnnotationsConfigBuilderIfPresent(builders);

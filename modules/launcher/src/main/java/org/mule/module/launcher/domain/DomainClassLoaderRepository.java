@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher.domain;
 
-import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 
 /**
  * Repository for domain class loaders.

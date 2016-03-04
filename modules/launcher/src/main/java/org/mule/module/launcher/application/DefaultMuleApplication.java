@@ -27,10 +27,10 @@ import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.DeploymentStopException;
-import org.mule.module.launcher.DisposableClassLoader;
+import org.mule.module.artifact.classloader.DisposableClassLoader;
 import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.MuleDeploymentService;
-import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.MuleContextDeploymentListener;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.domain.Domain;
@@ -86,7 +86,7 @@ public class DefaultMuleApplication implements Application
     {
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("New app '%s'", descriptor.getAppName())));
+            logger.info(miniSplash(String.format("New app '%s'", descriptor.getName())));
         }
 
         // set even though it might be redundant, just in case the app is been redeployed
@@ -118,7 +118,7 @@ public class DefaultMuleApplication implements Application
 
     public void setAppName(String appName)
     {
-        this.descriptor.setAppName(appName);
+        this.descriptor.setName(appName);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class DefaultMuleApplication implements Application
     {
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("Starting app '%s'", descriptor.getAppName())));
+            logger.info(miniSplash(String.format("Starting app '%s'", descriptor.getName())));
         }
 
         try
@@ -139,7 +139,7 @@ public class DefaultMuleApplication implements Application
             try
             {
                 Thread.currentThread().setContextClassLoader(null);
-                deployLogger.info(miniSplash(String.format("Started app '%s'", descriptor.getAppName())));
+                deployLogger.info(miniSplash(String.format("Started app '%s'", descriptor.getName())));
             }
             finally
             {
@@ -170,7 +170,7 @@ public class DefaultMuleApplication implements Application
     {
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("Initializing app '%s'", descriptor.getAppName())));
+            logger.info(miniSplash(String.format("Initializing app '%s'", descriptor.getName())));
         }
 
         try
@@ -315,7 +315,7 @@ public class DefaultMuleApplication implements Application
     @Override
     public String getArtifactName()
     {
-        return descriptor.getAppName();
+        return descriptor.getName();
     }
 
     @Override
@@ -343,7 +343,7 @@ public class DefaultMuleApplication implements Application
             // app never started, maybe due to a previous error
             if (logger.isInfoEnabled())
             {
-                logger.info(String.format("Stopping app '%s' with no mule context", descriptor.getAppName()));
+                logger.info(String.format("Stopping app '%s' with no mule context", descriptor.getName()));
             }
 
             status = ApplicationStatus.STOPPED;
@@ -356,7 +356,7 @@ public class DefaultMuleApplication implements Application
         {
             if (logger.isInfoEnabled())
             {
-                logger.info(miniSplash(String.format("Stopping app '%s'", descriptor.getAppName())));
+                logger.info(miniSplash(String.format("Stopping app '%s'", descriptor.getName())));
             }
 
             this.muleContext.stop();
@@ -364,7 +364,7 @@ public class DefaultMuleApplication implements Application
         catch (MuleException e)
         {
             // TODO add app name to the exception field
-            throw new DeploymentStopException(MessageFactory.createStaticMessage(descriptor.getAppName()), e);
+            throw new DeploymentStopException(MessageFactory.createStaticMessage(descriptor.getName()), e);
         }
     }
 
@@ -378,7 +378,7 @@ public class DefaultMuleApplication implements Application
     public String toString()
     {
         return String.format("%s[%s]@%s", getClass().getName(),
-                             descriptor.getAppName(),
+                             descriptor.getName(),
                              Integer.toHexString(System.identityHashCode(this)));
     }
 
@@ -388,7 +388,7 @@ public class DefaultMuleApplication implements Application
         {
             if (logger.isInfoEnabled())
             {
-                logger.info(String.format("App '%s' never started, nothing to dispose of", descriptor.getAppName()));
+                logger.info(String.format("App '%s' never started, nothing to dispose of", descriptor.getName()));
             }
             return;
         }
@@ -407,7 +407,7 @@ public class DefaultMuleApplication implements Application
         }
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("Disposing app '%s'", descriptor.getAppName())));
+            logger.info(miniSplash(String.format("Disposing app '%s'", descriptor.getName())));
         }
 
         muleContext.dispose();

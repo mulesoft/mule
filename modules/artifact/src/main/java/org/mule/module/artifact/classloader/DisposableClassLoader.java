@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher;
+package org.mule.module.artifact.classloader;
 
 
 public interface DisposableClassLoader
@@ -12,6 +12,6 @@ public interface DisposableClassLoader
     /**
      * Gets rid of the class loader resources.
      */
-    public void dispose();
+    void dispose();
 
 }
