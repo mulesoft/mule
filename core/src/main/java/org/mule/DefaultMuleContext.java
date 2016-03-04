@@ -11,6 +11,7 @@ import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import static org.mule.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -52,6 +53,8 @@ import org.mule.config.NullClusterConfiguration;
 import org.mule.config.bootstrap.ArtifactType;
 import org.mule.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.connector.DefaultPollingController;
+import org.mule.connector.PollingController;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
@@ -64,8 +67,6 @@ import org.mule.management.stats.AllStatistics;
 import org.mule.management.stats.ProcessingTimeWatcher;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
-import org.mule.connector.DefaultPollingController;
-import org.mule.connector.PollingController;
 import org.mule.util.ApplicationShutdownSplashScreen;
 import org.mule.util.ApplicationStartupSplashScreen;
 import org.mule.util.JdkVersionUtils;
@@ -312,7 +313,6 @@ public class DefaultMuleContext implements MuleContext
 
         startIfNeeded(extensionManager);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTING));
-        initTransactionManager();
         getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
         overridePollingController();
         overrideClusterConfiguration();
