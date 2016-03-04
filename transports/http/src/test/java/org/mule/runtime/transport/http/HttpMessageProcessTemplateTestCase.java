@@ -13,6 +13,8 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -21,11 +23,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.transport.http.HttpConnector;
-import org.mule.runtime.transport.http.HttpConstants;
-import org.mule.runtime.transport.http.HttpMessageProcessTemplate;
-import org.mule.runtime.transport.http.HttpMessageReceiver;
-import org.mule.runtime.transport.http.HttpServerConnection;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -140,4 +137,12 @@ public class HttpMessageProcessTemplateTestCase
         assertThat(retMessage.<String>getInboundProperty(MuleProperties.MULE_PROXY_ADDRESS), is(equalTo(PROXY_2_ADDRESS)));
     }
 
+    @Test
+    public void getMuleEventCachesEvent() throws Exception
+    {
+        HttpMessageProcessTemplate template = new HttpMessageProcessTemplate(messageReceiver, httpServerConnection);
+        template.getMuleEvent();
+        template.getMuleEvent();
+        verify(messageReceiver, times(1)).createMuleMessage(any(), anyString());
+    }
 }
