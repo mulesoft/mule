@@ -49,14 +49,14 @@ public class PluginDescriptorParser
         }
 
         Arrays.sort(pluginZips);
-        Set<PluginDescriptor> pds = new HashSet<PluginDescriptor>(pluginZips.length);
+        Set<PluginDescriptor> pds = new HashSet<>(pluginZips.length);
 
         for (String pluginZip : pluginZips)
         {
             final String pluginName = StringUtils.removeEnd(pluginZip, ".zip");
             // must unpack as there's no straightforward way for a ClassLoader to use a jar within another jar/zip
             final File tmpDir = new File(MuleContainerBootstrapUtils.getMuleTmpDir(),
-                                         appDescriptor.getAppName() + "/plugins/" + pluginName);
+                                         appDescriptor.getName() + "/plugins/" + pluginName);
             // TODO fix unzip impl to not stumble over existing dirs
             FileUtils.unzip(new File(pluginsDir, pluginZip), tmpDir);
             final PluginDescriptor pd = new PluginDescriptor();
@@ -72,7 +72,7 @@ public class PluginDescriptorParser
                 final String overrideString = props.getProperty(PROPERTY_LOADER_OVERRIDE);
                 if (StringUtils.isNotBlank(overrideString))
                 {
-                    Set<String> values = new HashSet<String>();
+                    Set<String> values = new HashSet<>();
                     final String[] overrides = overrideString.split(",");
                     Collections.addAll(values, overrides);
                     pd.setLoaderOverride(values);

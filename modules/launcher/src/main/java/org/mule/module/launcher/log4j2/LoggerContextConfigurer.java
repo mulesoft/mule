@@ -9,6 +9,8 @@ package org.mule.module.launcher.log4j2;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.module.artifact.classloader.ShutdownListener;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
@@ -48,10 +50,10 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
  * <p/>
  * Its basic functions are:
  * <ul>
- * <li>Disable log4j's shutdown hook so that it doesn't collide with mule's {@link org.mule.module.launcher.artifact.ShutdownListener},
+ * <li>Disable log4j's shutdown hook so that it doesn't collide with mule's {@link ShutdownListener},
  * which would result in a classloader leak.</li>
  * <li>When using a default configuration (one which doesn't come from a config file), the console appender is removed</li>
- * <li>if the classloader is an {@link org.mule.module.launcher.artifact.ArtifactClassLoader}, then it adds a rolling file appender
+ * <li>if the classloader is an {@link ArtifactClassLoader}, then it adds a rolling file appender
  * to collect the artifact's logs</li>
  * <li>if the configuration did not include a monitorInterval, then one is set to a default value of 60</li>
  * <li>if the context is standalone, then it adds a rolling file appender associated to the artifact</li>

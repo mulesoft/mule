@@ -4,11 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.artifact;
+package org.mule.module.artifact.classloader;
 
-import org.mule.module.launcher.DirectoryResourceLocator;
-import org.mule.module.launcher.FineGrainedControlClassLoader;
-import org.mule.module.launcher.LocalResourceLocator;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
@@ -27,11 +24,11 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractArtifactClassLoader extends FineGrainedControlClassLoader implements ArtifactClassLoader
 {
 
-    private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION = "/org/mule/module/launcher/artifact/DefaultResourceReleaser.class";
+    private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION = "/org/mule/module/artifact/classloader/DefaultResourceReleaser.class";
 
     protected Log logger = LogFactory.getLog(getClass());
 
-    protected List<ShutdownListener> shutdownListeners = new ArrayList<ShutdownListener>();
+    protected List<ShutdownListener> shutdownListeners = new ArrayList<>();
 
     private LocalResourceLocator localResourceLocator;
 

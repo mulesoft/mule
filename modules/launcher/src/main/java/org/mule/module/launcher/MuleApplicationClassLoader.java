@@ -7,7 +7,7 @@
 package org.mule.module.launcher;
 
 import org.mule.module.launcher.application.ApplicationClassLoader;
-import org.mule.module.launcher.artifact.AbstractArtifactClassLoader;
+import org.mule.module.artifact.classloader.AbstractArtifactClassLoader;
 import org.mule.module.launcher.nativelib.NativeLibraryFinder;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;

@@ -9,8 +9,8 @@ package org.mule.module.launcher.domain;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.launcher.DeploymentException;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
-import org.mule.module.launcher.artifact.ArtifactClassLoader;
-import org.mule.module.launcher.artifact.ShutdownListener;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.module.artifact.classloader.ShutdownListener;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.Preconditions;
 
@@ -22,7 +22,7 @@ import java.util.Map;
 public class MuleDomainClassLoaderRepository implements DomainClassLoaderRepository
 {
 
-    private Map<String, ArtifactClassLoader> domainArtifactClassLoaders = new HashMap<String, ArtifactClassLoader>();
+    private Map<String, ArtifactClassLoader> domainArtifactClassLoaders = new HashMap<>();
     private ArtifactClassLoader defaultDomainArtifactClassLoader;
 
     @Override

@@ -4,9 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher;
-
-import org.mule.module.launcher.artifact.ResourceReleaser;
+package org.mule.module.artifact.classloader;
 
 public class TestResourceReleaser implements ResourceReleaser
 {

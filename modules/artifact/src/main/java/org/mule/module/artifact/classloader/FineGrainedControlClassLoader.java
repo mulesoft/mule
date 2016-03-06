@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher;
+package org.mule.module.artifact.classloader;
 
 import org.mule.util.StringUtils;
 
@@ -30,8 +30,8 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
             "com.mulesource."
     };
 
-    protected Set<String> overrides = new HashSet<String>();
-    protected Set<String> blocked = new HashSet<String>();
+    protected Set<String> overrides = new HashSet<>();
+    protected Set<String> blocked = new HashSet<>();
 
     public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent)
     {

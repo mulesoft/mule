@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.descriptor;
 
+import org.mule.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.module.launcher.plugin.PluginDescriptor;
 
 import java.io.File;
@@ -16,8 +17,9 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class ApplicationDescriptor
+public class ApplicationDescriptor extends ArtifactDescriptor
 {
+
     public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
     public static final String DEFAULT_APP_PROPERTIES_RESOURCE = "mule-app.properties";
 
@@ -27,8 +29,6 @@ public class ApplicationDescriptor
      */
     public static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
 
-
-    private String appName;
     private String encoding;
     private String configurationBuilder;
     private String domain;
@@ -39,21 +39,8 @@ public class ApplicationDescriptor
     private Map<String, String> appProperties = new HashMap<String, String>();
 
     private boolean redeploymentEnabled = true;
-
-    private Set<String> loaderOverride = new HashSet<String>();
-
     private Set<PluginDescriptor> plugins = new HashSet<PluginDescriptor>(0);
     private URL[] sharedPluginLibs = new URL[0];
-
-    public String getAppName()
-    {
-        return appName;
-    }
-
-    public void setAppName(String appName)
-    {
-        this.appName = appName;
-    }
 
     public String getEncoding()
     {
@@ -90,7 +77,6 @@ public class ApplicationDescriptor
     {
         this.configurationBuilder = configurationBuilder;
     }
-
 
     public String getDomain()
     {
@@ -140,16 +126,6 @@ public class ApplicationDescriptor
     public void setRedeploymentEnabled(boolean redeploymentEnabled)
     {
         this.redeploymentEnabled = redeploymentEnabled;
-    }
-
-    public Set<String> getLoaderOverride()
-    {
-        return loaderOverride;
-    }
-
-    public void setLoaderOverride(Set<String> loaderOverride)
-    {
-        this.loaderOverride = loaderOverride;
     }
 
     public Set<PluginDescriptor> getPlugins()

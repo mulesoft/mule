@@ -6,8 +6,8 @@
  */
 package org.mule.module.launcher;
 
-import org.mule.module.launcher.artifact.AbstractArtifactClassLoader;
-import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.artifact.classloader.AbstractArtifactClassLoader;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;

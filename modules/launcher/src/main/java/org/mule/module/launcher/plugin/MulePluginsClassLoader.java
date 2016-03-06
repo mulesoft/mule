@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher.plugin;
 
-import org.mule.module.launcher.FineGrainedControlClassLoader;
+import org.mule.module.artifact.classloader.FineGrainedControlClassLoader;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -32,7 +32,7 @@ public class MulePluginsClassLoader extends FineGrainedControlClassLoader
                 addURL(pluginUrl);
             }
 
-            final Set<String> override = plugin.getLoaderOverride();
+            final Set<String> override = plugin.getLoaderOverrides();
             processOverrides(override);
         }
     }

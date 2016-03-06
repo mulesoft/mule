@@ -7,6 +7,7 @@
 package org.mule.module.launcher.artifact;
 
 import org.mule.api.MuleContext;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.InstallException;
 
