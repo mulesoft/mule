@@ -10,6 +10,7 @@ import org.mule.api.config.MuleConfiguration;
 import org.mule.transaction.lookup.GenericTransactionManagerLookupFactory;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
@@ -20,6 +21,7 @@ import javax.transaction.TransactionManager;
  */
 public class TestTransactionManagerFactory extends GenericTransactionManagerLookupFactory
 {
+    @Override
     public TransactionManager create(MuleConfiguration config) throws Exception
     {
         return (TransactionManager) Proxy.newProxyInstance(getClass().getClassLoader(),
@@ -27,6 +29,7 @@ public class TestTransactionManagerFactory extends GenericTransactionManagerLook
                                                            new InternalInvocationHandler());
     }
 
+    @Override
     public void initialise()
     {
         // shortcut super's implementation
@@ -39,9 +42,24 @@ public class TestTransactionManagerFactory extends GenericTransactionManagerLook
             return TestTransactionManagerFactory.this;
         }
 
+        @Override
         public Object invoke (Object proxy, Method method, Object[] args) throws Throwable
         {
-            return null;
+            if (Object.class.equals(method.getDeclaringClass()))
+            {
+                try
+                {
+                    return method.invoke(this, args);
+                }
+                catch (InvocationTargetException e)
+                {
+                    throw e.getCause();
+                }
+            }
+            else
+            {
+                return null;
+            }
         }
 
     }
