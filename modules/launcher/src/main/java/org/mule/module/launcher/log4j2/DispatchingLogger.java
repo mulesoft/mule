@@ -7,6 +7,7 @@
 package org.mule.module.launcher.log4j2;
 
 import static org.mule.module.launcher.log4j2.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
+import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withParameters;
 
@@ -27,7 +28,6 @@ import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.MessageFactory;
 import org.apache.logging.log4j.spi.AbstractLogger;
 import org.apache.logging.log4j.spi.ExtendedLogger;
-import org.reflections.ReflectionUtils;
 
 /**
  * Suppose that class X is used in applications Y and Z. If X
@@ -88,19 +88,16 @@ abstract class DispatchingLogger extends Logger
         return currentClassLoader.hashCode() == ownerClassLoaderHash;
     }
 
-
     /**
-     * This is workaround for log4j2 issue
-     * <a href="https://issues.apache.org/jira/browse/LOG4J2-998">
-     * LOG4J2-998</a>. When we upgrade to a version which includes
-     * that fix then we should simply override {@link Logger#updateConfiguration(Configuration)}
-     * and invoke the same method on {@code originalLogger}. Meanwhile, we
-     * keep this method (which doesn't override the other) and use
-     * reflection to update the {@code originalLogger}
+     * This is workaround for the low visibility of the {@link Logger#updateConfiguration(Configuration)} method, which
+     * invokes it on the {@code originalLogger}.
+     * 
+     * Using a wrapper in the log4j package causes an {@link IllegalAccessError}.
      *
      * @param config
      */
-    void updateConfiguration(final Configuration config)
+    @Override
+    protected void updateConfiguration(final Configuration config)
     {
         if (lookupUpdateConfigurationMethod())
         {
@@ -119,7 +116,7 @@ abstract class DispatchingLogger extends Logger
     {
         if (updateConfigurationMethod == null)
         {
-            Collection<Method> candidateMethods = ReflectionUtils.getAllMethods(originalLogger.getClass(), withName("updateConfiguration"), withParameters(Configuration.class));
+            Collection<Method> candidateMethods = getAllMethods(originalLogger.getClass(), withName("updateConfiguration"), withParameters(Configuration.class));
             if (candidateMethods.size() == 1)
             {
                 updateConfigurationMethod = candidateMethods.iterator().next();
