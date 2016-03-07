@@ -22,7 +22,9 @@ import static org.mule.module.extension.HeisenbergConnectionProvider.SAUL_OFFICE
 import static org.mule.module.extension.HeisenbergExtension.AGE;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
+import static org.mule.module.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
+import static org.mule.module.extension.HeisenbergOperations.KILL_WITH_GROUP;
 import static org.mule.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DEFAULT_CONNECTION_PROVIDER_NAME;
 import org.mule.api.MuleEvent;
@@ -50,6 +52,7 @@ import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.SourceDeclaration;
+import org.mule.extension.api.introspection.property.display.PlacementModelProperty;
 import org.mule.module.extension.HeisenbergConnection;
 import org.mule.module.extension.HeisenbergConnectionProvider;
 import org.mule.module.extension.HeisenbergExtension;
@@ -139,11 +142,52 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     }
 
     @Test
+    public void parseDisplayAnnotationsOnParameter()
+    {
+        Descriptor descriptor = getDescriber().describe(new DefaultDescribingContext());
+        Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
+        List<ParameterDeclaration> parameters = declaration.getConfigurations().get(0).getParameters();
+
+        assertParameterPlacement(findParameter(parameters, "labeledRicin"), PERSONAL_INFORMATION_GROUP_NAME, 1);
+        assertParameterPlacement(findParameter(parameters, "ricinPacks"), PERSONAL_INFORMATION_GROUP_NAME, 2);
+
+    }
+
+    @Test
+    public void parseDisplayAnnotationsOnParameterGroup()
+    {
+        Descriptor descriptor = getDescriber().describe(new DefaultDescribingContext());
+        Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
+        List<ParameterDeclaration> parameters = declaration.getConfigurations().get(0).getParameters();
+
+        assertParameterPlacement(findParameter(parameters, "dateOfBirth"), PERSONAL_INFORMATION_GROUP_NAME, null);
+        assertParameterPlacement(findParameter(parameters, "dateOfDeath"), PERSONAL_INFORMATION_GROUP_NAME, null);
+        assertParameterPlacement(findParameter(parameters, "age"), PERSONAL_INFORMATION_GROUP_NAME, null);
+        assertParameterPlacement(findParameter(parameters, "myName"), PERSONAL_INFORMATION_GROUP_NAME, null);
+    }
+
+    @Test
+    public void parseDisplayAnnotationsOnOperationParameter()
+    {
+        Descriptor descriptor = getDescriber().describe(new DefaultDescribingContext());
+        Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
+        OperationDeclaration operation = getOperation(declaration, KILL_CUSTOM_OPERATION);
+
+        assertThat(operation, is(notNullValue()));
+        List<ParameterDeclaration> parameters = operation.getParameters();
+
+        assertParameterPlacement(findParameter(parameters, "victim"), KILL_WITH_GROUP, 1);
+        assertParameterPlacement(findParameter(parameters, "goodbyeMessage"), KILL_WITH_GROUP, 2);
+
+    }
+
+    @Test
     public void heisenbergPointer() throws Exception
     {
         setDescriber(describerFor(HeisenbergPointer.class));
         describeTestModule();
     }
+
 
     @Test
     public void heisenbergPointerPlusExternalConfig() throws Exception
@@ -399,6 +443,19 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(param.getDefaultValue(), equalTo(defaultValue));
     }
 
+    private void assertParameterPlacement(ParameterDeclaration param, String groupName, Integer order)
+    {
+        PlacementModelProperty placement = param.getModelProperty(PlacementModelProperty.KEY);
+        if (groupName != null)
+        {
+            assertThat(placement.getGroupName(), is(groupName));
+        }
+        if (order != null)
+        {
+            assertThat(placement.getOrder(), is(order));
+        }
+    }
+
     private ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name)
     {
         return (ParameterDeclaration) CollectionUtils.find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
@@ -485,6 +542,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         {
             return 10L;
         }
+
     }
 
     public static class HeisenbergAlternateConfig extends HeisenbergExtension
@@ -502,6 +560,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         {
             this.extendedProperty = extendedProperty;
         }
+
     }
 
     public static class HeisenbergIsolatedConfig

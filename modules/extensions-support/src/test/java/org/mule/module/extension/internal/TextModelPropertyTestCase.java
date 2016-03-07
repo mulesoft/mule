@@ -13,7 +13,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.extension.api.introspection.property.TextModelProperty;
+import org.mule.extension.api.introspection.property.display.TextModelProperty;
 import org.mule.module.extension.internal.introspection.enricher.TextModelEnricher;
 import org.mule.module.extension.internal.runtime.connector.secure.SecureConnector;
 import org.mule.tck.size.SmallTest;

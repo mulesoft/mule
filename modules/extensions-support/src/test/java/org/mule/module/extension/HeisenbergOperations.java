@@ -21,6 +21,7 @@ import org.mule.extension.api.annotation.param.Ignore;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.annotation.param.display.Placement;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.module.extension.exception.CureCancerExceptionEnricher;
 import org.mule.module.extension.exception.HealthException;
@@ -47,6 +48,7 @@ public class HeisenbergOperations
     private static final String METH = "meth";
     public static final String CURE_CANCER_MESSAGE = "Can't help you, you are going to die";
     public static final String CALL_GUS_MESSAGE = "You are not allowed to speak with gus.";
+    public static final String KILL_WITH_GROUP = "KillGroup";
 
     @Inject
     private ExtensionManager extensionManager;
@@ -76,7 +78,8 @@ public class HeisenbergOperations
         return killWithCustomMessage(victim, goodbyeMessage);
     }
 
-    public String killWithCustomMessage(@Optional(defaultValue = "#[payload]") String victim, String goodbyeMessage)
+    public String killWithCustomMessage(@Optional(defaultValue = "#[payload]") @Placement(group = KILL_WITH_GROUP, order = 1) String victim,
+                                        @Placement(group = KILL_WITH_GROUP, order = 2) String goodbyeMessage)
     {
         return String.format("%s, %s", goodbyeMessage, victim);
     }

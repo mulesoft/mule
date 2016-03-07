@@ -6,11 +6,11 @@
  */
 package org.mule.module.extension.internal.introspection.enricher;
 
-import org.mule.extension.api.annotation.param.display.Text;
-import org.mule.extension.api.introspection.property.ImmutableTextModelProperty;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.extension.api.introspection.property.TextModelProperty;
 
+import org.mule.extension.api.annotation.param.display.Text;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.extension.api.introspection.property.display.ImmutableTextModelProperty;
+import org.mule.extension.api.introspection.property.display.TextModelProperty;
 
 import java.lang.annotation.Annotation;
 

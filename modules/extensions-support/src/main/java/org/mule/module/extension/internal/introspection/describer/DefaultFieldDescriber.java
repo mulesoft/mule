@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection.describer;
 
+import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import org.mule.extension.api.annotation.param.Optional;
@@ -62,6 +63,7 @@ final class DefaultFieldDescriber implements FieldDescriber
         parameterDescriptor.ofType(dataType);
         parameterDescriptor.withExpressionSupport(getExpressionSupport(field));
         parameterDescriptor.withModelProperty(DeclaringMemberModelProperty.KEY, new DeclaringMemberModelProperty(field));
+        parseDisplayAnnotations(field, parameterDescriptor);
 
         return parameterDescriptor;
     }

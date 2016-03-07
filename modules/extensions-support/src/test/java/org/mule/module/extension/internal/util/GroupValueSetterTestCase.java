@@ -12,12 +12,12 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
-import org.mule.module.extension.model.ExtendedPersonalInfo;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.model.LifetimeInfo;
-import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.introspection.ParameterGroup;
+import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.module.extension.model.ExtendedPersonalInfo;
+import org.mule.module.extension.model.LifetimeInfo;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

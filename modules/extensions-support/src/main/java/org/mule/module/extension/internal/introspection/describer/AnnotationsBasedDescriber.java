@@ -9,6 +9,7 @@ package org.mule.module.extension.internal.introspection.describer;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
+import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
@@ -32,11 +33,8 @@ import org.mule.extension.api.annotation.connector.Providers;
 import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
-import org.mule.extension.api.annotation.param.display.Password;
-import org.mule.extension.api.annotation.param.display.Text;
+import org.mule.extension.api.annotation.param.display.Placement;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.property.ImmutablePasswordModelProperty;
-import org.mule.extension.api.introspection.property.ImmutableTextModelProperty;
 import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
@@ -51,8 +49,8 @@ import org.mule.extension.api.introspection.declaration.fluent.ParameterDescript
 import org.mule.extension.api.introspection.declaration.fluent.SourceDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
-import org.mule.extension.api.introspection.property.PasswordModelProperty;
-import org.mule.extension.api.introspection.property.TextModelProperty;
+import org.mule.extension.api.introspection.property.display.ImmutablePlacementModelProperty;
+import org.mule.extension.api.introspection.property.display.PlacementModelProperty;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
@@ -260,7 +258,7 @@ public final class AnnotationsBasedDescriber implements Describer
     private void declareAnnotatedParameters(Class<?> annotatedType, Descriptor descriptor, WithParameters with)
     {
         declareSingleParameters(getParameterFields(annotatedType), with);
-        List<ParameterGroup> groups = declareConfigurationParametersGroups(annotatedType, with);
+        List<ParameterGroup> groups = declareConfigurationParametersGroups(annotatedType, with, null);
         if (!CollectionUtils.isEmpty(groups) && descriptor instanceof HasModelProperties)
         {
             ((HasModelProperties) descriptor).withModelProperty(ParameterGroupModelProperty.KEY, new ParameterGroupModelProperty(groups));
@@ -277,7 +275,7 @@ public final class AnnotationsBasedDescriber implements Describer
         return java.util.Optional.empty();
     }
 
-    private List<ParameterGroup> declareConfigurationParametersGroups(Class<?> annotatedType, WithParameters with)
+    private List<ParameterGroup> declareConfigurationParametersGroups(Class<?> annotatedType, WithParameters with, ParameterGroup parent)
     {
         List<ParameterGroup> groups = new LinkedList<>();
         for (Field field : getParameterGroupFields(annotatedType))
@@ -292,17 +290,34 @@ public final class AnnotationsBasedDescriber implements Describer
             if (!parameters.isEmpty())
             {
                 ParameterGroup group = new ParameterGroup(field.getType(), field);
+                PlacementModelProperty groupPlacement = null;
                 groups.add(group);
+
+                if (field.isAnnotationPresent(Placement.class))
+                {
+                    Placement placement = field.getAnnotation(Placement.class);
+                    groupPlacement = new ImmutablePlacementModelProperty(placement.order(), placement.group(), placement.tab());
+                }
+                else
+                {
+                    groupPlacement = parent != null ? parent.getModelProperty(PlacementModelProperty.KEY) : null;
+                }
 
                 for (ParameterDescriptor descriptor : parameters)
                 {
+                    if (groupPlacement != null)
+                    {
+                        group.addModelProperty(PlacementModelProperty.KEY, groupPlacement);
+                        descriptor.withModelProperty(PlacementModelProperty.KEY, groupPlacement);
+                    }
+
                     ParameterDeclaration parameter = descriptor.getDeclaration();
                     group.addParameter(parameter.getName(), getField(field.getType(),
                                                                      getMemberName(parameter, parameter.getName()),
                                                                      parameter.getType().getRawType()));
                 }
 
-                List<ParameterGroup> childGroups = declareConfigurationParametersGroups(field.getType(), with);
+                List<ParameterGroup> childGroups = declareConfigurationParametersGroups(field.getType(), with, group);
                 if (!CollectionUtils.isEmpty(childGroups))
                 {
                     group.addModelProperty(ParameterGroupModelProperty.KEY, new ParameterGroupModelProperty(childGroups));
@@ -454,7 +469,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 parameter.withExpressionSupport(IntrospectionUtils.getExpressionSupport(parsedParameter));
                 parameter.describedAs(EMPTY).ofType(parsedParameter.getType());
                 addTypeRestrictions(parameter, parsedParameter);
-                addModelPropertiesToParameter(parsedParameter, parameter);
+                parseDisplayAnnotations(parsedParameter, parameter);
             }
 
             Connection connectionAnnotation = parsedParameter.getAnnotation(Connection.class);
@@ -468,20 +483,6 @@ public final class AnnotationsBasedDescriber implements Describer
             {
                 operation.withModelProperty(ConfigTypeModelProperty.KEY, new ConfigTypeModelProperty(parsedParameter.getType().getRawType()));
             }
-        }
-    }
-
-    private void addModelPropertiesToParameter(ParsedParameter parsedParameter, ParameterDescriptor parameter)
-    {
-        Password passwordAnnotation = parsedParameter.getAnnotation(Password.class);
-        if (passwordAnnotation != null)
-        {
-            parameter.withModelProperty(PasswordModelProperty.KEY, new ImmutablePasswordModelProperty());
-        }
-        Text textAnnotation = parsedParameter.getAnnotation(Text.class);
-        if (textAnnotation != null)
-        {
-            parameter.withModelProperty(TextModelProperty.KEY, new ImmutableTextModelProperty());
         }
     }
 
