@@ -1581,6 +1581,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
 
         reset(domainDeploymentListener);
+        reset(applicationDeploymentListener);
 
         addPackedDomainFromResource(dummyDomainDescriptor.zipPath);
         alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
