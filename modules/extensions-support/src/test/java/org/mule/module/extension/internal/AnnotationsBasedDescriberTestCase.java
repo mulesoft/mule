@@ -23,6 +23,7 @@ import static org.mule.module.extension.HeisenbergExtension.AGE;
 import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.module.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
+import static org.mule.module.extension.HeisenbergExtension.RICIN_GROUP_NAME;
 import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
 import static org.mule.module.extension.HeisenbergOperations.KILL_WITH_GROUP;
 import static org.mule.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
@@ -148,8 +149,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
         List<ParameterDeclaration> parameters = declaration.getConfigurations().get(0).getParameters();
 
-        assertParameterPlacement(findParameter(parameters, "labeledRicin"), PERSONAL_INFORMATION_GROUP_NAME, 1);
-        assertParameterPlacement(findParameter(parameters, "ricinPacks"), PERSONAL_INFORMATION_GROUP_NAME, 2);
+        assertParameterPlacement(findParameter(parameters, "labeledRicin"), RICIN_GROUP_NAME, 1);
+        assertParameterPlacement(findParameter(parameters, "ricinPacks"), RICIN_GROUP_NAME, 2);
 
     }
 
