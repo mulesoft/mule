@@ -7,6 +7,7 @@
 package org.mule.module.launcher.log4j2;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.launcher.log4j2.LoggerContextConfigurer.FORCED_CONSOLE_APPENDER_NAME;
 import static org.mule.module.launcher.log4j2.LoggerContextConfigurer.PER_APP_FILE_APPENDER_NAME;
+
 import org.mule.api.config.MuleProperties;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -29,6 +31,7 @@ import org.mule.util.ClassUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Appender;
@@ -37,11 +40,11 @@ import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
-import org.apache.logging.log4j.core.config.ConfigurationMonitor;
+import org.apache.logging.log4j.core.config.ConfiguratonFileWatcher;
 import org.apache.logging.log4j.core.config.DefaultConfiguration;
-import org.apache.logging.log4j.core.config.FileConfigurationMonitor;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.config.Reconfigurable;
+import org.apache.logging.log4j.core.util.WatchManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -116,14 +119,16 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase
     @Test
     public void configurationMonitor() throws Exception
     {
+        WatchManager watchManager = mock(WatchManager.class);
+        when(configuration.getWatchManager()).thenReturn(watchManager);
+
         when(context.getConfigFile()).thenReturn(new File(CURRENT_DIRECTORY).toURI());
         contextConfigurer.configure(context);
-        ArgumentCaptor<ConfigurationMonitor> captor = ArgumentCaptor.forClass(ConfigurationMonitor.class);
-        verify(configuration).setConfigurationMonitor(captor.capture());
+        ArgumentCaptor<ConfiguratonFileWatcher> captor = ArgumentCaptor.forClass(ConfiguratonFileWatcher.class);
+        verify(watchManager).watchFile(any(File.class), captor.capture());
 
-        assertThat(captor.getValue() instanceof FileConfigurationMonitor, is(true));
-        FileConfigurationMonitor monitor = (FileConfigurationMonitor) captor.getValue();
-        assertThat(MONITOR_INTERVAL, equalTo(ClassUtils.getFieldValue(monitor, INTERVAL_PROPERTY, true)));
+        assertThat(captor.getValue(), instanceOf(ConfiguratonFileWatcher.class));
+        verify(watchManager).setIntervalSeconds(eq((int) TimeUnit.MILLISECONDS.toSeconds(MONITOR_INTERVAL)));
     }
 
     @Test

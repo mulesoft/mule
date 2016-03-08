@@ -37,10 +37,11 @@ import org.apache.logging.log4j.core.appender.rolling.TriggeringPolicy;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.ConfigurationListener;
-import org.apache.logging.log4j.core.config.FileConfigurationMonitor;
+import org.apache.logging.log4j.core.config.ConfiguratonFileWatcher;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.config.Reconfigurable;
 import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.apache.logging.log4j.core.util.FileWatcher;
 
 /**
  * This component grabs a {link MuleLoggerContext} which has just been created reading a configuration file
@@ -116,26 +117,21 @@ final class LoggerContextConfigurer
     private void configureMonitor(MuleLoggerContext context)
     {
         Configuration configuration = context.getConfiguration();
-        if (!(configuration.getConfigurationMonitor() instanceof FileConfigurationMonitor))
+        File configFile = null;
+        if (context.getConfigFile() != null)
         {
-            File configFile = null;
-            if (context.getConfigFile() != null)
-            {
-                configFile = new File(context.getConfigFile().getPath());
-            }
-            else if (!StringUtils.isEmpty(configuration.getName()))
-            {
-                configFile = new File(configuration.getName());
-            }
+            configFile = new File(context.getConfigFile().getPath());
+        }
+        else if (!StringUtils.isEmpty(configuration.getName()))
+        {
+            configFile = new File(configuration.getName());
+        }
 
-            if (configFile != null && configuration instanceof Reconfigurable)
-            {
-                configuration.setConfigurationMonitor(new FileConfigurationMonitor(
-                        (Reconfigurable) configuration,
-                        configFile,
-                        getListeners(configuration),
-                        DEFAULT_MONITOR_INTERVAL_SECS));
-            }
+        if (configFile != null && configuration instanceof Reconfigurable)
+        {
+            configuration.getWatchManager().setIntervalSeconds(DEFAULT_MONITOR_INTERVAL_SECS);
+            FileWatcher watcher = new ConfiguratonFileWatcher((Reconfigurable) configuration, getListeners(configuration));
+            configuration.getWatchManager().watchFile(configFile, watcher);
         }
     }
 
@@ -173,7 +169,7 @@ final class LoggerContextConfigurer
     private RollingFileAppender createRollingFileAppender(String logFilePath, String filePattern, String appenderName, Configuration configuration)
     {
         TriggeringPolicy triggeringPolicy = TimeBasedTriggeringPolicy.createPolicy("1", "true");
-        RolloverStrategy rolloverStrategy = DefaultRolloverStrategy.createStrategy("30", "1", null, String.valueOf(Deflater.NO_COMPRESSION), configuration);
+        RolloverStrategy rolloverStrategy = DefaultRolloverStrategy.createStrategy("30", "1", null, String.valueOf(Deflater.NO_COMPRESSION), null, true, configuration);
 
         return RollingFileAppender.createAppender(logFilePath,
                                                   logFilePath + filePattern,
@@ -190,7 +186,7 @@ final class LoggerContextConfigurer
 
     private Layout<? extends Serializable> createLayout(Configuration configuration)
     {
-        return PatternLayout.createLayout(PATTERN_LAYOUT, configuration, null, null, true, false, null, null);
+        return PatternLayout.createLayout(PATTERN_LAYOUT, null, configuration, null, null, true, false, null, null);
     }
 
 
