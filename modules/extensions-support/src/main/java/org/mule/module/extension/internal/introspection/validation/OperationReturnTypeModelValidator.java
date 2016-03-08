@@ -6,12 +6,12 @@
  */
 package org.mule.module.extension.internal.introspection.validation;
 
+import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import org.mule.api.MuleEvent;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.metadata.java.utils.JavaTypeUtils;
-import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
+import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 
 /**
  * Validates that all {@link OperationModel operations} specify
@@ -35,7 +35,7 @@ public class OperationReturnTypeModelValidator implements ModelValidator
                 throw missingReturnTypeException(model, operationModel);
             }
 
-            Class<?> returnType = JavaTypeUtils.getType(operationModel.getReturnType());
+            Class<?> returnType = getType(operationModel.getReturnType());
             if (returnType == null)
             {
                 throw missingReturnTypeException(model, operationModel);

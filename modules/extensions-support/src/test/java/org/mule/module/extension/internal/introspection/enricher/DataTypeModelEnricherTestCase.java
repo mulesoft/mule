@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withReturnType;
 import org.mule.extension.api.annotation.DataTypeParameters;
@@ -31,7 +32,6 @@ import org.mule.extension.api.introspection.declaration.fluent.OperationDeclarat
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
-import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -104,14 +104,15 @@ public class DataTypeModelEnricherTestCase extends AbstractMuleTestCase
     {
         assertThat(parameter, is(notNullValue()));
         assertThat(parameter.getName(), is(name));
-        assertThat(parameter.getType(), equalTo(ExtensionsTestUtils.toMetadataType(String.class)));
+        assertThat(parameter.getType(), equalTo(toMetadataType(String.class)));
         assertThat(parameter.isRequired(), is(false));
         assertThat(parameter.getExpressionSupport(), is(SUPPORTED));
         assertThat(parameter.getDefaultValue(), is(nullValue()));
     }
 
     @DataTypeParameters
-    public Object operationMethod() {
+    public Object operationMethod()
+    {
         return null;
     }
 
