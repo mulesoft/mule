@@ -101,25 +101,7 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase
 
         public TestArtifactClassLoader(ClassLoader parentCl)
         {
-            super(new URL[0], parentCl);
-        }
-
-        @Override
-        protected String[] getLocalResourceLocations()
-        {
-            return new String[0];
-        }
-
-        @Override
-        public String getArtifactName()
-        {
-            return null;
-        }
-
-        @Override
-        public ClassLoader getClassLoader()
-        {
-            return null;
+            super("testArtifact", new URL[0], parentCl);
         }
 
         @Override

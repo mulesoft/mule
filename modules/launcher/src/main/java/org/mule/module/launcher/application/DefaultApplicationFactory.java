@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.application;
 
+import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.launcher.AppBloodhound;
 import org.mule.module.launcher.DefaultAppBloodhound;
 import org.mule.module.launcher.DeploymentListener;
@@ -24,11 +25,11 @@ import org.apache.commons.lang.StringUtils;
 public class DefaultApplicationFactory implements ApplicationFactory
 {
 
-    private final ApplicationClassLoaderFactory applicationClassLoaderFactory;
+    private final ArtifactClassLoaderFactory applicationClassLoaderFactory;
     private final DomainFactory domainFactory;
     protected DeploymentListener deploymentListener;
 
-    public DefaultApplicationFactory(ApplicationClassLoaderFactory applicationClassLoaderFactory, DomainFactory domainFactory)
+    public DefaultApplicationFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory, DomainFactory domainFactory)
     {
         this.applicationClassLoaderFactory = applicationClassLoaderFactory;
         this.domainFactory = domainFactory;

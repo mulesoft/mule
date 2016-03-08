@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Defines a composite classloader for applications
  */
-public class CompositeApplicationClassLoader extends CompositeClassLoader implements ApplicationClassLoader
+public class CompositeApplicationClassLoader extends CompositeClassLoader implements ArtifactClassLoader, ApplicationClassLoader
 {
 
     protected static final Log logger = LogFactory.getLog(CompositeApplicationClassLoader.class);
@@ -33,12 +33,6 @@ public class CompositeApplicationClassLoader extends CompositeClassLoader implem
     {
         super(classLoaders);
         this.appName = appName;
-    }
-
-    @Override
-    public String getAppName()
-    {
-        return appName;
     }
 
     @Override
@@ -129,7 +123,7 @@ public class CompositeApplicationClassLoader extends CompositeClassLoader implem
         {
             if (classLoader instanceof MuleApplicationClassLoader)
             {
-                ((ApplicationClassLoader)classLoader).addShutdownListener(listener);
+                ((MuleApplicationClassLoader) classLoader).addShutdownListener(listener);
                 return;
             }
         }

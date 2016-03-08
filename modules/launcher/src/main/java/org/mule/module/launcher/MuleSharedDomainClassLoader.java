@@ -26,22 +26,15 @@ public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader imp
     public static final String DOMAIN_LIBRARY_FOLDER = "lib";
     public static final String OLD_DOMAIN_LIBRARY_FOLDER = DOMAIN_LIBRARY_FOLDER + File.separator + "shared";
 
-    private final String domain;
     private File domainDir;
     private File domainLibraryFolder;
 
     @SuppressWarnings("unchecked")
     public MuleSharedDomainClassLoader(String domain, ClassLoader parent)
     {
-        super(new URL[0], parent);
+        super(domain, new URL[0], parent);
         try
         {
-            if (domain == null)
-            {
-                throw new IllegalArgumentException("Domain name cannot be null");
-            }
-            this.domain = domain;
-
             validateAndGetDomainFolders();
 
             addUrls();
@@ -60,20 +53,8 @@ public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader imp
     public String toString()
     {
         return String.format("%s[%s]@%s", getClass().getName(),
-                             domain,
+                             getArtifactName(),
                              Integer.toHexString(System.identityHashCode(this)));
-    }
-
-    @Override
-    public String getArtifactName()
-    {
-        return domain;
-    }
-
-    @Override
-    public ClassLoader getClassLoader()
-    {
-        return this;
     }
 
     @Override
@@ -100,34 +81,34 @@ public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader imp
 
     protected void validateAndGetDomainFolders() throws Exception
     {
-        File oldDomainDir = new File(MuleContainerBootstrapUtils.getMuleHome(), OLD_DOMAIN_LIBRARY_FOLDER + File.separator + domain);
+        File oldDomainDir = new File(MuleContainerBootstrapUtils.getMuleHome(), OLD_DOMAIN_LIBRARY_FOLDER + File.separator + getArtifactName());
         if (oldDomainDir.exists())
         {
             if (!oldDomainDir.canRead())
             {
                 throw new IllegalArgumentException(
-                        String.format("Shared ClassLoader Domain '%s' is not accessible", domain));
+                        String.format("Shared ClassLoader Domain '%s' is not accessible", getArtifactName()));
             }
             domainLibraryFolder = oldDomainDir;
             domainDir = oldDomainDir;
             return;
         }
 
-        File newDomainDir = new File(MuleContainerBootstrapUtils.getMuleDomainsDir() + File.separator + domain);
+        File newDomainDir = new File(MuleContainerBootstrapUtils.getMuleDomainsDir() + File.separator + getArtifactName());
         if (!newDomainDir.exists())
         {
             throw new IllegalArgumentException(
-                    String.format("Domain '%s' is not accessible", domain));
+                    String.format("Domain '%s' is not accessible", getArtifactName()));
         }
 
         if (!newDomainDir.canRead())
         {
             throw new IllegalArgumentException(
-                    String.format("Domain '%s' is not accessible", domain));
+                    String.format("Domain '%s' is not accessible", getArtifactName()));
         }
         domainDir = newDomainDir;
         domainLibraryFolder = new File(newDomainDir, DOMAIN_LIBRARY_FOLDER);
-        logger.info(String.format("Using domain dir %s for domain %s", domainDir.getAbsolutePath(), domain));
+        logger.info(String.format("Using domain dir %s for domain %s", domainDir.getAbsolutePath(), getArtifactName()));
     }
 
     protected void addUrls() throws MalformedURLException
@@ -141,7 +122,7 @@ public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader imp
             if (logger.isDebugEnabled())
             {
                 StringBuilder sb = new StringBuilder();
-                sb.append("Loading Shared ClassLoader Domain: ").append(domain).append(SystemUtils.LINE_SEPARATOR);
+                sb.append("Loading Shared ClassLoader Domain: ").append(getArtifactName()).append(SystemUtils.LINE_SEPARATOR);
                 sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
 
                 for (File jar : jars)

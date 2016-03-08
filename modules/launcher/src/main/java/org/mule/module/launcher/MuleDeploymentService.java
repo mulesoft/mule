@@ -10,7 +10,7 @@ import static org.mule.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_D
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
 import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.application.ApplicationClassLoaderFactory;
+import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.launcher.application.ApplicationFactory;
 import org.mule.module.launcher.application.CompositeApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.DefaultApplicationFactory;
@@ -70,7 +70,7 @@ public class MuleDeploymentService implements DeploymentService
     {
         DomainClassLoaderRepository domainClassLoaderRepository = new MuleDomainClassLoaderRepository();
 
-        ApplicationClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory(domainClassLoaderRepository, new DefaultNativeLibraryFinderFactory());
+        ArtifactClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory(domainClassLoaderRepository, new DefaultNativeLibraryFinderFactory());
         applicationClassLoaderFactory = new CompositeApplicationClassLoaderFactory(applicationClassLoaderFactory, pluginClassLoaderManager);
 
         DefaultDomainFactory domainFactory = new DefaultDomainFactory(domainClassLoaderRepository);

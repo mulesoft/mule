@@ -19,8 +19,6 @@ import java.util.Set;
 public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
 {
 
-    protected String appName;
-
     // Finished with '.' so that we can use startsWith to verify
     protected String[] systemPackages = {
             "java.",

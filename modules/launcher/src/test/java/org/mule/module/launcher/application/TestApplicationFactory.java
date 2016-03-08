@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.application;
 
+import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.launcher.domain.DefaultDomainFactory;
 import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
 
@@ -21,7 +22,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory
     private boolean failOnStopApplication;
     private boolean failOnDisposeApplication;
 
-    public TestApplicationFactory(ApplicationClassLoaderFactory applicationClassLoaderFactory)
+    public TestApplicationFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory)
     {
         super(applicationClassLoaderFactory, new DefaultDomainFactory(new MuleDomainClassLoaderRepository()));
     }
