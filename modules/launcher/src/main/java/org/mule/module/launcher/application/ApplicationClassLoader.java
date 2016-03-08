@@ -6,22 +6,9 @@
  */
 package org.mule.module.launcher.application;
 
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-
-import java.net.URL;
-
 /**
  * Identifies a classLoader created for a given Mule application
  */
-public interface ApplicationClassLoader extends ArtifactClassLoader
+public interface ApplicationClassLoader
 {
-
-    /**
-     * @deprecated use ArtifactClassLoader.getArtifactName instead.
-     */
-    @Deprecated
-    String getAppName();
-
-    URL findResource(String s);
-
 }

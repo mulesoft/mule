@@ -23,6 +23,7 @@ import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentStartException;
@@ -53,7 +54,7 @@ public class DefaultMuleApplication implements Application
     protected transient final Log deployLogger = LogFactory.getLog(MuleDeploymentService.class);
 
     protected final ApplicationDescriptor descriptor;
-    protected final ApplicationClassLoaderFactory applicationClassLoaderFactory;
+    protected final ArtifactClassLoaderFactory applicationClassLoaderFactory;
     private ApplicationStatus status;
 
     protected MuleContext muleContext;
@@ -62,7 +63,7 @@ public class DefaultMuleApplication implements Application
     protected DeploymentListener deploymentListener;
     private ServerNotificationListener<MuleContextNotification> statusListener;
 
-    public DefaultMuleApplication(ApplicationDescriptor descriptor, ApplicationClassLoaderFactory applicationClassLoaderFactory, Domain domain)
+    public DefaultMuleApplication(ApplicationDescriptor descriptor, ArtifactClassLoaderFactory applicationClassLoaderFactory, Domain domain)
     {
         this.descriptor = descriptor;
         this.applicationClassLoaderFactory = applicationClassLoaderFactory;

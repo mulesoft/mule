@@ -46,8 +46,6 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
 
     protected static final URL[] CLASSPATH_EMPTY = new URL[0];
 
-    private String appName;
-
     private File appDir;
     private File classesDir;
     private File libDir;
@@ -60,8 +58,7 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
 
     public MuleApplicationClassLoader(String appName, ClassLoader parentCl, Set<String> loaderOverrides, NativeLibraryFinder nativeLibraryFinder)
     {
-        super(CLASSPATH_EMPTY, parentCl, loaderOverrides);
-        this.appName = appName;
+        super(appName, CLASSPATH_EMPTY, parentCl, loaderOverrides);
         this.nativeLibraryFinder = nativeLibraryFinder;
 
         try
@@ -146,29 +143,12 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
         return super.getResources(name);
     }
 
-    public String getAppName()
-    {
-        return appName;
-    }
-
     @Override
     public String toString()
     {
         return String.format("%s[%s]@%s", getClass().getName(),
-                             appName,
+                             getArtifactName(),
                              Integer.toHexString(System.identityHashCode(this)));
-    }
-
-    @Override
-    public String getArtifactName()
-    {
-        return getAppName();
-    }
-
-    @Override
-    public ClassLoader getClassLoader()
-    {
-        return this;
     }
 
     @Override

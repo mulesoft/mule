@@ -6,7 +6,9 @@
  */
 package org.mule.module.artifact.classloader;
 
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -25,6 +27,7 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
 {
 
     private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION = "/org/mule/module/artifact/classloader/DefaultResourceReleaser.class";
+    private final String name;
 
     protected Log logger = LogFactory.getLog(getClass());
 
@@ -34,14 +37,33 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
 
     private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
 
-    public AbstractArtifactClassLoader(URL[] urls, ClassLoader parent)
+    public AbstractArtifactClassLoader(String name, URL[] urls, ClassLoader parent)
     {
-        this(urls, parent, Collections.<String>emptySet());
+        this(name, urls, parent, Collections.<String>emptySet());
     }
 
-    public AbstractArtifactClassLoader(URL[] urls, ClassLoader parent, Set<String> overrides)
+    public AbstractArtifactClassLoader(String name, URL[] urls, ClassLoader parent, Set<String> overrides)
     {
         super(urls, parent, overrides);
+        checkArgument(!StringUtils.isEmpty(name), "Artifact name cannot be empty");
+        this.name = name;
+    }
+
+    @Override
+    public String getArtifactName()
+    {
+        return name;
+    }
+
+    protected String[] getLocalResourceLocations()
+    {
+        return new String[0];
+    }
+
+    @Override
+    public ClassLoader getClassLoader()
+    {
+        return this;
     }
 
     @Override
@@ -97,6 +119,7 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
         }
     }
 
+    @Override
     public URL findLocalResource(String resourceName)
     {
         URL resource = getLocalResourceLocator().findLocalResource(resourceName);
@@ -115,6 +138,4 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
         }
         return localResourceLocator;
     }
-
-    protected abstract String[] getLocalResourceLocations();
 }

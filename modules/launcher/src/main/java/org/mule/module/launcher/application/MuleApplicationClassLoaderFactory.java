@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.application;
 
+import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.artifact.classloader.GoodCitizenClassLoader;
 import org.mule.module.launcher.MuleApplicationClassLoader;
 import org.mule.module.launcher.nativelib.NativeLibraryFinderFactory;
@@ -22,7 +23,7 @@ import java.util.Set;
  * Creates {@link MuleApplicationClassLoader} instances based on the
  * application descriptor.
  */
-public class MuleApplicationClassLoaderFactory implements ApplicationClassLoaderFactory
+public class MuleApplicationClassLoaderFactory implements ArtifactClassLoaderFactory<ApplicationDescriptor>
 {
 
     private final DomainClassLoaderRepository domainClassLoaderRepository;
