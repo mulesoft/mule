@@ -114,8 +114,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         @Override
         protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
         {
-            return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext, false,
-                storePrefix)
+            return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext, storePrefix)
             {
                 @Override
                 public boolean shouldAggregateEvents(EventGroup events)
@@ -134,6 +133,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
 
     public static class EventPayloadComparator implements Comparator
     {
+        @Override
         public int compare(Object o1, Object o2)
         {
             try

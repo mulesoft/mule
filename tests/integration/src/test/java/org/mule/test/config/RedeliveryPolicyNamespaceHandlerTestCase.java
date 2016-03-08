@@ -6,14 +6,17 @@
  */
 package org.mule.test.config;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.source.MessageSource;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.construct.Flow;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.processor.IdempotentRedeliveryPolicy;
@@ -67,6 +70,9 @@ public class RedeliveryPolicyNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(filter.getTheFailedMessageProcessor());
         assertEquals(5, filter.getMaxRedeliveryCount());
         assertNull(filter.getIdExpression());
+
+        filter.findCounter("msgId");
+        assertThat(CustomObjectStore.askedForKey, is((Serializable) "msgId"));
     }
 
     private IdempotentRedeliveryPolicy redeliveryPolicyFromFlow(String flowName) throws Exception
@@ -83,6 +89,8 @@ public class RedeliveryPolicyNamespaceHandlerTestCase extends FunctionalTestCase
 
     public static class CustomObjectStore extends SimpleMemoryObjectStore<Serializable>
     {
+        private static Serializable askedForKey;
+
         private String customProperty;
 
         public String getCustomProperty()
@@ -93,6 +101,13 @@ public class RedeliveryPolicyNamespaceHandlerTestCase extends FunctionalTestCase
         public void setCustomProperty(String value)
         {
             customProperty = value;
+        }
+
+        @Override
+        public boolean contains(Serializable key) throws ObjectStoreException
+        {
+            askedForKey = key;
+            return super.contains(key);
         }
     }
 }

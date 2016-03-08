@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -38,13 +39,14 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import junit.framework.Assert;
 
 public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
 {
@@ -85,7 +87,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_PROVIDER)).thenReturn(new SingleServerLockProvider());
         muleLockFactory.initialise();
         when(mockMuleContext.getLockFactory()).thenReturn(muleLockFactory);
-        when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
+        when(mockMuleContext.getObjectStoreManager()).thenReturn(mockObjectStoreManager);
         when(mockMuleContext.getConfiguration().getDefaultEncoding()).thenReturn(UTF_8);
         final InMemoryObjectStore inMemoryObjectStore = new InMemoryObjectStore();
         when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt())).thenAnswer(new Answer<ObjectStore>()

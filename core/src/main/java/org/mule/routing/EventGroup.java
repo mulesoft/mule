@@ -16,9 +16,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.ObjectStoreManager;
+import org.mule.api.store.PartitionableObjectStore;
 import org.mule.session.DefaultMuleSession;
 import org.mule.util.ClassUtils;
 import org.mule.util.store.DeserializationPostInitialisable;
@@ -49,14 +48,13 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     public static final String MULE_ARRIVAL_ORDER_PROPERTY = MuleProperties.PROPERTY_PREFIX + "ARRIVAL_ORDER";
 
-    transient private ObjectStoreManager objectStoreManager = null;
-
     private final Object groupId;
-    transient ListableObjectStore<MuleEvent> events;
+    private transient PartitionableObjectStore<MuleEvent> eventsObjectStore;
+    private final String storePrefix;
+    private final String eventsPartitionKey;
     private final long created;
     private final int expectedSize;
     transient private MuleContext muleContext;
-    private final String storePrefix;
     private String commonRootId = null;
     private static boolean hasNoCommonRootId = false;
     private int arrivalOrderCounter = 0;
@@ -66,22 +64,20 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     public EventGroup(Object groupId, MuleContext muleContext)
     {
-        this(groupId, muleContext, -1, false, DEFAULT_STORE_PREFIX);
+        this(groupId, muleContext, -1, DEFAULT_STORE_PREFIX);
     }
 
     public EventGroup(Object groupId,
-                      MuleContext muleContext,
-                      int expectedSize,
-                      boolean storeIsPersistent,
-                      String storePrefix)
+            MuleContext muleContext,
+            int expectedSize,
+            String storePrefix)
     {
         super();
         this.created = System.currentTimeMillis();
         this.muleContext = muleContext;
-        this.storePrefix = storePrefix;
 
-        String storeKey = storePrefix + ".eventGroup." + groupId;
-        this.events = getObjectStoreManager().getObjectStore(storeKey, storeIsPersistent);
+        this.storePrefix = storePrefix;
+        this.eventsPartitionKey = storePrefix + ".eventGroups." + groupId;
 
         this.expectedSize = expectedSize;
         this.groupId = groupId;
@@ -193,9 +189,9 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     @SuppressWarnings("unchecked")
     public Iterator<MuleEvent> iterator(boolean sortByArrival) throws ObjectStoreException
     {
-        synchronized (events)
+        synchronized (this)
         {
-            if (events.allKeys().isEmpty())
+            if (eventsObjectStore.allKeys(eventsPartitionKey).isEmpty())
             {
                 return IteratorUtils.emptyIterator();
             }
@@ -226,17 +222,17 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
      */
     public MuleEvent[] toArray(boolean sortByArrival) throws ObjectStoreException
     {
-        synchronized (events)
+        synchronized (this)
         {
-            if (events.allKeys().isEmpty())
+            if (eventsObjectStore.allKeys(eventsPartitionKey).isEmpty())
             {
                 return EMPTY_EVENTS_ARRAY;
             }
-            List<Serializable> keys = events.allKeys();
+            List<Serializable> keys = eventsObjectStore.allKeys(eventsPartitionKey);
             MuleEvent[] eventArray = new MuleEvent[keys.size()];
             for (int i = 0; i < keys.size(); i++)
             {
-                eventArray[i] = events.retrieve(keys.get(i));
+                eventArray[i] = eventsObjectStore.retrieve(keys.get(i), eventsPartitionKey);
             }
             if (sortByArrival)
             {
@@ -254,14 +250,14 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
      */
     public void addEvent(MuleEvent event) throws ObjectStoreException
     {
-        synchronized (events)
+        synchronized (this)
         {
             //Using both event ID and CorrelationSequence since in certain instances
             //when an event is split up, the same event IDs are used.
             Serializable key= getEventKey(event);
             event.getMessage().setInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, ++arrivalOrderCounter);
             lastStoredEventKey = key;
-            events.store(key, event);
+            eventsObjectStore.store(key, event, eventsPartitionKey);
 
             if (!hasNoCommonRootId)
             {
@@ -292,9 +288,9 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
      */
     public void removeEvent(MuleEvent event) throws ObjectStoreException
     {
-        synchronized (events)
+        synchronized (this)
         {
-            events.remove(event.getId());
+            eventsObjectStore.remove(event.getId(), eventsPartitionKey);
         }
     }
 
@@ -315,11 +311,11 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
      */
     public int size()
     {
-        synchronized (events)
+        synchronized (this)
         {
             try
             {
-                return events.allKeys().size();
+                return eventsObjectStore.allKeys(eventsPartitionKey).size();
             }
             catch (ObjectStoreException e)
             {
@@ -347,7 +343,11 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
      */
     public void clear() throws ObjectStoreException
     {
-        getObjectStoreManager().disposeStore(events);
+        synchronized (this)
+        {
+            eventsObjectStore.clear(eventsPartitionKey);
+            eventsObjectStore.close(eventsPartitionKey);
+        }
     }
 
     @Override
@@ -361,22 +361,22 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
         try
         {
-            synchronized (events)
+            synchronized (this)
             {
                 int currentSize;
 
-                currentSize = events.allKeys().size();
+                currentSize = eventsObjectStore.allKeys(eventsPartitionKey).size();
 
                 buf.append(", current events=").append(currentSize);
 
                 if (currentSize > 0)
                 {
                     buf.append(" [");
-                    Iterator<Serializable> i = events.allKeys().iterator();
+                    Iterator<Serializable> i = eventsObjectStore.allKeys(eventsPartitionKey).iterator();
                     while (i.hasNext())
                     {
                         Serializable id = i.next();
-                        buf.append(events.retrieve(id).getMessage().getUniqueId());
+                        buf.append(eventsObjectStore.retrieve(id, eventsPartitionKey).getMessage().getUniqueId());
                         if (i.hasNext())
                         {
                             buf.append(", ");
@@ -406,11 +406,11 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         DefaultMessageCollection col = new DefaultMessageCollection(muleContext);
         List<MuleMessage> messages = new ArrayList<MuleMessage>();
 
-        synchronized (events)
+        synchronized (this)
         {
-            for (Serializable id : events.allKeys())
+            for (Serializable id : eventsObjectStore.allKeys(eventsPartitionKey))
             {
-                MuleMessage message = events.retrieve(id).getMessage();
+                MuleMessage message = eventsObjectStore.retrieve(id, eventsPartitionKey).getMessage();
                 messages.add(message);
             }
         }
@@ -458,12 +458,15 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     private MuleEvent retrieveLastStoredEvent() throws ObjectStoreException
     {
-        if (lastStoredEventKey == null)
+        synchronized (this)
         {
-            lastStoredEventKey = findLastStoredEventKey();
-        }
+            if (lastStoredEventKey == null)
+            {
+                lastStoredEventKey = findLastStoredEventKey();
+            }
 
-        return events.retrieve(lastStoredEventKey);
+            return eventsObjectStore.retrieve(lastStoredEventKey, eventsPartitionKey);
+        }
     }
 
     protected MuleSession getMergedSession() throws ObjectStoreException
@@ -471,11 +474,11 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         MuleEvent lastStoredEvent = retrieveLastStoredEvent();
         MuleSession session = new DefaultMuleSession(
                 lastStoredEvent.getSession());
-        for (Serializable key : events.allKeys())
+        for (Serializable key : eventsObjectStore.allKeys(eventsPartitionKey))
         {
             if (!key.equals(lastStoredEventKey))
             {
-                MuleEvent event = events.retrieve(key);
+                MuleEvent event = eventsObjectStore.retrieve(key, eventsPartitionKey);
                 addAndOverrideSessionProperties(session, event);
             }
         }
@@ -491,22 +494,15 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         }
     }
 
-    private ObjectStoreManager getObjectStoreManager()
-    {
-        if (objectStoreManager == null)
-        {
-            objectStoreManager = muleContext.getRegistry().get(
-                    MuleProperties.OBJECT_STORE_MANAGER);
-        }
-        return objectStoreManager;
-    }
-
     public void initAfterDeserialisation(MuleContext context) throws MuleException
     {
         this.muleContext = context;
+    }
 
-        String storeKey = storePrefix + ".eventGroup." + groupId;
-        this.events = getObjectStoreManager().getObjectStore(storeKey, true);
+    public void initEventsStore(PartitionableObjectStore<MuleEvent> events) throws ObjectStoreException
+    {
+        this.eventsObjectStore = events;
+        events.open(eventsPartitionKey);
     }
 
     /**

@@ -11,7 +11,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessageCollection;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
@@ -22,12 +21,11 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
-import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.ObjectStoreManager;
+import org.mule.api.store.PartitionableObjectStore;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.execution.ErrorHandlingExecutionTemplate;
@@ -58,18 +56,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
     public static final String NO_CORRELATION_ID = "no-id";
 
-    public static final int MAX_PROCESSED_GROUPS = 50000;
-
     private static final long ONE_DAY_IN_MILLI = 1000 * 60 * 60 * 24;
 
     protected long groupTimeToLive = ONE_DAY_IN_MILLI;
-
-    /**
-     * A map of EventGroup objects. These represent one or more messages to be
-     * agregated, keyed by message id. There will be one response message for every
-     * EventGroup.
-     */
-    protected ListableObjectStore<EventGroup> eventGroups;
 
     protected final Object groupsLock = new Object();
 
@@ -89,24 +78,25 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     private MessageProcessor timeoutMessageProcessor;
 
     /**
-     * A map with keys = group id and values = group creation time
+     * A map of EventGroup objects in a partition. These represent one or more messages to be agregated, keyed by
+     * message id. There will be one response message for every EventGroup.
      */
-    private ListableObjectStore<Long> expiredAndDispatchedGroups = null;
+    private PartitionableObjectStore correlatorStore = null;
+    private String storePrefix;
 
     private EventCorrelator.ExpiringGroupMonitoringThread expiringGroupMonitoringThread;
     private final String name;
 
-    private final boolean persistentStores;
-    private final String storePrefix;
     private final FlowConstruct flowConstruct;
 
     public EventCorrelator(EventCorrelatorCallback callback,
-                           MessageProcessor timeoutMessageProcessor,
-                           MessageInfoMapping messageInfoMapping,
-                           MuleContext muleContext,
-                           FlowConstruct flowConstruct,
-                           boolean persistentStores,
-                           String storePrefix)
+            MessageProcessor timeoutMessageProcessor,
+            MessageInfoMapping messageInfoMapping,
+            MuleContext muleContext,
+            FlowConstruct flowConstruct,
+            PartitionableObjectStore correlatorStore,
+            String storePrefix,
+            ObjectStore<Long> processedGroups)
     {
         if (callback == null)
         {
@@ -125,28 +115,20 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
         this.messageInfoMapping = messageInfoMapping;
         this.muleContext = muleContext;
         this.timeoutMessageProcessor = timeoutMessageProcessor;
-        this.persistentStores = persistentStores;
-        this.storePrefix = storePrefix;
         name = String.format("%s%s.event.correlator", ThreadNameHelper.getPrefix(muleContext),
                              flowConstruct.getName());
-        ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(
-                MuleProperties.OBJECT_STORE_MANAGER);
-        expiredAndDispatchedGroups = (ListableObjectStore<Long>) objectStoreManager.getObjectStore(
-                storePrefix + ".expiredAndDispatchedGroups", persistentStores);
-        processedGroups = (ListableObjectStore<Long>) objectStoreManager.getObjectStore(storePrefix
-                                                                                        + ".processedGroups",
-                                                                                        persistentStores, MAX_PROCESSED_GROUPS, -1, 1000);
-        eventGroups = (ListableObjectStore<EventGroup>) objectStoreManager.getObjectStore(storePrefix
-                                                                                          + ".eventGroups",
-                                                                                          persistentStores);
         this.flowConstruct = flowConstruct;
+
+        this.correlatorStore = correlatorStore;
+        this.storePrefix = storePrefix;
+        this.processedGroups = processedGroups;
     }
 
     public void forceGroupExpiry(String groupId) throws MessagingException
     {
         try
         {
-            if (eventGroups.retrieve(groupId) != null)
+            if (correlatorStore.retrieve(groupId, getEventGroupsPartitionKey()) != null)
             {
                 handleGroupExpiry(getEventGroup(groupId));
             }
@@ -228,7 +210,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 // ..apparently not, so create a new one & add it
                 try
                 {
-                    group = this.addEventGroup(callback.createEventGroup(event, groupId));
+                    EventGroup eventGroup = callback.createEventGroup(event, groupId);
+                    eventGroup.initEventsStore(correlatorStore);
+                    group = this.addEventGroup(eventGroup);
                 }
                 catch (ObjectStoreException e)
                 {
@@ -292,7 +276,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     {
         try
         {
-            EventGroup eventGroup = eventGroups.retrieve(groupId);
+            EventGroup eventGroup = (EventGroup) correlatorStore.retrieve(groupId, getEventGroupsPartitionKey());
             if (!eventGroup.isInitialised())
             {
                 try
@@ -304,6 +288,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                     throw new ObjectStoreException(e);
                 }
             }
+            eventGroup.initEventsStore(correlatorStore);
             return eventGroup;
         }
         catch (ObjectDoesNotExistException e)
@@ -316,7 +301,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     {
         try
         {
-            eventGroups.store((Serializable) group.getGroupId(), group);
+            correlatorStore.store((Serializable) group.getGroupId(), group, getEventGroupsPartitionKey());
             return group;
         }
         catch (ObjectAlreadyExistsException e)
@@ -332,7 +317,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
         {
             if (!isGroupAlreadyProcessed(groupId))
             {
-                eventGroups.remove((Serializable) groupId);
+                correlatorStore.remove((Serializable) groupId, getEventGroupsPartitionKey());
                 addProcessedGroup(groupId);
             }
         }
@@ -429,7 +414,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                     group.clear();
                     newEvent.getMessage().setCorrelationId(group.getGroupId().toString());
 
-                    if (!expiredAndDispatchedGroups.contains((Serializable) group.getGroupId()))
+                    if (!correlatorStore.contains((Serializable) group.getGroupId(), getExpiredAndDispatchedPartitionKey()))
                     {
                         // TODO which use cases would need a sync reply event
                         // returned?
@@ -448,8 +433,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
                             ((Service) service).dispatchEvent(newEvent);
                         }
-                        expiredAndDispatchedGroups.store((Serializable) group.getGroupId(),
-                                                         group.getCreated());
+                        correlatorStore.store((Serializable) group.getGroupId(),
+                                                         group.getCreated(),
+                                                         getExpiredAndDispatchedPartitionKey());
                     }
                     else
                     {
@@ -514,12 +500,12 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
         {
             try
             {
-                for (Serializable o : expiredAndDispatchedGroups.allKeys())
+                for (Serializable o : (List<Serializable>) correlatorStore.allKeys(getExpiredAndDispatchedPartitionKey()))
                 {
-                    Long time = expiredAndDispatchedGroups.retrieve(o);
+                    Long time = (Long) correlatorStore.retrieve(o, getExpiredAndDispatchedPartitionKey());
                     if (time + groupTimeToLive < System.currentTimeMillis())
                     {
-                        expiredAndDispatchedGroups.remove(o);
+                        correlatorStore.remove(o, getExpiredAndDispatchedPartitionKey());
                         logger.warn(MessageFormat.format("Discarding group {0}", o));
                     }
                 }
@@ -545,7 +531,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
             List<EventGroup> expired = new ArrayList<EventGroup>(1);
             try
             {
-                for (Serializable o : eventGroups.allKeys())
+                for (Serializable o : (List<Serializable>) correlatorStore.allKeys(getEventGroupsPartitionKey()))
                 {
                     EventGroup group = getEventGroup(o);
                     // group may have been removed by another thread right after eventGroups.allKeys()
@@ -595,12 +581,19 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
         }
     }
 
+    protected String getExpiredAndDispatchedPartitionKey()
+    {
+        return storePrefix + ".expiredAndDispatchedGroups";
+    }
+    
+    protected String getEventGroupsPartitionKey()
+    {
+        return storePrefix + ".eventGroups";
+    }
+
     @Override
     public void dispose()
     {
-        disposeIfDisposable(expiredAndDispatchedGroups);
-        disposeIfDisposable(processedGroups);
-        disposeIfDisposable(eventGroups);
         disposeIfDisposable(expiringGroupMonitoringThread);
     }
 

@@ -13,9 +13,11 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
+import org.mule.util.store.ProvidedObjectStoreWrapper;
 
 import java.util.concurrent.locks.Lock;
 
+import org.apache.commons.collections.Factory;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -27,7 +29,7 @@ import org.apache.commons.lang.StringUtils;
 public class DefaultRefreshTokenManager implements MuleContextAware, RefreshTokenManager
 {
 
-    private ObjectStore<Boolean> refreshedTokens;
+    private volatile ObjectStore<Boolean> refreshedTokens;
     private MuleContext muleContext;
     private int minRefreshInterval = DEFAULT_MIN_REFRESH_INTERVAL;
 
@@ -68,11 +70,23 @@ public class DefaultRefreshTokenManager implements MuleContextAware, RefreshToke
     {
         if (this.refreshedTokens == null)
         {
-            ObjectStoreManager osManager = this.muleContext.getObjectStoreManager();
-            this.refreshedTokens = osManager.getObjectStore("RefreshTokenStore", false, UNBOUNDED,
-                                                            this.minRefreshInterval, this.minRefreshInterval);
+            this.refreshedTokens = new ProvidedObjectStoreWrapper<>(null, internalObjectStoreFactory());
         }
         return this.refreshedTokens;
+    }
+
+    protected Factory internalObjectStoreFactory()
+    {
+        return new Factory()
+        {
+            @Override
+            public Object create()
+            {
+                ObjectStoreManager osManager = muleContext.getObjectStoreManager();
+                return osManager.getObjectStore("RefreshTokenStore", false, UNBOUNDED,
+                        minRefreshInterval, minRefreshInterval);
+            }
+        };
     }
 
     @Override
@@ -85,5 +99,18 @@ public class DefaultRefreshTokenManager implements MuleContextAware, RefreshToke
     public void setMinRefreshIntervalInMillis(int minRefreshIntervalInMillis)
     {
         this.minRefreshInterval = minRefreshIntervalInMillis;
+    }
+
+    @Override
+    public synchronized void setRefreshedTokensStore(ObjectStore<Boolean> refreshedTokens) throws IllegalStateException
+    {
+        if (this.refreshedTokens == null)
+        {
+            this.refreshedTokens = new ProvidedObjectStoreWrapper<>(refreshedTokens, internalObjectStoreFactory());
+        }
+        else
+        {
+            throw new IllegalStateException("refreshedTokens object store had already been set/obtained for this DefaultRefreshTokenManager: " + toString());
+        }
     }
 }

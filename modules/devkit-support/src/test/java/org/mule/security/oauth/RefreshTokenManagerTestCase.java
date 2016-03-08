@@ -14,17 +14,22 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.util.store.InMemoryObjectStore;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.collections.Closure;
 import org.junit.Test;
 
 public class RefreshTokenManagerTestCase extends AbstractMuleContextTestCase
 {
 
     private static final String NAME = "connector";
+
+    private final int TIMEOUT = 1000;
+    private final String ACCESS_TOKEN_ID = "accessTokenId";
 
     private RefreshTokenManager refreshTokenManager;
 
@@ -38,14 +43,53 @@ public class RefreshTokenManagerTestCase extends AbstractMuleContextTestCase
     @Test
     public void dontRefreshConcurrently() throws Exception
     {
-        final String ACCESS_TOKEN_ID = "accessTokenId";
-        final int TIMEOUT = 1000;
+        doDontRefreshConcurrently(new Closure()
+        {
+            @Override
+            public void execute(Object input)
+            {
+                ((RefreshTokenManager) input).setMinRefreshIntervalInMillis(TIMEOUT);
+            }
+        });
+    }
+
+    @Test
+    public void dontRefreshConcurrentlyConfigureStore() throws Exception
+    {
+        doDontRefreshConcurrently(new Closure()
+        {
+            @Override
+            public void execute(Object input)
+            {
+                ((RefreshTokenManager) input).setRefreshedTokensStore(new InMemoryObjectStore<Boolean>());
+            }
+        });
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void configureStoreTwice() throws Exception
+    {
+        this.refreshTokenManager.setRefreshedTokensStore(new InMemoryObjectStore<Boolean>());
+        this.refreshTokenManager.setRefreshedTokensStore(new InMemoryObjectStore<Boolean>());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void configureStoreAfterInit() throws Exception
+    {
+        refreshTokenManager.setMinRefreshIntervalInMillis(TIMEOUT);
+        final OAuth2Adapter adapter = this.getAdapter();
+        refreshTokenManager.refreshToken(adapter, ACCESS_TOKEN_ID);
+        refreshTokenManager.setRefreshedTokensStore(new InMemoryObjectStore<Boolean>());
+    }
+
+    private void doDontRefreshConcurrently(Closure configureRefreshStoreColsure) throws Exception
+    {
         final int THREAD_COUNT = 10;
         final AtomicInteger exceptionCount = new AtomicInteger(0);
 
         final OAuth2Adapter adapter = this.getAdapter();
 
-        this.refreshTokenManager.setMinRefreshIntervalInMillis(TIMEOUT);
+        configureRefreshStoreColsure.execute(refreshTokenManager);
 
         final Runnable task = new Runnable()
         {
