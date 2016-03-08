@@ -25,9 +25,17 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_LONG;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_MAP;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExpressionSupport;
-import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.BooleanType;
+import org.mule.metadata.api.model.DateTimeType;
+import org.mule.metadata.api.model.DateType;
+import org.mule.metadata.api.model.DictionaryType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.NumberType;
+import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.util.ValueHolder;
 
@@ -36,70 +44,93 @@ import javax.xml.namespace.QName;
 public final class SchemaTypeConversion
 {
 
-    public static QName convertType(final DataType type, ExpressionSupport expressionSupport)
+    public static QName convertType(final MetadataType type, ExpressionSupport expressionSupport)
     {
         final boolean dynamic = MuleExtensionUtils.acceptsExpressions(expressionSupport);
         final ValueHolder<QName> qName = new ValueHolder<>();
-        type.getQualifier().accept(new AbstractDataQualifierVisitor()
+        type.accept(new MetadataTypeVisitor()
         {
+
             @Override
-            public void onBoolean()
+            public void visitBoolean(BooleanType booleanType)
             {
                 qName.set(dynamic ? EXPRESSION_BOOLEAN : SUBSTITUTABLE_BOOLEAN);
             }
 
             @Override
-            public void onInteger()
+            public void visitNumber(NumberType numberType)
             {
-                qName.set(dynamic ? EXPRESSION_INTEGER : SUBSTITUTABLE_INT);
+                Class<Number> type = JavaTypeUtils.getType(numberType);
+                if (anyOf(type, Integer.class, int.class))
+                {
+                    qName.set(dynamic ? EXPRESSION_INTEGER : SUBSTITUTABLE_INT);
+                }
+                else if (anyOf(type, Double.class, double.class))
+                {
+                    qName.set(dynamic ? EXPRESSION_DOUBLE : SUBSTITUTABLE_DECIMAL);
+                }
+                else if (anyOf(type, Long.class, long.class))
+                {
+                    qName.set(dynamic ? EXPRESSION_LONG : SUBSTITUTABLE_LONG);
+                }
+                else
+                {
+                    qName.set(dynamic ? EXPRESSION_DECIMAL : SUBSTITUTABLE_DECIMAL);
+                }
             }
 
             @Override
-            public void onDouble()
-            {
-                qName.set(dynamic ? EXPRESSION_DOUBLE : SUBSTITUTABLE_DECIMAL);
-            }
-
-            @Override
-            public void onDecimal()
-            {
-                qName.set(dynamic ? EXPRESSION_DECIMAL : SUBSTITUTABLE_DECIMAL);
-            }
-
-            @Override
-            public void onString()
+            public void visitString(StringType stringType)
             {
                 qName.set(dynamic ? EXPRESSION_STRING : STRING);
             }
 
             @Override
-            public void onLong()
+            public void visitDateTime(DateTimeType dateTimeType)
             {
-                qName.set(dynamic ? EXPRESSION_LONG : SUBSTITUTABLE_LONG);
+                onDate();
             }
 
             @Override
-            public void onDateTime()
+            public void visitDate(DateType dateType)
             {
-                qName.set(dynamic ? EXPRESSION_DATE_TIME : SUBSTITUTABLE_DATE_TIME);
+                onDate();
             }
 
             @Override
-            public void onList()
+            public void visitArrayType(ArrayType arrayType)
             {
                 qName.set(dynamic ? EXPRESSION_LIST : SUBSTITUTABLE_NAME);
             }
 
             @Override
-            public void onMap()
+            public void visitDictionary(DictionaryType dictionaryType)
             {
                 qName.set(dynamic ? EXPRESSION_MAP : SUBSTITUTABLE_MAP);
             }
 
             @Override
-            protected void defaultOperation()
+            protected void defaultVisit(MetadataType metadataType)
             {
                 qName.set(dynamic ? EXPRESSION_OBJECT : STRING);
+            }
+
+            private void onDate()
+            {
+                qName.set(dynamic ? EXPRESSION_DATE_TIME : SUBSTITUTABLE_DATE_TIME);
+            }
+
+            private boolean anyOf(Class<Number> type, Class<?>... targets)
+            {
+                for (Class<?> target : targets)
+                {
+                    if (type.equals(target))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
         });
 

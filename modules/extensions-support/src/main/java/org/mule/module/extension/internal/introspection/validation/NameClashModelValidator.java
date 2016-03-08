@@ -8,14 +8,15 @@ package org.mule.module.extension.internal.introspection.validation;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
-import org.mule.extension.api.introspection.DataQualifier;
 import org.mule.extension.api.introspection.Described;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.metadata.api.model.ObjectType;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedListMultimap;
@@ -35,7 +36,7 @@ import org.apache.commons.lang.StringUtils;
  * Validates names clashes in the model by comparing:
  * <ul>
  * <li>The {@link Described#getName()} value of all the {@link ConfigurationModel}, {@link OperationModel} and {@link ConnectionProviderModel}</li>
- * <li>Makes sure that there no two {@link ParameterModel}s with the same name but different types, for those with a {@link DataQualifier#POJO} qualifier</li>
+ * <li>Makes sure that there no two {@link ParameterModel}s with the same name but different types, for those which represent an object</li>
  * <li>Makes sure that no {@link ConfigurationModel}, {@link OperationModel} or {@link ConnectionProviderModel} have parameters with repeated name</li>
  * </ul>
  *
@@ -84,7 +85,7 @@ public final class NameClashModelValidator implements ModelValidator
             extensionModel.getOperationModels().stream().forEach(operationModel -> {
                 operationModel.getParameterModels().stream().forEach(parameterModel -> {
                     validateClash(operationModel.getName(),
-                                  parameterModel.getType().getName(),
+                                  getType(parameterModel.getType()).getName(),
                                   "operation",
                                   "argument");
                 });
@@ -95,7 +96,7 @@ public final class NameClashModelValidator implements ModelValidator
                 extensionModel.getOperationModels().stream().forEach(operationModel -> {
                     operationModel.getParameterModels().stream().forEach(parameterModel -> {
                         validateClash(connectionProviderModel.getName(),
-                                      parameterModel.getType().getName(),
+                                      getType(parameterModel.getType()).getName(),
                                       "connection provider",
                                       String.format("operation's (%s) parameter", operationModel.getName()));
                     });
@@ -107,7 +108,7 @@ public final class NameClashModelValidator implements ModelValidator
                 extensionModel.getOperationModels().stream().forEach(operationModel -> {
                     operationModel.getParameterModels().stream().forEach(parameterModel -> {
                         validateClash(configurationModel.getName(),
-                                      parameterModel.getType().getName(),
+                                      getType(parameterModel.getType()).getName(),
                                       "configuration",
                                       String.format("operation's (%s) parameter", operationModel.getName()));
                     });
@@ -152,9 +153,9 @@ public final class NameClashModelValidator implements ModelValidator
         private void validateTopLevelParameters(List<ParameterModel> parameters, String ownerName, String ownerType)
         {
             parameters.stream()
-                    .filter(parameter -> parameter.getType().getQualifier() == DataQualifier.POJO)
+                    .filter(parameter -> parameter.getType() instanceof ObjectType)
                     .forEach(parameter -> {
-                        final Class<?> parameterType = parameter.getType().getRawType();
+                        final Class<?> parameterType = getType(parameter.getType());
                         Collection<TopLevelParameter> foundParameters = topLevelParameters.get(parameter.getName());
                         if (CollectionUtils.isEmpty(foundParameters))
                         {
@@ -220,7 +221,7 @@ public final class NameClashModelValidator implements ModelValidator
         {
             this.owner = owner;
             this.ownerType = ownerType;
-            type = parameterModel.getType().getRawType();
+            type = getType(parameterModel.getType());
         }
     }
 }

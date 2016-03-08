@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -28,6 +29,11 @@ import static org.mule.module.extension.HeisenbergExtension.SCHEMA_VERSION;
 import static org.mule.module.extension.HeisenbergOperations.KILL_WITH_GROUP;
 import static org.mule.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DEFAULT_CONNECTION_PROVIDER_NAME;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
+import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.api.MuleEvent;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.config.MuleManifest;
@@ -43,7 +49,6 @@ import org.mule.extension.api.annotation.connector.Providers;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
@@ -54,6 +59,8 @@ import org.mule.extension.api.introspection.declaration.fluent.OperationDeclarat
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.extension.api.introspection.property.display.PlacementModelProperty;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.annotation.GenericTypesAnnotation;
 import org.mule.module.extension.HeisenbergConnection;
 import org.mule.module.extension.HeisenbergConnectionProvider;
 import org.mule.module.extension.HeisenbergExtension;
@@ -189,7 +196,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         describeTestModule();
     }
 
-
     @Test
     public void heisenbergPointerPlusExternalConfig() throws Exception
     {
@@ -203,7 +209,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(configuration, is(notNullValue()));
         assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
         assertThat(configuration.getParameters(), hasSize(26));
-        assertParameter(configuration.getParameters(), "extendedProperty", "", DataType.of(String.class), true, SUPPORTED, null);
+        assertParameter(configuration.getParameters(), "extendedProperty", "", toMetadataType(String.class), true, SUPPORTED, null);
     }
 
     @Test(expected = IllegalConfigurationModelDefinitionException.class)
@@ -245,30 +251,61 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         List<ParameterDeclaration> parameters = conf.getParameters();
         assertThat(parameters, hasSize(25));
 
-        assertParameter(parameters, "myName", "", DataType.of(String.class), false, SUPPORTED, HEISENBERG);
-        assertParameter(parameters, "age", "", DataType.of(Integer.class), false, SUPPORTED, AGE);
-        assertParameter(parameters, "enemies", "", DataType.of(List.class, String.class), true, SUPPORTED, null);
-        assertParameter(parameters, "money", "", DataType.of(BigDecimal.class), true, SUPPORTED, null);
-        assertParameter(parameters, "cancer", "", DataType.of(boolean.class), true, SUPPORTED, null);
-        assertParameter(parameters, "cancer", "", DataType.of(boolean.class), true, SUPPORTED, null);
-        assertParameter(parameters, "dateOfBirth", "", DataType.of(Date.class), true, SUPPORTED, null);
-        assertParameter(parameters, "dateOfDeath", "", DataType.of(Calendar.class), true, SUPPORTED, null);
-        assertParameter(parameters, "recipe", "", DataType.of(Map.class, String.class, Long.class), false, SUPPORTED, null);
-        assertParameter(parameters, "ricinPacks", "", DataType.of(Set.class, Ricin.class), false, SUPPORTED, null);
-        assertParameter(parameters, "nextDoor", "", DataType.of(KnockeableDoor.class), false, SUPPORTED, null);
-        assertParameter(parameters, "candidateDoors", "", DataType.of(Map.class, String.class, KnockeableDoor.class), false, SUPPORTED, null);
-        assertParameter(parameters, "initialHealth", "", DataType.of(HealthStatus.class), false, SUPPORTED, "CANCER");
-        assertParameter(parameters, "finalHealth", "", DataType.of(HealthStatus.class), true, SUPPORTED, null);
-        assertParameter(parameters, "labAddress", "", DataType.of(String.class), false, REQUIRED, null);
-        assertParameter(parameters, "firstEndevour", "", DataType.of(String.class), false, NOT_SUPPORTED, null);
-        assertParameter(parameters, "weapon", "", DataType.of(Weapon.class), false, SUPPORTED, null);
-        assertParameter(parameters, "moneyFunction", "", DataType.of(Function.class, MuleEvent.class, Integer.class), false, SUPPORTED, null);
-        assertParameter(parameters, "wildCardWeapons", "", DataType.of(List.class, Weapon.class), false, SUPPORTED, null);
-        assertParameter(parameters, "wildCardList", "", DataType.of(List.class, Object.class), false, SUPPORTED, null);
-        assertParameter(parameters, "wildCardWeaponMap", "", DataType.of(Map.class, Weapon.class, Object.class), false, SUPPORTED, null);
-        assertParameter(parameters, "monthlyIncomes", "", DataType.of(List.class, Long.class), true, SUPPORTED, null);
-        assertParameter(parameters, "labeledRicin", "", DataType.of(Map.class, String.class, Ricin.class), false, SUPPORTED, null);
-        assertParameter(parameters, "deathsBySeasons", "", DataType.of(Map.class, DataType.of(String.class), DataType.of(List.class, DataType.of(String.class))), false, SUPPORTED, null);
+        assertParameter(parameters, "myName", "", toMetadataType(String.class), false, SUPPORTED, HEISENBERG);
+        assertParameter(parameters, "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);
+        assertParameter(parameters, "enemies", "", listOfString(), true, SUPPORTED, null);
+        assertParameter(parameters, "money", "", toMetadataType(BigDecimal.class), true, SUPPORTED, null);
+        assertParameter(parameters, "cancer", "", toMetadataType(boolean.class), true, SUPPORTED, null);
+        assertParameter(parameters, "cancer", "", toMetadataType(boolean.class), true, SUPPORTED, null);
+        assertParameter(parameters, "dateOfBirth", "", toMetadataType(Date.class), true, SUPPORTED, null);
+        assertParameter(parameters, "dateOfDeath", "", toMetadataType(Calendar.class), true, SUPPORTED, null);
+
+        assertParameter(parameters, "recipe", "", TYPE_BUILDER.dictionaryType().id(Map.class.getName())
+                                .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
+                                .ofValue(TYPE_BUILDER.numberType().id("java.lang.Long"))
+                                .build(),
+                        false, SUPPORTED, null);
+
+        assertParameter(parameters, "ricinPacks", "", arrayOf(Set.class, objectTypeBuilder(Ricin.class)), false, SUPPORTED, null);
+
+        assertParameter(parameters, "nextDoor", "", toMetadataType(KnockeableDoor.class), false, SUPPORTED, null);
+        assertParameter(parameters, "candidateDoors", "", TYPE_BUILDER.dictionaryType().id(Map.class.getName())
+                                .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
+                                .ofValue(objectTypeBuilder(KnockeableDoor.class))
+                                .build(),
+                        false, SUPPORTED, null);
+
+        assertParameter(parameters, "initialHealth", "", toMetadataType(HealthStatus.class), false, SUPPORTED, "CANCER");
+        assertParameter(parameters, "finalHealth", "", toMetadataType(HealthStatus.class), true, SUPPORTED, null);
+        assertParameter(parameters, "labAddress", "", toMetadataType(String.class), false, REQUIRED, null);
+        assertParameter(parameters, "firstEndevour", "", toMetadataType(String.class), false, NOT_SUPPORTED, null);
+        assertParameter(parameters, "weapon", "", toMetadataType(Weapon.class), false, SUPPORTED, null);
+        assertParameter(parameters, "moneyFunction", "", TYPE_BUILDER.objectType()
+                                .id(Function.class.getName())
+                                .with(new GenericTypesAnnotation(asList(
+                                        TYPE_LOADER.load(MuleEvent.class),
+                                        TYPE_LOADER.load(Integer.class))))
+                                .build(),
+                        false, SUPPORTED, null);
+        assertParameter(parameters, "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false, SUPPORTED, null);
+        assertParameter(parameters, "wildCardList", "", arrayOf(List.class, objectTypeBuilder(Object.class)), false, SUPPORTED, null);
+        assertParameter(parameters, "wildCardWeaponMap", "", TYPE_BUILDER.dictionaryType().id(Map.class.getName())
+                                .ofKey(objectTypeBuilder(Weapon.class))
+                                .ofValue(objectTypeBuilder(Object.class))
+                                .build(),
+                        false, SUPPORTED, null);
+
+        assertParameter(parameters, "monthlyIncomes", "", arrayOf(List.class, TYPE_BUILDER.numberType().id(Long.class.getName())), true, SUPPORTED, null);
+        assertParameter(parameters, "labeledRicin", "", TYPE_BUILDER.dictionaryType().id(Map.class.getName())
+                                .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
+                                .ofValue(objectTypeBuilder(Ricin.class))
+                                .build(),
+                        false, SUPPORTED, null);
+        assertParameter(parameters, "deathsBySeasons", "", TYPE_BUILDER.dictionaryType().id(Map.class.getName())
+                                .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
+                                .ofValue(TYPE_BUILDER.arrayType().id(List.class.getName()).of(TYPE_BUILDER.stringType().id(String.class.getName())))
+                                .build(),
+                        false, SUPPORTED, null);
     }
 
     private void assertExtensionProperties(Declaration declaration)
@@ -309,34 +346,34 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         operation = getOperation(declaration, GET_ENEMY_OPERATION);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(1));
-        assertParameter(operation.getParameters(), "index", "", DataType.of(int.class), false, SUPPORTED, "0");
+        assertParameter(operation.getParameters(), "index", "", toMetadataType(int.class), false, SUPPORTED, "0");
 
         operation = getOperation(declaration, KILL_OPERATION);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(2));
-        assertParameter(operation.getParameters(), "victim", "", DataType.of(String.class), false, SUPPORTED, "#[payload]");
-        assertParameter(operation.getParameters(), "goodbyeMessage", "", DataType.of(String.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "victim", "", toMetadataType(String.class), false, SUPPORTED, "#[payload]");
+        assertParameter(operation.getParameters(), "goodbyeMessage", "", toMetadataType(String.class), true, SUPPORTED, null);
 
         operation = getOperation(declaration, KILL_WITH_WEAPON);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(1));
-        assertParameter(operation.getParameters(), "weapon", "", DataType.of(Weapon.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "weapon", "", toMetadataType(Weapon.class), true, SUPPORTED, null);
 
         operation = getOperation(declaration, KILL_WITH_MULTIPLES_WEAPONS);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(1));
-        assertParameter(operation.getParameters(), "weaponList", "", DataType.of(List.class, Weapon.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "weaponList", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), true, SUPPORTED, null);
 
         operation = getOperation(declaration, KILL_WITH_MULTIPLE_WILDCARD_WEAPONS);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(1));
-        assertParameter(operation.getParameters(), "wildCardWeapons", "", DataType.of(List.class, Weapon.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), true, SUPPORTED, null);
 
         operation = getOperation(declaration, KILL_CUSTOM_OPERATION);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(2));
-        assertParameter(operation.getParameters(), "victim", "", DataType.of(String.class), false, SUPPORTED, "#[payload]");
-        assertParameter(operation.getParameters(), "goodbyeMessage", "", DataType.of(String.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "victim", "", toMetadataType(String.class), false, SUPPORTED, "#[payload]");
+        assertParameter(operation.getParameters(), "goodbyeMessage", "", toMetadataType(String.class), true, SUPPORTED, null);
 
         operation = getOperation(declaration, GET_PAYMENT_FROM_EVENT_OPERATION);
         assertThat(operation, is(notNullValue()));
@@ -347,22 +384,22 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(operation.getParameters().isEmpty(), is(true));
 
         operation = getOperation(declaration, LAUNDER_MONEY);
-        assertParameter(operation.getParameters(), "amount", "", DataType.of(long.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "amount", "", toMetadataType(long.class), true, SUPPORTED, null);
 
         operation = getOperation(declaration, INJECTED_EXTENSION_MANAGER);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters().isEmpty(), is(true));
 
         operation = getOperation(declaration, ALIAS);
-        assertParameter(operation.getParameters(), "greeting", "", DataType.of(String.class), true, SUPPORTED, null);
-        assertParameter(operation.getParameters(), "myName", "", DataType.of(String.class), false, SUPPORTED, HEISENBERG);
-        assertParameter(operation.getParameters(), "age", "", DataType.of(Integer.class), false, SUPPORTED, AGE);
+        assertParameter(operation.getParameters(), "greeting", "", toMetadataType(String.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "myName", "", toMetadataType(String.class), false, SUPPORTED, HEISENBERG);
+        assertParameter(operation.getParameters(), "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);
 
         operation = getOperation(declaration, KNOCK);
-        assertParameter(operation.getParameters(), "door", "", DataType.of(KnockeableDoor.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "door", "", toMetadataType(KnockeableDoor.class), true, SUPPORTED, null);
 
         operation = getOperation(declaration, KNOCK_MANY);
-        assertParameter(operation.getParameters(), "doors", "", DataType.of(List.class, KnockeableDoor.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "doors", "", arrayOf(List.class, objectTypeBuilder(KnockeableDoor.class)), true, SUPPORTED, null);
 
         operation = getOperation(declaration, CALL_SAUL);
         assertThat(operation.getParameters(), is(empty()));
@@ -394,8 +431,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         List<ParameterDeclaration> parameters = connectionProvider.getParameters();
         assertThat(parameters, hasSize(2));
 
-        assertParameter(parameters, "saulPhoneNumber", "", DataType.of(String.class), false, SUPPORTED, SAUL_OFFICE_NUMBER);
-        assertParameter(parameters, TLS_ATTRIBUTE_NAME, "", DataType.of(TlsContextFactory.class), false, NOT_SUPPORTED, null);
+        assertParameter(parameters, "saulPhoneNumber", "", toMetadataType(String.class), false, SUPPORTED, SAUL_OFFICE_NUMBER);
+        assertParameter(parameters, TLS_ATTRIBUTE_NAME, "", toMetadataType(TlsContextFactory.class), false, NOT_SUPPORTED, null);
         ImplementingTypeModelProperty typeModelProperty = connectionProvider.getModelProperty(ImplementingTypeModelProperty.KEY);
         assertThat(typeModelProperty, is(notNullValue()));
         assertThat(typeModelProperty.getType(), equalTo(HeisenbergConnectionProvider.class));
@@ -410,7 +447,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         List<ParameterDeclaration> parameters = source.getParameters();
         assertThat(parameters, hasSize(2));
 
-        assertParameter(parameters, SOURCE_PARAMETER, "", DataType.of(int.class), true, SUPPORTED, null);
+        assertParameter(parameters, SOURCE_PARAMETER, "", toMetadataType(int.class), true, SUPPORTED, null);
         ImplementingTypeModelProperty typeModelProperty = source.getModelProperty(ImplementingTypeModelProperty.KEY);
         assertThat(typeModelProperty, is(notNullValue()));
         assertThat(typeModelProperty.getType(), equalTo(HeisenbergSource.class));
@@ -428,7 +465,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private void assertParameter(List<ParameterDeclaration> parameters,
                                  String name,
                                  String description,
-                                 DataType dataType,
+                                 MetadataType metadataType,
                                  boolean required,
                                  ExpressionSupport expressionSupport,
                                  Object defaultValue)
@@ -438,7 +475,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         assertThat(param.getName(), equalTo(name));
         assertThat(param.getDescription(), equalTo(description));
-        assertThat(param.getType(), equalTo(dataType));
+        assertThat(param.getType(), equalTo(metadataType));
         assertThat(param.isRequired(), is(required));
         assertThat(param.getExpressionSupport(), is(expressionSupport));
         assertThat(param.getDefaultValue(), equalTo(defaultValue));
@@ -460,6 +497,13 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name)
     {
         return (ParameterDeclaration) CollectionUtils.find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
+    }
+
+    private MetadataType listOfString()
+    {
+        return TYPE_BUILDER.arrayType().id(List.class.getName())
+                .of(TYPE_BUILDER.stringType().id(String.class.getName()))
+                .build();
     }
 
     protected void assertModelProperties(Declaration declaration)

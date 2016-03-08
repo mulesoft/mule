@@ -15,7 +15,6 @@ import org.mule.api.MuleException;
 import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
 import org.mule.util.ClassUtils;
@@ -28,11 +27,11 @@ import org.apache.commons.lang.StringUtils;
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions and tries
  * to ensure that the output is always of a certain type.
- * <p/>
+ * <p>
  * If the MEL expression does not return a value of that type, then it
  * tries to locate a {@link Transformer} which can do the transformation
  * from the obtained type to the expected one.
- * <p/>
+ * <p>
  * It resolves the expressions by making use of the {@link AttributeEvaluator}
  * so that it's compatible with simple expressions and templates alike
  *
@@ -42,12 +41,12 @@ import org.apache.commons.lang.StringUtils;
 public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>
 {
 
-    private final DataType expectedType;
+    private final Class<?> expectedType;
     private final AttributeEvaluator evaluator;
     private MuleContext muleContext;
     private EvaluatorDelegate delegate = new CaptureContextEvaluatorDelegate();
 
-    public TypeSafeExpressionValueResolver(String expression, DataType expectedType)
+    public TypeSafeExpressionValueResolver(String expression, Class<?> expectedType)
     {
         checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
         checkArgument(expectedType != null, "expected type cannot be null");
@@ -65,12 +64,12 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>
 
     private T transform(T object, MuleEvent event) throws MuleException
     {
-        if (ClassUtils.isInstance(expectedType.getRawType(), object))
+        if (ClassUtils.isInstance(expectedType, object))
         {
             return object;
         }
 
-        Type expectedClass = expectedType.getRawType();
+        Type expectedClass = expectedType;
         if (expectedClass instanceof ParameterizedType)
         {
             expectedClass = ((ParameterizedType) expectedClass).getRawType();
@@ -91,9 +90,9 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>
                     "Expression '%s' was expected to return a value of type '%s' but a '%s' was found instead " +
                     "and no suitable transformer could be located",
                     evaluator.getRawValue(),
-                    expectedType.getRawType().getName(),
+                    expectedType.getName(),
                     object.getClass().getName())),
-                 event, e);
+                                         event, e);
         }
 
         if (transformer instanceof MessageTransformer)

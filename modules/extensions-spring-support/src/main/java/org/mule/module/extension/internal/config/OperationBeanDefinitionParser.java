@@ -8,20 +8,21 @@ package org.mule.module.extension.internal.config;
 
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_SINGLETON;
-
+import org.mule.api.NestedProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.enricher.MessageEnricher;
-import org.mule.extension.api.introspection.DataQualifier;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
-import org.mule.module.extension.internal.introspection.AbstractDataQualifierVisitor;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.module.extension.internal.util.NameUtils;
-import org.mule.util.ArrayUtils;
 
 import java.util.List;
 
@@ -79,24 +80,30 @@ final class OperationBeanDefinitionParser extends BaseExtensionBeanDefinitionPar
 
         for (final ParameterModel parameterModel : operationModel.getParameterModels())
         {
-            final DataType type = parameterModel.getType();
-            type.getQualifier().accept(new AbstractDataQualifierVisitor()
+            final MetadataType type = parameterModel.getType();
+            type.accept(new MetadataTypeVisitor()
             {
-
                 @Override
-                public void onOperation()
+                public void visitObject(ObjectType objectType)
                 {
-                    nestedOperations.put(parameterModel.getName(), parseNestedProcessor(element, parameterModel, parserContext));
-                }
-
-                @Override
-                public void onList()
-                {
-                    DataType[] generics = type.getGenericTypes();
-                    if (!ArrayUtils.isEmpty(generics) && generics[0].getQualifier() == DataQualifier.OPERATION)
+                    if (isOperation(objectType))
                     {
                         nestedOperations.put(parameterModel.getName(), parseNestedProcessor(element, parameterModel, parserContext));
                     }
+                }
+
+                @Override
+                public void visitArrayType(ArrayType arrayType)
+                {
+                    if (isOperation(arrayType.getType()))
+                    {
+                        nestedOperations.put(parameterModel.getName(), parseNestedProcessor(element, parameterModel, parserContext));
+                    }
+                }
+
+                private boolean isOperation(MetadataType metadataType)
+                {
+                    return NestedProcessor.class.isAssignableFrom(JavaTypeUtils.getType(metadataType));
                 }
             });
         }

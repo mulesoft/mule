@@ -9,11 +9,11 @@ package org.mule.module.extension.internal.introspection.validation;
 import static java.util.Arrays.asList;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
-import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.api.MuleEvent;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
+import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -40,7 +40,7 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
     public void before()
     {
         when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
-        when(operationModel.getReturnType()).thenReturn(DataType.of(String.class));
+        when(operationModel.getReturnType()).thenReturn(ExtensionsTestUtils.toMetadataType(String.class));
         when(operationModel.getName()).thenReturn("operation");
     }
 
@@ -60,7 +60,7 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
     @Test(expected = IllegalOperationModelDefinitionException.class)
     public void muleEventReturnType()
     {
-        when(operationModel.getReturnType()).thenReturn(DataType.of(MuleEvent.class));
+        when(operationModel.getReturnType()).thenReturn(ExtensionsTestUtils.toMetadataType(MuleEvent.class));
         validator.validate(extensionModel);
     }
 }

@@ -10,15 +10,15 @@ import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_POOLING_PROFILE_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.UNBOUNDED;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.PoolingSupport;
+import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -39,6 +39,7 @@ final class ConnectionProviderSchemaDelegate
 
     private final ObjectFactory objectFactory = new ObjectFactory();
     private final SchemaBuilder builder;
+    private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
     public ConnectionProviderSchemaDelegate(SchemaBuilder builder)
     {
@@ -99,7 +100,7 @@ final class ConnectionProviderSchemaDelegate
 
     private void addValidationFlag(ExtensionType providerType)
     {
-        providerType.getAttributeOrAttributeGroup().add(builder.createAttribute(DISABLE_VALIDATION, DataType.of(boolean.class), false, NOT_SUPPORTED));
+        providerType.getAttributeOrAttributeGroup().add(builder.createAttribute(DISABLE_VALIDATION, typeLoader.load(boolean.class), false, NOT_SUPPORTED));
     }
 
 

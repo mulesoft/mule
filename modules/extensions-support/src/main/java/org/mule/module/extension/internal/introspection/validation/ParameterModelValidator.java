@@ -8,13 +8,13 @@ package org.mule.module.extension.internal.introspection.validation;
 
 import static org.mule.extension.api.introspection.ParameterModel.RESERVED_NAMES;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 
 /**
  * Validates that all {@link ParameterModel parameters} provided by the {@link ConfigurationModel configurations},
@@ -22,7 +22,7 @@ import org.mule.extension.api.introspection.ParameterModel;
  * from the {@link ExtensionModel extension} complies with:
  * <ul>
  * <li>The name must not be one of the reserved ones</li>
- * <li>The {@link DataType dataType} must be provided</li>
+ * <li>The {@link MetadataType metadataType} must be provided</li>
  * <li>If required, cannot provide a default value</li>
  * </ul>
  *

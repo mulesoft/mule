@@ -12,16 +12,16 @@ import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.extension.api.introspection.ConfigurationModel;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
 import org.springframework.beans.factory.FactoryBean;
 
 /**
  * A {@link FactoryBean} that creates instances of a type defined by a
- * {@link DataType}. It will be defined as a top level element and will
+ * {@link MetadataType}. It will be defined as a top level element and will
  * serve as a reusable {@link ParameterModel} of a {@link ConfigurationModel} or {@link OperationModel}
  *
  * @since 3.7.0
@@ -30,14 +30,14 @@ final class TopLevelParameterTypeFactoryBean extends ExtensionComponentFactoryBe
 {
 
     private final ElementDescriptor element;
-    private final DataType dataType;
+    private final MetadataType metadataType;
     private final MuleContext muleContext;
     private ValueResolver<Object> valueResolver;
 
-    TopLevelParameterTypeFactoryBean(ElementDescriptor element, DataType dataType, MuleContext muleContext)
+    TopLevelParameterTypeFactoryBean(ElementDescriptor element, MetadataType metadataType, MuleContext muleContext)
     {
         this.element = element;
-        this.dataType = dataType;
+        this.metadataType = metadataType;
         this.muleContext = muleContext;
     }
 
@@ -63,7 +63,7 @@ final class TopLevelParameterTypeFactoryBean extends ExtensionComponentFactoryBe
     {
         if (valueResolver == null)
         {
-            valueResolver = parserDelegate.parseElement(element, EMPTY, dataType, null);
+            valueResolver = parserDelegate.parseElement(element, EMPTY, metadataType, null);
         }
 
         return valueResolver;

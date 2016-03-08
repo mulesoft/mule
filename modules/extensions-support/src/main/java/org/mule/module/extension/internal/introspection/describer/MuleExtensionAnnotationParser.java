@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection.describer;
 
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldDataType;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.api.MuleEvent;
@@ -21,7 +21,6 @@ import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.annotation.param.display.Password;
 import org.mule.extension.api.annotation.param.display.Placement;
 import org.mule.extension.api.annotation.param.display.Text;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.HasModelProperties;
@@ -31,6 +30,9 @@ import org.mule.extension.api.introspection.property.display.ImmutableTextModelP
 import org.mule.extension.api.introspection.property.display.PasswordModelProperty;
 import org.mule.extension.api.introspection.property.display.PlacementModelProperty;
 import org.mule.extension.api.introspection.property.display.TextModelProperty;
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ClassUtils;
@@ -97,7 +99,7 @@ public final class MuleExtensionAnnotationParser
         return extension;
     }
 
-    static List<ParsedParameter> parseParameters(Method method)
+    static List<ParsedParameter> parseParameters(Method method, ClassTypeLoader typeLoader)
     {
         List<String> paramNames = getParamNames(method);
 
@@ -106,7 +108,7 @@ public final class MuleExtensionAnnotationParser
             return ImmutableList.of();
         }
 
-        DataType[] parameterTypes = IntrospectionUtils.getMethodArgumentTypes(method);
+        MetadataType[] parameterTypes = IntrospectionUtils.getMethodArgumentTypes(method, typeLoader);
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
         List<ParsedParameter> parsedParameters = new LinkedList<>();
@@ -118,7 +120,7 @@ public final class MuleExtensionAnnotationParser
 
             if (annotations.containsKey(ParameterGroup.class))
             {
-                parseGroupParameters(parameterTypes[i], parsedParameters);
+                parseGroupParameters(parameterTypes[i], parsedParameters, typeLoader);
             }
             else
             {
@@ -130,17 +132,19 @@ public final class MuleExtensionAnnotationParser
         return parsedParameters;
     }
 
-    private static void parseGroupParameters(DataType parameterType, List<ParsedParameter> parsedParameters)
+    private static void parseGroupParameters(MetadataType parameterType, List<ParsedParameter> parsedParameters, ClassTypeLoader typeLoader)
     {
-        for (Field field : IntrospectionUtils.getParameterFields(parameterType.getRawType()))
+        for (Field field : IntrospectionUtils.getParameterFields(JavaTypeUtils.getType(parameterType)))
         {
             if (field.getAnnotation(org.mule.extension.api.annotation.ParameterGroup.class) != null)
             {
-                parseGroupParameters(getFieldDataType(field), parsedParameters);
+                parseGroupParameters(getFieldMetadataType(field, typeLoader), parsedParameters, typeLoader);
             }
             else
             {
-                ParsedParameter parsedParameter = doParseParameter(field.getName(), getFieldDataType(field), toMap(field.getAnnotations()));
+                ParsedParameter parsedParameter = doParseParameter(field.getName(),
+                                                                   getFieldMetadataType(field, typeLoader),
+                                                                   toMap(field.getAnnotations()));
                 if (parsedParameter != null)
                 {
                     parsedParameters.add(parsedParameter);
@@ -149,13 +153,15 @@ public final class MuleExtensionAnnotationParser
         }
     }
 
-    private static ParsedParameter doParseParameter(String paramName, DataType dataType, Map<Class<? extends Annotation>, Annotation> annotations)
+    private static ParsedParameter doParseParameter(String paramName,
+                                                    MetadataType metadataType,
+                                                    Map<Class<? extends Annotation>, Annotation> annotations)
     {
         ParsedParameter parameter = new ParsedParameter(annotations);
-        parameter.setAdvertised(shouldAdvertise(dataType, annotations));
+        parameter.setAdvertised(shouldAdvertise(metadataType, annotations));
 
         parameter.setName(getAliasName(paramName, (Alias) annotations.get(Alias.class)));
-        parameter.setType(dataType);
+        parameter.setType(metadataType);
 
         Optional optional = (Optional) annotations.get(Optional.class);
         if (optional != null)
@@ -176,9 +182,9 @@ public final class MuleExtensionAnnotationParser
         return parameter;
     }
 
-    private static boolean shouldAdvertise(DataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations)
+    private static boolean shouldAdvertise(MetadataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations)
     {
-        return !(IMPLICIT_ARGUMENT_TYPES.contains(parameterType.getRawType()) ||
+        return !(IMPLICIT_ARGUMENT_TYPES.contains(JavaTypeUtils.getType(parameterType)) ||
                  annotations.containsKey(UseConfig.class) ||
                  annotations.containsKey(Connection.class));
     }

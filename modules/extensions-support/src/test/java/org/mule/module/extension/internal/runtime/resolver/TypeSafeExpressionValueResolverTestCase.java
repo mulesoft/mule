@@ -19,7 +19,6 @@ import static org.mockito.Mockito.verify;
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.expression.DefaultExpressionManager;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -104,6 +103,6 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
 
     private ValueResolver getResolver(String expression, Class<?> expectedType) throws Exception
     {
-        return new TypeSafeExpressionValueResolver(expression, DataType.of(expectedType));
+        return new TypeSafeExpressionValueResolver(expression, expectedType);
     }
 }

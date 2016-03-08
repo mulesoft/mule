@@ -123,6 +123,8 @@
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-artifact-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-metadata-model-api-1.0.0-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-metadata-model-java-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-builders-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-client-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-cxf-${productVersion}.jar
@@ -182,6 +184,7 @@
 /mule-standalone-${productVersion}/lib/opt/commons-digester-1.8.jar
 /mule-standalone-${productVersion}/lib/opt/commons-io-2.4.jar
 /mule-standalone-${productVersion}/lib/opt/commons-lang-2.4.jar
+/mule-standalone-${productVersion}/lib/opt/commons-lang3-3.4.jar
 /mule-standalone-${productVersion}/lib/opt/commons-net-3.3.jar
 /mule-standalone-${productVersion}/lib/opt/commons-pool-1.6.jar
 /mule-standalone-${productVersion}/lib/opt/commons-validator-1.4.0.jar
@@ -277,7 +280,7 @@
 /mule-standalone-${productVersion}/lib/opt/mx4j-tools-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/neethi-3.0.3.jar
 /mule-standalone-${productVersion}/lib/opt/quartz-2.2.1.jar
-/mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
+/mule-standalone-${productVersion}/lib/opt/reflections-0.9.10.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.7.0-1.jar

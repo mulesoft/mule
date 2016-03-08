@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection.describer;
 
-import org.mule.extension.api.introspection.DataType;
+import org.mule.metadata.api.model.MetadataType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -24,7 +24,7 @@ final class ParsedParameter implements AnnotatedElement
 {
 
     private String name;
-    private DataType type;
+    private MetadataType type;
     private boolean required;
     private Object defaultValue;
     private Class<?> typeRestriction = null;
@@ -46,12 +46,12 @@ final class ParsedParameter implements AnnotatedElement
         this.name = name;
     }
 
-    DataType getType()
+    MetadataType getType()
     {
         return type;
     }
 
-    void setType(DataType type)
+    void setType(MetadataType type)
     {
         this.type = type;
     }

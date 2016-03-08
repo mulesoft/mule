@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.runtime.resolver;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.extension.api.introspection.DataType;
+import org.mule.metadata.api.model.MetadataType;
 
 import java.util.function.Function;
 
@@ -22,18 +22,18 @@ public final class ExpressionFunctionValueResolver<T> implements ValueResolver<F
 {
 
     private final String exp;
-    private DataType dataType;
+    private final MetadataType metadataType;
 
-    public ExpressionFunctionValueResolver(String exp, DataType dataType)
+    public ExpressionFunctionValueResolver(String exp, MetadataType metadataType)
     {
         this.exp = exp;
-        this.dataType = dataType;
+        this.metadataType = metadataType;
     }
 
     @Override
     public Function<MuleEvent, T> resolve(MuleEvent event) throws MuleException
     {
-        return new ExpressionFunction<>(exp, dataType);
+        return new ExpressionFunction<>(exp, metadataType);
     }
 
     @Override

@@ -11,9 +11,10 @@ import static org.mule.module.extension.internal.ExtensionProperties.ENCODING_PA
 import static org.mule.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import org.mule.extension.api.annotation.DataTypeParameters;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.DataType;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.module.extension.internal.ExtensionProperties;
 import org.mule.module.extension.internal.model.AbstractAnnotatedModelEnricher;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
@@ -31,6 +32,8 @@ import java.lang.reflect.Method;
  */
 public final class DataTypeModelEnricher extends AbstractAnnotatedModelEnricher
 {
+
+    private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
     @Override
     public void enrich(DescribingContext describingContext)
@@ -62,7 +65,7 @@ public final class DataTypeModelEnricher extends AbstractAnnotatedModelEnricher
         ParameterDeclaration parameter = new ParameterDeclaration(name);
         parameter.setRequired(false);
         parameter.setExpressionSupport(SUPPORTED);
-        parameter.setType(DataType.of(String.class));
+        parameter.setType(typeLoader.load(String.class));
         parameter.setDescription(description);
 
         return parameter;

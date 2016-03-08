@@ -64,7 +64,7 @@ public final class SchemaConstants
     public static final QName EXPRESSION_OBJECT = new QName(MULE_NAMESPACE, "expressionObject", MULE_PREFIX);
     public static final QName EXPRESSION_LIST = new QName(MULE_NAMESPACE, "expressionList", MULE_PREFIX);
     public static final QName EXPRESSION_MAP = new QName(MULE_NAMESPACE, "expressionMap", MULE_PREFIX);
-    public static final QName EXPRESSION_DATE_TIME = new QName(MULE_NAMESPACE, "expressionMap", MULE_PREFIX);
+    public static final QName EXPRESSION_DATE_TIME = new QName(MULE_NAMESPACE, "expressionDateTime", MULE_PREFIX);
 
     // ATTRIBUTES
     public static final String USE_REQUIRED = "required";

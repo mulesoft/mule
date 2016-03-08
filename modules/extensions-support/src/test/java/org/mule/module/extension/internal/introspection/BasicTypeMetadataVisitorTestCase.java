@@ -9,15 +9,15 @@ package org.mule.module.extension.internal.introspection;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
-import org.mule.extension.api.introspection.DataQualifier;
-import org.mule.extension.api.introspection.DataQualifierVisitor;
+import static org.mule.metadata.java.JavaTypeLoader.JAVA;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,43 +25,40 @@ import org.junit.runners.Parameterized;
 
 @SmallTest
 @RunWith(Parameterized.class)
-public class SimpleTypeDataQualifierVisitorTestCase extends AbstractMuleTestCase
+public class BasicTypeMetadataVisitorTestCase extends AbstractMuleTestCase
 {
 
-    private static final DataQualifier[] SIMPLE_TYPES = new DataQualifier[] {
-            DataQualifier.BOOLEAN,
-            DataQualifier.INTEGER,
-            DataQualifier.DOUBLE,
-            DataQualifier.DECIMAL,
-            DataQualifier.STRING,
-            DataQualifier.LONG,
-            DataQualifier.ENUM};
+    private static final BaseTypeBuilder<?> BUILDER = BaseTypeBuilder.create(JAVA);
 
     @Parameters(name = "isSimpleType({0})")
     public static Collection<Object[]> data()
     {
-        Collection<Object[]> types = new ArrayList<>();
-        for (DataQualifier qualifier : DataQualifier.values())
-        {
-            types.add(new Object[] {qualifier});
-        }
-
-        return types;
+        return Arrays.asList(new Object[][] {
+                {BUILDER.stringType().build(), true},
+                {BUILDER.numberType().build(), true},
+                {BUILDER.booleanType().build(), true},
+                {BUILDER.objectType().build(), false},
+                {BUILDER.arrayType().of(BUILDER.stringType()).build(), false},
+                {BUILDER.dateTimeType().build(), false}
+        });
     }
 
     @Parameterized.Parameter(0)
-    public DataQualifier qualifier;
+    public MetadataType metadataType;
 
-    private DataQualifierVisitor visitor = new SimpleTypeDataQualifierVisitor()
+    @Parameterized.Parameter(1)
+    public boolean expectedSimple;
+
+    private BasicTypeMetadataVisitor visitor = new BasicTypeMetadataVisitor()
     {
         @Override
-        protected void onSimpleType()
+        protected void visitBasicType(MetadataType metadataType)
         {
             simpleType = true;
         }
 
         @Override
-        protected void defaultOperation()
+        protected void defaultVisit(MetadataType metadataType)
         {
             complexType = true;
         }
@@ -80,9 +77,8 @@ public class SimpleTypeDataQualifierVisitorTestCase extends AbstractMuleTestCase
     @Test
     public void assertSimpleOrNot()
     {
-        qualifier.accept(visitor);
-        boolean shouldBeSimple = ArrayUtils.contains(SIMPLE_TYPES, qualifier);
-        assertThat(simpleType, is(shouldBeSimple));
-        assertThat(complexType, is(!shouldBeSimple));
+        metadataType.accept(visitor);
+        assertThat(simpleType, is(expectedSimple));
+        assertThat(complexType, is(!expectedSimple));
     }
 }
