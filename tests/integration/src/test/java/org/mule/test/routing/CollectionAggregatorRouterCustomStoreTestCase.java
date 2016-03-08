@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -40,9 +41,9 @@ public class CollectionAggregatorRouterCustomStoreTestCase extends FunctionalTes
 
         flowRunner("splitter").withPayload(list).run();
 
-        MuleMessageCollection request = (MuleMessageCollection) client.request("vm://out", 10000);
+        MuleMessage request = client.request("test://out", 10000);
         assertNotNull(request);
-        assertEquals(list.size(), request.size());
+        assertEquals(list.size(), ((List) request.getPayload()).size());
 
         assertThat(CustomPartitionableObjectStore.askedForKey, not(nullValue()));
         assertThat(CustomPartitionableObjectStore.askedForPartition, not(nullValue()));

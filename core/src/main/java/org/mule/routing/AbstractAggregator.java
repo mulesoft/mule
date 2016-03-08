@@ -11,6 +11,8 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
@@ -19,12 +21,22 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.Aggregator;
 import org.mule.api.routing.MessageInfoMapping;
+import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.ObjectStoreManager;
+import org.mule.api.store.PartitionableObjectStore;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.routing.correlation.EventCorrelator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.util.concurrent.ThreadNameHelper;
+import org.mule.util.store.DefaultObjectStoreFactoryBean;
+import org.mule.util.store.ProvidedObjectStoreWrapper;
+import org.mule.util.store.ProvidedPartitionableObjectStoreWrapper;
+
+import org.apache.commons.collections.Factory;
 
 /**
  * <code>AbstractEventAggregator</code> will aggregate a set of messages into a
