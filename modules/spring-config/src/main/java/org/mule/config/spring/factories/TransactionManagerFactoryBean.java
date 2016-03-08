@@ -45,7 +45,14 @@ public class TransactionManagerFactoryBean implements FactoryBean<TransactionMan
     @Override
     public TransactionManager getObject() throws Exception
     {
-        if (txManagerFactory != null)
+        if (muleContext.isDisposing())
+        {
+            // The txManager might be declared, but if it isn't used by the application it won't be created until the
+            // muleContext is disposed.
+            // At that point, there is no need to create the txManager.
+            return null;
+        }
+        else if (txManagerFactory != null)
         {
             try
             {
