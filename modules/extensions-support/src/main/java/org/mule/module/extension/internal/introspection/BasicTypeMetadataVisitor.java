@@ -26,7 +26,7 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
  * All other qualifiers delegate into {@link #defaultVisit(MetadataType)} ()} by default, but they
  * can be overridden at will
  *
- * @since 3.7.0
+ * @since 4.0
  */
 public abstract class BasicTypeMetadataVisitor extends MetadataTypeVisitor
 {
