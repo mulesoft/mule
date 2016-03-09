@@ -9,11 +9,14 @@ package org.mule.internal.connection;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mule.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.config.PoolingProfile;
-import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -39,17 +42,23 @@ public class DefaultConnectionHandlingStrategyFactoryTestCase extends AbstractMu
     @Mock
     private ConnectionProvider<Apple, Banana> connectionProvider;
 
-    @Mock
+    @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
-
-    private PoolingProfile poolingProfile = new PoolingProfile();
 
     private ConnectionHandlingStrategyFactory factory;
 
+    private DefaultConnectionManager connectionManager;
+
     @Before
-    public void before()
+    public void before() throws MuleException
     {
-        factory = new DefaultConnectionHandlingStrategyFactory<>(config, connectionProvider, muleContext);
+        factory = new DefaultConnectionHandlingStrategyFactory<>(config, connectionProvider, new PoolingProfile(), muleContext);
+
+        connectionManager = new DefaultConnectionManager(muleContext);
+        connectionManager.initialise();
+
+        muleContext.getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
+        muleContext.getInjector().inject(connectionManager);
     }
 
     @Test
@@ -61,27 +70,13 @@ public class DefaultConnectionHandlingStrategyFactoryTestCase extends AbstractMu
     @Test
     public void supportsPooling()
     {
-        assertType(factory.supportsPooling(poolingProfile), PoolingConnectionHandlingStrategy.class);
-    }
-
-    @Test
-    public void disabledPoolingSupport()
-    {
-        poolingProfile.setDisabled(true);
-        assertType(factory.supportsPooling(poolingProfile), NullConnectionHandlingStrategy.class);
+        assertType(factory.supportsPooling(), PoolingConnectionHandlingStrategy.class);
     }
 
     @Test
     public void requiresPooling()
     {
-        assertType(factory.requiresPooling(poolingProfile), PoolingConnectionHandlingStrategy.class);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void requiresPoolingWithInvalidProfile()
-    {
-        poolingProfile.setDisabled(true);
-        factory.requiresPooling(poolingProfile);
+        assertType(factory.requiresPooling(), PoolingConnectionHandlingStrategy.class);
     }
 
     @Test

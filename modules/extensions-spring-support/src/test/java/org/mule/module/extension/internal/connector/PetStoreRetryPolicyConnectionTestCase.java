@@ -26,7 +26,6 @@ import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreCli
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreOperations;
-import org.mule.module.extension.internal.runtime.connector.petstore.PetStorePoolingProfile;
 import org.mule.retry.RetryPolicyExhaustedException;
 
 import org.junit.Rule;
@@ -107,7 +106,7 @@ public class PetStoreRetryPolicyConnectionTestCase extends ExtensionFunctionalTe
         @Override
         public ConnectionHandlingStrategy<PetStoreClient> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
         {
-            return handlingStrategyFactory.requiresPooling(new PetStorePoolingProfile());
+            return handlingStrategyFactory.requiresPooling();
         }
     }
 
@@ -123,7 +122,7 @@ public class PetStoreRetryPolicyConnectionTestCase extends ExtensionFunctionalTe
         @Override
         public ConnectionHandlingStrategy<PetStoreClient> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
         {
-            return handlingStrategyFactory.requiresPooling(new PetStorePoolingProfile());
+            return handlingStrategyFactory.requiresPooling();
         }
     }
 

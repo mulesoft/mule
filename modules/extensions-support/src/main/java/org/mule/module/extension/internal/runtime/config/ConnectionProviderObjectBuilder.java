@@ -10,7 +10,6 @@ import org.mule.api.MuleException;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
 import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
 import org.mule.internal.connection.CachedConnectionProviderWrapper;
@@ -30,16 +29,15 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
 {
 
     private final RuntimeConnectionProviderModel providerModel;
+    private final boolean disableValidation;
+    private final RetryPolicyTemplate retryPolicyTemplate;
     private final PoolingProfile poolingProfile;
-    private boolean disableValidation;
-    private RetryPolicyTemplate retryPolicyTemplate;
-    private final ConnectionManagerAdapter connectionManager;
 
     /**
      * Creates a new instances which produces instances based on the given {@code providerModel} and
      * {@code resolverSet}
      *
-     * @param providerModel     the {@link ConnectionProviderModel} which describes the instances to be produced
+     * @param providerModel     the {@link RuntimeConnectionProviderModel} which describes the instances to be produced
      * @param resolverSet       a {@link ResolverSet} to populate the values
      * @param connectionManager a {@link ConnectionManagerAdapter} to obtain the default {@link RetryPolicyTemplate} in case
      *                          of none is provided
@@ -49,26 +47,25 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
         this(providerModel, resolverSet, null, false, null, connectionManager);
     }
 
-    public ConnectionProviderObjectBuilder(RuntimeConnectionProviderModel providerModel, ResolverSet resolverSet, PoolingProfile poolingProfile, boolean disableValidation, RetryPolicyTemplate retryPolicyTemplate, ConnectionManagerAdapter connectionManager)
+    public ConnectionProviderObjectBuilder(RuntimeConnectionProviderModel providerModel,
+                                           ResolverSet resolverSet,
+                                           PoolingProfile poolingProfile,
+                                           boolean disableValidation,
+                                           RetryPolicyTemplate retryPolicyTemplate,
+                                           ConnectionManagerAdapter connectionManager)
     {
         super(providerModel.getConnectionProviderFactory().getObjectType(), providerModel, resolverSet);
         this.providerModel = providerModel;
         this.poolingProfile = poolingProfile;
+        this.retryPolicyTemplate = retryPolicyTemplate != null ? retryPolicyTemplate : connectionManager.getDefaultRetryPolicyTemplate();
         this.disableValidation = disableValidation;
-        this.retryPolicyTemplate = retryPolicyTemplate;
-        this.connectionManager = connectionManager;
     }
 
     @Override
     public ConnectionProvider build(ResolverSetResult result) throws MuleException
     {
         ConnectionProvider provider = super.build(result);
-
         ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
-        if (retryPolicyTemplate == null)
-        {
-            retryPolicyTemplate = connectionManager.getDefaultRetryPolicyTemplate();
-        }
 
         if (connectionHandlingType != null)
         {

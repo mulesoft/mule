@@ -6,18 +6,21 @@
  */
 package org.mule.internal.connection;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleContext;
+import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionHandler;
+import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionValidationResult;
@@ -28,6 +31,7 @@ import org.mule.tck.testmodels.fruit.Banana;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -44,7 +48,6 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
-
 
     private DefaultConnectionManager connectionManager;
 
@@ -69,18 +72,11 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase
         assertThat(connectionHandler.getConnection(), is(sameInstance(connection)));
     }
 
-    @Test
+    @Test(expected = ConnectionException.class)
     public void assertUnboundedConnection() throws Exception
     {
-        try
-        {
-            connectionManager.getConnection(config);
-            fail("Config was unbounded yet a connection could be obtained");
-        }
-        catch (ConnectionException e)
-        {
-            // ok!
-        }
+        connectionManager.getConnection(config);
+
     }
 
     @Test
@@ -91,13 +87,31 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase
         verifyDisconnect();
     }
 
-    @Test
+    @Test(expected = ConnectionException.class)
     public void unbind() throws Exception
     {
         getConnection();
         connectionManager.unbind(config);
         verifyDisconnect();
         assertUnboundedConnection();
+    }
+
+    @Test
+    public void defaultPoolingProfileUsed() throws Exception
+    {
+        connectionManager.bind(config, connectionProvider);
+        ArgumentCaptor<ConnectionHandlingStrategyFactory> captor = ArgumentCaptor.forClass(ConnectionHandlingStrategyFactory.class);
+        verify(connectionProvider).getHandlingStrategy(captor.capture());
+        getConnection();
+
+        ConnectionHandlingStrategyFactory factory = captor.getValue();
+        assertThat(factory, is(notNullValue()));
+
+        ConnectionHandlingStrategy strategy = factory.supportsPooling();
+        assertThat(strategy, instanceOf(PoolingConnectionHandlingStrategy.class));
+
+        PoolingProfile poolingProfile = ((PoolingConnectionHandlingStrategy) strategy).getPoolingProfile();
+        assertThat(poolingProfile, equalTo(new PoolingProfile()));
     }
 
     private void verifyDisconnect()

@@ -6,7 +6,6 @@
  */
 package org.mule.module.extension.internal.model.property;
 
-import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionProvider;
@@ -31,29 +30,29 @@ public final class ImmutableConnectionHandlingTypeModelProperty implements Conne
         connectionProvider.getHandlingStrategy(new ConnectionHandlingStrategyFactory()
         {
             @Override
-            public ConnectionHandlingStrategy supportsPooling(PoolingProfile defaultPoolingProfile)
+            public ConnectionHandlingStrategy supportsPooling()
             {
                 poolingSupport = PoolingSupport.SUPPORTED;
                 return null;
             }
 
             @Override
-            public ConnectionHandlingStrategy supportsPooling(PoolingProfile defaultPoolingProfile, PoolingListener poolingListener)
+            public ConnectionHandlingStrategy supportsPooling(PoolingListener poolingListener)
             {
-                return supportsPooling(defaultPoolingProfile);
+                return supportsPooling();
             }
 
             @Override
-            public ConnectionHandlingStrategy requiresPooling(PoolingProfile defaultPoolingProfile)
+            public ConnectionHandlingStrategy requiresPooling()
             {
                 poolingSupport = PoolingSupport.REQUIRED;
                 return null;
             }
 
             @Override
-            public ConnectionHandlingStrategy requiresPooling(PoolingProfile defaultPoolingProfile, PoolingListener poolingListener)
+            public ConnectionHandlingStrategy requiresPooling(PoolingListener poolingListener)
             {
-                return requiresPooling(defaultPoolingProfile);
+                return requiresPooling();
             }
 
             @Override

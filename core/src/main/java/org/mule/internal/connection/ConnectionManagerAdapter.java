@@ -6,8 +6,10 @@
  */
 package org.mule.internal.connection;
 
+import org.mule.api.config.PoolingProfile;
 import org.mule.api.connector.ConnectionManager;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.retry.RetryPolicy;
 import org.mule.api.retry.RetryPolicyTemplate;
 
 /**
@@ -18,5 +20,22 @@ import org.mule.api.retry.RetryPolicyTemplate;
 public interface ConnectionManagerAdapter extends ConnectionManager, Stoppable
 {
 
+    /**
+     * When no {@link RetryPolicyTemplate} is specified by the user
+     * the {@link ConnectionManagerAdapter} will provide the
+     * default one to create the required {@link RetryPolicy}s
+     * instances.
+     *
+     * @return a {@link RetryPolicyTemplate}
+     */
     RetryPolicyTemplate getDefaultRetryPolicyTemplate();
+
+    /**
+     * When no {@link PoolingProfile} is specified by the user
+     * the {@link ConnectionManagerAdapter} will provide the
+     * default one to configure the pool of connections
+     *
+     * @return a {@link PoolingProfile}
+     */
+    PoolingProfile getDefaultPoolingProfile();
 }

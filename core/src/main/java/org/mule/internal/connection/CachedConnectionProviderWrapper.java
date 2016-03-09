@@ -8,6 +8,7 @@ package org.mule.internal.connection;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.api.context.MuleContextAware;
@@ -15,6 +16,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.retry.RetryPolicyTemplate;
+
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -100,6 +103,12 @@ public final class CachedConnectionProviderWrapper<Config, Connection> extends C
     public void stop() throws MuleException
     {
         LifecycleUtils.stopIfNeeded(retryPolicyTemplate);
+    }
+
+    @Override
+    public Optional<PoolingProfile> getPoolingProfile()
+    {
+        return Optional.empty();
     }
 }
 
