@@ -43,7 +43,7 @@ public final class SchemaConstants
     public static final QName MULE_ABSTRACT_MESSAGE_SOURCE = new QName(MULE_NAMESPACE, "abstract-message-source", MULE_PREFIX);
     public static final QName MULE_ABSTRACT_RECONNECTION_STRATEGY = new QName(MULE_NAMESPACE, "abstract-reconnection-strategy", MULE_PREFIX);
     public static final QName MULE_ABSTRACT_RECONNECTION_STRATEGY_TYPE = new QName(MULE_NAMESPACE, "abstractReconnectionStrategyType", MULE_PREFIX);
-    public static final QName MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE = new QName(MULE_NAMESPACE, "messageProcessorOrOutboundEndpoint", MULE_PREFIX);
+    public static final QName MULE_MESSAGE_PROCESSOR_TYPE = new QName(MULE_NAMESPACE, "messageProcessorOrMixedContentMessageProcessor", MULE_PREFIX);
     public static final QName TLS_CONTEXT_TYPE = new QName(MULE_TLS_NAMESPACE, "context", "tls");
 
     //TYPES
