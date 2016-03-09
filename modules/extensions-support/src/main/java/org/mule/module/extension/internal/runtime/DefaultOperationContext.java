@@ -8,8 +8,8 @@ package org.mule.module.extension.internal.runtime;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.MuleEvent;
-import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.RuntimeOperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 
@@ -29,17 +29,18 @@ public class DefaultOperationContext implements OperationContextAdapter
     private final ConfigurationInstance<?> configuration;
     private final Map<String, Object> parameters;
     private final Map<String, Object> variables = new HashMap<>();
-    private final OperationModel operationModel;
+    private final RuntimeOperationModel operationModel;
     private final MuleEvent event;
 
     /**
      * Creates a new instance with the given state
      *
-     * @param configuration the {@link ConfigurationInstance} that the operation will use
-     * @param parameters    the parameters that the operation will use
-     * @param event         the current {@link MuleEvent}
+     * @param configuration  the {@link ConfigurationInstance} that the operation will use
+     * @param parameters     the parameters that the operation will use
+     * @param operationModel a {@link RuntimeOperationModel} for the operation being executed
+     * @param event          the current {@link MuleEvent}
      */
-    public DefaultOperationContext(ConfigurationInstance<Object> configuration, ResolverSetResult parameters, OperationModel operationModel, MuleEvent event)
+    public DefaultOperationContext(ConfigurationInstance<Object> configuration, ResolverSetResult parameters, RuntimeOperationModel operationModel, MuleEvent event)
     {
         this.configuration = configuration;
         this.event = event;
@@ -132,7 +133,7 @@ public class DefaultOperationContext implements OperationContextAdapter
      * {@inheritDoc}
      */
     @Override
-    public OperationModel getOperationModel()
+    public RuntimeOperationModel getOperationModel()
     {
         return operationModel;
     }

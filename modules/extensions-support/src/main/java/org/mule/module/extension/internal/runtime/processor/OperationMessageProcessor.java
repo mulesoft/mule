@@ -21,8 +21,9 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.RuntimeOperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
@@ -43,10 +44,10 @@ import org.slf4j.LoggerFactory;
  * A {@link MessageProcessor} capable of executing extension operations.
  * <p>
  * It obtains a configuration instance, evaluate all the operation parameters
- * and executes a {@link OperationModel} by using a {@link #operationExecutor}. This message processor is capable
- * of serving the execution of any {@link OperationModel} of any {@link ExtensionModel}.
+ * and executes a {@link RuntimeOperationModel} by using a {@link #operationExecutor}. This message processor is capable
+ * of serving the execution of any {@link OperationModel} of any {@link RuntimeExtensionModel}.
  * <p>
- * A {@link #operationExecutor} is obtained by invoking {@link OperationModel#getExecutor()}. That instance
+ * A {@link #operationExecutor} is obtained by invoking {@link RuntimeOperationModel#getExecutor()}. That instance
  * will be use to serve all invokations of {@link #process(MuleEvent)} on {@code this} instance but
  * will not be shared with other instances of {@link OperationMessageProcessor}. All the {@link Lifecycle}
  * events that {@code this} instance receives will be propagated to the {@link #operationExecutor}.
@@ -60,9 +61,9 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OperationMessageProcessor.class);
 
-    private final ExtensionModel extensionModel;
+    private final RuntimeExtensionModel extensionModel;
     private final String configurationProviderName;
-    private final OperationModel operationModel;
+    private final RuntimeOperationModel operationModel;
     private final ResolverSet resolverSet;
     private final ExtensionManager extensionManager;
     private final String target;
@@ -75,8 +76,8 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     @Inject
     private ConnectionManagerAdapter connectionManager;
 
-    public OperationMessageProcessor(ExtensionModel extensionModel,
-                                     OperationModel operationModel,
+    public OperationMessageProcessor(RuntimeExtensionModel extensionModel,
+                                     RuntimeOperationModel operationModel,
                                      String configurationProviderName,
                                      String target,
                                      ResolverSet resolverSet,

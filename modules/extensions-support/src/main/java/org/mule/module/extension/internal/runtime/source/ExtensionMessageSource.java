@@ -37,7 +37,8 @@ import org.mule.execution.MessageProcessContext;
 import org.mule.execution.MessageProcessingManager;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.SourceModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.RuntimeSourceModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ExceptionCallback;
 import org.mule.extension.api.runtime.MessageHandler;
@@ -85,8 +86,8 @@ public class ExtensionMessageSource implements MessageSource,
     private SourceWrapper source;
     private WorkManager workManager;
 
-    public ExtensionMessageSource(ExtensionModel extensionModel,
-                                  SourceModel sourceModel,
+    public ExtensionMessageSource(RuntimeExtensionModel extensionModel,
+                                  RuntimeSourceModel sourceModel,
                                   SourceFactory sourceFactory,
                                   String configurationProviderName,
                                   ThreadingProfile threadingProfile,

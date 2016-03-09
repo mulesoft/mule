@@ -25,12 +25,12 @@ import static org.mockito.Mockito.when;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExceptionEnricher;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
-import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.Interceptable;
-import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.RuntimeOperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.OperationContext;
@@ -102,13 +102,13 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     private ExceptionEnricher exceptionEnricher;
 
     @Mock
-    private ConfigurationModel configurationModel;
+    private RuntimeConfigurationModel configurationModel;
 
     @Mock
-    private ExtensionModel extensionModel;
+    private RuntimeExtensionModel extensionModel;
 
     @Mock
-    private OperationModel operationModel;
+    private RuntimeOperationModel operationModel;
 
     @Mock
     private ConnectionManagerAdapter connectionManagerAdapter;

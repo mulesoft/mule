@@ -15,18 +15,22 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSo
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
-import org.mule.extension.api.introspection.ImmutableConfigurationModel;
-import org.mule.extension.api.introspection.ImmutableConnectionProviderModel;
-import org.mule.extension.api.introspection.ImmutableExtensionModel;
-import org.mule.extension.api.introspection.ImmutableOperationModel;
-import org.mule.extension.api.introspection.ImmutableParameterModel;
-import org.mule.extension.api.introspection.ImmutableSourceModel;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionFactory;
-import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.ImmutableExtensionModel;
+import org.mule.extension.api.introspection.ImmutableParameterModel;
+import org.mule.extension.api.introspection.ImmutableRuntimeConfigurationModel;
+import org.mule.extension.api.introspection.ImmutableRuntimeConnectionProviderModel;
+import org.mule.extension.api.introspection.ImmutableRuntimeExtensionModel;
+import org.mule.extension.api.introspection.ImmutableRuntimeOperationModel;
+import org.mule.extension.api.introspection.ImmutableRuntimeSourceModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.RuntimeOperationModel;
+import org.mule.extension.api.introspection.RuntimeSourceModel;
 import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
@@ -103,7 +107,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
      * {@inheritDoc}
      */
     @Override
-    public ExtensionModel createFrom(Descriptor descriptor)
+    public RuntimeExtensionModel createFrom(Descriptor descriptor)
     {
         return createFrom(descriptor, new DefaultDescribingContext(descriptor.getRootDeclaration()));
     }
@@ -112,29 +116,29 @@ public final class DefaultExtensionFactory implements ExtensionFactory
      * {@inheritDoc}
      */
     @Override
-    public ExtensionModel createFrom(Descriptor descriptor, DescribingContext describingContext)
+    public RuntimeExtensionModel createFrom(Descriptor descriptor, DescribingContext describingContext)
     {
         enrichModel(describingContext);
-        ExtensionModel extensionModel = toExtension(descriptor.getRootDeclaration().getDeclaration());
+        RuntimeExtensionModel extensionModel = toExtension(descriptor.getRootDeclaration().getDeclaration());
         modelValidators.forEach(v -> v.validate(extensionModel));
 
         return extensionModel;
     }
 
-    private ExtensionModel toExtension(Declaration declaration)
+    private RuntimeExtensionModel toExtension(Declaration declaration)
     {
         validateMuleVersion(declaration);
-        ValueHolder<ExtensionModel> extensionModelValueHolder = new ValueHolder<>();
-        ExtensionModel extensionModel = new ImmutableExtensionModel(declaration.getName(),
-                                                                    declaration.getDescription(),
-                                                                    declaration.getVersion(),
-                                                                    declaration.getVendor(),
-                                                                    sortConfigurations(toConfigurations(declaration.getConfigurations(), extensionModelValueHolder)),
-                                                                    alphaSortDescribedList(toOperations(declaration.getOperations())),
-                                                                    toConnectionProviders(declaration.getConnectionProviders()),
-                                                                    alphaSortDescribedList(toMessageSources(declaration.getMessageSources())),
-                                                                    declaration.getModelProperties(),
-                                                                    declaration.getExceptionEnricherFactory());
+        ValueHolder<RuntimeExtensionModel> extensionModelValueHolder = new ValueHolder<>();
+        RuntimeExtensionModel extensionModel = new ImmutableRuntimeExtensionModel(declaration.getName(),
+                                                                                  declaration.getDescription(),
+                                                                                  declaration.getVersion(),
+                                                                                  declaration.getVendor(),
+                                                                                  sortConfigurations(toConfigurations(declaration.getConfigurations(), extensionModelValueHolder)),
+                                                                                  alphaSortDescribedList(toOperations(declaration.getOperations())),
+                                                                                  toConnectionProviders(declaration.getConnectionProviders()),
+                                                                                  alphaSortDescribedList(toMessageSources(declaration.getMessageSources())),
+                                                                                  declaration.getModelProperties(),
+                                                                                  declaration.getExceptionEnricherFactory());
 
         extensionModelValueHolder.set(extensionModel);
         return extensionModel;
@@ -161,22 +165,22 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     }
 
 
-    private List<ConfigurationModel> toConfigurations(List<ConfigurationDeclaration> declarations, ValueHolder<ExtensionModel> extensionModelValueHolder)
+    private List<ConfigurationModel> toConfigurations(List<ConfigurationDeclaration> declarations, ValueHolder<RuntimeExtensionModel> extensionModelValueHolder)
     {
         return declarations.stream()
                 .map(declaration -> toConfiguration(declaration, extensionModelValueHolder))
                 .collect(toList());
     }
 
-    private ConfigurationModel toConfiguration(ConfigurationDeclaration declaration, ValueHolder<ExtensionModel> extensionModel)
+    private ConfigurationModel toConfiguration(ConfigurationDeclaration declaration, ValueHolder<RuntimeExtensionModel> extensionModel)
     {
-        return new ImmutableConfigurationModel(declaration.getName(),
-                                               declaration.getDescription(),
-                                               extensionModel::get,
-                                               declaration.getConfigurationFactory(),
-                                               toParameters(declaration.getParameters()),
-                                               declaration.getModelProperties(),
-                                               declaration.getInterceptorFactories());
+        return new ImmutableRuntimeConfigurationModel(declaration.getName(),
+                                                      declaration.getDescription(),
+                                                      extensionModel::get,
+                                                      declaration.getConfigurationFactory(),
+                                                      toParameters(declaration.getParameters()),
+                                                      declaration.getModelProperties(),
+                                                      declaration.getInterceptorFactories());
     }
 
     private List<SourceModel> toMessageSources(List<SourceDeclaration> declarations)
@@ -186,17 +190,17 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                 .collect(toList());
     }
 
-    private SourceModel toMessageSource(SourceDeclaration declaration)
+    private RuntimeSourceModel toMessageSource(SourceDeclaration declaration)
     {
-        return new ImmutableSourceModel(declaration.getName(),
-                                        declaration.getDescription(),
-                                        toParameters(declaration.getParameters()),
-                                        declaration.getReturnType(),
-                                        declaration.getAttributesType(),
-                                        declaration.getSourceFactory(),
-                                        declaration.getModelProperties(),
-                                        declaration.getInterceptorFactories(),
-                                        declaration.getExceptionEnricherFactory());
+        return new ImmutableRuntimeSourceModel(declaration.getName(),
+                                               declaration.getDescription(),
+                                               toParameters(declaration.getParameters()),
+                                               declaration.getReturnType(),
+                                               declaration.getAttributesType(),
+                                               declaration.getSourceFactory(),
+                                               declaration.getModelProperties(),
+                                               declaration.getInterceptorFactories(),
+                                               declaration.getExceptionEnricherFactory());
     }
 
     private List<OperationModel> toOperations(List<OperationDeclaration> declarations)
@@ -204,21 +208,21 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         return declarations.stream().map(this::toOperation).collect(toList());
     }
 
-    private OperationModel toOperation(OperationDeclaration declaration)
+    private RuntimeOperationModel toOperation(OperationDeclaration declaration)
     {
         List<ParameterModel> parameterModels = toOperationParameters(declaration.getParameters());
 
         List<Interceptor> interceptors = createInterceptors(declaration.getInterceptorFactories());
         OperationExecutorFactory executorFactory = new OperationExecutorFactoryWrapper(declaration.getExecutorFactory(), interceptors);
 
-        return new ImmutableOperationModel(declaration.getName(),
-                                           declaration.getDescription(),
-                                           executorFactory,
-                                           parameterModels,
-                                           declaration.getReturnType(),
-                                           declaration.getModelProperties(),
-                                           declaration.getInterceptorFactories(),
-                                           declaration.getExceptionEnricherFactory());
+        return new ImmutableRuntimeOperationModel(declaration.getName(),
+                                                  declaration.getDescription(),
+                                                  executorFactory,
+                                                  parameterModels,
+                                                  declaration.getReturnType(),
+                                                  declaration.getModelProperties(),
+                                                  declaration.getInterceptorFactories(),
+                                                  declaration.getExceptionEnricherFactory());
     }
 
     private List<ConnectionProviderModel> toConnectionProviders(List<ConnectionProviderDeclaration> declarations)
@@ -226,9 +230,9 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         return declarations.stream().map(this::toConnectionProvider).collect(new ImmutableListCollector<>());
     }
 
-    private ConnectionProviderModel toConnectionProvider(ConnectionProviderDeclaration declaration)
+    private RuntimeConnectionProviderModel toConnectionProvider(ConnectionProviderDeclaration declaration)
     {
-        return new ImmutableConnectionProviderModel(
+        return new ImmutableRuntimeConnectionProviderModel(
                 declaration.getName(),
                 declaration.getDescription(),
                 declaration.getConfigurationType(),

@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.runtime.config;
 
 import org.mule.api.MuleContext;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -26,7 +26,7 @@ public interface ConfigurationProviderFactory
      * Creates a new {@link ConfigurationProvider} which servers instances of a dynamic configuration
      *
      * @param name                       the provider's name
-     * @param configurationModel         the {@link ConfigurationModel} that describes the configuration instances to be returned
+     * @param configurationModel         the {@link RuntimeConfigurationModel} that describes the configuration instances to be returned
      * @param resolverSet                a {@link ResolverSet} for the configuration's attributes
      * @param connectionProviderResolver A {@link ValueResolver} to obtain a {@link ConnectionProvider}
      * @param dynamicConfigPolicy        a {@link DynamicConfigPolicy} in case the configuration is dynamic
@@ -36,7 +36,7 @@ public interface ConfigurationProviderFactory
      */
     <T> ConfigurationProvider<T> createDynamicConfigurationProvider(
             String name,
-            ConfigurationModel configurationModel,
+            RuntimeConfigurationModel configurationModel,
             ResolverSet resolverSet,
             ValueResolver<ConnectionProvider> connectionProviderResolver,
             DynamicConfigPolicy dynamicConfigPolicy) throws Exception;
@@ -46,7 +46,7 @@ public interface ConfigurationProviderFactory
      * Creates a new {@link ConfigurationProvider} which servers a static configuration instance
      *
      * @param name                       the provider's name
-     * @param configurationModel         the {@link ConfigurationModel} that describes the configuration instances to be returned
+     * @param configurationModel         the {@link RuntimeConfigurationModel} that describes the configuration instances to be returned
      * @param resolverSet                a {@link ResolverSet} for the configuration's attributes
      * @param connectionProviderResolver A {@link ValueResolver} to obtain a {@link ConnectionProvider}
      * @param muleContext                the {@link MuleContext} that will own the configuration instances
@@ -56,7 +56,7 @@ public interface ConfigurationProviderFactory
      */
     <T> ConfigurationProvider<T> createStaticConfigurationProvider(
             String name,
-            ConfigurationModel configurationModel,
+            RuntimeConfigurationModel configurationModel,
             ResolverSet resolverSet,
             ValueResolver<ConnectionProvider> connectionProviderResolver,
             MuleContext muleContext) throws Exception;

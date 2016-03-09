@@ -21,18 +21,18 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionDiscoverer;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.RuntimeOperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.OperationExecutor;
@@ -80,22 +80,22 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     private ExtensionDiscoverer discoverer;
 
     @Mock
-    private ExtensionModel extensionModel1;
+    private RuntimeExtensionModel extensionModel1;
 
     @Mock
-    private ExtensionModel extensionModel2;
+    private RuntimeExtensionModel extensionModel2;
 
     @Mock
-    private ExtensionModel extensionModel3WithRepeatedName;
+    private RuntimeExtensionModel extensionModel3WithRepeatedName;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
-    private ConfigurationModel extension1ConfigurationModel;
+    private RuntimeConfigurationModel extension1ConfigurationModel;
 
     @Mock
-    private OperationModel extension1OperationModel;
+    private RuntimeOperationModel extension1OperationModel;
 
     @Mock
     private OperationContextAdapter extension1OperationContext;
@@ -174,7 +174,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         ExtensionsTestUtils.stubRegistryKeys(muleContext, EXTENSION1_CONFIG_INSTANCE_NAME, EXTENSION1_OPERATION_NAME, EXTENSION1_NAME);
     }
 
-    private void setDiscoverableExtensions(ExtensionModel... extensionModels)
+    private void setDiscoverableExtensions(RuntimeExtensionModel... extensionModels)
     {
         when(discoverer.discover(same(classLoader))).thenReturn(asList(extensionModels));
     }
@@ -182,7 +182,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     @Test
     public void discover()
     {
-        List<ExtensionModel> extensionModels = extensionsManager.discoverExtensions(classLoader);
+        List<RuntimeExtensionModel> extensionModels = extensionsManager.discoverExtensions(classLoader);
         verify(discoverer).discover(same(classLoader));
         testEquals(getTestExtensions(), extensionModels);
     }
@@ -285,7 +285,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     public void registerTwoExtensionsWithTheSameNameButDifferentVendor()
     {
         setDiscoverableExtensions(extensionModel2, extensionModel3WithRepeatedName);
-        List<ExtensionModel> extensionModels = extensionsManager.discoverExtensions(classLoader);
+        List<RuntimeExtensionModel> extensionModels = extensionsManager.discoverExtensions(classLoader);
         List<String> extensionNameList = extensionModels.stream().map(ExtensionModel::getName).distinct().collect(Collectors.toList());
         List<String> extensionVendorList = extensionModels.stream().map(ExtensionModel::getVendor).distinct().collect(Collectors.toList());
 
@@ -310,20 +310,20 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         when(extension1ConfigurationModel.getConfigurationFactory().newInstance()).thenReturn(configInstance);
     }
 
-    private List<ExtensionModel> getTestExtensions()
+    private List<RuntimeExtensionModel> getTestExtensions()
     {
-        return ImmutableList.<ExtensionModel>builder()
+        return ImmutableList.<RuntimeExtensionModel>builder()
                 .add(extensionModel1)
                 .add(extensionModel2)
                 .add(extensionModel3WithRepeatedName)
                 .build();
     }
 
-    private void testEquals(Collection<ExtensionModel> expected, Collection<ExtensionModel> obtained)
+    private void testEquals(Collection<RuntimeExtensionModel> expected, Collection<RuntimeExtensionModel> obtained)
     {
         assertThat(obtained.size(), is(expected.size()));
-        Iterator<ExtensionModel> expectedIterator = expected.iterator();
-        Iterator<ExtensionModel> obtainedIterator = expected.iterator();
+        Iterator<RuntimeExtensionModel> expectedIterator = expected.iterator();
+        Iterator<RuntimeExtensionModel> obtainedIterator = expected.iterator();
 
         while (expectedIterator.hasNext())
         {

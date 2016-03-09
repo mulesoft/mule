@@ -15,6 +15,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ExpirableConfigurationProvider;
@@ -58,7 +59,7 @@ final class ExtensionRegistry
         }
     });
 
-    private final Map<ExtensionEntityKey, ExtensionModel> extensions = new ConcurrentHashMap<>();
+    private final Map<ExtensionEntityKey, RuntimeExtensionModel> extensions = new ConcurrentHashMap<>();
     private final MuleRegistry registry;
 
     /**
@@ -78,7 +79,7 @@ final class ExtensionRegistry
      * @param vendor         the registration vendor name you want for the {@code extension}
      * @param extensionModel a {@link ExtensionModel}
      */
-    void registerExtension(String name, String vendor, ExtensionModel extensionModel)
+    void registerExtension(String name, String vendor, RuntimeExtensionModel extensionModel)
     {
         extensions.put(new ExtensionEntityKey(name, vendor), extensionModel);
     }
@@ -86,7 +87,7 @@ final class ExtensionRegistry
     /**
      * @return an immutable view of the currently registered {@link ExtensionModel}
      */
-    Set<ExtensionModel> getExtensions()
+    Set<RuntimeExtensionModel> getExtensions()
     {
         return ImmutableSet.copyOf(extensions.values());
     }

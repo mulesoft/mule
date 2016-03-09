@@ -13,6 +13,7 @@ import org.mule.config.spring.MuleArtifactContext;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
@@ -113,7 +114,7 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
 
     private void registerConfigurations(ExtensionModel extensionModel)
     {
-        extensionModel.getConfigurationModels().forEach(configurationModel -> registerParser(configurationModel.getName(), new ConfigurationBeanDefinitionParser(configurationModel)));
+        extensionModel.getConfigurationModels().forEach(configurationModel -> registerParser(configurationModel.getName(), new ConfigurationBeanDefinitionParser((RuntimeConfigurationModel) configurationModel)));
     }
 
     private void registerConnectionProviders(ExtensionModel extensionModel)

@@ -74,7 +74,7 @@ public class ParameterGroup implements EnrichableModel
      *
      * @param name  the name of the parameter
      * @param field the parameter's {@link Field}
-     * @return {@value this}
+     * @return {@code this}
      */
     public ParameterGroup addParameter(String name, Field field)
     {
@@ -104,6 +104,15 @@ public class ParameterGroup implements EnrichableModel
     public <T> T getModelProperty(String key)
     {
         return (T) modelProperties.get(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Object> getModelProperties()
+    {
+        return ImmutableMap.copyOf(modelProperties);
     }
 
     public void addModelProperty(String key, Object value)

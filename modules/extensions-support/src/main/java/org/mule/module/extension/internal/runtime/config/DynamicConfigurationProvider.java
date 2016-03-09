@@ -15,6 +15,7 @@ import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ConfigurationStats;
@@ -70,7 +71,7 @@ public final class DynamicConfigurationProvider<T> extends LifecycleAwareConfigu
      * @param expirationPolicy           the {@link ExpirationPolicy} for the unused instances
      */
     public DynamicConfigurationProvider(String name,
-                                        ConfigurationModel configurationModel,
+                                        RuntimeConfigurationModel configurationModel,
                                         ResolverSet resolverSet,
                                         ValueResolver<ConnectionProvider> connectionProviderResolver,
                                         ExpirationPolicy expirationPolicy)
