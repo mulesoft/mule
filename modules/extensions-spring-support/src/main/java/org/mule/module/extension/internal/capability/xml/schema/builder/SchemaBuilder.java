@@ -27,7 +27,7 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_TLS_NAMESPACE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
@@ -925,7 +925,7 @@ public final class SchemaBuilder
 
     private GroupRef generateNestedProcessorGroup(ParameterModel parameterModel, String maxOccurs)
     {
-        QName ref = MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE;
+        QName ref = MULE_MESSAGE_PROCESSOR_TYPE;
         TypeRestrictionModelProperty restrictionCapability = parameterModel.getModelProperty(TypeRestrictionModelProperty.KEY);
         if (restrictionCapability != null)
         {
