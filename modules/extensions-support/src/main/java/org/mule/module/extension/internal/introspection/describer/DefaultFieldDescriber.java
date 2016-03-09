@@ -11,6 +11,7 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefa
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
+import org.mule.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
@@ -71,7 +72,12 @@ final class DefaultFieldDescriber implements FieldDescriber
         parameterDescriptor.ofType(dataType);
         parameterDescriptor.withExpressionSupport(IntrospectionUtils.getExpressionSupport(field));
         parameterDescriptor.withModelProperty(DeclaringMemberModelProperty.KEY, new DeclaringMemberModelProperty(field));
-        parseDisplayAnnotations(field, parameterDescriptor);
+
+        DisplayModelProperty displayModelProperty = parseDisplayAnnotations(field, field.getName());
+        if (displayModelProperty != null)
+        {
+            parameterDescriptor.withModelProperty(DisplayModelProperty.KEY, displayModelProperty);
+        }
 
         return parameterDescriptor;
     }

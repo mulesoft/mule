@@ -35,7 +35,6 @@ import org.mule.extension.api.annotation.connector.Providers;
 import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
-import org.mule.extension.api.annotation.param.display.Placement;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
@@ -51,8 +50,7 @@ import org.mule.extension.api.introspection.declaration.fluent.SourceDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.extension.api.introspection.property.display.ImmutablePlacementModelProperty;
-import org.mule.extension.api.introspection.property.display.PlacementModelProperty;
+import org.mule.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
@@ -68,6 +66,7 @@ import org.mule.module.extension.internal.model.property.ImplementingMethodModel
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
+import org.mule.module.extension.internal.model.property.DisplayModelPropertyBuilder;
 import org.mule.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
 import org.mule.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.module.extension.internal.runtime.source.DefaultSourceFactory;
@@ -290,33 +289,18 @@ public final class AnnotationsBasedDescriber implements Describer
             {
                 throw new IllegalParameterModelDefinitionException(String.format("@%s can not be applied along with @%s. Affected field [%s] in [%s].", Optional.class.getSimpleName(), org.mule.extension.api.annotation.ParameterGroup.class.getSimpleName(), field.getName(), annotatedType));
             }
+
             Set<ParameterDescriptor> parameters = declareSingleParameters(getExposedFields(field.getType()), with);
 
             if (!parameters.isEmpty())
             {
                 ParameterGroup group = new ParameterGroup(field.getType(), field);
-                PlacementModelProperty groupPlacement = null;
                 groups.add(group);
-
-                if (field.isAnnotationPresent(Placement.class))
-                {
-                    Placement placement = field.getAnnotation(Placement.class);
-                    groupPlacement = new ImmutablePlacementModelProperty(placement.order(), placement.group(), placement.tab());
-                }
-                else
-                {
-                    groupPlacement = parent != null ? parent.getModelProperty(PlacementModelProperty.KEY) : null;
-                }
 
                 for (ParameterDescriptor descriptor : parameters)
                 {
-                    if (groupPlacement != null)
-                    {
-                        group.addModelProperty(PlacementModelProperty.KEY, groupPlacement);
-                        descriptor.withModelProperty(PlacementModelProperty.KEY, groupPlacement);
-                    }
+                    ParameterDeclaration parameter = inheritGroupParentDisplayProperties(parent, field, group, descriptor);
 
-                    ParameterDeclaration parameter = descriptor.getDeclaration();
                     group.addParameter(parameter.getName(), getField(field.getType(),
                                                                      getMemberName(parameter, parameter.getName()),
                                                                      getType(parameter.getType())));
@@ -331,6 +315,39 @@ public final class AnnotationsBasedDescriber implements Describer
         }
 
         return groups;
+    }
+
+    private ParameterDeclaration inheritGroupParentDisplayProperties(ParameterGroup parent, Field field, ParameterGroup group, ParameterDescriptor descriptor)
+    {
+        ParameterDeclaration parameter = descriptor.getDeclaration();
+        DisplayModelProperty parameterDisplayProperty = descriptor.getDeclaration()
+                .getModelProperty(DisplayModelProperty.KEY);
+
+        DisplayModelPropertyBuilder builder = parameterDisplayProperty == null ? DisplayModelPropertyBuilder.create() :
+                                              DisplayModelPropertyBuilder.create(parameterDisplayProperty);
+
+        // Inherit parent placement model properties
+        DisplayModelProperty groupDisplay = null;
+        DisplayModelProperty parentDisplay = parent != null ? parent.getModelProperty(DisplayModelProperty.KEY) : null;
+        if (parentDisplay != null)
+        {
+            builder.groupName(parentDisplay.getGroupName())
+                    .tabName(parentDisplay.getTabName())
+                    .order(parentDisplay.getOrder());
+
+            groupDisplay = builder.build();
+        }
+        else
+        {
+            groupDisplay = parseDisplayAnnotations(field, field.getName(), builder);
+        }
+
+        if (groupDisplay != null)
+        {
+            descriptor.withModelProperty(DisplayModelProperty.KEY, groupDisplay);
+            group.addModelProperty(DisplayModelProperty.KEY, groupDisplay);
+        }
+        return parameter;
     }
 
     private Set<ParameterDescriptor> declareSingleParameters(Collection<Field> parameterFields, WithParameters with)
@@ -474,7 +491,11 @@ public final class AnnotationsBasedDescriber implements Describer
                 parameter.withExpressionSupport(IntrospectionUtils.getExpressionSupport(parsedParameter.getAnnotation(Expression.class)));
                 parameter.describedAs(EMPTY).ofType(parsedParameter.getType());
                 addTypeRestrictions(parameter, parsedParameter);
-                parseDisplayAnnotations(parsedParameter, parameter);
+                DisplayModelProperty displayModelProperty = parseDisplayAnnotations(parsedParameter, parsedParameter.getName());
+                if (displayModelProperty != null)
+                {
+                    parameter.withModelProperty(DisplayModelProperty.KEY, displayModelProperty);
+                }
             }
 
             Connection connectionAnnotation = parsedParameter.getAnnotation(Connection.class);
