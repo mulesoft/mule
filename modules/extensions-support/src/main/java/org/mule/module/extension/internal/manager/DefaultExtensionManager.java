@@ -24,6 +24,7 @@ import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionDiscoverer;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.module.extension.internal.config.ExtensionConfig;
@@ -107,11 +108,11 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
      * {@inheritDoc}
      */
     @Override
-    public List<ExtensionModel> discoverExtensions(ClassLoader classLoader)
+    public List<RuntimeExtensionModel> discoverExtensions(ClassLoader classLoader)
     {
         LOGGER.info("Starting discovery of extensions");
 
-        List<ExtensionModel> discovered = extensionDiscoverer.discover(classLoader);
+        List<RuntimeExtensionModel> discovered = extensionDiscoverer.discover(classLoader);
         LOGGER.info("Discovered {} extensions", discovered.size());
 
         discovered.forEach(this::registerExtension);
@@ -122,7 +123,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
      * {@inheritDoc}
      */
     @Override
-    public void registerExtension(ExtensionModel extensionModel)
+    public void registerExtension(RuntimeExtensionModel extensionModel)
     {
         final String extensionName = extensionModel.getName();
         final String extensionVersion = extensionModel.getVersion();
@@ -225,7 +226,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
      * {@inheritDoc}
      */
     @Override
-    public Set<ExtensionModel> getExtensions()
+    public Set<RuntimeExtensionModel> getExtensions()
     {
         return extensionRegistry.getExtensions();
     }

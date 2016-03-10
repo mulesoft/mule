@@ -16,8 +16,8 @@ import static org.mockito.Mockito.when;
 import org.mule.api.connection.ConnectionException;
 import org.mule.extension.api.introspection.ExceptionEnricher;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.SourceModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.RuntimeSourceModel;
 import org.mule.module.extension.exception.HeisenbergException;
 import org.mule.tck.size.SmallTest;
 
@@ -38,10 +38,10 @@ public class ExceptionEnricherManagerTestCase
     private static final String ERROR_MESSAGE = "ERROR MESSAGE";
 
     @Mock
-    private ExtensionModel extensionModel;
+    private RuntimeExtensionModel extensionModel;
 
     @Mock
-    private SourceModel sourceModel;
+    private RuntimeSourceModel sourceModel;
 
     @Mock
     private ExceptionEnricherFactory extensionFactory;

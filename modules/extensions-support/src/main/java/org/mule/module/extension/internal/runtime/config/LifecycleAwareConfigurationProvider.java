@@ -18,9 +18,9 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.extension.api.introspection.ConfigurationModel;
-import org.mule.extension.api.runtime.ConfigurationProvider;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.lifecycle.DefaultLifecycleManager;
 import org.mule.lifecycle.SimpleLifecycleManager;
 
@@ -48,14 +48,14 @@ public abstract class LifecycleAwareConfigurationProvider<T> implements Configur
     private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareConfigurationProvider.class);
 
     private final String name;
-    private final ConfigurationModel configurationModel;
+    private final RuntimeConfigurationModel configurationModel;
     private final List<ConfigurationInstance<T>> configurationInstances = new LinkedList<>();
     protected SimpleLifecycleManager lifecycleManager = new DefaultLifecycleManager<>(String.format("%s-%s", getClass().getName(), getName()), this);
 
     @Inject
     protected MuleContext muleContext;
 
-    public LifecycleAwareConfigurationProvider(String name, ConfigurationModel configurationModel)
+    public LifecycleAwareConfigurationProvider(String name, RuntimeConfigurationModel configurationModel)
     {
         this.name = name;
         this.configurationModel = configurationModel;
@@ -164,7 +164,7 @@ public abstract class LifecycleAwareConfigurationProvider<T> implements Configur
      * {@inheritDoc}
      */
     @Override
-    public ConfigurationModel getModel()
+    public RuntimeConfigurationModel getModel()
     {
         return configurationModel;
     }

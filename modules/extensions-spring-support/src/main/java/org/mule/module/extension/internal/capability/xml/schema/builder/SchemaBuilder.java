@@ -46,13 +46,13 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.NestedProcessor;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Extensible;
-import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.ParametrizedModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.extension.api.introspection.declaration.type.TypeUtils;
@@ -211,7 +211,7 @@ public final class SchemaBuilder
         return this;
     }
 
-    public SchemaBuilder registerConfigElement(final ConfigurationModel configurationModel)
+    public SchemaBuilder registerConfigElement(final RuntimeConfigurationModel configurationModel)
     {
         new ConfigurationSchemaDelegate(this).registerConfigElement(schema, configurationModel);
         return this;

@@ -13,6 +13,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 
@@ -32,7 +33,7 @@ public final class DefaultImplicitConfigurationFactory implements ImplicitConfig
     @Override
     public <C> ConfigurationInstance<C> createImplicitConfigurationInstance(ExtensionModel extensionModel, MuleEvent event)
     {
-        ConfigurationModel implicitConfigurationModel = getFirstImplicit(extensionModel.getConfigurationModels());
+        RuntimeConfigurationModel implicitConfigurationModel = (RuntimeConfigurationModel) getFirstImplicit(extensionModel.getConfigurationModels());
 
         if (implicitConfigurationModel == null)
         {

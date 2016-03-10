@@ -14,18 +14,16 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionValidationResult;
-import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
@@ -57,7 +55,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
     private static final String CONFIG_NAME = "config";
 
     @Mock(answer = RETURNS_DEEP_STUBS)
-    private ConfigurationModel configurationModel;
+    private RuntimeConfigurationModel configurationModel;
 
     @Mock
     private OperationModel operationModel;

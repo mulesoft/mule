@@ -23,10 +23,10 @@ import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.ConfigurationModel;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.RuntimeOperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.HeisenbergOperations;
@@ -67,13 +67,13 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     private ResolverSetResult parameters;
 
     @Mock
-    private ExtensionModel extensionModel;
+    private RuntimeExtensionModel extensionModel;
 
     @Mock
-    private ConfigurationModel configurationModel;
+    private RuntimeConfigurationModel configurationModel;
 
     @Mock
-    private OperationModel operationModel;
+    private RuntimeOperationModel operationModel;
 
     @Mock
     private ExtensionManager extensionManager;

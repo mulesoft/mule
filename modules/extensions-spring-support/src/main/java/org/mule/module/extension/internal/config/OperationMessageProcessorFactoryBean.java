@@ -14,8 +14,8 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.RuntimeOperationModel;
 import org.mule.module.extension.internal.runtime.processor.OperationMessageProcessor;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.util.ObjectNameHelper;
@@ -35,8 +35,8 @@ public class OperationMessageProcessorFactoryBean extends ExtensionComponentFact
 {
 
     private final String configurationProviderName;
-    private final ExtensionModel extensionModel;
-    private final OperationModel operationModel;
+    private final RuntimeExtensionModel extensionModel;
+    private final RuntimeOperationModel operationModel;
     private final ElementDescriptor element;
     private final ExtensionManager extensionManager;
     private final Map<String, List<MessageProcessor>> nestedOperations;
@@ -44,8 +44,8 @@ public class OperationMessageProcessorFactoryBean extends ExtensionComponentFact
     private final MuleContext muleContext;
 
     public OperationMessageProcessorFactoryBean(String configurationProviderName,
-                                                ExtensionModel extensionModel,
-                                                OperationModel operationModel,
+                                                RuntimeExtensionModel extensionModel,
+                                                RuntimeOperationModel operationModel,
                                                 ElementDescriptor element,
                                                 Map<String, List<MessageProcessor>> nestedOperations,
                                                 MuleContext muleContext)

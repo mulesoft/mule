@@ -14,10 +14,10 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.RuntimeOperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -48,10 +48,10 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase
     private ExtensionModel extensionModel;
 
     @Mock
-    private ConfigurationModel configurationModel;
+    private RuntimeConfigurationModel configurationModel;
 
     @Mock
-    private OperationModel operationModel;
+    private RuntimeOperationModel operationModel;
 
     @Mock
     private ResolverSetResult resolverSetResult;

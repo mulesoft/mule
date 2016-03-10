@@ -9,8 +9,8 @@ package org.mule.module.extension.internal.capability.xml.schema;
 import static org.mule.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
 import static org.mule.util.Preconditions.checkArgument;
 import static org.mule.util.Preconditions.checkState;
-
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.module.extension.internal.capability.xml.schema.builder.SchemaBuilder;
 import org.mule.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
@@ -48,7 +48,7 @@ public class SchemaGenerator
         validate(extensionModel, xmlModelProperty);
         SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(xmlModelProperty.getSchemaLocation());
 
-        extensionModel.getConfigurationModels().forEach(schemaBuilder::registerConfigElement);
+        extensionModel.getConfigurationModels().forEach(conf -> schemaBuilder.registerConfigElement((RuntimeConfigurationModel) conf));
         extensionModel.getOperationModels().forEach(schemaBuilder::registerOperation);
         extensionModel.getConnectionProviders().forEach(schemaBuilder::registerConnectionProviderElement);
         extensionModel.getSourceModels().forEach(schemaBuilder::registerMessageSource);

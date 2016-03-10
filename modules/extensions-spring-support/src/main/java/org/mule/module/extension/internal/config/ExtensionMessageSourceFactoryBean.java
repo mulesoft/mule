@@ -10,14 +10,14 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.config.ImmutableThreadingProfile;
-import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.RuntimeSourceModel;
 import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.extension.api.runtime.source.SourceFactory;
@@ -43,8 +43,8 @@ final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryB
 {
 
     private final ElementDescriptor element;
-    private final ExtensionModel extensionModel;
-    private final SourceModel sourceModel;
+    private final RuntimeExtensionModel extensionModel;
+    private final RuntimeSourceModel sourceModel;
     private final String configurationProviderName;
     private final MuleContext muleContext;
     private RetryPolicyTemplate retryPolicyTemplate;
@@ -53,8 +53,8 @@ final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryB
     private ConnectionManagerAdapter connectionManagerAdapter;
 
     ExtensionMessageSourceFactoryBean(ElementDescriptor element,
-                                      ExtensionModel extensionModel,
-                                      SourceModel sourceModel,
+                                      RuntimeExtensionModel extensionModel,
+                                      RuntimeSourceModel sourceModel,
                                       String configurationProviderName,
                                       MuleContext muleContext) throws ConfigurationException
     {

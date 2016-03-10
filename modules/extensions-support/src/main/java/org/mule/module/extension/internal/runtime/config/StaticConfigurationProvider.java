@@ -7,9 +7,9 @@
 package org.mule.module.extension.internal.runtime.config;
 
 import org.mule.api.MuleEvent;
-import org.mule.extension.api.introspection.ConfigurationModel;
-import org.mule.extension.api.runtime.ConfigurationProvider;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 
 /**
  * {@link ConfigurationProvider} which provides always the same {@link #configuration}.
@@ -22,7 +22,7 @@ public final class StaticConfigurationProvider<T> extends LifecycleAwareConfigur
 
     private final ConfigurationInstance<T> configuration;
 
-    public StaticConfigurationProvider(String name, ConfigurationModel model, ConfigurationInstance<T> configuration)
+    public StaticConfigurationProvider(String name, RuntimeConfigurationModel model, ConfigurationInstance<T> configuration)
     {
         super(name, model);
         this.configuration = configuration;

@@ -11,13 +11,13 @@ import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.util.Preconditions.checkState;
-
 import org.mule.api.MuleException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connector.ConnectionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.Interceptable;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationStats;
 import org.mule.extension.api.runtime.Interceptor;
@@ -55,7 +55,7 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
     private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareConfigurationInstance.class);
 
     private final String name;
-    private final ConfigurationModel model;
+    private final RuntimeConfigurationModel model;
     private final T value;
     private final Optional<ConnectionProvider> connectionProvider;
 
@@ -77,7 +77,7 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
      * @param connectionProvider an {@link Optional} containing the {@link ConnectionProvider} to use
      */
     public LifecycleAwareConfigurationInstance(String name,
-                                               ConfigurationModel model,
+                                               RuntimeConfigurationModel model,
                                                T value,
                                                List<Interceptor> interceptors,
                                                Optional<ConnectionProvider> connectionProvider)
@@ -196,7 +196,7 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
      * {@inheritDoc}
      */
     @Override
-    public ConfigurationModel getModel()
+    public RuntimeConfigurationModel getModel()
     {
         return model;
     }

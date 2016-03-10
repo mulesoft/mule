@@ -12,9 +12,9 @@ import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.Interceptable;
-import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.RuntimeOperationModel;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.extension.api.runtime.ConfigurationStats;
 import org.mule.extension.api.runtime.Interceptor;
@@ -68,7 +68,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator
     private final ExceptionEnricherManager exceptionEnricherManager;
     private final ConnectionManagerAdapter connectionManager;
 
-    public DefaultExecutionMediator(ExtensionModel extensionModel, OperationModel operationModel, ConnectionManagerAdapter connectionManager)
+    public DefaultExecutionMediator(RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel, ConnectionManagerAdapter connectionManager)
     {
         this.connectionManager = connectionManager;
         this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, operationModel);

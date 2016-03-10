@@ -49,8 +49,8 @@ import org.mule.execution.MessageProcessingManager;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExceptionEnricher;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.SourceModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.RuntimeSourceModel;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.extension.api.runtime.source.SourceContext;
 import org.mule.extension.api.runtime.source.SourceFactory;
@@ -85,10 +85,10 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private ExtensionModel extensionModel;
+    private RuntimeExtensionModel extensionModel;
 
     @Mock
-    private SourceModel sourceModel;
+    private RuntimeSourceModel sourceModel;
 
     @Mock
     private SourceFactory sourceFactory;

@@ -11,8 +11,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.ConfigurationModel;
-import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
@@ -32,7 +32,7 @@ public class HeisenbergDefaultConfigTestCase extends ExtensionFunctionalTestCase
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private ConfigurationModel configurationModel;
+    private RuntimeConfigurationModel configurationModel;
 
     @Mock
     private ConfigurationProvider<Object> configurationProvider;
@@ -53,7 +53,7 @@ public class HeisenbergDefaultConfigTestCase extends ExtensionFunctionalTestCase
     public void twoConfigsAndNoConfigRef() throws Exception
     {
         ExtensionManager extensionManager = muleContext.getExtensionManager();
-        ExtensionModel extensionModel = extensionManager.getExtensions().stream().findFirst().get();
+        RuntimeExtensionModel extensionModel = extensionManager.getExtensions().stream().findFirst().get();
         assertThat(extensionModel.getName(), is(HEISENBERG));
 
         when(configurationProvider.getName()).thenReturn("secondConfig");

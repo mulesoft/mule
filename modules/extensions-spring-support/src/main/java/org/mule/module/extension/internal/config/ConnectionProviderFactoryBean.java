@@ -13,6 +13,7 @@ import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
 import org.mule.internal.connection.ConnectionManagerAdapter;
 import org.mule.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
@@ -36,13 +37,13 @@ public class ConnectionProviderFactoryBean extends ExtensionComponentFactoryBean
 {
 
     private final ElementDescriptor element;
-    private final ConnectionProviderModel providerModel;
+    private final RuntimeConnectionProviderModel providerModel;
     private boolean disableValidation = false;
 
     @Inject
     private ConnectionManagerAdapter connectionManager;
 
-    public ConnectionProviderFactoryBean(ConnectionProviderModel providerModel, ElementDescriptor element)
+    public ConnectionProviderFactoryBean(RuntimeConnectionProviderModel providerModel, ElementDescriptor element)
     {
         this.providerModel = providerModel;
         this.element = element;

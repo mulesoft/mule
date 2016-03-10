@@ -11,6 +11,7 @@ import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
 import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
 import org.mule.internal.connection.CachedConnectionProviderWrapper;
 import org.mule.internal.connection.ConnectionManagerAdapter;
@@ -21,14 +22,14 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 /**
  * Implementation of {@link ParameterGroupAwareObjectBuilder} which produces instances
- * of {@link ConnectionProviderModel}
+ * of {@link RuntimeConnectionProviderModel}
  *
  * @since 4.0
  */
 public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareObjectBuilder<ConnectionProvider>
 {
 
-    private final ConnectionProviderModel providerModel;
+    private final RuntimeConnectionProviderModel providerModel;
     private final PoolingProfile poolingProfile;
     private boolean disableValidation;
     private RetryPolicyTemplate retryPolicyTemplate;
@@ -43,12 +44,12 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
      * @param connectionManager a {@link ConnectionManagerAdapter} to obtain the default {@link RetryPolicyTemplate} in case
      *                          of none is provided
      */
-    public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet, ConnectionManagerAdapter connectionManager)
+    public ConnectionProviderObjectBuilder(RuntimeConnectionProviderModel providerModel, ResolverSet resolverSet, ConnectionManagerAdapter connectionManager)
     {
         this(providerModel, resolverSet, null, false, null, connectionManager);
     }
 
-    public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet, PoolingProfile poolingProfile, boolean disableValidation, RetryPolicyTemplate retryPolicyTemplate, ConnectionManagerAdapter connectionManager)
+    public ConnectionProviderObjectBuilder(RuntimeConnectionProviderModel providerModel, ResolverSet resolverSet, PoolingProfile poolingProfile, boolean disableValidation, RetryPolicyTemplate retryPolicyTemplate, ConnectionManagerAdapter connectionManager)
     {
         super(providerModel.getConnectionProviderFactory().getObjectType(), providerModel, resolverSet);
         this.providerModel = providerModel;

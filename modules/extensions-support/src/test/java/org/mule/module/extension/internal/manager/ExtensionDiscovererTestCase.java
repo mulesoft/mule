@@ -17,7 +17,7 @@ import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionDiscoverer;
 import org.mule.extension.api.introspection.ExtensionFactory;
-import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
@@ -54,7 +54,7 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
     private Describer describer;
 
     @Mock
-    private ExtensionModel extensionModel;
+    private RuntimeExtensionModel extensionModel;
 
     private ExtensionDiscoverer discoverer;
 
@@ -71,7 +71,7 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
         when(describer.describe(any(DescribingContext.class))).thenReturn(descriptor);
         when(extensionFactory.createFrom(descriptor)).thenReturn(extensionModel);
 
-        List<ExtensionModel> extensionModels = discoverer.discover(getClass().getClassLoader());
+        List<RuntimeExtensionModel> extensionModels = discoverer.discover(getClass().getClassLoader());
         assertThat(extensionModels, hasSize(1));
 
         assertThat(extensionModels.get(0), is(sameInstance(extensionModel)));

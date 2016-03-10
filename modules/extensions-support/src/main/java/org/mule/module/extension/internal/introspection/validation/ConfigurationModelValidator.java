@@ -7,10 +7,12 @@
 package org.mule.module.extension.internal.introspection.validation;
 
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
+import org.mule.extension.api.introspection.ConfigurationFactory;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.module.extension.internal.model.property.ConfigTypeModelProperty;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -36,13 +38,19 @@ public final class ConfigurationModelValidator implements ModelValidator
 
         for (ConfigurationModel configurationModel : model.getConfigurationModels())
         {
+            if (!(configurationModel instanceof RuntimeConfigurationModel))
+            {
+                continue;
+            }
+
             for (Class clazz : configParams.keySet())
             {
-                if (!clazz.isAssignableFrom(configurationModel.getConfigurationFactory().getObjectType()))
+                final ConfigurationFactory configurationFactory = ((RuntimeConfigurationModel) configurationModel).getConfigurationFactory();
+                if (!clazz.isAssignableFrom(configurationFactory.getObjectType()))
                 {
                     throw new IllegalConfigurationModelDefinitionException(String.format("Extension '%s' defines the '%s' configuration. However, the extension's operations %s expect configurations of type '%s'. " +
                                                                                          "Please make sure that all configurations in the extension can be used with all its operations.",
-                                                                                         model.getName(), configurationModel.getConfigurationFactory().getObjectType(), clazz, configParams.get(clazz)));
+                                                                                         model.getName(), configurationFactory.getObjectType(), clazz, configParams.get(clazz)));
                 }
             }
         }

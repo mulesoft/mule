@@ -73,14 +73,16 @@ import org.mule.extension.api.exception.NoSuchConfigurationException;
 import org.mule.extension.api.exception.NoSuchOperationException;
 import org.mule.extension.api.introspection.ConfigurationFactory;
 import org.mule.extension.api.introspection.ConfigurationModel;
-import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
-import org.mule.extension.api.introspection.SourceModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
+import org.mule.extension.api.introspection.RuntimeOperationModel;
+import org.mule.extension.api.introspection.RuntimeSourceModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
@@ -154,7 +156,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     @Test
     public void defaultConfiguration() throws Exception
     {
-        ConfigurationModel configurationModel = extensionModel.getConfigurationModel(CONFIG_NAME);
+        RuntimeConfigurationModel configurationModel = (RuntimeConfigurationModel) extensionModel.getConfigurationModel(CONFIG_NAME);
         assertThat(configurationModel, is(notNullValue()));
         assertThat(configurationModel.getName(), equalTo(CONFIG_NAME));
         assertThat(configurationModel.getDescription(), equalTo(CONFIG_DESCRIPTION));
@@ -317,7 +319,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     {
         for (OperationModel operation : extensionModel.getOperationModels())
         {
-            assertThat(operation.getExecutor().createExecutor(), is(instanceOf(Interceptable.class)));
+            assertThat(((RuntimeOperationModel) operation).getExecutor().createExecutor(), is(instanceOf(Interceptable.class)));
         }
     }
 
@@ -325,7 +327,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     public void connectionProviders()
     {
         assertThat(extensionModel.getConnectionProviders(), hasSize(1));
-        ConnectionProviderModel connectionProvider = extensionModel.getConnectionProviders().get(0);
+        RuntimeConnectionProviderModel connectionProvider = (RuntimeConnectionProviderModel) extensionModel.getConnectionProviders().get(0);
         assertThat(connectionProvider, is(notNullValue()));
         assertThat(connectionProvider.getName(), is(CONNECTION_PROVIDER_NAME));
         assertThat(connectionProvider.getDescription(), is(CONNECTION_PROVIDER_DESCRIPTION));
@@ -342,7 +344,7 @@ public class ExtensionBuildersTestCase extends AbstractMuleTestCase
     public void messageSources()
     {
         assertThat(extensionModel.getSourceModels(), hasSize(1));
-        SourceModel sourceModel = extensionModel.getSourceModels().get(0);
+        RuntimeSourceModel sourceModel = (RuntimeSourceModel) extensionModel.getSourceModels().get(0);
         assertThat(sourceModel, is(notNullValue()));
         assertThat(sourceModel.getName(), is(LISTENER));
         assertThat(sourceModel.getDescription(), is(LISTEN_DESCRIPTION));

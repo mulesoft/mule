@@ -32,10 +32,10 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.RuntimeOperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
@@ -70,13 +70,13 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     private static final String TARGET_VAR = "myFlowVar";
 
     @Mock
-    private ExtensionModel extensionModel;
+    private RuntimeExtensionModel extensionModel;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
-    private ConfigurationModel configurationModel;
+    private RuntimeConfigurationModel configurationModel;
 
     @Mock
-    private OperationModel operationModel;
+    private RuntimeOperationModel operationModel;
 
     @Mock
     private ExtensionManager extensionManager;

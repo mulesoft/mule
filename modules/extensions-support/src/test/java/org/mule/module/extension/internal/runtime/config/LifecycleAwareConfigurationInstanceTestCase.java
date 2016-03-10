@@ -27,7 +27,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.module.extension.internal.AbstractInterceptableContractTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
@@ -61,7 +61,7 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractInterce
     }
 
     @Mock
-    private ConfigurationModel configurationModel;
+    private RuntimeConfigurationModel configurationModel;
 
     @Mock
     private Lifecycle value;

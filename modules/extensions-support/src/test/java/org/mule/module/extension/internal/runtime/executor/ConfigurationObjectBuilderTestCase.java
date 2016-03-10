@@ -13,9 +13,9 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getResolver;
 import org.mule.api.MuleEvent;
-import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -54,7 +54,7 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase
     private ExtensionModel extensionModel;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
-    private ConfigurationModel configurationModel;
+    private RuntimeConfigurationModel configurationModel;
 
     @Mock
     private MuleEvent event;

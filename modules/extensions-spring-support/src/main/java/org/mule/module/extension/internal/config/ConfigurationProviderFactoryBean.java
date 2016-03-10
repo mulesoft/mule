@@ -10,6 +10,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ExpirationPolicy;
 import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;
@@ -35,7 +36,7 @@ final class ConfigurationProviderFactoryBean extends ExtensionComponentFactoryBe
 {
 
     private final String name;
-    private final ConfigurationModel configurationModel;
+    private final RuntimeConfigurationModel configurationModel;
     private final ElementDescriptor element;
     private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
     private final TimeSupplier timeSupplier;
@@ -43,7 +44,7 @@ final class ConfigurationProviderFactoryBean extends ExtensionComponentFactoryBe
     private final MuleContext muleContext;
 
     ConfigurationProviderFactoryBean(String name,
-                                     ConfigurationModel configurationModel,
+                                     RuntimeConfigurationModel configurationModel,
                                      ElementDescriptor element,
                                      MuleContext muleContext,
                                      TimeSupplier timeSupplier,

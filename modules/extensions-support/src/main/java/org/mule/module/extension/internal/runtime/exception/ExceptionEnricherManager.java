@@ -10,16 +10,18 @@ import org.mule.api.connection.ConnectionException;
 import org.mule.extension.api.introspection.ExceptionEnrichableModel;
 import org.mule.extension.api.introspection.ExceptionEnricher;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
-import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.RuntimeOperationModel;
+import org.mule.extension.api.introspection.RuntimeSourceModel;
 import org.mule.util.ExceptionUtils;
 
 import java.util.Optional;
 
 /**
- * Given an {@link ExtensionModel} and another {@link ExceptionEnrichableModel} such
- * as {@link org.mule.extension.api.introspection.SourceModel} or {@link org.mule.extension.api.introspection.OperationModel}
+ * Given a {@link RuntimeExtensionModel} and another {@link ExceptionEnrichableModel} such
+ * as {@link RuntimeSourceModel} or {@link RuntimeOperationModel},
  * this class will inspect for the correct {@link ExceptionEnricher} if there is one.
- *
+ * <p>
  * It contains all the logic for operations and sources {@link Throwable} process and handling.
  *
  * @since 4.0
@@ -29,7 +31,7 @@ public final class ExceptionEnricherManager
 
     private final ExceptionEnricher exceptionEnricher;
 
-    public ExceptionEnricherManager(ExtensionModel extensionModel, ExceptionEnrichableModel childEnrichableModel)
+    public ExceptionEnricherManager(RuntimeExtensionModel extensionModel, ExceptionEnrichableModel childEnrichableModel)
     {
         exceptionEnricher = findExceptionEnricher(extensionModel, childEnrichableModel);
     }
@@ -66,7 +68,7 @@ public final class ExceptionEnricherManager
     }
 
 
-    private ExceptionEnricher findExceptionEnricher(ExtensionModel extension, ExceptionEnrichableModel child)
+    private ExceptionEnricher findExceptionEnricher(RuntimeExtensionModel extension, ExceptionEnrichableModel child)
     {
         Optional<ExceptionEnricherFactory> exceptionEnricherFactory = child.getExceptionEnricherFactory();
         if (!exceptionEnricherFactory.isPresent())

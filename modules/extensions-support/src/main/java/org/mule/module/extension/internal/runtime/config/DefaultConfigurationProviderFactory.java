@@ -12,7 +12,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;
@@ -33,7 +33,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
     @Override
     public <T> ConfigurationProvider<T> createDynamicConfigurationProvider(
             String name,
-            ConfigurationModel configurationModel,
+            RuntimeConfigurationModel configurationModel,
             ResolverSet resolverSet,
             ValueResolver<ConnectionProvider> connectionProviderResolver,
             DynamicConfigPolicy dynamicConfigPolicy) throws Exception
@@ -51,7 +51,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
     @Override
     public <T> ConfigurationProvider<T> createStaticConfigurationProvider(
             String name,
-            ConfigurationModel configurationModel,
+            RuntimeConfigurationModel configurationModel,
             ResolverSet resolverSet,
             ValueResolver<ConnectionProvider> connectionProviderResolver,
             MuleContext muleContext) throws Exception

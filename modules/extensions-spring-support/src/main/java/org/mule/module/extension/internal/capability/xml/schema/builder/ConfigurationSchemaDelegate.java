@@ -18,6 +18,7 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getConn
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDynamicParameters;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -45,7 +46,7 @@ final class ConfigurationSchemaDelegate
         this.builder = builder;
     }
 
-    public void registerConfigElement(Schema schema, final ConfigurationModel configurationModel)
+    public void registerConfigElement(Schema schema, final RuntimeConfigurationModel configurationModel)
     {
         this.schema = schema;
 
@@ -83,7 +84,7 @@ final class ConfigurationSchemaDelegate
         return complexContentExtension;
     }
 
-    private void addConnectionProviderElement(ExplicitGroup all, ConfigurationModel configurationModel)
+    private void addConnectionProviderElement(ExplicitGroup all, RuntimeConfigurationModel configurationModel)
     {
         ExtensionModel extensionModel = configurationModel.getExtensionModel();
         if (!getConnectedOperations(extensionModel).isEmpty())

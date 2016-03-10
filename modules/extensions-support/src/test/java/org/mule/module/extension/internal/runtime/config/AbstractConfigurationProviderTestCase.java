@@ -13,8 +13,8 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mule.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import org.mule.api.MuleEvent;
-import org.mule.extension.api.introspection.ConfigurationModel;
-import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -35,10 +35,10 @@ abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleCont
     protected static final String CONFIG_NAME = "config";
 
     @Mock
-    protected ExtensionModel extensionModel;
+    protected RuntimeExtensionModel extensionModel;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
-    protected ConfigurationModel configurationModel;
+    protected RuntimeConfigurationModel configurationModel;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     protected DefaultOperationContext operationContext;

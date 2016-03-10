@@ -15,6 +15,7 @@ import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.InterceptorFactory;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -29,7 +30,7 @@ import java.util.Optional;
  * <p/>
  * The created instances will be of concrete type {@link LifecycleAwareConfigurationInstance}, which means
  * that all the {@link InterceptorFactory interceptor factories} obtained through
- * {@link ConfigurationModel#getInterceptorFactories()}  will be exercised per each
+ * {@link RuntimeConfigurationModel#getInterceptorFactories()}  will be exercised per each
  * created instance
  *
  * @param <T> the generic type of the returned {@link ConfigurationInstance} instances
@@ -40,7 +41,7 @@ public final class ConfigurationInstanceFactory<T>
 
     private static final ValueResolver<ConnectionProvider> NULL_CONNECTION_PROVIDER = new StaticValueResolver<>(null);
 
-    private final ConfigurationModel configurationModel;
+    private final RuntimeConfigurationModel configurationModel;
     private final ConfigurationObjectBuilder<T> configurationObjectBuilder;
     private final ImplicitConnectionProviderFactory implicitConnectionProviderFactory = new DefaultImplicitConnectionProviderFactory();
     private final boolean requiresConnection;
@@ -52,7 +53,7 @@ public final class ConfigurationInstanceFactory<T>
      * @param configurationModel the {@link ConfigurationModel} that describes the configurations to be created
      * @param resolverSet        the {@link ResolverSet} which provides the values for the configuration's parameters
      */
-    public ConfigurationInstanceFactory(ConfigurationModel configurationModel, ResolverSet resolverSet)
+    public ConfigurationInstanceFactory(RuntimeConfigurationModel configurationModel, ResolverSet resolverSet)
     {
         this.configurationModel = configurationModel;
         configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
