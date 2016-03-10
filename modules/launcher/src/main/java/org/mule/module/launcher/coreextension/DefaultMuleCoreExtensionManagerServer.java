@@ -14,8 +14,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.DeploymentServiceAware;
-import org.mule.module.launcher.PluginClassLoaderManager;
-import org.mule.module.launcher.PluginClassLoaderManagerAware;
+import org.mule.module.launcher.ServerPluginClassLoaderManager;
+import org.mule.module.launcher.ServerPluginClassLoaderManagerAware;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -23,24 +23,24 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
+public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionManagerServer
 {
 
-    protected static final Log logger = LogFactory.getLog(DefaultMuleCoreExtensionManager.class);
+    protected static final Log logger = LogFactory.getLog(DefaultMuleCoreExtensionManagerServer.class);
 
     private final MuleCoreExtensionDiscoverer coreExtensionDiscoverer;
     private final MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver;
     private List<MuleCoreExtension> coreExtensions = new LinkedList<>();
     private DeploymentService deploymentService;
     private List<MuleCoreExtension> orderedCoreExtensions;
-    private PluginClassLoaderManager pluginClassLoaderManager;
+    private ServerPluginClassLoaderManager serverPluginClassLoaderManager;
 
-    public DefaultMuleCoreExtensionManager()
+    public DefaultMuleCoreExtensionManagerServer()
     {
         this(new ClasspathMuleCoreExtensionDiscoverer(), new ReflectionMuleCoreExtensionDependencyResolver());
     }
 
-    public DefaultMuleCoreExtensionManager(MuleCoreExtensionDiscoverer coreExtensionDiscoverer, MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver)
+    public DefaultMuleCoreExtensionManagerServer(MuleCoreExtensionDiscoverer coreExtensionDiscoverer, MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver)
     {
         this.coreExtensionDiscoverer = coreExtensionDiscoverer;
         this.coreExtensionDependencyResolver = coreExtensionDependencyResolver;
@@ -129,9 +129,9 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
                 deploymentService.addDeploymentListener((DeploymentListener) extension);
             }
 
-            if (extension instanceof PluginClassLoaderManagerAware)
+            if (extension instanceof ServerPluginClassLoaderManagerAware)
             {
-                ((PluginClassLoaderManagerAware) extension).setPluginClassLoaderManager(pluginClassLoaderManager);
+                ((ServerPluginClassLoaderManagerAware) extension).setServerPluginClassLoaderManager(serverPluginClassLoaderManager);
             }
 
             if (extension instanceof CoreExtensionsAware)
@@ -149,9 +149,8 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
         this.deploymentService = deploymentService;
     }
 
-    @Override
-    public void setPluginClassLoaderManager(PluginClassLoaderManager pluginClassLoaderManager)
+    public void setServerPluginClassLoaderManager(ServerPluginClassLoaderManager serverPluginClassLoaderManager)
     {
-        this.pluginClassLoaderManager = pluginClassLoaderManager;
+        this.serverPluginClassLoaderManager = serverPluginClassLoaderManager;
     }
 }

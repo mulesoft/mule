@@ -7,10 +7,10 @@
 package org.mule.module.launcher;
 
 /**
- * Enables {@link PluginClassLoaderManager} injection.
+ * Enables {@link ServerPluginClassLoaderManager} injection.
  */
-public interface PluginClassLoaderManagerAware
+public interface ServerPluginClassLoaderManagerAware
 {
 
-    void setPluginClassLoaderManager(PluginClassLoaderManager pluginClassLoaderManager);
+    void setServerPluginClassLoaderManager(ServerPluginClassLoaderManager serverPluginClassLoaderManager);
 }

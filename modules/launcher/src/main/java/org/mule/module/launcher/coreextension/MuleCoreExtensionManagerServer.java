@@ -8,12 +8,12 @@ package org.mule.module.launcher.coreextension;
 
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.module.launcher.DeploymentServiceAware;
-import org.mule.module.launcher.PluginClassLoaderManagerAware;
+import org.mule.module.launcher.ServerPluginClassLoaderManagerAware;
 
 /**
  * Manages lifecycle and dependency injection for {@link org.mule.MuleCoreExtension}
  */
-public interface MuleCoreExtensionManager extends Lifecycle, DeploymentServiceAware, PluginClassLoaderManagerAware
+public interface MuleCoreExtensionManagerServer extends Lifecycle, DeploymentServiceAware, ServerPluginClassLoaderManagerAware
 {
 
 }

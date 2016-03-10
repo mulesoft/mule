@@ -14,8 +14,8 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.module.launcher.coreextension.DefaultMuleCoreExtensionManager;
-import org.mule.module.launcher.coreextension.MuleCoreExtensionManager;
+import org.mule.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
+import org.mule.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
@@ -62,8 +62,8 @@ public class MuleContainer
     private static MuleShutdownHook muleShutdownHook;
 
     protected final DeploymentService deploymentService;
-    private final MuleCoreExtensionManager coreExtensionManager;
-    private final PluginClassLoaderManager pluginClassLoaderManager = new MulePluginClassLoaderManager();
+    private final MuleCoreExtensionManagerServer coreExtensionManager;
+    private final ServerPluginClassLoaderManager serverPluginClassLoaderManager = new MuleServerPluginClassLoaderManager();
 
     static
     {
@@ -88,13 +88,13 @@ public class MuleContainer
 
     public MuleContainer(String[] args)
     {
-        this.deploymentService = new MuleDeploymentService(pluginClassLoaderManager);
-        this.coreExtensionManager = new DefaultMuleCoreExtensionManager();
+        this.deploymentService = new MuleDeploymentService(serverPluginClassLoaderManager);
+        this.coreExtensionManager = new DefaultMuleCoreExtensionManagerServer();
 
         init(args);
     }
 
-    public MuleContainer(DeploymentService deploymentService, MuleCoreExtensionManager coreExtensionManager)
+    public MuleContainer(DeploymentService deploymentService, MuleCoreExtensionManagerServer coreExtensionManager)
     {
         this(new String[0], deploymentService, coreExtensionManager);
     }
@@ -102,7 +102,7 @@ public class MuleContainer
     /**
      * Configure the server with command-line arguments.
      */
-    public MuleContainer(String[] args, DeploymentService deploymentService, MuleCoreExtensionManager coreExtensionManager) throws IllegalArgumentException
+    public MuleContainer(String[] args, DeploymentService deploymentService, MuleCoreExtensionManagerServer coreExtensionManager) throws IllegalArgumentException
     {
         //TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
         this.deploymentService = deploymentService;
@@ -163,7 +163,7 @@ public class MuleContainer
             createExecutionMuleFolder();
 
             coreExtensionManager.setDeploymentService(deploymentService);
-            coreExtensionManager.setPluginClassLoaderManager(pluginClassLoaderManager);
+            coreExtensionManager.setServerPluginClassLoaderManager(serverPluginClassLoaderManager);
             coreExtensionManager.initialise();
             coreExtensionManager.start();
 

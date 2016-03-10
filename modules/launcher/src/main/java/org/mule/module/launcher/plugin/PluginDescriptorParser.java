@@ -14,7 +14,10 @@ import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -41,7 +44,6 @@ public class PluginDescriptorParser
     {
         // parse plugins
         final File pluginsDir = new File(appDir, MuleFoldersUtil.PLUGINS_FOLDER);
-        // TODO decide if we want to support 'exploded' plugins, for now no
         String[] pluginZips = pluginsDir.list(new SuffixFileFilter(".zip"));
         if (pluginZips == null || pluginZips.length == 0)
         {
@@ -79,21 +81,30 @@ public class PluginDescriptorParser
                 }
             }
 
-            PluginClasspath cp = PluginClasspath.from(tmpDir);
-            pd.setClasspath(cp);
+            try
+            {
+                pd.setRuntimeClassesDir(new File(tmpDir, "classes").toURI().toURL());
+                final File libDir = new File(tmpDir, "lib");
+                URL[] urls = new URL[0];
+                if (libDir.exists())
+                {
+                    final File[] jars = libDir.listFiles((FilenameFilter) new SuffixFileFilter(".jar"));
+                    urls = new URL[jars.length];
+                    for (int i = 0; i < jars.length; i++)
+                    {
+                        urls[i] = jars[i].toURI().toURL();
+                    }
+                }
+                pd.setRuntimeLibs(urls);
+            }
+            catch (MalformedURLException e)
+            {
+                throw new IllegalArgumentException("Failed to create plugin descriptor " + tmpDir);
+            }
+
             pds.add(pd);
         }
 
         return pds;
-    }
-
-    public ApplicationDescriptor getAppDescriptor()
-    {
-        return appDescriptor;
-    }
-
-    public File getAppDir()
-    {
-        return appDir;
     }
 }

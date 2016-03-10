@@ -8,7 +8,7 @@ package org.mule.module.launcher;
 
 import java.util.List;
 
-public interface PluginClassLoaderManager
+public interface ServerPluginClassLoaderManager
 {
 
     /**

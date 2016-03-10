@@ -9,10 +9,13 @@ package org.mule.module.launcher.plugin;
 import org.mule.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
+import java.net.URL;
+
 public class PluginDescriptor extends ArtifactDescriptor
 {
-    private PluginClasspath classpath = new PluginClasspath();
     private ApplicationDescriptor appDescriptor;
+    private URL runtimeClassesDir;
+    private URL[] runtimeLibs = new URL[0];
 
     public ApplicationDescriptor getAppDescriptor()
     {
@@ -24,13 +27,23 @@ public class PluginDescriptor extends ArtifactDescriptor
         this.appDescriptor = appDescriptor;
     }
 
-    public PluginClasspath getClasspath()
+    public URL getRuntimeClassesDir()
     {
-        return classpath;
+        return runtimeClassesDir;
     }
 
-    public void setClasspath(PluginClasspath classpath)
+    public void setRuntimeClassesDir(URL runtimeClassesDir)
     {
-        this.classpath = classpath;
+        this.runtimeClassesDir = runtimeClassesDir;
+    }
+
+    public URL[] getRuntimeLibs()
+    {
+        return runtimeLibs;
+    }
+
+    public void setRuntimeLibs(URL[] runtimeLibs)
+    {
+        this.runtimeLibs = runtimeLibs;
     }
 }

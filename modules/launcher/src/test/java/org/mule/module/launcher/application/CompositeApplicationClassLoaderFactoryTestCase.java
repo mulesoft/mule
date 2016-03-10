@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.module.launcher.PluginClassLoaderManager;
+import org.mule.module.launcher.ServerPluginClassLoaderManager;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -30,8 +30,8 @@ public class CompositeApplicationClassLoaderFactoryTestCase extends AbstractMule
 {
 
     private final ArtifactClassLoaderFactory applicationClassLoaderFactory = mock(ArtifactClassLoaderFactory.class, RETURNS_DEEP_STUBS.get());
-    private final PluginClassLoaderManager pluginClassLoaderManager = mock(PluginClassLoaderManager.class);
-    private final CompositeApplicationClassLoaderFactory pluginAwareClassLoaderFactory = new CompositeApplicationClassLoaderFactory(applicationClassLoaderFactory, pluginClassLoaderManager);
+    private final ServerPluginClassLoaderManager serverPluginClassLoaderManager = mock(ServerPluginClassLoaderManager.class);
+    private final CompositeApplicationClassLoaderFactory pluginAwareClassLoaderFactory = new CompositeApplicationClassLoaderFactory(applicationClassLoaderFactory, serverPluginClassLoaderManager);
     private final ApplicationDescriptor appDescriptor = new ApplicationDescriptor();
 
     @Test
@@ -39,7 +39,7 @@ public class CompositeApplicationClassLoaderFactoryTestCase extends AbstractMule
     {
         ClassLoader expectedClassLoader = Thread.currentThread().getContextClassLoader();
         when(applicationClassLoaderFactory.create(appDescriptor).getClassLoader()).thenReturn(expectedClassLoader);
-        when(pluginClassLoaderManager.getPluginClassLoaders()).thenReturn(Collections.EMPTY_LIST);
+        when(serverPluginClassLoaderManager.getPluginClassLoaders()).thenReturn(Collections.EMPTY_LIST);
 
         ClassLoader appClassLoader = pluginAwareClassLoaderFactory.create(appDescriptor).getClassLoader();
 
@@ -55,7 +55,7 @@ public class CompositeApplicationClassLoaderFactoryTestCase extends AbstractMule
         TestClassLoader pluginClassLoader = new TestClassLoader();
         List<ClassLoader> pluginClassLoaders = new LinkedList<ClassLoader>();
         pluginClassLoaders.add(pluginClassLoader);
-        when(pluginClassLoaderManager.getPluginClassLoaders()).thenReturn(pluginClassLoaders);
+        when(serverPluginClassLoaderManager.getPluginClassLoaders()).thenReturn(pluginClassLoaders);
 
         ClassLoader createdClassLoader = pluginAwareClassLoaderFactory.create(appDescriptor).getClassLoader();
 
