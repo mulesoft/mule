@@ -17,7 +17,7 @@
     <!--// START SNIPPET: transformer-config -->
     <mulexml:xslt-transformer name="xslt">
         <mulexml:xslt-text>
-            <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+            <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="">
                         <xsl:output method="xml"/>
                         <xsl:param name="title"/>
                         <xsl:param name="rating"/>
