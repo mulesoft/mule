@@ -30,12 +30,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.config.StartupContext;
+import org.mule.construct.Flow;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationStatus;
 import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
@@ -105,6 +109,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private static final ArtifactDescriptor incompleteAppDescriptor = new ArtifactDescriptor("incompleteApp", "/incompleteApp.zip", "/incompleteApp", "incompleteApp.zip", null);
     private static final ArtifactDescriptor waitAppDescriptor = new ArtifactDescriptor("wait-app", "/wait-app.zip", "/wait-app", "wait-app.zip", "mule-config.xml");
     private static final ArtifactDescriptor sharedPluginLibAppDescriptor = new ArtifactDescriptor("shared-plugin-lib-app", "/shared-plugin-lib-app.zip", "/shared-plugin-lib-app", "shared-plugin-lib-app.zip", "mule-config.xml");
+    private static final ArtifactDescriptor dummyAppWithPluginDescriptor = new ArtifactDescriptor("dummyWithEchoPlugin", "/dummyWithEchoPlugin.zip", "/dummyWithEchoPlugin", null, null);
+    private static final ArtifactDescriptor dummyMultiPluginLibVersionAppDescriptor = new ArtifactDescriptor("multiPluginLibVersion", "/multiPluginLibVersion.zip", "/multiPluginLibVersion", null, null);
 
     //Domain constants
     private static final ArtifactDescriptor brokenDomainDescriptor = new ArtifactDescriptor("brokenDomain", "/broken-domain.zip", null, "brokenDomain.zip", "/broken-config.xml");
@@ -154,7 +160,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         applicationDeploymentListener = mock(DeploymentListener.class);
         domainDeploymentListener = mock(DeploymentListener.class);
-        deploymentService = new MuleDeploymentService(new MulePluginClassLoaderManager());
+        deploymentService = new MuleDeploymentService(new MuleServerPluginClassLoaderManager());
         deploymentService.addDeploymentListener(applicationDeploymentListener);
         deploymentService.addDomainDeploymentListener(domainDeploymentListener);
     }
@@ -1231,6 +1237,16 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void deploysAppZipWithPlugin() throws Exception
+    {
+        addPackedAppFromResource(dummyAppWithPluginDescriptor.zipPath);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(applicationDeploymentListener, dummyAppWithPluginDescriptor.id);
+    }
+
+    @Test
     public void deploysAppWithPluginSharedLibrary() throws IOException
     {
         addPackedAppFromResource(sharedPluginLibAppDescriptor.zipPath);
@@ -1240,6 +1256,22 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertApplicationDeploymentSuccess(applicationDeploymentListener, sharedPluginLibAppDescriptor.id);
         assertAppsDir(NONE, new String[] {sharedPluginLibAppDescriptor.id}, true);
         assertApplicationAnchorFileExists(sharedPluginLibAppDescriptor.id);
+    }
+
+    @Test
+    public void deploysMultiPluginVersionLib() throws Exception
+    {
+        addPackedAppFromResource(dummyMultiPluginLibVersionAppDescriptor.zipPath);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(applicationDeploymentListener, dummyMultiPluginLibVersionAppDescriptor.id);
+
+        Application application = deploymentService.getApplications().get(0);
+        Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, application.getMuleContext());
+
+        mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }
 
     @Test

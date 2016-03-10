@@ -6,18 +6,31 @@
  */
 package org.mule.module.launcher.application;
 
-import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.module.artifact.classloader.GoodCitizenClassLoader;
-import org.mule.module.launcher.MuleApplicationClassLoader;
-import org.mule.module.launcher.nativelib.NativeLibraryFinderFactory;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.module.artifact.classloader.CompositeClassLoader;
+import org.mule.module.artifact.classloader.GoodCitizenClassLoader;
+import org.mule.module.artifact.classloader.MuleArtifactClassLoader;
+import org.mule.module.launcher.MuleApplicationClassLoader;
+import org.mule.module.launcher.MuleFoldersUtil;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.domain.DomainClassLoaderRepository;
-import org.mule.module.launcher.plugin.MulePluginsClassLoader;
+import org.mule.module.launcher.nativelib.NativeLibraryFinderFactory;
 import org.mule.module.launcher.plugin.PluginDescriptor;
+import org.mule.util.FileUtils;
+import org.mule.util.SystemUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates {@link MuleApplicationClassLoader} instances based on the
@@ -26,6 +39,7 @@ import java.util.Set;
 public class MuleApplicationClassLoaderFactory implements ArtifactClassLoaderFactory<ApplicationDescriptor>
 {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final DomainClassLoaderRepository domainClassLoaderRepository;
     private final NativeLibraryFinderFactory nativeLibraryFinderFactory;
 
@@ -37,6 +51,69 @@ public class MuleApplicationClassLoaderFactory implements ArtifactClassLoaderFac
 
     @Override
     public ArtifactClassLoader create(ApplicationDescriptor descriptor)
+    {
+        ClassLoader parent = getParentClassLoader(descriptor);
+
+        List<URL> urls = new LinkedList<>();
+        try
+        {
+            urls.add(MuleFoldersUtil.getAppClassesFolder(descriptor.getName()).toURI().toURL());
+            urls.addAll(findJars(descriptor.getName(), MuleFoldersUtil.getAppLibFolder(descriptor.getName()), true));
+            urls.addAll(findJars(descriptor.getName(), MuleFoldersUtil.getMulePerAppLibFolder(), true));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Unable to create classloader for application", e);
+        }
+
+        return new MuleApplicationClassLoader(descriptor.getName(), parent, descriptor.getLoaderOverrides(), nativeLibraryFinderFactory.create(descriptor.getName()), urls);
+    }
+
+    /**
+     * Add jars from the supplied directory to the class path
+     */
+    private List<URL> findJars(String appName, File dir, boolean verbose) throws MalformedURLException
+    {
+        List<URL> result = new LinkedList<>();
+
+        if (dir.exists() && dir.canRead())
+        {
+            @SuppressWarnings("unchecked")
+            Collection<File> jars = FileUtils.listFiles(dir, new String[]{"jar"}, false);
+
+            if (!jars.isEmpty() && logger.isInfoEnabled())
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.append(String.format("[%s] Loading the following jars:%n", appName));
+                sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
+
+                for (File jar : jars)
+                {
+                    sb.append(jar.toURI().toURL()).append(SystemUtils.LINE_SEPARATOR);
+                }
+
+                sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
+
+                if (verbose)
+                {
+                    logger.info(sb.toString());
+                }
+                else
+                {
+                    logger.debug(sb.toString());
+                }
+            }
+
+            for (File jar : jars)
+            {
+                result.add(jar.toURI().toURL());
+            }
+        }
+
+        return result;
+    }
+
+    private ClassLoader getParentClassLoader(ApplicationDescriptor descriptor)
     {
         final String domain = descriptor.getDomain();
         ClassLoader parent;
@@ -51,17 +128,38 @@ public class MuleApplicationClassLoaderFactory implements ArtifactClassLoaderFac
         final Set<PluginDescriptor> plugins = descriptor.getPlugins();
         if (!plugins.isEmpty())
         {
-            // Re-assigns parent if there are shared plugin libraries
+            // Re-assigns parent classloader if there are shared plugin libraries
             URL[] pluginLibs = descriptor.getSharedPluginLibs();
             if (pluginLibs != null && pluginLibs.length != 0)
             {
                 parent = new GoodCitizenClassLoader(pluginLibs, parent);
             }
 
-            // re-assign parent ref if any plugins deployed, will be used by the MuleAppCL
-            parent = new MulePluginsClassLoader(parent, plugins);
+            // Defines a new parent classLoader from plugins
+            parent = createPluginsClassLoader(parent, plugins);
         }
 
-        return new MuleApplicationClassLoader(descriptor.getName(), parent, descriptor.getLoaderOverrides(), nativeLibraryFinderFactory.create(descriptor.getName()));
+        return parent;
+    }
+
+    private ClassLoader createPluginsClassLoader(ClassLoader parent, Set<PluginDescriptor> plugins)
+    {
+        List<ClassLoader> classLoaders = new LinkedList<>();
+
+        // Adds parent classloader first to use parent-first lookup approach
+        classLoaders.add(parent);
+
+        for (PluginDescriptor descriptor : plugins)
+        {
+            URL[] urls = new URL[descriptor.getRuntimeLibs().length + 1];
+            urls[0] = descriptor.getRuntimeClassesDir();
+            System.arraycopy(descriptor.getRuntimeLibs(), 0, urls, 1, descriptor.getRuntimeLibs().length);
+
+            final MuleArtifactClassLoader pluginClassLoader = new MuleArtifactClassLoader(descriptor.getName(), urls, parent, descriptor.getLoaderOverrides());
+
+            classLoaders.add(pluginClassLoader);
+        }
+
+        return new CompositeClassLoader(parent, classLoaders);
     }
 }

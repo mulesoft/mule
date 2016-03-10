@@ -61,7 +61,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         Class<?> aClass = compositeApplicationClassLoader.loadClass(CLASS_NAME);
         assertThat(aClass, equalTo(APP_LOADED_CLASS));
@@ -74,7 +74,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         Class<?> aClass = compositeApplicationClassLoader.loadClass(CLASS_NAME);
         assertThat(aClass, equalTo(PLUGIN_LOADED_CLASS));
@@ -85,7 +85,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     {
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         compositeApplicationClassLoader.loadClass(CLASS_NAME);
     }
@@ -98,7 +98,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         URL resource = compositeApplicationClassLoader.getResource(RESOURCE_NAME);
         assertThat(resource, equalTo(APP_LOADED_RESOURCE));
@@ -111,7 +111,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         URL resource = compositeApplicationClassLoader.getResource(RESOURCE_NAME);
         assertThat(resource, equalTo(PLUGIN_LOADED_RESOURCE));
@@ -122,7 +122,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     {
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         URL resource = compositeApplicationClassLoader.getResource(RESOURCE_NAME);
         assertThat(resource, equalTo(null));
@@ -136,7 +136,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         InputStream resourceAsStream = compositeApplicationClassLoader.getResourceAsStream(RESOURCE_NAME);
         assertThat(resourceAsStream, equalTo(APP_LOADED_STREAM_RESOURCE));
@@ -149,7 +149,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         InputStream resourceAsStream = compositeApplicationClassLoader.getResourceAsStream(RESOURCE_NAME);
         assertThat(resourceAsStream, equalTo(PLUGIN_LOADED_STREAM_RESOURCE));
@@ -160,7 +160,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     {
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         InputStream resourceAsStream = compositeApplicationClassLoader.getResourceAsStream(RESOURCE_NAME);
         assertThat(resourceAsStream, equalTo(null));
@@ -174,7 +174,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         Enumeration<URL> resources = compositeApplicationClassLoader.getResources(RESOURCE_NAME);
 
@@ -193,7 +193,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         Enumeration<URL> resources = compositeApplicationClassLoader.getResources(RESOURCE_NAME);
 
@@ -213,7 +213,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         URL resource = compositeApplicationClassLoader.findResource(RESOURCE_NAME);
         assertThat(resource, equalTo(APP_LOADED_RESOURCE));
@@ -226,7 +226,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         URL resource = compositeApplicationClassLoader.findResource(RESOURCE_NAME);
         assertThat(resource, equalTo(PLUGIN_LOADED_RESOURCE));
@@ -237,7 +237,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     {
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         URL resource = compositeApplicationClassLoader.findResource(RESOURCE_NAME);
         assertThat(resource, equalTo(null));
@@ -248,7 +248,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     {
         List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
+        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders);
 
         compositeApplicationClassLoader.dispose();
         assertThat(appClassLoader.disposed, equalTo(true));

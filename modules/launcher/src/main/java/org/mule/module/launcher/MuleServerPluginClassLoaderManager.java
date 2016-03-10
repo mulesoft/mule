@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MulePluginClassLoaderManager implements PluginClassLoaderManager
+public class MuleServerPluginClassLoaderManager implements ServerPluginClassLoaderManager
 {
 
     private final List<ClassLoader> classLoaders = new LinkedList<ClassLoader>();

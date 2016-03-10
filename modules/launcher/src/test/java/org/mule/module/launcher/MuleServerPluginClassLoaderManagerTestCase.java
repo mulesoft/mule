@@ -15,10 +15,10 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class MulePluginClassLoaderManagerTestCase extends AbstractMuleTestCase
+public class MuleServerPluginClassLoaderManagerTestCase extends AbstractMuleTestCase
 {
 
-    private MulePluginClassLoaderManager pluginClassLoaderManager = new MulePluginClassLoaderManager();
+    private MuleServerPluginClassLoaderManager pluginClassLoaderManager = new MuleServerPluginClassLoaderManager();
 
     @Test
     public void isEmptyOnStartup() throws Exception

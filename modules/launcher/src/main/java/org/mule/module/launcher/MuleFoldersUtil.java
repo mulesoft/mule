@@ -22,6 +22,9 @@ public class MuleFoldersUtil
     public static final String LIB_FOLDER = "lib";
     public static final String APPS_FOLDER = "apps";
     public static final String PLUGINS_FOLDER = "plugins";
+    public static final String CLASSES_FOLDER = "classes";
+    public static final String PER_APP_LIB_FOLDER = "per-app";
+    public static final String DOMAINS_FOLDER = "domains";
 
     private MuleFoldersUtil()
     {
@@ -34,6 +37,16 @@ public class MuleFoldersUtil
         return new File(muleHome);
     }
 
+    public static File getDomainsFolder()
+    {
+        return new File(getMuleHomeFolder(), DOMAINS_FOLDER);
+    }
+
+    public static File getDomainFolder(String domainName)
+    {
+        return new File(getDomainsFolder(), domainName);
+    }
+
     public static File getAppsFolder()
     {
         return new File(getMuleHomeFolder(), APPS_FOLDER);
@@ -42,6 +55,11 @@ public class MuleFoldersUtil
     public static File getAppFolder(String appName)
     {
         return new File(getAppsFolder(), appName);
+    }
+
+    public static File getAppClassesFolder(String appName)
+    {
+        return new File(getAppFolder(appName), CLASSES_FOLDER);
     }
 
     public static File getAppLibFolder(String appName)
@@ -67,6 +85,11 @@ public class MuleFoldersUtil
     public static File getMuleLibFolder()
     {
         return new File(getMuleHomeFolder(), LIB_FOLDER);
+    }
+
+    public static File getMulePerAppLibFolder()
+    {
+        return new File(getMuleLibFolder(), PER_APP_LIB_FOLDER);
     }
 
     public static File getAppTempFolder(String appName)

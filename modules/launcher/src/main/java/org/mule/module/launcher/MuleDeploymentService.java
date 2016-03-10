@@ -66,12 +66,12 @@ public class MuleDeploymentService implements DeploymentService
     private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
     private DefaultArchiveDeployer<Application> applicationDeployer;
 
-    public MuleDeploymentService(PluginClassLoaderManager pluginClassLoaderManager)
+    public MuleDeploymentService(ServerPluginClassLoaderManager serverPluginClassLoaderManager)
     {
         DomainClassLoaderRepository domainClassLoaderRepository = new MuleDomainClassLoaderRepository();
 
         ArtifactClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory(domainClassLoaderRepository, new DefaultNativeLibraryFinderFactory());
-        applicationClassLoaderFactory = new CompositeApplicationClassLoaderFactory(applicationClassLoaderFactory, pluginClassLoaderManager);
+        applicationClassLoaderFactory = new CompositeApplicationClassLoaderFactory(applicationClassLoaderFactory, serverPluginClassLoaderManager);
 
         DefaultDomainFactory domainFactory = new DefaultDomainFactory(domainClassLoaderRepository);
         domainFactory.setDeploymentListener(domainDeploymentListener);

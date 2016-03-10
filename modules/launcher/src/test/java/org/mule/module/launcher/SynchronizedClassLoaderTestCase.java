@@ -13,6 +13,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.MediumTest;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +35,7 @@ public class SynchronizedClassLoaderTestCase extends AbstractMuleTestCase
     @Test
     public void synchronizesLoadClassInMuleApplicationClassLoader() throws Exception
     {
-        doLoadClassSynchronizationTest(new MuleApplicationClassLoader("test", new TestClassLoader(), null));
+        doLoadClassSynchronizationTest(new MuleApplicationClassLoader("test", new TestClassLoader(), null, Collections.emptyList()));
     }
 
     private void doLoadClassSynchronizationTest(ClassLoader classLoader) throws InterruptedException

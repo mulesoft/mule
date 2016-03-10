@@ -33,8 +33,9 @@ public class CompositeClassLoader extends ClassLoader
 
     protected final List<ClassLoader> classLoaders;
 
-    public CompositeClassLoader(List<ClassLoader> classLoaders)
+    public CompositeClassLoader(ClassLoader parent, List<ClassLoader> classLoaders)
     {
+        super(parent);
         this.classLoaders = new LinkedList<>(classLoaders);
     }
 

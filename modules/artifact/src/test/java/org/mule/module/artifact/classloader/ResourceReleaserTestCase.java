@@ -73,7 +73,7 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase
         assertThat(list(getDrivers()), not(hasItem(jdbcDriver)));
     }
 
-    private void ensureResourceReleaserIsCreatedByCorrectClassLoader(AbstractArtifactClassLoader classLoader) throws Exception
+    private void ensureResourceReleaserIsCreatedByCorrectClassLoader(MuleArtifactClassLoader classLoader) throws Exception
     {
         assertThat(classLoader.getClass().getClassLoader(), is(Thread.currentThread().getContextClassLoader()));
         classLoader.setResourceReleaserClassLocation(TEST_RESOURCE_RELEASER_CLASS_LOCATION);
@@ -94,7 +94,7 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase
         ResourceReleaser getResourceReleaserInstance();
     }
 
-    private static class TestArtifactClassLoader extends AbstractArtifactClassLoader implements KeepResourceReleaserInstance
+    private static class TestArtifactClassLoader extends MuleArtifactClassLoader implements KeepResourceReleaserInstance
     {
 
         private ResourceReleaser resourceReleaserInstance;
