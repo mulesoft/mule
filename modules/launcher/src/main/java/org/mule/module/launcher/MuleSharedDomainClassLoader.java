@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher;
 
-import org.mule.module.artifact.classloader.AbstractArtifactClassLoader;
+import org.mule.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
@@ -20,7 +20,7 @@ import java.util.Collection;
 /**
  * Load $MULE_HOME/lib/shared/<domain> libraries.
  */
-public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader implements ArtifactClassLoader
+public class MuleSharedDomainClassLoader extends MuleArtifactClassLoader implements ArtifactClassLoader
 {
 
     public static final String DOMAIN_LIBRARY_FOLDER = "lib";

@@ -20,9 +20,9 @@ import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.MuleDeploymentService;
-import org.mule.module.launcher.MulePluginClassLoaderManager;
+import org.mule.module.launcher.MuleServerPluginClassLoaderManager;
 import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.coreextension.DefaultMuleCoreExtensionManager;
+import org.mule.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.module.launcher.coreextension.MuleCoreExtensionDiscoverer;
 import org.mule.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.tck.probe.PollingProber;
@@ -67,7 +67,7 @@ public class FakeMuleServer
         }
     }
 
-    private DefaultMuleCoreExtensionManager coreExtensionManager;
+    private DefaultMuleCoreExtensionManagerServer coreExtensionManager;
 
     public FakeMuleServer(String muleHomePath)
     {
@@ -98,11 +98,11 @@ public class FakeMuleServer
             throw new RuntimeException(e);
         }
 
-        deploymentService = new MuleDeploymentService(new MulePluginClassLoaderManager());
+        deploymentService = new MuleDeploymentService(new MuleServerPluginClassLoaderManager());
         deploymentListener = mock(DeploymentListener.class);
         deploymentService.addDeploymentListener(deploymentListener);
 
-        coreExtensionManager = new DefaultMuleCoreExtensionManager(
+        coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(
                 new MuleCoreExtensionDiscoverer()
                 {
                     @Override

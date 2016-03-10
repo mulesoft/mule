@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.module.launcher.MuleFoldersUtil.getExecutionFolder;
 
 import org.mule.api.config.MuleProperties;
-import org.mule.module.launcher.coreextension.MuleCoreExtensionManager;
+import org.mule.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -39,14 +39,14 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
 
     private MuleContainer container;
 
-    private MuleCoreExtensionManager coreExtensionManager;
+    private MuleCoreExtensionManagerServer coreExtensionManager;
 
     private DeploymentService deploymentService;
 
     @Before
     public void setUp() throws Exception
     {
-        coreExtensionManager = mock(MuleCoreExtensionManager.class);
+        coreExtensionManager = mock(MuleCoreExtensionManagerServer.class);
         deploymentService = mock(DeploymentService.class);
 
         container = new MuleContainer(deploymentService, coreExtensionManager);

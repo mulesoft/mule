@@ -29,9 +29,9 @@ public class CompositeApplicationClassLoader extends CompositeClassLoader implem
 
     private final String appName;
 
-    public CompositeApplicationClassLoader(String appName, List<ClassLoader> classLoaders)
+    public CompositeApplicationClassLoader(String appName, ClassLoader parent, List<ClassLoader> classLoaders)
     {
-        super(classLoaders);
+        super(parent, classLoaders);
         this.appName = appName;
     }
 

@@ -6,10 +6,14 @@
  */
 package org.mule.module.launcher;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.module.launcher.MuleFoldersUtil.getAppClassesFolder;
+import static org.mule.module.launcher.MuleFoldersUtil.getAppLibFolder;
 import org.mule.api.config.MuleProperties;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -18,6 +22,8 @@ import org.mule.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -55,36 +61,34 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase
         // Create directories structure
         previousMuleHome = System.setProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, tempMuleHome.getRoot().getAbsolutePath());
 
-        domainDir = createDirectory("domains/%s", DOMAIN_NAME);
+        final List<URL> urls = new LinkedList<>();
 
-        classesDir = createDirectory("apps/%s/classes", APP_NAME);
-
-        File libDir = tempMuleHome.newFolder(String.format("apps/%s/lib", APP_NAME));
+        classesDir = getAppClassesFolder(APP_NAME);
+        assertThat(classesDir.mkdirs(), is(true));
+        // Add isolated resources in classes dir
+        FileUtils.stringToFile(new File(classesDir, RESOURCE_IN_CLASSES_AND_JAR).getAbsolutePath(), "Some text");
+        FileUtils.stringToFile(new File(classesDir, RESOURCE_JUST_IN_CLASSES).getAbsolutePath(), "Some text");
+        urls.add(classesDir.toURI().toURL());
 
         // Add jar file with resources in lib dir
+        File libDir = getAppLibFolder(APP_NAME);
+        assertThat(libDir.mkdirs(), is(true));
         URL resourceSrcJarFile = Thread.currentThread().getContextClassLoader().getResource("test-jar-with-resources.jar");
         assertNotNull(resourceSrcJarFile);
         File srcJarFile = new File(resourceSrcJarFile.getFile());
         jarFile = new File(libDir, "test-jar-with-resources.jar");
         FileUtils.copyFile(srcJarFile, jarFile, false);
-
-        // Add isolated resources in classes dir
-        FileUtils.stringToFile(new File(classesDir, RESOURCE_IN_CLASSES_AND_JAR).getAbsolutePath(), "Some text");
-        FileUtils.stringToFile(new File(classesDir, RESOURCE_JUST_IN_CLASSES).getAbsolutePath(), "Some text");
+        urls.add(jarFile.toURI().toURL());
 
         // Add isolated resources in domain dir
+        domainDir = MuleFoldersUtil.getDomainFolder(DOMAIN_NAME);
+        assertThat(domainDir.mkdirs(), is(true));
         FileUtils.stringToFile(new File(domainDir, RESOURCE_JUST_IN_DOMAIN).getAbsolutePath(), "Some text");
 
         // Create app class loader
         domainCL = new MuleSharedDomainClassLoader(DOMAIN_NAME, Thread.currentThread().getContextClassLoader());
-        appCL = new MuleApplicationClassLoader(APP_NAME, domainCL, null);
-    }
 
-    private File createDirectory(String format, Object... args)
-    {
-        File file = new File(tempMuleHome.getRoot(), String.format(format, args));
-        file.mkdirs();
-        return file;
+        appCL = new MuleApplicationClassLoader(APP_NAME, domainCL, null, urls);
     }
 
     @After

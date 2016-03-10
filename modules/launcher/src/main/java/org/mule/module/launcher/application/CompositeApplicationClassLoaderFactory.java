@@ -7,7 +7,7 @@
 package org.mule.module.launcher.application;
 
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.module.launcher.PluginClassLoaderManager;
+import org.mule.module.launcher.ServerPluginClassLoaderManager;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
@@ -17,24 +17,24 @@ import java.util.List;
 /**
  * Composes a {@link CompositeApplicationClassLoader} using a {@link ArtifactClassLoaderFactory}
  * to getDomainClassLoader the classloader for a Mule application and the plugin
- * classloaders available in the {@link PluginClassLoaderManager}
+ * classloaders available in the {@link ServerPluginClassLoaderManager}
  */
 public class CompositeApplicationClassLoaderFactory implements ArtifactClassLoaderFactory<ApplicationDescriptor>
 {
 
-    private final PluginClassLoaderManager pluginClassLoaderManager;
+    private final ServerPluginClassLoaderManager serverPluginClassLoaderManager;
     private final ArtifactClassLoaderFactory applicationClassLoaderFactory;
 
-    public CompositeApplicationClassLoaderFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory, PluginClassLoaderManager pluginClassLoaderManager)
+    public CompositeApplicationClassLoaderFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory, ServerPluginClassLoaderManager serverPluginClassLoaderManager)
     {
         this.applicationClassLoaderFactory = applicationClassLoaderFactory;
-        this.pluginClassLoaderManager = pluginClassLoaderManager;
+        this.serverPluginClassLoaderManager = serverPluginClassLoaderManager;
     }
 
     @Override
     public ArtifactClassLoader create(ApplicationDescriptor descriptor)
     {
-        List<ClassLoader> pluginClassLoaders = pluginClassLoaderManager.getPluginClassLoaders();
+        List<ClassLoader> pluginClassLoaders = serverPluginClassLoaderManager.getPluginClassLoaders();
 
         ArtifactClassLoader appClassLoader = applicationClassLoaderFactory.create(descriptor);
 
@@ -44,7 +44,7 @@ public class CompositeApplicationClassLoaderFactory implements ArtifactClassLoad
             classLoaders.add(appClassLoader.getClassLoader());
             classLoaders.addAll(pluginClassLoaders);
 
-            appClassLoader = new CompositeApplicationClassLoader(descriptor.getName(), classLoaders);
+            appClassLoader = new CompositeApplicationClassLoader(descriptor.getName(), appClassLoader.getClassLoader().getParent(), classLoaders);
         }
 
         return appClassLoader;

@@ -102,7 +102,7 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase
         List<ClassLoader> classLoaders = new LinkedList<>();
         Collections.addAll(classLoaders, classLoader1, classLoader2);
 
-        return new CompositeClassLoader(classLoaders);
+        return new CompositeClassLoader(Thread.currentThread().getContextClassLoader(), classLoaders);
     }
 
     // Used to ensure that the composite classloader is able to access

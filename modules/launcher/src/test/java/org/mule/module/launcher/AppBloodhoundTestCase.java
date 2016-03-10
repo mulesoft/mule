@@ -11,7 +11,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.module.launcher.plugin.PluginClasspath;
 import org.mule.module.launcher.plugin.PluginDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
@@ -51,9 +50,9 @@ public class AppBloodhoundTestCase extends AbstractMuleTestCase
 
         final PluginDescriptor plugin = plugins.iterator().next();
         assertThat(plugin.getName(), equalTo("groovy-plugin"));
-        final PluginClasspath cp = plugin.getClasspath();
-        assertThat(cp.toURLs().length, equalTo(2));
-        assertThat(cp.getRuntimeLibs()[0].toExternalForm(), endsWith("groovy-all-1.8.0.jar"));
+        assertThat(plugin.getRuntimeClassesDir().toExternalForm(), endsWith("testApp/plugins/groovy-plugin/classes/"));
+        assertThat(plugin.getRuntimeLibs().length, equalTo(1));
+        assertThat(plugin.getRuntimeLibs()[0].toExternalForm(), endsWith("groovy-all-1.8.0.jar"));
     }
 
     @Test

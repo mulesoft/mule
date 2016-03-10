@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Abstract implementation of the ArtifactClassLoader interface, that manages shutdown listeners.
  */
-public abstract class AbstractArtifactClassLoader extends FineGrainedControlClassLoader implements ArtifactClassLoader
+public class MuleArtifactClassLoader extends FineGrainedControlClassLoader implements ArtifactClassLoader
 {
 
     private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION = "/org/mule/module/artifact/classloader/DefaultResourceReleaser.class";
@@ -37,12 +37,12 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
 
     private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
 
-    public AbstractArtifactClassLoader(String name, URL[] urls, ClassLoader parent)
+    public MuleArtifactClassLoader(String name, URL[] urls, ClassLoader parent)
     {
         this(name, urls, parent, Collections.<String>emptySet());
     }
 
-    public AbstractArtifactClassLoader(String name, URL[] urls, ClassLoader parent, Set<String> overrides)
+    public MuleArtifactClassLoader(String name, URL[] urls, ClassLoader parent, Set<String> overrides)
     {
         super(urls, parent, overrides);
         checkArgument(!StringUtils.isEmpty(name), "Artifact name cannot be empty");
