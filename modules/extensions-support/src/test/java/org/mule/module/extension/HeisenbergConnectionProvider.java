@@ -6,11 +6,10 @@
  */
 package org.mule.module.extension;
 
-import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Parameter;
@@ -50,6 +49,6 @@ public class HeisenbergConnectionProvider implements ConnectionProvider<Heisenbe
     @Override
     public ConnectionHandlingStrategy<HeisenbergConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<HeisenbergExtension, HeisenbergConnection> handlingStrategyFactory)
     {
-        return handlingStrategyFactory.supportsPooling(new PoolingProfile());
+        return handlingStrategyFactory.supportsPooling();
     }
 }

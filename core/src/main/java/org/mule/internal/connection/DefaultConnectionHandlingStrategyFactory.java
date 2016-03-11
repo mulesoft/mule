@@ -8,16 +8,16 @@ package org.mule.internal.connection;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.PoolingProfile;
-import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.PoolingListener;
 
 /**
  * Default implementation of {@link ConnectionHandlingStrategyFactory}.
- * <p>
+ * <p/>
  * This implementation is stateful an is tightly associated to a {@link #config},
- * {@link #connectionProvider} and {@link #muleContext}.
+ * {@link #connectionProvider}, a {@link #poolingProfile} and {@link #muleContext}.
  *
  * @param <Config>     the generic type of the config for which connections will be produced
  * @param <Connection> the generic type of the connections that will be produced
@@ -29,18 +29,24 @@ final class DefaultConnectionHandlingStrategyFactory<Config, Connection> impleme
     private final Config config;
     private final ConnectionProvider<Config, Connection> connectionProvider;
     private final MuleContext muleContext;
+    private final PoolingProfile poolingProfile;
 
     /**
      * Creates a new instance
      *
      * @param config             the config for which we try to create connections
      * @param connectionProvider the {@link ConnectionProvider} that will be used to manage connections
+     * @param poolingProfile     the {@link PoolingProfile} that will be used to configure the pool of connections
      * @param muleContext        the owning  {@link MuleContext}
      */
-    DefaultConnectionHandlingStrategyFactory(Config config, ConnectionProvider<Config, Connection> connectionProvider, MuleContext muleContext)
+    DefaultConnectionHandlingStrategyFactory(Config config,
+                                             ConnectionProvider<Config, Connection> connectionProvider,
+                                             PoolingProfile poolingProfile,
+                                             MuleContext muleContext)
     {
         this.config = config;
         this.connectionProvider = connectionProvider;
+        this.poolingProfile = poolingProfile;
         this.muleContext = muleContext;
     }
 
@@ -48,44 +54,42 @@ final class DefaultConnectionHandlingStrategyFactory<Config, Connection> impleme
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy supportsPooling(PoolingProfile defaultPoolingProfile)
+    public ConnectionHandlingStrategy supportsPooling()
     {
-        return supportsPooling(defaultPoolingProfile, new NullPoolingListener<>());
+        return supportsPooling(new NullPoolingListener<>());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<Connection> supportsPooling(PoolingProfile defaultPoolingProfile, PoolingListener<Config, Connection> poolingListener)
+    public ConnectionHandlingStrategy<Connection> supportsPooling(PoolingListener<Config, Connection> poolingListener)
     {
-        return defaultPoolingProfile.isDisabled()
-               ? none()
-               : createPoolingStrategy(defaultPoolingProfile, poolingListener);
+        return poolingProfile.isDisabled() ? none() : createPoolingStrategy(poolingListener);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingProfile defaultPoolingProfile)
+    public ConnectionHandlingStrategy<Connection> requiresPooling()
     {
-        return requiresPooling(defaultPoolingProfile, new NullPoolingListener<>());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingProfile defaultPoolingProfile, PoolingListener<Config, Connection> poolingListener)
-    {
-        if (defaultPoolingProfile.isDisabled())
+        if (poolingProfile.isDisabled())
         {
             throw new IllegalArgumentException("The selected connection management strategy requires pooling but the supplied pooling profile " +
                                                "is attempting to disable pooling. Supply a valid PoolingProfile or choose a different management strategy.");
         }
 
-        return createPoolingStrategy(defaultPoolingProfile, poolingListener);
+        return requiresPooling(new NullPoolingListener<>());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingListener<Config, Connection> poolingListener)
+    {
+        return createPoolingStrategy(poolingListener);
     }
 
     /**
@@ -106,8 +110,8 @@ final class DefaultConnectionHandlingStrategyFactory<Config, Connection> impleme
         return new NullConnectionHandlingStrategy<>(config, connectionProvider, muleContext);
     }
 
-    private PoolingConnectionHandlingStrategy<Config, Connection> createPoolingStrategy(PoolingProfile defaultPoolingProfile, PoolingListener<Config, Connection> poolingListener)
+    private PoolingConnectionHandlingStrategy<Config, Connection> createPoolingStrategy(PoolingListener<Config, Connection> poolingListener)
     {
-        return new PoolingConnectionHandlingStrategy<>(config, connectionProvider, defaultPoolingProfile, poolingListener,  muleContext);
+        return new PoolingConnectionHandlingStrategy<>(config, connectionProvider, poolingProfile, poolingListener, muleContext);
     }
 }

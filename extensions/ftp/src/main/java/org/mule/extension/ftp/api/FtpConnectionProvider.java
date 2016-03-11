@@ -6,7 +6,6 @@
  */
 package org.mule.extension.ftp.api;
 
-import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
@@ -81,7 +80,7 @@ public final class FtpConnectionProvider implements ConnectionProvider<FtpConnec
     @Override
     public ConnectionHandlingStrategy<FtpFileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory<FtpConnector, FtpFileSystem> handlingStrategyFactory)
     {
-        return handlingStrategyFactory.supportsPooling(new PoolingProfile(), new PoolingListener<FtpConnector, FtpFileSystem>()
+        return handlingStrategyFactory.supportsPooling(new PoolingListener<FtpConnector, FtpFileSystem>()
         {
             @Override
             public void onBorrow(FtpConnector ftpConnector, FtpFileSystem ftpFileSystem)

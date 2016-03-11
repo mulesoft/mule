@@ -6,7 +6,6 @@
  */
 package org.mule.internal.connection;
 
-import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.PoolingListener;
@@ -34,27 +33,27 @@ abstract class ConnectionHandlingStrategyFactoryWrapper<Config, Connection> impl
     }
 
     @Override
-    public ConnectionHandlingStrategy<Connection> supportsPooling(PoolingProfile defaultPoolingProfile)
+    public ConnectionHandlingStrategy<Connection> supportsPooling()
     {
-        return delegate.supportsPooling(defaultPoolingProfile);
+        return delegate.supportsPooling();
     }
 
     @Override
-    public ConnectionHandlingStrategy<Connection> supportsPooling(PoolingProfile defaultPoolingProfile, PoolingListener<Config, Connection> poolingListener)
+    public ConnectionHandlingStrategy<Connection> supportsPooling(PoolingListener<Config, Connection> poolingListener)
     {
-        return delegate.supportsPooling(defaultPoolingProfile, poolingListener);
+        return delegate.supportsPooling(poolingListener);
     }
 
     @Override
-    public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingProfile defaultPoolingProfile)
+    public ConnectionHandlingStrategy<Connection> requiresPooling()
     {
-        return delegate.requiresPooling(defaultPoolingProfile);
+        return delegate.requiresPooling();
     }
 
     @Override
-    public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingProfile defaultPoolingProfile, PoolingListener<Config, Connection> poolingListener)
+    public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingListener<Config, Connection> poolingListener)
     {
-        return delegate.requiresPooling(defaultPoolingProfile, poolingListener);
+        return delegate.requiresPooling(poolingListener);
     }
 
     @Override
