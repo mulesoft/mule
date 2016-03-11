@@ -8,13 +8,17 @@ package org.mule.internal.connection;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.HasPoolingProfile;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.retry.RetryPolicy;
 import org.mule.api.retry.RetryPolicyTemplate;
+
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * @param <Connection> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0
  */
-class LifecycleAwareConnectionProviderWrapper<Config, Connection> extends ConnectionProviderWrapper<Config, Connection>
+class LifecycleAwareConnectionProviderWrapper<Config, Connection> extends ConnectionProviderWrapper<Config, Connection> implements HasPoolingProfile
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareConnectionProviderWrapper.class);
@@ -112,5 +116,12 @@ class LifecycleAwareConnectionProviderWrapper<Config, Connection> extends Connec
         }
 
         return ((ConnectionManagerAdapter) muleContext.getRegistry().get(MuleProperties.OBJECT_CONNECTION_MANAGER)).getDefaultRetryPolicyTemplate();
+    }
+
+    @Override
+    public Optional<PoolingProfile> getPoolingProfile()
+    {
+        ConnectionProvider<Config, Connection> delegate = getDelegate();
+        return delegate instanceof ConnectionProviderWrapper ? ((ConnectionProviderWrapper) delegate).getPoolingProfile() : Optional.empty();
     }
 }

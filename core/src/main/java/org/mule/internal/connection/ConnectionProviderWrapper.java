@@ -6,13 +6,13 @@
  */
 package org.mule.internal.connection;
 
+import org.mule.api.config.HasPoolingProfile;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.retry.policies.NoRetryPolicyTemplate;
 
 /**
  * Base class for wrappers for {@link ConnectionProvider} instances
@@ -21,7 +21,7 @@ import org.mule.retry.policies.NoRetryPolicyTemplate;
  * @param <Connection> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0
  */
-public abstract class ConnectionProviderWrapper<Config, Connection> implements ConnectionProvider<Config, Connection>
+public abstract class ConnectionProviderWrapper<Config, Connection> implements ConnectionProvider<Config, Connection>, HasPoolingProfile
 {
 
     private final ConnectionProvider<Config, Connection> delegate;
@@ -75,4 +75,5 @@ public abstract class ConnectionProviderWrapper<Config, Connection> implements C
      * @return a {@link RetryPolicyTemplate}
      */
     public abstract RetryPolicyTemplate getRetryPolicyTemplate();
+
 }

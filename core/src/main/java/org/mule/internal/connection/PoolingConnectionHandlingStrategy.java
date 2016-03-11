@@ -7,7 +7,6 @@
 package org.mule.internal.connection;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -61,7 +60,6 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
         super(config, connectionProvider, muleContext);
         this.poolingProfile = poolingProfile;
         this.poolingListener = poolingListener;
-
         pool = createPool();
     }
 
@@ -148,7 +146,6 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
         config.whenExhaustedAction = (byte) poolingProfile.getExhaustedAction();
         config.minEvictableIdleTimeMillis = poolingProfile.getMinEvictionMillis();
         config.timeBetweenEvictionRunsMillis = poolingProfile.getEvictionCheckIntervalMillis();
-
         GenericObjectPool genericPool = new GenericObjectPool(new ObjectFactoryAdapter(), config);
 
         return genericPool;
@@ -184,5 +181,10 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
         public void passivateObject(Connection connection) throws Exception
         {
         }
+    }
+
+    public PoolingProfile getPoolingProfile()
+    {
+        return poolingProfile;
     }
 }

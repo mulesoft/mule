@@ -8,17 +8,18 @@ package org.mule.internal.connection;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.HasPoolingProfile;
 import org.mule.api.config.PoolingProfile;
-import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionValidationResult;
-import org.mule.api.connection.PoolingListener;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.retry.policies.AbstractPolicyTemplate;
+
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -27,24 +28,22 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ConnectionProviderWrapper} which decorates the {@link #delegate}
- * with a user configured {@link PoolingProfile}.
- * <p>
+ * with a user configured {@link PoolingProfile} or the default one if is was not supplied by the user.
+ * <p/>
  * The purpose of this wrapper is having the {@link #getHandlingStrategy(ConnectionHandlingStrategyFactory)}
  * method use the configured {@link #poolingProfile} instead of the default included
  * in the {@link #delegate}
- * <p>
- * If a {@link #poolingProfile} is not supplied (meaning, it is {@code null}), then the
- * default {@link #delegate} behavior is applied.
+ * <p/>
  *
  * @since 4.0
  */
-public final class PooledConnectionProviderWrapper<Config, Connection> extends ConnectionProviderWrapper<Config, Connection> implements Lifecycle
+public final class PooledConnectionProviderWrapper<Config, Connection> extends ConnectionProviderWrapper<Config, Connection> implements Lifecycle, HasPoolingProfile
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PooledConnectionProviderWrapper.class);
+    private final PoolingProfile poolingProfile;
     private final boolean disableValidation;
     private final RetryPolicyTemplate retryPolicyTemplate;
-    private final PoolingProfile poolingProfile;
 
     @Inject
     MuleContext muleContext;
@@ -53,10 +52,13 @@ public final class PooledConnectionProviderWrapper<Config, Connection> extends C
      * Creates a new instance
      *
      * @param delegate            the {@link ConnectionProvider} to be wrapped
-     * @param poolingProfile      a nullable {@link PoolingProfile}
+     * @param poolingProfile      a not {@code null} {@link PoolingProfile}
      * @param retryPolicyTemplate a {@link AbstractPolicyTemplate} which will hold the retry policy configured in the Mule Application
      */
-    public PooledConnectionProviderWrapper(ConnectionProvider<Config, Connection> delegate, PoolingProfile poolingProfile, boolean disableValidation, RetryPolicyTemplate retryPolicyTemplate)
+    public PooledConnectionProviderWrapper(ConnectionProvider<Config, Connection> delegate,
+                                           PoolingProfile poolingProfile,
+                                           boolean disableValidation,
+                                           RetryPolicyTemplate retryPolicyTemplate)
     {
         super(delegate);
         this.poolingProfile = poolingProfile;
@@ -79,54 +81,6 @@ public final class PooledConnectionProviderWrapper<Config, Connection> extends C
             return ConnectionValidationResult.success();
         }
         return getDelegate().validate(connection);
-    }
-
-    /**
-     * If {@link #poolingProfile} is not {@code null} and the delegate wants to invoke
-     * {@link ConnectionHandlingStrategyFactory#requiresPooling(PoolingProfile)} or
-     * {@link ConnectionHandlingStrategyFactory#supportsPooling(PoolingProfile)}, then this method
-     * makes those invokations using the supplied {@link #poolingProfile}.
-     * <p>
-     * In any other case, the default {@link #delegate} behavior is applied
-     *
-     * @param handlingStrategyFactory a {@link ConnectionHandlingStrategyFactory}
-     * @return a {@link ConnectionHandlingStrategy}
-     */
-    @Override
-    public ConnectionHandlingStrategy<Connection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Config, Connection> handlingStrategyFactory)
-    {
-        ConnectionHandlingStrategyFactory<Config, Connection> factoryDecorator = new ConnectionHandlingStrategyFactoryWrapper<Config, Connection>(handlingStrategyFactory)
-        {
-            public ConnectionHandlingStrategy<Connection> supportsPooling(PoolingProfile defaultPoolingProfile, PoolingListener<Config, Connection> poolingListener)
-            {
-                return super.supportsPooling(resolvePoolingProfile(defaultPoolingProfile), poolingListener);
-            }
-
-            @Override
-            public ConnectionHandlingStrategy<Connection> supportsPooling(PoolingProfile defaultPoolingProfile)
-            {
-                return super.supportsPooling(resolvePoolingProfile(defaultPoolingProfile));
-            }
-
-            @Override
-            public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingProfile defaultPoolingProfile, PoolingListener<Config, Connection> poolingListener)
-            {
-                return super.requiresPooling(resolvePoolingProfile(defaultPoolingProfile), poolingListener);
-            }
-
-            @Override
-            public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingProfile defaultPoolingProfile)
-            {
-                return super.requiresPooling(resolvePoolingProfile(defaultPoolingProfile));
-            }
-
-            private PoolingProfile resolvePoolingProfile(PoolingProfile defaultPoolingProfile)
-            {
-                return poolingProfile != null ? poolingProfile : defaultPoolingProfile;
-            }
-        };
-
-        return super.getHandlingStrategy(factoryDecorator);
     }
 
     /**
@@ -160,5 +114,11 @@ public final class PooledConnectionProviderWrapper<Config, Connection> extends C
     public void stop() throws MuleException
     {
         LifecycleUtils.stopIfNeeded(retryPolicyTemplate);
+    }
+
+    @Override
+    public Optional<PoolingProfile> getPoolingProfile()
+    {
+        return Optional.ofNullable(poolingProfile);
     }
 }

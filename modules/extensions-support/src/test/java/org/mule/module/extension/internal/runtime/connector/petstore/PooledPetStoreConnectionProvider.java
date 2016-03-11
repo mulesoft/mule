@@ -17,6 +17,6 @@ public class PooledPetStoreConnectionProvider extends PetStoreConnectionProvider
     @Override
     public ConnectionHandlingStrategy<PetStoreClient> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
     {
-        return handlingStrategyFactory.requiresPooling(new PetStorePoolingProfile());
+        return handlingStrategyFactory.requiresPooling();
     }
 }
