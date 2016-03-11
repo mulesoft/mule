@@ -31,6 +31,7 @@ MULE-9306: Losing flow and session variables when using MuleClient to dispatch/s
 MULE-9383: HTTP Connector will allow invalid Content-Type header values. In order to strictly validate them as before, use the mule.strictContentType=true system property.
 MULE-9405: MuleException instead of NPE is now thrown when setting a null value for a context-property in an XstlTransformation.
 MULE-9160: Log4J was upgraded from 2.1 to 2.5.
+MULE-9444: Saxon was upgraded from 9.6.0-1-HE to 9.7.0.3-HE and XMLUnit from 1.5 to 1.6
 
 Migration changes from 3.6.x to 3.7.x
 
