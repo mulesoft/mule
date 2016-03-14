@@ -75,9 +75,8 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
     private static final int DEATH_YEAR = 2011;
     private static final HealthStatus INITIAL_HEALTH = HealthStatus.CANCER;
     private static final HealthStatus FINAL_HEALTH = HealthStatus.DEAD;
-    private static final Ricin WEAPON = new Ricin();
 
-    @Parameters
+    @Parameters(name = "{0}")
     public static Collection<Object[]> data()
     {
         return Arrays.asList(new Object[][] {
@@ -93,6 +92,13 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
     {
         HeisenbergExtension heisenberg = lookupHeisenberg(testConfig);
         assertHeisenbergConfig(heisenberg);
+    }
+
+    @Test
+    public void injectedConfigName() throws Exception
+    {
+        HeisenbergExtension heisenberg = lookupHeisenberg(testConfig);
+        assertThat(heisenberg.getConfigName(), equalTo(testConfig));
     }
 
     @Test

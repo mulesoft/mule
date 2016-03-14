@@ -12,7 +12,6 @@ import org.mule.extension.api.introspection.property.ImmutableStudioModelPropert
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.api.introspection.property.StudioModelProperty;
-import org.mule.module.extension.internal.model.AbstractAnnotatedModelEnricher;
 
 /**
  * Enriches the {@link DeclarationDescriptor} with a model property which key is {@link StudioModelProperty#KEY} and the value an instance of {@link StudioModelProperty}.

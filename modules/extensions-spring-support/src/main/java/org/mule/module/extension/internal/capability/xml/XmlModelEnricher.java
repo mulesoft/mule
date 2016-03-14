@@ -11,7 +11,7 @@ import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
-import org.mule.module.extension.internal.model.AbstractAnnotatedModelEnricher;
+import org.mule.module.extension.internal.introspection.enricher.AbstractAnnotatedModelEnricher;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.internal.util.NameUtils;
 import org.mule.util.StringUtils;
