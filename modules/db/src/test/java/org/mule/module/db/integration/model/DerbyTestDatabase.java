@@ -78,6 +78,10 @@ public class DerbyTestDatabase extends AbstractTestDatabase
             "DYNAMIC RESULT SETS 0\n" +
             "EXTERNAL NAME 'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.concatenateStrings'";
 
+    public static final String SQL_CREATE_DELAY_FUNCTION = "create function delay(SECONDS INTEGER) " +
+                                                           "returns INTEGER language java parameter style java external name " +
+                                                           "'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.timeDelay'";
+
     @Override
     public void createPlanetTable(Connection connection) throws SQLException
     {
@@ -136,6 +140,12 @@ public class DerbyTestDatabase extends AbstractTestDatabase
     public void createStoredProcedureConcatenateStrings(DataSource dataSource) throws SQLException
     {
         createStoredProcedure(dataSource, SQL_CREATE_SP_CONCATENATE_STRINGS);
+    }
+
+    @Override
+    public void createDelayFunction(DataSource dataSource) throws SQLException
+    {
+        createStoredProcedure(dataSource, SQL_CREATE_DELAY_FUNCTION);
     }
 
     public void createStoredProcedure(DataSource dataSource, String sql) throws SQLException

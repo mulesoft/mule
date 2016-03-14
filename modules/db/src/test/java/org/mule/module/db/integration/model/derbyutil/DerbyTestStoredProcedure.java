@@ -131,4 +131,21 @@ public class DerbyTestStoredProcedure
     {
         result[0] = string1 + string2;
     }
+
+    public static int timeDelay(int secondsDelay)
+    {
+        if (secondsDelay > 0)
+        {
+            try
+            {
+                Thread.sleep(secondsDelay * 1000);
+            }
+            catch (InterruptedException e)
+            {
+                return 0;
+            }
+        }
+
+        return 1;
+    }
 }
