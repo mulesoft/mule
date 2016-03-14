@@ -8,10 +8,17 @@ package org.mule.module.launcher;
 
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.module.launcher.MuleFoldersUtil.getAppFolder;
+import static org.mule.module.launcher.MuleFoldersUtil.getAppPluginsFolder;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.module.launcher.plugin.PluginDescriptor;
+import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
+import org.mule.module.launcher.plugin.ApplicationPluginDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.util.IOUtils;
@@ -27,7 +34,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class AppBloodhoundTestCase extends AbstractMuleTestCase
+public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase
 {
 
     public static final String APP_NAME = "testApp";
@@ -39,20 +46,25 @@ public class AppBloodhoundTestCase extends AbstractMuleTestCase
     @Test
     public void readsPlugin() throws Exception
     {
-        File pluginDir = MuleFoldersUtil.getAppPluginsFolder(APP_NAME);
+        File pluginDir = getAppPluginsFolder(APP_NAME);
         pluginDir.mkdirs();
-        copyResourceAs("plugins/groovy-plugin.zip", pluginDir, "groovy-plugin.zip");
+        copyResourceAs("plugins/groovy-plugin.zip", pluginDir, "groovy-plugin1.zip");
+        copyResourceAs("plugins/groovy-plugin.zip", pluginDir, "groovy-plugin2.zip");
 
-        ApplicationDescriptor desc = new DefaultAppBloodhound().fetch(APP_NAME);
+        final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory();
+        final ApplicationPluginDescriptorFactory pluginDescriptorFactory = mock(ApplicationPluginDescriptorFactory.class);
+        final ApplicationPluginDescriptor expectedPluginDescriptor1 = mock(ApplicationPluginDescriptor.class);
+        final ApplicationPluginDescriptor expectedPluginDescriptor2 = mock(ApplicationPluginDescriptor.class);
+        when(pluginDescriptorFactory.create(any())).thenReturn(expectedPluginDescriptor1).thenReturn(expectedPluginDescriptor2);
 
-        Set<PluginDescriptor> plugins = desc.getPlugins();
-        assertThat(plugins.size(), equalTo(1));
+        applicationDescriptorFactory.setPluginDescriptorFactory(pluginDescriptorFactory);
 
-        final PluginDescriptor plugin = plugins.iterator().next();
-        assertThat(plugin.getName(), equalTo("groovy-plugin"));
-        assertThat(plugin.getRuntimeClassesDir().toExternalForm(), endsWith("testApp/plugins/groovy-plugin/classes/"));
-        assertThat(plugin.getRuntimeLibs().length, equalTo(1));
-        assertThat(plugin.getRuntimeLibs()[0].toExternalForm(), endsWith("groovy-all-1.8.0.jar"));
+        ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
+
+        Set<ApplicationPluginDescriptor> plugins = desc.getPlugins();
+        assertThat(plugins.size(), equalTo(2));
+        assertThat(plugins, hasItem(equalTo(expectedPluginDescriptor1)));
+        assertThat(plugins, hasItem(equalTo(expectedPluginDescriptor2)));
     }
 
     @Test
@@ -62,7 +74,7 @@ public class AppBloodhoundTestCase extends AbstractMuleTestCase
         pluginLibDir.mkdirs();
 
         copyResourceAs("test-jar-with-resources.jar", pluginLibDir, JAR_FILE_NAME);
-        ApplicationDescriptor desc = new DefaultAppBloodhound().fetch(APP_NAME);
+        ApplicationDescriptor desc = new ApplicationDescriptorFactory().create(getAppFolder(APP_NAME));
 
         URL[] sharedPluginLibs = desc.getSharedPluginLibs();
 

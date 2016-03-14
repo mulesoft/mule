@@ -25,7 +25,7 @@ import org.mule.module.launcher.MuleSharedDomainClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.domain.DomainClassLoaderRepository;
 import org.mule.module.launcher.nativelib.NativeLibraryFinderFactory;
-import org.mule.module.launcher.plugin.PluginDescriptor;
+import org.mule.module.launcher.plugin.ApplicationPluginDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.FileUtils;
 
@@ -135,8 +135,8 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
         final ApplicationDescriptor descriptor = new ApplicationDescriptor();
         descriptor.setName(APP_NAME);
         descriptor.setDomain(DOMAIN_NAME);
-        final Set<PluginDescriptor> plugins = new HashSet<>();
-        final PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        final Set<ApplicationPluginDescriptor> plugins = new HashSet<>();
+        final ApplicationPluginDescriptor pluginDescriptor = new ApplicationPluginDescriptor();
         pluginDescriptor.setName("plugin1");
         plugins.add(pluginDescriptor);
         descriptor.setPlugins(plugins);
@@ -158,8 +158,8 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
         final ApplicationDescriptor descriptor = new ApplicationDescriptor();
         descriptor.setName(APP_NAME);
         descriptor.setDomain(DOMAIN_NAME);
-        final Set<PluginDescriptor> plugins = new HashSet<>();
-        final PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        final Set<ApplicationPluginDescriptor> plugins = new HashSet<>();
+        final ApplicationPluginDescriptor pluginDescriptor = new ApplicationPluginDescriptor();
         pluginDescriptor.setName("plugin1");
         plugins.add(pluginDescriptor);
         descriptor.setPlugins(plugins);

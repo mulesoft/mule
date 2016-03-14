@@ -9,7 +9,7 @@ package org.mule.module.artifact.classloader;
 
 import org.mule.module.artifact.descriptor.ArtifactDescriptor;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Filters classes and resources using a {@link ArtifactDescriptor} describing
@@ -56,7 +56,7 @@ public class ArtifactClassLoaderFilter implements ClassLoaderFilter
         return hasListedPrefix(name, descriptor.getExportedPrefixNames());
     }
 
-    private boolean hasListedPrefix(String name, List<String> classes)
+    private boolean hasListedPrefix(String name, Set<String> classes)
     {
         for (String exported : classes)
         {

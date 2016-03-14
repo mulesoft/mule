@@ -7,25 +7,14 @@
 package org.mule.module.launcher.plugin;
 
 import org.mule.module.artifact.descriptor.ArtifactDescriptor;
-import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 import java.net.URL;
 
-public class PluginDescriptor extends ArtifactDescriptor
+public class ApplicationPluginDescriptor extends ArtifactDescriptor
 {
-    private ApplicationDescriptor appDescriptor;
+
     private URL runtimeClassesDir;
     private URL[] runtimeLibs = new URL[0];
-
-    public ApplicationDescriptor getAppDescriptor()
-    {
-        return appDescriptor;
-    }
-
-    public void setAppDescriptor(ApplicationDescriptor appDescriptor)
-    {
-        this.appDescriptor = appDescriptor;
-    }
 
     public URL getRuntimeClassesDir()
     {
