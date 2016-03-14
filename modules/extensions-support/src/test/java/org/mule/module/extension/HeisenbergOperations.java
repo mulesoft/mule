@@ -21,6 +21,7 @@ import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.annotation.param.Ignore;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
+import org.mule.extension.api.annotation.param.display.DisplayName;
 import org.mule.extension.api.annotation.param.display.Placement;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.module.extension.exception.CureCancerExceptionEnricher;
@@ -46,6 +47,10 @@ public class HeisenbergOperations
     public static final String CURE_CANCER_MESSAGE = "Can't help you, you are going to die";
     public static final String CALL_GUS_MESSAGE = "You are not allowed to speak with gus.";
     public static final String KILL_WITH_GROUP = "KillGroup";
+
+    public static final String OPERATION_WITH_DISPLAY_NAME_PARAMETER = "literalEcho";
+    public static final String OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "literalExpression";
+    public static final String OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME = "Custom overrided display name";
 
     @Inject
     private ExtensionManager extensionManager;
@@ -168,7 +173,7 @@ public class HeisenbergOperations
         return connection.getSaulPhoneNumber();
     }
 
-    public String literalEcho(@Expression(ExpressionSupport.LITERAL) String literalExpression)
+    public String literalEcho(@DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) @Expression(ExpressionSupport.LITERAL) String literalExpression)
     {
         return literalExpression;
     }
