@@ -165,6 +165,22 @@ public class OracleTestDatabase extends AbstractTestDatabase
     }
 
     @Override
+    public void createDelayFunction(DataSource dataSource) throws SQLException
+    {
+
+        final String sql = "CREATE OR REPLACE FUNCTION DELAY(seconds number) " +
+                           "RETURN number IS " +
+                           "targetDate DATE; " +
+                           "BEGIN SELECT sysdate + seconds * 10/864 INTO targetDate FROM DUAL; " +
+                           "LOOP EXIT WHEN SYSDATE >= targetDate; " +
+                           "END LOOP; " +
+                           "RETURN 1; " +
+                           "END;";
+
+        createStoredProcedure(dataSource, sql);
+    }
+
+    @Override
     public Class getIdFieldJavaClass()
     {
         return BigDecimal.class;

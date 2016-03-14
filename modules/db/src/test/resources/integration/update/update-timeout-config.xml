@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="queryTimeout">
+        <db:update config-ref="dbConfig" queryTimeout="1">
+            <db:parameterized-query>update PLANET set NAME='Mercury' where DELAY(#[payload]) = 1</db:parameterized-query>
+        </db:update>
+    </flow>
+</mule>
