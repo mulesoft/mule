@@ -59,9 +59,9 @@ public class StudioModelEnricherTestCase extends AbstractMuleTestCase
 
     private StudioModelProperty enrich(Class<?> type)
     {
-        declarationDescriptor.withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(type));
+        declarationDescriptor.withModelProperty(new ImplementingTypeModelProperty(type));
         modelEnricher.enrich(new DefaultDescribingContext(declarationDescriptor));
-        return declarationDescriptor.getDeclaration().getModelProperty(StudioModelProperty.KEY);
+        return declarationDescriptor.getDeclaration().getModelProperty(StudioModelProperty.class).get();
     }
 
     private void assertExpectedValuesAre(StudioModelProperty studioProperty, String expectedEditor, boolean expectedDerived)

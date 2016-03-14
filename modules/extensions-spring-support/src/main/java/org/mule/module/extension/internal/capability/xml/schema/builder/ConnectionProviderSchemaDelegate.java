@@ -68,10 +68,7 @@ final class ConnectionProviderSchemaDelegate
         choice.setMinOccurs(ZERO);
         choice.setMaxOccurs(UNBOUNDED);
 
-        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
-
-        if (connectionHandlingType != null)
-        {
+        providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.class).ifPresent(connectionHandlingType -> {
             if (connectionHandlingType.isPooled() || connectionHandlingType.isCached())
             {
                 addValidationFlag(providerType);
@@ -81,14 +78,14 @@ final class ConnectionProviderSchemaDelegate
             {
                 addConnectionProviderPoolingProfile(choice, providerModel);
             }
-        }
+        });
 
         builder.registerParameters(providerType, choice, providerModel.getParameterModels());
     }
 
     private void addConnectionProviderPoolingProfile(ExplicitGroup choice, ConnectionProviderModel providerModel)
     {
-        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
+        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.class).get();
         TopLevelElement objectElement = new TopLevelElement();
 
         objectElement.setMinOccurs(connectionHandlingType.getPoolingSupport() == PoolingSupport.REQUIRED ? ONE : ZERO);

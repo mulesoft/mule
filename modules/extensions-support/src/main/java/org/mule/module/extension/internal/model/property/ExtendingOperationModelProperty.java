@@ -9,25 +9,21 @@ package org.mule.module.extension.internal.model.property;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.api.annotation.Extensible;
 import org.mule.extension.api.annotation.Extension;
+import org.mule.extension.api.introspection.ModelProperty;
 
 /**
  * A custom model property which marks that an operation is augmenting
  * the functionality of an {@link Extension} which is defined in a type
  * annotated with {@link Extensible}.
- * <p/>
+ * <p>
  * The runtime consequences of this property depend on the runtime.
  * This class constructor throws {@link IllegalArgumentException} if
  * {@link #type} is not annotated with {@link Extensible}
  *
  * @since 4.0
  */
-public final class ExtendingOperationModelProperty<T>
+public final class ExtendingOperationModelProperty<T> implements ModelProperty
 {
-
-    /**
-     * A unique key that identifies this property type
-     */
-    public static final String KEY = ExtendingOperationModelProperty.class.getName();
 
     private final Class<T> type;
 
@@ -51,5 +47,27 @@ public final class ExtendingOperationModelProperty<T>
     public Class<T> getType()
     {
         return type;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code extendingOperation}
+     */
+    @Override
+    public String getName()
+    {
+        return "extendingOperation";
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code false}
+     */
+    @Override
+    public boolean isExternalizable()
+    {
+        return false;
     }
 }

@@ -50,7 +50,7 @@ public final class GroupValueSetter implements ValueSetter
      */
     public static List<ValueSetter> settersFor(EnrichableModel model)
     {
-        ParameterGroupModelProperty parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.KEY);
+        ParameterGroupModelProperty parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class).orElse(null);
 
         if (parameterGroupModelProperty != null)
         {

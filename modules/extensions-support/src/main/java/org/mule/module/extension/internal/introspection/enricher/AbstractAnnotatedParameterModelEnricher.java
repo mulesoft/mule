@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection.enricher;
 
+import org.mule.extension.api.introspection.ModelProperty;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
@@ -48,15 +49,13 @@ public abstract class AbstractAnnotatedParameterModelEnricher extends AbstractAn
      */
     private void addModelPropertyIfRequired(ParameterDeclaration parameterDeclaration)
     {
-        DeclaringMemberModelProperty declaringMember = parameterDeclaration.getModelProperty(DeclaringMemberModelProperty.KEY);
-        if (declaringMember != null)
-        {
+        parameterDeclaration.getModelProperty(DeclaringMemberModelProperty.class).ifPresent(declaringMember -> {
             Field field = declaringMember.getDeclaringField();
             if (field.isAnnotationPresent(getAnnotationClass()))
             {
-                parameterDeclaration.addModelProperty(getModelPropertyKey(parameterDeclaration), getModelProperty(parameterDeclaration));
+                parameterDeclaration.addModelProperty(getModelProperty(parameterDeclaration));
             }
-        }
+        });
     }
 
     /**
@@ -65,14 +64,9 @@ public abstract class AbstractAnnotatedParameterModelEnricher extends AbstractAn
     protected abstract Class<? extends Annotation> getAnnotationClass();
 
     /**
-     * Gets the key that will be used to populate a model property
-     */
-    protected abstract String getModelPropertyKey(ParameterDeclaration parameterDeclaration);
-
-    /**
      * Gets an instance of the model property this enricher will contribute.
      *
      * @return an immutable instance of a model property.
      */
-    protected abstract Object getModelProperty(ParameterDeclaration parameterDeclaration);
+    protected abstract ModelProperty getModelProperty(ParameterDeclaration parameterDeclaration);
 }

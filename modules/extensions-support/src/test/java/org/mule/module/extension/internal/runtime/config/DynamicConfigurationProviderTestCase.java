@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -31,6 +31,7 @@ import org.mule.util.collection.ImmutableListCollector;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
@@ -60,7 +61,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     {
         when(configurationModel.getConfigurationFactory().getObjectType()).thenReturn(MODULE_CLASS);
         when(configurationModel.getConfigurationFactory().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
-        when(configurationModel.getModelProperty(anyString())).thenReturn(null);
+        when(configurationModel.getModelProperty(any())).thenReturn(Optional.empty());
         when(configurationModel.getInterceptorFactories()).thenReturn(ImmutableList.of());
         when(configurationModel.getExtensionModel().getOperationModels()).thenReturn(ImmutableList.of());
 

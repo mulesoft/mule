@@ -9,11 +9,11 @@ package org.mule.module.extension.internal.introspection.validation;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getOperationsConnectionType;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
+import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 
 import com.sun.org.apache.xpath.internal.ExtensionsProvider;
@@ -57,11 +57,11 @@ public final class ConnectionProviderModelValidator implements ModelValidator
         Class<?> providerConfigType = providerModel.getConfigurationType();
         for (ConfigurationModel configurationModel : extensionModel.getConfigurationModels())
         {
-            ImplementingTypeModelProperty typeProperty = configurationModel.getModelProperty(ImplementingTypeModelProperty.KEY);
+            ImplementingTypeModelProperty typeProperty = configurationModel.getModelProperty(ImplementingTypeModelProperty.class).orElse(null);
             if (typeProperty != null && !providerConfigType.isAssignableFrom(typeProperty.getType()))
             {
                 throw new IllegalConnectionProviderModelDefinitionException(String.format(
-                        "Configuration '%s' in Extension '%s' is of type '%s' which cannot be used with the connection provider of type '%s' "        +
+                        "Configuration '%s' in Extension '%s' is of type '%s' which cannot be used with the connection provider of type '%s' " +
                         "because it requires configs of type '%s'. Please make sure that all configuration models in the extension can be used with " +
                         "any of the defined connection providers",
                         configurationModel.getName(), extensionModel.getName(), typeProperty.getType().getName(),
@@ -74,7 +74,7 @@ public final class ConnectionProviderModelValidator implements ModelValidator
     {
         if (!connectionType.isAssignableFrom(providerModel.getConnectionType()))
         {
-            throw new IllegalConnectionProviderModelDefinitionException(String.format(                                                                                                             "Extension '%s' defines a connection provider of name '%s' which yields connections of type '%s'. "          +
+            throw new IllegalConnectionProviderModelDefinitionException(String.format("Extension '%s' defines a connection provider of name '%s' which yields connections of type '%s'. " +
                                                                                       "However, the extension's operations expect connections of type '%s'. Please make sure that all connection " +
                                                                                       "providers in the extension can be used with all its operations",
                                                                                       extensionModel.getName(), providerModel.getName(), providerModel.getConnectionType().getName(),

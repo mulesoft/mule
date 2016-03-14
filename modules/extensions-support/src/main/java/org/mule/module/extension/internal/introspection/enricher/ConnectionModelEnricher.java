@@ -25,7 +25,7 @@ public class ConnectionModelEnricher implements ModelEnricher
     public void enrich(DescribingContext describingContext)
     {
         describingContext.getDeclarationDescriptor().getDeclaration().getOperations().stream()
-                .filter(operation -> operation.getModelProperty(ConnectionTypeModelProperty.KEY) != null)
+                .filter(operation -> operation.getModelProperty(ConnectionTypeModelProperty.class).isPresent())
                 .forEach(operation -> operation.addInterceptorFactory(ConnectionInterceptor::new));
     }
 }

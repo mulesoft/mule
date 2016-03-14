@@ -91,9 +91,9 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
 
     private XmlModelProperty enrich(Class<?> type)
     {
-        declarationDescriptor.withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(type));
+        declarationDescriptor.withModelProperty(new ImplementingTypeModelProperty(type));
         modelEnricher.enrich(new DefaultDescribingContext(declarationDescriptor));
-        return declarationDescriptor.getDeclaration().getModelProperty(XmlModelProperty.KEY);
+        return declarationDescriptor.getDeclaration().getModelProperty(XmlModelProperty.class).get();
     }
 
     @Xml(schemaVersion = SCHEMA_VERSION, namespace = NAMESPACE, schemaLocation = SCHEMA_LOCATION)

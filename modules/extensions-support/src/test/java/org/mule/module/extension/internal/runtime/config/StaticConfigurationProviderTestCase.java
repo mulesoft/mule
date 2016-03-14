@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.runtime.config;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.junit.Before;
@@ -65,7 +66,7 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
     {
         when(configurationModel.getConfigurationFactory().getObjectType()).thenReturn(MODULE_CLASS);
         when(configurationModel.getConfigurationFactory().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
-        when(configurationModel.getModelProperty(anyString())).thenReturn(null);
+        when(configurationModel.getModelProperty(any())).thenReturn(Optional.empty());
         when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
         when(configurationModel.getInterceptorFactories()).thenReturn(ImmutableList.of());
 

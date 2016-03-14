@@ -23,6 +23,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -73,7 +74,7 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase
         when(configurationModel.getParameterModels()).thenReturn(Arrays.asList(nameParameterModel, descriptionParameterModel));
         when(configurationModel.getConfigurationFactory().newInstance()).thenReturn(configuration);
         when(configurationModel.getConfigurationFactory().getObjectType()).thenAnswer(invocation -> TestConfig.class);
-        when(configurationModel.getModelProperty(ParameterGroupModelProperty.KEY)).thenReturn(null);
+        when(configurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
 
         resolverSet = createResolverSet();
 

@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.same;
@@ -49,6 +50,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -148,6 +150,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         when(extension1ConfigurationModel.getConfigurationFactory().getObjectType()).thenReturn((Class) configInstance.getClass());
         when(extension1ConfigurationModel.getExtensionModel()).thenReturn(extensionModel1);
         when(extension1ConfigurationModel.getInterceptorFactories()).thenReturn(emptyList());
+        when(extension1ConfigurationModel.getModelProperty(any())).thenReturn(Optional.empty());
 
         when(extensionModel1.getConfigurationModel(EXTENSION1_CONFIG_NAME)).thenReturn(extension1ConfigurationModel);
         when(extensionModel1.getOperationModel(EXTENSION1_OPERATION_NAME)).thenReturn(extension1OperationModel);
@@ -240,7 +243,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     public void getConfigurationThroughImplicitConfiguration() throws Exception
     {
         discover();
-        when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.KEY)).thenReturn(null);
+        when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
         registerConfigurationProvider();
         ConfigurationInstance<Object> configInstance = extensionsManager.getConfiguration(extensionModel1, event);
         assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
@@ -254,7 +257,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
 
         MuleRegistry registry = muleContext.getRegistry();
         discover();
-        when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.KEY)).thenReturn(null);
+        when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
         when(registry.lookupObjects(ConfigurationProvider.class)).thenReturn(emptyList());
 
         doAnswer(invocation -> {

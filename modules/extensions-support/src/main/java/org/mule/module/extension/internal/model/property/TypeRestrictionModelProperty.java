@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.model.property;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.api.introspection.EnrichableModel;
+import org.mule.extension.api.introspection.ModelProperty;
 
 /**
  * A custom model property to link an {@link EnrichableModel}
@@ -16,13 +17,8 @@ import org.mule.extension.api.introspection.EnrichableModel;
  * @param <T> generic type of the restriction {@link #type}
  * @since 4.0
  */
-public final class TypeRestrictionModelProperty<T>
+public final class TypeRestrictionModelProperty<T> implements ModelProperty
 {
-
-    /**
-     * A unique key that identifies this property type
-     */
-    public static final String KEY = TypeRestrictionModelProperty.class.getName();
 
     private final Class<T> type;
 
@@ -35,5 +31,27 @@ public final class TypeRestrictionModelProperty<T>
     public Class<T> getType()
     {
         return type;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code typeRestriction}
+     */
+    @Override
+    public String getName()
+    {
+        return "typeRestriction";
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code false}
+     */
+    @Override
+    public boolean isExternalizable()
+    {
+        return false;
     }
 }

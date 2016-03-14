@@ -44,7 +44,7 @@ public final class ConfigNameModelEnricher implements ModelEnricher
     {
         for (ConfigurationDeclaration config : describingContext.getDeclarationDescriptor().getDeclaration().getConfigurations())
         {
-            ImplementingTypeModelProperty typeProperty = config.getModelProperty(ImplementingTypeModelProperty.KEY);
+            ImplementingTypeModelProperty typeProperty = config.getModelProperty(ImplementingTypeModelProperty.class).orElse(null);
             if (typeProperty == null)
             {
                 continue;
@@ -79,7 +79,7 @@ public final class ConfigNameModelEnricher implements ModelEnricher
                         configNameField.getType().getName()));
             }
 
-            config.addModelProperty(RequireNameField.KEY, new RequireNameField(configNameField));
+            config.addModelProperty(new RequireNameField(configNameField));
         }
     }
 }

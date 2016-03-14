@@ -926,7 +926,7 @@ public final class SchemaBuilder
     private GroupRef generateNestedProcessorGroup(ParameterModel parameterModel, String maxOccurs)
     {
         QName ref = MULE_MESSAGE_PROCESSOR_TYPE;
-        TypeRestrictionModelProperty restrictionCapability = parameterModel.getModelProperty(TypeRestrictionModelProperty.KEY);
+        TypeRestrictionModelProperty restrictionCapability = parameterModel.getModelProperty(TypeRestrictionModelProperty.class).orElse(null);
         if (restrictionCapability != null)
         {
             ref = getSubstitutionGroup(restrictionCapability.getType());

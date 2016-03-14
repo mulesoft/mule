@@ -17,11 +17,12 @@ import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.extension.api.resources.GeneratedResource;
 import org.mule.extension.api.resources.ResourcesGenerator;
-import org.mule.module.extension.internal.capability.xml.ImmutableXmlModelProperty;
 import org.mule.module.extension.internal.capability.xml.SpringBundleResourceContributor;
 import org.mule.module.extension.internal.config.ExtensionNamespaceHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.Optional;
 
 import javax.annotation.processing.ProcessingEnvironment;
 
@@ -59,8 +60,8 @@ public class SpringBundleResourceContributorTestCase extends AbstractMuleTestCas
     @Before
     public void before()
     {
-        xmlModelProperty = new ImmutableXmlModelProperty(EXTENSION_VERSION, EXTENSION_NAME, UNESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION);
-        when(extensionModel.getModelProperty(XmlModelProperty.KEY)).thenReturn(xmlModelProperty);
+        xmlModelProperty = new XmlModelProperty(EXTENSION_VERSION, EXTENSION_NAME, UNESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION);
+        when(extensionModel.getModelProperty(XmlModelProperty.class)).thenReturn(Optional.of(xmlModelProperty));
 
         generator = new AnnotationProcessorResourceGenerator(mock(ProcessingEnvironment.class), serviceRegistry);
 

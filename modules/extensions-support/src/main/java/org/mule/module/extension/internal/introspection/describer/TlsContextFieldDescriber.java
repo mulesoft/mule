@@ -56,6 +56,6 @@ final class TlsContextFieldDescriber implements FieldDescriber
 
         return descriptor.ofType(TlsContextFactory.class)
                 .withExpressionSupport(ExpressionSupport.NOT_SUPPORTED)
-                .withModelProperty(DeclaringMemberModelProperty.KEY, new DeclaringMemberModelProperty(field));
+                .withModelProperty(new DeclaringMemberModelProperty(field));
     }
 }

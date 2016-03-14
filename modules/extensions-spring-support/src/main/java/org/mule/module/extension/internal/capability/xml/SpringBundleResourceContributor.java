@@ -28,10 +28,10 @@ public class SpringBundleResourceContributor implements GenerableResourceContrib
     @Override
     public void contribute(ExtensionModel extensionModel, ResourcesGenerator resourcesGenerator)
     {
-        XmlModelProperty xmlProperty = extensionModel.getModelProperty(XmlModelProperty.KEY);
+        XmlModelProperty xmlProperty = extensionModel.getModelProperty(XmlModelProperty.class).orElse(null);
 
         generateSchema(extensionModel, xmlProperty, resourcesGenerator);
-        generateSpringBundle(extensionModel, xmlProperty, resourcesGenerator);
+        generateSpringBundle(xmlProperty, resourcesGenerator);
     }
 
     private void generateSchema(ExtensionModel extensionModel, XmlModelProperty xmlProperty, ResourcesGenerator resourcesGenerator)
@@ -40,10 +40,10 @@ public class SpringBundleResourceContributor implements GenerableResourceContrib
         resourcesGenerator.get(getXsdFileName(xmlProperty)).getContentBuilder().append(schema);
     }
 
-    private void generateSpringBundle(ExtensionModel extensionModel, XmlModelProperty xmlProperty, ResourcesGenerator resourcesGenerator)
+    private void generateSpringBundle(XmlModelProperty xmlProperty, ResourcesGenerator resourcesGenerator)
     {
         writeSpringHandlerBundle(xmlProperty, resourcesGenerator);
-        writeSpringSchemaBundle(extensionModel, xmlProperty, resourcesGenerator);
+        writeSpringSchemaBundle(xmlProperty, resourcesGenerator);
     }
 
     private void writeSpringHandlerBundle(XmlModelProperty capability, ResourcesGenerator resourcesGenerator)
@@ -52,7 +52,7 @@ public class SpringBundleResourceContributor implements GenerableResourceContrib
         resourcesGenerator.get("spring.handlers").getContentBuilder().append(springBundleScape(content));
     }
 
-    private void writeSpringSchemaBundle(ExtensionModel extensionModel, XmlModelProperty xmlProperty, ResourcesGenerator resourcesGenerator)
+    private void writeSpringSchemaBundle(XmlModelProperty xmlProperty, ResourcesGenerator resourcesGenerator)
     {
         StringBuilder builder = resourcesGenerator.get("spring.schemas").getContentBuilder();
         builder.append(getSpringSchemaBundle(xmlProperty, xmlProperty.getSchemaVersion()));

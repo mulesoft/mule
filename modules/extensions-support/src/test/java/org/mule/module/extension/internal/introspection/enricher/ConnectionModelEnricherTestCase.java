@@ -25,6 +25,8 @@ import org.mule.module.extension.internal.runtime.connector.ConnectionIntercepto
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,8 +54,8 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase
     public void before() throws Exception
     {
         when(describingContext.getDeclarationDescriptor().getDeclaration().getOperations()).thenReturn(asList(connectedOperation, notConnectedOperation));
-        when(connectedOperation.getModelProperty(ConnectionTypeModelProperty.KEY)).thenReturn(new ConnectionTypeModelProperty(Object.class));
-        when(notConnectedOperation.getModelProperty(ConnectionTypeModelProperty.KEY)).thenReturn(null);
+        when(connectedOperation.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.of(new ConnectionTypeModelProperty(Object.class)));
+        when(notConnectedOperation.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.empty());
     }
 
     @Test

@@ -6,16 +6,20 @@
  */
 package org.mule.module.extension.internal.introspection.enricher;
 
+import org.mule.api.connection.ConnectionProvider;
+import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
-import org.mule.module.extension.internal.model.property.ImmutableConnectionHandlingTypeModelProperty;
 
 
 /**
- * Model Enricher for {@link org.mule.extension.api.introspection.ConnectionProviderModel} which describes
- * the Connection Handling Type for a given {@link org.mule.api.connection.ConnectionProvider}.
+ * Model Enricher for {@link ConnectionProviderModel} which describes
+ * the Connection Handling Type for a given {@link ConnectionProvider}.
+ * <p>
+ * For each {@link ConnectionProviderDeclaration} in the {@code describingContext}
+ * a {@link ConnectionHandlingTypeModelProperty} will be added
  *
  * @since 4.0
  */
@@ -27,7 +31,7 @@ public final class ConnectionHandlingEnricher implements ModelEnricher
     {
         for (ConnectionProviderDeclaration declaration : describingContext.getDeclarationDescriptor().getDeclaration().getConnectionProviders())
         {
-            declaration.addModelProperty(ConnectionHandlingTypeModelProperty.KEY, new ImmutableConnectionHandlingTypeModelProperty(declaration.getFactory().newInstance()));
+            declaration.addModelProperty(new ConnectionHandlingTypeModelProperty(declaration.getFactory().newInstance()));
         }
     }
 }

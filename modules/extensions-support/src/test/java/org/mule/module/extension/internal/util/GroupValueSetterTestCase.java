@@ -53,7 +53,7 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase
 
         ParameterGroup child = new ParameterGroup(LifetimeInfo.class, getField(ExtendedPersonalInfo.class, "lifetimeInfo", LifetimeInfo.class));
         child.addParameter("dateOfBirth", getField(LifetimeInfo.class, "dateOfBirth", Date.class));
-        group.addModelProperty(ParameterGroupModelProperty.KEY, new ParameterGroupModelProperty(asList(child)));
+        group.addModelProperty(new ParameterGroupModelProperty(asList(child)));
 
         when(result.get("myName")).thenReturn(NAME);
         when(result.get("age")).thenReturn(AGE);

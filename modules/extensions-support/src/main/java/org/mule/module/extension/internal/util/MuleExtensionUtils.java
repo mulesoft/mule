@@ -112,17 +112,14 @@ public class MuleExtensionUtils
     public static List<OperationModel> getConnectedOperations(ExtensionModel extensionModel)
     {
         return extensionModel.getOperationModels().stream()
-                .filter(o -> o.getModelProperty(ConnectionTypeModelProperty.KEY) != null)
+                .filter(o -> o.getModelProperty(ConnectionTypeModelProperty.class).isPresent())
                 .collect(toList());
     }
 
     public static Class<?> getOperationsConnectionType(ExtensionModel extensionModel)
     {
         Set<Class<?>> connectionTypes = extensionModel.getOperationModels().stream()
-                .map(operation -> {
-                    ConnectionTypeModelProperty connectionProperty = operation.getModelProperty(ConnectionTypeModelProperty.KEY);
-                    return connectionProperty != null ? connectionProperty.getConnectionType() : null;
-                })
+                .map(operation -> operation.getModelProperty(ConnectionTypeModelProperty.class).map(ConnectionTypeModelProperty::getConnectionType).orElse(null))
                 .filter(type -> type != null)
                 .collect(toSet());
 
@@ -202,8 +199,7 @@ public class MuleExtensionUtils
      */
     public static <T> Class<T> getImplementingType(EnrichableModel model)
     {
-        ImplementingTypeModelProperty property = model.getModelProperty(ImplementingTypeModelProperty.KEY);
-        return property != null ? (Class<T>) property.getType() : null;
+        return (Class<T>) model.getModelProperty(ImplementingTypeModelProperty.class).map(ImplementingTypeModelProperty::getType).orElse(null);
     }
 
     /**
@@ -266,13 +262,7 @@ public class MuleExtensionUtils
      */
     public static Method getImplementingMethod(OperationDeclaration operationDeclaration)
     {
-        ImplementingMethodModelProperty methodProperty = operationDeclaration.getModelProperty(ImplementingMethodModelProperty.KEY);
-        if (methodProperty != null)
-        {
-            return methodProperty.getMethod();
-        }
-
-        return null;
+        return operationDeclaration.getModelProperty(ImplementingMethodModelProperty.class).map(ImplementingMethodModelProperty::getMethod).orElse(null);
     }
 
     private static class DescribedComparator implements Comparator<Described>

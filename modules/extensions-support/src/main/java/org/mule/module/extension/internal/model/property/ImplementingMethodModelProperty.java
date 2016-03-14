@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.model.property;
 
 import static org.mule.util.Preconditions.checkArgument;
+import org.mule.extension.api.introspection.ModelProperty;
 import org.mule.extension.api.introspection.OperationModel;
 
 import java.lang.reflect.Method;
@@ -17,13 +18,8 @@ import java.lang.reflect.Method;
  *
  * @since 4.0
  */
-public final class ImplementingMethodModelProperty
+public final class ImplementingMethodModelProperty implements ModelProperty
 {
-
-    /**
-     * A unique key that identifies this property type
-     */
-    public static final String KEY = ImplementingMethodModelProperty.class.getName();
 
     private final Method method;
 
@@ -45,5 +41,27 @@ public final class ImplementingMethodModelProperty
     public Method getMethod()
     {
         return method;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code implementingMethod}
+     */
+    @Override
+    public String getName()
+    {
+        return "implementingMethod";
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code false}
+     */
+    @Override
+    public boolean isExternalizable()
+    {
+        return false;
     }
 }
