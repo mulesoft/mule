@@ -29,4 +29,12 @@ public interface ConfigurableStatementFactory extends StatementFactory
      * @param size the number of rows to fetch
      */
     void setFetchSize(int size);
+
+    /**
+     * Indicates the minimum amount of time in seconds before the JDBC driver
+     * attempts to cancel a running statement.
+     *
+     * @param queryTimeout number of seconds to wait. Non negative. Zero means no timeout.
+     */
+    void setQueryTimeout(int queryTimeout);
 }

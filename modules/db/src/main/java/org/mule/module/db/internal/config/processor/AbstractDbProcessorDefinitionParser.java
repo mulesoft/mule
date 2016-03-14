@@ -28,6 +28,7 @@ public abstract class AbstractDbProcessorDefinitionParser extends AbstractHierar
     public static final String FETCH_SIZE = "fetchSize";
     public static final String STREAMING_ATTRIBUTE = "streaming";
     public static final int DEFAULT_FETCH_SIZE = 10;
+    public static final String QUERY_TIMEOUT_ATTRIBUTE = "queryTimeout";
 
     protected BeanDefinition dbConfigResolverFactoryBeanDefinition;
     protected boolean streaming;
@@ -92,6 +93,11 @@ public abstract class AbstractDbProcessorDefinitionParser extends AbstractHierar
         {
             logger.warn("Streaming mode needs to configure fetchSize property. Using default value: " + DEFAULT_FETCH_SIZE);
             defaultStatementFactory.setFetchSize(DEFAULT_FETCH_SIZE);
+        }
+
+        if (element.hasAttribute(QUERY_TIMEOUT_ATTRIBUTE))
+        {
+            defaultStatementFactory.setQueryTimeout(Integer.parseInt(element.getAttribute(QUERY_TIMEOUT_ATTRIBUTE)));
         }
 
         return defaultStatementFactory;
