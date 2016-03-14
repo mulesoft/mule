@@ -23,8 +23,6 @@ public class AbstractConfigParserTestCase extends ExtensionFunctionalTestCase
 {
 
     protected static final String HEISENBERG_BYNAME = "heisenberg";
-    protected static final String HEISENBERG_PLACEHOLDERS = "heisenbergWithPlaceHolders";
-    protected static final String HEISENBERG_BYREF = "heisenbergByRef";
     protected static final String HEISENBERG_EXPRESSION = "expressionHeisenberg";
     protected static final String HEISENBERG_EXPRESSION_BYREF = "expressionHeisenbergByRef";
 
@@ -35,9 +33,7 @@ public class AbstractConfigParserTestCase extends ExtensionFunctionalTestCase
     protected static final String GUSTAVO_FRING = "Gustavo Fring";
     protected static final String KRAZY_8 = "Krazy-8";
     protected static final String JESSE_S = "Jesse's";
-    protected static final String METHYLAMINE = "methylamine";
     protected static final int METHYLAMINE_QUANTITY = 75;
-    protected static final String PSEUDOEPHEDRINE = "pseudoephedrine";
     protected static final int PSEUDOEPHEDRINE_QUANTITY = 0;
     protected static final String P2P = "P2P";
     protected static final int P2P_QUANTITY = 25;
@@ -47,9 +43,6 @@ public class AbstractConfigParserTestCase extends ExtensionFunctionalTestCase
     protected static final String SAUL = "Saul";
     protected static final String WHITE_ADDRESS = "308 Negra Arroyo Lane";
     protected static final String SHOPPING_MALL = "Shopping Mall";
-    protected static final String LAB_ADDRESS = "Pollos Hermanos";
-    protected static final String FIRST_ENDEVOUR = "Gray Matter Technologies";
-    protected static final int DEATH_YEAR = 2011;
     protected static final HealthStatus INITIAL_HEALTH = HealthStatus.CANCER;
     protected static final HealthStatus FINAL_HEALTH = HealthStatus.DEAD;
     protected static final Ricin WEAPON = new Ricin();

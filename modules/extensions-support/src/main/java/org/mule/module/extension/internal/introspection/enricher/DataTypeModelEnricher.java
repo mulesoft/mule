@@ -16,7 +16,6 @@ import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarat
 import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.module.extension.internal.ExtensionProperties;
-import org.mule.module.extension.internal.model.AbstractAnnotatedModelEnricher;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.module.extension.internal.util.MuleExtensionUtils;
 

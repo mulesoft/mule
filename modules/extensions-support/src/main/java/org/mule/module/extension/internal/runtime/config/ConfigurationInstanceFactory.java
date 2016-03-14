@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.runtime.config;
 
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getConnectedOperations;
-
+import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.connection.ConnectionProvider;
@@ -18,16 +18,18 @@ import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.InterceptorFactory;
+import org.mule.module.extension.internal.model.property.RequireNameField;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 
 /**
  * Reusable and thread-safe factory that creates instances of {@link ConfigurationInstance}
- * <p/>
+ * <p>
  * The created instances will be of concrete type {@link LifecycleAwareConfigurationInstance}, which means
  * that all the {@link InterceptorFactory interceptor factories} obtained through
  * {@link RuntimeConfigurationModel#getInterceptorFactories()}  will be exercised per each
@@ -63,7 +65,7 @@ public final class ConfigurationInstanceFactory<T>
     /**
      * Creates a new instance using the given {@code event} to obtain the configuration's parameter
      * values.
-     * <p/>
+     * <p>
      * This method tries to automatically infer a {@link ConnectionProvider}. The first step is to
      * determine if the {@link ExtensionModel} which owns the {@link #configurationModel} has any
      * {@link OperationModel} which requires a connection. If the answer is no, then it just provides
@@ -93,7 +95,7 @@ public final class ConfigurationInstanceFactory<T>
     /**
      * Creates a new instance using the given {@code event} to obtain the configuration's parameter
      * values.
-     * <p/>
+     * <p>
      * This method overload allows specifying a {@link ValueResolver} to provide the {@link ConnectionProvider}
      * that the configuration will use to obtain connections. If the connection does not need such a concept
      * you can provide a {@code null}
@@ -107,7 +109,7 @@ public final class ConfigurationInstanceFactory<T>
     public ConfigurationInstance<T> createConfiguration(String name, MuleEvent event, ValueResolver<ConnectionProvider> connectionProviderResolver) throws MuleException
     {
         Optional<ConnectionProvider> connectionProvider = Optional.ofNullable(connectionProviderResolver.resolve(event));
-        T configValue = createConfigurationInstance(event);
+        T configValue = createConfigurationInstance(name, event);
 
         return new LifecycleAwareConfigurationInstance<>(name,
                                                          configurationModel,
@@ -127,7 +129,7 @@ public final class ConfigurationInstanceFactory<T>
      */
     public ConfigurationInstance<T> createConfiguration(String name, ResolverSetResult resolverSetResult, Optional<ConnectionProvider> connectionProvider) throws MuleException
     {
-        T configValue = createConfigurationInstance(resolverSetResult);
+        T configValue = createConfigurationInstance(name, resolverSetResult);
 
         return new LifecycleAwareConfigurationInstance<>(name,
                                                          configurationModel,
@@ -136,13 +138,38 @@ public final class ConfigurationInstanceFactory<T>
                                                          connectionProvider);
     }
 
-    private T createConfigurationInstance(ResolverSetResult resolverSetResult) throws MuleException
+    private T createConfigurationInstance(String name, ResolverSetResult resolverSetResult) throws MuleException
     {
-        return configurationObjectBuilder.build(resolverSetResult);
+        T config = configurationObjectBuilder.build(resolverSetResult);
+        injectConfigName(name, config);
+
+        return config;
     }
 
-    private T createConfigurationInstance(MuleEvent event) throws MuleException
+    private T createConfigurationInstance(String name, MuleEvent event) throws MuleException
     {
-        return configurationObjectBuilder.build(event);
+        T config = configurationObjectBuilder.build(event);
+        injectConfigName(name, config);
+
+        return config;
+    }
+
+    private void injectConfigName(String name, Object configValue)
+    {
+        RequireNameField property = configurationModel.getModelProperty(RequireNameField.KEY);
+        if (property == null)
+        {
+            return;
+        }
+
+        final Field configNameField = property.getConfigNameField();
+
+        if (!configNameField.getDeclaringClass().isInstance(configValue))
+        {
+            throw new RuntimeException("otup[");
+        }
+
+        configNameField.setAccessible(true);
+        setField(configNameField, configValue, name);
     }
 }

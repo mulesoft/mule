@@ -2,3 +2,4 @@ org.mule.module.extension.internal.introspection.enricher.DataTypeModelEnricher
 org.mule.module.extension.internal.introspection.enricher.ConnectionModelEnricher
 org.mule.module.extension.internal.introspection.enricher.StudioModelEnricher
 org.mule.module.extension.internal.introspection.enricher.ConnectionHandlingEnricher
+org.mule.module.extension.internal.introspection.enricher.ConfigNameModelEnricher

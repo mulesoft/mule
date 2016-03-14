@@ -27,6 +27,7 @@ import org.mule.extension.api.annotation.ParameterGroup;
 import org.mule.extension.api.annotation.Sources;
 import org.mule.extension.api.annotation.capability.Xml;
 import org.mule.extension.api.annotation.connector.Providers;
+import org.mule.extension.api.annotation.param.ConfigName;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.display.DisplayName;
 import org.mule.extension.api.annotation.param.display.Placement;
@@ -76,6 +77,9 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
 
     @Inject
     private ExtensionManager extensionManager;
+
+    @ConfigName
+    private String configName;
 
     @Placement(group = PERSONAL_INFORMATION_GROUP_NAME)
     @ParameterGroup
@@ -338,5 +342,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     public Map<String, Ricin> getLabeledRicin()
     {
         return labeledRicin;
+    }
+
+    public String getConfigName()
+    {
+        return configName;
     }
 }
