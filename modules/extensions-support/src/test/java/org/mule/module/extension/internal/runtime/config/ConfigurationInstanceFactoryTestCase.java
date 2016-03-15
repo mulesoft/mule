@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
 import org.mule.api.connection.ConnectionException;
@@ -27,7 +28,6 @@ import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
-import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.runtime.executor.ConfigurationObjectBuilderTestCase;
 import org.mule.module.extension.internal.runtime.executor.ConfigurationObjectBuilderTestCase.TestConfig;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -76,11 +76,10 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
     public void before() throws Exception
     {
         when(configurationModel.getConfigurationFactory().newInstance()).thenReturn(new TestConfig());
-        when(configurationModel.getModelProperty(ParameterGroupModelProperty.KEY)).thenReturn(null);
-        when(configurationModel.getModelProperty(ConnectionTypeModelProperty.KEY)).thenReturn(null);
+        when(configurationModel.getModelProperty(any())).thenReturn(Optional.empty());
         when(configurationModel.getInterceptorFactories()).thenReturn(asList(() -> interceptor1, () -> interceptor2));
         when(configurationModel.getExtensionModel().getOperationModels()).thenReturn(asList(operationModel));
-        when(operationModel.getModelProperty(ConnectionTypeModelProperty.KEY)).thenReturn(new ConnectionTypeModelProperty(Banana.class));
+        when(operationModel.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.of(new ConnectionTypeModelProperty(Banana.class)));
 
         resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
         factory = new ConfigurationInstanceFactory<>(configurationModel, resolverSet);

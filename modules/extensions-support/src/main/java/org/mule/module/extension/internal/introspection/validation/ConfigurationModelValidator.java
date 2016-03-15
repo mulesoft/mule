@@ -62,11 +62,8 @@ public final class ConfigurationModelValidator implements ModelValidator
 
         for (OperationModel operationModel : model.getOperationModels())
         {
-            ConfigTypeModelProperty modelProperty = operationModel.getModelProperty(ConfigTypeModelProperty.KEY);
-            if (modelProperty != null)
-            {
-                listMultimap.put(modelProperty.getConfigType(), operationModel.getName());
-            }
+            operationModel.getModelProperty(ConfigTypeModelProperty.class)
+                    .ifPresent(modelProperty -> listMultimap.put(modelProperty.getConfigType(), operationModel.getName()));
         }
 
         return listMultimap;

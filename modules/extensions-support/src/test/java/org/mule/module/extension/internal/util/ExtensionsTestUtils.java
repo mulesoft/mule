@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.jar.Manifest;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -109,6 +110,7 @@ public abstract class ExtensionsTestUtils
         ParameterModel parameterModel = mock(ParameterModel.class);
         when(parameterModel.getName()).thenReturn(name);
         when(parameterModel.getType()).thenReturn(toMetadataType(type));
+        when(parameterModel.getModelProperty(any())).thenReturn(Optional.empty());
 
         return parameterModel;
     }

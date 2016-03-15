@@ -65,7 +65,7 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
     public ConnectionProvider build(ResolverSetResult result) throws MuleException
     {
         ConnectionProvider provider = super.build(result);
-        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.KEY);
+        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.class).orElse(null);
 
         if (connectionHandlingType != null)
         {

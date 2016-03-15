@@ -92,7 +92,7 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
         Descriptor descriptor = new AnnotationsBasedDescriber(extensionUnderTest).describe(new DefaultDescribingContext()).getRootDeclaration();
         ExtensionModel extensionModel = extensionFactory.createFrom(descriptor);
 
-        XmlModelProperty capability = extensionModel.getModelProperty(XmlModelProperty.KEY);
+        XmlModelProperty capability = extensionModel.getModelProperty(XmlModelProperty.class).get();
 
         String schema = generator.generate(extensionModel, capability);
 

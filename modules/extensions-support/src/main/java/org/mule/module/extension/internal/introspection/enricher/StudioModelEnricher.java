@@ -8,13 +8,12 @@ package org.mule.module.extension.internal.introspection.enricher;
 
 import org.mule.extension.api.annotation.capability.CustomStudioEditor;
 import org.mule.extension.api.annotation.capability.StudioProvidedEditor;
-import org.mule.extension.api.introspection.property.ImmutableStudioModelProperty;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.api.introspection.property.StudioModelProperty;
 
 /**
- * Enriches the {@link DeclarationDescriptor} with a model property which key is {@link StudioModelProperty#KEY} and the value an instance of {@link StudioModelProperty}.
+ * Enriches the {@link DeclarationDescriptor} with a {@link StudioModelProperty}
  *
  * @since 4.0
  */
@@ -28,7 +27,7 @@ public final class StudioModelEnricher extends AbstractAnnotatedModelEnricher
         CustomStudioEditor customStudioEditor = extractAnnotation(describingContext.getDeclarationDescriptor().getDeclaration(), CustomStudioEditor.class);
 
         DeclarationDescriptor descriptor = describingContext.getDeclarationDescriptor();
-        descriptor.withModelProperty(StudioModelProperty.KEY, createStudioEditorModelProperty(studioProvidedEditor, customStudioEditor));
+        descriptor.withModelProperty(createStudioEditorModelProperty(studioProvidedEditor, customStudioEditor));
     }
 
     private StudioModelProperty createStudioEditorModelProperty(StudioProvidedEditor studioProvidedEditor, CustomStudioEditor customStudioEditor)
@@ -48,6 +47,6 @@ public final class StudioModelEnricher extends AbstractAnnotatedModelEnricher
                 editorFileName = customStudioEditor.fileName();
             }
         }
-        return new ImmutableStudioModelProperty(editorFileName, isDerived);
+        return new StudioModelProperty(editorFileName, isDerived);
     }
 }

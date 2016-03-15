@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -28,6 +27,7 @@ import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.lang.reflect.Field;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -63,7 +63,7 @@ public class ConfigNameModelEnricherTestCase extends AbstractMuleTestCase
     {
         enricher.enrich(describingContext);
         ArgumentCaptor<RequireNameField> captor = ArgumentCaptor.forClass(RequireNameField.class);
-        verify(configurationDeclaration).addModelProperty(eq(RequireNameField.KEY), captor.capture());
+        verify(configurationDeclaration).addModelProperty(captor.capture());
 
         RequireNameField property = captor.getValue();
         assertThat(property, is(notNullValue()));
@@ -94,7 +94,7 @@ public class ConfigNameModelEnricherTestCase extends AbstractMuleTestCase
     private void mockImplementingProperty(Class<?> type)
     {
         ImplementingTypeModelProperty property = type != null ? new ImplementingTypeModelProperty(type) : null;
-        when(configurationDeclaration.getModelProperty(ImplementingTypeModelProperty.KEY)).thenReturn(property);
+        when(configurationDeclaration.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.ofNullable(property));
     }
 
     public static class TestNameAwareConfig

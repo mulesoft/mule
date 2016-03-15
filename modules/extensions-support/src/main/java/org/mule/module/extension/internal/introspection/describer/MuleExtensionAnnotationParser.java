@@ -25,11 +25,11 @@ import org.mule.extension.api.annotation.param.display.Text;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.extension.api.introspection.property.DisplayModelProperty;
+import org.mule.extension.api.introspection.property.DisplayModelPropertyBuilder;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
-import org.mule.module.extension.internal.model.property.DisplayModelPropertyBuilder;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -77,14 +77,12 @@ public final class MuleExtensionAnnotationParser
 
     public static String getMemberName(BaseDeclaration<?> declaration, String defaultName)
     {
-        DeclaringMemberModelProperty declaringMemberModelProperty = declaration.getModelProperty(DeclaringMemberModelProperty.KEY);
-        return declaringMemberModelProperty != null ? declaringMemberModelProperty.getDeclaringField().getName() : defaultName;
+        return declaration.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField().getName()).orElse(defaultName);
     }
 
     public static String getMemberName(EnrichableModel enrichableModel, String defaultName)
     {
-        DeclaringMemberModelProperty declaringMemberModelProperty = enrichableModel.getModelProperty(DeclaringMemberModelProperty.KEY);
-        return declaringMemberModelProperty != null ? declaringMemberModelProperty.getDeclaringField().getName() : defaultName;
+        return enrichableModel.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField().getName()).orElse(defaultName);
     }
 
     public static Extension getExtension(Class<?> extensionType)

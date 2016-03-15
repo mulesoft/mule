@@ -14,7 +14,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
@@ -435,8 +434,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         operation = getOperation(declaration, CALL_SAUL);
         assertThat(operation.getParameters(), is(empty()));
-        ConnectionTypeModelProperty connectionType = operation.getModelProperty(ConnectionTypeModelProperty.KEY);
-        assertThat(connectionType, is(notNullValue()));
+        ConnectionTypeModelProperty connectionType = operation.getModelProperty(ConnectionTypeModelProperty.class).get();
         assertThat(connectionType.getConnectionType(), equalTo(HeisenbergConnection.class));
 
         operation = getOperation(declaration, CURE_CANCER);
@@ -466,8 +464,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         assertParameter(parameters, "saulPhoneNumber", "", toMetadataType(String.class), false, SUPPORTED, SAUL_OFFICE_NUMBER);
         assertParameter(parameters, TLS_ATTRIBUTE_NAME, "", toMetadataType(TlsContextFactory.class), false, NOT_SUPPORTED, null);
-        ImplementingTypeModelProperty typeModelProperty = connectionProvider.getModelProperty(ImplementingTypeModelProperty.KEY);
-        assertThat(typeModelProperty, is(notNullValue()));
+        ImplementingTypeModelProperty typeModelProperty = connectionProvider.getModelProperty(ImplementingTypeModelProperty.class).get();
         assertThat(typeModelProperty.getType(), equalTo(HeisenbergConnectionProvider.class));
     }
 
@@ -481,8 +478,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(parameters, hasSize(2));
 
         assertParameter(parameters, SOURCE_PARAMETER, "", toMetadataType(int.class), true, SUPPORTED, null);
-        ImplementingTypeModelProperty typeModelProperty = source.getModelProperty(ImplementingTypeModelProperty.KEY);
-        assertThat(typeModelProperty, is(notNullValue()));
+        ImplementingTypeModelProperty typeModelProperty = source.getModelProperty(ImplementingTypeModelProperty.class).get();
         assertThat(typeModelProperty.getType(), equalTo(HeisenbergSource.class));
     }
 
@@ -516,8 +512,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     private void assertParameterPlacement(ParameterDeclaration param, String groupName, Integer order)
     {
-        DisplayModelProperty display = param.getModelProperty(DisplayModelProperty.KEY);
-        assertNotNull(display);
+        DisplayModelProperty display = param.getModelProperty(DisplayModelProperty.class).get();
 
         if (groupName != null)
         {
@@ -531,8 +526,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     private void assertParameterDisplayName(ParameterDeclaration param, String displayName)
     {
-        DisplayModelProperty display = param.getModelProperty(DisplayModelProperty.KEY);
-        assertNotNull(display);
+        DisplayModelProperty display = param.getModelProperty(DisplayModelProperty.class).get();
         assertThat(display.getDisplayName(), is(displayName));
     }
 
@@ -550,7 +544,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     protected void assertModelProperties(Declaration declaration)
     {
-        ImplementingTypeModelProperty implementingTypeModelProperty = declaration.getModelProperty(ImplementingTypeModelProperty.KEY);
+        ImplementingTypeModelProperty implementingTypeModelProperty = declaration.getModelProperty(ImplementingTypeModelProperty.class).get();
         assertThat(implementingTypeModelProperty, is(notNullValue()));
         assertThat(HeisenbergExtension.class.isAssignableFrom(implementingTypeModelProperty.getType()), is(true));
     }

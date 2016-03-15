@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.model.property;
 
 import org.mule.extension.api.annotation.param.ConfigName;
 import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ModelProperty;
 
 import java.lang.reflect.Field;
 
@@ -17,15 +18,10 @@ import java.lang.reflect.Field;
  * on which the config's name should be injected.
  *
  * @see ConfigName
- * @since 1.0
+ * @since 4.0
  */
-public final class RequireNameField
+public final class RequireNameField implements ModelProperty
 {
-
-    /**
-     * A unique key that identifies this property type
-     */
-    public static final String KEY = RequireNameField.class.getName();
 
     /**
      * The {@link Field} on which the name should be injected
@@ -48,5 +44,27 @@ public final class RequireNameField
     public Field getConfigNameField()
     {
         return configNameField;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code requireNameField}
+     */
+    @Override
+    public String getName()
+    {
+        return "requireNameField";
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code false}
+     */
+    @Override
+    public boolean isExternalizable()
+    {
+        return false;
     }
 }

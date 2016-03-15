@@ -18,6 +18,7 @@ import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.InterceptorFactory;
+import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.module.extension.internal.model.property.RequireNameField;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -156,7 +157,7 @@ public final class ConfigurationInstanceFactory<T>
 
     private void injectConfigName(String name, Object configValue)
     {
-        RequireNameField property = configurationModel.getModelProperty(RequireNameField.KEY);
+        RequireNameField property = configurationModel.getModelProperty(RequireNameField.class).orElse(null);
         if (property == null)
         {
             return;
@@ -166,7 +167,9 @@ public final class ConfigurationInstanceFactory<T>
 
         if (!configNameField.getDeclaringClass().isInstance(configValue))
         {
-            throw new RuntimeException("otup[");
+            throw new IllegalConfigurationModelDefinitionException(String.format("Config field name '%s' is not declared on config class '%s'",
+                                                                                 configNameField.toString(),
+                                                                                 configValue.getClass().getName()));
         }
 
         configNameField.setAccessible(true);

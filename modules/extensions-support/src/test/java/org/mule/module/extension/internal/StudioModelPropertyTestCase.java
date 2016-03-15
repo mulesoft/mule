@@ -8,7 +8,6 @@ package org.mule.module.extension.internal;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -19,8 +18,8 @@ import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.introspection.property.StudioModelProperty;
 import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.enricher.StudioModelEnricher;
 import org.mule.registry.SpiServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -53,8 +52,7 @@ public class StudioModelPropertyTestCase extends AbstractMuleTestCase
     {
         Descriptor descriptor = new AnnotationsBasedDescriber(HeisenbergExtension.class).describe(new DefaultDescribingContext()).getRootDeclaration();
         ExtensionModel extensionModel = extensionFactory.createFrom(descriptor);
-        StudioModelProperty studioModelProperty = extensionModel.getModelProperty(StudioModelProperty.KEY);
-        assertThat(studioModelProperty, is(notNullValue()));
+        StudioModelProperty studioModelProperty = extensionModel.getModelProperty(StudioModelProperty.class).get();
         assertThat(studioModelProperty.getEditorFileName(), is(""));
         assertThat(studioModelProperty.isDerived(), is(true));
     }

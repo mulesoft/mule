@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.model.property;
 
 
 import org.mule.extension.api.introspection.EnrichableModel;
+import org.mule.extension.api.introspection.ModelProperty;
 
 /**
  * An immutable model property which specifies that the owning {@link EnrichableModel}
@@ -15,13 +16,8 @@ import org.mule.extension.api.introspection.EnrichableModel;
  *
  * @since 4.0
  */
-public final class ConfigTypeModelProperty
+public final class ConfigTypeModelProperty implements ModelProperty
 {
-
-    /**
-     * A unique key that identifies this property type
-     */
-    public static final String KEY = ConfigTypeModelProperty.class.getName();
 
     private final Class<?> configType;
 
@@ -41,5 +37,27 @@ public final class ConfigTypeModelProperty
     public Class<?> getConfigType()
     {
         return configType;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code configType}
+     */
+    @Override
+    public String getName()
+    {
+        return "configType";
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code false}
+     */
+    @Override
+    public boolean isExternalizable()
+    {
+        return false;
     }
 }

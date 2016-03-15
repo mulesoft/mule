@@ -36,6 +36,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -68,10 +69,10 @@ public class DataTypeModelEnricherTestCase extends AbstractMuleTestCase
     public void before()
     {
         when(describingContext.getDeclarationDescriptor().getDeclaration().getOperations()).thenReturn(asList(annotatedOperation, notAnnotatedOperation));
-        when(annotatedOperation.getModelProperty(ImplementingTypeModelProperty.KEY)).thenReturn(null);
-        when(notAnnotatedOperation.getModelProperty(ImplementingTypeModelProperty.KEY)).thenReturn(null);
-        when(annotatedOperation.getModelProperty(ImplementingMethodModelProperty.KEY)).thenReturn(new ImplementingMethodModelProperty(method));
-        when(notAnnotatedOperation.getModelProperty(ImplementingMethodModelProperty.KEY)).thenReturn(null);
+        when(annotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.empty());
+        when(notAnnotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.empty());
+        when(annotatedOperation.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(Optional.of(new ImplementingMethodModelProperty(method)));
+        when(notAnnotatedOperation.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(Optional.empty());
     }
 
     @Test
@@ -96,7 +97,7 @@ public class DataTypeModelEnricherTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalModelDefinitionException.class)
     public void voidOperation()
     {
-        when(annotatedOperation.getModelProperty(ImplementingMethodModelProperty.KEY)).thenReturn(new ImplementingMethodModelProperty(getVoidAnnotatedMethod()));
+        when(annotatedOperation.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(Optional.of(new ImplementingMethodModelProperty(getVoidAnnotatedMethod())));
         enricher.enrich(describingContext);
     }
 

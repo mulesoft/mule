@@ -8,25 +8,29 @@ package org.mule.module.extension.internal.introspection;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.api.introspection.EnrichableModel;
+import org.mule.extension.api.introspection.ModelProperty;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * A metadata class that groups a set of parameters together.
  * It caches reflection objects necessary for handling those parameters
  * so that introspection is not executed every time, resulting in a performance gain.
- * <p/>
+ * <p>
  * Because groups can be nested, this class also implements {@link EnrichableModel},
  * allowing for this group to have a {@link ParameterGroupModelProperty} which
  * describes the nested group.
- * <p/>
+ * <p>
  * To decouple this class from the representation model (which depending on the
  * context could be a {@link Declaration} or an actual {@link ParameterModel}, this class
  * references parameters by name
@@ -56,7 +60,7 @@ public class ParameterGroup implements EnrichableModel
     /**
      * The model properties per the {@link EnrichableModel} interface
      */
-    private Map<String, Object> modelProperties = new HashMap<>();
+    private Map<Class<? extends ModelProperty>, ModelProperty> modelProperties = new HashMap<>();
 
 
     public ParameterGroup(Class<?> type, Field field)
@@ -101,22 +105,23 @@ public class ParameterGroup implements EnrichableModel
      * {@inheritDoc}
      */
     @Override
-    public <T> T getModelProperty(String key)
+    public <T extends ModelProperty> Optional<T> getModelProperty(Class<T> propertyType)
     {
-        return (T) modelProperties.get(key);
+        return Optional.ofNullable((T) modelProperties.get(propertyType));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> getModelProperties()
+    public Set<ModelProperty> getModelProperties()
     {
-        return ImmutableMap.copyOf(modelProperties);
+        return ImmutableSet.copyOf(modelProperties.values());
     }
 
-    public void addModelProperty(String key, Object value)
+    public void addModelProperty(ModelProperty modelProperty)
     {
-        modelProperties.put(key, value);
+        checkArgument(modelProperty != null, "Cannot add a null model property");
+        modelProperties.put(modelProperty.getClass(), modelProperty);
     }
 }

@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.model.property;
 
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ModelProperty;
 import org.mule.extension.api.introspection.ParameterModel;
 
 import java.lang.annotation.Annotation;
@@ -15,24 +16,19 @@ import java.lang.reflect.Field;
 
 /**
  * A custom model property to link a {@link ParameterModel} to the actual member it represents.
- * <p/>
+ * <p>
  * The most common use case for this is to support the {@link Alias} annotation.
  * For example, consider a {@link ConfigurationModel} parameter which is obtained through
  * inspecting fields in a class. This property allows for the introspection model to list
  * the parameter by a given alias, while this parameter still provides the real name of the field
  * which is going to be needed for further operations
- * <p/>
+ * <p>
  * Another common use case is to get the field {@link Annotation}s in order to enrich the model with other properties.
  *
  * @since 4.0
  */
-public final class DeclaringMemberModelProperty
+public final class DeclaringMemberModelProperty implements ModelProperty
 {
-
-    /**
-     * A unique key that identifies this property type
-     */
-    public static final String KEY = DeclaringMemberModelProperty.class.getName();
 
     private final Field declaringField;
 
@@ -49,5 +45,27 @@ public final class DeclaringMemberModelProperty
     public Field getDeclaringField()
     {
         return declaringField;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code declaringMember}
+     */
+    @Override
+    public String getName()
+    {
+        return "declaringMember";
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code false}
+     */
+    @Override
+    public boolean isExternalizable()
+    {
+        return false;
     }
 }

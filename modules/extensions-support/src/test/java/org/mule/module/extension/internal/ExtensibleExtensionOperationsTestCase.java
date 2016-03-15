@@ -55,7 +55,7 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
         Declaration declaration = getDescriber().describe(new DefaultDescribingContext()).getRootDeclaration().getDeclaration();
         OperationDeclaration operation = getOperation(declaration, operationName);
 
-        ExtendingOperationModelProperty<ExtensibleExtension> modelProperty = operation.getModelProperty(ExtendingOperationModelProperty.KEY);
+        ExtendingOperationModelProperty<ExtensibleExtension> modelProperty = operation.getModelProperty(ExtendingOperationModelProperty.class).get();
         assertThat(modelProperty.getType(), is(sameInstance(propertyType)));
     }
 

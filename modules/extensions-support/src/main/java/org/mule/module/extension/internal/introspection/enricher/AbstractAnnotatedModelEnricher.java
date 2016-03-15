@@ -52,7 +52,6 @@ public abstract class AbstractAnnotatedModelEnricher implements ModelEnricher
      */
     protected <T> Class<T> extractExtensionType(BaseDeclaration<? extends BaseDeclaration> declaration)
     {
-        ImplementingTypeModelProperty backingType = declaration.getModelProperty(ImplementingTypeModelProperty.KEY);
-        return backingType != null ? (Class<T>) backingType.getType() : null;
+        return (Class<T>) declaration.getModelProperty(ImplementingTypeModelProperty.class).map(ImplementingTypeModelProperty::getType).orElse(null);
     }
 }

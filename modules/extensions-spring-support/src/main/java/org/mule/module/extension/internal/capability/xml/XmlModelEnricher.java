@@ -12,7 +12,6 @@ import org.mule.extension.api.introspection.declaration.fluent.Declaration;
 import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.module.extension.internal.introspection.enricher.AbstractAnnotatedModelEnricher;
-import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.internal.util.NameUtils;
 import org.mule.util.StringUtils;
 
@@ -20,12 +19,11 @@ import java.util.function.Supplier;
 
 /**
  * Verifies if the extension is annotated with {@link Xml} and if so, enriches the {@link DeclarationDescriptor}
- * with a model property which key is {@value XmlModelProperty#KEY} and the value an instance of {@link XmlModelProperty}.
- * <p/>
+ * with a {@link XmlModelProperty}.
+ * <p>
  * To get a hold of the {@link Class} on which the {@link Xml} annotation is expected to be, the
- * {@link DescribingContext} will be queried for a model property of key {@link ImplementingTypeModelProperty#KEY}
- * and type {@link ImplementingTypeModelProperty}. If such property is not found, then this enricher will return
- * without any side effects
+ * {@link DescribingContext} will be queried for such a model property. If such property is not present,
+ * then this enricher will return without any side effects
  *
  * @since 4.0
  */
@@ -39,7 +37,7 @@ public final class XmlModelEnricher extends AbstractAnnotatedModelEnricher
     {
         Xml xml = extractAnnotation(describingContext.getDeclarationDescriptor().getDeclaration(), Xml.class);
         DeclarationDescriptor descriptor = describingContext.getDeclarationDescriptor();
-        descriptor.withModelProperty(XmlModelProperty.KEY, createXmlModelProperty(xml, descriptor));
+        descriptor.withModelProperty(createXmlModelProperty(xml, descriptor));
     }
 
     private XmlModelProperty createXmlModelProperty(Xml xml, DeclarationDescriptor descriptor)
@@ -48,7 +46,7 @@ public final class XmlModelEnricher extends AbstractAnnotatedModelEnricher
         String schemaVersion = calculateValue(xml, () -> xml.schemaVersion(), declaration::getVersion);
         String namespace = calculateValue(xml, () -> xml.namespace(), () -> buildDefaultNamespace(declaration.getName()));
         String schemaLocation = calculateValue(xml, () -> xml.schemaLocation(), () -> buildDefaultLocation(namespace));
-        return new ImmutableXmlModelProperty(schemaVersion, namespace, schemaLocation);
+        return new XmlModelProperty(schemaVersion, namespace, schemaLocation);
     }
 
     private String calculateValue(Xml xml, Supplier<String> value, Supplier<String> fallback)

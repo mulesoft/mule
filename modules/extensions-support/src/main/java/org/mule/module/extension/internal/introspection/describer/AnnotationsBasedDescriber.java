@@ -51,6 +51,7 @@ import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.extension.api.introspection.property.DisplayModelProperty;
+import org.mule.extension.api.introspection.property.DisplayModelPropertyBuilder;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
@@ -66,7 +67,6 @@ import org.mule.module.extension.internal.model.property.ImplementingMethodModel
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
-import org.mule.module.extension.internal.model.property.DisplayModelPropertyBuilder;
 import org.mule.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
 import org.mule.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.module.extension.internal.runtime.source.DefaultSourceFactory;
@@ -143,7 +143,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 .fromVendor(extension.vendor())
                 .describedAs(extension.description())
                 .withExceptionEnricherFactory(getExceptionEnricherFactory(extensionType))
-                .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(extensionType));
+                .withModelProperty(new ImplementingTypeModelProperty(extensionType));
 
         declareConfigurations(declaration, extensionType);
         declareOperations(declaration, extensionType);
@@ -208,7 +208,7 @@ public final class AnnotationsBasedDescriber implements Describer
         }
 
         configuration.createdWith(new TypeAwareConfigurationFactory(configurationType))
-                .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(configurationType));
+                .withModelProperty(new ImplementingTypeModelProperty(configurationType));
 
         declareAnnotatedParameters(configurationType, configuration, configuration.with());
     }
@@ -254,7 +254,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 .whichReturns(typeLoader.load(sourceGenerics.get(0)))
                 .withAttributesOfType(typeLoader.load(sourceGenerics.get(1)))
                 .withExceptionEnricherFactory(getExceptionEnricherFactory(sourceType))
-                .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(sourceType));
+                .withModelProperty(new ImplementingTypeModelProperty(sourceType));
 
         declareAnnotatedParameters(sourceType, source, source.with());
     }
@@ -265,7 +265,7 @@ public final class AnnotationsBasedDescriber implements Describer
         List<ParameterGroup> groups = declareConfigurationParametersGroups(annotatedType, with, null);
         if (!CollectionUtils.isEmpty(groups) && descriptor instanceof HasModelProperties)
         {
-            ((HasModelProperties) descriptor).withModelProperty(ParameterGroupModelProperty.KEY, new ParameterGroupModelProperty(groups));
+            ((HasModelProperties) descriptor).withModelProperty(new ParameterGroupModelProperty(groups));
         }
     }
 
@@ -309,7 +309,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 List<ParameterGroup> childGroups = declareConfigurationParametersGroups(field.getType(), with, group);
                 if (!CollectionUtils.isEmpty(childGroups))
                 {
-                    group.addModelProperty(ParameterGroupModelProperty.KEY, new ParameterGroupModelProperty(childGroups));
+                    group.addModelProperty(new ParameterGroupModelProperty(childGroups));
                 }
             }
         }
@@ -320,15 +320,15 @@ public final class AnnotationsBasedDescriber implements Describer
     private ParameterDeclaration inheritGroupParentDisplayProperties(ParameterGroup parent, Field field, ParameterGroup group, ParameterDescriptor descriptor)
     {
         ParameterDeclaration parameter = descriptor.getDeclaration();
-        DisplayModelProperty parameterDisplayProperty = descriptor.getDeclaration()
-                .getModelProperty(DisplayModelProperty.KEY);
+        DisplayModelProperty parameterDisplayProperty = descriptor.getDeclaration().getModelProperty(DisplayModelProperty.class).orElse(null);
 
-        DisplayModelPropertyBuilder builder = parameterDisplayProperty == null ? DisplayModelPropertyBuilder.create() :
-                                              DisplayModelPropertyBuilder.create(parameterDisplayProperty);
+        DisplayModelPropertyBuilder builder = parameterDisplayProperty == null
+                                              ? DisplayModelPropertyBuilder.create()
+                                              : DisplayModelPropertyBuilder.create(parameterDisplayProperty);
 
         // Inherit parent placement model properties
         DisplayModelProperty groupDisplay = null;
-        DisplayModelProperty parentDisplay = parent != null ? parent.getModelProperty(DisplayModelProperty.KEY) : null;
+        DisplayModelProperty parentDisplay = parent != null ? parent.getModelProperty(DisplayModelProperty.class).orElse(null) : null;
         if (parentDisplay != null)
         {
             builder.groupName(parentDisplay.getGroupName())
@@ -344,8 +344,8 @@ public final class AnnotationsBasedDescriber implements Describer
 
         if (groupDisplay != null)
         {
-            descriptor.withModelProperty(DisplayModelProperty.KEY, groupDisplay);
-            group.addModelProperty(DisplayModelProperty.KEY, groupDisplay);
+            descriptor.withModelProperty(groupDisplay);
+            group.addModelProperty(groupDisplay);
         }
         return parameter;
     }
@@ -395,7 +395,7 @@ public final class AnnotationsBasedDescriber implements Describer
         for (Method method : getOperationMethods(actingClass))
         {
             OperationDescriptor operation = declaration.withOperation(method.getName())
-                    .withModelProperty(ImplementingMethodModelProperty.KEY, new ImplementingMethodModelProperty(method))
+                    .withModelProperty(new ImplementingMethodModelProperty(method))
                     .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(actingClass, method))
                     .whichReturns(IntrospectionUtils.getMethodReturnType(method, typeLoader))
                     .withExceptionEnricherFactory(getExceptionEnricherFactory(method));
@@ -444,7 +444,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 .createdWith(new DefaultConnectionProviderFactory<>(providerClass))
                 .forConfigsOfType(providerGenerics.get(0))
                 .whichGivesConnectionsOfType(providerGenerics.get(1))
-                .withModelProperty(ImplementingTypeModelProperty.KEY, new ImplementingTypeModelProperty(providerClass));
+                .withModelProperty(new ImplementingTypeModelProperty(providerClass));
 
         declareAnnotatedParameters(providerClass, providerDescriptor, providerDescriptor.with());
     }
@@ -459,11 +459,11 @@ public final class AnnotationsBasedDescriber implements Describer
 
         if (extensionOf != null)
         {
-            operation.withModelProperty(ExtendingOperationModelProperty.KEY, new ExtendingOperationModelProperty(extensionOf.value()));
+            operation.withModelProperty(new ExtendingOperationModelProperty(extensionOf.value()));
         }
         else if (isExtensible())
         {
-            operation.withModelProperty(ExtendingOperationModelProperty.KEY, new ExtendingOperationModelProperty(extensionType));
+            operation.withModelProperty(new ExtendingOperationModelProperty(extensionType));
         }
     }
 
@@ -494,20 +494,20 @@ public final class AnnotationsBasedDescriber implements Describer
                 DisplayModelProperty displayModelProperty = parseDisplayAnnotations(parsedParameter, parsedParameter.getName());
                 if (displayModelProperty != null)
                 {
-                    parameter.withModelProperty(DisplayModelProperty.KEY, displayModelProperty);
+                    parameter.withModelProperty(displayModelProperty);
                 }
             }
 
             Connection connectionAnnotation = parsedParameter.getAnnotation(Connection.class);
             if (connectionAnnotation != null)
             {
-                operation.withModelProperty(ConnectionTypeModelProperty.KEY, new ConnectionTypeModelProperty(getType(parsedParameter.getType(), typeLoader.getClassLoader())));
+                operation.withModelProperty(new ConnectionTypeModelProperty(getType(parsedParameter.getType(), typeLoader.getClassLoader())));
             }
 
             UseConfig useConfig = parsedParameter.getAnnotation(UseConfig.class);
             if (useConfig != null)
             {
-                operation.withModelProperty(ConfigTypeModelProperty.KEY, new ConfigTypeModelProperty(getType(parsedParameter.getType())));
+                operation.withModelProperty(new ConfigTypeModelProperty(getType(parsedParameter.getType())));
             }
         }
     }
@@ -531,7 +531,7 @@ public final class AnnotationsBasedDescriber implements Describer
         Class<?> restriction = descriptor.getTypeRestriction();
         if (restriction != null)
         {
-            parameter.withModelProperty(TypeRestrictionModelProperty.KEY, new TypeRestrictionModelProperty<>(restriction));
+            parameter.withModelProperty(new TypeRestrictionModelProperty<>(restriction));
         }
     }
 }

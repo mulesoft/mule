@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal.model.property;
 
 import org.mule.extension.api.introspection.EnrichableModel;
+import org.mule.extension.api.introspection.ModelProperty;
 
 /**
  * An immutable model property which indicates that the owning {@link EnrichableModel}
@@ -14,13 +15,8 @@ import org.mule.extension.api.introspection.EnrichableModel;
  *
  * @since 4.0
  */
-public final class ImplementingTypeModelProperty
+public final class ImplementingTypeModelProperty implements ModelProperty
 {
-
-    /**
-     * A unique key that identifies this property type
-     */
-    public static final String KEY = ImplementingTypeModelProperty.class.getName();
 
     private final Class<?> type;
 
@@ -40,5 +36,27 @@ public final class ImplementingTypeModelProperty
     public Class<?> getType()
     {
         return type;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code implementingType}
+     */
+    @Override
+    public String getName()
+    {
+        return "implementingType";
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code false}
+     */
+    @Override
+    public boolean isExternalizable()
+    {
+        return false;
     }
 }

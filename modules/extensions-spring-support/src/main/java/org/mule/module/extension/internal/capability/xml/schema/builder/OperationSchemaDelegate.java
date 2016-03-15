@@ -22,6 +22,7 @@ import org.mule.module.extension.internal.capability.xml.schema.model.ExtensionT
 import org.mule.module.extension.internal.capability.xml.schema.model.Schema;
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
+import org.mule.util.ValueHolder;
 
 import javax.xml.namespace.QName;
 
@@ -69,14 +70,11 @@ class OperationSchemaDelegate
 
     private QName getOperationSubstitutionGroup(OperationModel operationModel)
     {
-        QName substitutionGroup = MULE_ABSTRACT_MESSAGE_PROCESSOR;
-        ExtendingOperationModelProperty extendingOperationModelProperty = operationModel.getModelProperty(ExtendingOperationModelProperty.class.getName());
-        if (extendingOperationModelProperty != null)
-        {
-            substitutionGroup = builder.getSubstitutionGroup(extendingOperationModelProperty.getType());
-        }
+        ValueHolder<QName> substitutionGroup = new ValueHolder<>(MULE_ABSTRACT_MESSAGE_PROCESSOR);
+        operationModel.getModelProperty(ExtendingOperationModelProperty.class)
+                .ifPresent(property -> substitutionGroup.set(builder.getSubstitutionGroup(property.getType())));
 
-        return substitutionGroup;
+        return substitutionGroup.get();
     }
 
     private void addTargetParameter(ExtensionType operationType, OperationModel operationModel)
