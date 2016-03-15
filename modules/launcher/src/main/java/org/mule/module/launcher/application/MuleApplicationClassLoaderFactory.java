@@ -8,7 +8,9 @@ package org.mule.module.launcher.application;
 
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.module.artifact.classloader.CompositeClassLoader;
+import org.mule.module.artifact.classloader.FilteringArtifactClassLoader;
 import org.mule.module.artifact.classloader.GoodCitizenClassLoader;
 import org.mule.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.module.launcher.MuleApplicationClassLoader;
@@ -16,7 +18,7 @@ import org.mule.module.launcher.MuleFoldersUtil;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.domain.DomainClassLoaderRepository;
 import org.mule.module.launcher.nativelib.NativeLibraryFinderFactory;
-import org.mule.module.launcher.plugin.PluginDescriptor;
+import org.mule.module.launcher.plugin.ApplicationPluginDescriptor;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
@@ -125,7 +127,7 @@ public class MuleApplicationClassLoaderFactory implements ArtifactClassLoaderFac
         {
             parent = domainClassLoaderRepository.getDomainClassLoader(domain).getClassLoader();
         }
-        final Set<PluginDescriptor> plugins = descriptor.getPlugins();
+        final Set<ApplicationPluginDescriptor> plugins = descriptor.getPlugins();
         if (!plugins.isEmpty())
         {
             // Re-assigns parent classloader if there are shared plugin libraries
@@ -142,14 +144,14 @@ public class MuleApplicationClassLoaderFactory implements ArtifactClassLoaderFac
         return parent;
     }
 
-    private ClassLoader createPluginsClassLoader(ClassLoader parent, Set<PluginDescriptor> plugins)
+    private ClassLoader createPluginsClassLoader(ClassLoader parent, Set<ApplicationPluginDescriptor> plugins)
     {
         List<ClassLoader> classLoaders = new LinkedList<>();
 
         // Adds parent classloader first to use parent-first lookup approach
         classLoaders.add(parent);
 
-        for (PluginDescriptor descriptor : plugins)
+        for (ApplicationPluginDescriptor descriptor : plugins)
         {
             URL[] urls = new URL[descriptor.getRuntimeLibs().length + 1];
             urls[0] = descriptor.getRuntimeClassesDir();
@@ -157,7 +159,8 @@ public class MuleApplicationClassLoaderFactory implements ArtifactClassLoaderFac
 
             final MuleArtifactClassLoader pluginClassLoader = new MuleArtifactClassLoader(descriptor.getName(), urls, parent, descriptor.getLoaderOverrides());
 
-            classLoaders.add(pluginClassLoader);
+            ArtifactClassLoaderFilter filter = new ArtifactClassLoaderFilter(descriptor);
+            classLoaders.add(new FilteringArtifactClassLoader(descriptor.getName(), pluginClassLoader, filter));
         }
 
         return new CompositeClassLoader(parent, classLoaders);

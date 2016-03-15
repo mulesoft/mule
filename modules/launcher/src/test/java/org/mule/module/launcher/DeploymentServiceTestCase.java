@@ -111,6 +111,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private static final ArtifactDescriptor sharedPluginLibAppDescriptor = new ArtifactDescriptor("shared-plugin-lib-app", "/shared-plugin-lib-app.zip", "/shared-plugin-lib-app", "shared-plugin-lib-app.zip", "mule-config.xml");
     private static final ArtifactDescriptor dummyAppWithPluginDescriptor = new ArtifactDescriptor("dummyWithEchoPlugin", "/dummyWithEchoPlugin.zip", "/dummyWithEchoPlugin", null, null);
     private static final ArtifactDescriptor dummyMultiPluginLibVersionAppDescriptor = new ArtifactDescriptor("multiPluginLibVersion", "/multiPluginLibVersion.zip", "/multiPluginLibVersion", null, null);
+    private static final ArtifactDescriptor appWithLibDifferentThanPlugins = new ArtifactDescriptor("appWithLibDifferentThanPlugin", "/appWithLibDifferentThanPlugin.zip", "/appWithLibDifferentThanPlugin", null, null);
 
     //Domain constants
     private static final ArtifactDescriptor brokenDomainDescriptor = new ArtifactDescriptor("brokenDomain", "/broken-domain.zip", null, "brokenDomain.zip", "/broken-config.xml");
@@ -1266,6 +1267,22 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
 
         assertDeploymentSuccess(applicationDeploymentListener, dummyMultiPluginLibVersionAppDescriptor.id);
+
+        Application application = deploymentService.getApplications().get(0);
+        Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, application.getMuleContext());
+
+        mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
+    }
+
+    @Test
+    public void deploysAppWithLibDifferentThanPlugin() throws Exception
+    {
+        addPackedAppFromResource(appWithLibDifferentThanPlugins.zipPath);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(applicationDeploymentListener, appWithLibDifferentThanPlugins.id);
 
         Application application = deploymentService.getApplications().get(0);
         Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");

@@ -8,8 +8,11 @@ package org.mule.module.launcher;
 
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,10 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.mule.util.IOUtils;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  * Test the overriding of app properties by system properties
@@ -50,8 +49,8 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase
         input.close();
         output.close();
         ApplicationDescriptor descriptor = new ApplicationDescriptor();
-        DefaultAppBloodhound dab = new DefaultAppBloodhound();
-        dab.setApplicationProperties(descriptor, tempProps);
+        ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory();
+        applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
         Map<String, String>appProps = descriptor.getAppProperties();
         assertEquals("state", appProps.get("texas"));
         assertEquals("country", appProps.get("peru"));
@@ -64,7 +63,7 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase
         {
             setSystemProperties();
             descriptor = new ApplicationDescriptor();
-            dab.setApplicationProperties(descriptor, tempProps);
+            applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
             appProps = descriptor.getAppProperties();
             assertEquals("state", appProps.get("texas"));
             assertEquals("nation", appProps.get("peru"));
@@ -75,7 +74,7 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase
             assertEquals("evenCooler", appProps.get("mule.mmc"));
 
             descriptor = new ApplicationDescriptor();
-            dab.setApplicationProperties(descriptor, new File("nonexistent.nonexistent"));
+            applicationDescriptorFactory.setApplicationProperties(descriptor, new File("nonexistent.nonexistent"));
             appProps = descriptor.getAppProperties();
             assertNull(appProps.get("texas"));
             assertEquals("nation", appProps.get("peru"));

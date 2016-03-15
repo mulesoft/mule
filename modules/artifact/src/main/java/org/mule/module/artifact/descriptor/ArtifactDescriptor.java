@@ -9,7 +9,6 @@ package org.mule.module.artifact.descriptor;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 public class ArtifactDescriptor
@@ -18,8 +17,8 @@ public class ArtifactDescriptor
     private String name;
     private File rootFolder;
     private Set<String> loaderOverrides = Collections.emptySet();
-    private List<String> exportedPrefixNames = Collections.EMPTY_LIST;
-    private List<String> blockedPrefixNames = Collections.EMPTY_LIST;
+    private Set<String> exportedPrefixNames = Collections.emptySet();
+    private Set<String> blockedPrefixNames = Collections.emptySet();
 
     public String getName()
     {
@@ -61,28 +60,28 @@ public class ArtifactDescriptor
         return loaderOverrides;
     }
 
-    public void setExportedPrefixNames(List<String> exported)
+    public void setExportedPrefixNames(Set<String> exported)
     {
-        this.exportedPrefixNames = Collections.unmodifiableList(exported);
+        this.exportedPrefixNames = Collections.unmodifiableSet(exported);
     }
 
     /**
-     * @return an immutable list of exported class prefix names
+     * @return an immutable set of exported class prefix names
      */
-    public List<String> getExportedPrefixNames()
+    public Set<String> getExportedPrefixNames()
     {
         return exportedPrefixNames;
     }
 
-    public void setBlockedPrefixNames(List<String> blocked)
+    public void setBlockedPrefixNames(Set<String> blocked)
     {
-        this.blockedPrefixNames = Collections.unmodifiableList(blocked);
+        this.blockedPrefixNames = Collections.unmodifiableSet(blocked);
     }
 
     /**
-     * @return an immutable list of blocked class prefix names
+     * @return an immutable set of blocked class prefix names
      */
-    public List<String> getBlockedPrefixNames()
+    public Set<String> getBlockedPrefixNames()
     {
         return blockedPrefixNames;
     }

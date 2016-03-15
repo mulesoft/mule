@@ -14,7 +14,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -23,9 +23,9 @@ public class ArtifactClassLoaderFilterTestCase extends AbstractMuleTestCase
 {
 
     public static final String CLASS_NAME = "java.lang.Object";
-    public static final List<String> CLASS_NAMES = Collections.singletonList(CLASS_NAME);
+    public static final Set<String> CLASS_NAMES = Collections.singleton(CLASS_NAME);
     public static final String CLASS_PREFIX = "java.lang";
-    public static final List<String> PREFIX_NAMES = Collections.singletonList(CLASS_PREFIX);
+    public static final Set<String> PREFIX_NAMES = Collections.singleton(CLASS_PREFIX);
 
     private final ArtifactDescriptor descriptor = new ArtifactDescriptor();
     private ArtifactClassLoaderFilter filter = new ArtifactClassLoaderFilter(descriptor);

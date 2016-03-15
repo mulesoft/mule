@@ -7,7 +7,7 @@
 package org.mule.module.launcher.descriptor;
 
 import org.mule.module.artifact.descriptor.ArtifactDescriptor;
-import org.mule.module.launcher.plugin.PluginDescriptor;
+import org.mule.module.launcher.plugin.ApplicationPluginDescriptor;
 
 import java.io.File;
 import java.net.URL;
@@ -39,7 +39,7 @@ public class ApplicationDescriptor extends ArtifactDescriptor
     private Map<String, String> appProperties = new HashMap<String, String>();
 
     private boolean redeploymentEnabled = true;
-    private Set<PluginDescriptor> plugins = new HashSet<PluginDescriptor>(0);
+    private Set<ApplicationPluginDescriptor> plugins = new HashSet<ApplicationPluginDescriptor>(0);
     private URL[] sharedPluginLibs = new URL[0];
 
     public String getEncoding()
@@ -128,7 +128,7 @@ public class ApplicationDescriptor extends ArtifactDescriptor
         this.redeploymentEnabled = redeploymentEnabled;
     }
 
-    public Set<PluginDescriptor> getPlugins()
+    public Set<ApplicationPluginDescriptor> getPlugins()
     {
         return plugins;
     }
@@ -143,19 +143,9 @@ public class ApplicationDescriptor extends ArtifactDescriptor
         return sharedPluginLibs;
     }
 
-    public void setPlugins(Set<PluginDescriptor> plugins)
+    public void setPlugins(Set<ApplicationPluginDescriptor> plugins)
     {
         this.plugins = plugins;
-    }
-
-    public String getPackagesToScan()
-    {
-        return packagesToScan;
-    }
-
-    public void setPackagesToScan(String packages)
-    {
-        this.packagesToScan = packages;
     }
 
 }

@@ -7,8 +7,8 @@
 package org.mule.module.launcher.application;
 
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.module.launcher.AppBloodhound;
-import org.mule.module.launcher.DefaultAppBloodhound;
+import org.mule.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.module.launcher.ApplicationDescriptorFactory;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.domain.DomainFactory;
@@ -47,8 +47,9 @@ public class DefaultApplicationFactory implements ApplicationFactory
             throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);
         }
 
-        AppBloodhound bh = new DefaultAppBloodhound();
-        final ApplicationDescriptor descriptor = bh.fetch(appName);
+        ArtifactDescriptorFactory<ApplicationDescriptor> applicationDescriptorFactory = new ApplicationDescriptorFactory();
+        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
+        final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(new File(appsDir, appName));
 
         return createAppFrom(descriptor);
     }
