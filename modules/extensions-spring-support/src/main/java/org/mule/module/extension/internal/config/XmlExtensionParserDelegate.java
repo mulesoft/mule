@@ -19,13 +19,17 @@ import static org.mule.module.extension.internal.util.NameUtils.pluralize;
 import static org.mule.module.extension.internal.util.NameUtils.singularize;
 import static org.springframework.util.xml.DomUtils.getChildElements;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.NestedProcessor;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
@@ -50,6 +54,7 @@ import org.mule.module.extension.internal.runtime.resolver.TypeSafeExpressionVal
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.module.extension.internal.util.NameUtils;
+import org.mule.util.ClassUtils;
 import org.mule.util.TemplateParser;
 import org.mule.util.ValueHolder;
 
@@ -93,6 +98,7 @@ final class XmlExtensionParserDelegate
     private static final ConversionService conversionService = new DefaultConversionService();
 
     private Map<Class<?>, Object> infrastructureParameters = new HashMap<>();
+    private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
     /**
      * Parses the given {@code element} for an attribute named {@code name}. If not found,
@@ -502,8 +508,7 @@ final class XmlExtensionParserDelegate
     {
         if (isExpressionFunction(expectedType) && value != null)
         {
-            return new ExpressionFunctionValueResolver<>((String) value,
-                                                         getGenericTypeAt((ObjectType) expectedType, 1).get());
+            return new ExpressionFunctionValueResolver<>((String) value, getGenericTypeAt((ObjectType) expectedType, 1, typeLoader).get());
         }
 
         final Class<Object> expectedClass = getType(expectedType);
@@ -561,7 +566,15 @@ final class XmlExtensionParserDelegate
             return false;
         }
 
-        return MuleEvent.class.isAssignableFrom(getType(generics.getGenericTypes().get(0)));
+        final String genericClassName = generics.getGenericTypes().get(0);
+        try
+        {
+            return MuleEvent.class.isAssignableFrom(ClassUtils.getClass(genericClassName));
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not load class " + genericClassName), e);
+        }
     }
 
     /**

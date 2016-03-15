@@ -76,7 +76,7 @@ public abstract class ExtensionsTestUtils
     public static TypeBuilder<?> objectTypeBuilder(Class<?> clazz)
     {
         BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
-        final TypeHandlerManager typeHandlerManager = new ExtensionsTypeHandlerManagerFactory().createTypeHandlerManager(TYPE_LOADER);
+        final TypeHandlerManager typeHandlerManager = new ExtensionsTypeHandlerManagerFactory().createTypeHandlerManager();
         typeHandlerManager.handle(clazz, new ParsingContext(), typeBuilder);
 
         return typeBuilder;
