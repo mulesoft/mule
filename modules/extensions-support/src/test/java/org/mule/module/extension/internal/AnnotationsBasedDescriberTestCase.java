@@ -399,8 +399,11 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         operation = getOperation(declaration, KILL_WITH_WEAPON);
         assertThat(operation, is(notNullValue()));
-        assertThat(operation.getParameters(), hasSize(1));
+        assertThat(operation.getParameters(), hasSize(3)) ;
         assertParameter(operation.getParameters(), "weapon", "", toMetadataType(Weapon.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "type", "", toMetadataType(Weapon.WeaponType.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "weaponAttributes", "", toMetadataType(Weapon.WeaponAttributes.class), true, SUPPORTED, null);
+
 
         operation = getOperation(declaration, KILL_WITH_MULTIPLES_WEAPONS);
         assertThat(operation, is(notNullValue()));

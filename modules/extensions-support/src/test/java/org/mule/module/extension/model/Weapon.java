@@ -9,5 +9,26 @@ package org.mule.module.extension.model;
 public interface Weapon
 {
 
+    public enum WeaponType
+    {
+        FIRE_WEAPON, MELEE_WEAPON
+    }
+
+    public class WeaponAttributes
+    {
+
+        public String getBrand()
+        {
+            return brand;
+        }
+
+        public void setBrand(String brand)
+        {
+            this.brand = brand;
+        }
+
+        public String brand;
+    }
+
     String kill();
 }

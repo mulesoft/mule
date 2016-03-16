@@ -93,9 +93,9 @@ public class HeisenbergOperations
         return door.knock();
     }
 
-    public String killWithWeapon(Weapon weapon)
+    public String killWithWeapon(Weapon weapon, Weapon.WeaponType type, Weapon.WeaponAttributes weaponAttributes)
     {
-        return weapon.kill();
+        return String.format("Killed with: %s , Type %s and attribute %s", weapon.kill(), type.name(), weaponAttributes.getBrand());
     }
 
     public List<String> killWithMultiplesWeapons(List<Weapon> weaponList)

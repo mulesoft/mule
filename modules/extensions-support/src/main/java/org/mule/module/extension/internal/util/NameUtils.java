@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.util;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.metadata.api.model.MetadataType;
@@ -324,5 +325,15 @@ public class NameUtils
             }
             return java.util.regex.Pattern.compile(pattern, flags).matcher(word).replaceAll(replacement);
         }
+    }
+
+    /**
+     * Removes everything that's not a word, a dot nor a hyphen
+     * @param originalName name that needs the removal of invalid characters
+     * @return name without invalid characters
+     */
+    public static String sanitizeName(String originalName)
+    {
+        return originalName.replaceAll("[^\\w|\\.\\-]", EMPTY);
     }
 }

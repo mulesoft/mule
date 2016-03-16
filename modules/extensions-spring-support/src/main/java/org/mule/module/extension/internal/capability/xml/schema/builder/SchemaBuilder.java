@@ -274,7 +274,7 @@ public final class SchemaBuilder
 
     private String getBaseTypeName(MetadataType type)
     {
-        return getType(type).getName();
+        return NameUtils.sanitizeName(getType(type).getName());
     }
 
     private TopLevelComplexType registerBasePojoType(ObjectType metadataType, String description)
@@ -283,7 +283,7 @@ public final class SchemaBuilder
         final Class<?> clazz = getType(metadataType);
         registeredComplexTypesHolders.put(clazz, new ComplexTypeHolder(complexType, metadataType));
 
-        complexType.setName(clazz.getName());
+        complexType.setName(NameUtils.sanitizeName(clazz.getName()));
         complexType.setAnnotation(createDocAnnotation(description));
 
         ComplexContent complexContent = new ComplexContent();
@@ -376,7 +376,7 @@ public final class SchemaBuilder
     private void registerEnum(Schema schema, Class<? extends Enum> enumType)
     {
         TopLevelSimpleType enumSimpleType = new TopLevelSimpleType();
-        enumSimpleType.setName(enumType.getName() + SchemaConstants.ENUM_TYPE_SUFFIX);
+        enumSimpleType.setName(NameUtils.sanitizeName(enumType.getName()) + SchemaConstants.ENUM_TYPE_SUFFIX);
 
         Union union = new Union();
         union.getSimpleType().add(createEnumSimpleType(enumType));
@@ -516,7 +516,7 @@ public final class SchemaBuilder
                     throw new IllegalParameterModelDefinitionException(String.format("Parameter '%s' refers to an enum class which couldn't be loaded.", name), e);
                 }
 
-                attribute.setType(new QName(schema.getTargetNamespace(), enumType.getName() + SchemaConstants.ENUM_TYPE_SUFFIX));
+                attribute.setType(new QName(schema.getTargetNamespace(), NameUtils.sanitizeName(enumType.getName()) + SchemaConstants.ENUM_TYPE_SUFFIX));
                 registeredEnums.add(enumType);
             }
 
