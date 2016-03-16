@@ -37,7 +37,7 @@ public class MvelExpressionDataTypeResolverTestCase extends AbstractMuleContextT
 
         dataTypeResolver = new MvelDataTypeResolver(EMPTY_LIST);
 
-        assertThat(dataTypeResolver.resolve(EXPRESSION_VALUE, testEvent.getMessage(), compiledExpression), like(String.class, ANY, null));
+        assertThat(dataTypeResolver.resolve(EXPRESSION_VALUE, testEvent, compiledExpression), like(String.class, ANY, null));
     }
 
     @Test
@@ -49,7 +49,7 @@ public class MvelExpressionDataTypeResolverTestCase extends AbstractMuleContextT
 
         dataTypeResolver = new MvelDataTypeResolver();
 
-        assertThat(dataTypeResolver.resolve(null, testEvent.getMessage(), compiledExpression), like(Object.class, ANY, null));
+        assertThat(dataTypeResolver.resolve(null, testEvent, compiledExpression), like(Object.class, ANY, null));
     }
 
     private CompiledExpression compileMelExpression()

@@ -77,7 +77,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends AbstractJaasFunc
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            event.getMessage().setInvocationProperty("notSerializableProperty",new Object());
+            event.setFlowVariable("notSerializableProperty",new Object());
             return event;
         }
     }

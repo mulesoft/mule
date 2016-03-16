@@ -10,7 +10,6 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
@@ -371,18 +370,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
         if (isFailOnTimeout())
         {
-            MuleMessage messageCollection;
-            try
-            {
-                messageCollection = group.toMessageCollection();
-            }
-            catch (ObjectStoreException e)
-            {
-                throw new MessagingException(group.getMessageCollectionEvent(), e);
-            }
-            muleContext.fireNotification(new RoutingNotification(messageCollection, null,
+            MuleEvent messageCollectionEvent = group.getMessageCollectionEvent();
+            muleContext.fireNotification(new RoutingNotification(messageCollectionEvent.getMessage(), null,
                                                                  RoutingNotification.CORRELATION_TIMEOUT));
-            MuleEvent groupCollectionEvent = group.getMessageCollectionEvent();
             try
             {
                 group.clear();
@@ -392,8 +382,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 logger.warn("Failed to clear group with id " + group.getGroupId()
                             + " since underlying ObjectStore threw Exception:" + e.getMessage());
             }
-            throw new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
-                                                  groupCollectionEvent);
+            throw new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()), messageCollectionEvent);
         }
         else
         {

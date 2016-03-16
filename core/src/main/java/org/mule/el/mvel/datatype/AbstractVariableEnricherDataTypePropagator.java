@@ -7,8 +7,7 @@
 
 package org.mule.el.mvel.datatype;
 
-import org.mule.api.MuleMessage;
-import org.mule.PropertyScope;
+import org.mule.api.MuleEvent;
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.ast.AssignmentNode;
 import org.mule.mvel2.ast.DeepAssignmentNode;
@@ -25,19 +24,16 @@ import java.lang.reflect.Field;
 /**
  * Base class {@link EnricherDataTypePropagator} that propagate data type to message properties.
  */
-public class AbstractVariableEnricherDataTypePropagator extends AbstractEnricherDataTypePropagator
+public abstract class AbstractVariableEnricherDataTypePropagator extends AbstractEnricherDataTypePropagator
 {
 
     private final String propertyName;
-    private final PropertyScope scope;
     private final Field accExprFieldForMapSyntax;
     private final Field accExprFieldForDotSyntax;
 
-    public AbstractVariableEnricherDataTypePropagator(String propertyName, PropertyScope scope)
+    public AbstractVariableEnricherDataTypePropagator(String propertyName)
     {
         this.propertyName = propertyName;
-        this.scope = scope;
-
         try
         {
             // Needs to use reflection to access parsing information not available on the available interfaces
@@ -54,7 +50,7 @@ public class AbstractVariableEnricherDataTypePropagator extends AbstractEnricher
     }
 
     @Override
-    protected boolean doPropagate(MuleMessage message, TypedValue typedValue, ASTNode node)
+    protected boolean doPropagate(MuleEvent event, TypedValue typedValue, ASTNode node)
     {
         if (isAssignmentNode(node))
         {
@@ -83,10 +79,10 @@ public class AbstractVariableEnricherDataTypePropagator extends AbstractEnricher
                             propertyName = (String) ((MapAccessor) nextNode).getProperty();
                         }
 
-                        if (propertyName != null && message.getPropertyNames(scope).contains(propertyName))
+                        if (propertyName != null && containsVariable(event, propertyName))
                         {
                             propertyName = getUnescapedPropertyName(propertyName);
-                            message.setProperty(propertyName, typedValue.getValue(), scope, typedValue.getDataType());
+                            addVariable(event, typedValue, propertyName);
                             return true;
                         }
                     }
@@ -97,11 +93,15 @@ public class AbstractVariableEnricherDataTypePropagator extends AbstractEnricher
         return false;
     }
 
+    protected abstract void addVariable(MuleEvent event, TypedValue typedValue, String propertyName);
+
+    protected abstract boolean containsVariable(MuleEvent event, String propertyName);
+
     private String getUnescapedPropertyName(String propertyName)
     {
         if (propertyName.startsWith("'") && propertyName.endsWith("'"))
         {
-            propertyName = propertyName.substring(1, propertyName.length() -1);
+            propertyName = propertyName.substring(1, propertyName.length() - 1);
         }
 
         return propertyName;
@@ -131,4 +131,5 @@ public class AbstractVariableEnricherDataTypePropagator extends AbstractEnricher
             throw new IllegalStateException(e);
         }
     }
+
 }

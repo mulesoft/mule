@@ -51,11 +51,9 @@
     <flow name="parent-message-config">
         <foreach rootMessageVariableName="parent">
             <test:component/>
-            <message-properties-transformer scope="invocation">
-                <add-message-property key="parent2" value="#[flowVars.parent]"/>
-            </message-properties-transformer>
+            <set-variable variableName="parent2" value="#[flowVars.parent]" />
         </foreach>
-        <message-properties-transformer scope="outbound">
+        <message-properties-transformer>
             <add-message-property key="parent" value="#[flowVars.parent2]"/>
         </message-properties-transformer>
     </flow>
@@ -63,11 +61,9 @@
     <flow name="counter-config">
         <foreach counterVariableName="index">
             <test:component/>
-            <message-properties-transformer scope="session">
-            	<add-message-property key="msg-last-index" value="#[flowVars.index]"/>
-            </message-properties-transformer>
+            <set-session-variable variableName="msg-last-index" value="#[flowVars.index]" />
         </foreach>
-        <message-properties-transformer scope="outbound">
+        <message-properties-transformer>
         	<add-message-property key="msg-last-index" value="#[sessionVars['msg-last-index']]"/>
         </message-properties-transformer>
     </flow>
@@ -93,11 +89,9 @@
     <flow name="map-config">
         <foreach>
             <test:component/>
-            <message-properties-transformer scope="invocation">
-            	<add-message-property key="totalMessages" value="#[flowVars.counter]"/>
-            </message-properties-transformer>
+            <set-variable variableName="totalMessages" value="#[flowVars.counter]" />
         </foreach>
-        <message-properties-transformer scope="outbound">
+        <message-properties-transformer>
         	<add-message-property key="totalMessages" value="#[flowVars.totalMessages]"/>
         </message-properties-transformer>
         <test:assert expression="#[totalMessages == 2]" />
@@ -106,11 +100,9 @@
     <flow name="map-expression-config">
         <foreach collection="#[message.inboundProperties.names]">
             <test:component/>
-            <message-properties-transformer scope="invocation">
-            	<add-message-property key="totalMessages" value="#[flowVars.counter]"/>
-            </message-properties-transformer>
+            <set-variable variableName="totalMessages" value="#[flowVars.counter]" />
         </foreach>
-        <message-properties-transformer scope="outbound">
+        <message-properties-transformer>
         	<add-message-property key="totalMessages" value="#[flowVars.totalMessages]"/>
         </message-properties-transformer>
     </flow>
@@ -128,8 +120,8 @@
             <script:component>
                 <script:script engine="groovy">
                     <![CDATA[
-                    def root = message.getInvocationProperty("rootMessage").payload
-                    def key = "key3-" + message.getInvocationProperty("counter")
+                    def root = flowVars.rootMessage.payload
+                    def key = "key3-" + flowVars.counter
                     root.order.items << [(key) : "je"]
                     ]]>
                 </script:script>
@@ -140,15 +132,13 @@
     </flow>
 
     <flow name="array-expression-config">
-        <message-properties-transformer scope="invocation">
-            <add-message-property key="loops" value="0"/>
-        </message-properties-transformer>
+        <set-variable variableName="loops" value="0" />
         <foreach>
             <script:component>
                 <script:script engine="groovy">
-                    def loops = message.getInvocationProperty("loops").toInteger()
+                    def loops = flowVars.loops.toInteger()
                     loops++
-                    message.setInvocationProperty("loops", loops + "")
+                    flowVars['loops'] = loops + ""
                 </script:script>
             </script:component>
         </foreach>
@@ -165,17 +155,13 @@
     <flow name="counter-two-foreach-independence">
         <foreach>
             <test:component/>
-            <message-properties-transformer scope="invocation">
-                <add-message-property key="totalMessages" value="#[flowVars.counter]"/>
-            </message-properties-transformer>
+            <set-variable variableName="totalMessages" value="#[flowVars.counter]" />
         </foreach>
         <foreach>
             <test:component/>
-            <message-properties-transformer scope="invocation">
-                <add-message-property key="totalMessages" value="#[flowVars.counter]"/>
-            </message-properties-transformer>
+            <set-variable variableName="totalMessages" value="#[flowVars.counter]" />
         </foreach>
-        <message-properties-transformer scope="outbound">
+        <message-properties-transformer>
             <add-message-property key="msg-total-messages" value="#[flowVars.totalMessages]"/>
         </message-properties-transformer>
     </flow>
@@ -193,12 +179,12 @@
         <foreach>
             <foreach>
                 <test:component/>
-                <message-properties-transformer scope="outbound">
+                <message-properties-transformer>
                     <add-message-property key="j" value="#[flowVars.counter]"/>
                 </message-properties-transformer>
                 <test:queue name="out"/>
             </foreach>
-            <message-properties-transformer scope="outbound">
+            <message-properties-transformer>
                 <add-message-property key="i" value="#[flowVars.counter]"/>
             </message-properties-transformer>
             <test:queue name="out"/>
@@ -206,10 +192,8 @@
     </flow>
 
     <flow name="foreach-properties-restored">
-        <message-properties-transformer scope="invocation">
-            <add-message-property key="counter" value="hello"/>
-            <add-message-property key="rootMessage" value="world"/>
-        </message-properties-transformer>
+        <set-variable variableName="counter" value="hello" />
+        <set-variable variableName="rootMessage" value="world" />
         <foreach>
             <test:component/>
             <test:queue name="out"/>

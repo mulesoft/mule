@@ -14,7 +14,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.metadata.DataType;
@@ -38,22 +37,7 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
         MessagePropertiesContext mpc = new MessagePropertiesContext();
         mpc.setProperty("FOO", "BAR", PropertyScope.OUTBOUND);
         mpc.setProperty("ABC", "abc", PropertyScope.OUTBOUND);
-        mpc.setProperty("DOO", "DAR", PropertyScope.INVOCATION);
         doTest(mpc);
-    }
-
-    @Test
-    public void testSessionScope() throws Exception
-    {
-        MuleEvent e = getTestEvent("testing");
-        e.getSession().setProperty("SESSION_PROP", "Value1");
-
-        MuleMessage message = e.getMessage();
-
-        assertEquals("Value1", message.getProperty("SESSION_PROP", PropertyScope.SESSION));
-        // test case insensitivity
-        assertEquals("Value1", message.getProperty("SESSION_prop", PropertyScope.SESSION));
-        assertNull(message.getProperty("SESSION_X", PropertyScope.SESSION));
     }
 
     @Test
@@ -64,18 +48,12 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
 
         MuleMessage message = e.getMessage();
         //Note that we cannot write to the Inbound scope, its read only
-        message.setProperty("Prop", "invocation", PropertyScope.INVOCATION);
         message.setProperty("Prop", "outbound", PropertyScope.OUTBOUND);
 
         assertEquals("outbound", message.getProperty("Prop", PropertyScope.OUTBOUND));
         message.removeProperty("Prop", PropertyScope.OUTBOUND);
 
-        assertEquals("invocation", message.getProperty("Prop", PropertyScope.INVOCATION));
-        message.removeProperty("Prop", PropertyScope.INVOCATION);
-
-        assertEquals("session", message.getProperty("Prop", PropertyScope.SESSION));
         assertNull(message.getProperty("Prop", PropertyScope.INBOUND));
-        assertNull(message.getProperty("Prop", PropertyScope.INVOCATION));
         assertNull(message.getProperty("Prop", PropertyScope.OUTBOUND));
     }
 
@@ -86,7 +64,6 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
         MessagePropertiesContext mpc = new MessagePropertiesContext();
         mpc.setProperty("FOO", "BAR", PropertyScope.OUTBOUND);
         mpc.setProperty("ABC", "abc", PropertyScope.OUTBOUND);
-        mpc.setProperty("DOO", "DAR", PropertyScope.INVOCATION);
         doTest(mpc);
 
         //Serialize and deserialize
@@ -101,12 +78,8 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
         MessagePropertiesContext mpc = new MessagePropertiesContext();
         mpc.setProperty("FOO", "BAR", PropertyScope.OUTBOUND);
         mpc.setProperty("ABC", "abc", PropertyScope.OUTBOUND);
-        mpc.setProperty("DOO", "DAR", PropertyScope.INVOCATION);
 
         MessagePropertiesContext copy = new MessagePropertiesContext(mpc);
-        
-        assertSame(mpc.invocationMap, copy.invocationMap);
-        assertSame(mpc.sessionMap, copy.sessionMap);
         
         assertNotSame(mpc.inboundMap, copy.inboundMap);
         assertNotSame(mpc.outboundMap, copy.outboundMap);
@@ -121,36 +94,18 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
         assertSame(mpc.getProperty("ABC", PropertyScope.OUTBOUND), "abc");
     }
 
-    /*@Test
-    public void testInboundScopeIsImmutable() throws Exception
-    {        
-        MessagePropertiesContext mpc = new MessagePropertiesContext();
-        try
-        {
-            mpc.setProperty("key", "value", PropertyScope.INBOUND);
-            fail("Inbound scope should be read-only");
-        }
-        catch (IllegalArgumentException iae)
-        {
-            // this exception was expected
-        }
-    }*/
-        
     protected void doTest(MessagePropertiesContext mpc)
     {
         //Look in all scopes
         assertEquals("BAR", mpc.getProperty("foo", PropertyScope.OUTBOUND));
-        assertEquals("DAR", mpc.getProperty("doo", PropertyScope.INVOCATION));
         assertEquals("abc", mpc.getProperty("abc", PropertyScope.OUTBOUND));
 
         //Look in specific scope
         assertEquals("BAR", mpc.getProperty("foO", PropertyScope.OUTBOUND)); //default scope
-        assertEquals("DAR", mpc.getProperty("doO", PropertyScope.INVOCATION));
 
         //Not found using other specific scopes
         assertNull(mpc.getProperty("doo", PropertyScope.INBOUND));
         assertNull(mpc.getProperty("doo", PropertyScope.OUTBOUND));
-        assertNull(mpc.getProperty("doo", PropertyScope.SESSION));
 
         Set<String> keys = mpc.getPropertyNames(PropertyScope.OUTBOUND);
         assertEquals(2, keys.size());
@@ -174,19 +129,6 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
     {
         MessagePropertiesContext mpc = new MessagePropertiesContext();
         mpc.getPropertyNames(PropertyScope.OUTBOUND).add("other");
-    }
-    @Test(expected=UnsupportedOperationException.class)
-    public void testInvocationPropertyNamesImmutable() throws Exception
-    {
-        MessagePropertiesContext mpc = new MessagePropertiesContext();
-        mpc.getPropertyNames(PropertyScope.INVOCATION).add("other");
-    }
-
-    @Test(expected=UnsupportedOperationException.class)
-    public void testSessionPropertyNamesImmutable() throws Exception
-    {
-        MessagePropertiesContext mpc = new MessagePropertiesContext();
-        mpc.getPropertyNames(PropertyScope.SESSION).add("other");
     }
 
     @Test

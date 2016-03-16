@@ -16,7 +16,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
@@ -25,8 +24,8 @@ import org.mule.api.el.ExpressionLanguageExtension;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.InvalidExpressionException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.RegistrationException;
 import org.mule.api.metadata.DataType;
+import org.mule.api.registry.RegistrationException;
 import org.mule.config.MuleManifest;
 import org.mule.el.context.AppContext;
 import org.mule.el.context.MessageContext;
@@ -251,11 +250,11 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void appTakesPrecedenceOverEverything() throws RegistrationException, InitialisationException
+    public void appTakesPrecedenceOverEverything() throws Exception
     {
         mvel.setAliases(Collections.singletonMap("app", "'other1'"));
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setInvocationProperty("app", "otherb");
+        MuleEvent event = getTestEvent("");
+        event.setFlowVariable("app", "otherb");
         muleContext.getRegistry().registerObject("foo", new ExpressionLanguageExtension()
         {
             @Override
@@ -265,7 +264,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
             }
         });
         mvel.initialise();
-        assertEquals(AppContext.class, evaluate("app").getClass());
+        assertEquals(AppContext.class, evaluate("app", event).getClass());
     }
 
     @Test
@@ -273,7 +272,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     {
         mvel.setAliases(Collections.singletonMap("message", "'other1'"));
         MuleEvent event = getTestEvent("");
-        event.getMessage().setInvocationProperty("message", "other2");
+        event.setFlowVariable("message", "other2");
         muleContext.getRegistry().registerObject("foo", new ExpressionLanguageExtension()
         {
             @Override
@@ -321,11 +320,11 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void aliasTakesPrecedenceOverExtension() throws RegistrationException, InitialisationException
+    public void aliasTakesPrecedenceOverExtension() throws Exception
     {
         mvel.setAliases(Collections.singletonMap("foo", "'bar'"));
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
-        message.setInvocationProperty("foo", "other");
+        MuleEvent event = getTestEvent("");
+        event.setFlowVariable("foo", "other");
         mvel.initialise();
         assertEquals("bar", evaluate("foo"));
     }

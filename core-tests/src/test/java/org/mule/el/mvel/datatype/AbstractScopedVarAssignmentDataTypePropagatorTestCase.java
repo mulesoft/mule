@@ -7,57 +7,53 @@
 
 package org.mule.el.mvel.datatype;
 
-import org.mule.PropertyScope;
-
 import org.junit.Test;
 
 public abstract class AbstractScopedVarAssignmentDataTypePropagatorTestCase extends AbstractVarAssignmentDataTypePropagatorTestCase
 {
 
-    protected final PropertyScope scope;
     protected final String variableName;
 
-    public AbstractScopedVarAssignmentDataTypePropagatorTestCase(EnricherDataTypePropagator dataTypePropagator, PropertyScope scope, String variableName)
+    public AbstractScopedVarAssignmentDataTypePropagatorTestCase(EnricherDataTypePropagator dataTypePropagator, String variableName)
     {
         super(dataTypePropagator);
-        this.scope = scope;
         this.variableName = variableName;
     }
 
     @Test
     public void propagatesVarDataTypeUsingMapSyntax() throws Exception
     {
-        doAssignmentDataTypePropagationTest(scope, createAssignmentExpression("['" + PROPERTY_NAME + "']"));
+        doAssignmentDataTypePropagationTest(createAssignmentExpression("['" + PROPERTY_NAME + "']"));
     }
 
     @Test
     public void propagatesVarDataTypeUsingDotSyntax() throws Exception
     {
-        doAssignmentDataTypePropagationTest(scope, createAssignmentExpression("." + PROPERTY_NAME + ""));
+        doAssignmentDataTypePropagationTest(createAssignmentExpression("." + PROPERTY_NAME + ""));
     }
 
     @Test
     public void propagatesVarDataTypeUsingEscapedDotSyntax() throws Exception
     {
-        doAssignmentDataTypePropagationTest(scope, createAssignmentExpression(".'" + PROPERTY_NAME + "'"));
+        doAssignmentDataTypePropagationTest(createAssignmentExpression(".'" + PROPERTY_NAME + "'"));
     }
 
     @Test
     public void doesNotChangesVarDataTypeUsingRecursiveMapSyntax() throws Exception
     {
-        doInnerAssignmentDataTypePropagationTest(scope, createAssignmentExpression("['" + PROPERTY_NAME + "']['" + INNER_PROPERTY_NAME + "']"));
+        doInnerAssignmentDataTypePropagationTest(createAssignmentExpression("['" + PROPERTY_NAME + "']['" + INNER_PROPERTY_NAME + "']"));
     }
 
     @Test
     public void doesNotChangesVarDataTypeUsingRecursiveDotSyntax() throws Exception
     {
-        doInnerAssignmentDataTypePropagationTest(scope, createAssignmentExpression("." + PROPERTY_NAME + "." + INNER_PROPERTY_NAME));
+        doInnerAssignmentDataTypePropagationTest(createAssignmentExpression("." + PROPERTY_NAME + "." + INNER_PROPERTY_NAME));
     }
 
     @Test
     public void doesNotChangesVarDataTypeUsingRecursiveEscapedDotSyntax() throws Exception
     {
-        doInnerAssignmentDataTypePropagationTest(scope, createAssignmentExpression(".'" + PROPERTY_NAME + "'.'" + INNER_PROPERTY_NAME + "'"));
+        doInnerAssignmentDataTypePropagationTest(createAssignmentExpression(".'" + PROPERTY_NAME + "'.'" + INNER_PROPERTY_NAME + "'"));
     }
 
     private String createAssignmentExpression(String accessorExpression)

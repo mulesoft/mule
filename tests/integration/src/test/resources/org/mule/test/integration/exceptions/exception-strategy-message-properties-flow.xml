@@ -8,7 +8,7 @@
     <flow name="inbound">
         <test:component throwException="true"/>
         <catch-exception-strategy>
-            <message-properties-transformer scope="outbound">
+            <message-properties-transformer>
                 <add-message-property key="prop" value="#[message.inboundProperties.foo]" />
             </message-properties-transformer>
             <test:queue name="out"/>

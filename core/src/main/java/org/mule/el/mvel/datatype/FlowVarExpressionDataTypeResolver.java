@@ -7,8 +7,9 @@
 
 package org.mule.el.mvel.datatype;
 
-import static org.mule.PropertyScope.INVOCATION;
 import static org.mule.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
+import org.mule.api.MuleEvent;
+import org.mule.api.metadata.DataType;
 
 /**
  * Resolves data type for flow var when flowVars['x'] syntax is used
@@ -18,6 +19,12 @@ public class FlowVarExpressionDataTypeResolver extends AbstractVariableExpressio
 
     public FlowVarExpressionDataTypeResolver()
     {
-        super(FLOW_VARS, INVOCATION);
+        super(FLOW_VARS);
+    }
+
+    @Override
+    protected DataType<?> getVariableDataType(MuleEvent event, String propertyName)
+    {
+        return event.getFlowVariableDataType(propertyName);
     }
 }

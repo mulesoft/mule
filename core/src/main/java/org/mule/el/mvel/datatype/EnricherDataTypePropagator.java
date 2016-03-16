@@ -7,24 +7,24 @@
 
 package org.mule.el.mvel.datatype;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.transformer.types.TypedValue;
 
 /**
- * Propagates {@link org.mule.api.transformer.DataType} from the right to the left side
+ * Propagates {@link org.mule.api.metadata.DataType} from the right to the left side
  * of an assignment expression if possible
  */
 public interface EnricherDataTypePropagator
 {
 
     /**
-     * Propagates {@link org.mule.api.transformer.DataType} on message enrichment
+     * Propagates {@link org.mule.api.metadata.DataType} on message enrichment
      *
-     * @param message message being enriched
+     * @param event event being enriched
      * @param typedValue value used to enrich the message
      * @param compiledExpression assignment expression used for enrichment
      * @return true if propagation was done, false otherwise
      */
-    boolean propagate(MuleMessage message, TypedValue typedValue, CompiledExpression compiledExpression);
+    boolean propagate(MuleEvent event, TypedValue typedValue, CompiledExpression compiledExpression);
 }

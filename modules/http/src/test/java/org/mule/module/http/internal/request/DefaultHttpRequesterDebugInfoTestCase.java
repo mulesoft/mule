@@ -35,6 +35,7 @@ import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.api.MuleEvent;
 import org.mule.api.debug.FieldDebugInfo;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.construct.Flow;
@@ -106,7 +107,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
     public void returnsDebugInfoWithSecurity() throws Exception
     {
         configureSecurityExpressions();
-        addConfigSecurityProperties(message);
+        addConfigSecurityProperties(event);
 
         doDebugInfoTest(message, event, getSecurityFieldsMatchers());
     }
@@ -159,28 +160,28 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         return securityFields;
     }
 
-    private void addConfigSecurityProperties(DefaultMuleMessage message)
+    private void addConfigSecurityProperties(MuleEvent event)
     {
-        message.setInvocationProperty(DOMAIN_PROPERTY, DOMAIN);
-        message.setInvocationProperty(PASSWORD_PROPERTY, PASSWORD);
-        message.setInvocationProperty(PREEMPTIVE_PROPERTY, Boolean.FALSE.toString());
-        message.setInvocationProperty(USERNAME_PROPERTY, USERNAME);
-        message.setInvocationProperty(WORKSTATION_PROPERTY, WORKSTATION);
+        event.setFlowVariable(DOMAIN_PROPERTY, DOMAIN);
+        event.setFlowVariable(PASSWORD_PROPERTY, PASSWORD);
+        event.setFlowVariable(PREEMPTIVE_PROPERTY, Boolean.FALSE.toString());
+        event.setFlowVariable(USERNAME_PROPERTY, USERNAME);
+        event.setFlowVariable(WORKSTATION_PROPERTY, WORKSTATION);
     }
 
     private void addRequesterProperties(DefaultMuleMessage message)
     {
-        message.setInvocationProperty(HOST_PROPERTY, HOST);
-        message.setInvocationProperty(PORT_PROPERTY, PORT);
-        message.setInvocationProperty(METHOD_PROPERTY, METHOD);
-        message.setInvocationProperty(STREAMING_MODE_PROPERTY, TRUE.toString());
-        message.setInvocationProperty(SEND_BODY_PROPERTY, ALWAYS.toString());
-        message.setInvocationProperty(FOLLOW_REDIRECTS_PROPERTY, TRUE.toString());
-        message.setInvocationProperty(PARSE_RESPONSE_PROPERTY, TRUE.toString());
-        message.setInvocationProperty(RESPONSE_TIMEOUT_PROPERTY, RESPONSE_TIMEOUT);
-        message.setInvocationProperty(PARAM_NAME1, PARAM_VALUE1);
-        message.setInvocationProperty(PARAM2_FIRST_VALUE_PROPERTY, PARAM_VALUE1);
-        message.setInvocationProperty(PARAM2_SECOND_VALUE_PROPERTY, PARAM_VALUE2);
+        event.setFlowVariable(HOST_PROPERTY, HOST);
+        event.setFlowVariable(PORT_PROPERTY, PORT);
+        event.setFlowVariable(METHOD_PROPERTY, METHOD);
+        event.setFlowVariable(STREAMING_MODE_PROPERTY, TRUE.toString());
+        event.setFlowVariable(SEND_BODY_PROPERTY, ALWAYS.toString());
+        event.setFlowVariable(FOLLOW_REDIRECTS_PROPERTY, TRUE.toString());
+        event.setFlowVariable(PARSE_RESPONSE_PROPERTY, TRUE.toString());
+        event.setFlowVariable(RESPONSE_TIMEOUT_PROPERTY, RESPONSE_TIMEOUT);
+        event.setFlowVariable(PARAM_NAME1, PARAM_VALUE1);
+        event.setFlowVariable(PARAM2_FIRST_VALUE_PROPERTY, PARAM_VALUE1);
+        event.setFlowVariable(PARAM2_SECOND_VALUE_PROPERTY, PARAM_VALUE2);
     }
 
     private void configureSecurityExpressions() throws InitialisationException

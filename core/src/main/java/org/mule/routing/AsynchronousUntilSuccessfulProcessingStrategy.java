@@ -98,7 +98,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     {
         try
         {
-            final Serializable eventStoreKey = storeEvent(event);
+            final Serializable eventStoreKey = storeEvent(threadSafeCopy(event));
             scheduleForProcessing(eventStoreKey, true);
             if (getUntilSuccessfulConfiguration().getAckExpression() == null)
             {
@@ -187,14 +187,15 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
             final MuleEvent mutableEvent = threadSafeCopy(event);
 
             final MuleMessage message = mutableEvent.getMessage();
-            final Integer deliveryAttemptCount = message.getInvocationProperty(
-                    PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE);
+            final Integer configuredAttempts = mutableEvent.getFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME);
+            final Integer deliveryAttemptCount = configuredAttempts != null ? configuredAttempts :
+                                                 DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 
             if (deliveryAttemptCount <= getUntilSuccessfulConfiguration().getMaxRetries())
             {
                 // we store the incremented version unless the max attempt count has
                 // been reached
-                message.setInvocationProperty(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount + 1);
+                mutableEvent.setFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount + 1);
                 getUntilSuccessfulConfiguration().getObjectStore().store(eventStoreKey, mutableEvent);
                 this.scheduleForProcessing(eventStoreKey, false);
             }
@@ -211,17 +212,16 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
 
     private Serializable storeEvent(final MuleEvent event) throws ObjectStoreException
     {
-        final MuleMessage message = event.getMessage();
-        final Integer deliveryAttemptCount = message.getInvocationProperty(
-                PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE);
+        final Integer configuredAttempts = event.getFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME);
+        final Integer deliveryAttemptCount = configuredAttempts != null ? configuredAttempts :
+                                             DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
         return storeEvent(event, deliveryAttemptCount);
     }
 
     private Serializable storeEvent(final MuleEvent event, final int deliveryAttemptCount)
             throws ObjectStoreException
     {
-        final MuleMessage message = event.getMessage();
-        message.setInvocationProperty(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount);
+        event.setFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount);
         final Serializable eventStoreKey = buildQueueKey(event);
         getUntilSuccessfulConfiguration().getObjectStore().store(eventStoreKey, event);
         return eventStoreKey;

@@ -10,8 +10,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-
-import org.mule.PropertyScope;
 import org.mule.api.MuleEvent;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -41,7 +39,7 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     public void setSessionPropertyInFlowGetUsingAPI() throws Exception
     {
         MuleEvent result = flowRunner("B").withPayload("data").run();
-        assertThat(result.getMessage().getProperty("key", PropertyScope.SESSION), is("value"));
+        assertThat(result.getSession().getProperty("key"), is("value"));
     }
 
     /**
@@ -61,10 +59,10 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
         assertSame(event.getSession(), result.getSession());
 
         assertNotNull(result);
-        assertThat(result.getMessage().getProperty("key", PropertyScope.SESSION), is("value"));
-        assertThat(result.getMessage().getProperty("key1", PropertyScope.SESSION), is("value1"));
-        assertThat(result.getMessage().getProperty("key2", PropertyScope.SESSION), is("value2"));
-        assertThat(result.getMessage().getProperty("keyNonSerializable", PropertyScope.SESSION), is(nonSerializable));
+        assertThat(result.getSession().getProperty("key"), is("value"));
+        assertThat(result.getSession().getProperty("key1"), is("value1"));
+        assertThat(result.getSession().getProperty("key2"), is("value2"));
+        assertThat(result.getSession().getProperty("keyNonSerializable"), is(nonSerializable));
     }
 
 

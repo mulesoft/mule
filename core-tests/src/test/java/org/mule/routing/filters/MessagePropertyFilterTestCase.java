@@ -9,14 +9,10 @@ package org.mule.routing.filters;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mule.PropertyScope.INVOCATION;
 import static org.mule.PropertyScope.OUTBOUND;
-import static org.mule.PropertyScope.SESSION;
-import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleMessage;
-import org.mule.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;
@@ -33,19 +29,6 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
         assertTrue(!filter.accept(message));
         message.setOutboundProperty("foo", "bar");
-        assertTrue("Filter didn't accept the message", filter.accept(message));
-    }
-
-    @Test
-    public void testMessagePropertyFilterSessionScope() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
-        // An event/session is needed otherwise the session properties set on the message go nowhere.
-        new DefaultMuleEvent(message, getTestFlow());
-        MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
-        filter.setScope(PropertyScope.SESSION_NAME);
-        assertFalse(filter.accept(message));
-        message.setProperty("foo", "bar", SESSION);
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
@@ -139,7 +122,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     public void testMessagePropertyFilterDodgyValues() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter();
-        assertFalse(filter.accept(null));
+        assertFalse(filter.accept((MuleMessage) null));
 
         filter = new MessagePropertyFilter("foo = bar");
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
@@ -162,7 +145,6 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     private void removeProperty(MuleMessage message, String property)
     {
         message.removeProperty(property, OUTBOUND);
-        message.removeProperty(property, INVOCATION);
     }
 
     @Test

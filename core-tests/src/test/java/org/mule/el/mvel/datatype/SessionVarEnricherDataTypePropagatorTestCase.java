@@ -8,13 +8,28 @@
 package org.mule.el.mvel.datatype;
 
 import static org.mule.el.mvel.MessageVariableResolverFactory.SESSION_VARS;
-import org.mule.PropertyScope;
+import org.mule.api.MuleEvent;
+import org.mule.api.metadata.DataType;
+
+import java.io.Serializable;
 
 public class SessionVarEnricherDataTypePropagatorTestCase extends AbstractScopedVarAssignmentDataTypePropagatorTestCase
 {
 
     public SessionVarEnricherDataTypePropagatorTestCase()
     {
-        super(new SessionVarEnricherDataTypePropagator(), PropertyScope.SESSION, SESSION_VARS);
+        super(new SessionVarEnricherDataTypePropagator(), SESSION_VARS);
+    }
+
+    @Override
+    protected DataType<?> getVariableDataType(MuleEvent event)
+    {
+        return event.getSession().getPropertyDataType(PROPERTY_NAME);
+    }
+
+    @Override
+    protected void setVariable(MuleEvent event, Object propertyValue, DataType dataType)
+    {
+        event.getSession().setProperty(PROPERTY_NAME, (Serializable) propertyValue, dataType);
     }
 }

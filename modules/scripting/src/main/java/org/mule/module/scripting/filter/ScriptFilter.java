@@ -46,7 +46,7 @@ public class ScriptFilter extends AbstractFilteringMessageProcessor implements F
     }
 
     @Override
-    protected boolean accept(MuleEvent event)
+    public boolean accept(MuleEvent event)
     {
         Bindings bindings = script.getScriptEngine().createBindings();
 

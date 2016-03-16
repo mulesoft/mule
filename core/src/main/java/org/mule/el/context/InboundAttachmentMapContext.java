@@ -13,7 +13,7 @@ import java.util.Set;
 
 import javax.activation.DataHandler;
 
-public class InboundAttachmentMapContext extends AbstractMapContext<String, DataHandler>
+public class InboundAttachmentMapContext extends AbstractMapContext<DataHandler>
 {
     private MuleEvent event;
 
@@ -23,24 +23,20 @@ public class InboundAttachmentMapContext extends AbstractMapContext<String, Data
     }
 
     @Override
-    public DataHandler get(Object key)
+    public DataHandler doGet(String key)
     {
-        if (!(key instanceof String))
-        {
-            return null;
-        }
-        return event.getMessage().getInboundAttachment((String) key);
+        return event.getMessage().getInboundAttachment(key);
     }
 
     @Override
-    public DataHandler put(String key, DataHandler value)
+    public void doPut(String key, DataHandler value)
     {
         throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable(key)
             .getMessage());
     }
 
     @Override
-    public DataHandler remove(Object key)
+    public void doRemove(String key)
     {
         throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable(key)
             .getMessage());

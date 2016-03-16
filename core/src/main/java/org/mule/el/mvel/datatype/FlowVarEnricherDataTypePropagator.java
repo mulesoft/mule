@@ -7,7 +7,9 @@
 
 package org.mule.el.mvel.datatype;
 
-import org.mule.PropertyScope;
+import static org.mule.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
+import org.mule.api.MuleEvent;
+import org.mule.transformer.types.TypedValue;
 
 /**
  * Propagates data type for flow vars used for enrichment target
@@ -17,6 +19,18 @@ public class FlowVarEnricherDataTypePropagator extends AbstractVariableEnricherD
 
     public FlowVarEnricherDataTypePropagator()
     {
-        super("flowVars", PropertyScope.INVOCATION);
+        super(FLOW_VARS);
+    }
+
+    @Override
+    protected void addVariable(MuleEvent event, TypedValue typedValue, String propertyName)
+    {
+        event.setFlowVariable(propertyName, typedValue.getValue(), typedValue.getDataType());
+    }
+
+    @Override
+    protected boolean containsVariable(MuleEvent event, String propertyName)
+    {
+        return event.getFlowVariableNames().contains(propertyName);
     }
 }

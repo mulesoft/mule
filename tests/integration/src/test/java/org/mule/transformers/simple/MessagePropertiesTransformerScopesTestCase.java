@@ -8,10 +8,9 @@ package org.mule.transformers.simple;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mule.PropertyScope.SESSION;
+import static org.mule.PropertyScope.OUTBOUND;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
 
@@ -32,7 +31,6 @@ public class MessagePropertiesTransformerScopesTestCase extends AbstractMuleCont
         // Add properties to scope
         
         MessagePropertiesTransformer add = new MessagePropertiesTransformer();
-        add.setScope(PropertyScope.INVOCATION);
         Map<String, Object> addProps = new HashMap<String, Object>();
         addProps.put("foo", "bar");
         addProps.put("foo2", "baz");
@@ -42,31 +40,18 @@ public class MessagePropertiesTransformerScopesTestCase extends AbstractMuleCont
 
         msg = (DefaultMuleMessage) add.transform(msg, (String)null);
 
-        assertEquals("bar", msg.getInvocationProperty("foo"));
-        assertNull(msg.getOutboundProperty("foo"));
-        assertNull(msg.getProperty("foo", SESSION));
+        assertEquals("bar", msg.getOutboundProperty("foo"));
+        assertEquals("bar", msg.getProperty("foo", OUTBOUND));
 
-        // Remove property from the wrong scope
-        
-        MessagePropertiesTransformer deleteWrongScope = new MessagePropertiesTransformer();
-        deleteWrongScope.setScope(PropertyScope.OUTBOUND);
-        deleteWrongScope.setDeleteProperties("foo");
-        deleteWrongScope.setMuleContext(muleContext);
-        deleteWrongScope.initialise();
-
-        msg = (DefaultMuleMessage) deleteWrongScope.transform(msg, (String)null);
-        assertEquals("bar", msg.getInvocationProperty("foo"));
-
-        // Remove property from the correct scope
+        // Remove property from scope
         
         MessagePropertiesTransformer delete = new MessagePropertiesTransformer();
-        delete.setScope(PropertyScope.INVOCATION);
         delete.setDeleteProperties(Collections.singletonList("foo"));
         delete.setMuleContext(muleContext);
         delete.initialise();
 
         msg = (DefaultMuleMessage) delete.transform(msg, (String)null);
-        assertNull(msg.getInvocationProperty("foo"));
-        assertEquals("baz", msg.getInvocationProperty("foo2"));
+        assertNull(msg.getOutboundProperty("foo"));
+        assertEquals("baz", msg.getOutboundProperty("foo2"));
     }
 }

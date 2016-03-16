@@ -8,11 +8,9 @@ package org.mule.module.scripting;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-
 import org.mule.api.MuleEvent;
 import org.mule.functional.junit4.FunctionalTestCase;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class GreedyTestCase extends FunctionalTestCase
@@ -24,14 +22,12 @@ public class GreedyTestCase extends FunctionalTestCase
         return "greedy-config.xml";
     }
 
-    @Ignore("MULE-9341")
     @Test
     public void testDollars() throws Exception
     {
         runTest(2.33, "USD", "[9 quarters, 0 dimes, 1 nickels, 3 pennies]");
     }
 
-    @Ignore("MULE-9341")
     @Test
     public void testPounds() throws Exception
     {

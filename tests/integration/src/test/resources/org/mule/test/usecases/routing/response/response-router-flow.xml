@@ -15,7 +15,7 @@
 
         <echo-component />
 
-        <message-properties-transformer scope="outbound">
+        <message-properties-transformer>
             <delete-message-property key="MULE_REPLYTO"/>
         </message-properties-transformer>
         <flow-ref name="W10Report"/>

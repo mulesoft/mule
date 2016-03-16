@@ -7,13 +7,21 @@
 
 package org.mule.el.mvel.datatype;
 
-import static org.mule.PropertyScope.INVOCATION;
+import static org.mule.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
+import org.mule.api.MuleEvent;
+import org.mule.api.metadata.DataType;
 
 public class FlowVarExpressionDataTypeResolverTestCase extends AbstractVarExpressionDataTypeResolverTestCase
 {
 
     public FlowVarExpressionDataTypeResolverTestCase()
     {
-        super(new FlowVarExpressionDataTypeResolver(), INVOCATION,  "flowVars");
+        super(new FlowVarExpressionDataTypeResolver(), FLOW_VARS);
+    }
+
+    @Override
+    protected void setVariable(MuleEvent event, Object propertyValue, DataType dataType)
+    {
+        event.setFlowVariable(PROPERTY_NAME, propertyValue, dataType);
     }
 }

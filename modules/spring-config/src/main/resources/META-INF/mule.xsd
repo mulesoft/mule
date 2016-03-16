@@ -2945,10 +2945,7 @@
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:NMTOKEN">
                             <xsd:enumeration value="inbound"/>
-                            <xsd:enumeration value="invocation"/>
                             <xsd:enumeration value="outbound"/>
-                            <xsd:enumeration value="session"/>
-                            <xsd:enumeration value="application"/>
                         </xsd:restriction>
                     </xsd:simpleType>
                 </xsd:attribute>
@@ -3274,21 +3271,6 @@
                             If false, a property is not added if the message already contains a property with that name.
                         </xsd:documentation>
                     </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="scope" use="optional" default="outbound">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Property scope to/from which properties are added/removed.  The scope determines the lifespan of the properties. Default scope is outbound.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="invocation"/>
-                            <xsd:enumeration value="outbound"/>
-                            <xsd:enumeration value="session"/>
-                            <xsd:enumeration value="application"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
                 </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>

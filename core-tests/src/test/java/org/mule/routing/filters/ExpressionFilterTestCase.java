@@ -10,9 +10,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.PropertyScope.INVOCATION;
 import static org.mule.PropertyScope.OUTBOUND;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -20,7 +20,6 @@ import org.mule.tck.testmodels.fruit.Apple;
 
 import java.io.IOException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
@@ -37,16 +36,15 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         assertTrue(filter.accept(message));
     }
 
-    @Ignore("MULE-9341")
     @Test
     public void testVariableFilterEL() throws Exception
     {
         ExpressionFilter filter = new ExpressionFilter("flowVars['foo']=='bar'");
         filter.setMuleContext(muleContext);
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
-        assertTrue(!filter.accept(message));
-        message.setInvocationProperty("foo", "bar");
-        assertTrue(filter.accept(message));
+        MuleEvent event = getTestEvent("blah");
+        assertTrue(!filter.accept(event));
+        event.setFlowVariable("foo", "bar");
+        assertTrue(filter.accept(event));
     }
     @Test
     public void testHeaderFilterWithNotEL() throws Exception
@@ -63,26 +61,24 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         assertTrue(filter.accept(message));
     }
 
-    @Ignore("MULE-9341")
     @Test
     public void testVariableFilterWithNotEL() throws Exception
     {
         ExpressionFilter filter = new ExpressionFilter("flowVars['foo']!='bar'");
         filter.setMuleContext(muleContext);
 
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        MuleEvent event = getTestEvent("blah");
 
-        assertTrue(filter.accept(message));
-        message.setInvocationProperty("foo", "bar");
-        assertTrue(!filter.accept(message));
-        message.setInvocationProperty("foo", "car");
-        assertTrue(filter.accept(message));
+        assertTrue(filter.accept(event));
+        event.setFlowVariable("foo", "bar");
+        assertTrue(!filter.accept(event));
+        event.setFlowVariable("foo", "car");
+        assertTrue(filter.accept(event));
     }
 
     private void removeProperty(MuleMessage message)
     {
         message.removeProperty("foo", OUTBOUND);
-        message.removeProperty("foo", INVOCATION);
     }
 
     @Test
@@ -100,20 +96,19 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         assertTrue(filter.accept(message));
     }
 
-    @Ignore("MULE-9341")
     @Test
     public void testVariableFilterWithNotNullEL() throws Exception
     {
         ExpressionFilter filter = new ExpressionFilter("flowVars['foo']!=null");
         filter.setMuleContext(muleContext);
 
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        MuleEvent event = getTestEvent("blah");
 
-        assertTrue(!filter.accept(message));
-        removeProperty(message);
-        assertTrue(!filter.accept(message));
-        message.setInvocationProperty("foo", "car");
-        assertTrue(filter.accept(message));
+        assertTrue(!filter.accept(event));
+        removeProperty(event.getMessage());
+        assertTrue(!filter.accept(event));
+        event.setFlowVariable("foo", "car");
+        assertTrue(filter.accept(event));
     }
 
     @Test

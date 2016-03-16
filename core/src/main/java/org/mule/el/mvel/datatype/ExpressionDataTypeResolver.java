@@ -7,7 +7,7 @@
 
 package org.mule.el.mvel.datatype;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.mvel2.compiler.CompiledExpression;
 
@@ -20,10 +20,10 @@ public interface ExpressionDataTypeResolver
     /**
      * Resolves the data type form a given expression
      *
-     * @param message mule message being executed
+     * @param event mule message being executed
      * @param compiledExpression compiled MEL expression
      * @return a non null data type corresponding to the expression if the resolver
      *         is able to resolve it, null otherwise
      */
-    DataType resolve(MuleMessage message, CompiledExpression compiledExpression);
+    DataType resolve(MuleEvent event, CompiledExpression compiledExpression);
 }

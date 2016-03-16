@@ -8,14 +8,11 @@
 package org.mule.el.mvel.datatype;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.PropertyScope.INVOCATION;
-import static org.mule.PropertyScope.SESSION;
 import static org.mule.mvel2.MVEL.compileExpression;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.transformer.types.MimeTypes.JSON;
 import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
-import org.mule.PropertyScope;
 import org.mule.el.mvel.MVELExpressionLanguage;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
@@ -37,16 +34,22 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
     @Test
     public void propagatesDataTypeForInlinedInvocationProperty() throws Exception
     {
-        doInlinePropertyDataTypePropagationTest(INVOCATION);
+        final DataType expectedDataType = DataTypeFactory.create(String.class, JSON);
+        expectedDataType.setEncoding(CUSTOM_ENCODING);
+
+        MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
+        final CompiledExpression compiledExpression = (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
+
+        MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
+        testEvent.setFlowVariable("foo", "bar");
+
+        dataTypePropagator.propagate(testEvent, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+
+        assertThat(testEvent.getFlowVariableDataType("foo"), like(String.class, JSON, CUSTOM_ENCODING));
     }
 
     @Test
     public void propagatesDataTypeForInlinedSessionProperty() throws Exception
-    {
-        doInlinePropertyDataTypePropagationTest(SESSION);
-    }
-
-    private void doInlinePropertyDataTypePropagationTest(PropertyScope scope) throws Exception
     {
         final DataType expectedDataType = DataTypeFactory.create(String.class, JSON);
         expectedDataType.setEncoding(CUSTOM_ENCODING);
@@ -55,11 +58,12 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
         final CompiledExpression compiledExpression = (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
-        testEvent.getMessage().setProperty("foo", "bar", scope);
+        testEvent.getSession().setProperty("foo", "bar");
 
 
-        dataTypePropagator.propagate(testEvent.getMessage(), new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+        dataTypePropagator.propagate(testEvent, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
 
-        assertThat(testEvent.getMessage().getPropertyDataType("foo", scope), like(String.class, JSON, CUSTOM_ENCODING));
+        assertThat(testEvent.getSession().getPropertyDataType("foo"), like(String.class, JSON, CUSTOM_ENCODING));
     }
+
 }

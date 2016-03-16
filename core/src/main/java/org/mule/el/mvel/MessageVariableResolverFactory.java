@@ -12,8 +12,10 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.el.VariableAssignmentCallback;
 import org.mule.PropertyScope;
+import org.mule.el.context.FlowVariableMapContext;
 import org.mule.el.context.MessageContext;
 import org.mule.el.context.MessagePropertyMapContext;
+import org.mule.el.context.SessionVariableMapContext;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
@@ -92,8 +94,8 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
             }
             else if (FLOW_VARS.equals(name))
             {
-                return new MuleImmutableVariableResolver<Map<String, Object>>(FLOW_VARS,
-                    new MessagePropertyMapContext(event, PropertyScope.INVOCATION), null);
+                return new MuleImmutableVariableResolver<Map<String, Object>>(FLOW_VARS, new FlowVariableMapContext
+                        (event), null);
             }
             else if (EXCEPTION.equals(name))
             {
@@ -109,8 +111,8 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
             }
             else if (SESSION_VARS.equals(name))
             {
-                return new MuleImmutableVariableResolver<Map<String, Object>>(SESSION_VARS,
-                    new MessagePropertyMapContext(event, PropertyScope.SESSION), null);
+                return new MuleImmutableVariableResolver<Map<String, Object>>(SESSION_VARS, new
+                        SessionVariableMapContext(event.getSession()), null);
             }
             else if (MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE.equals(name))
             {

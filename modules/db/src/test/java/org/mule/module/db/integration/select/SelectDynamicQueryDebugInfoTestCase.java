@@ -61,7 +61,7 @@ public class SelectDynamicQueryDebugInfoTestCase extends AbstractDbIntegrationTe
         AbstractSingleQueryDbMessageProcessor queryMessageProcessor = (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(1);
 
         final MuleEvent muleEvent = getTestEvent(TEST_MESSAGE);
-        muleEvent.getMessage().setInvocationProperty("tableName", "PLANET");
+        muleEvent.setFlowVariable("tableName", "PLANET");
         final List<FieldDebugInfo> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
 
         assertThat(debugInfo, is(not(nullValue())));

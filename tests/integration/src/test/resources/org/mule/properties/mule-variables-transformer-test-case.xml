@@ -8,29 +8,17 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <message-properties-transformer name="addInvocationVariable" scope="invocation">
-        <add-message-property key="invVarKey" value="invVarValue"/>
-    </message-properties-transformer>
+    <set-variable name="addInvocationVariable" variableName="invVarKey" value="invVarValue" />
 
-    <message-properties-transformer name="addInvocationVariableName" scope="invocation">
-        <add-message-property key="invVarKeyName" value="invVarKey"/>
-    </message-properties-transformer>
+    <set-variable name="addInvocationVariableName" variableName="invVarKeyName" value="invVarKey" />
 
-    <message-properties-transformer name="addInvocationVariable2" scope="invocation">
-        <add-message-property key="invVarKey2" value="invVarValue2"/>
-    </message-properties-transformer>
+    <set-variable name="addInvocationVariable2" variableName="invVarKey2" value="invVarValue2" />
 
-    <message-properties-transformer name="addAnotherInvocationVariable" scope="invocation">
-        <add-message-property key="anotherInvVarKey" value="anotherInvVarValue"/>
-    </message-properties-transformer>
+    <set-variable name="addAnotherInvocationVariable" variableName="anotherInvVarKey" value="anotherInvVarValue" />
 
-    <message-properties-transformer scope="session" name="addSessionVariable">
-        <add-message-property key="sesVarKey" value="sesVarValue"/>
-    </message-properties-transformer>
+    <set-session-variable name="addSessionVariable" variableName="sesVarKey" value="sesVarValue" />
 
-    <message-properties-transformer scope="session" name="addSessionVariable2">
-        <add-message-property key="sesVarKey2" value="sesVarValue2"/>
-    </message-properties-transformer>
+    <set-session-variable name="addSessionVariable2" variableName="sesVarKey2" value="sesVarValue2" />
 
     <set-variable name="setVarGlobal" variableName="#[flowVars.invVarKey]" value="#[sessionVars.sesVarKey]"/>
 

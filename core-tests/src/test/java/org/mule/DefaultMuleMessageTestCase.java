@@ -14,7 +14,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.PropertyScope.OUTBOUND;
-import static org.mule.PropertyScope.SESSION;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -167,14 +166,9 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     {
         MuleMessage payload = createMuleMessage();
         payload.setOutboundProperty(FOO_PROPERTY, "fooValue");
-        payload.setInvocationProperty("bar", "barValue");
 
-        assertEquals(1, payload.getInvocationPropertyNames().size());
         assertEquals(2, payload.getOutboundPropertyNames().size());
         assertEquals(0, payload.getInboundPropertyNames().size());
-
-        payload.clearProperties(PropertyScope.INVOCATION);
-        assertEquals(0, payload.getInvocationPropertyNames().size());
 
         payload.clearProperties(OUTBOUND);
         assertEquals(0, payload.getOutboundPropertyNames().size());
@@ -313,16 +307,11 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
 
         message.setOutboundProperty(FOO_PROPERTY, "fooOutbound");
-        message.setInvocationProperty("bar", "barInvocation");
-        message.setInvocationProperty(FOO_PROPERTY, "fooInvocation");
         message.setProperty(FOO_PROPERTY, "fooInbound", PropertyScope.INBOUND);
-        message.setProperty(FOO_PROPERTY, "fooSession", SESSION);
 
 
-        assertEquals(2, message.getInvocationPropertyNames().size());
         assertEquals(1, message.getOutboundPropertyNames().size());
         assertEquals(1, message.getInboundPropertyNames().size());
-        assertEquals(1, message.getPropertyNames(SESSION).size());
 
         String value = message.findPropertyInAnyScope(FOO_PROPERTY, null);
         assertEquals("fooOutbound", value);
@@ -330,20 +319,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         message.removeProperty(FOO_PROPERTY, OUTBOUND);
 
         value = message.findPropertyInAnyScope(FOO_PROPERTY, null);
-        assertEquals("fooInvocation", value);
-
-        message.removeProperty(FOO_PROPERTY, PropertyScope.INVOCATION);
-
-        value = message.findPropertyInAnyScope(FOO_PROPERTY, null);
-        assertEquals("fooSession", value);
-        message.removeProperty(FOO_PROPERTY, SESSION);
-
-        value = message.findPropertyInAnyScope(FOO_PROPERTY, null);
         assertEquals("fooInbound", value);
-
-        value = message.findPropertyInAnyScope("bar", null);
-        assertEquals("barInvocation", value);
-
     }
 
     //
@@ -404,36 +380,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         message.setOutboundProperty(FOO_PROPERTY, "bar");
         message.getPropertyNames(OUTBOUND).remove(FOO_PROPERTY);
         assertNull(message.getOutboundProperty(FOO_PROPERTY));
-    }
-    
-    @Test(expected=UnsupportedOperationException.class)
-    public void testInvocationPropertyNamesImmutable() throws Exception
-    {
-        MuleMessage message = createMuleMessage();
-        message.getPropertyNames(PropertyScope.INVOCATION).add("other");
-    }
-    
-    public void tesInvocationPropertyNamesRemoveMmutable() throws Exception
-    {
-        MuleMessage message = createMuleMessage();
-        message.setInvocationProperty(FOO_PROPERTY, "bar");
-        message.getPropertyNames(PropertyScope.INVOCATION).remove(FOO_PROPERTY);
-        assertNull(message.getInvocationProperty(FOO_PROPERTY));
-    }
-    
-    @Test(expected=UnsupportedOperationException.class)
-    public void testSessionPropertyNamesImmutable() throws Exception
-    {
-        MuleMessage message = createMuleMessage();
-        message.getPropertyNames(SESSION).add("other");
-    }
-
-    public void testtSessionPropertyNamesRemoveMmutable() throws Exception
-    {
-        MuleMessage message = createMuleMessage();
-        message.setProperty(FOO_PROPERTY, "bar", SESSION);
-        message.getPropertyNames(SESSION).remove(FOO_PROPERTY);
-        assertNull(message.getProperty(FOO_PROPERTY, SESSION));
     }
 
     @Test

@@ -54,6 +54,6 @@ public class PayloadExpressionDataTypeResolverTestCase extends AbstractMuleConte
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
         testEvent.getMessage().setPayload(TEST_MESSAGE, expectedDataType);
 
-        assertThat(dataTypeResolver.resolve(testEvent.getMessage(), compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
+        assertThat(dataTypeResolver.resolve(testEvent, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
     }
 }

@@ -34,8 +34,7 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
             resultEvent = processNext(event);
 
             // Allow components to stop processing of the ReplyTo property (e.g. CXF)
-            final String replyToStop = resultEvent.getMessage().getInvocationProperty(
-                    MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
+            final String replyToStop = resultEvent.getFlowVariable(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
             if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)
                 && !BooleanUtils.toBoolean(replyToStop))
             {

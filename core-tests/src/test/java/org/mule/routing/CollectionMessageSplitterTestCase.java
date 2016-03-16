@@ -170,17 +170,17 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         }
 
         MuleMessage toSplit = new DefaultMuleMessage(payload, inboundProps, outboundProps, null, muleContext);
-        for (Map.Entry<String, Object> entry : invocationProps.entrySet())
-        {
-            toSplit.setInvocationProperty(entry.getKey(), entry.getValue());
-        }
         CollectionSplitter splitter = new CollectionSplitter();
         splitter.setMuleContext(muleContext);
         Grabber grabber = new Grabber();
         splitter.setListener(grabber);
         DefaultMuleEvent event = new DefaultMuleEvent(toSplit, fc, session);
+        for (Map.Entry<String, Object> entry : invocationProps.entrySet())
+        {
+            event.setFlowVariable(entry.getKey(), entry.getValue());
+        }
         splitter.process(event);
-        List<MuleMessage> splits = grabber.getMessages();
+        List<MuleEvent> splits = grabber.getEvents();
         assertEquals(count, splits.size());
 
         Set<Object> actualSequences = new HashSet<Object>();
@@ -194,11 +194,12 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
                                   Map<String, Object> inboundProps,
                                   Map<String, Object> outboundProps,
                                   Map<String, Object> invocationProps,
-                                  List<MuleMessage> splits,
+                                  List<MuleEvent> splits,
                                   Set<Object> actualSequences)
     {
-        for (MuleMessage msg : splits)
+        for (MuleEvent event : splits)
         {
+            MuleMessage msg = event.getMessage();
             assertTrue(msg.getPayload() instanceof String);
             assertThat(msg.getOutboundProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY), is(counted ? count : -1));
             actualSequences.add(msg.getOutboundProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY));
@@ -214,25 +215,25 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
             }
             for (String key : invocationProps.keySet())
             {
-                assertEquals(msg.getInvocationProperty(key), invocationProps.get(key));
+                assertEquals(event.getFlowVariable(key), invocationProps.get(key));
             }
         }
     }
 
     private static class Grabber implements MessageProcessor
     {
-        private List<MuleMessage> messages = new ArrayList<MuleMessage>();
+        private List<MuleEvent> events = new ArrayList<>();
 
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            messages.add(event.getMessage());
+            events.add(event);
             return null;
         }
 
-        public List<MuleMessage> getMessages()
+        public List<MuleEvent> getEvents()
         {
-            return messages;
+            return events;
         }
     }
 }

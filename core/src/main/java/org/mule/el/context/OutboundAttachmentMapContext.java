@@ -13,7 +13,7 @@ import java.util.Set;
 
 import javax.activation.DataHandler;
 
-public class OutboundAttachmentMapContext extends AbstractMapContext<String, DataHandler>
+public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler>
 {
     private MuleEvent event;
 
@@ -23,20 +23,14 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<String, Dat
     }
 
     @Override
-    public DataHandler get(Object key)
+    public DataHandler doGet(String key)
     {
-        if (!(key instanceof String))
-        {
-            return null;
-        }
-
-        return event.getMessage().getOutboundAttachment((String) key);
+        return event.getMessage().getOutboundAttachment(key);
     }
 
     @Override
-    public DataHandler put(String key, DataHandler value)
+    public void doPut(String key, DataHandler value)
     {
-        DataHandler previousValue = get(key);
         try
         {
             event.getMessage().addOutboundAttachment(key, value);
@@ -45,18 +39,11 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<String, Dat
         {
             throw new MuleRuntimeException(e);
         }
-        return previousValue;
     }
 
     @Override
-    public DataHandler remove(Object key)
+    public void doRemove(String key)
     {
-        if (!(key instanceof String))
-        {
-            return null;
-        }
-
-        DataHandler previousValue = get(key);
         try
         {
             event.getMessage().removeOutboundAttachment((String) key);
@@ -65,7 +52,6 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<String, Dat
         {
             throw new RuntimeException(e);
         }
-        return previousValue;
     }
 
     @Override

@@ -68,7 +68,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
                                                        + event));
         }
 
-        final boolean errorDetected = untilSuccessfulConfiguration.getFailureExpressionFilter().accept(msg);
+        final boolean errorDetected = untilSuccessfulConfiguration.getFailureExpressionFilter().accept(returnEvent);
         if (errorDetected)
         {
             throw new MuleRuntimeException(

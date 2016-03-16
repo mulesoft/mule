@@ -5,26 +5,17 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <message-properties-transformer name="addInvocationProperty" scope="invocation">
-        <add-message-property key="invPropKey" value="invPropValue"/>
-    </message-properties-transformer>
 
-    <message-properties-transformer name="addInvocationPropertyName" scope="invocation">
-        <add-message-property key="invPropKeyName" value="invPropKey"/>
-    </message-properties-transformer>
+    <set-variable name="addInvocationProperty" variableName="invPropKey" value="invPropValue"/>
 
-    <message-properties-transformer name="addInvocationProperty2" scope="invocation">
-        <add-message-property key="invPropKey2" value="invPropValue2"/>
-    </message-properties-transformer>
+    <set-variable name="addInvocationPropertyName" variableName="invPropKeyName" value="invPropKey"/>
 
-    <message-properties-transformer scope="session" name="addSessionProperty">
-        <add-message-property key="sesPropKey" value="sesPropValue"/>
-    </message-properties-transformer>
+    <set-variable name="addInvocationProperty2" variableName="invPropKey2" value="invPropValue2"/>
 
-    <message-properties-transformer scope="session" name="addSessionProperty2">
-        <add-message-property key="sesPropKey2" value="sesPropValue2"/>
-    </message-properties-transformer>
-    
+    <set-session-variable name="addSessionProperty" variableName="sesPropKey" value="sesPropValue"/>
+
+    <set-session-variable name="addSessionProperty2" variableName="sesPropKey2" value="sesPropValue2"/>
+
     <set-attachment name="setAttachGlobal" attachmentName="#[flowVars.invPropKey]" value="#[sessionVars.sesPropKey]" contentType="text/plain"/>
     
     <remove-attachment name="remAttachGlobal" attachmentName="#['attach']"/>

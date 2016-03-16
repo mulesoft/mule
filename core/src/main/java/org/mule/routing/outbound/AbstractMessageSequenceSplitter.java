@@ -109,36 +109,34 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
             messageSequence = new PartitionedMessageSequence(seq, batchSize);
         }
         int count = messageSequence.size();
-        MuleEvent currentEvent = originalEvent;
         for (; messageSequence.hasNext();)
         {
-            Object payload = messageSequence.next();
-            MuleMessage message = createMessage(payload, originalEvent.getMessage());
+            MuleEvent event = createEvent(messageSequence.next(), originalEvent);
+
             correlationSequence++;
             if (counterVariableName != null)
             {
-                message.setInvocationProperty(counterVariableName, correlationSequence);
+                originalEvent.setFlowVariable(counterVariableName, correlationSequence);
             }
             if (enableCorrelation != CorrelationMode.NEVER)
             {
-                boolean correlationSet = message.getCorrelationId() != null;
+                boolean correlationSet = event.getMessage().getCorrelationId() != null;
                 if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
                     || (enableCorrelation == CorrelationMode.ALWAYS))
                 {
-                    message.setCorrelationId(correlationId);
+                    event.getMessage().setCorrelationId(correlationId);
                 }
 
                 // take correlation group size from the message properties, set by
                 // concrete
                 // message splitter implementations
-                message.setCorrelationGroupSize(count);
-                message.setCorrelationSequence(correlationSequence);
+                event.getMessage().setCorrelationGroupSize(count);
+                event.getMessage().setCorrelationSequence(correlationSequence);
             }
-            message.propagateRootId(originalEvent.getMessage());
-            MuleEvent resultEvent = processNext(RequestContext.setEvent(new DefaultMuleEvent(message, originalEvent, currentEvent.getSession())));
+            event.getMessage().propagateRootId(originalEvent.getMessage());
+            MuleEvent resultEvent = processNext(RequestContext.setEvent(event));
             if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent))
             {
-                currentEvent = resultEvent;
                 resultEvents.add(resultEvent);
             }
         }
@@ -149,15 +147,21 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         return resultEvents;
     }
 
-    private MuleMessage createMessage(Object payload, MuleMessage originalMessage)
+    private MuleEvent createEvent(Object payload, MuleEvent originalEvent)
     {
-        if (payload instanceof MuleMessage)
+        if (payload instanceof MuleEvent)
         {
-            return (MuleMessage) payload;
+            return new DefaultMuleEvent(((MuleEvent) payload).getMessage(), originalEvent);
         }
-        MuleMessage message = new DefaultMuleMessage(originalMessage, muleContext);
-        message.setPayload(payload);
-        return message;
+        else if (payload instanceof MuleMessage)
+        {
+            return new DefaultMuleEvent((MuleMessage) payload, originalEvent);
+        }
+        else
+        {
+            MuleMessage message = new DefaultMuleMessage(payload, originalEvent.getMessage(), muleContext);
+            return new DefaultMuleEvent(message, originalEvent);
+        }
     }
 
     public void setEnableCorrelation(CorrelationMode enableCorrelation)

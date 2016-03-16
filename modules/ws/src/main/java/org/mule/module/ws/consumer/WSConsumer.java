@@ -8,8 +8,8 @@
 package org.mule.module.ws.consumer;
 
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
 import org.mule.DefaultMuleMessage;
+import org.mule.PropertyScope;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -23,8 +23,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.routing.RoutingException;
-import org.mule.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.CxfConstants;
@@ -226,7 +224,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             @Override
             protected MuleEvent processRequest(MuleEvent event) throws MuleException
             {
-                propertyValue = event.getMessage().removeProperty(propertyName, PropertyScope.INVOCATION);
+                propertyValue = event.getFlowVariable(propertyName);
+                event.removeFlowVariable(propertyName);
                 return super.processRequest(event);
             }
 
@@ -235,7 +234,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             {
                 if (propertyValue != null)
                 {
-                    event.getMessage().setInvocationProperty(propertyName, propertyValue);
+                    event.setFlowVariable(propertyName, propertyValue);
                 }
                 return super.processResponse(event);
             }
@@ -441,7 +440,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                 Attachment attachment = new AttachmentImpl(outboundAttachmentName, message.getOutboundAttachment(outboundAttachmentName));
                 attachments.add(attachment);
             }
-            message.setInvocationProperty(CxfConstants.ATTACHMENTS, attachments);
+            event.setFlowVariable(CxfConstants.ATTACHMENTS, attachments);
 
             message.clearAttachments();
         }
@@ -455,9 +454,9 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     {
         MuleMessage message = event.getMessage();
 
-        if (message.getInvocationProperty(CxfConstants.ATTACHMENTS) != null)
+        if (event.getFlowVariable(CxfConstants.ATTACHMENTS) != null)
         {
-            Collection<Attachment> attachments = message.getInvocationProperty(CxfConstants.ATTACHMENTS);
+            Collection<Attachment> attachments = event.getFlowVariable(CxfConstants.ATTACHMENTS);
             for (Attachment attachment : attachments)
             {
                 try

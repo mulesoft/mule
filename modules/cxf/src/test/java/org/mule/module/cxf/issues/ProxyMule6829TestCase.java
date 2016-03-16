@@ -55,8 +55,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
         @Override
         public void eventReceived(MuleEventContext context, Object component) throws Exception
         {
-            QName cxfOperation = (QName)context.getMessage().getProperty("cxf_operation",
-                PropertyScope.INVOCATION);
+            QName cxfOperation = context.getEvent().getFlowVariable("cxf_operation");
             cxfOperationName = cxfOperation.getLocalPart();
 
             latch.countDown();

@@ -20,9 +20,7 @@
         <add-message-property key="outPropKey2" value="outPropValue2"/>
     </message-properties-transformer>
 
-    <message-properties-transformer scope="invocation" name="addInvocationProperty">
-        <add-message-property key="invPropKey" value="invPropValue"/>
-    </message-properties-transformer>
+    <set-variable name="addInvocationProperty" variableName="invPropKey" value="invPropValue" />
 
     <set-property name="setPropGlobal" propertyName="prop" value="#['some value']"/>
 

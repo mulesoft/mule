@@ -11,8 +11,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -20,11 +18,11 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.PropertyScope;
 import org.mule.exception.CatchMessagingExceptionStrategy;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.exception.MessagingExceptionHandlerToSystemAdapter;
 import org.mule.exception.RollbackMessagingExceptionStrategy;
+import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
@@ -34,6 +32,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class ExceptionHandlingTestCase extends FunctionalTestCase
 {
@@ -61,7 +60,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
         MuleMessage response = muleEvent.getMessage();
 
         assertNotNull(response);
-        assertTrue(response.getProperty("expectedHandler", PropertyScope.SESSION));
+        assertTrue(muleEvent.getFlowVariable("expectedHandler"));
         assertTrue(injectedMessagingExceptionHandler instanceof DefaultMessagingExceptionStrategy);
     }
 
@@ -117,7 +116,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
         MuleMessage response = muleEvent.getMessage();
 
         assertNotNull(response);
-        assertTrue(response.getProperty("expectedHandler", PropertyScope.SESSION));
+        assertTrue(muleEvent.getFlowVariable("expectedHandler"));
         assertTrue(injectedMessagingExceptionHandler instanceof RollbackMessagingExceptionStrategy);
     }
 
@@ -132,7 +131,9 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
         MuleMessage response = client.request("test://outScope2", 3000);
 
         assertNotNull(response);
-        assertTrue(response.getProperty("expectedHandler", PropertyScope.SESSION));
+
+        FlowAssert.verify("outboundEndpointInScope");
+
         assertTrue(injectedMessagingExceptionHandler instanceof RollbackMessagingExceptionStrategy);
     }
 
@@ -150,7 +151,9 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
         MuleMessage response = client.request("test://outScope3", 3000);
 
         assertNotNull(response);
-        assertTrue(response.getProperty("expectedHandler", PropertyScope.SESSION));
+
+        FlowAssert.verify("outboundDynamicEndpointInScope");
+
         assertTrue(injectedMessagingExceptionHandler instanceof RollbackMessagingExceptionStrategy);
     }
 
@@ -163,7 +166,9 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
         MuleMessage response = client.request("test://outTransactional1", 3000);
 
         assertNotNull(response);
-        assertFalse(response.getProperty("expectedHandler", PropertyScope.SESSION));
+
+        FlowAssert.verify("customProcessorInTransactionalScope");
+
         assertTrue(injectedMessagingExceptionHandler instanceof CatchMessagingExceptionStrategy);
     }
 
@@ -201,7 +206,9 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
         MuleMessage response = client.request("test://outStrategy1",3000);
 
         assertNotNull(response);
-        assertFalse(response.getProperty("expectedHandler", PropertyScope.SESSION));
+
+        FlowAssert.verify("customProcessorInExceptionStrategy");
+
         assertTrue(injectedMessagingExceptionHandler instanceof MessagingExceptionHandlerToSystemAdapter);
     }
 
@@ -267,7 +274,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
                             .run();
 
         assertFalse(latch.await(3, TimeUnit.SECONDS));
-        verify(latch).countDown();
+        Mockito.verify(latch).countDown();
     }
 
     public static class ExecutionCountProcessor implements MessageProcessor
@@ -293,7 +300,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
             {
                 expectedHandler = messagingExceptionHandler.equals(event.getFlowConstruct().getExceptionListener());
             }
-            event.getMessage().setProperty("expectedHandler",expectedHandler, PropertyScope.SESSION);
+            event.setFlowVariable("expectedHandler",expectedHandler);
             injectedMessagingExceptionHandler = messagingExceptionHandler;
             return event;
         }

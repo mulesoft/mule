@@ -6,20 +6,21 @@
  */
 package org.mule.transformer.simple;
 
-import org.mule.PropertyScope;
+import org.mule.api.MuleEvent;
+import org.mule.api.metadata.DataType;
 
 public class AddFlowVariableTransformer extends AbstractAddVariablePropertyTransformer
 {
 
     @Override
-    protected PropertyScope getScope()
+    protected void addProperty(MuleEvent event, String propertyName, Object value, DataType dataType)
     {
-        return PropertyScope.INVOCATION;
-    }
-    
-    public void setVariableName(String variableName)
-    {
-        this.setIdentifier(variableName);
+        event.setFlowVariable(propertyName, value, dataType);
     }
 
+    @Override
+    protected void removeProperty(MuleEvent event, String propertyName)
+    {
+        event.removeFlowVariable(propertyName);
+    }
 }

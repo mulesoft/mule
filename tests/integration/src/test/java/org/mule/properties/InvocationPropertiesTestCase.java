@@ -11,11 +11,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.FilterUnacceptedException;
-import org.mule.PropertyScope;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -64,7 +61,7 @@ public class InvocationPropertiesTestCase extends FunctionalTestCase
         MuleEvent event = runner.buildEvent();
         runner.run();
 
-        assertThat(event.getMessage().getProperty("P1", PropertyScope.INVOCATION), is("P1_VALUE"));
+        assertThat(event.getFlowVariable("P1"), is("P1_VALUE"));
     }
 
     @Test
@@ -76,7 +73,7 @@ public class InvocationPropertiesTestCase extends FunctionalTestCase
         MuleEvent event = runner.buildEvent();
         runner.run();
         
-        assertThat(event.getMessage().getProperty("P1", PropertyScope.INVOCATION), is("P1_VALUE_NEW"));
+        assertThat(event.getFlowVariable("P1"), is("P1_VALUE_NEW"));
     }
 
     @Test
@@ -100,12 +97,12 @@ public class InvocationPropertiesTestCase extends FunctionalTestCase
                                                    .withFlowVariable("P2", nonSerializable)
                                                    .withFlowVariable("testThread", Thread.currentThread())
                                                    .asynchronously();
-        MuleMessage message = runner.buildEvent().getMessage();
+        MuleEvent event = runner.buildEvent();
         runner.run();
 
-        assertNotNull(message.getInvocationProperty("P1"));
-        assertNotNull(message.getInvocationProperty("P2"));
-        assertNull(message.getInvocationProperty("P3"));
+        assertNotNull(event.getFlowVariable("P1"));
+        assertNotNull(event.getFlowVariable("P2"));
+        assertNull(event.getFlowVariable("P3"));
     }
 
     @Test

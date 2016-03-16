@@ -21,9 +21,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.TransformationService;
 import org.mule.api.ExceptionPayload;
@@ -102,8 +100,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         when(mockUntilSuccessfulConfiguration.getRoute()).thenReturn(mockRoute);
         when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
         when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
-        // http://stackoverflow.com/questions/10324063/mockito-classcastexception
-        when((Object) (mockEvent.getMessage().getInvocationProperty(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE))).thenAnswer(new Answer<Object>()
+        when(mockEvent.getFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME)).thenAnswer(new Answer<Object>()
         {
             private int numberOfAttempts = 0;
 

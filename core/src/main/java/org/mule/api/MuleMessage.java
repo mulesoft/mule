@@ -42,16 +42,6 @@ public interface MuleMessage extends org.mule.api.temporary.MuleMessage<Object, 
     /**
      * @see #setProperty(String, Object, org.mule.PropertyScope)
      */
-    void setInvocationProperty(String key, Object value);
-
-    /**
-     * @see #setProperty(String, Object, org.mule.PropertyScope)
-     */
-    void setInvocationProperty(String key, Object value, DataType<?> dataType);
-
-    /**
-     * @see #setProperty(String, Object, org.mule.PropertyScope)
-     */
     void setOutboundProperty(String key, Object value);
 
     /**
@@ -68,7 +58,6 @@ public interface MuleMessage extends org.mule.api.temporary.MuleMessage<Object, 
      * @param value the property value
      * @param scope The scope at which to set the property at
      * @see PropertyScope
-     * @see #setInvocationProperty(String, Object)
      * @see #setOutboundProperty(String, Object)
      */
     void setProperty(String key, Object value, PropertyScope scope);
@@ -98,13 +87,11 @@ public interface MuleMessage extends org.mule.api.temporary.MuleMessage<Object, 
      *
      * @param scope the scope of property names
      * @return all property keys on this message in the given scope
-     * @see #getInvocationPropertyNames()
      * @see #getInboundPropertyNames()
      * @see #getOutboundPropertyNames()
      */
     Set<String> getPropertyNames(PropertyScope scope);
 
-    Set<String> getInvocationPropertyNames();
     Set<String> getInboundPropertyNames();
     Set<String> getOutboundPropertyNames();
 
@@ -145,7 +132,6 @@ public interface MuleMessage extends org.mule.api.temporary.MuleMessage<Object, 
      * @return the property value or null if the property does not exist in the specified scope
      * @see #getInboundProperty(String)
      * @see #getOutboundProperty(String)
-     * @see #getInvocationProperty(String)
      */
     <T> T getProperty(String name, PropertyScope scope);
 
@@ -159,19 +145,6 @@ public interface MuleMessage extends org.mule.api.temporary.MuleMessage<Object, 
      */
     <T> T getInboundProperty(String name);
 
-    /**
-     * @see #getProperty(String, org.mule.PropertyScope, Object)
-     */
-    <T> T getInvocationProperty(String name, T defaultValue);
-
-    /**
-     * @see #getProperty(String, org.mule.PropertyScope, Object)
-     */
-    <T> T getInvocationProperty(String name);
-
-    /**
-     * @see #getProperty(String, org.mule.PropertyScope, Object)
-     */
     <T> T getOutboundProperty(String name, T defaultValue);
 
     /**

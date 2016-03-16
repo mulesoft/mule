@@ -14,7 +14,6 @@ import static org.mule.transformer.types.MimeTypes.JSON;
 import static org.mule.transformer.types.MimeTypes.UNKNOWN;
 import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
-import org.mule.PropertyScope;
 import org.mule.el.mvel.DelegateVariableResolverFactory;
 import org.mule.el.mvel.GlobalVariableResolverFactory;
 import org.mule.el.mvel.MVELExpressionLanguage;
@@ -50,7 +49,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
         this.dataTypePropagator = dataTypePropagator;
     }
 
-    protected void doAssignmentDataTypePropagationTest(PropertyScope scope, String expression) throws Exception
+    protected void doAssignmentDataTypePropagationTest(String expression) throws Exception
     {
         final DataType expectedDataType = DataTypeFactory.create(String.class, JSON);
         expectedDataType.setEncoding(CUSTOM_ENCODING);
@@ -59,12 +58,12 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
         CompiledExpression compiledExpression = compileMelExpression(expression, testEvent);
 
-        dataTypePropagator.propagate(testEvent.getMessage(), new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+        dataTypePropagator.propagate(testEvent, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
 
-        assertThat(testEvent.getMessage().getPropertyDataType(PROPERTY_NAME, scope), like(String.class, JSON, CUSTOM_ENCODING));
+        assertThat(getVariableDataType(testEvent), like(String.class, JSON, CUSTOM_ENCODING));
     }
 
-    protected void doInnerAssignmentDataTypePropagationTest(PropertyScope scope, String expression) throws Exception
+    protected void doInnerAssignmentDataTypePropagationTest(String expression) throws Exception
     {
         final DataType expectedDataType = DataTypeFactory.create(Map.class, UNKNOWN);
         expectedDataType.setEncoding(CUSTOM_ENCODING);
@@ -72,15 +71,19 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
         final Map<String, String> propertyValue = new HashMap<>();
         propertyValue.put(INNER_PROPERTY_NAME, TEST_MESSAGE);
-        testEvent.getMessage().setProperty(PROPERTY_NAME, propertyValue, scope, expectedDataType);
+        setVariable(testEvent, propertyValue, expectedDataType);
 
         CompiledExpression compiledExpression = compileMelExpression(expression, testEvent);
 
         // Attempts to propagate a different dataType, which should be ignored
-        dataTypePropagator.propagate(testEvent.getMessage(), new TypedValue(propertyValue, DataType.STRING_DATA_TYPE), compiledExpression);
+        dataTypePropagator.propagate(testEvent, new TypedValue(propertyValue, DataType.STRING_DATA_TYPE), compiledExpression);
 
-        assertThat(testEvent.getMessage().getPropertyDataType(PROPERTY_NAME, scope), like(Map.class, UNKNOWN, CUSTOM_ENCODING));
+        assertThat(getVariableDataType(testEvent), like(Map.class, UNKNOWN, CUSTOM_ENCODING));
     }
+
+    protected abstract DataType<?> getVariableDataType(MuleEvent event);
+
+    protected abstract void setVariable(MuleEvent testEvent, Object propertyValue, DataType expectedDataType);
 
     private CompiledExpression compileMelExpression(String expression, MuleEvent testEvent)
     {

@@ -99,7 +99,7 @@ public class NestedProcessorChain implements NestedProcessor, MuleContextAware
         muleMessage = event.getMessage();
         for (String property : properties.keySet())
         {
-            muleMessage.setInvocationProperty(property, properties.get(property));
+            event.setFlowVariable(property, properties.get(property));
         }
         MuleEvent muleEvent;
         muleEvent = new DefaultMuleEvent(muleMessage, event);
@@ -110,12 +110,12 @@ public class NestedProcessorChain implements NestedProcessor, MuleContextAware
     {
         MuleMessage muleMessage;
         muleMessage = new DefaultMuleMessage(payload, muleContext);
-        for (String property : properties.keySet())
-        {
-            muleMessage.setInvocationProperty(property, properties.get(property));
-        }
         MuleEvent muleEvent;
         muleEvent = new DefaultMuleEvent(muleMessage, event);
+        for (String property : properties.keySet())
+        {
+            muleEvent.setFlowVariable(property, properties.get(property));
+        }
         return chain.process(muleEvent).getMessage().getPayload();
     }
 

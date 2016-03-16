@@ -106,13 +106,13 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase
     private static class TestSplitter extends AbstractSplitter
     {
         @Override
-        protected List<MuleMessage> splitMessage(MuleEvent event)
+        protected List<MuleEvent> splitMessage(MuleEvent event)
         {
             FruitBowl bowl = (FruitBowl) event.getMessage().getPayload();
-            List<MuleMessage> parts = new ArrayList<MuleMessage>();
+            List<MuleEvent> parts = new ArrayList<>();
             for (Fruit fruit : bowl.getFruit())
             {
-                parts.add(new DefaultMuleMessage(fruit, muleContext));
+                parts.add(new DefaultMuleEvent(new DefaultMuleMessage(fruit, muleContext), event));
             }
             return parts;
         }

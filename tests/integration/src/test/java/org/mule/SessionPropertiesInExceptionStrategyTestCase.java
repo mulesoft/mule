@@ -10,9 +10,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.PropertyScope.SESSION;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.api.message.NullPayload;
 
@@ -37,10 +36,10 @@ public class SessionPropertiesInExceptionStrategyTestCase extends FunctionalTest
         list.add("two");
         list.add("three");
 
-        MuleMessage result = flowRunner("test").withPayload(list).run().getMessage();
+        MuleEvent event = flowRunner("test").withPayload(list).run();
 
-        assertNull(result.getExceptionPayload());
-        assertFalse(result.getPayload() instanceof NullPayload);
-        assertThat(result.getProperty("ErrorCount", SESSION), is(list.size()));
+        assertNull(event.getMessage().getExceptionPayload());
+        assertFalse(event.getMessage().getPayload() instanceof NullPayload);
+        assertThat(event.getSession().getProperty("ErrorCount"), is(list.size()));
     }
 }

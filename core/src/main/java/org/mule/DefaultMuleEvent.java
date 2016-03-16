@@ -1020,19 +1020,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     public void setMessage(MuleMessage message)
     {
         this.message = message;
-        if (message instanceof DefaultMuleMessage)
-        {
-            // Don't copy properties from message to event every time we copy event as we did before. Rather
-            // only copy invocation properties over if MuleMessage had invocation properties set on it before
-            // MuleEvent was created.
-            flowVariables.putAll(((DefaultMuleMessage) message).getOrphanFlowVariables());
-
-            ((DefaultMuleMessage) message).setInvocationProperties(flowVariables);
-            if (session instanceof DefaultMuleSession)
-            {
-                ((DefaultMuleMessage) message).setSessionProperties(((DefaultMuleSession) session).getExtendedProperties());
-            }
-        }
     }
 
     /**
@@ -1050,7 +1037,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         DefaultMuleEvent eventCopy = new DefaultMuleEvent(messageCopy, event, new DefaultMuleSession(
             event.getSession()));
         eventCopy.flowVariables = ((DefaultMuleEvent) event).flowVariables.clone();
-        ((DefaultMuleMessage) messageCopy).setInvocationProperties(eventCopy.flowVariables);
         ((DefaultMuleMessage) messageCopy).resetAccessControl();
         return eventCopy;
     }

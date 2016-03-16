@@ -7,17 +7,29 @@
 package org.mule.transformer.simple;
 
 import org.mule.PropertyScope;
+import org.mule.api.MuleEvent;
+
+import java.util.Set;
 
 public class RemovePropertyTransformer extends AbstractRemoveVariablePropertyTransformer
 {
+
     @Override
-    public PropertyScope getScope()
+    protected void removeProperty(MuleEvent event, String propertyName)
     {
-        return PropertyScope.OUTBOUND;
+        event.getMessage().removeProperty(propertyName, PropertyScope.OUTBOUND);
     }
-    
-    public void setPropertyName(String propertyName)
+
+    @Override
+    protected Set<String> getPropertyNames(MuleEvent event)
     {
-        this.setIdentifier(propertyName);
+        return event.getMessage().getOutboundPropertyNames();
     }
+
+    @Override
+    protected String getScopeName()
+    {
+        return PropertyScope.OUTBOUND_NAME;
+    }
+
 }

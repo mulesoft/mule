@@ -43,22 +43,12 @@
     </flow>
 
     <sub-flow name="set-rr-thread-property">
-        <message-properties-transformer
-            scope="invocation">
-            <add-message-property key="property-name"
-                value="request-response-thread" />
-        </message-properties-transformer>
-
+        <set-variable variableName="property-name" value="request-response-thread" />
         <processor ref="threadSensingProcessor" />
     </sub-flow>
 
     <sub-flow name="set-async-thread-property">
-        <message-properties-transformer
-            scope="invocation">
-            <add-message-property key="property-name"
-                value="async-thread" />
-        </message-properties-transformer>
-
+        <set-variable variableName="property-name" value="async-thread" />
         <processor ref="threadSensingProcessor" />
     </sub-flow>
 

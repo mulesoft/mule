@@ -54,6 +54,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     public void setUp() throws Exception
     {
         when(mockAlwaysTrueFailureExpressionFilter.accept(any(MuleMessage.class))).thenReturn(true);
+        when(mockAlwaysTrueFailureExpressionFilter.accept(any(MuleEvent.class))).thenReturn(true);
         when(mockUntilSuccessfulConfiguration.getRoute()).thenReturn(mockRoute);
         when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
         when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
@@ -118,7 +119,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
         {
             assertThat(e, instanceOf(RoutingException.class));
             verify(mockRoute, times(DEFAULT_RETRIES + 1)).process(event);
-            verify(mockAlwaysTrueFailureExpressionFilter, times(DEFAULT_RETRIES + 1)).accept(any(MuleMessage.class));
+            verify(mockAlwaysTrueFailureExpressionFilter, times(DEFAULT_RETRIES + 1)).accept(any(MuleEvent.class));
         }
     }
 
@@ -166,7 +167,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
         {
             assertThat(e, instanceOf(RoutingException.class));
             verify(mockRoute, times(DEFAULT_RETRIES + 1)).process(event);
-            verify(mockAlwaysTrueFailureExpressionFilter, times(DEFAULT_RETRIES + 1)).accept(any(MuleMessage.class));
+            verify(mockAlwaysTrueFailureExpressionFilter, times(DEFAULT_RETRIES + 1)).accept(any(MuleEvent.class));
         }
     }
 

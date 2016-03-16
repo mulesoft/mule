@@ -67,7 +67,7 @@ public class SelectParameterizedQueryDebugInfoTestCase extends AbstractDbIntegra
 
         final MuleEvent muleEvent = getTestEvent(TEST_MESSAGE);
         final String expectedPosition = "3";
-        muleEvent.getMessage().setInvocationProperty("position", expectedPosition);
+        muleEvent.setFlowVariable("position", expectedPosition);
         final List<FieldDebugInfo> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
 
         assertThat(debugInfo, is(not(nullValue())));

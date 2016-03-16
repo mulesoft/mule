@@ -13,8 +13,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
@@ -194,13 +194,13 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void matchesValueFromFlowVar() throws InitialisationException
+    public void matchesValueFromFlowVar() throws Exception
     {
         regExWithValue.setValue("#[flowVars.value]");
         regExWithValue.initialise();
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(null, muleContext);
-        muleMessage.setInvocationProperty("value", "code with the mules");
-        assertThat(regExWithValue.accept(muleMessage), is(true));
+        MuleEvent event = getTestEvent(null);
+        event.setFlowVariable("value", "code with the mules");
+        assertThat(regExWithValue.accept(event), is(true));
     }
 
     @Test

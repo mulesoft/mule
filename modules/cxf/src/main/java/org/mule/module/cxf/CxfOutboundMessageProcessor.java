@@ -20,7 +20,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.connector.DispatchException;
 import org.mule.api.processor.CloneableMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.RoutingException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
@@ -380,11 +379,11 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         // People can specify a CXF operation, which may in fact be different
         // than the method name. If that's not found, we'll default back to the
         // mule method property.
-        String method = event.getMessage().getInvocationProperty(CxfConstants.OPERATION);
+        String method = event.getFlowVariable(CxfConstants.OPERATION);
 
         if (method == null)
         {
-            Object muleMethodProperty = event.getMessage().getInvocationProperty(MuleProperties.MULE_METHOD_PROPERTY);
+            Object muleMethodProperty = event.getFlowVariable(MuleProperties.MULE_METHOD_PROPERTY);
 
             if (muleMethodProperty != null)
             {

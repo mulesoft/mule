@@ -65,6 +65,7 @@
             <test:component throwException="true"/>
         </foreach>
         <rollback-exception-strategy>
+            <test:assert expression="#[flowVars.expectedHandler == true]"/>
             <test:queue name="outScope2"/>
         </rollback-exception-strategy>
     </flow>
@@ -75,6 +76,7 @@
             <test:component throwException="true"/>
         </foreach>
         <rollback-exception-strategy>
+            <test:assert expression="#[flowVars.expectedHandler == true]"/>
             <test:queue name="outScope3"/>
         </rollback-exception-strategy>
     </flow>
@@ -84,6 +86,7 @@
             <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
             <test:component throwException="true"/>
             <catch-exception-strategy>
+                <test:assert expression="#[flowVars.expectedHandler == false]"/>
                 <test:queue name="outTransactional1"/>
             </catch-exception-strategy>
         </transactional>
@@ -137,6 +140,7 @@
         <test:component throwException="true"/>
         <catch-exception-strategy>
             <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
+            <test:assert expression="#[flowVars.expectedHandler == false]"/>
             <test:queue name="outStrategy1"/>
         </catch-exception-strategy>
     </flow>

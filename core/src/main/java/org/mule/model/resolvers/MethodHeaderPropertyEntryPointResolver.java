@@ -10,7 +10,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.model.InvocationResult;
-import org.mule.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 
@@ -54,10 +53,8 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         // MULE-4874: this is needed in order to execute the transformers before determining the methodProp
         Object[] payload = getPayloadFromMessage(context);
 
-        //TODO MULE-4953 I don't think the VM transport if managing invocation properties correctly, or maybe it is and this
-        //is valid
-        //Here I have to remove the 'method' property rather than just read it
-        Object methodProp = context.getMessage().removeProperty(getMethodProperty(), PropertyScope.INVOCATION);
+        Object methodProp = context.getEvent().getFlowVariable(getMethodProperty());
+        context.getEvent().removeFlowVariable(getMethodProperty());
         if (methodProp == null)
         {
             methodProp = context.getMessage().getInboundProperty(getMethodProperty());

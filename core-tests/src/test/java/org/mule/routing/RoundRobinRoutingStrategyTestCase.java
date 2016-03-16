@@ -33,7 +33,7 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
             @Override
             public String getRouteIdentifier(MuleEvent event) throws MessagingException
             {
-                return event.getMessage().getInvocationProperty(ID_PROPERTY_NAME);
+                return event.getFlowVariable(ID_PROPERTY_NAME);
             }
 
             @Override
