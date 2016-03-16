@@ -66,13 +66,15 @@ public class HeisenbergOperations
         config.setEndingHealth(HealthStatus.DEAD);
     }
 
-    public MuleMessage getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index)
+    public MuleMessage<String, Integer> getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index)
     {
         org.mule.api.metadata.DataType<String> dt = DataTypeFactory.create(String.class);
         Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
         dt.setEncoding(lastSupportedEncoding.toString());
         dt.setMimeType("dead/dead");
-        return new DefaultMuleMessage(config.getEnemies().get(index), dt);
+
+        MuleMessage message = new DefaultMuleMessage(config.getEnemies().get(index), dt, index);
+        return (MuleMessage<String, Integer>) message;
     }
 
     public String kill(@Optional(defaultValue = "#[payload]") String victim, String goodbyeMessage) throws Exception

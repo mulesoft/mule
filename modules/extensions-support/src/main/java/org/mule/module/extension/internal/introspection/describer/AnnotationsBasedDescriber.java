@@ -398,6 +398,7 @@ public final class AnnotationsBasedDescriber implements Describer
                     .withModelProperty(new ImplementingMethodModelProperty(method))
                     .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(actingClass, method))
                     .whichReturns(IntrospectionUtils.getMethodReturnType(method, typeLoader))
+                    .withAttributesOfType(IntrospectionUtils.getMethodReturnAttributesType(method, typeLoader))
                     .withExceptionEnricherFactory(getExceptionEnricherFactory(method));
 
             declareOperationParameters(method, operation);
