@@ -35,7 +35,7 @@ abstract class BaseExtensionBeanDefinitionParser implements BeanDefinitionParser
     private final Class<?> type;
 
     /**
-     *
+     * Delegate used for handling XML parsing
      */
     protected XmlExtensionParserDelegate parserDelegate;
 

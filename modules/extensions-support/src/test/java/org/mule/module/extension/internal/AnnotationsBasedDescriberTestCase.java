@@ -34,7 +34,6 @@ import static org.mule.module.extension.HeisenbergOperations.OPERATION_PARAMETER
 import static org.mule.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DEFAULT_CONNECTION_PROVIDER_NAME;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
@@ -313,9 +312,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(parameters, "weapon", "", toMetadataType(Weapon.class), false, SUPPORTED, null);
         assertParameter(parameters, "moneyFunction", "", TYPE_BUILDER.objectType()
                                 .id(Function.class.getName())
-                                .with(new GenericTypesAnnotation(asList(
-                                        TYPE_LOADER.load(MuleEvent.class),
-                                        TYPE_LOADER.load(Integer.class))))
+                                .with(new GenericTypesAnnotation(asList(MuleEvent.class.getName(), Integer.class.getName())))
                                 .build(),
                         false, SUPPORTED, null);
         assertParameter(parameters, "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false, SUPPORTED, null);
