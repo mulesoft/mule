@@ -220,6 +220,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                                   executorFactory,
                                                   parameterModels,
                                                   declaration.getReturnType(),
+                                                  declaration.getAttributesType(),
                                                   declaration.getModelProperties(),
                                                   declaration.getInterceptorFactories(),
                                                   declaration.getExceptionEnricherFactory());

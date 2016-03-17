@@ -38,6 +38,7 @@ import static org.mule.module.extension.internal.util.ExtensionsTestUtils.arrayO
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.api.MuleEvent;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.config.MuleManifest;
 import org.mule.extension.api.annotation.Configuration;
@@ -62,7 +63,9 @@ import org.mule.extension.api.introspection.declaration.fluent.OperationDeclarat
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.extension.api.introspection.property.DisplayModelProperty;
+import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.java.annotation.GenericTypesAnnotation;
 import org.mule.module.extension.HeisenbergConnection;
 import org.mule.module.extension.HeisenbergConnectionProvider;
@@ -272,6 +275,16 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         describerFor(HeisenbergWithOperationsPointingToExtensionAndDefaultConfig.class).describe(new DefaultDescribingContext());
     }
 
+    @Test
+    public void messageOperationWithoutGenerics() throws Exception
+    {
+        Descriptor descriptor = describerFor(HeisenbergWithGenericlessMessageOperation.class).describe(new DefaultDescribingContext());
+        OperationDeclaration operation = getOperation(descriptor.getRootDeclaration().getDeclaration(), "noGenerics");
+
+        assertThat(operation.getReturnType(), is(instanceOf(AnyType.class)));
+        assertThat(operation.getAttributesType(), is(instanceOf(NullType.class)));
+    }
+
     private void assertTestModuleConfiguration(Declaration declaration) throws Exception
     {
         assertThat(declaration.getConfigurations(), hasSize(1));
@@ -374,6 +387,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         operation = getOperation(declaration, GET_ENEMY_OPERATION);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(1));
+        assertThat(operation.getReturnType(), equalTo(toMetadataType(String.class)));
+        assertThat(operation.getAttributesType(), equalTo(toMetadataType(Integer.class)));
         assertParameter(operation.getParameters(), "index", "", toMetadataType(int.class), false, SUPPORTED, "0");
 
         operation = getOperation(declaration, KILL_OPERATION);
@@ -447,7 +462,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         operation = getOperation(declaration, IGNORED_OPERATION);
         assertThat(operation, is(nullValue()));
-
     }
 
     private void assertTestModuleConnectionProviders(Declaration declaration) throws Exception
@@ -613,6 +627,13 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     }
 
+    @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
+    @Operations({HeisenbergExtension.class, GenericlessMessageOperation.class})
+    public static class HeisenbergWithGenericlessMessageOperation
+    {
+
+    }
+
     public static class DuplicateConfigOperation
     {
 
@@ -621,6 +642,15 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
             return 10L;
         }
 
+    }
+
+    public static class GenericlessMessageOperation
+    {
+
+        public MuleMessage noGenerics()
+        {
+            return null;
+        }
     }
 
     public static class HeisenbergAlternateConfig extends HeisenbergExtension

@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
+import static org.mule.metadata.java.JavaTypeLoader.JAVA;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.util.Preconditions.checkArgument;
@@ -19,6 +20,7 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
+import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Expression;
 import org.mule.extension.api.annotation.Parameter;
@@ -32,6 +34,8 @@ import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.util.ArrayUtils;
@@ -54,6 +58,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.core.ResolvableType;
@@ -71,18 +76,73 @@ public final class IntrospectionUtils
     }
 
     /**
-     * Returns a {@link MetadataType} representing the given {@link Method}'s return type
+     * Returns a {@link MetadataType} representing the given {@link Method}'s return type.
+     * If the {@code method} returns a {@link MuleMessage}, then it returns the type
+     * of the {@code Payload} generic. If the {@link MuleMessage} type is being used
+     * in its raw form, then an {@link AnyType} will be returned.
      *
      * @param method     the {@link Method} being introspected
      * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
      * @return a {@link MetadataType}
-     * @throws java.lang.IllegalArgumentException is method is {@code null}
+     * @throws IllegalArgumentException is method is {@code null}
      */
     public static MetadataType getMethodReturnType(Method method, ClassTypeLoader typeLoader)
     {
+        return getMethodType(method, typeLoader, 0, () -> typeBuilder().anyType().build());
+    }
+
+    /**
+     * Returns a {@link MetadataType} representing the {@link MuleMessage#getAttributes()}
+     * that will be set after executing the given {@code method}.
+     * <p>
+     * If the {@code method} returns a {@link MuleMessage}, then it returns the type
+     * of the {@code Attributes} generic. In any other case
+     * (including raw uses of {@link MuleMessage}) it will return a {@link NullType}
+     *
+     * @param method     the {@link Method} being introspected
+     * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
+     * @return a {@link MetadataType}
+     * @throws IllegalArgumentException is method is {@code null}
+     */
+    public static MetadataType getMethodReturnAttributesType(Method method, ClassTypeLoader typeLoader)
+    {
+        return getMethodType(method, typeLoader, 1, () -> typeBuilder().nullType().build());
+    }
+
+    private static MetadataType getMethodType(Method method,
+                                              ClassTypeLoader typeLoader,
+                                              int genericIndex,
+                                              Supplier<MetadataType> fallbackSupplier)
+    {
+        ResolvableType methodType = getMethodResolvableType(method);
+        Type returnType = null;
+        if (methodType.getRawClass().equals(MuleMessage.class))
+        {
+            ResolvableType payloadGeneric = methodType.getGenerics()[genericIndex];
+            if (payloadGeneric.getRawClass() != null)
+            {
+                returnType = payloadGeneric.getType();
+            }
+        }
+        else
+        {
+            returnType = methodType.getType();
+        }
+
+        return returnType != null
+               ? typeLoader.load(returnType)
+               : fallbackSupplier.get();
+    }
+
+    private static ResolvableType getMethodResolvableType(Method method)
+    {
         checkArgument(method != null, "Can't introspect a null method");
-        ResolvableType type = ResolvableType.forMethodReturnType(method);
-        return typeLoader.load(type.getType());
+        return ResolvableType.forMethodReturnType(method);
+    }
+
+    private static BaseTypeBuilder<?> typeBuilder()
+    {
+        return BaseTypeBuilder.create(JAVA);
     }
 
     /**
@@ -93,7 +153,7 @@ public final class IntrospectionUtils
      * @param typeLoader a {@link ClassTypeLoader} to be used to create the returned {@link MetadataType}s
      * @return an array of {@link MetadataType} matching
      * the method's arguments. If the method doesn't take any, then the array will be empty
-     * @throws java.lang.IllegalArgumentException is method is {@code null}
+     * @throws IllegalArgumentException is method is {@code null}
      */
     public static MetadataType[] getMethodArgumentTypes(Method method, ClassTypeLoader typeLoader)
     {
@@ -120,7 +180,7 @@ public final class IntrospectionUtils
      * @param field      a not {@code null} {@link Field}
      * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
      * @return a {@link MetadataType} matching the field's type
-     * @throws java.lang.IllegalArgumentException if field is {@code null}
+     * @throws IllegalArgumentException if field is {@code null}
      */
     public static MetadataType getFieldMetadataType(Field field, ClassTypeLoader typeLoader)
     {
@@ -147,12 +207,10 @@ public final class IntrospectionUtils
     public static Field getFieldByAlias(Class<?> clazz, String alias, Class<?> type)
     {
         Collection<Field> candidates = getAllFields(clazz, withAnnotation(Alias.class), withTypeAssignableTo(type));
-        Field field = candidates.stream()
+        return candidates.stream()
                 .filter(f -> alias.equals(f.getAnnotation(Alias.class).value()))
                 .findFirst()
-                .orElse(null);
-
-        return field != null ? field : getField(clazz, alias, type);
+                .orElseGet(() -> getField(clazz, alias, type));
     }
 
     public static boolean hasDefaultConstructor(Class<?> clazz)
