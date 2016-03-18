@@ -98,8 +98,8 @@ import org.mule.util.ValueHolder;
 
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -120,9 +120,9 @@ public final class SchemaBuilder
 
     private static final String UNBOUNDED = "unbounded";
 
-    private final Set<Class<? extends Enum>> registeredEnums = new HashSet<>();
-    private final Map<Class<?>, ComplexTypeHolder> registeredComplexTypesHolders = new HashMap<>();
-    private final Map<String, NamedGroup> substitutionGroups = new HashMap<>();
+    private final Set<Class<? extends Enum>> registeredEnums = new LinkedHashSet<>();
+    private final Map<Class<?>, ComplexTypeHolder> registeredComplexTypesHolders = new LinkedHashMap<>();
+    private final Map<String, NamedGroup> substitutionGroups = new LinkedHashMap<>();
     private final ObjectFactory objectFactory = new ObjectFactory();
     private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 

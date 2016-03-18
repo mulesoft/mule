@@ -53,7 +53,7 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
     private SchemaGenerator generator;
     private ExtensionFactory extensionFactory;
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "{1}")
     public static Collection<Object[]> data()
     {
         return Arrays.asList(new Object[][] {
