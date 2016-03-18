@@ -40,6 +40,7 @@ public class ApplicationDescriptor extends ArtifactDescriptor
     private Map<String, String> appProperties = new HashMap<String, String>();
 
     private boolean redeploymentEnabled = true;
+    private File logConfigFile;
     private Set<ApplicationPluginDescriptor> plugins = new HashSet<ApplicationPluginDescriptor>(0);
     private URL[] sharedPluginLibs = new URL[0];
 
@@ -127,6 +128,16 @@ public class ApplicationDescriptor extends ArtifactDescriptor
     public void setRedeploymentEnabled(boolean redeploymentEnabled)
     {
         this.redeploymentEnabled = redeploymentEnabled;
+    }
+
+    public void setLogConfigFile(File logConfigFile)
+    {
+        this.logConfigFile = logConfigFile;
+    }
+
+    public File getLogConfigFile()
+    {
+        return logConfigFile;
     }
 
     public Set<ApplicationPluginDescriptor> getPlugins()
