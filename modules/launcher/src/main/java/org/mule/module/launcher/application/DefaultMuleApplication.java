@@ -7,6 +7,7 @@
 package org.mule.module.launcher.application;
 
 import static org.mule.util.SplashScreen.miniSplash;
+
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;

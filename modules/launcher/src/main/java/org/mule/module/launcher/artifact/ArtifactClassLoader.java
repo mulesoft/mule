@@ -9,6 +9,7 @@ package org.mule.module.launcher.artifact;
 import org.mule.module.launcher.DisposableClassLoader;
 import org.mule.module.launcher.LocalResourceLocator;
 
+import java.io.File;
 import java.net.URL;
 
 public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourceLocator
@@ -61,4 +62,9 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
      */
     void addShutdownListener(ShutdownListener listener);
 
+    /**
+     * @return the custom log4j configuration location for the artifact. This may return {@code null}, in which case the
+     *         default behavior for looking for the logging configuration will be applied.
+     */
+    File getLogConfigFile();
 }

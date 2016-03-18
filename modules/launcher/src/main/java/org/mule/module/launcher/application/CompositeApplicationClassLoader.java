@@ -11,6 +11,7 @@ import org.mule.module.launcher.MuleApplicationClassLoader;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.ShutdownListener;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -259,6 +260,23 @@ public class CompositeApplicationClassLoader extends ClassLoader implements Appl
                 if( resource!=null )
                 {
                     return resource;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public File getLogConfigFile()
+    {
+        for (ClassLoader classLoader : classLoaders)
+        {
+            if (classLoader instanceof ArtifactClassLoader)
+            {
+                File logConfigFile = ((ArtifactClassLoader) classLoader).getLogConfigFile();
+                if (logConfigFile != null)
+                {
+                    return logConfigFile;
                 }
             }
         }

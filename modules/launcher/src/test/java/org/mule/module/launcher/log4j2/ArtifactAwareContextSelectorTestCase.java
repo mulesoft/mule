@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 import static org.mule.module.launcher.log4j2.LoggerContextReaperThreadFactory.THREAD_NAME;
 import static org.mule.tck.MuleTestUtils.getRunningThreadByName;
+
 import org.mule.module.launcher.application.CompositeApplicationClassLoader;
 import org.mule.module.launcher.artifact.ShutdownListener;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
@@ -123,6 +124,26 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase
         expected = new File(expected, "log4j2.xml");
         LoggerContext ctx = selector.getContext("", classLoader, true);
         assertThat(ctx.getConfigLocation(), equalTo(expected.toURI()));
+    }
+
+    @Test
+    public void externalConf()
+    {
+        File customLogConfig = new File("src/test/resources/log4j2-test-custom.xml");
+        assertThat(customLogConfig.exists(), is(true));
+        when(classLoader.getLogConfigFile()).thenReturn(customLogConfig);
+        LoggerContext ctx = selector.getContext("", classLoader, true);
+        assertThat(ctx.getConfigLocation(), equalTo(customLogConfig.toURI()));
+    }
+
+    @Test
+    public void externalConfInvalid()
+    {
+        File customLogConfig = new File("src/test/resources/log4j2-test-custom-invalid.xml");
+        assertThat(customLogConfig.exists(), is(false));
+        when(classLoader.getLogConfigFile()).thenReturn(customLogConfig);
+        LoggerContext ctx = selector.getContext("", classLoader, true);
+        assertConfigurationLocation(ctx);
     }
 
     @Test

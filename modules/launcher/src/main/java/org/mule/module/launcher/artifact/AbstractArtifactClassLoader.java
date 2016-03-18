@@ -11,6 +11,7 @@ import org.mule.module.launcher.FineGrainedControlClassLoader;
 import org.mule.module.launcher.LocalResourceLocator;
 import org.mule.util.IOUtils;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -37,14 +38,17 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
 
     private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
 
+    private final File logConfig;
+
     public AbstractArtifactClassLoader(URL[] urls, ClassLoader parent)
     {
-        this(urls, parent, Collections.<String>emptySet());
+        this(urls, parent, Collections.<String> emptySet(), null);
     }
 
-    public AbstractArtifactClassLoader(URL[] urls, ClassLoader parent, Set<String> overrides)
+    public AbstractArtifactClassLoader(URL[] urls, ClassLoader parent, Set<String> overrides, File logConfig)
     {
         super(urls, parent, overrides);
+        this.logConfig = logConfig;
     }
 
     @Override
@@ -100,6 +104,7 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
         }
     }
 
+    @Override
     public URL findLocalResource(String resourceName)
     {
         URL resource = getLocalResourceLocator().findLocalResource(resourceName);
@@ -108,6 +113,12 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
             resource = ((LocalResourceLocator) getParent()).findLocalResource(resourceName);
         }
         return resource;
+    }
+
+    @Override
+    public File getLogConfigFile()
+    {
+        return logConfig;
     }
 
     private LocalResourceLocator getLocalResourceLocator()

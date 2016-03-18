@@ -7,6 +7,7 @@
 package org.mule.module.launcher.log4j2;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.module.launcher.DirectoryResourceLocator;
@@ -180,10 +181,20 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable
 
     private URI getArtifactLoggingConfig(ArtifactClassLoader muleCL)
     {
-        // Checks if there's an app-specific logging configuration available,
-        // scope the lookup to this classloader only, as getResource() will delegate to parents
-        // locate xml config first, fallback to properties format if not found
-        URI appLogConfig = getLogConfig(muleCL);
+        URI appLogConfig;
+        if (muleCL.getLogConfigFile() == null)
+        {
+            appLogConfig = getLogConfig(muleCL);
+        }
+        else if (!muleCL.getLogConfigFile().exists())
+        {
+            logger.warn("Configured 'log.configFile' in app descriptor points to a non-existant file. Using default configuration.");
+            appLogConfig = getLogConfig(muleCL);
+        }
+        else
+        {
+            appLogConfig = muleCL.getLogConfigFile().toURI();
+        }
 
         if (appLogConfig != null && logger.isInfoEnabled())
         {
@@ -193,6 +204,13 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable
         return appLogConfig;
     }
 
+    /**
+     * Checks if there's an app-specific logging configuration available, scope the lookup to this classloader only, as
+     * getResource() will delegate to parents locate xml config first, fallback to properties format if not found
+     * 
+     * @param localResourceLocator
+     * @return
+     */
     private URI getLogConfig(LocalResourceLocator localResourceLocator)
     {
         URL appLogConfig = localResourceLocator.findLocalResource("log4j2-test.xml");
