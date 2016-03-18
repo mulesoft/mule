@@ -20,6 +20,8 @@ import org.mule.tck.probe.Prober;
 import org.mule.source.polling.PollingTask;
 import org.mule.source.polling.PollingWorker;
 
+import java.util.TimeZone;
+
 import org.junit.Test;
 
 
@@ -95,14 +97,14 @@ public class CronSchedulerTest  extends AbstractMuleContextTestCase
 
     private CronScheduler createVoidScheduler()
     {
-        CronScheduler scheduler = new CronScheduler("name", new PollingWorker(mock(PollingTask.class), muleContext.getExceptionListener()), "0/1 * * * * ?");
+        CronScheduler scheduler = new CronScheduler("name", new PollingWorker(mock(PollingTask.class), muleContext.getExceptionListener()), "0/1 * * * * ?", TimeZone.getDefault());
         scheduler.setMuleContext(muleContext);
         return scheduler;
     }
 
     private CronScheduler createScheduler(PollingWorker worker)
     {
-        CronScheduler cronScheduler = new CronScheduler("name", worker, "0/1 * * * * ?");
+        CronScheduler cronScheduler = new CronScheduler("name", worker, "0/1 * * * * ?", TimeZone.getDefault());
         cronScheduler.setMuleContext(muleContext);
         return cronScheduler;
     }
