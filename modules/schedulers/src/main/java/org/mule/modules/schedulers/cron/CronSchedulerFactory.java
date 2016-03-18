@@ -6,9 +6,18 @@
  */
 package org.mule.modules.schedulers.cron;
 
+import static java.lang.String.format;
+import static java.util.TimeZone.getDefault;
+import static java.util.TimeZone.getTimeZone;
+
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.SchedulerFactory;
 import org.mule.transport.PollingReceiverWorker;
+
+import java.util.TimeZone;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -20,19 +29,39 @@ import org.mule.transport.PollingReceiverWorker;
  */
 public class CronSchedulerFactory extends SchedulerFactory<PollingReceiverWorker>
 {
+    private static final Log logger = LogFactory.getLog(CronSchedulerFactory.class);
+
+    private static final String TZ_GMT_ID = "GMT";
 
     private String expression;
+
+    private String timeZone;
 
     @Override
     protected Scheduler doCreate(String name, PollingReceiverWorker job)
     {
-        CronScheduler cronScheduler = new CronScheduler(name, job, expression);
+        CronScheduler cronScheduler = new CronScheduler(name, job, expression, resolveTimeZone(name));
         cronScheduler.setMuleContext(context);
         return cronScheduler;
+    }
+
+    protected TimeZone resolveTimeZone(String name)
+    {
+        TimeZone resolvedTimeZone = timeZone == null ? getDefault() : getTimeZone(timeZone);
+        if (!TZ_GMT_ID.equals(timeZone) && resolvedTimeZone.equals(getTimeZone(TZ_GMT_ID)))
+        {
+            logger.warn(format("Configured timezone '%s' is invalid in scheduler '%s'. Defaulting to %s", timeZone, name, TZ_GMT_ID));
+        }
+        return resolvedTimeZone;
     }
 
     public void setExpression(String expression)
     {
         this.expression = expression;
+    }
+
+    public void setTimeZone(String timeZone)
+    {
+        this.timeZone = timeZone;
     }
 }

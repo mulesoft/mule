@@ -10,6 +10,7 @@ import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -114,6 +115,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         jobDataMap.put(QuartzConnector.PROPERTY_PAYLOAD, payload);
 
         String cronExpression = jobDataMap.getString(QuartzConnector.PROPERTY_CRON_EXPRESSION);
+        String timeZone = jobDataMap.getString(QuartzConnector.PROPERTY_CRON_TIME_ZONE);
         String repeatInterval = jobDataMap.getString(QuartzConnector.PROPERTY_REPEAT_INTERVAL);
         String repeatCount = jobDataMap.getString(QuartzConnector.PROPERTY_REPEAT_COUNT);
         String startDelay = jobDataMap.getString(QuartzConnector.PROPERTY_START_DELAY);
@@ -141,7 +143,9 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 
         if (cronExpression != null)
         {
-            triggerBuilder.withSchedule(cronSchedule(cronExpression));
+            triggerBuilder.withSchedule(
+                    cronSchedule(cronExpression)
+                    .inTimeZone(((QuartzConnector) this.getConnector()).resolveTimeZone(timeZone, endpoint.getEndpointURI().getAddress())));
         }
         else if (repeatInterval != null)
         {

@@ -6,6 +6,9 @@
  */
 package org.mule.transport.quartz;
 
+import static java.util.TimeZone.getDefault;
+import static java.util.TimeZone.getTimeZone;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
@@ -17,6 +20,7 @@ import org.mule.transport.AbstractConnector;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -31,6 +35,7 @@ public class QuartzConnector extends AbstractConnector
     public static final String QUARTZ = "quartz";
 
     public static final String PROPERTY_CRON_EXPRESSION = "cronExpression";
+    public static final String PROPERTY_CRON_TIME_ZONE = "cronTimeZone";
     public static final String PROPERTY_REPEAT_INTERVAL = "repeatInterval";
     public static final String PROPERTY_REPEAT_COUNT = "repeatCount";
     public static final String PROPERTY_START_DELAY = "startDelay";
@@ -45,6 +50,8 @@ public class QuartzConnector extends AbstractConnector
 
     public static final String DEFAULT_GROUP_NAME = "mule";
     public static final String QUARTZ_INSTANCE_NAME_PROPERTY = "org.quartz.scheduler.instanceName";
+
+    private static final String TZ_GMT_ID = "GMT";
 
     private static final Object instanceNamesLock = new Object();
     private static final Map<String, QuartzConnector> instanceNames = new HashMap<String, QuartzConnector>();
@@ -200,6 +207,17 @@ public class QuartzConnector extends AbstractConnector
         }
     }
 
+    TimeZone resolveTimeZone(String timeZone, String name)
+    {
+        TimeZone resolvedTimeZone = timeZone == null ? getDefault() : getTimeZone(timeZone);
+        if (!TZ_GMT_ID.equals(timeZone) && resolvedTimeZone.equals(getTimeZone(TZ_GMT_ID)))
+        {
+            logger.warn(String.format("Configured timezone '%s' is invalid in scheduler '%s'. Defaulting to %s", timeZone, name, TZ_GMT_ID));
+        }
+        return resolvedTimeZone;
+    }
+
+    @Override
     public String getProtocol()
     {
         return QUARTZ;
