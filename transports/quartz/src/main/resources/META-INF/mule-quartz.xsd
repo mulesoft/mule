@@ -346,6 +346,13 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="cronTimeZone" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The ID of the time zone in which the expression will be based. Refer to <a href="https://docs.oracle.com/javase/7/docs/api/java/util/TimeZone.html">java.util.TimeZone</a> for the format and possible values of the timeZone ID.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="repeatInterval" type="mule:substitutableLong">
             <xsd:annotation>
                 <xsd:documentation>

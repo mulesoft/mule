@@ -64,6 +64,22 @@
         </service>
         <!--// END SNIPPET: example-1 -->
 
+        <service name="testService1Timezone">
+            <description>
+                This configuration will create an inbound event for testService1 at 12 noon in "America/Argentina/Buenos_Aires" TZ every day. The event payload
+                will always have the same value 'foo'.
+            </description>
+
+            <inbound>
+                <quartz:inbound-endpoint name="qEP1b" cronExpression="0 0 12 * * ?" cronTimeZone="America/Argentina/Buenos_Aires" jobName="job1b" 
+                    connector-ref="quartzConnector1">
+                    <quartz:event-generator-job>
+                        <quartz:payload>foo</quartz:payload>
+                    </quartz:event-generator-job>
+                </quartz:inbound-endpoint>
+            </inbound>
+        </service>
+
         <!--// START SNIPPET: example-2 -->
         <service name="testService2">
             <description>

@@ -9,6 +9,7 @@ package org.mule.modules.schedulers.cron;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -17,6 +18,8 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.PollingReceiverWorker;
+
+import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -92,14 +95,14 @@ public class CronSchedulerTest  extends AbstractMuleContextTestCase
 
     private CronScheduler createVoidScheduler()
     {
-        CronScheduler scheduler = new CronScheduler("name", new PollingReceiverWorker(receiver), "0/1 * * * * ?");
+        CronScheduler scheduler = new CronScheduler("name", new PollingReceiverWorker(receiver), "0/1 * * * * ?", TimeZone.getDefault());
         scheduler.setMuleContext(muleContext);
         return scheduler;
     }
 
     private CronScheduler createScheduler(PollingReceiverWorker job)
     {
-        CronScheduler cronScheduler = new CronScheduler("name", job, "0/1 * * * * ?");
+        CronScheduler cronScheduler = new CronScheduler("name", job, "0/1 * * * * ?", TimeZone.getDefault());
         cronScheduler.setMuleContext(muleContext);
         return cronScheduler;
     }
