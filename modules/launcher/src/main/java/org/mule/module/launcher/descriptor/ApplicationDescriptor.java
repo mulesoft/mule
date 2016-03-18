@@ -40,6 +40,8 @@ public class ApplicationDescriptor
 
     private boolean redeploymentEnabled = true;
 
+    private File logConfigFile;
+
     private Set<String> loaderOverride = new HashSet<String>();
 
     private Set<PluginDescriptor> plugins = new HashSet<PluginDescriptor>(0);
@@ -140,6 +142,16 @@ public class ApplicationDescriptor
     public void setRedeploymentEnabled(boolean redeploymentEnabled)
     {
         this.redeploymentEnabled = redeploymentEnabled;
+    }
+
+    public void setLogConfigFile(File logConfigFile)
+    {
+        this.logConfigFile = logConfigFile;
+    }
+
+    public File getLogConfigFile()
+    {
+        return logConfigFile;
     }
 
     public Set<String> getLoaderOverride()
