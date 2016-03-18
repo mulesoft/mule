@@ -52,6 +52,8 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     private static final String GOODBYE_MESSAGE = "Say hello to my little friend";
     private static final String VICTIM = "Skyler";
     public static final String HEISENBERG = "heisenberg";
+    public static final String KILL_RESULT = String.format("Killed with: %s , Type %s and attribute %s", RICIN_KILL_MESSAGE, Weapon.WeaponType.MELEE_WEAPON.name(), "Pizza on the rooftop");
+
     public static final long PAYMENT = 100;
 
     @Rule
@@ -292,7 +294,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
         ricinWeapon.setMicrogramsPerKilo(10L);
 
         MuleEvent event = flowRunner("killWithWeapon").withPayload(EMPTY).withFlowVariable("weapon", ricinWeapon).run();
-        assertThat(event.getMessageAsString(), is(RICIN_KILL_MESSAGE));
+        assertThat(event.getMessageAsString(), is(KILL_RESULT));
     }
 
 

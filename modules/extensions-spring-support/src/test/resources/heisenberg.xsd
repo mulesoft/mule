@@ -503,15 +503,42 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithWeaponType" substitutionGroup="heisenberg-empire" name="kill-with-weapon"></xs:element>
+    <xs:complexType name="org.mule.module.extension.model.WeaponWeaponAttributes">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionString" use="optional" name="brand"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="weapon-attributes">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.module.extension.model.WeaponWeaponAttributes">
+                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="KillWithWeaponType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="weapon-attributes">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.module.extension.model.WeaponWeaponAttributes"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="required" name="weapon"></xs:attribute>
+                <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.module.extension.model.WeaponWeaponTypeEnumType" use="required" name="type"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="weaponAttributes"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -683,6 +710,19 @@
                     <xs:enumeration value="HEALTHY"></xs:enumeration>
                     <xs:enumeration value="CANCER"></xs:enumeration>
                     <xs:enumeration value="DEAD"></xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType>
+                <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+            </xs:simpleType>
+        </xs:union>
+    </xs:simpleType>
+    <xs:simpleType name="org.mule.module.extension.model.WeaponWeaponTypeEnumType">
+        <xs:union>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="FIRE_WEAPON"></xs:enumeration>
+                    <xs:enumeration value="MELEE_WEAPON"></xs:enumeration>
                 </xs:restriction>
             </xs:simpleType>
             <xs:simpleType>
