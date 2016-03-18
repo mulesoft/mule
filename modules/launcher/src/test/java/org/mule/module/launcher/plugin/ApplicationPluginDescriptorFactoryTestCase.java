@@ -9,6 +9,7 @@ package org.mule.module.launcher.plugin;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.core.Is.is;
 import static org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory.PLUGIN_PROPERTIES;
 import static org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory.PROPERTY_LOADER_EXPORTED;
@@ -167,12 +168,21 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
                 throw new AssertionError("Can't compare classes dir", e);
             }
 
-            assertThat(pluginDescriptor.getRuntimeLibs(), equalTo(runtimeLibs));
+            assertRuntimeLibs(pluginDescriptor);
             blockedPrefixes = Collections.emptySet();
             assertThat(pluginDescriptor.getBlockedPrefixNames(), equalTo(blockedPrefixes));
             assertThat(pluginDescriptor.getExportedPrefixNames(), equalTo(exportedPrefixes));
             assertThat(pluginDescriptor.getLoaderOverrides(), equalTo(overriddenPrefixes));
             assertThat(pluginDescriptor.getRootFolder(), equalTo(pluginFolder));
+        }
+
+        private void assertRuntimeLibs(ApplicationPluginDescriptor pluginDescriptor)
+        {
+            assertThat(pluginDescriptor.getRuntimeLibs().length, equalTo(runtimeLibs.length));
+            for (URL libUrl : pluginDescriptor.getRuntimeLibs())
+            {
+                assertThat(pluginDescriptor.getRuntimeLibs(), hasItemInArray(equalTo(libUrl)));
+            }
         }
     }
 
