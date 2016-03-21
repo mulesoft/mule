@@ -13,6 +13,7 @@ import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotShutdow
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -22,6 +23,7 @@ import org.mule.transport.PollingReceiverWorker;
 import org.mule.transport.polling.schedule.PollScheduler;
 
 import java.util.Properties;
+import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -62,7 +64,7 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
 
     /**
      * <p>
-     * {@link MuleContext} used to define the thread poll size of the quarz scheduler
+     * {@link MuleContext} used to define the thread poll size of the quartz scheduler
      * </p>
      */
     private MuleContext context;
@@ -76,8 +78,15 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
 
     /**
      * <p>
-     * The poll job name created in the initialization phase. (This is used to tell quartz which is the job that
-     * we are managing)
+     * The {@link TimeZone} in which the {@code cronExpression} will be based
+     * </p>
+     */
+    private TimeZone timeZone;
+
+    /**
+     * <p>
+     * The poll job name created in the initialization phase. (This is used to tell quartz which is the job that we are
+     * managing)
      * </p>
      */
     private String jobName;
@@ -90,11 +99,12 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
      */
     private String groupName;
 
-    public CronScheduler(String name, PollingReceiverWorker job, String cronExpression)
+    public CronScheduler(String name, PollingReceiverWorker job, String cronExpression, TimeZone timeZone)
     {
         super(name, job);
 
         this.cronExpression = cronExpression;
+        this.timeZone = timeZone;
     }
 
     @Override
@@ -149,7 +159,7 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
                     CronTrigger cronTrigger = newTrigger()
                         .withIdentity(getName(), groupName)
                         .forJob(jobName, groupName)
-                        .withSchedule(cronSchedule(cronExpression))
+                        .withSchedule(cronSchedule(cronExpression).inTimeZone(timeZone))
                         .build();
                     quartzScheduler.scheduleJob(cronTrigger);
                 }
@@ -182,6 +192,14 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
     public String getCronExpression()
     {
         return cronExpression;
+    }
+
+    /**
+     * @return the {@link TimeZone} in which the {@code cronExpression} will be based.
+     */
+    public TimeZone getTimeZone()
+    {
+        return timeZone;
     }
 
     @Override

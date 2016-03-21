@@ -6,9 +6,14 @@
  */
 package org.mule.transport.quartz.config;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.endpoint.InboundEndpoint;
@@ -103,6 +108,21 @@ public class QuartzNamespaceHandlerFlowTestCase extends FunctionalTestCase
         assertTrue(ep.getProperty("jobConfig") instanceof EventGeneratorJobConfig);
         EventGeneratorJobConfig config = (EventGeneratorJobConfig) ep.getProperty("jobConfig");
         assertEquals("foo", config.getPayload());
+    }
+
+    @Test
+    public void testEndpoint1TimezoneConfig() throws Exception
+    {
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("testService1Timezone");
+        assertThat(flow, not(nullValue()));
+
+        InboundEndpoint ep = (DefaultInboundEndpoint) flow.getMessageSource();
+        assertThat(ep, not(nullValue()));
+        assertThat(ep.getProperty("jobConfig"), not(nullValue()));
+        assertThat(ep.getProperty("jobConfig"), instanceOf(EventGeneratorJobConfig.class));
+        EventGeneratorJobConfig config = (EventGeneratorJobConfig) ep.getProperty("jobConfig");
+        assertThat((String) config.getPayload(), is("foo"));
+        assertThat((String) ep.getProperty("cronTimeZone"), is("America/Argentina/Buenos_Aires"));
     }
 
     @Test
