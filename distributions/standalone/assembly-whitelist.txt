@@ -368,8 +368,8 @@
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
 /mule-standalone-${productVersion}/lib/opt/rome-0.9.jar
-/mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.7.0-3.jar
-/mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.7.0-3-xqj.jar
+/mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-7.jar
+/mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-7-xqj.jar
 /mule-standalone-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/smack-3.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/smackx-3.4.1.jar
