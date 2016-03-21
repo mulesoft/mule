@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request.grizzly;
+package org.mule.module.http.internal.request;
 
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 
 
-public class GrizzlyHttpClientConfiguration
+public class HttpClientConfiguration
 {
     private final TlsContextFactory tlsContextFactory;
     private final ProxyConfig proxyConfig;
@@ -22,7 +22,7 @@ public class GrizzlyHttpClientConfiguration
     private final String threadNamePrefix;
     private final String ownerName;
 
-    private GrizzlyHttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties,
+    private HttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties,
                                            int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix, String ownerName)
     {
         this.tlsContextFactory = tlsContextFactory;
@@ -134,9 +134,9 @@ public class GrizzlyHttpClientConfiguration
             return this;
         }
 
-        public GrizzlyHttpClientConfiguration build()
+        public HttpClientConfiguration build()
         {
-            return new GrizzlyHttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
+            return new HttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
                                                       usePersistentConnections, connectionIdleTimeout, threadNamePrefix, ownerName);
         }
     }

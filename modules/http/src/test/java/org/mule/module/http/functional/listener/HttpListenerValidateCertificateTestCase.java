@@ -47,7 +47,7 @@ public class HttpListenerValidateCertificateTestCase extends FunctionalTestCase
         tlsContextFactory = new DefaultTlsContextFactory();
 
         // Configure trust store in the client with the certificate of the server.
-        tlsContextFactory.setTrustStorePath("trustStore");
+        tlsContextFactory.setTrustStorePath("tls/trustStore");
         tlsContextFactory.setTrustStorePassword("mulepassword");
 
     }
@@ -98,7 +98,7 @@ public class HttpListenerValidateCertificateTestCase extends FunctionalTestCase
      */
     private void configureClientKeyStore() throws IOException
     {
-        tlsContextFactory.setKeyStorePath("ssltest-keystore.jks");
+        tlsContextFactory.setKeyStorePath("tls/ssltest-keystore.jks");
         tlsContextFactory.setKeyStorePassword("changeit");
         tlsContextFactory.setKeyManagerPassword("changeit");
     }

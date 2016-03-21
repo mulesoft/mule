@@ -9,6 +9,7 @@ package org.mule.module.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.util.FileUtils;
@@ -88,7 +89,7 @@ public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase
 
         try
         {
-            realmPath = FileUtils.getResourcePath("realm.properties", getClass());
+            realmPath = FileUtils.getResourcePath("auth/realm.properties", getClass());
         }
         catch (IOException e)
         {

@@ -8,8 +8,8 @@ package org.mule.module.http.functional.requester;
 
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.FileUtils;
 import org.mule.util.CaseInsensitiveMapWrapper;
+import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
 import com.google.common.base.Supplier;
@@ -98,7 +98,7 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
         try
         {
-            sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("serverKeystore", getClass()));
+            sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("tls/serverKeystore", getClass()));
         }
         catch (IOException e)
         {
@@ -170,6 +170,6 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
     public String getFirstReceivedHeader(String headerName)
     {
-        return (String) headers.get(headerName).iterator().next();
+        return headers.get(headerName).iterator().next();
     }
 }

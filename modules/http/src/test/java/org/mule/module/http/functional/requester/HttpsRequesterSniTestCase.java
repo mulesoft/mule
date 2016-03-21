@@ -6,21 +6,11 @@
  */
 package org.mule.module.http.functional.requester;
 
-import org.apache.commons.lang.StringUtils;
-import org.glassfish.grizzly.Connection;
-import org.glassfish.grizzly.Grizzly;
-import org.glassfish.grizzly.attributes.Attribute;
-import org.glassfish.grizzly.filterchain.FilterChainBuilder;
-import org.glassfish.grizzly.http.server.AddOn;
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.http.server.NetworkListener;
-import org.glassfish.grizzly.sni.SNIConfig;
-import org.glassfish.grizzly.sni.SNIFilter;
-import org.glassfish.grizzly.sni.SNIServerConfigResolver;
-import org.glassfish.grizzly.ssl.SSLBaseFilter;
-import org.glassfish.grizzly.ssl.SSLContextConfigurator;
-import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
-import org.junit.*;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.security.tls.TlsConfiguration;
@@ -36,10 +26,26 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeThat;
+import org.apache.commons.lang.StringUtils;
+import org.glassfish.grizzly.Connection;
+import org.glassfish.grizzly.Grizzly;
+import org.glassfish.grizzly.attributes.Attribute;
+import org.glassfish.grizzly.filterchain.FilterChainBuilder;
+import org.glassfish.grizzly.http.server.AddOn;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.sni.SNIConfig;
+import org.glassfish.grizzly.sni.SNIFilter;
+import org.glassfish.grizzly.sni.SNIServerConfigResolver;
+import org.glassfish.grizzly.ssl.SSLBaseFilter;
+import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 
 public class HttpsRequesterSniTestCase extends FunctionalTestCase
 {
@@ -74,7 +80,11 @@ public class HttpsRequesterSniTestCase extends FunctionalTestCase
 
     private static File getTlsPropertiesFile()
     {
-        String path = ClassUtils.getClassPathRoot(HttpsRequesterSniTestCase.class).getPath();
+        String path = System.getProperty("testClasspathDir");
+        if (path == null)
+        {
+            path = ClassUtils.getClassPathRoot(HttpsRequesterSniTestCase.class).getPath();
+        }
         return new File(path, String.format(TlsConfiguration.PROPERTIES_FILE_PATTERN, TlsConfiguration.DEFAULT_SECURITY_MODEL));
     }
 
@@ -128,6 +138,7 @@ public class HttpsRequesterSniTestCase extends FunctionalTestCase
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
+    @Override
     protected MuleEvent runFlow(String flowName, MuleEvent event) throws Exception
     {
         Flow flow = lookupFlowConstruct(flowName);
@@ -198,14 +209,14 @@ public class HttpsRequesterSniTestCase extends FunctionalTestCase
             SSLContextConfigurator sslContextConfigurator = new SSLContextConfigurator();
             ClassLoader cl = HttpsRequesterSniTestCase.class.getClassLoader();
 
-            URL cacertsUrl = cl.getResource("sni-server-truststore.jks");
+            URL cacertsUrl = cl.getResource("tls/sni-server-truststore.jks");
             if (cacertsUrl != null)
             {
                 sslContextConfigurator.setTrustStoreFile(cacertsUrl.getFile());
                 sslContextConfigurator.setTrustStorePass("changeit");
             }
 
-            URL keystoreUrl = cl.getResource("sni-server-keystore.jks");
+            URL keystoreUrl = cl.getResource("tls/sni-server-keystore.jks");
             if (keystoreUrl != null)
             {
                 sslContextConfigurator.setKeyStoreFile(keystoreUrl.getFile());
@@ -218,6 +229,7 @@ public class HttpsRequesterSniTestCase extends FunctionalTestCase
 
         private class SniAddOn implements AddOn
         {
+            @Override
             public void setup(NetworkListener networkListener, FilterChainBuilder builder)
             {
                 // replace SSLFilter (if any) with SNIFilter

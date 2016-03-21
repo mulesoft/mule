@@ -27,7 +27,6 @@ import org.mule.module.http.api.requester.HttpSendBodyMode;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClient;
-import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClientConfiguration;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.ssl.api.TlsContextFactoryBuilder;
 import org.mule.transport.tcp.DefaultTcpClientSocketProperties;
@@ -39,6 +38,7 @@ import java.net.CookieManager;
 
 public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implements HttpRequesterConfig, Initialisable, Stoppable, Startable, MuleContextAware
 {
+    public static final String OBJECT_HTTP_CLIENT_FACTORY = "_httpClientFactory";
     private static final int UNLIMITED_CONNECTIONS = -1;
     private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
     private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
@@ -100,7 +100,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
 
         String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, ThreadNameHelper.getPrefix(muleContext), name);
 
-        GrizzlyHttpClientConfiguration configuration = new GrizzlyHttpClientConfiguration.Builder()
+        HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
                 .setTlsContextFactory(tlsContext)
                 .setProxyConfig(proxyConfig)
                 .setClientSocketProperties(clientSocketProperties)
@@ -111,7 +111,15 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
                 .setOwnerName(name)
                 .build();
 
-        httpClient = new GrizzlyHttpClient(configuration);
+        HttpClientFactory httpClientFactory = muleContext.getRegistry().get(OBJECT_HTTP_CLIENT_FACTORY);
+        if (httpClientFactory == null)
+        {
+            httpClient = new GrizzlyHttpClient(configuration);
+        }
+        else
+        {
+            httpClient = httpClientFactory.create(configuration);
+        }
 
         httpClient.initialise();
     }
@@ -172,6 +180,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
         this.basePath = basePath;
     }
 
+    @Override
     public String getName()
     {
         return name;
@@ -215,6 +224,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
         this.authentication = authentication;
     }
 
+    @Override
     public TlsContextFactory getTlsContext()
     {
         return tlsContext;
@@ -256,6 +266,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
         this.clientSocketProperties = clientSocketProperties;
     }
 
+    @Override
     public ProxyConfig getProxyConfig()
     {
         return proxyConfig;

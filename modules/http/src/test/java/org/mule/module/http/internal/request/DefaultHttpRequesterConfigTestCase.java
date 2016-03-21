@@ -13,8 +13,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.module.http.internal.request.DefaultHttpRequesterConfig.OBJECT_HTTP_CLIENT_FACTORY;
 
 import org.mule.api.MuleContext;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.transport.ssl.api.TlsContextFactory;
@@ -41,6 +43,10 @@ public class DefaultHttpRequesterConfigTestCase extends AbstractMuleTestCase
     {
         when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(true);
         requestConfig = createBaseRequester();
+
+        MuleRegistry registry = mock(MuleRegistry.class);
+        when(registry.get(OBJECT_HTTP_CLIENT_FACTORY)).thenReturn(null);
+        when(mockMuleContext.getRegistry()).thenReturn(registry);
     }
 
     @Test

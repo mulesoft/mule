@@ -9,21 +9,21 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <tls:context name="globalTlsContext" >
-        <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
-        <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
+        <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
     </tls:context>
 
     <http:listener-config name="insecureConfig" protocol="HTTPS" host="localhost" port="${port1}">
         <tls:context>
-            <tls:trust-store path="ssltest-cacerts.jks" password="changeit" insecure="true"/>
-            <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+            <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" insecure="true"/>
+            <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
         </tls:context>
     </http:listener-config>
 
     <http:listener-config name="secureConfig" protocol="HTTPS" host="localhost" port="${port2}">
         <tls:context>
-            <tls:trust-store path="ssltest-cacerts.jks" password="changeit" />
-            <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+            <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" />
+            <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
         </tls:context>
     </http:listener-config>
 

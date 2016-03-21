@@ -9,7 +9,7 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <tls:context name="tlsContext" >
-        <tls:trust-store path="sni-client-truststore.jks" password="changeit"/>
+        <tls:trust-store path="tls/sni-client-truststore.jks" password="changeit"/>
     </tls:context>
 
     <http:request-config name="requestConfig" protocol="HTTPS" port="${httpsPort}" tlsContext-ref="tlsContext" />

@@ -9,6 +9,7 @@ package org.mule.module.http.internal.request.grizzly;
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
+
 import org.mule.api.CompletionHandler;
 import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
@@ -28,12 +29,24 @@ import org.mule.module.http.internal.domain.response.HttpResponseBuilder;
 import org.mule.module.http.internal.multipart.HttpPart;
 import org.mule.module.http.internal.request.HttpAuthenticationType;
 import org.mule.module.http.internal.request.HttpClient;
+import org.mule.module.http.internal.request.HttpClientConfiguration;
 import org.mule.module.http.internal.request.NtlmProxyConfig;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.ssl.api.TlsContextTrustStoreConfiguration;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
+import javax.net.ssl.SSLContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -48,17 +61,6 @@ import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.multipart.ByteArrayPart;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-
-import javax.net.ssl.SSLContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GrizzlyHttpClient implements HttpClient
 {
@@ -80,7 +82,7 @@ public class GrizzlyHttpClient implements HttpClient
     private AsyncHttpClient asyncHttpClient;
     private SSLContext sslContext;
 
-    public GrizzlyHttpClient(GrizzlyHttpClientConfiguration config)
+    public GrizzlyHttpClient(HttpClientConfiguration config)
     {
         this.tlsContextFactory = config.getTlsContextFactory();
         this.proxyConfig = config.getProxyConfig();
@@ -150,34 +152,44 @@ public class GrizzlyHttpClient implements HttpClient
     {
         if (proxyConfig != null)
         {
-            ProxyServer proxyServer;
-            if (!StringUtils.isEmpty(proxyConfig.getUsername()))
-            {
-                proxyServer = new ProxyServer(
-                        proxyConfig.getHost(),
-                        proxyConfig.getPort(),
-                        proxyConfig.getUsername(),
-                        proxyConfig.getPassword());
-                if (proxyConfig instanceof NtlmProxyConfig)
-                {
-                    proxyServer.setNtlmDomain(((NtlmProxyConfig) proxyConfig).getNtlmDomain());
-                    try
-                    {
-                        proxyServer.setNtlmHost(getHostName());
-                    }
-                    catch (UnknownHostException e)
-                    {
-                        //do nothing, let the default behaviour be used
-                    }
-                    proxyServer.setScheme(NTLM);
-                }
-            }
-            else
-            {
-                proxyServer = new ProxyServer(proxyConfig.getHost(),proxyConfig.getPort());
-            }
-            builder.setProxyServer(proxyServer);
+            doConfigureProxy(builder, proxyConfig);
         }
+    }
+
+    protected void doConfigureProxy(AsyncHttpClientConfig.Builder builder, ProxyConfig proxyConfig)
+    {
+        builder.setProxyServer(buildProxy(proxyConfig));
+    }
+
+    protected final ProxyServer buildProxy(ProxyConfig proxyConfig)
+    {
+        ProxyServer proxyServer;
+        if (!StringUtils.isEmpty(proxyConfig.getUsername()))
+        {
+            proxyServer = new ProxyServer(
+                    proxyConfig.getHost(),
+                    proxyConfig.getPort(),
+                    proxyConfig.getUsername(),
+                    proxyConfig.getPassword());
+            if (proxyConfig instanceof NtlmProxyConfig)
+            {
+                proxyServer.setNtlmDomain(((NtlmProxyConfig) proxyConfig).getNtlmDomain());
+                try
+                {
+                    proxyServer.setNtlmHost(getHostName());
+                }
+                catch (UnknownHostException e)
+                {
+                    //do nothing, let the default behaviour be used
+                }
+                proxyServer.setScheme(NTLM);
+            }
+        }
+        else
+        {
+            proxyServer = new ProxyServer(proxyConfig.getHost(),proxyConfig.getPort());
+        }
+        return proxyServer;
     }
 
     private void configureTransport(AsyncHttpClientConfig.Builder builder)
@@ -250,6 +262,10 @@ public class GrizzlyHttpClient implements HttpClient
             if (e.getCause() instanceof TimeoutException)
             {
                 throw (TimeoutException) e.getCause();
+            }
+            else if (e.getCause() instanceof IOException)
+            {
+                throw (IOException) e.getCause();
             }
             else
             {
@@ -329,34 +345,13 @@ public class GrizzlyHttpClient implements HttpClient
     private Request createGrizzlyRequest(HttpRequest request, int responseTimeout, boolean followRedirects,
                                          HttpRequestAuthentication authentication) throws IOException
     {
-        RequestBuilder builder = new RequestBuilder();
+        RequestBuilder builder = createRequestBuilder(request);
 
         builder.setMethod(request.getMethod());
         builder.setUrl(request.getUri());
         builder.setFollowRedirects(followRedirects);
 
-        for (String headerName : request.getHeaderNames())
-        {
-            for (String headerValue : request.getHeaderValues(headerName))
-            {
-                builder.addHeader(headerName, headerValue);
-            }
-        }
-
-        // If persistent connections are disabled, the "Connection: close" header must be explicitly added. AHC will
-        // add "Connection: keep-alive" otherwise. (https://github.com/AsyncHttpClient/async-http-client/issues/885)
-
-        if (!usePersistentConnections)
-        {
-            String connectionHeaderValue = request.getHeaderValue(CONNECTION);
-            if (connectionHeaderValue != null && !CLOSE.equals(connectionHeaderValue) && logger.isDebugEnabled())
-            {
-                logger.debug("Persistent connections are disabled in the HTTP requester configuration, but the request already " +
-                             "contains a Connection header with value {}. This header will be ignored, and a Connection: close header " +
-                             "will be sent instead.", connectionHeaderValue);
-            }
-            builder.setHeader(CONNECTION, CLOSE);
-        }
+        populateHeaders(request, builder);
 
         DefaultHttpRequest defaultHttpRequest = (DefaultHttpRequest) request;
 
@@ -435,9 +430,46 @@ public class GrizzlyHttpClient implements HttpClient
         return builder.build();
     }
 
+    protected RequestBuilder createRequestBuilder(HttpRequest request)
+    {
+        return new RequestBuilder();
+    }
+
+    protected void populateHeaders(HttpRequest request, RequestBuilder builder)
+    {
+        for (String headerName : request.getHeaderNames())
+        {
+            for (String headerValue : request.getHeaderValues(headerName))
+            {
+                builder.addHeader(headerName, headerValue);
+            }
+        }
+
+        // If persistent connections are disabled, the "Connection: close" header must be explicitly added. AHC will
+        // add "Connection: keep-alive" otherwise. (https://github.com/AsyncHttpClient/async-http-client/issues/885)
+
+        if (!usePersistentConnections)
+        {
+            String connectionHeaderValue = request.getHeaderValue(CONNECTION);
+            if (connectionHeaderValue != null && !CLOSE.equals(connectionHeaderValue) && logger.isDebugEnabled())
+            {
+                logger.debug("Persistent connections are disabled in the HTTP requester configuration, but the request already " +
+                             "contains a Connection header with value {}. This header will be ignored, and a Connection: close header " +
+                             "will be sent instead.",
+                        connectionHeaderValue);
+            }
+            builder.setHeader(CONNECTION, CLOSE);
+        }
+    }
+
     private String getHostName() throws UnknownHostException
     {
         return InetAddress.getLocalHost().getHostName();
+    }
+
+    protected ProxyConfig getProxyConfig()
+    {
+        return proxyConfig;
     }
 
     @Override

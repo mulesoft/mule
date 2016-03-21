@@ -10,39 +10,39 @@
 
     <!--Forces TLSv1.2 because of the cipher suite being used-->
     <tls:context name="tlsClientContext" enabledCipherSuites="TLS_DHE_DSS_WITH_AES_128_CBC_SHA256">
-        <tls:trust-store path="trustStore" password="mulepassword"/>
+        <tls:trust-store path="tls/trustStore" password="mulepassword"/>
     </tls:context>
 
     <http:request-config name="requestConfig1" protocol="${protocol}" host="localhost" port="${port1}" tlsContext-ref="tlsClientContext" />
     <!--Forces TLSv1.1 and TLSv1.2 with a cipher suite for each-->
     <http:request-config name="requestConfig2" protocol="HTTPS" host="localhost" port="${port2}">
         <tls:context enabledProtocols="TLSv1.1, TLSv1.2" enabledCipherSuites="TLS_DHE_DSS_WITH_AES_128_CBC_SHA256, ${cipherSuites}">
-            <tls:trust-store path="trustStore" password="mulepassword"/>
+            <tls:trust-store path="tls/trustStore" password="mulepassword"/>
         </tls:context>
     </http:request-config>
     <!--Forces TLSv1.1 and TLSv1.2 but the cipher suite is only available in TLSv1.2-->
     <http:request-config name="requestConfig3" protocol="HTTPS" host="localhost" port="${port3}">
         <tls:context enabledProtocols="TLSv1.1, TLSv1.2" enabledCipherSuites="TLS_DHE_DSS_WITH_AES_128_CBC_SHA256">
-            <tls:trust-store path="trustStore" password="mulepassword"/>
+            <tls:trust-store path="tls/trustStore" password="mulepassword"/>
         </tls:context>
     </http:request-config>
 
     <!--Uses JVM defaults because there is no tls-default.conf file-->
     <tls:context name="tlsServer2Context" enabledCipherSuites="default">
-        <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+        <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
     </tls:context>
 
     <!--Forces TLSv1.1-->
     <http:listener-config name="listenerConfig1" protocol="${protocol}" host="localhost" port="${port1}">
         <tls:context enabledProtocols="TLSv1.1">
-            <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+            <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
         </tls:context>
     </http:listener-config>
     <http:listener-config name="listenerConfig2" protocol="HTTPS" host="localhost" port="${port2}" tlsContext-ref="tlsServer2Context" />
     <!--Forces TLS_DHE_DSS_WITH_AES_128_CBC_SHA through a system property-->
     <http:listener-config name="listenerConfig3" protocol="HTTPS" host="localhost" port="${port3}">
         <tls:context enabledCipherSuites="${cipherSuites}">
-            <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+            <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
         </tls:context>
     </http:listener-config>
 

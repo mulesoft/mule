@@ -16,15 +16,15 @@
     -->
 
     <tls:context name="listenerTlsContext" >
-        <tls:key-store path="clientServerKeystore" keyPassword="mulepassword" password="mulepassword" alias="muleserver" />
+        <tls:key-store path="tls/clientServerKeystore" keyPassword="mulepassword" password="mulepassword" alias="muleserver" />
     </tls:context>
 
     <tls:context name="requestTlsContextWithCertificate" >
-        <tls:trust-store path="trustStore" password="mulepassword" />
+        <tls:trust-store path="tls/trustStore" password="mulepassword" />
     </tls:context>
 
     <tls:context name="requestTlsContextWithoutCertificate" >
-        <tls:trust-store path="trustStoreWithoutMuleServerCertificate" password="mulepassword" />
+        <tls:trust-store path="tls/trustStoreWithoutMuleServerCertificate" password="mulepassword" />
     </tls:context>
 
     <http:listener-config name="listenerConfig" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="listenerTlsContext" />
