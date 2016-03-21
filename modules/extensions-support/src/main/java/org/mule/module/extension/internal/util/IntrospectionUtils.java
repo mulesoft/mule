@@ -32,6 +32,7 @@ import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.extension.api.metadata.MetadataModelProperty;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -88,7 +89,12 @@ public final class IntrospectionUtils
      */
     public static MetadataType getMethodReturnType(Method method, ClassTypeLoader typeLoader)
     {
-        return getMethodType(method, typeLoader, 0, () -> typeBuilder().anyType().build());
+        return getMethodType(method, typeLoader, 0, () -> {
+            ResolvableType methodType = getMethodResolvableType(method);
+            return methodType.getRawClass().equals(MuleMessage.class)
+                   ? typeBuilder().anyType().build()
+                   : typeLoader.load(methodType.getType());
+        });
     }
 
     /**
@@ -115,23 +121,17 @@ public final class IntrospectionUtils
                                               Supplier<MetadataType> fallbackSupplier)
     {
         ResolvableType methodType = getMethodResolvableType(method);
-        Type returnType = null;
+        Type type = null;
         if (methodType.getRawClass().equals(MuleMessage.class))
         {
-            ResolvableType payloadGeneric = methodType.getGenerics()[genericIndex];
-            if (payloadGeneric.getRawClass() != null)
+            ResolvableType genericType = methodType.getGenerics()[genericIndex];
+            if (genericType.getRawClass() != null)
             {
-                returnType = payloadGeneric.getType();
+                type = genericType.getType();
             }
         }
-        else
-        {
-            returnType = methodType.getType();
-        }
 
-        return returnType != null
-               ? typeLoader.load(returnType)
-               : fallbackSupplier.get();
+        return type != null ? typeLoader.load(type) : fallbackSupplier.get();
     }
 
     private static ResolvableType getMethodResolvableType(Method method)
@@ -303,6 +303,11 @@ public final class IntrospectionUtils
         return !forceOptional && parameterModel.isRequired();
     }
 
+    public static boolean isNullType(MetadataType type)
+    {
+        return type instanceof NullType;
+    }
+
     public static boolean isVoid(Method method)
     {
         return isVoid(method.getReturnType());
@@ -380,5 +385,21 @@ public final class IntrospectionUtils
         }
 
         return sourceType.getSimpleName();
+    }
+
+    public static java.util.Optional<ParameterModel> getContentParameter(OperationModel operation)
+    {
+        return operation.getParameterModels().stream()
+                .filter(p -> p.getModelProperty(MetadataModelProperty.class).isPresent() &&
+                             p.getModelProperty(MetadataModelProperty.class).get().isContent())
+                .findFirst();
+    }
+
+    public static java.util.Optional<ParameterModel> getMetadataKeyParam(OperationModel operation)
+    {
+        return operation.getParameterModels().stream()
+                .filter(p -> p.getModelProperty(MetadataModelProperty.class).isPresent() &&
+                             p.getModelProperty(MetadataModelProperty.class).get().isMetadataKeyParam())
+                .findFirst();
     }
 }

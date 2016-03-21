@@ -63,6 +63,7 @@ import org.mule.extension.api.introspection.declaration.fluent.OperationDeclarat
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.extension.api.introspection.property.DisplayModelProperty;
+import org.mule.extension.api.metadata.MetadataModelProperty;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
@@ -76,6 +77,7 @@ import org.mule.module.extension.MoneyLaunderingOperation;
 import org.mule.module.extension.exception.CureCancerExceptionEnricher;
 import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.module.extension.internal.metadata.extension.MetadataExtension;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.model.ExtendedPersonalInfo;
@@ -147,7 +149,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     public void describeTestModule() throws Exception
     {
         Descriptor descriptor = getDescriber().describe(new DefaultDescribingContext());
-
         Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
         assertExtensionProperties(declaration);
 
@@ -156,6 +157,19 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertTestModuleConnectionProviders(declaration);
         assertTestModuleMessageSource(declaration);
         assertModelProperties(declaration);
+    }
+
+    @Test
+    public void parseMetadataAnnotationsOnParameter()
+    {
+        setDescriber(describerFor(MetadataExtension.class));
+        Descriptor descriptor = getDescriber().describe(new DefaultDescribingContext());
+        Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
+
+        List<ParameterDeclaration> parameters = getOperation(declaration, "contentMetadataWithKeyParam").getParameters();
+
+        assertParameterIsMetadataKeyParam(findParameter(parameters, "type"));
+        assertParameterIsMetadataContent(findParameter(parameters, "content"));
     }
 
     @Test
@@ -394,12 +408,14 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         operation = getOperation(declaration, KILL_OPERATION);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(2));
+        assertThat(operation.getReturnType(), equalTo(toMetadataType(String.class)));
+        assertThat(operation.getAttributesType(), is(instanceOf(NullType.class)));
         assertParameter(operation.getParameters(), "victim", "", toMetadataType(String.class), false, SUPPORTED, "#[payload]");
         assertParameter(operation.getParameters(), "goodbyeMessage", "", toMetadataType(String.class), true, SUPPORTED, null);
 
         operation = getOperation(declaration, KILL_WITH_WEAPON);
         assertThat(operation, is(notNullValue()));
-        assertThat(operation.getParameters(), hasSize(3)) ;
+        assertThat(operation.getParameters(), hasSize(3));
         assertParameter(operation.getParameters(), "weapon", "", toMetadataType(Weapon.class), true, SUPPORTED, null);
         assertParameter(operation.getParameters(), "type", "", toMetadataType(Weapon.WeaponType.class), true, SUPPORTED, null);
         assertParameter(operation.getParameters(), "weaponAttributes", "", toMetadataType(Weapon.WeaponAttributes.class), true, SUPPORTED, null);
@@ -427,6 +443,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         operation = getOperation(declaration, GET_PAYMENT_FROM_MESSAGE_OPERATION);
         assertThat(operation, is(notNullValue()));
+        assertThat(operation.getReturnType(), is(instanceOf(NullType.class)));
+        assertThat(operation.getAttributesType(), is(instanceOf(NullType.class)));
         assertThat(operation.getParameters().isEmpty(), is(true));
 
         operation = getOperation(declaration, LAUNDER_MONEY);
@@ -542,6 +560,20 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     {
         DisplayModelProperty display = param.getModelProperty(DisplayModelProperty.class).get();
         assertThat(display.getDisplayName(), is(displayName));
+    }
+
+    private void assertParameterIsMetadataKeyParam(ParameterDeclaration param)
+    {
+        MetadataModelProperty metadata = param.getModelProperty(MetadataModelProperty.class).get();
+        assertThat(metadata.isMetadataKeyParam(), is(true));
+        assertThat(metadata.isContent(), is(false));
+    }
+
+    private void assertParameterIsMetadataContent(ParameterDeclaration param)
+    {
+        MetadataModelProperty metadata = param.getModelProperty(MetadataModelProperty.class).get();
+        assertThat(metadata.isContent(), is(true));
+        assertThat(metadata.isMetadataKeyParam(), is(false));
     }
 
     private ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name)

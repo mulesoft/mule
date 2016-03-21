@@ -22,10 +22,14 @@ import org.mule.extension.api.annotation.param.display.DisplayName;
 import org.mule.extension.api.annotation.param.display.Password;
 import org.mule.extension.api.annotation.param.display.Placement;
 import org.mule.extension.api.annotation.param.display.Text;
+import org.mule.extension.api.annotation.metadata.Content;
+import org.mule.extension.api.annotation.metadata.MetadataKeyParam;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterDescriptor;
 import org.mule.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.extension.api.introspection.property.DisplayModelPropertyBuilder;
+import org.mule.extension.api.metadata.MetadataModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
@@ -268,4 +272,22 @@ public final class MuleExtensionAnnotationParser
         return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
     }
 
+    /**
+     * Enriches the {@link ParameterDescriptor} with a {@link MetadataModelProperty} if the parsedParameter is
+     * annotated either as {@link Content} or {@link MetadataKeyParam}
+     *
+     * @param parsedParameter the method annotated parameter parsed
+     * @param parameter       the {@link ParameterDescriptor} associated to the parsed parameter
+     */
+    public static void parseMetadataAnnotations(AnnotatedElement parsedParameter, ParameterDescriptor parameter)
+    {
+        if (parsedParameter.getAnnotation(Content.class) != null)
+        {
+            parameter.withModelProperty(new MetadataModelProperty(false, true));
+        }
+        else if (parsedParameter.getAnnotation(MetadataKeyParam.class) != null)
+        {
+            parameter.withModelProperty(new MetadataModelProperty(true, false));
+        }
+    }
 }

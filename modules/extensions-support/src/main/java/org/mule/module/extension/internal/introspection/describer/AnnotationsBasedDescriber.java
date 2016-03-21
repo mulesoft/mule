@@ -11,6 +11,7 @@ import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
+import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseMetadataAnnotations;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
@@ -32,6 +33,7 @@ import org.mule.extension.api.annotation.OnException;
 import org.mule.extension.api.annotation.Operations;
 import org.mule.extension.api.annotation.Sources;
 import org.mule.extension.api.annotation.connector.Providers;
+import org.mule.extension.api.annotation.metadata.MetadataScope;
 import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
@@ -50,6 +52,7 @@ import org.mule.extension.api.introspection.declaration.fluent.SourceDescriptor;
 import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.extension.api.introspection.property.DisplayModelPropertyBuilder;
 import org.mule.extension.api.runtime.source.Source;
@@ -60,6 +63,8 @@ import org.mule.module.extension.internal.exception.IllegalOperationModelDefinit
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.module.extension.internal.introspection.ParameterGroup;
 import org.mule.module.extension.internal.introspection.VersionResolver;
+import org.mule.api.metadata.DefaultMetadataResolverFactory;
+import org.mule.api.metadata.NullMetadataResolverFactory;
 import org.mule.module.extension.internal.model.property.ConfigTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
@@ -399,11 +404,27 @@ public final class AnnotationsBasedDescriber implements Describer
                     .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(actingClass, method))
                     .whichReturns(IntrospectionUtils.getMethodReturnType(method, typeLoader))
                     .withAttributesOfType(IntrospectionUtils.getMethodReturnAttributesType(method, typeLoader))
-                    .withExceptionEnricherFactory(getExceptionEnricherFactory(method));
+                    .withExceptionEnricherFactory(getExceptionEnricherFactory(method))
+                    .withMetadataResolverFactory(getMetadataResolverFactory(extensionType, method));
 
             declareOperationParameters(method, operation);
             calculateExtendedTypes(actingClass, method, operation);
         }
+    }
+
+    private MetadataResolverFactory getMetadataResolverFactory(Class<?> extensionType, Method method)
+    {
+        MetadataScope scopeAnnotation = method.getAnnotation(MetadataScope.class);
+        scopeAnnotation = scopeAnnotation == null ? extensionType.getAnnotation(MetadataScope.class) : scopeAnnotation;
+
+        if (scopeAnnotation != null)
+        {
+            return new DefaultMetadataResolverFactory(scopeAnnotation.keysResolver(),
+                                                      scopeAnnotation.contentResolver(),
+                                                      scopeAnnotation.outputResolver());
+        }
+
+        return new NullMetadataResolverFactory();
     }
 
     private void declareConnectionProviders(DeclarationDescriptor declaration, Class<?> extensionType)
@@ -497,6 +518,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 {
                     parameter.withModelProperty(displayModelProperty);
                 }
+                parseMetadataAnnotations(parsedParameter, parameter);
             }
 
             Connection connectionAnnotation = parsedParameter.getAnnotation(Connection.class);

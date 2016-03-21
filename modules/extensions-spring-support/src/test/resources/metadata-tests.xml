@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/metadata http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd">
+
+    <metadata:config name="config">
+        <metadata:connection/>
+    </metadata:config>
+
+    <flow name="contentMetadataWithKeyParam">
+        <metadata:content-metadata-with-key-param type="Person"/>
+    </flow>
+
+    <flow name="outputMetadataWithKeyParam">
+        <metadata:output-metadata-with-key-param type="Person"/>
+    </flow>
+
+    <flow name="contentAndOutputMetadataWithKeyParam">
+        <metadata:content-and-output-metadata-with-key-param type="Person"/>
+    </flow>
+
+    <flow name="outputOnlyWithoutContentParam">
+        <metadata:output-only-without-content-param type="Person"/>
+    </flow>
+
+    <flow name="contentOnlyIgnoresOutput">
+        <metadata:content-only-ignores-output type="Person"/>
+    </flow>
+
+    <flow name="contentMetadataWithoutKeyParam">
+        <metadata:content-metadata-without-key-param/>
+    </flow>
+
+    <flow name="outputMetadataWithoutKeyParam">
+        <metadata:output-metadata-without-key-param/>
+    </flow>
+
+    <flow name="contentAndOutputMetadataWithoutKeyParam">
+        <metadata:content-and-output-metadata-without-key-param/>
+    </flow>
+
+    <flow name="contentMetadataWithoutKeysWithKeyParam">
+        <metadata:content-metadata-without-keys-with-key-param type="Person"/>
+    </flow>
+
+    <flow name="outputMetadataWithoutKeysWithKeyParam">
+        <metadata:output-metadata-without-keys-with-key-param type="Person"/>
+    </flow>
+
+    <flow name="failWithResolvingException">
+        <metadata:fail-with-resolving-exception type="Person"/>
+    </flow>
+
+    <flow name="failWithRuntimeException">
+        <metadata:fail-with-runtime-exception type="Person"/>
+    </flow>
+
+    <flow name="keyParamWithoutKeyResolver">
+        <metadata:key-param-without-key-resolver type="Person"/>
+    </flow>
+
+    <flow name="messageAttributesNullTypeMetadata">
+        <metadata:message-attributes-null-type-metadata/>
+    </flow>
+
+    <flow name="messageAttributesPersonTypeMetadata">
+        <metadata:message-attributes-person-type-metadata/>
+    </flow>
+
+    <flow name="loggerFlow">
+        <logger message="Logger"/>
+        <metadata:output-metadata-without-keys-with-key-param type="Person"/>
+    </flow>
+</mule>
