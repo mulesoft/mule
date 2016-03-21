@@ -78,7 +78,11 @@ public class HttpsRequesterSniTestCase extends FunctionalTestCase
 
     private static File getTlsPropertiesFile()
     {
-        String path = ClassUtils.getClassPathRoot(HttpsRequesterSniTestCase.class).getPath();
+        String path = System.getProperty("testClasspathDir");
+        if (path == null)
+        {
+            path = ClassUtils.getClassPathRoot(HttpsRequesterSniTestCase.class).getPath();
+        }
         return new File(path, String.format(TlsConfiguration.PROPERTIES_FILE_PATTERN, TlsConfiguration.DEFAULT_SECURITY_MODEL));
     }
 
@@ -188,14 +192,14 @@ public class HttpsRequesterSniTestCase extends FunctionalTestCase
             SSLContextConfigurator sslContextConfigurator = new SSLContextConfigurator();
             ClassLoader cl = HttpsRequesterSniTestCase.class.getClassLoader();
 
-            URL cacertsUrl = cl.getResource("sni-server-truststore.jks");
+            URL cacertsUrl = cl.getResource("tls/sni-server-truststore.jks");
             if (cacertsUrl != null)
             {
                 sslContextConfigurator.setTrustStoreFile(cacertsUrl.getFile());
                 sslContextConfigurator.setTrustStorePass("changeit");
             }
 
-            URL keystoreUrl = cl.getResource("sni-server-keystore.jks");
+            URL keystoreUrl = cl.getResource("tls/sni-server-keystore.jks");
             if (keystoreUrl != null)
             {
                 sslContextConfigurator.setKeyStoreFile(keystoreUrl.getFile());

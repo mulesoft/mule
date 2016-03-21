@@ -59,7 +59,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends FunctionalTestCas
     public void setUp() throws IOException
     {
         tlsContextFactory = new DefaultTlsContextFactory();
-        tlsContextFactory.setTrustStorePath("trustStore");
+        tlsContextFactory.setTrustStorePath("tls/trustStore");
         tlsContextFactory.setTrustStorePassword("mulepassword");
     }
 

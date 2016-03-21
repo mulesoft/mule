@@ -40,7 +40,7 @@ import org.junit.Test;
 
 public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestTestCase
 {
-    private static final String TEST_FILE_NAME = "realm.properties";
+    private static final String TEST_FILE_NAME = "auth/realm.properties";
     private static final String TEST_PART_NAME = "partName";
 
     @Rule
@@ -103,7 +103,7 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
                                  .run();
 
         Part part = getPart(TEST_PART_NAME);
-        assertFormDataContentDisposition(part, TEST_PART_NAME, TEST_FILE_NAME);
+        assertFormDataContentDisposition(part, TEST_PART_NAME, TEST_FILE_NAME.substring(5));
     }
 
     @Test

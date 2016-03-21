@@ -84,7 +84,7 @@ public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase
 
         try
         {
-            realmPath = FileUtils.getResourcePath("realm.properties", getClass());
+            realmPath = FileUtils.getResourcePath("auth/realm.properties", getClass());
         }
         catch (IOException e)
         {
