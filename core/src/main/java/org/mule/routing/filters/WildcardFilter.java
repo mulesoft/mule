@@ -6,6 +6,8 @@
  */
 package org.mule.routing.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.ObjectFilter;
@@ -14,9 +16,6 @@ import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
 
 /**
  * <code>WildcardFilter</code> is used to match Strings against wildcards. It
@@ -60,7 +59,7 @@ public class WildcardFilter implements Filter, ObjectFilter
 
     public boolean accept(Object object)
     {
-        if (object == null || pattern ==null)
+        if (object == null || pattern == null)
         {
             return false;
         }
@@ -90,25 +89,34 @@ public class WildcardFilter implements Filter, ObjectFilter
                     candidate = candidate.toLowerCase();
                 }
 
-                int i = pattern.indexOf('*');
-                if (i == -1)
+                int firstWildcardIndex = pattern.indexOf('*');
+                if (firstWildcardIndex == -1)
                 {
                     foundMatch = pattern.equals(candidate);
                 }
                 else
                 {
-                    int i2 = pattern.indexOf('*', i + 1);
-                    if (i2 > 1)
+                    int secondWildcardIndex = pattern.indexOf('*', firstWildcardIndex + 1);
+                    if (firstWildcardIndex == 0 && secondWildcardIndex == pattern.length() - 1)
                     {
-                        foundMatch = candidate.indexOf(pattern.substring(1, i2)) > -1;
+                        //enclosing string case
+                        foundMatch = candidate.indexOf(pattern.substring(1, secondWildcardIndex)) > -1;
                     }
-                    else if (i == 0)
+                    else if (firstWildcardIndex == 0 && secondWildcardIndex == -1)
                     {
+                        //prefix case
                         foundMatch = candidate.endsWith(pattern.substring(1));
+                    }
+                    else if (firstWildcardIndex == pattern.length() - 1)
+                    {
+                        //suffix case
+                        foundMatch = candidate.startsWith(pattern.substring(0, firstWildcardIndex));
                     }
                     else
                     {
-                        foundMatch = candidate.startsWith(pattern.substring(0, i));
+                        //no other cases are supported
+                        logger.warn(String.format("wildcard-filter only supports wildcards as prefix (*.log), suffix (java.util.*) or enclosing strings (*util*). Consider using a regex-filter instead for pattern: %s.", pattern));
+                        foundMatch = false;
                     }
                 }
 
