@@ -7,6 +7,7 @@
 package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -33,14 +34,14 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
     protected MuleEvent doRoute(MuleEvent event) throws MessagingException
     {
         Exception lastExecutionException = null;
+        MuleEvent retryEvent = copyEventForRetry(event);
         try
         {
-            MuleEvent retryEvent = DefaultMuleEvent.copy(event);
             for (int i = 0; i <= getUntilSuccessfulConfiguration().getMaxRetries(); i++)
             {
                 try
                 {
-                    return processResponseThroughAckResponseExpression(processEvent(event));
+                    return processResponseThroughAckResponseExpression(processEvent(retryEvent));
                 }
                 catch (Exception e)
                 {
@@ -53,11 +54,11 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
                     if (i < getUntilSuccessfulConfiguration().getMaxRetries())
                     {
                         Thread.sleep(getUntilSuccessfulConfiguration().getMillisBetweenRetries());
-                        event = DefaultMuleEvent.copy(retryEvent);
+                        retryEvent = copyEventForRetry(event);
                     }
                 }
             }
-            throw new RoutingException(event, getUntilSuccessfulConfiguration().getRouter(), lastExecutionException);
+            throw new RoutingException(retryEvent, getUntilSuccessfulConfiguration().getRouter(), lastExecutionException);
         }
         catch (MessagingException e)
         {
@@ -65,9 +66,15 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
         }
         catch (Exception e)
         {
-            throw new RoutingException(event, getUntilSuccessfulConfiguration().getRouter(), e);
+            throw new RoutingException(retryEvent, getUntilSuccessfulConfiguration().getRouter(), e);
         }
     }
+
+    private MuleEvent copyEventForRetry(MuleEvent event)
+    {
+        return OptimizedRequestContext.unsafeSetEvent(DefaultMuleEvent.copy(event));
+    }
+
 
     @Override
     public void initialise() throws InitialisationException
