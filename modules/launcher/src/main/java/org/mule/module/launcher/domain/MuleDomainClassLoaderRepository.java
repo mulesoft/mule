@@ -88,6 +88,12 @@ public class MuleDomainClassLoaderRepository implements DomainClassLoaderReposit
             }
 
             @Override
+            public File getLogConfigFile()
+            {
+                return classLoader.getLogConfigFile();
+            }
+
+            @Override
             public ClassLoader getClassLoader()
             {
                 return classLoader.getClassLoader();

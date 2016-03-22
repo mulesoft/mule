@@ -55,12 +55,12 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
 
     public MuleApplicationClassLoader(String appName, ClassLoader parentCl, NativeLibraryFinder nativeLibraryFinder)
     {
-        this(appName, parentCl, Collections.<String>emptySet(), nativeLibraryFinder);
+        this(appName, parentCl, Collections.<String> emptySet(), nativeLibraryFinder, null);
     }
 
-    public MuleApplicationClassLoader(String appName, ClassLoader parentCl, Set<String> loaderOverrides, NativeLibraryFinder nativeLibraryFinder)
+    public MuleApplicationClassLoader(String appName, ClassLoader parentCl, Set<String> loaderOverrides, NativeLibraryFinder nativeLibraryFinder, File logConfig)
     {
-        super(CLASSPATH_EMPTY, parentCl, loaderOverrides);
+        super(CLASSPATH_EMPTY, parentCl, loaderOverrides, logConfig);
         this.appName = appName;
         this.nativeLibraryFinder = nativeLibraryFinder;
 
@@ -146,6 +146,7 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
         return super.getResources(name);
     }
 
+    @Override
     public String getAppName()
     {
         return appName;
