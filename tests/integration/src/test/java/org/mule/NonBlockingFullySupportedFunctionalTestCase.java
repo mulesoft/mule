@@ -10,8 +10,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.tck.functional.FlowAssert.verify;
 import org.mule.api.MuleEvent;
-import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -67,7 +67,7 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
     public void filterRejects() throws Exception
     {
         MuleEvent result = runFlowNonBlocking("filterRejects");
-        FlowAssert.verify("filterRejects");
+        verify("filterRejects");
         assertThat(result, is(nullValue()));
     }
 
@@ -81,7 +81,7 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
     public void filterAfterNonBlockingRejects() throws Exception
     {
         MuleEvent result = runFlowNonBlocking("filterAfterNonBlockingRejects");
-        FlowAssert.verify("filterAfterNonBlockingRejects");
+        verify("filterAfterNonBlockingRejects");
         assertThat(result, is(nullValue()));
     }
 
@@ -95,7 +95,7 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
     public void filterBeforeNonBlockingRejects() throws Exception
     {
         MuleEvent result = runFlowNonBlocking("filterAfterNonBlockingRejects");
-        FlowAssert.verify("filterAfterNonBlockingRejects");
+        verify("filterAfterNonBlockingRejects");
         assertThat(result, is(nullValue()));
     }
 
@@ -103,7 +103,7 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
     public void filterAfterEnricherBeforeNonBlocking() throws Exception
     {
         MuleEvent result = runFlowNonBlocking("filterAfterEnricherBeforeNonBlocking");
-        FlowAssert.verify("filterAfterEnricherBeforeNonBlocking");
+        verify("filterAfterEnricherBeforeNonBlocking");
         assertThat(result, is(nullValue()));
     }
 
@@ -141,7 +141,7 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
     public void responseWithNullEvent() throws Exception
     {
         MuleEvent result = runFlowNonBlocking("responseWithNullEvent");
-        FlowAssert.verify("responseWithNullEvent");
+        verify("responseWithNullEvent");
         assertThat(result, is(nullValue()));
     }
 
@@ -149,7 +149,7 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
     public void enricherIssue() throws Exception
     {
         MuleEvent result = runFlowNonBlocking("enricherIssue");
-        FlowAssert.verify("enricherIssue");
+        verify("enricherIssue");
         assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
     }
 
@@ -157,7 +157,7 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
     public void enricherIssueNonBlocking() throws Exception
     {
         MuleEvent result = runFlowNonBlocking("enricherIssueNonBlocking");
-        FlowAssert.verify("enricherIssueNonBlocking");
+        verify("enricherIssueNonBlocking");
         assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
     }
 
@@ -165,8 +165,25 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
     public void enricherFlowVar() throws Exception
     {
         MuleEvent result = runFlowNonBlocking("enricherFlowVar");
-        FlowAssert.verify("enricherFlowVar");
+        verify("enricherFlowVar");
         assertThat((String) result.getFlowVariable(FOO), is(equalTo(TEST_MESSAGE)));
     }
+
+    @Test
+    public void testTransportOutboundEndpoint() throws Exception
+    {
+        MuleEvent result = runFlowNonBlocking("testOutboundEndpoint");
+        verify("testOutboundEndpoint");
+        assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
+    }
+
+    @Test
+    public void testTransportOutboundEndpointError() throws Exception
+    {
+        MuleEvent result = runFlowNonBlocking("testOutboundEndpointError");
+        verify("testOutboundEndpointError");
+        assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
+    }
+
 }
 

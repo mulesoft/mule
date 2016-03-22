@@ -45,7 +45,7 @@ public class SimpleMessageProcessorChain extends DefaultMessageProcessorChain
             {
                 return null;
             }
-            else if (VoidMuleEvent.getInstance().equals(event))
+            else if (event instanceof VoidMuleEvent)
             {
                 return event;
             }

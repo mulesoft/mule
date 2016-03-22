@@ -6,8 +6,10 @@
  */
 package org.mule.tck.junit4;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
@@ -28,21 +30,25 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
+import org.mule.construct.Flow;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
+import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.TestingWorkListener;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
-import org.mule.util.TestsLogConfigurationHelper;
 import org.mule.util.StringUtils;
+import org.mule.util.TestsLogConfigurationHelper;
 import org.mule.util.concurrent.Latch;
 
 import java.io.File;
@@ -611,4 +617,33 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     {
         return new File(getWorkingDirectory(), fileName);
     }
+
+    protected MuleEvent getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler) throws Exception
+    {
+        final Flow flow = new Flow("", muleContext);
+        flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
+        muleContext.getRegistry().registerFlowConstruct(flow);
+        return new DefaultMuleEvent(getTestMuleMessage(payload), MessageExchangePattern.REQUEST_RESPONSE, replyToHandler, flow);
+    }
+
+    protected MuleEvent getNonBlockingResponse(SensingNullReplyToHandler replyToHandler, MuleEvent result) throws Exception
+    {
+        if (NonBlockingVoidMuleEvent.getInstance() == result)
+        {
+            if (!replyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
+            {
+                throw new RuntimeException("No Non-Blocking Response");
+            }
+            if (replyToHandler.exception != null)
+            {
+                throw replyToHandler.exception;
+            }
+            return replyToHandler.event;
+        }
+        else
+        {
+            return result;
+        }
+    }
+
 }
