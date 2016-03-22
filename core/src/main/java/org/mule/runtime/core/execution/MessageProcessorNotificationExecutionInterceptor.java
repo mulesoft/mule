@@ -7,18 +7,18 @@
 package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
@@ -121,7 +121,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         }
         finally
         {
-            if (!NonBlockingVoidMuleEvent.getInstance().equals(result) && fireNotification)
+            if (!(result instanceof VoidMuleEvent) && fireNotification)
             {
                 fireNotification(notificationManager, event.getFlowConstruct(), result != null ? result : event,
                                  messageProcessor,

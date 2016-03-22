@@ -14,17 +14,18 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.model.CoreComponentBuildingDefinitionProvider.getTransformerBaseBuilderForClass;
 import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromType;
+
 import org.mule.functional.client.QueueWriterMessageProcessor;
 import org.mule.functional.functional.AssertionMessageProcessor;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.InvocationCountMessageProcessor;
 import org.mule.functional.functional.ResponseAssertionMessageProcessor;
-import org.mule.functional.functional.TestNonBlockingProcessor;
 import org.mule.functional.transformer.NoActionTransformer;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.tck.processor.TestNonBlockingProcessor;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -10,21 +10,21 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 
+import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.functional.functional.FlowAssert;
-import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
+import org.mule.tck.SensingNullReplyToHandler;
 
 import java.util.concurrent.TimeUnit;
 
@@ -107,30 +107,38 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner>
             {
                 MuleEvent responseEvent = (MuleEvent) input;
                 SensingNullReplyToHandler nullSensingReplyToHandler = (SensingNullReplyToHandler) replyToHandler;
-                if (NonBlockingVoidMuleEvent.getInstance() == responseEvent)
+                try
                 {
-                    try
-                    {
-                        if (!nullSensingReplyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
-                        {
-                            throw new RuntimeException("No Non-Blocking Response");
-                        }
-                        if (nullSensingReplyToHandler.exception != null)
-                        {
-                            throw nullSensingReplyToHandler.exception;
-                        }
-                        return nullSensingReplyToHandler.event;
-                    }
-                    catch (Exception e)
-                    {
-                        throw new MuleRuntimeException(e);
-                    }
+                    return getNonBlockingResponse(nullSensingReplyToHandler, responseEvent);
                 }
-                return responseEvent;
+                catch (Exception e)
+                {
+                    throw new MuleRuntimeException(e);
+                }
             }
         };
 
         return this;
+    }
+
+    protected MuleEvent getNonBlockingResponse(SensingNullReplyToHandler replyToHandler, MuleEvent result) throws Exception
+    {
+        if (NonBlockingVoidMuleEvent.getInstance() == result)
+        {
+            if (!replyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
+            {
+                throw new RuntimeException("No Non-Blocking Response");
+            }
+            if (replyToHandler.exception != null)
+            {
+                throw replyToHandler.exception;
+            }
+            return replyToHandler.event;
+        }
+        else
+        {
+            return result;
+        }
     }
 
     /**
