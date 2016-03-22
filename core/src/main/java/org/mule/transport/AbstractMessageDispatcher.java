@@ -7,8 +7,11 @@
 package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
+import org.mule.RequestContext;
 import org.mule.VoidMuleEvent;
+import org.mule.api.CompletionHandler;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -22,9 +25,14 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.construct.Flow;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 
 import java.util.List;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkListener;
 
 /**
  * Abstract implementation of an outbound channel adaptors. Outbound channel adaptors send messages over over
@@ -55,7 +63,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         return getConnector().getName() + ".dispatcher." + System.identityHashCode(this);
     }
 
-    public MuleEvent process(MuleEvent event) throws MuleException
+    public MuleEvent process(final MuleEvent event) throws MuleException
     {
         try
         {
@@ -81,25 +89,18 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                     throw new MessagingException(MessageFactory.createStaticMessage("Timeout waiting for mule context to be completely started"), event, this);
                 }
 
-                MuleMessage resultMessage = doSend(event);
-                if (resultMessage != null)
+                if (isNonBlocking(event))
                 {
-                    resultMessage.setMessageRootId(event.getMessage().getMessageRootId());
-                    
-                    // Ensure ENCODING message property is set to give exactly same behavior as before
-                    // OutboundRewriteResponseEventMessageProcessor was removed (MULE-7535).
-                    resultMessage.setEncoding(resultMessage.getEncoding());
-                    
-                    MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(
-                        resultMessage);
-                    event.getSession().merge(storedSession);
-                    MuleEvent resultEvent = new DefaultMuleEvent(resultMessage, event);
-                    OptimizedRequestContext.unsafeSetEvent(resultEvent);
-                    return resultEvent;
+                    doSendNonBlocking(event, new NonBlockingSendCompletionHandler(event, ((Flow) event.getFlowConstruct()).getWorkManager(), connector));
+                    // Update RequestContext ThreadLocal for backwards compatibility.  Clear event as we are done with this
+                    // thread.
+                    RequestContext.clear();
+                    return NonBlockingVoidMuleEvent.getInstance();
                 }
                 else
                 {
-                    return null;
+                    MuleMessage resultMessage = doSend(event);
+                    return createResponseEvent(resultMessage, event);
                 }
             }
             else
@@ -116,6 +117,47 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         {
             throw new DispatchException(event, getEndpoint(), e);
         }
+    }
+
+    private MuleEvent createResponseEvent(MuleMessage resultMessage, MuleEvent requestEvent) throws MuleException
+    {
+        if (resultMessage != null)
+        {
+            resultMessage.setMessageRootId(requestEvent.getMessage().getMessageRootId());
+
+            // Ensure ENCODING message property is set to give exactly same behavior as before
+            // OutboundRewriteResponseEventMessageProcessor was removed (MULE-7535).
+            resultMessage.setEncoding(resultMessage.getEncoding());
+
+            MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(
+                    resultMessage);
+            requestEvent.getSession().merge(storedSession);
+            MuleEvent resultEvent = new DefaultMuleEvent(resultMessage, requestEvent);
+            OptimizedRequestContext.unsafeSetEvent(resultEvent);
+            return resultEvent;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private boolean isNonBlocking(MuleEvent event)
+    {
+        return event.getFlowConstruct() instanceof Flow && event.isAllowNonBlocking() && event.getReplyToHandler() != null &&
+               isSupportsNonBlocking() && !endpoint.getTransactionConfig().isTransacted();
+    }
+
+    /**
+     * Dispatcher implementations that support non-blocking processing should override this method and return 'true'.
+     * To support non-blocking processing it is also necessary to implment the
+     * {@link AbstractMessageDispatcher#doSendNonBlocking(MuleEvent, CompletionHandler)} method.
+     *
+     * @return true if non-blocking processing is supported by this dispatcher implemnetation.
+     */
+    protected boolean isSupportsNonBlocking()
+    {
+        return false;
     }
 
     /**
@@ -213,4 +255,88 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     protected abstract void doDispatch(MuleEvent event) throws Exception;
 
     protected abstract MuleMessage doSend(MuleEvent event) throws Exception;
+
+    protected void doSendNonBlocking(MuleEvent event, CompletionHandler<MuleMessage, Exception> completionHandler)
+    {
+        throw new IllegalStateException("This MessageDispatcher does not support non-blocking");
+    }
+
+    private class NonBlockingSendCompletionHandler implements CompletionHandler<MuleMessage, Exception>
+    {
+        private final MuleEvent event;
+        private final WorkManager workManager;
+        private final WorkListener workListener;
+
+
+        public NonBlockingSendCompletionHandler(MuleEvent event, WorkManager workManager, WorkListener workListener)
+        {
+            this.event = event;
+            this.workManager = workManager;
+            this.workListener = workListener;
+        }
+
+        @Override
+        public void onCompletion(final MuleMessage result)
+        {
+            try
+            {
+                workManager.scheduleWork(new Work()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            event.getReplyToHandler().processReplyTo(createResponseEvent(result, event), null, null);
+                        }
+                        catch (MessagingException messagingException)
+                        {
+                            event.getReplyToHandler().processExceptionReplyTo(messagingException, null);
+                        }
+                        catch (MuleException exception)
+                        {
+                            event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, exception), null);
+                        }
+                    }
+
+                    @Override
+                    public void release()
+                    {
+                        // no-op
+                    }
+                }, WorkManager.INDEFINITE, null, workListener);
+            }
+            catch (Exception exception)
+            {
+                onFailure(exception);
+            }
+        }
+
+        @Override
+        public void onFailure(final Exception exception)
+        {
+            try
+            {
+                workManager.scheduleWork(new Work()
+                {
+                    @Override
+                    public void run()
+                    {
+                        event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, exception), null);
+                    }
+
+                    @Override
+                    public void release()
+                    {
+                        // no-op
+                    }
+                }, WorkManager.INDEFINITE, null, workListener);
+            }
+            catch (WorkException e)
+            {
+                // Handle exception in transport thread if unable to schedule work
+                event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, exception), null);
+            }
+        }
+    }
 }

@@ -7,8 +7,8 @@
 package org.mule.execution;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -120,7 +120,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         }
         finally
         {
-            if (!NonBlockingVoidMuleEvent.getInstance().equals(result) && fireNotification)
+            if (!(result instanceof VoidMuleEvent) && fireNotification)
             {
                 fireNotification(notificationManager, event.getFlowConstruct(), result != null ? result : event,
                                  messageProcessor,

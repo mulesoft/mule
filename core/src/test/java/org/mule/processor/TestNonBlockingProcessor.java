@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.tck.functional;
+package org.mule.processor;
 
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.VoidMuleEvent;
@@ -12,7 +12,6 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
-import org.mule.processor.NonBlockingMessageProcessor;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;

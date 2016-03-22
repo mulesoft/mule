@@ -178,4 +178,19 @@
         </enricher>
     </flow>
 
+    <flow name="testOutboundEndpoint">
+        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <outbound-endpoint address="test://test" exchange-pattern="request-response" />
+    </flow>
+
+    <flow name="testOutboundEndpointError">
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
+        <outbound-endpoint address="test://AlwaysFail" exchange-pattern="request-response" />
+        <catch-exception-strategy>
+            <test:assert expression="#[assertPayload()]" />
+            <test:assert expression="#[exception.causedBy(org.mule.api.routing.RoutingException)]" />
+            <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread]"/>
+        </catch-exception-strategy>
+    </flow>
+
 </mule>

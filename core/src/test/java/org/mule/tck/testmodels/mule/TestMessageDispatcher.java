@@ -6,10 +6,14 @@
  */
 package org.mule.tck.testmodels.mule;
 
+import org.mule.api.CompletionHandler;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
+import org.mule.processor.TestNonBlockingProcessor;
 import org.mule.transport.AbstractMessageDispatcher;
 
 public class TestMessageDispatcher extends AbstractMessageDispatcher
@@ -18,6 +22,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
     {
         super(endpoint);
     }
+    private MessageProcessor nonBlockingProcessor = new TestNonBlockingProcessor();
 
     @Override
     protected void doInitialise()
@@ -51,6 +56,23 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
     }
 
     @Override
+    protected void doSendNonBlocking(MuleEvent event, CompletionHandler<MuleMessage, Exception> completionHandler)
+    {
+        if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail"))
+        {
+            completionHandler.onFailure(new RoutingException(event, (OutboundEndpoint) endpoint));
+        }
+        try
+        {
+            nonBlockingProcessor.process(event);
+        }
+        catch (MuleException e)
+        {
+            completionHandler.onFailure(e);
+        }
+    }
+
+    @Override
     protected void doConnect() throws Exception
     {
         // no op
@@ -72,5 +94,11 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
     protected void doStop() 
     {
         // no op
+    }
+
+    @Override
+    protected boolean isSupportsNonBlocking()
+    {
+        return true;
     }
 }

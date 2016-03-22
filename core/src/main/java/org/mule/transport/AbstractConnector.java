@@ -2728,8 +2728,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
                 {
                     // We need to invoke notification message processor with request
                     // message only after successful send/dispatch
-                    notificationMessageProcessor.process((result != null && !VoidMuleEvent.getInstance().equals(
-                            result)) ? result : event);
+                    notificationMessageProcessor.process((result != null && !(result instanceof VoidMuleEvent)) ? result : event);
                 }
 
                 return result;
