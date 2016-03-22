@@ -6,22 +6,32 @@
  */
 package org.mule.endpoint.outbound;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mule.MessageExchangePattern;
+import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.RequestContext;
 import org.mule.VoidMuleEvent;
+import org.mule.api.CompletionHandler;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.SecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
@@ -32,6 +42,7 @@ import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.security.TestSecurityFilter;
 import org.mule.tck.testmodels.mule.TestMessageDispatcher;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
@@ -42,6 +53,7 @@ import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -58,10 +70,10 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
     @Test
     public void testDefaultFlowSync() throws Exception
     {
-        Transformer reqTransformer = Mockito.mock(Transformer.class);
-        Mockito.when(reqTransformer.process(Mockito.any(MuleEvent.class))).then(echoEventAnswer);
-        Transformer resTransformer = Mockito.mock(Transformer.class);
-        Mockito.when(resTransformer.process(Mockito.any(MuleEvent.class))).then(echoEventAnswer);
+        Transformer reqTransformer = mock(Transformer.class);
+        when(reqTransformer.process(any(MuleEvent.class))).then(echoEventAnswer);
+        Transformer resTransformer = mock(Transformer.class);
+        when(resTransformer.process(any(MuleEvent.class))).then(echoEventAnswer);
         
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, reqTransformer, resTransformer, 
             MessageExchangePattern.REQUEST_RESPONSE, null);
@@ -69,8 +81,8 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         testOutboundEvent = createTestOutboundEvent();
         MuleEvent result = endpoint.process(testOutboundEvent);
 
-        Mockito.verify(reqTransformer, Mockito.times(1)).process(Mockito.any(MuleEvent.class));
-        Mockito.verify(resTransformer, Mockito.times(1)).process(Mockito.any(MuleEvent.class));
+        verify(reqTransformer, times(1)).process(any(MuleEvent.class));
+        verify(resTransformer, times(1)).process(any(MuleEvent.class));
         
         assertMessageSentSame(true);
 
@@ -80,12 +92,49 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
     }
 
     @Test
+    public void testDefaultFlowNonBlocking() throws Exception
+    {
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
+
+        SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
+        MuleEvent event = getNonBlockingTestEventUsingFlow(TEST_MESSAGE, nullReplyToHandler);
+
+        MuleEvent response = endpoint.process(event);
+        assertThat(response, CoreMatchers.<MuleEvent>equalTo(NonBlockingVoidMuleEvent.getInstance()));
+
+        assertThat(getNonBlockingResponse(nullReplyToHandler, response), equalTo(event));
+    }
+
+    @Test
+    public void testDefaultFlowNonBlockingError() throws Exception
+    {
+        OutboundEndpoint endpoint = createOutboundEndpoint("test://AlwaysFail", null, null, null, null,
+                                                           MessageExchangePattern.REQUEST_RESPONSE, null);
+        SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
+        MuleEvent event = getNonBlockingTestEventUsingFlow(TEST_MESSAGE, nullReplyToHandler);
+
+        MuleEvent response = endpoint.process(event);
+        assertThat(response, CoreMatchers.<MuleEvent>equalTo(NonBlockingVoidMuleEvent.getInstance()));
+
+        try
+        {
+            getNonBlockingResponse(nullReplyToHandler, response);
+            fail("Exception Expected");
+        }
+        catch (Exception e)
+        {
+            assertThat(e, instanceOf(MessagingException.class));
+            assertThat(e.getCause(), instanceOf(RoutingException.class));
+        }
+    }
+
+    @Test
     public void testDefaultFlowAsync() throws Exception
     {
-        Transformer reqTransformer = Mockito.mock(Transformer.class);
-        Mockito.when(reqTransformer.process(Mockito.any(MuleEvent.class))).then(echoEventAnswer);
-        Transformer resTransformer = Mockito.mock(Transformer.class);
-        Mockito.when(resTransformer.process(Mockito.any(MuleEvent.class))).then(echoEventAnswer);
+        Transformer reqTransformer = mock(Transformer.class);
+        when(reqTransformer.process(any(MuleEvent.class))).then(echoEventAnswer);
+        Transformer resTransformer = mock(Transformer.class);
+        when(resTransformer.process(any(MuleEvent.class))).then(echoEventAnswer);
 
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, reqTransformer, resTransformer, 
             MessageExchangePattern.ONE_WAY, null);
@@ -93,8 +142,8 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         testOutboundEvent = createTestOutboundEvent();
         MuleEvent result = endpoint.process(testOutboundEvent);
         
-        Mockito.verify(reqTransformer, Mockito.times(1)).process(Mockito.any(MuleEvent.class));
-        Mockito.verify(resTransformer, Mockito.never()).process(Mockito.any(MuleEvent.class));
+        verify(reqTransformer, times(1)).process(any(MuleEvent.class));
+        verify(resTransformer, Mockito.never()).process(any(MuleEvent.class));
 
         dispacher.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
         assertMessageSentSame(false);
@@ -313,11 +362,6 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertEquals(expect.getEncoding(), actual.getEncoding());
         assertEquals(expect.getUniqueId(), actual.getUniqueId());
         assertEquals(expect.getExceptionPayload(), actual.getExceptionPayload());
-
-        //// Outbound endcodin property is added
-        //assertEquals(muleContext.getConfiguration().getDefaultEncoding(),
-        //             actual.getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY));
-
     }
 
     protected OutboundEndpoint createOutboundEndpoint(String uri, Filter filter,
@@ -339,7 +383,6 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
             {
                 return dispacher;
             }
-
         });
         return endpoint;
     }
@@ -379,6 +422,14 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         {
             sensedDispatchEvent = event;
             latch.countDown();
+        }
+
+        @Override
+        protected void doSendNonBlocking(MuleEvent event, CompletionHandler<MuleMessage, Exception> completionHandler)
+        {
+            sensedSendEvent = event;
+            latch.countDown();
+            super.doSendNonBlocking(event, completionHandler);
         }
     }
 

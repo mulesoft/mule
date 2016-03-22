@@ -304,22 +304,26 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      */
     protected MuleEvent runFlowNonBlocking(String flowName, MuleEvent event) throws Exception
     {
-        Flow flow = this.lookupFlowConstruct(flowName);
+        Flow flow = lookupFlowConstruct(flowName);
         SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
         event = new DefaultMuleEvent(event, event.getFlowConstruct(), nullReplyToHandler, null, false);
         MuleEvent result = flow.process(event);
-        if (NonBlockingVoidMuleEvent.getInstance() == result)
-        {
-            if (!nullReplyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
-            {
-                throw new RuntimeException("No Non-Blocking Response");
-            }
-            if (nullReplyToHandler.exception != null)
-            {
-                throw nullReplyToHandler.exception;
-            }
-        }
-        return nullReplyToHandler.event;
+
+        return getNonBlockingResponse(nullReplyToHandler, result);
+    }
+
+    /**
+     * Runs the given non blocking flow with a given payload
+     *
+     * @param flowName the name of the flow to be executed
+     * @param payload the payload to send
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    protected MuleEvent runFlowNonBlocking(String flowName, Object payload) throws Exception
+    {
+        Flow flow = lookupFlowConstruct(flowName);
+        return runFlowNonBlocking(flowName, getTestEvent(payload, flow, MessageExchangePattern.REQUEST_RESPONSE));
     }
 
     /**
