@@ -139,7 +139,7 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase
             @Override
             public void run()
             {
-                contextConfigurer.configure(context);
+                contextConfigurer.update(context);
                 ArgumentCaptor<ConsoleAppender> appenderCaptor = ArgumentCaptor.forClass(ConsoleAppender.class);
                 verify(context.getConfiguration()).addAppender(appenderCaptor.capture());
 
@@ -159,7 +159,7 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase
     public void perAppDefaultAppender() throws Exception
     {
         when(context.isArtifactClassloader()).thenReturn(true);
-        contextConfigurer.configure(context);
+        contextConfigurer.update(context);
         ArgumentCaptor<RollingFileAppender> appenderCaptor = ArgumentCaptor.forClass(RollingFileAppender.class);
         verify(context.getConfiguration()).addAppender(appenderCaptor.capture());
 

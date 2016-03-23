@@ -71,14 +71,14 @@ final class LoggerContextConfigurer
     static final String FORCED_CONSOLE_APPENDER_NAME = "Forced-Console";
     static final String PER_APP_FILE_APPENDER_NAME = "defaultFileAppender";
 
-    LoggerContextConfigurer()
-    {
-    }
-
     protected void configure(MuleLoggerContext context)
     {
         disableShutdownHook(context);
         configureMonitor(context);
+    }
+
+    protected void update(MuleLoggerContext context)
+    {
         boolean forceConsoleLog = System.getProperty(MuleProperties.MULE_FORCE_CONSOLE_LOG) != null;
 
         if (context.getConfigFile() == null && !forceConsoleLog)
