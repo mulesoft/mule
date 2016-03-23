@@ -224,11 +224,11 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             // Cookies are a special case because there may be more than one
             // cookie.
             if (HttpConnector.HTTP_COOKIES_PROPERTY.equals(header.getName())
-                || HttpConstants.HEADER_COOKIE.equals(header.getName()))
+                || HttpConstants.HEADER_COOKIE.equalsIgnoreCase(header.getName()))
             {
                 putCookieHeaderInMapAsAServer(headersMap, header, uri);
             }
-            else if (HttpConstants.HEADER_COOKIE_SET.equals(header.getName()))
+            else if (HttpConstants.HEADER_COOKIE_SET.equalsIgnoreCase(header.getName()))
             {
                 putCookieHeaderInMapAsAClient(headersMap, header, uri);
             }

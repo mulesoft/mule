@@ -6,13 +6,14 @@
  */
 package org.mule.transport.http;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageTypeNotSupportedException;
@@ -26,16 +27,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.StatusLine;
 import org.apache.commons.httpclient.URI;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
     private static final Header[] HEADERS = new Header[] { new Header("foo-header", "foo-value") };
+    private static final String[] COOKIES = new String[] {"COOKIE1=HEY", "cookie2=ho", "COOKIE3=LETS", "cookie4=go"};
     private static final String REQUEST_LINE = "GET /services/Echo HTTP/1.1";
     private static final String MULTIPART_BOUNDARY = "------------------------------2eab2c5d5c7e";
     private static final String MULTIPART_MESSAGE = MULTIPART_BOUNDARY + "\n" + "Content-Disposition: form-data; name=\"payload\"\n" + TEST_MESSAGE
@@ -229,6 +233,32 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertEquals(2, parsedHeaders.size());
         assertEquals("top", parsedHeaders.get("k1"));
         assertEquals("priority,always,true", parsedHeaders.get("k2"));
+    }
+
+    @Test
+    public void testCookieHeadersCase() throws Exception
+    {
+        HttpMuleMessageFactory messageFactory = new HttpMuleMessageFactory();
+        messageFactory.setEnableCookies(true);
+
+        Header[] headers = new Header[4];
+        headers[0] = new Header("SET-COOKIE", COOKIES[0]);
+        headers[1] = new Header("Set-Cookie", COOKIES[1]);
+        headers[2] = new Header("COOKIE", COOKIES[2]);
+        headers[3] = new Header("Cookie", COOKIES[3]);
+
+        Map<String, Object> parsedHeaders = messageFactory.convertHeadersToMap(headers, "http://localhost/");
+
+        assertThat(parsedHeaders.keySet(), Matchers.hasSize(2));
+        assertThat(parsedHeaders.keySet(), Matchers.containsInAnyOrder(HttpConstants.HEADER_COOKIE_SET, HttpConnector.HTTP_COOKIES_PROPERTY));
+
+        Cookie[] setCookies = (Cookie[]) parsedHeaders.get(HttpConstants.HEADER_COOKIE_SET);
+        assertThat(setCookies[0].toString(), is(COOKIES[0]));
+        assertThat(setCookies[1].toString(), is(COOKIES[1]));
+
+        Cookie[] cookies = (Cookie[]) parsedHeaders.get(HttpConnector.HTTP_COOKIES_PROPERTY);
+        assertThat(cookies[0].toString(), is(COOKIES[2]));
+        assertThat(cookies[1].toString(), is(COOKIES[3]));
     }
 
     @Test
