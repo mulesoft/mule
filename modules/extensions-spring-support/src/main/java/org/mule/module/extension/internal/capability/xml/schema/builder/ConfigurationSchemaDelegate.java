@@ -14,7 +14,6 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.UNBOUNDED;
 import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.getConnectedOperations;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDynamicParameters;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
@@ -87,7 +86,7 @@ final class ConfigurationSchemaDelegate
     private void addConnectionProviderElement(ExplicitGroup all, RuntimeConfigurationModel configurationModel)
     {
         ExtensionModel extensionModel = configurationModel.getExtensionModel();
-        if (!getConnectedOperations(extensionModel).isEmpty())
+        if (!extensionModel.getConnectionProviders().isEmpty())
         {
             TopLevelElement objectElement = new TopLevelElement();
 
