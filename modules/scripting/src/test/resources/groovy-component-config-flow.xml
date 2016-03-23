@@ -41,7 +41,7 @@
     <flow name="inlineScriptMutateVariable">
         <script:component>
             <script:script engine="groovy">
-                message.setInvocationProperty('foo','bar-mutated')                
+                flowVars['foo'] = 'bar-mutated'
              </script:script>
         </script:component>
         <test:assert expression="#[flowVars.foo == 'bar-mutated']"/>
@@ -50,7 +50,7 @@
     <flow name="inlineScriptAddVariable">
         <script:component>
             <script:script engine="groovy">
-                message.setInvocationProperty('foo','bar')                
+                flowVars['foo'] = 'bar'
              </script:script>
         </script:component>
         <test:assert expression="#[flowVars.foo == 'bar']"/>

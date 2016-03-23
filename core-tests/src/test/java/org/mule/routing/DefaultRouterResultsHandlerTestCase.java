@@ -61,13 +61,13 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
     {
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        message1.setInvocationProperty("key1", "value1");
         MuleEvent event1 = new DefaultMuleEvent(message1, flow);
+        event1.setFlowVariable("key1", "value1");
         event1.getSession().setProperty("key", "value");
 
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
-        message2.setInvocationProperty("key2", "value2");
         MuleEvent event2 = new DefaultMuleEvent(message2, flow);
+        event2.setFlowVariable("key2", "value2");
         event2.getSession().setProperty("key", "valueNEW");
         event2.getSession().setProperty("key1", "value1");
 
@@ -77,8 +77,8 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
 
         // Because same event instance is returned rather than MessageCollection
         // don't copy invocation properties
-        assertNull(result.getMessage().getInvocationProperty("key1"));
-        assertEquals("value2", result.getMessage().getInvocationProperty("key2"));
+        assertNull(result.getFlowVariable("key1"));
+        assertEquals("value2", result.getFlowVariable("key2"));
 
         assertEquals("valueNEW", result.getSession().getProperty("key"));
         assertEquals("value1", result.getSession().getProperty("key1"));
@@ -89,15 +89,15 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
     public void aggregateMultipleEvents() throws Exception
     {
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        message1.setInvocationProperty("key1", "value1");
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
-        message2.setInvocationProperty("key2", "value2");
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
-        message3.setInvocationProperty("key3", "value3");
         MuleEvent event1 = new DefaultMuleEvent(message1, flow);
+        event1.setFlowVariable("key1", "value1");
         MuleSession session = event1.getSession();
         MuleEvent event2 = new DefaultMuleEvent(message2, flow, session);
+        event2.setFlowVariable("key2", "value2");
         MuleEvent event3 = new DefaultMuleEvent(message3, flow, session);
+        event3.setFlowVariable("key3", "value3");
         event1.getSession().setProperty("key", "value");
         event2.getSession().setProperty("key1", "value1");
         event2.getSession().setProperty("key2", "value2");
@@ -117,10 +117,9 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
 
         // Because a new MuleMessageCollection is created, propagate properties from
         // original event
-        // TODO DF
-        // assertEquals("value1", result.getMessage().getInvocationProperty("key1"));
-        assertNull(result.getMessage().getInvocationProperty("key2"));
-        assertNull(result.getMessage().getInvocationProperty("key3"));
+        assertEquals("value1", result.getFlowVariable("key1"));
+        assertNull(result.getFlowVariable("key2"));
+        assertNull(result.getFlowVariable("key3"));
 
         // Root id
         assertEquals(event1.getMessage().getMessageRootId(), result.getMessage().getMessageRootId());
@@ -136,11 +135,11 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
     public void aggregateMultipleEventsAllButOneNull()
     {
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        message1.setInvocationProperty("key", "value");
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
-        message2.setInvocationProperty("key2", "value2");
         MuleEvent event1 = new DefaultMuleEvent(message1, flow);
+        event1.setFlowVariable("key", "value");
         MuleEvent event2 = new DefaultMuleEvent(message2, flow);
+        event2.setFlowVariable("key2", "value2");
         List<MuleEvent> events = new ArrayList<MuleEvent>();
         events.add(null);
         events.add(event2);
@@ -150,16 +149,16 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
 
         // Because same event instance is returned rather than MessageCollection
         // don't copy invocation properties
-        assertNull(result.getMessage().getInvocationProperty("key1"));
-        assertEquals("value2", result.getMessage().getInvocationProperty("key2"));
+        assertNull(result.getFlowVariable("key1"));
+        assertEquals("value2", result.getFlowVariable("key2"));
     }
 
     @Test
     public void aggregateSingleMuleMessageCollection()
     {
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        message1.setInvocationProperty("key1", "value1");
         MuleEvent event1 = new DefaultMuleEvent(message1, flow);
+        event1.setFlowVariable("key1", "value1");
 
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
@@ -168,8 +167,8 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         list.add(message2);
         list.add(message3);
         MuleMessage messageCollection = new DefaultMuleMessage(list, muleContext);
-        messageCollection.setInvocationProperty("key2", "value2");
         MuleEvent event2 = new DefaultMuleEvent(messageCollection, flow);
+        event2.setFlowVariable("key2", "value2");
 
         MuleEvent result = resultsHandler.aggregateResults(Collections.<MuleEvent> singletonList(event2),
             event1, muleContext);
@@ -177,16 +176,16 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
 
         // Because same event instance is returned rather than MessageCollection
         // don't copy invocation properties
-        assertNull(result.getMessage().getInvocationProperty("key1"));
-        assertEquals("value2", result.getMessage().getInvocationProperty("key2"));
+        assertNull(result.getFlowVariable("key1"));
+        assertEquals("value2", result.getFlowVariable("key2"));
     }
 
     @Test
     public void aggregateMultipleMuleMessageCollections()
     {
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        message1.setInvocationProperty("key1", "value1");
         MuleEvent event1 = new DefaultMuleEvent(message1, flow);
+        event1.setFlowVariable("key1", "value1");
 
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
@@ -197,15 +196,15 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         list.add(message2);
         list.add(message3);
         MuleMessage messageCollection = new DefaultMuleMessage(list, muleContext);
-        messageCollection.setInvocationProperty("key2", "value2");
         MuleEvent event2 = new DefaultMuleEvent(messageCollection, flow);
+        event2.setFlowVariable("key2", "value2");
 
         List<MuleMessage> list2 = new ArrayList<>();
         list.add(message4);
         list.add(message5);
         MuleMessage messageCollection2 = new DefaultMuleMessage(list2, muleContext);
-        messageCollection.setInvocationProperty("key3", "value3");
         MuleEvent event3 = new DefaultMuleEvent(messageCollection2, flow);
+        event3.setFlowVariable("key3", "value3");
 
         List<MuleEvent> events = new ArrayList<MuleEvent>();
         events.add(event2);
@@ -220,10 +219,9 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
 
         // Because a new MuleMessageCollection is created, propagate properties from
         // original event
-        // TODO DF
-        // assertEquals("value1", result.getMessage().getInvocationProperty("key1"));
-        assertNull(result.getMessage().getInvocationProperty("key2"));
-        assertNull(result.getMessage().getInvocationProperty("key3"));
+        assertEquals("value1", result.getFlowVariable("key1"));
+        assertNull(result.getFlowVariable("key2"));
+        assertNull(result.getFlowVariable("key3"));
 
         // Root id
         assertEquals(event1.getMessage().getMessageRootId(), result.getMessage().getMessageRootId());

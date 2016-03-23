@@ -7,8 +7,7 @@
 
 package org.mule.el.mvel.datatype;
 
-import org.mule.api.MuleMessage;
-import org.mule.PropertyScope;
+import org.mule.api.MuleEvent;
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.ast.AssignmentNode;
 import org.mule.transformer.types.TypedValue;
@@ -20,29 +19,23 @@ public class PropertyEnricherDataTypePropagator extends AbstractEnricherDataType
 {
 
     @Override
-    protected boolean doPropagate(MuleMessage message, TypedValue typedValue, ASTNode node)
+    protected boolean doPropagate(MuleEvent event, TypedValue typedValue, ASTNode node)
     {
         if (node instanceof AssignmentNode)
         {
-            PropertyScope scope = null;
             String assignmentVar = ((AssignmentNode) node).getAssignmentVar();
 
-            if (message.getPropertyNames(PropertyScope.INVOCATION).contains(assignmentVar))
+            if (event.getFlowVariableNames().contains(assignmentVar))
             {
-                scope = PropertyScope.INVOCATION;
+                event.setFlowVariable(assignmentVar, typedValue.getValue(), typedValue.getDataType());
+                return true;
             }
-            else if (message.getPropertyNames(PropertyScope.SESSION).contains(assignmentVar))
+            else if (event.getSession().getPropertyNamesAsSet().contains(assignmentVar))
             {
-                scope = PropertyScope.SESSION;
-            }
-
-            if (scope != null)
-            {
-                message.setProperty(assignmentVar, typedValue.getValue(), scope, typedValue.getDataType());
+                event.getSession().setProperty(assignmentVar, typedValue.getValue(), typedValue.getDataType());
                 return true;
             }
         }
-
         return false;
     }
 }

@@ -8,6 +8,7 @@ package org.mule.routing;
 
 import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -100,7 +101,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                 event.setMessage(transformedMessage);
             }
         }
-        message.setInvocationProperty(parentMessageProp, message);
+        event.setFlowVariable(parentMessageProp, message);
         doProcess(event);
         if (transformed)
         {
@@ -271,13 +272,14 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
             Object payload = event.getMessage().getPayload();
             if (payload instanceof Map<?, ?>)
             {
-                List<MuleMessage> list = new LinkedList<MuleMessage>();
+                List<MuleEvent> list = new LinkedList<>();
                 Set<Map.Entry<?, ?>> set = ((Map) payload).entrySet();
                 for (Entry<?, ?> entry : set)
                 {
                     MuleMessage splitMessage = new DefaultMuleMessage(entry.getValue(), muleContext);
-                    splitMessage.setInvocationProperty(MapSplitter.MAP_ENTRY_KEY, entry.getKey());
-                    list.add(splitMessage);
+                    MuleEvent splitEvent = new DefaultMuleEvent(splitMessage, event);
+                    // TODO MULE-9502 Support "key" flowVar with MapSplitter in Mule 4
+                    list.add(splitEvent);
                 }
                 return new CollectionMessageSequence(list);
             }

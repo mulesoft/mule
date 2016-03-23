@@ -7,6 +7,7 @@
 
 package org.mule.el.mvel.datatype;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.metadata.DataType;
 import org.mule.mvel2.ast.ASTNode;
@@ -21,7 +22,7 @@ public abstract class AbstractExpressionDataTypeResolver implements ExpressionDa
 {
 
     @Override
-    public DataType resolve(MuleMessage message, CompiledExpression compiledExpression)
+    public DataType resolve(MuleEvent event, CompiledExpression compiledExpression)
     {
         ASTIterator iterator = new ASTLinkedList(compiledExpression.getFirstNode());
 
@@ -33,9 +34,9 @@ public abstract class AbstractExpressionDataTypeResolver implements ExpressionDa
         {
             ASTNode node = iterator.nextNode();
 
-            return getDataType(message, node);
+            return getDataType(event, node);
         }
     }
 
-    protected abstract DataType getDataType(MuleMessage message, ASTNode node);
+    protected abstract DataType getDataType(MuleEvent event, ASTNode node);
 }

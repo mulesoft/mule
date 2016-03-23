@@ -14,7 +14,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.metadata.DataType;
-import org.mule.PropertyScope;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.transformer.types.MimeTypes;
@@ -47,7 +46,7 @@ public class SetFlowVariableDataTypeTestCase extends FunctionalTestCase
         @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
-            return eventContext.getMessage().getPropertyDataType("testVariable", PropertyScope.INVOCATION);
+            return eventContext.getEvent().getFlowVariableDataType("testVariable");
         }
     }
 }

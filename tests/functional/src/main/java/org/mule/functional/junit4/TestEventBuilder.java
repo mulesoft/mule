@@ -9,7 +9,6 @@ package org.mule.functional.junit4;
 import static org.mockito.Mockito.spy;
 import static org.mule.MessageExchangePattern.ONE_WAY;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.PropertyScope.SESSION;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -262,7 +261,7 @@ public class TestEventBuilder
         }
         for (Entry<String, Object> sessionPropertyEntry : sessionProperties.entrySet())
         {
-            muleMessage.setProperty(sessionPropertyEntry.getKey(), sessionPropertyEntry.getValue(), SESSION);
+            event.getSession().setProperty(sessionPropertyEntry.getKey(), sessionPropertyEntry.getValue());
         }
 
         for (Entry<String, Object> flowVarEntry : flowVariables.entrySet())

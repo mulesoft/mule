@@ -8,15 +8,14 @@ package org.mule.component;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.component.InterfaceBinding;
-import org.mule.api.config.MuleProperties;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.api.message.NullPayload;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringMessageUtils;
 
 import java.lang.reflect.InvocationHandler;
@@ -27,6 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * TODO MULE-9449 Remove Java Component Bindings
+ */
 public class BindingInvocationHandler implements InvocationHandler
 {
 
@@ -73,9 +75,6 @@ public class BindingInvocationHandler implements InvocationHandler
         }
 
         MuleMessage message = createMuleMessage(args);
-
-        // Some transports such as Axis, RMI and EJB can use the method information
-        message.setInvocationProperty(MuleProperties.MULE_METHOD_PROPERTY, method.getName());
 
         InterfaceBinding router = routers.get(method.getName());
         if (router == null)

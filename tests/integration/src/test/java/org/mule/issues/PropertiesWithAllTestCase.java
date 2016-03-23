@@ -10,8 +10,7 @@ package org.mule.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mule.PropertyScope.SESSION;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -32,12 +31,12 @@ public class PropertiesWithAllTestCase extends FunctionalTestCase
     @Test
     public void testSessionAndOutboundProperties() throws Exception
     {
-        MuleMessage response = flowRunner("flow1").withPayload("Hello").run().getMessage();
+        MuleEvent response = flowRunner("flow1").withPayload("Hello").run();
         assertNotNull(response);
-        assertEquals("foo", response.getProperty("foo", SESSION));
-        assertEquals("bar", response.getProperty("bar", SESSION));
-        assertEquals("baz", response.getProperty("baz", SESSION));
-        assertNull(response.<String>getOutboundProperty("outbar"));
-        assertNull(response.<String>getOutboundProperty("outbaz"));
+        assertEquals("foo", response.getSession().getProperty("foo"));
+        assertEquals("bar", response.getSession().getProperty("bar"));
+        assertEquals("baz", response.getSession().getProperty("baz"));
+        assertNull(response.getMessage().<String>getOutboundProperty("outbar"));
+        assertNull(response.getMessage().<String>getOutboundProperty("outbaz"));
     }
 }

@@ -6,15 +6,14 @@
  */
 package org.mule.routing;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import org.mule.api.MuleEvent;
-import org.mule.api.NonBlockingSupported;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.processor.NonBlockingMessageProcessor;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Routes the event to a single<code>MessageProcessor</code> using a {@link Filter}
@@ -30,7 +29,7 @@ public class ChoiceRouter extends AbstractSelectiveRouter implements NonBlocking
     {
         for (MessageProcessorFilterPair mpfp : getConditionalMessageProcessors())
         {
-            if (mpfp.getFilter().accept(event.getMessage()))
+            if (mpfp.getFilter().accept(event))
             {
                 return Collections.singleton(mpfp.getMessageProcessor());
             }

@@ -147,6 +147,16 @@ public final class DefaultMuleSession implements MuleSession
     }
 
     @Override
+    public void setProperty(String key, Object value, DataType dataType)
+    {
+        if (!(value instanceof Serializable))
+        {
+            logger.warn(CoreMessages.sessionPropertyNotSerializableWarning(key));
+        }
+        properties.put(key, new TypedValue(value, dataType));
+    }
+
+    @Override
     public Set<String> getPropertyNamesAsSet()
     {
         return Collections.unmodifiableSet(properties.keySet());

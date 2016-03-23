@@ -35,7 +35,7 @@ public class CopyAttachmentInInterceptor extends AbstractPhaseInterceptor
 
         if (atts != null && !atts.isEmpty())
         {
-            muleMsg.setInvocationProperty(CxfConstants.ATTACHMENTS, atts);
+            event.setFlowVariable(CxfConstants.ATTACHMENTS, atts);
             muleMsg.setOutboundProperty(CONTENT_TYPE, muleMsg.getInboundProperty(CONTENT_TYPE));
         }
     }

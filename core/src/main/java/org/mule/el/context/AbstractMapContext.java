@@ -15,22 +15,61 @@ import java.util.Set;
 
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 
-public abstract class AbstractMapContext<K, V> implements Map<K, V>
+public abstract class AbstractMapContext<V> implements Map<String, V>
 {
 
-    public void putAll(Map<? extends K, ? extends V> m)
+    @Override
+    public V get(Object key)
     {
-        for (Map.Entry<? extends K, ? extends V> entry : m.entrySet())
+        if (!(key instanceof String))
+        {
+            return null;
+        }
+        return doGet((String) key);
+    }
+
+    protected abstract V doGet(String key);
+
+    @Override
+    public V remove(Object key)
+    {
+        if (!(key instanceof String))
+        {
+            return null;
+        }
+        V previousValue = get(key);
+        doRemove((String) key);
+        return previousValue;
+    }
+
+    protected abstract void doRemove(String key);
+
+    @Override
+    public V put(String key, V value)
+    {
+        V previousValue = doGet(key);
+        doPut(key, value);
+        return previousValue;
+    }
+
+    protected abstract void doPut(String key, V value);
+
+    @Override
+    public void putAll(Map<? extends String, ? extends V> m)
+    {
+        for (Entry<? extends String, ? extends V> entry : m.entrySet())
         {
             put(entry.getKey(), entry.getValue());
         }
     }
 
+    @Override
     public int size()
     {
         return keySet().size();
     }
 
+    @Override
     public boolean isEmpty()
     {
         return keySet().isEmpty();
@@ -46,7 +85,7 @@ public abstract class AbstractMapContext<K, V> implements Map<K, V>
     public Collection<V> values()
     {
         List<V> values = new ArrayList<V>(size());
-        for (K key : keySet())
+        for (String key : keySet())
         {
             values.add(get(key));
         }
@@ -55,10 +94,10 @@ public abstract class AbstractMapContext<K, V> implements Map<K, V>
 
     @SuppressWarnings("unchecked")
     @Override
-    public Set<java.util.Map.Entry<K, V>> entrySet()
+    public Set<Entry<String, V>> entrySet()
     {
-        Set<java.util.Map.Entry<K, V>> entrySet = new HashSet<java.util.Map.Entry<K, V>>();
-        for (K key : keySet())
+        Set<Entry<String, V>> entrySet = new HashSet<Entry<String, V>>();
+        for (String key : keySet())
         {
             entrySet.add(new DefaultMapEntry(key, get(key)));
         }
@@ -68,7 +107,7 @@ public abstract class AbstractMapContext<K, V> implements Map<K, V>
     @Override
     public boolean containsValue(Object value)
     {
-        for (K key : keySet())
+        for (String key : keySet())
         {
             if (value.equals(get(key)))
             {

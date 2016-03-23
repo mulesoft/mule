@@ -7,36 +7,28 @@
 package org.mule.transformer.simple;
 
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.metadata.SimpleDataType;
 import org.mule.api.transformer.TransformerException;
-import org.mule.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
-import org.mockito.internal.verification.VerificationModeFactory;
 
-@RunWith(Parameterized.class)
 @SmallTest
-public class RemoveVariablePropertyTransformerTest extends AbstractMuleTestCase
+public abstract class AbstractRemoveVariablePropertyTransformerTestCase extends AbstractMuleTestCase
 {
     public static final String ENCODING = "encoding";
     public static final String PLAIN_STRING_KEY = "someText";
@@ -46,39 +38,28 @@ public class RemoveVariablePropertyTransformerTest extends AbstractMuleTestCase
     public static final String NULL_EXPRESSION = "#[string:someValueNull]";
     public static final String NULL_EXPRESSION_VALUE = null;
 
+    private MuleMessage mockMessage = mock(MuleMessage.class);
     private MuleEvent mockEvent = mock(MuleEvent.class);
-    private MuleMessage mockMessage = Mockito.mock(MuleMessage.class, RETURNS_DEEP_STUBS);
-    private MuleContext mockMuleContext = Mockito.mock(MuleContext.class);
-    private ExpressionManager mockExpressionManager = Mockito.mock(ExpressionManager.class);
+    private MuleSession mockSession = mock(MuleSession.class);
+    private MuleContext mockMuleContext = mock(MuleContext.class);
+    private ExpressionManager mockExpressionManager = mock(ExpressionManager.class);
     private AbstractRemoveVariablePropertyTransformer removeVariableTransformer;
-    private PropertyScope scope;
 
-    public RemoveVariablePropertyTransformerTest(AbstractRemoveVariablePropertyTransformer abstractAddVariableTransformer, PropertyScope scope)
-    {
-        this.removeVariableTransformer = abstractAddVariableTransformer;
-        this.scope = scope;
-    }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    public AbstractRemoveVariablePropertyTransformerTestCase(AbstractRemoveVariablePropertyTransformer abstractAddVariableTransformer)
     {
-        return Arrays.asList(new Object[][]{
-                {new RemoveFlowVariableTransformer(), PropertyScope.INVOCATION},
-                {new RemoveSessionVariableTransformer(), PropertyScope.SESSION},
-                {new RemovePropertyTransformer(), PropertyScope.OUTBOUND}
-        });
+        removeVariableTransformer = abstractAddVariableTransformer;
     }
 
     @Before
     public void setUpTest()
     {
         when(mockEvent.getMessage()).thenReturn(mockMessage);
+        when(mockEvent.getSession()).thenReturn(mockSession);
         when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-        when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(
-                invocation -> invocation.getArguments()[0]);
+        when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
         when(mockExpressionManager.evaluate(EXPRESSION, mockEvent)).thenReturn(EXPRESSION_VALUE);
         removeVariableTransformer.setMuleContext(mockMuleContext);
-        when(mockMessage.getDataType()).thenReturn(new SimpleDataType(String.class));
     }
 
     @Test
@@ -86,8 +67,8 @@ public class RemoveVariablePropertyTransformerTest extends AbstractMuleTestCase
     {
         removeVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
         removeVariableTransformer.initialise();
-        removeVariableTransformer.transform(mockMessage, ENCODING);
-        verify(mockMessage).removeProperty(PLAIN_STRING_KEY, scope);
+        removeVariableTransformer.transform(mockEvent, ENCODING);
+        verifyRemoved(mockEvent, PLAIN_STRING_KEY);
     }
 
     @Test
@@ -96,7 +77,7 @@ public class RemoveVariablePropertyTransformerTest extends AbstractMuleTestCase
         removeVariableTransformer.setIdentifier(EXPRESSION);
         removeVariableTransformer.initialise();
         removeVariableTransformer.transform(mockEvent, ENCODING);
-        verify(mockMessage).removeProperty(EXPRESSION_VALUE, scope);
+        verifyRemoved(mockEvent, EXPRESSION_VALUE);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -110,20 +91,29 @@ public class RemoveVariablePropertyTransformerTest extends AbstractMuleTestCase
     {
         removeVariableTransformer.setIdentifier(NULL_EXPRESSION);
         removeVariableTransformer.initialise();
-        removeVariableTransformer.transform(mockMessage, ENCODING);
+        removeVariableTransformer.transform(mockEvent, ENCODING);
     }
 
     @Test
     @Ignore
     public void testRemoveVariableWithRegexExpression() throws InitialisationException, TransformerException
     {
-        Mockito.when(mockMessage.getPropertyNames(scope)).thenReturn(new HashSet<String>(Arrays.asList("MULE_ID","MULE_CORRELATION_ID","SomeVar","MULE_GROUP_ID")));
+        addMockedPropeerties(mockEvent, new HashSet<>(Arrays.asList("MULE_ID", "MULE_CORRELATION_ID", "SomeVar", "MULE_GROUP_ID")));
+
         removeVariableTransformer.setIdentifier("MULE_(.*)");
         removeVariableTransformer.initialise();
-        removeVariableTransformer.transform(mockMessage, ENCODING);
-        verify(mockMessage).removeProperty("MULE_ID", scope);
-        verify(mockMessage).removeProperty("MULE_CORRELATION_ID", scope);
-        verify(mockMessage).removeProperty("MULE_GROUP_ID", scope);
-        verify(mockMessage, VerificationModeFactory.times(0)).removeProperty("SomeVar", scope);
+        removeVariableTransformer.transform(mockEvent, ENCODING);
+
+        verifyRemoved(mockEvent, "MULE_ID");
+        verifyRemoved(mockEvent, "MULE_CORRELATION_ID");
+        verifyRemoved(mockEvent, "MULE_GROUP_ID");
+        verifyNotRemoved(mockEvent, "SomeVar");
     }
+
+    protected abstract void addMockedPropeerties(MuleEvent event, HashSet properties);
+
+    protected abstract void verifyRemoved(MuleEvent mockEvent, String key);
+
+    protected abstract void verifyNotRemoved(MuleEvent mockEvent, String somevar);
+
 }

@@ -108,7 +108,7 @@ public class WireTap extends AbstractMessageProcessorOwner implements MessagePro
             }
             else
             {
-                return filter.accept(event.getMessage());
+                return filter.accept(event);
             }
         }
 

@@ -14,18 +14,10 @@
     <http:listener-config name="listenerConfig1" host="localhost" port="${port1}"/>
     <http:request-config name="requestConfig1" host="localhost" port="${port1}"/>
 
-    <message-properties-transformer scope="invocation" name="addP1">
-        <add-message-property key="P1" value="P1_VALUE" />
-    </message-properties-transformer>
-    <message-properties-transformer scope="invocation" name="addP2">
-        <add-message-property key="P2" value="P2_VALUE" />
-    </message-properties-transformer>
-    <message-properties-transformer scope="invocation" name="addP3">
-        <add-message-property key="P3" value="P3_VALUE" />
-    </message-properties-transformer>
-    <message-properties-transformer scope="invocation" name="addP4">
-        <add-message-property key="P4" value="P4_VALUE" />
-    </message-properties-transformer>
+    <set-variable name="addP1" variableName="P1" value="P1_VALUE"/>
+    <set-variable name="addP2" variableName="P2" value="P2_VALUE"/>
+    <set-variable name="addP3" variableName="P3" value="P3_VALUE"/>
+    <set-variable name="addP4" variableName="P4" value="P4_VALUE"/>
 
     <!-- Test Flows -->
 
@@ -38,9 +30,7 @@
     </flow>
 
     <flow name="OverwritePropertyValueInFlow" processingStrategy="synchronous">
-        <message-properties-transformer scope="invocation">
-            <add-message-property key="P1" value="P1_VALUE_NEW" />
-        </message-properties-transformer>
+        <set-variable variableName="P1" value="P1_VALUE_NEW"/>
     </flow>
 
     <flow name="propagationInSameFlow">
@@ -123,9 +113,7 @@
         <test:assert expression="#[P1 == 'P1_VALUE_NEW']" />
     </flow>
     <flow name="OverwriteInFlowRef-1" processingStrategy="synchronous">
-        <message-properties-transformer scope="invocation">
-            <add-message-property key="P1" value="P1_VALUE_NEW" />
-        </message-properties-transformer>
+        <set-variable variableName="P1" value="P1_VALUE_NEW"/>
     </flow>
 
     <flow name="propagationThroughFlowRefToSubFlow">
@@ -164,9 +152,7 @@
         <test:assert expression="#[P1 == 'P1_VALUE_NEW']" />
     </flow>
     <flow name="OverwriteInSubFlowRef-1" processingStrategy="synchronous">
-        <message-properties-transformer scope="invocation">
-            <add-message-property key="P1" value="P1_VALUE_NEW" />
-        </message-properties-transformer>
+        <set-variable variableName="P1" value="P1_VALUE_NEW"/>
     </flow>
 
     <flow name="propagationThroughAsyncElement">
@@ -337,13 +323,9 @@
     </flow>
 
     <flow name="defaultExceptionStrategyAfterCallingSubflow">
-        <message-properties-transformer scope="invocation">
-            <add-message-property key="P1" value="P1_VALUE"/>
-        </message-properties-transformer>
+        <set-variable variableName="P1" value="P1_VALUE"/>
         <flow-ref name="TestSubFlow"/>
-        <message-properties-transformer scope="invocation">
-            <add-message-property key="P2" value="P2_VALUE"/>
-        </message-properties-transformer>
+        <set-variable variableName="P2" value="P2_VALUE"/>
         <message-filter throwOnUnaccepted="true">
             <payload-type-filter expectedType="java.lang.NoSuchFieldError"/>
         </message-filter>

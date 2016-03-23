@@ -55,7 +55,7 @@ public class AppContext
         return new RegistryWrapperMap(muleContext.getRegistry());
     }
 
-    private static class RegistryWrapperMap extends AbstractMapContext<String, Object>
+    private static class RegistryWrapperMap extends AbstractMapContext<Object>
     {
         private MuleRegistry registry;
 
@@ -77,17 +77,13 @@ public class AppContext
         }
 
         @Override
-        public Object get(Object key)
+        public Object doGet(String key)
         {
-            if (!(key instanceof String))
-            {
-                return null;
-            }
-            return registry.get((String) key);
+            return registry.get(key);
         }
 
         @Override
-        public Object put(String key, Object value)
+        public void doPut(String key, Object value)
         {
             try
             {
@@ -97,39 +93,23 @@ public class AppContext
             {
                 throw new MuleRuntimeException(e);
             }
-            return value;
         }
 
         @Override
-        public void putAll(Map<? extends String, ? extends Object> m)
+        public void doRemove(String key)
         {
-            for (java.util.Map.Entry<? extends String, ? extends Object> entry : m.entrySet())
-            {
-                put(entry.getKey(), entry.getValue());
-            }
-        }
-
-        @Override
-        public Object remove(Object key)
-        {
-            if (!(key instanceof String))
-            {
-                return null;
-            }
-
-            Object value = registry.lookupObject((String) key);
+            Object value = registry.lookupObject(key);
             if (value != null)
             {
                 try
                 {
-                    registry.unregisterObject((String) key);
+                    registry.unregisterObject(key);
                 }
                 catch (RegistrationException e)
                 {
                     throw new MuleRuntimeException(e);
                 }
             }
-            return value;
         }
 
         @Override

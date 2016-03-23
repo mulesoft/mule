@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class MessagePropertyMapContext extends AbstractMapContext<String, Object>
+public class MessagePropertyMapContext extends AbstractMapContext<Object>
 {
     private MuleEvent event;
     private PropertyScope propertyScope;
@@ -26,17 +26,13 @@ public class MessagePropertyMapContext extends AbstractMapContext<String, Object
     }
 
     @Override
-    public Object get(Object key)
+    public Object doGet(String key)
     {
-        if (!(key instanceof String))
-        {
-            return null;
-        }
-        return event.getMessage().getProperty((String) key, propertyScope);
+        return event.getMessage().getProperty(key, propertyScope);
     }
 
     @Override
-    public Object put(String key, Object value)
+    public void doPut(String key, Object value)
     {
         if (PropertyScope.INBOUND.equals(propertyScope))
         {
@@ -45,20 +41,13 @@ public class MessagePropertyMapContext extends AbstractMapContext<String, Object
         }
         else
         {
-            Object previousValue = get(key);
             event.getMessage().setProperty(key, value, propertyScope);
-            return previousValue;
         }
     }
 
     @Override
-    public Object remove(Object key)
+    public void doRemove(String key)
     {
-        if (!(key instanceof String))
-        {
-            return null;
-        }
-
         if (PropertyScope.INBOUND.equals(propertyScope))
         {
             throw new UnsupportedOperationException(CoreMessages.inboundMessagePropertiesImmutable(key)
@@ -66,7 +55,7 @@ public class MessagePropertyMapContext extends AbstractMapContext<String, Object
         }
         else
         {
-            return event.getMessage().removeProperty((String) key, propertyScope);
+            event.getMessage().removeProperty(key, propertyScope);
         }
     }
 

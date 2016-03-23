@@ -14,7 +14,6 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.PropertyScope;
 
 import java.util.Map;
 
@@ -40,7 +39,7 @@ public class VariablesTestCase extends AbstractELTestCase
     @Test
     public void flowVariablesMap() throws Exception
     {
-        event.getMessage().setProperty("foo", "bar", PropertyScope.INVOCATION);
+        event.setFlowVariable("foo", "bar");
         assertTrue(evaluate("flowVars", event) instanceof Map);
     }
 
@@ -86,7 +85,7 @@ public class VariablesTestCase extends AbstractELTestCase
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow());
-        message.setProperty("foo", "bar", PropertyScope.SESSION);
+        event.getSession().setProperty("foo", "bar");
         assertTrue(evaluate("sessionVars", event) instanceof Map);
     }
 

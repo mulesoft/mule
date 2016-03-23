@@ -13,12 +13,11 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.execution.ExecutionCallback;
-import org.mule.PropertyScope;
+import org.mule.api.message.NullPayload;
 import org.mule.component.ComponentException;
 import org.mule.config.ExceptionHelper;
 import org.mule.execution.ErrorHandlingExecutionTemplate;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.api.message.NullPayload;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -82,13 +81,13 @@ public class MuleInvoker implements Invoker
                         m = matchMethod(m, targetClass);
                     }
 
-                    reqMsg.setProperty(MuleProperties.MULE_METHOD_PROPERTY, m, PropertyScope.INVOCATION);
+                    event.setFlowVariable(MuleProperties.MULE_METHOD_PROPERTY, m);
                 }
 
                 if (bop != null)
                 {
-                    reqMsg.setProperty(CxfConstants.INBOUND_OPERATION, bop.getOperationInfo().getName(), PropertyScope.INVOCATION);
-                    reqMsg.setProperty(CxfConstants.INBOUND_SERVICE, svc.getName(), PropertyScope.INVOCATION);
+                    event.setFlowVariable(CxfConstants.INBOUND_OPERATION, bop.getOperationInfo().getName());
+                    event.setFlowVariable(CxfConstants.INBOUND_SERVICE, svc.getName());
                 }
 
                 ErrorHandlingExecutionTemplate errorHandlingExecutionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(event.getMuleContext(), event.getFlowConstruct().getExceptionListener());
@@ -108,7 +107,7 @@ public class MuleInvoker implements Invoker
                 Throwable cause = e;
 
                 // See MULE-6329
-                if(Boolean.valueOf((String) event.getMessage().getInvocationProperty(CxfConstants.UNWRAP_MULE_EXCEPTIONS)))
+                if(Boolean.valueOf((String) event.getFlowVariable(CxfConstants.UNWRAP_MULE_EXCEPTIONS)))
                 {
                     cause = ExceptionHelper.getNonMuleException(e);
                     // Exceptions thrown from a ScriptComponent or a ScriptTransformer are going to be wrapped on a

@@ -9,7 +9,7 @@ package org.mule.el.mvel.datatype;
 
 import static org.mule.el.mvel.MessageVariableResolverFactory.MESSAGE_PAYLOAD;
 import static org.mule.el.mvel.MessageVariableResolverFactory.PAYLOAD;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.ast.Assignment;
 import org.mule.transformer.types.TypedValue;
@@ -21,7 +21,7 @@ public class PayloadEnricherDataTypePropagator extends AbstractEnricherDataTypeP
 {
 
     @Override
-    protected boolean doPropagate(MuleMessage message, TypedValue typedValue, ASTNode node)
+    protected boolean doPropagate(MuleEvent event, TypedValue typedValue, ASTNode node)
     {
         if (node instanceof Assignment)
         {
@@ -29,7 +29,7 @@ public class PayloadEnricherDataTypePropagator extends AbstractEnricherDataTypeP
 
             if (PAYLOAD.equals(assignmentVar) || MESSAGE_PAYLOAD.equals(assignmentVar))
             {
-                message.setPayload(typedValue.getValue(), typedValue.getDataType());
+                event.getMessage().setPayload(typedValue.getValue(), typedValue.getDataType());
 
                 return true;
             }

@@ -19,8 +19,6 @@ import org.mule.construct.Flow;
 import org.mule.expression.ExpressionConfig;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -91,6 +89,19 @@ public class ExpressionFilter implements Filter, MuleContextAware
             return result;
         }
 
+        // TODO MULE-9341 Remove Filters. Expression filter will be replaced by something that uses MuleEvent.
+        return accept(new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, new Flow("", muleContext)));
+    }
+
+    /**
+     * Check a given event against this filter.
+     *
+     * @param event a non null event to filter.
+     * @return <code>true</code> if the event matches the filter
+     */
+    @Override
+    public boolean accept(MuleEvent event)
+    {
         // MULE-4797 Because there is no way to specify the class-loader that script
         // engines use and because scripts when used for expressions are compiled in
         // runtime rather than at initialization the only way to ensure the correct
@@ -101,21 +112,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
         try
         {
             Thread.currentThread().setContextClassLoader(expressionEvaluationClassLoader);
-
-            // TODO MULE-9341 Remove Filters. Expression filter will be replaced by something that uses MuleEvent.
-            // For now conserve the flowVars manually to allow tests to continue to pass.
-            Map<String, Object> flowVars = new HashMap<>();
-            for (String var: message.getInvocationPropertyNames())
-            {
-                flowVars.put(var, message.getInvocationProperty(var));
-            }
-            MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, new Flow("", muleContext));
-            for (Map.Entry<String, Object> var: flowVars.entrySet())
-            {
-                event.setFlowVariable(var.getKey(), var.getValue());
-            }
-
-            return muleContext.getExpressionManager().evaluateBoolean(expr, event, nullReturnsTrue, !nullReturnsTrue);
+            return muleContext.getExpressionManager().evaluateBoolean(getFullExpression(), event, nullReturnsTrue, !nullReturnsTrue);
         }
         finally
         {

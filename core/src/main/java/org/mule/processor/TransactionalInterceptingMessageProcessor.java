@@ -9,6 +9,8 @@ package org.mule.processor;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.execution.ExecutionCallback;
@@ -28,10 +30,11 @@ import org.mule.transaction.MuleTransactionConfig;
  * the {@link org.mule.api.transaction.TransactionConfig} is null then no transaction is used and the next
  * {@link org.mule.api.processor.MessageProcessor} is invoked directly.
  */
-public class TransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle, MuleContextAware
+public class TransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle, MuleContextAware, FlowConstructAware
 {
     protected MessagingExceptionHandler exceptionListener;
     protected MuleTransactionConfig transactionConfig;
+    protected FlowConstruct flowConstruct;
 
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
@@ -79,13 +82,17 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
     @Override
     public void initialise() throws InitialisationException
     {
-        if (this.exceptionListener == null)
+        if (exceptionListener == null)
         {
-            this.exceptionListener = muleContext.getDefaultExceptionStrategy();
+            exceptionListener = muleContext.getDefaultExceptionStrategy();
         }
-        if (this.exceptionListener instanceof Initialisable)
+        if (exceptionListener instanceof FlowConstructAware)
         {
-            ((Initialisable)(this.exceptionListener)).initialise();
+            ((FlowConstructAware) exceptionListener).setFlowConstruct(flowConstruct);
+        }
+        if (exceptionListener instanceof Initialisable)
+        {
+            ((Initialisable) exceptionListener).initialise();
         }
     }
 
@@ -114,5 +121,11 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
         {
             ((Stoppable)this.exceptionListener).stop();
         }
+    }
+
+    @Override
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        this.flowConstruct = flowConstruct;
     }
 }

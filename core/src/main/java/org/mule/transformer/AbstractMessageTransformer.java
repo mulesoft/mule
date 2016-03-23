@@ -23,9 +23,6 @@ import org.mule.api.message.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * <code>AbstractMessageTransformer</code> is a transformer that has a reference
  * to the current message. This message can be used to obtain properties associated
@@ -147,17 +144,8 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
         // TODO MULE-9342 Clean up transformer vs message transformer confusion
         if (event == null)
         {
-            Map<String, Object> flowVars = new HashMap<>();
-            for (String var: message.getInvocationPropertyNames())
-            {
-                flowVars.put(var, message.getInvocationProperty(var));
-            }
             event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, new DefaultLocalMuleClient
                     .MuleClientFlowConstruct(muleContext));
-            for (Map.Entry<String, Object> var: flowVars.entrySet())
-            {
-                event.setFlowVariable(var.getKey(), var.getValue());
-            }
         }
         try
         {

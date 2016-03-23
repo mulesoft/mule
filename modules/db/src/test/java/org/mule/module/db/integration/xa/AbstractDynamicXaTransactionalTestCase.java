@@ -44,7 +44,7 @@ public abstract class AbstractDynamicXaTransactionalTestCase extends AbstractXaT
         try
         {
             MuleEvent muleEvent = getTestEvent(TEST_MESSAGE);
-            muleEvent.getMessage().setInvocationProperty("dataSourceUrl", "jdbc:derby:muleEmbeddedDB;create=true");
+            muleEvent.setFlowVariable("dataSourceUrl", "jdbc:derby:muleEmbeddedDB;create=true");
 
             return dbConfigResolver.resolve(muleEvent);
         }

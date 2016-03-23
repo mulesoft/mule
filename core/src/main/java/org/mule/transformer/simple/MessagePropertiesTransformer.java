@@ -6,16 +6,16 @@
  */
 package org.mule.transformer.simple;
 
+import static org.mule.PropertyScope.OUTBOUND;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.message.NullPayload;
 import org.mule.api.metadata.DataType;
-import org.mule.PropertyScope;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.TypedValue;
-import org.mule.api.message.NullPayload;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -48,8 +48,6 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
     private Map<String, String> renameProperties;
     private String getProperty;
     private boolean overwrite = true;
-    // outbound is the default scope
-    private PropertyScope scope = PropertyScope.OUTBOUND;
 
     public MessagePropertiesTransformer()
     {
@@ -101,7 +99,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
         
         if (getProperty != null)
         {
-            Object prop = message.getProperty(getProperty, scope);
+            Object prop = message.getOutboundProperty(getProperty);
             if (prop != null)
             {
                 message = new DefaultMuleMessage(prop, muleContext);
@@ -118,7 +116,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
     protected void deleteProperties(MuleEvent event)
     {
         MuleMessage message = event.getMessage();
-        final Set<String> propertyNames = new HashSet<String>(message.getPropertyNames(scope));
+        final Set<String> propertyNames = new HashSet<String>(message.getOutboundPropertyNames());
         
         for (String expression : deleteProperties)
         {
@@ -128,9 +126,9 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
                 {
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug(String.format("Removing property: '%s' from scope: '%s'", key, scope.getScopeName()));
+                        logger.debug(String.format("Removing property: '%s' from scope: outbound", key));
                     }
-                    message.removeProperty(key, scope);
+                    message.removeProperty(key, OUTBOUND);
                 }
                 else
                 {
@@ -138,7 +136,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
                     WildcardFilter filter = new WildcardFilter(expression);
                     if (filter.accept(key))
                     {
-                        message.removeProperty(key, scope);
+                        message.removeProperty(key, OUTBOUND);
                     }
                 }
             }
@@ -170,25 +168,25 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
                 if (value != null)
                 {
                     DataType<?> propertyDataType = createPropertyDataType(value, typedValue.getDataType());
-                    if (message.getProperty(key, scope) != null)
+                    if (message.getOutboundProperty(key) != null)
                     {
                         if (overwrite)
                         {
-                            logger.debug("Overwriting message property " + key);
-                            message.setProperty(key, value, scope, propertyDataType);
+                            logger.debug("Overwriting outbound message property " + key);
+                            message.setOutboundProperty(key, value, propertyDataType);
                         }
                         else if(logger.isDebugEnabled())
                         {
                             logger.debug(MessageFormat.format(
-                                "Message already contains the property and overwrite is false, skipping: key={0}, value={1}, scope={2}",
-                                key, value, scope));
+                                "Message already contains the outbound property and overwrite is false, skipping: key={0}, value={1}",
+                                key, value));
                         }
                     }
                     //If value is null an exception will not be thrown if the key was marked as optional (with a '?'). If not
                     //optional the expression evaluator will throw an exception
                     else
                     {
-                        message.setProperty(key, value, scope, propertyDataType);
+                        message.setOutboundProperty(key, value, propertyDataType);
                     }
                 }
                 else if (logger.isInfoEnabled())
@@ -240,23 +238,23 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
 
                     MuleMessage message = event.getMessage();
                     /* log transformation */
-                    if (logger.isDebugEnabled() && message.getProperty(key, scope) == null)
+                    if (logger.isDebugEnabled() && message.getOutboundProperty(key) == null)
                     {
                         logger.debug(String.format("renaming message property '%s' to '%s'", key, value));
                     }
 
-                    renameInScope(key, value, scope, message);
+                    renameInScope(key, value, message);
                 }
             }
         }
     }
 
-    protected void renameInScope(String oldKey, String newKey, PropertyScope propertyScope, MuleMessage message)
+    protected void renameInScope(String oldKey, String newKey, MuleMessage message)
     {
-        Object propValue = message.getProperty(oldKey, propertyScope);
-        DataType<?> propertyDataType = message.getPropertyDataType(oldKey, propertyScope);
-        message.removeProperty(oldKey, propertyScope);
-        message.setProperty(newKey, propValue, propertyScope, propertyDataType);
+        Object propValue = message.getOutboundProperty(oldKey);
+        DataType<?> propertyDataType = message.getPropertyDataType(oldKey, OUTBOUND);
+        message.removeProperty(oldKey, OUTBOUND);
+        message.setOutboundProperty(newKey, propValue, propertyDataType);
     }
 
     public List<String> getDeleteProperties()
@@ -333,32 +331,4 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer
         this.overwrite = overwrite;
     }
 
-    public PropertyScope getScope()
-    {
-        return scope;
-    }
-
-    public void setScope(PropertyScope scope)
-    {
-        this.scope = scope;
-    }
-    
-    /**
-     * For XML-based config
-     *
-     * @return The string value name for a {@link org.mule.PropertyScope}
-     */
-    public String getScopeName()
-    {
-        return scope != null ? scope.getScopeName() : null;
-    }
-
-    /**
-     * For XML-based config
-     * @param scopeName The string value name for a {@link org.mule.PropertyScope}
-     */
-    public void setScopeName(String scopeName)
-    {
-        this.scope = PropertyScope.get(scopeName);
-    }
 }

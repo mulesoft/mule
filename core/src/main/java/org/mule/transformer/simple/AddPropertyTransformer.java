@@ -6,19 +6,24 @@
  */
 package org.mule.transformer.simple;
 
+
 import org.mule.PropertyScope;
+import org.mule.api.MuleEvent;
+import org.mule.api.metadata.DataType;
 
 public class AddPropertyTransformer extends AbstractAddVariablePropertyTransformer
 {
 
     @Override
-    protected PropertyScope getScope()
+    protected void addProperty(MuleEvent event, String propertyName, Object value, DataType dataType)
     {
-        return PropertyScope.OUTBOUND;
+        event.getMessage().setOutboundProperty(propertyName, value, dataType);
     }
 
-    public void setPropertyName(String propertyName)
+    @Override
+    protected void removeProperty(MuleEvent event, String propertyName)
     {
-        this.setIdentifier(propertyName);
+        event.getMessage().removeProperty(propertyName, PropertyScope.OUTBOUND);
     }
+
 }

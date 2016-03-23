@@ -7,8 +7,6 @@
 package org.mule.module.scripting.component;
 
 import static org.mule.PropertyScope.INBOUND;
-import static org.mule.PropertyScope.INVOCATION;
-import static org.mule.PropertyScope.SESSION;
 import static org.mule.config.i18n.CoreMessages.cannotLoadFromClasspath;
 import static org.mule.config.i18n.CoreMessages.propertiesNotSet;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
@@ -23,6 +21,8 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.PropertyScope;
 import org.mule.api.message.NullPayload;
+import org.mule.el.context.FlowVariableMapContext;
+import org.mule.el.context.SessionVariableMapContext;
 import org.mule.util.CollectionUtils;
 import org.mule.util.StringUtils;
 
@@ -252,7 +252,7 @@ public class Scriptable implements Initialisable, MuleContextAware
     {
         populatePropertyBindings(bindings, event);
         populateDefaultBindings(bindings);
-        populateMessageBindings(bindings, event.getMessage());
+        populateMessageBindings(bindings, event);
 
         bindings.put(BINDING_ORIGINAL_PAYLOAD, event.getMessage().getPayload());
         bindings.put(BINDING_EVENT_CONTEXT, new DefaultMuleEventContext(event));
@@ -260,34 +260,35 @@ public class Scriptable implements Initialisable, MuleContextAware
         bindings.put(BINDING_FLOW_CONSTRUCT, event.getFlowConstruct());
     }
 
-    protected void populateMessageBindings(Bindings bindings, MuleMessage message)
+    protected void populateMessageBindings(Bindings bindings, MuleEvent event)
     {
+        MuleMessage message = event.getMessage();
         if (message == null)
         {
             message = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
         }
 
-        populateVariablesInOrder(bindings, message);
+        populateVariablesInOrder(bindings, event);
 
-        bindings.put(BINDING_MESSAGE, message);
+        bindings.put(BINDING_MESSAGE, event.getMessage());
         // This will get overwritten if populateBindings(Bindings bindings, MuleEvent event) is called
         // and not this method directly.
         bindings.put(BINDING_PAYLOAD, message.getPayload());
         // For backward compatability
         bindings.put(BINDING_SRC, message.getPayload());
 
-        populateHeadersVariablesAndException(bindings, message);
+        populateHeadersVariablesAndException(bindings, event);
     }
 
-    private void populateHeadersVariablesAndException(Bindings bindings, MuleMessage message)
+    private void populateHeadersVariablesAndException(Bindings bindings, MuleEvent event)
     {
-        bindings.put(BINDING_FLOW_VARS, new MesssagePropertyMap(message, INVOCATION));
-        bindings.put(BINDING_SESSION_VARS, new MesssagePropertyMap(message, SESSION));
+        bindings.put(BINDING_FLOW_VARS, new FlowVariableMapContext(event));
+        bindings.put(BINDING_SESSION_VARS, new SessionVariableMapContext(event.getSession()));
 
         // Only add exception is present
-        if (message.getExceptionPayload() != null)
+        if (event.getMessage().getExceptionPayload() != null)
         {
-            bindings.put(BINDING_EXCEPTION, message.getExceptionPayload().getException());
+            bindings.put(BINDING_EXCEPTION, event.getMessage().getExceptionPayload().getException());
         }
         else
         {
@@ -295,15 +296,15 @@ public class Scriptable implements Initialisable, MuleContextAware
         }
     }
 
-    private void populateVariablesInOrder(Bindings bindings, MuleMessage message)
+    private void populateVariablesInOrder(Bindings bindings, MuleEvent event)
     {
-        for (String key : message.getPropertyNames(SESSION))
+        for (String key : event.getSession().getPropertyNamesAsSet())
         {
-            bindings.put(key, message.getProperty(key, SESSION));
+            bindings.put(key, event.getSession().getProperty(key));
         }
-        for (String key : message.getInvocationPropertyNames())
+        for (String key : event.getFlowVariableNames())
         {
-            bindings.put(key, message.getInvocationProperty(key));
+            bindings.put(key, event.getFlowVariable(key));
         }
     }
 

@@ -8,7 +8,6 @@ package org.mule;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.PropertyScope.INBOUND;
-import static org.mule.PropertyScope.INVOCATION;
 import static org.mule.PropertyScope.OUTBOUND;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.api.ExceptionPayload;
@@ -18,8 +17,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.metadata.DataType;
 import org.mule.api.message.NullPayload;
+import org.mule.api.metadata.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
@@ -340,12 +339,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
             setExceptionPayload(previous.getExceptionPayload());
         }
 
-        if (previous instanceof DefaultMuleMessage)
-        {
-            setInvocationProperties(((DefaultMuleMessage) previous).properties.invocationMap);
-            setSessionProperties(((DefaultMuleMessage) previous).properties.sessionMap);
-        }
-
         copyAttachments(previous);
 
         resetAccessControl();
@@ -475,18 +468,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     }
 
     @Override
-    public void setInvocationProperty(String key, Object value)
-    {
-        setProperty(key, value, INVOCATION);
-    }
-
-    @Override
-    public void setInvocationProperty(String key, Object value, DataType<?> dataType)
-    {
-        setProperty(key, value, INVOCATION, dataType);
-    }
-
-    @Override
     public void setOutboundProperty(String key, Object value)
     {
         setProperty(key, value, PropertyScope.OUTBOUND, DataTypeFactory.createFromObject(value));
@@ -600,12 +581,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     }
 
     @Override
-    public Set<String> getInvocationPropertyNames()
-    {
-        return getPropertyNames(INVOCATION);
-    }
-
-    @Override
     public Set<String> getInboundPropertyNames()
     {
         return getPropertyNames(INBOUND);
@@ -678,18 +653,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     public <T> T getInboundProperty(String name)
     {
         return getProperty(name, INBOUND, (T) null);
-    }
-
-    @Override
-    public <T> T getInvocationProperty(String name, T defaultValue)
-    {
-        return getProperty(name, INVOCATION, defaultValue);
-    }
-
-    @Override
-    public <T> T getInvocationProperty(String name)
-    {
-        return getInvocationProperty(name, (T) null);
     }
 
     @Override
@@ -781,12 +744,11 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         assertAccess(WRITE);
         if (StringUtils.isNotBlank(id))
         {
-            setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, id, PropertyScope.OUTBOUND);
+            setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, id, OUTBOUND);
         }
         else
         {
             removeProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, OUTBOUND);
-            removeProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, INVOCATION);
         }
     }
 
@@ -820,7 +782,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         else
         {
             removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, OUTBOUND);
-            removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, INVOCATION);
         }
     }
 
@@ -1046,9 +1007,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     public <T> T findPropertyInAnyScope(String name, T defaultValue)
     {
         Object value = findPropertyInSpecifiedScopes(name,
-                                                     PropertyScope.OUTBOUND,
-                                                     INVOCATION,
-                                                     PropertyScope.SESSION,
+                                                     OUTBOUND,
                                                      INBOUND);
         if (value == null)
         {
@@ -1581,8 +1540,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         }
 
         newMessage.clearProperties(INBOUND);
-        newMessage.clearProperties(INVOCATION);
-        newMessage.clearProperties(PropertyScope.OUTBOUND);
+        newMessage.clearProperties(OUTBOUND);
 
         for (Map.Entry<String, Object> s : newInboundProperties.entrySet())
         {
@@ -1607,16 +1565,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         return newMessage;
     }
 
-    void setSessionProperties(Map<String, TypedValue> sessionProperties)
-    {
-        properties.sessionMap = sessionProperties;
-    }
-
-    void setInvocationProperties(Map<String, TypedValue> invocationProperties)
-    {
-        properties.invocationMap = invocationProperties;
-    }
-
     @Override
     public boolean equals(Object obj)
     {
@@ -1631,11 +1579,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     public int hashCode()
     {
         return id.hashCode();
-    }
-
-    Map<String, TypedValue> getOrphanFlowVariables()
-    {
-        return properties.getOrphanFlowVariables();
     }
 
     @Override

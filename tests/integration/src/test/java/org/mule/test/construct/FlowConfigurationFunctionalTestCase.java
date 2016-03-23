@@ -315,10 +315,6 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertTrue(apple.isBitten());
         assertTrue(banana.isBitten());
         assertTrue(orange.isBitten());
-
-        assertNotNull(results[0].getProperty("key", PropertyScope.INVOCATION));
-        assertNotNull(results[1].getProperty("key", PropertyScope.INVOCATION));
-        assertNotNull(results[2].getProperty("key", PropertyScope.INVOCATION));
     }
 
     @Test

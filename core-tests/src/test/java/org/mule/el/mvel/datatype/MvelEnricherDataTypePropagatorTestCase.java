@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.api.metadata.DataType.STRING_DATA_TYPE;
 import static org.mule.mvel2.MVEL.compileExpression;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.el.mvel.MVELExpressionLanguage;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
@@ -30,7 +30,7 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
 
     public static final String MEL_EXPRESSION = "foo = bar";
 
-    private final MuleMessage message = mock(MuleMessage.class);
+    private final MuleEvent event = mock(MuleEvent.class);
     private final TypedValue typedValue = new TypedValue(TEST_MESSAGE, STRING_DATA_TYPE);
     private final EnricherDataTypePropagator propagator1 = mock(EnricherDataTypePropagator.class);
     private final EnricherDataTypePropagator propagator2 = mock(EnricherDataTypePropagator.class);
@@ -46,10 +46,10 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
 
         MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator(propagators);
 
-        dataTypePropagator.propagate(typedValue, message, compiledExpression);
+        dataTypePropagator.propagate(typedValue, event, compiledExpression);
 
-        verify(propagator1).propagate(message, typedValue, compiledExpression);
-        verify(propagator2).propagate(message, typedValue, compiledExpression);
+        verify(propagator1).propagate(event, typedValue, compiledExpression);
+        verify(propagator2).propagate(event, typedValue, compiledExpression);
     }
 
     @Test
@@ -59,15 +59,15 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
 
         final List<EnricherDataTypePropagator> propagators = new ArrayList<>();
         propagators.add(propagator1);
-        when(propagator1.propagate(message, typedValue, compiledExpression)).thenReturn(true);
+        when(propagator1.propagate(event, typedValue, compiledExpression)).thenReturn(true);
         propagators.add(propagator2);
 
         MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator(propagators);
 
-        dataTypePropagator.propagate(typedValue, message, compiledExpression);
+        dataTypePropagator.propagate(typedValue, event, compiledExpression);
 
-        verify(propagator1).propagate(message, typedValue, compiledExpression);
-        verify(propagator2, never()).propagate(message, typedValue, compiledExpression);
+        verify(propagator1).propagate(event, typedValue, compiledExpression);
+        verify(propagator2, never()).propagate(event, typedValue, compiledExpression);
     }
 
     private CompiledExpression compileMelExpression()

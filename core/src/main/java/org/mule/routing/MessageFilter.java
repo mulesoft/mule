@@ -90,7 +90,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
 
         if (event != null && !VoidMuleEvent.getInstance().equals(event))
         {
-            return filter.accept(event.getMessage());
+            return filter.accept(event);
         }
         else
         {

@@ -6,6 +6,7 @@
  */
 package org.mule.routing;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -44,9 +45,9 @@ public class MessageChunkSplitter extends AbstractSplitter
         return messageSize != 0;
     }
 
-    protected List<MuleMessage> splitMessage(MuleEvent event) throws RoutingException
+    protected List<MuleEvent> splitMessage(MuleEvent event) throws RoutingException
     {
-        List<MuleMessage> messageParts = new ArrayList<MuleMessage>();
+        List<MuleEvent> messageParts = new ArrayList<>();
         byte[] data;
         try
         {
@@ -80,7 +81,7 @@ public class MessageChunkSplitter extends AbstractSplitter
             part.setCorrelationId(message.getUniqueId());
             part.setCorrelationGroupSize(parts);
             part.setCorrelationSequence(count);
-            messageParts.add(part);
+            messageParts.add(new DefaultMuleEvent(part, event));
         }
         return messageParts;
     }

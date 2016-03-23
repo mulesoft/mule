@@ -6,29 +6,17 @@
 
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <message-properties-transformer name="addSessionVariable" scope="session">
-        <add-message-property key="sesVarKey" value="sesVarValue"/>
-    </message-properties-transformer>
+    <set-session-variable name="addSessionVariable" variableName="sesVarKey" value="sesVarValue" />
 
-    <message-properties-transformer name="addSessionVariableName" scope="session">
-        <add-message-property key="sesVarKeyName" value="sesVarKey"/>
-    </message-properties-transformer>
+    <set-session-variable name="addSessionVariableName" variableName="sesVarKeyName" value="sesVarKey" />
 
-    <message-properties-transformer name="addSessionVariable2" scope="session">
-        <add-message-property key="invVarKey2" value="invVarValue2"/>
-    </message-properties-transformer>
+    <set-session-variable name="addSessionVariable2" variableName="invVarKey2" value="invVarValue2" />
 
-    <message-properties-transformer name="addAnotherSessionVariable" scope="session">
-            <add-message-property key="anotherSessionVarKey" value="anotherSessionVarValue"/>
-        </message-properties-transformer>
+    <set-session-variable name="addAnotherSessionVariable" variableName="anotherSessionVarKey" value="anotherSessionVarValue" />
 
-    <message-properties-transformer scope="invocation" name="addInvocationVariable">
-        <add-message-property key="invVarKey" value="invVarValue"/>
-    </message-properties-transformer>
+    <set-variable name="addInvocationVariable" variableName="invVarKey" value="invVarValue" />
 
-    <message-properties-transformer scope="invocation" name="addInvocationVariable2">
-        <add-message-property key="invVarKey2" value="invVarValue2"/>
-    </message-properties-transformer>
+    <set-variable name="addInvocationVariable2" variableName="invVarKey2" value="invVarValue2" />
 
     <set-session-variable name="setSessVarGlobal" variableName="#[sessionVars.sesVarKey]" value="#[flowVars.invVarKey]"/>
 

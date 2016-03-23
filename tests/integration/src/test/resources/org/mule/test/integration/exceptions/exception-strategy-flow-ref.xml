@@ -10,10 +10,10 @@
         <flow-ref name="blockWithOwnExceptionStrategy"/>
         <default-exception-strategy>
             <processor-chain>
-                <message-properties-transformer scope="outbound">
+                <message-properties-transformer>
                     <add-message-property key="mainEs" value="yes"/>
                 </message-properties-transformer>
-                <message-properties-transformer scope="outbound">
+                <message-properties-transformer>
                     <add-message-property key="flowRefEs" value="#[sessionVars.flowRefEs]" />
                 </message-properties-transformer>
                 <test:queue name="dlq"/>
@@ -24,9 +24,7 @@
     <flow name="blockWithOwnExceptionStrategy" processingStrategy="synchronous">
         <test:component throwException="true"/>
         <default-exception-strategy>
-            <message-properties-transformer scope="session">
-                <add-message-property key="flowRefEs" value="yes"/>
-            </message-properties-transformer>
+            <set-session-variable variableName="flowRefEs" value="yes"/>
         </default-exception-strategy>
     </flow>
 

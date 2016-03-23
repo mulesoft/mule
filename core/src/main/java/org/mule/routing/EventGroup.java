@@ -6,6 +6,7 @@
  */
 package org.mule.routing;
 
+import static java.util.stream.Collectors.toList;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
@@ -18,13 +19,12 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.PartitionableObjectStore;
 import org.mule.session.DefaultMuleSession;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -254,7 +254,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             //Using both event ID and CorrelationSequence since in certain instances
             //when an event is split up, the same event IDs are used.
             Serializable key= getEventKey(event);
-            event.getMessage().setInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, ++arrivalOrderCounter);
+            event.setFlowVariable(MULE_ARRIVAL_ORDER_PROPERTY, ++arrivalOrderCounter);
             lastStoredEventKey = key;
             eventsObjectStore.store(key, event, eventsPartitionKey);
 
@@ -395,31 +395,6 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         return buf.toString();
     }
 
-    public MuleMessage toMessageCollection() throws ObjectStoreException
-    {
-        return toMessageCollection(true);
-    }
-
-    public MuleMessage toMessageCollection(boolean sortByArrival) throws ObjectStoreException
-    {
-        List<MuleMessage> messages = new ArrayList<MuleMessage>();
-
-        synchronized (this)
-        {
-            for (Serializable id : eventsObjectStore.allKeys(eventsPartitionKey))
-            {
-                MuleMessage message = eventsObjectStore.retrieve(id, eventsPartitionKey).getMessage();
-                messages.add(message);
-            }
-        }
-
-        if (sortByArrival)
-        {
-            Collections.sort(messages, new ArrivalOrderMessageComparator());
-        }
-        return new DefaultMuleMessage(messages, muleContext);
-    }
-
     public String getCommonRootId()
     {
         return commonRootId;
@@ -432,8 +407,12 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             if (size() > 0)
             {
 
+                MuleEvent[] muleEvents = toArray(true);
+
+                List<MuleMessage> messageList =  Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
+
                 MuleEvent lastEvent = retrieveLastStoredEvent();
-                DefaultMuleEvent muleEvent = new DefaultMuleEvent(toMessageCollection(),
+                DefaultMuleEvent muleEvent = new DefaultMuleEvent(new DefaultMuleMessage(messageList, DataTypeFactory.create(List.class), muleContext),
                                                                   lastEvent, getMergedSession());
                 if (getCommonRootId() != null)
                 {
@@ -533,25 +512,15 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         return muleContext != null;
     }
 
-    public final class ArrivalOrderMessageComparator implements Comparator<MuleMessage>
-    {
-        @Override
-        public int compare(MuleMessage message1, MuleMessage message2)
-        {
-            int val1 = message1.getInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, -1);
-            int val2 = message2.getInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, -1);
-
-            return val1 - val2;
-        }
-    }
-
     public final class ArrivalOrderEventComparator implements Comparator<MuleEvent>
     {
         @Override
         public int compare(MuleEvent event1, MuleEvent event2)
         {
-            int val1 = event1.getMessage().getInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, -1);
-            int val2 = event2.getMessage().getInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, -1);
+            int val1 = event1.getFlowVariable(MULE_ARRIVAL_ORDER_PROPERTY) != null ? event1.getFlowVariable
+                    (MULE_ARRIVAL_ORDER_PROPERTY) : -1;
+            int val2 = event2.getFlowVariable(MULE_ARRIVAL_ORDER_PROPERTY) != null ? event1.getFlowVariable
+                    (MULE_ARRIVAL_ORDER_PROPERTY) : -1;
 
             return val1 - val2;
         }

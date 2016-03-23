@@ -8,13 +8,26 @@
 package org.mule.el.mvel.datatype;
 
 import static org.mule.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
-import org.mule.PropertyScope;
+import org.mule.api.MuleEvent;
+import org.mule.api.metadata.DataType;
 
 public class FlowVarEnricherDataTypePropagatorTestCase extends AbstractScopedVarAssignmentDataTypePropagatorTestCase
 {
 
     public FlowVarEnricherDataTypePropagatorTestCase()
     {
-        super(new FlowVarEnricherDataTypePropagator(), PropertyScope.INVOCATION, FLOW_VARS);
+        super(new FlowVarEnricherDataTypePropagator(), FLOW_VARS);
+    }
+
+    @Override
+    protected DataType<?> getVariableDataType(MuleEvent event)
+    {
+        return event.getFlowVariableDataType(PROPERTY_NAME);
+    }
+
+    @Override
+    protected void setVariable(MuleEvent event, Object propertyValue, DataType dataType)
+    {
+        event.setFlowVariable(PROPERTY_NAME, propertyValue, dataType);
     }
 }

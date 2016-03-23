@@ -13,7 +13,6 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.transformer.types.MimeTypes.JSON;
 import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
-import org.mule.PropertyScope;
 import org.mule.el.mvel.DelegateVariableResolverFactory;
 import org.mule.el.mvel.GlobalVariableResolverFactory;
 import org.mule.el.mvel.MVELExpressionLanguage;
@@ -42,13 +41,11 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
     public static final String PROPERTY_NAME = "foo";
 
     private final ExpressionDataTypeResolver expressionDataTypeResolver;
-    private final PropertyScope scope;
     private final String variableName;
 
-    protected AbstractVarExpressionDataTypeResolverTestCase(ExpressionDataTypeResolver expressionDataTypeResolver, PropertyScope scope, String variableName)
+    protected AbstractVarExpressionDataTypeResolverTestCase(ExpressionDataTypeResolver expressionDataTypeResolver, String variableName)
     {
         this.expressionDataTypeResolver = expressionDataTypeResolver;
-        this.scope = scope;
         this.variableName = variableName;
     }
 
@@ -76,7 +73,7 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
         expectedDataType.setEncoding(CUSTOM_ENCODING);
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
-        testEvent.getMessage().setProperty(PROPERTY_NAME, EXPRESSION_VALUE, scope, expectedDataType);
+        setVariable(testEvent, EXPRESSION_VALUE, expectedDataType);
 
         final ParserConfiguration parserConfiguration = MVELExpressionLanguage.createParserConfiguration(Collections.EMPTY_MAP);
         final MVELExpressionLanguageContext context = createMvelExpressionLanguageContext(testEvent, parserConfiguration);
@@ -85,7 +82,7 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
         // Expression must be executed, otherwise the variable accessor is not properly configured
         MVEL.executeExpression(compiledExpression, context);
 
-        assertThat(expressionDataTypeResolver.resolve(testEvent.getMessage(), compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
+        assertThat(expressionDataTypeResolver.resolve(testEvent, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
     }
 
     protected MVELExpressionLanguageContext createMvelExpressionLanguageContext(MuleEvent testEvent, ParserConfiguration parserConfiguration)
@@ -100,4 +97,6 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
                                                                             globalContext, new VariableVariableResolverFactory(parserConfiguration, muleContext, testEvent))))));
         return context;
     }
+
+    protected abstract void setVariable(MuleEvent testEvent, Object propertyValue, DataType expectedDataType);
 }

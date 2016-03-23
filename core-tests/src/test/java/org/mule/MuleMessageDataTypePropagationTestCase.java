@@ -19,6 +19,9 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.PropertyScope.OUTBOUND;
+import static org.mule.api.metadata.DataType.ANY_MIME_TYPE;
+import static org.mule.api.metadata.DataType.STRING_DATA_TYPE;
+import static org.mule.tck.MuleTestUtils.getTestEvent;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.transformer.types.MimeTypes.ANY;
 import static org.mule.transformer.types.MimeTypes.APPLICATION_XML;
@@ -26,18 +29,16 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.registry.MuleRegistry;
+import org.mule.api.message.NullPayload;
 import org.mule.api.metadata.DataType;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.TypedValue;
-import org.mule.api.message.NullPayload;
 
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.HashMap;
 
 import javax.activation.DataHandler;
 
@@ -344,43 +345,45 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void setsDefaultInvocationPropertyDataType() throws Exception
+    public void setsDefaultFlowVariableDataType() throws Exception
     {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        muleMessage.setInvocationProperty(TEST_PROPERTY, TEST);
+        MuleEvent muleEvent = getTestEvent(TEST, muleContext);
+        muleEvent.setFlowVariable(TEST_PROPERTY, TEST);
 
-        assertDefaultPropertyDataType(muleMessage, PropertyScope.INVOCATION);
+        assertVariableDataType(muleEvent, STRING_DATA_TYPE);
     }
 
     @Test
-    public void setsCustomInvocationPropertyDataType() throws Exception
+    public void setsCustomFlowVariableDataType() throws Exception
     {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        MuleEvent muleEvent = getTestEvent(TEST, muleContext);
         DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
         dataType.setEncoding(CUSTOM_ENCODING);
 
-        muleMessage.setInvocationProperty(TEST_PROPERTY, TEST, dataType);
+        muleEvent.setFlowVariable(TEST_PROPERTY, TEST, dataType);
 
-        assertPropertyDataType(muleMessage, PropertyScope.INVOCATION, dataType);
+        assertVariableDataType(muleEvent, dataType);
     }
 
     @Test
-    public void setsDefaultInvocationScopePropertyDataType() throws Exception
+    public void setsDefaultSessionVariableDataType() throws Exception
     {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.INVOCATION);
+        MuleEvent muleEvent = getTestEvent(TEST, muleContext);
+        muleEvent.getSession().setProperty(TEST_PROPERTY, TEST);
 
-        assertDefaultPropertyDataType(muleMessage, PropertyScope.INVOCATION);
+        assertSessionVariableDataType(muleEvent, STRING_DATA_TYPE);
     }
 
     @Test
-    public void setsDefaultSessionPropertyDataType() throws Exception
+    public void setsCustomSessionVariableDataType() throws Exception
     {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        muleMessage.setSessionProperties(new HashMap<String, TypedValue>());
-        muleMessage.setProperty(TEST_PROPERTY, TEST, PropertyScope.SESSION);
+        MuleEvent muleEvent = getTestEvent(TEST, muleContext);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
+        dataType.setEncoding(CUSTOM_ENCODING);
 
-        assertDefaultPropertyDataType(muleMessage, PropertyScope.SESSION);
+        muleEvent.getSession().setProperty(TEST_PROPERTY, TEST, dataType);
+
+        assertSessionVariableDataType(muleEvent, dataType);
     }
 
     @Test
@@ -429,7 +432,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     private void assertDefaultDataType(MuleMessage muleMessage)
     {
-        assertDataType(muleMessage, String.class, DataType.ANY_MIME_TYPE, DEFAULT_ENCODING);
+        assertDataType(muleMessage, String.class, ANY_MIME_TYPE, DEFAULT_ENCODING);
     }
 
     private void assertDataType(MuleMessage muleMessage, Class type, String mimeType, String encoding)
@@ -444,12 +447,24 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     private void assertDefaultPropertyDataType(DefaultMuleMessage muleMessage, PropertyScope scope)
     {
-        assertPropertyDataType(muleMessage, scope, DataType.STRING_DATA_TYPE);
+        assertPropertyDataType(muleMessage, scope, STRING_DATA_TYPE);
     }
 
     private void assertPropertyDataType(DefaultMuleMessage muleMessage, PropertyScope scope, DataType dataType)
     {
         DataType<?> actualDataType = muleMessage.getPropertyDataType(TEST_PROPERTY, scope);
+        assertThat(actualDataType, like(dataType));
+    }
+
+    private void assertVariableDataType(MuleEvent event, DataType dataType)
+    {
+        DataType<?> actualDataType = event.getFlowVariableDataType(TEST_PROPERTY);
+        assertThat(actualDataType, like(dataType));
+    }
+
+    private void assertSessionVariableDataType(MuleEvent event, DataType dataType)
+    {
+        DataType<?> actualDataType = event.getSession().getPropertyDataType(TEST_PROPERTY);
         assertThat(actualDataType, like(dataType));
     }
 }

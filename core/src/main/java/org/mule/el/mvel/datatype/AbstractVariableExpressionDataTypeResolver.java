@@ -7,9 +7,8 @@
 
 package org.mule.el.mvel.datatype;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
-import org.mule.PropertyScope;
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.compiler.Accessor;
 import org.mule.mvel2.compiler.AccessorNode;
@@ -25,16 +24,14 @@ public abstract class AbstractVariableExpressionDataTypeResolver extends Abstrac
 {
 
     private final String propertyName;
-    private final PropertyScope scope;
 
-    public AbstractVariableExpressionDataTypeResolver(String propertyName, PropertyScope scope)
+    public AbstractVariableExpressionDataTypeResolver(String propertyName)
     {
         this.propertyName = propertyName;
-        this.scope = scope;
     }
 
     @Override
-    protected DataType getDataType(MuleMessage message, ASTNode node)
+    protected DataType getDataType(MuleEvent event, ASTNode node)
     {
         final Accessor accessor = node.getAccessor();
 
@@ -60,11 +57,14 @@ public abstract class AbstractVariableExpressionDataTypeResolver extends Abstrac
 
                 if (propertyName != null)
                 {
-                    return message.getPropertyDataType(propertyName, scope);
+                    return getVariableDataType(event, propertyName);
                 }
             }
         }
 
         return null;
     }
+
+    protected abstract DataType<?> getVariableDataType(MuleEvent event, String propertyName);
+
 }

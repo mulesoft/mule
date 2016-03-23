@@ -7,9 +7,7 @@
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="test">
-        <message-properties-transformer scope="session">
-            <add-message-property key="ErrorCount" value="#[0]"/>
-        </message-properties-transformer>
+        <set-session-variable variableName="ErrorCount" value="#[0]" />
 
         <collection-splitter/>
         <flow-ref name="splitterFlow"/>
@@ -25,8 +23,6 @@
     </flow>
 
     <flow name="exceptionFlow">
-        <message-properties-transformer scope="session">
-            <add-message-property key="ErrorCount" value="#[sessionVars.ErrorCount + 1]"/>
-        </message-properties-transformer>
+        <set-session-variable variableName="ErrorCount" value="#[sessionVars.ErrorCount + 1]" />
     </flow>
 </mule>

@@ -9,11 +9,12 @@ package org.mule.transformer.simple;
 import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.AttributeEvaluator;
 import org.mule.util.WildcardAttributeEvaluator;
+
+import java.util.Set;
 
 public abstract class AbstractRemoveVariablePropertyTransformer extends AbstractMessageTransformer
 {
@@ -38,25 +39,20 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
     {
         if (wildcardAttributeEvaluator.hasWildcards())
         {
-            wildcardAttributeEvaluator.processValues(event.getMessage().getPropertyNames(getScope()),new WildcardAttributeEvaluator.MatchCallback()
-            {
-                @Override
-                public void processMatch(String matchedValue)
+            wildcardAttributeEvaluator.processValues(getPropertyNames(event), matchedValue -> {
+                removeProperty(event, matchedValue);
+                if (logger.isDebugEnabled())
                 {
-                    event.getMessage().removeProperty(matchedValue,getScope());
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug(String.format("Removing property: '%s' from scope: '%s'", matchedValue, getScope().getScopeName()));
-                    }
+                    logger.debug(String.format("Removing property: '%s' from scope: '%s'", matchedValue, getScopeName()));
                 }
-            });    
+            });
         }
         else
         {
             Object keyValue = identifierEvaluator.resolveValue(event);
             if (keyValue != null)
             {
-                event.getMessage().removeProperty(keyValue.toString(), getScope());
+                removeProperty(event, keyValue.toString());
             }
             else
             {
@@ -65,6 +61,10 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
         }
         return event.getMessage();
     }
+
+    protected  abstract Set<String> getPropertyNames(MuleEvent event);
+
+    protected abstract void removeProperty(MuleEvent event, String propertyName);
 
     @Override
     public Object clone() throws CloneNotSupportedException
@@ -84,5 +84,6 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
         this.wildcardAttributeEvaluator = new WildcardAttributeEvaluator(identifier);
     }
 
-    public abstract PropertyScope getScope();
+    protected abstract String getScopeName();
+
 }

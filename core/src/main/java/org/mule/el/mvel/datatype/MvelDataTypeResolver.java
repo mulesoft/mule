@@ -7,7 +7,7 @@
 
 package org.mule.el.mvel.datatype;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.transformer.types.DataTypeFactory;
@@ -51,13 +51,13 @@ public class MvelDataTypeResolver
      * Resolves expression data type
      *
      * @param value result of evaluating the expression on the given message
-     * @param message message under evaluation
+     * @param event event under evaluation
      * @param serializedExpression expression
      * @return the data type corresponding to the given expression if there is an expression
      *         resolver able to resolved it. A default data type for the value if the expression
      *         was not resolved.
      */
-    public DataType resolve(Object value, MuleMessage message, Serializable serializedExpression)
+    public DataType resolve(Object value, MuleEvent event, Serializable serializedExpression)
     {
         DataType result = null;
 
@@ -67,7 +67,7 @@ public class MvelDataTypeResolver
 
             for (ExpressionDataTypeResolver resolver : resolvers)
             {
-                result = resolver.resolve(message, compiledExpression);
+                result = resolver.resolve(event, compiledExpression);
 
                 if (result != null)
                 {

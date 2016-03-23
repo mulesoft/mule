@@ -8,8 +8,6 @@
 package org.mule.el.mvel.datatype;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.PropertyScope.INVOCATION;
-import static org.mule.PropertyScope.SESSION;
 import static org.mule.mvel2.MVEL.compileExpression;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.transformer.types.MimeTypes.JSON;
@@ -43,9 +41,9 @@ public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleCont
         final CompiledExpression compiledExpression = (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
-        testEvent.getMessage().setProperty("foo", EXPRESSION_VALUE, INVOCATION, expectedDataType);
+        testEvent.setFlowVariable("foo", EXPRESSION_VALUE, expectedDataType);
 
-        assertThat(expressionDataTypeResolver.resolve(testEvent.getMessage(), compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
+        assertThat(expressionDataTypeResolver.resolve(testEvent, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
     }
 
     @Test
@@ -59,9 +57,9 @@ public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleCont
         final CompiledExpression compiledExpression = (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
-        testEvent.getMessage().setProperty("foo", EXPRESSION_VALUE, SESSION, expectedDataType);
+        testEvent.getSession().setProperty("foo", EXPRESSION_VALUE, expectedDataType);
 
-        assertThat(expressionDataTypeResolver.resolve(testEvent.getMessage(), compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
+        assertThat(expressionDataTypeResolver.resolve(testEvent, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
     }
 
 }

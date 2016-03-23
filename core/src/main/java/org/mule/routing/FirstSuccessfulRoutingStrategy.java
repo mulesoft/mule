@@ -10,7 +10,6 @@ import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.filters.ExpressionFilter;
@@ -70,8 +69,7 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy
                 }
                 else
                 {
-                    MuleMessage msg = returnEvent.getMessage();
-                    failed = msg == null || failureExpressionFilter.accept(msg);
+                    failed = returnEvent == null || failureExpressionFilter.accept(returnEvent);
                 }
             }
             catch (Exception ex)

@@ -6,6 +6,7 @@
  */
 package org.mule.api.routing.filter;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 
 /**
@@ -15,10 +16,24 @@ import org.mule.api.MuleMessage;
 public interface Filter
 {
     /**
-     * Check a given message against this filter.
+     * Checks a given message against this filter.
      * 
      * @param message a non null message to filter.
      * @return <code>true</code> if the message matches the filter
+     * TODO MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.
      */
+    @Deprecated
     boolean accept(MuleMessage message);
+
+    /**
+     * Checks a given event against this filter.
+     *
+     * @param event a non null event to filter.
+     * @return <code>true</code> if the event matches the filter
+     */
+    default boolean accept(MuleEvent event)
+    {
+        return accept(event.getMessage());
+    }
+
 }

@@ -37,7 +37,7 @@ public class CopyAttachmentOutInterceptor extends AbstractPhaseInterceptor
             return;
         }
 
-        Collection<Attachment> a = event.getMessage().getInvocationProperty(CxfConstants.ATTACHMENTS);
+        Collection<Attachment> a = event.getFlowVariable(CxfConstants.ATTACHMENTS);
         
         if (a != null) 
         {

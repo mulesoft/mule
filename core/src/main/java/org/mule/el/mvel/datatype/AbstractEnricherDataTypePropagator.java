@@ -7,7 +7,7 @@
 
 package org.mule.el.mvel.datatype;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.mvel2.util.ASTIterator;
@@ -21,7 +21,7 @@ public abstract class AbstractEnricherDataTypePropagator implements EnricherData
 {
 
     @Override
-    public boolean propagate(MuleMessage message, TypedValue typedValue, CompiledExpression compiledExpression)
+    public boolean propagate(MuleEvent event, TypedValue typedValue, CompiledExpression compiledExpression)
     {
         ASTIterator iterator = new ASTLinkedList(compiledExpression.getFirstNode());
 
@@ -29,11 +29,11 @@ public abstract class AbstractEnricherDataTypePropagator implements EnricherData
         {
             ASTNode node = iterator.nextNode();
 
-            return doPropagate(message, typedValue, node);
+            return doPropagate(event, typedValue, node);
         }
 
         return false;
     }
 
-    protected abstract boolean doPropagate(MuleMessage message, TypedValue typedValue, ASTNode node);
+    protected abstract boolean doPropagate(MuleEvent event, TypedValue typedValue, ASTNode node);
 }

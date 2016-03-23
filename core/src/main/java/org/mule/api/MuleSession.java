@@ -84,7 +84,11 @@ public interface MuleSession extends Serializable
     
     @Deprecated
     void setProperty(String key, Object value);
-    
+
+    @Deprecated
+    void setProperty(String key, Object value, DataType<?> dataType);
+
+
     /**
      * Will retrieve a session scope property.
      * 

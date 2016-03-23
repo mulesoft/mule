@@ -7,9 +7,7 @@
 
 package org.mule.el.mvel.datatype;
 
-import static org.mule.PropertyScope.INVOCATION;
-import static org.mule.PropertyScope.SESSION;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.mvel2.ast.ASTNode;
 
@@ -21,15 +19,15 @@ public class PropertyExpressionDataTypeResolver extends AbstractExpressionDataTy
 {
 
     @Override
-    protected DataType getDataType(MuleMessage message, ASTNode node)
+    protected DataType getDataType(MuleEvent event, ASTNode node)
     {
-        if (node.isIdentifier() && message.getPropertyNames(INVOCATION).contains(node.getName()))
+        if (node.isIdentifier() && event.getFlowVariableNames().contains(node.getName()))
         {
-            return message.getPropertyDataType(node.getName(), INVOCATION);
+            return event.getFlowVariableDataType(node.getName());
         }
-        else if (node.isIdentifier() && message.getPropertyNames(SESSION).contains(node.getName()))
+        else if (node.isIdentifier() && event.getSession().getPropertyNamesAsSet().contains(node.getName()))
         {
-            return message.getPropertyDataType(node.getName(), SESSION);
+            return event.getSession().getPropertyDataType(node.getName());
         }
         else
         {

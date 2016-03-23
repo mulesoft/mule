@@ -19,7 +19,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.PropertyScope.OUTBOUND;
 import static org.mule.transformer.types.MimeTypes.JSON;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -30,10 +29,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
+import org.mule.api.connector.ReplyToHandler;
 import org.mule.api.metadata.DataType;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.PropertyScope;
-import org.mule.api.connector.ReplyToHandler;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.Flow;
@@ -50,9 +48,8 @@ import org.mule.transformer.types.DataTypeFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
-
 import junit.framework.Assert;
+import org.junit.Test;
 
 public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 {
@@ -253,12 +250,12 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         });
         MuleEvent in = getTestEvent("");
         in.getSession().setProperty("sessionFoo", "bar");
-        in.getMessage().setInvocationProperty("flowFoo", "bar");
+        in.setFlowVariable("flowFoo", "bar");
 
         MuleEvent out = enricher.process(in);
 
         assertEquals("bar", out.getSession().getProperty("sessionFoo"));
-        assertEquals("bar", out.getMessage().getInvocationProperty("flowFoo"));
+        assertEquals("bar", out.getFlowVariable("flowFoo"));
     }
 
     @Test
@@ -316,7 +313,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
             @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
-                event.getMessage().setInvocationProperty("flowFoo", "bar");
+                event.setFlowVariable("flowFoo", "bar");
                 return event;
             }
         });
@@ -324,7 +321,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 
         MuleEvent out = enricher.process(in);
 
-        assertNull(out.getMessage().getInvocationProperty("flowFoo"));
+        assertNull(out.getFlowVariable("flowFoo"));
     }
 
     @Test
@@ -391,7 +388,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 
         MuleEvent out = enricher.process(in);
 
-        assertEquals("bar", out.getMessage().getInvocationProperty("foo"));
+        assertEquals("bar", out.getFlowVariable("foo"));
     }
 
     @Test
@@ -570,7 +567,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 
         MuleEvent out = enricher.process(in);
 
-        assertEquals("bar", out.getMessage().getInvocationProperty("foo"));
-        assertThat(out.getMessage().getPropertyDataType("foo", PropertyScope.INVOCATION), DataTypeMatcher.like(String.class, JSON, StandardCharsets.UTF_16.name()));
+        assertEquals("bar", out.getFlowVariable("foo"));
+        assertThat(out.getFlowVariableDataType("foo"), DataTypeMatcher.like(String.class, JSON, StandardCharsets.UTF_16.name()));
     }
 }

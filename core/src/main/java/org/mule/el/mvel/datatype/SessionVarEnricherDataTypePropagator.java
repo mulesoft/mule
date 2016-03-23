@@ -7,7 +7,9 @@
 
 package org.mule.el.mvel.datatype;
 
-import org.mule.PropertyScope;
+import org.mule.api.MuleEvent;
+import org.mule.el.mvel.MessageVariableResolverFactory;
+import org.mule.transformer.types.TypedValue;
 
 /**
  * Propagates data type for session vars used for enrichment target
@@ -17,6 +19,19 @@ public class SessionVarEnricherDataTypePropagator extends AbstractVariableEnrich
 
     public SessionVarEnricherDataTypePropagator()
     {
-        super("sessionVars", PropertyScope.SESSION);
+        super(MessageVariableResolverFactory.SESSION_VARS);
     }
+
+    @Override
+    protected void addVariable(MuleEvent event, TypedValue typedValue, String propertyName)
+    {
+        event.getSession().setProperty(propertyName, typedValue.getValue(), typedValue.getDataType());
+    }
+
+    @Override
+    protected boolean containsVariable(MuleEvent event, String propertyName)
+    {
+        return event.getSession().getPropertyNamesAsSet().contains(propertyName);
+    }
+
 }

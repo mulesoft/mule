@@ -6,12 +6,8 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <spring:bean name="date" class="java.util.Date"/>
-
     <flow name="InService1">
-        <message-properties-transformer name="SetSessionProperty" scope="session">
-            <add-message-property key="testProperty" value-ref="date"/>
-        </message-properties-transformer>
+        <set-session-variable variableName="testProperty" value="#[new Date()]" />
         <message-properties-transformer>
             <!-- 2 issues here: * Use MPT's copy/propagate simplified syntax * Session props should probably be propagated 
                 automatically? -->
@@ -21,9 +17,7 @@
     </flow>
 
     <flow name="InService2">
-        <message-properties-transformer name="SetInvocationProperty" scope="invocation">
-            <add-message-property key="testProperty" value-ref="date"/>
-        </message-properties-transformer>
+        <set-session-variable variableName="testProperty" value="date" />
         <flow-ref name="ResponseService"/>
     </flow>
 

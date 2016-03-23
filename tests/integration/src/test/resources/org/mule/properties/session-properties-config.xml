@@ -6,36 +6,26 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <message-properties-transformer scope="session" name="addP1">
-        <add-message-property key="P1" value="P1_VALUE" />
-    </message-properties-transformer>
+    <set-session-variable name="addP1" variableName="P1" value="P1_VALUE"/>
 
     <flow name="A" processingStrategy="synchronous">
         <expression-transformer expression="sessionVars.key" />
     </flow>
 
     <flow name="B" processingStrategy="synchronous">
-        <message-properties-transformer scope="session">
-            <add-message-property key="key" value="value" />
-        </message-properties-transformer>
+        <set-session-variable variableName="key" value="value"/>
     </flow>
 
     <flow name="FlowRefWithSessionProperties" processingStrategy="synchronous">
-        <message-properties-transformer scope="session">
-            <add-message-property key="key1" value="value1" />
-        </message-properties-transformer>
+        <set-session-variable variableName="key1" value="value1"/>
         <flow-ref name="I" />
     </flow>
     <flow name="I" processingStrategy="synchronous">
-        <message-properties-transformer scope="session">
-            <add-message-property key="key2" value="value2" />
-        </message-properties-transformer>
+        <set-session-variable variableName="key2" value="value2"/>
         <flow-ref name="J" />
     </flow>
     <flow name="J" processingStrategy="synchronous">
-        <message-properties-transformer scope="session">
-            <add-message-property key="key3" value="value3" />
-        </message-properties-transformer>
+        <set-session-variable variableName="key3" value="value3"/>
     </flow>
     
     <spring:bean name="nonSerializableBean" class="java.lang.Object"/>

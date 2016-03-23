@@ -175,7 +175,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
         final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
 
-        dataTypePropagator.propagate(typedValue, event.getMessage(), compiledExpression);
+        dataTypePropagator.propagate(typedValue, event, compiledExpression);
     }
 
     @Override
@@ -185,7 +185,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
         final Object value = evaluate(expression, event);
         final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
-        final DataType dataType = dataTypeResolver.resolve(value, event.getMessage(), compiledExpression);
+        final DataType dataType = dataTypeResolver.resolve(value, event, compiledExpression);
 
         return new TypedValue(value, dataType);
     }

@@ -51,6 +51,6 @@ public class OperationInvocationPropertyFunctionalTestCase extends AbstractWSCon
         MuleEvent event = flowRunner("echo").withPayload(ECHO_REQUEST).run();
         assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
 
-        assertNull(event.getMessage().getInvocationProperty(CxfConstants.OPERATION));
+        assertNull(event.getFlowVariable(CxfConstants.OPERATION));
     }
 }
