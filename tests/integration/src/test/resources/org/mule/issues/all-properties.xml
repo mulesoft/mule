@@ -19,17 +19,13 @@
 
     <flow name="flow2">
         <set-session-variable variableName="bar" value="bar" />
-        <message-properties-transformer>
-            <add-message-property key="outbar" value="bar"/>
-        </message-properties-transformer>
+        <set-property propertyName="outbar" value="bar"/>
         <echo-component/>
     </flow>
 
     <flow name="flow3">
         <set-session-variable variableName="baz" value="baz" />
-        <message-properties-transformer>
-            <add-message-property key="outbaz" value="baz"/>
-        </message-properties-transformer>
+        <set-property propertyName="outbaz" value="baz"/>
         <echo-component/>
     </flow>
 </mule>

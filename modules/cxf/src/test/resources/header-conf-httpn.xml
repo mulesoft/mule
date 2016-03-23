@@ -36,10 +36,7 @@
             <singleton-object
                     class="org.apache.hello_world_soap_http.GreeterImpl" />
         </component>
-        <message-properties-transformer>
-            <add-message-property key="FOO"
-                                  value="#[message.inboundProperties['FOO']]" />
-        </message-properties-transformer>
+        <set-property propertyName="FOO" value="#[message.inboundProperties['FOO']]" />
         <flow-ref name="testService"/>
     </flow>
 

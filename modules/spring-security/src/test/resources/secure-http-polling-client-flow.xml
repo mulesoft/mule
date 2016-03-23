@@ -34,9 +34,7 @@
                 <http:success-status-code-validator values="0..599"/>
             </http:request>
         </poll>
-        <message-properties-transformer>
-            <add-message-property key="http.status" value="#[message.inboundProperties['http.status']]" />
-        </message-properties-transformer>
+        <set-property propertyName="http.status" value="#[message.inboundProperties['http.status']]" />
         <test:queue name="toclient2"/>
     </flow>
 

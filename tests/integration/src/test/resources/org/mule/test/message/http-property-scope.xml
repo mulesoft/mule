@@ -12,10 +12,8 @@
 
     <flow name="foo">
         <http:listener path="foo" config-ref="listenerConfig"/>
-        <append-string-transformer message=" bar"/>        
-        <message-properties-transformer>
-            <add-message-property key="foo" value="#[message.inboundProperties.foo]"/>
-        </message-properties-transformer>
+        <append-string-transformer message=" bar"/>
+        <set-property propertyName="foo" value="#[message.inboundProperties.foo]"/>
         <echo-component/>
     </flow>
     

@@ -53,9 +53,7 @@
             <test:component/>
             <set-variable variableName="parent2" value="#[flowVars.parent]" />
         </foreach>
-        <message-properties-transformer>
-            <add-message-property key="parent" value="#[flowVars.parent2]"/>
-        </message-properties-transformer>
+        <set-property propertyName="parent" value="#[flowVars.parent2]"/>
     </flow>
 
     <flow name="counter-config">
@@ -63,9 +61,7 @@
             <test:component/>
             <set-session-variable variableName="msg-last-index" value="#[flowVars.index]" />
         </foreach>
-        <message-properties-transformer>
-        	<add-message-property key="msg-last-index" value="#[sessionVars['msg-last-index']]"/>
-        </message-properties-transformer>
+        <set-property propertyName="msg-last-index" value="#[sessionVars['msg-last-index']]"/>
     </flow>
 
     <flow name="message-collection-config">
@@ -91,9 +87,7 @@
             <test:component/>
             <set-variable variableName="totalMessages" value="#[flowVars.counter]" />
         </foreach>
-        <message-properties-transformer>
-        	<add-message-property key="totalMessages" value="#[flowVars.totalMessages]"/>
-        </message-properties-transformer>
+        <set-property propertyName="totalMessages" value="#[flowVars.totalMessages]"/>
         <test:assert expression="#[totalMessages == 2]" />
     </flow>
 
@@ -102,9 +96,7 @@
             <test:component/>
             <set-variable variableName="totalMessages" value="#[flowVars.counter]" />
         </foreach>
-        <message-properties-transformer>
-        	<add-message-property key="totalMessages" value="#[flowVars.totalMessages]"/>
-        </message-properties-transformer>
+        <set-property propertyName="totalMessages" value="#[flowVars.totalMessages]"/>
     </flow>
 
     <flow name="process-order-update">
@@ -161,9 +153,7 @@
             <test:component/>
             <set-variable variableName="totalMessages" value="#[flowVars.counter]" />
         </foreach>
-        <message-properties-transformer>
-            <add-message-property key="msg-total-messages" value="#[flowVars.totalMessages]"/>
-        </message-properties-transformer>
+        <set-property propertyName="msg-total-messages" value="#[flowVars.totalMessages]"/>
     </flow>
 
     <flow name="nested-foreach">
@@ -179,14 +169,10 @@
         <foreach>
             <foreach>
                 <test:component/>
-                <message-properties-transformer>
-                    <add-message-property key="j" value="#[flowVars.counter]"/>
-                </message-properties-transformer>
+                <set-property propertyName="j" value="#[flowVars.counter]"/>
                 <test:queue name="out"/>
             </foreach>
-            <message-properties-transformer>
-                <add-message-property key="i" value="#[flowVars.counter]"/>
-            </message-properties-transformer>
+            <set-property propertyName="i" value="#[flowVars.counter]"/>
             <test:queue name="out"/>
         </foreach>
     </flow>
