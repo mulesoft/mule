@@ -6,6 +6,7 @@
  */
 package org.mule.module.artifact.classloader;
 
+import static org.mule.module.artifact.classloader.ClassLoaderLookupPolicy.NULL_LOOKUP_POLICY;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
@@ -13,9 +14,7 @@ import org.mule.util.StringUtils;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,12 +38,12 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
     public MuleArtifactClassLoader(String name, URL[] urls, ClassLoader parent)
     {
-        this(name, urls, parent, Collections.<String>emptySet());
+        this(name, urls, parent, NULL_LOOKUP_POLICY);
     }
 
-    public MuleArtifactClassLoader(String name, URL[] urls, ClassLoader parent, Set<String> overrides)
+    public MuleArtifactClassLoader(String name, URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy)
     {
-        super(urls, parent, overrides);
+        super(urls, parent, lookupPolicy);
         checkArgument(!StringUtils.isEmpty(name), "Artifact name cannot be empty");
         this.name = name;
     }

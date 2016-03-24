@@ -6,9 +6,9 @@
  */
 package org.mule.module.artifact.classloader;
 
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.ClassUtils;
@@ -16,8 +16,6 @@ import org.mule.util.ClassUtils;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.junit.Test;
 
@@ -25,75 +23,9 @@ import org.junit.Test;
 public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase
 {
 
-    @Test
-    public void isBlockedFQClassName() throws Exception
-    {
-        Set<String> overrides = new HashSet<>(1);
-        overrides.add("-org.mycompany.MyClass");
-        FineGrainedControlClassLoader classLoader = new FineGrainedControlClassLoader(new URL[0], null,
-                                                                                      overrides);
-        assertTrue(classLoader.isBlocked("org.mycompany.MyClass"));
-        assertFalse(classLoader.isBlocked("MyClass"));
-        assertFalse(classLoader.isBlocked("org.mycompany.MyClassFactory"));
-    }
-
-    @Test
-    public void isBlockedNotFQClassName() throws Exception
-    {
-        Set<String> overrides = new HashSet<>(1);
-        overrides.add("-MyClass");
-        FineGrainedControlClassLoader classLoader = new FineGrainedControlClassLoader(new URL[0], null,
-            overrides);
-        assertTrue(classLoader.isBlocked("MyClass"));
-        assertFalse(classLoader.isBlocked("MyClassFactory"));
-        assertFalse(classLoader.isBlocked("org.mycompany.MyClass"));
-    }
-
-    @Test
-    public void isBlockedPackageName() throws Exception
-    {
-        Set<String> overrides = new HashSet<>(1);
-        overrides.add("-org.mycompany");
-        FineGrainedControlClassLoader classLoader = new FineGrainedControlClassLoader(new URL[0], null,
-            overrides);
-        assertTrue(classLoader.isBlocked("org.mycompany.MyClass"));
-        assertTrue(classLoader.isBlocked("org.mycompany.somepackage.MyClass"));
-    }
-
-    @Test
-    public void isOverriddenFQClassName() throws Exception
-    {
-        Set<String> overrides = new HashSet<>(1);
-        overrides.add("org.mycompany.MyClass");
-        FineGrainedControlClassLoader classLoader = new FineGrainedControlClassLoader(new URL[0], null,
-            overrides);
-        assertTrue(classLoader.isOverridden("org.mycompany.MyClass"));
-        assertFalse(classLoader.isOverridden("MyClass"));
-        assertFalse(classLoader.isOverridden("org.mycompany.MyClassFactory"));
-    }
-
-    @Test
-    public void isOverriddenNotFQClassName() throws Exception
-    {
-        Set<String> overrides = new HashSet<>(1);
-        overrides.add("MyClass");
-        FineGrainedControlClassLoader classLoader = new FineGrainedControlClassLoader(new URL[0], null,
-            overrides);
-        assertTrue(classLoader.isOverridden("MyClass"));
-        assertFalse(classLoader.isOverridden("MyClassFactory"));
-        assertFalse(classLoader.isOverridden("org.mycompany.MyClass"));
-    }
-
-    @Test
-    public void isOverriddenPackageName() throws Exception
-    {
-        Set<String> overrides = new HashSet<>(1);
-        overrides.add("org.mycompany");
-        FineGrainedControlClassLoader classLoader = new FineGrainedControlClassLoader(new URL[0], null,
-            overrides);
-        assertTrue(classLoader.isOverridden("org.mycompany.MyClass"));
-        assertTrue(classLoader.isOverridden("org.mycompany.somepackage.MyClass"));
-    }
+    public static final String TEST_CLASS_PACKAGE = "mypackage";
+    public static final String EXPECTED_CHILD_MESSAGE = "Bye";
+    public static final String EXPECTED_PARENT_MESSAGE = "Hello";
 
     @Test
     public void parentFirst() throws Exception
@@ -101,19 +33,18 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase
         URLClassLoader parent = new URLClassLoader(new URL[] { hello() }, Thread.currentThread().getContextClassLoader());
 
         FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] { bye() }, parent);
-        assertEquals("Hello", callHi(ext));
+        assertEquals(EXPECTED_PARENT_MESSAGE, callHi(ext));
     }
 
     @Test
-    public void childResolvesOverriden() throws Exception
+    public void childResolvesOverridden() throws Exception
     {
         URLClassLoader parent = new URLClassLoader(new URL[] { hello() }, Thread.currentThread().getContextClassLoader());
 
-        Set<String> overrides = new HashSet<>();
-        overrides.add("mypackage");
-        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] { bye() }, parent, overrides);
+        final ClassLoaderLookupPolicy lookupPolicy = new ClassLoaderLookupPolicy(singleton(TEST_CLASS_PACKAGE), emptySet());
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] { bye() }, parent, lookupPolicy);
 
-        assertEquals("Bye", callHi(ext));
+        assertEquals(EXPECTED_CHILD_MESSAGE, callHi(ext));
     }
 
     @Test
@@ -121,10 +52,9 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase
     {
         URLClassLoader parent = new URLClassLoader(new URL[] { hello() }, Thread.currentThread().getContextClassLoader());
 
-        Set<String> overrides = new HashSet<>();
-        overrides.add("mypackage");
-        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], parent, overrides);
-        assertEquals("Hello", callHi(ext));
+                final ClassLoaderLookupPolicy lookupPolicy = new ClassLoaderLookupPolicy(singleton(TEST_CLASS_PACKAGE), emptySet());
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], parent, lookupPolicy);
+        assertEquals(EXPECTED_PARENT_MESSAGE, callHi(ext));
     }
 
     @Test(expected = ClassNotFoundException.class)
@@ -132,9 +62,8 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase
     {
         URLClassLoader parent = new URLClassLoader(new URL[] { hello() }, Thread.currentThread().getContextClassLoader());
 
-        Set<String> overrides = new HashSet<>();
-        overrides.add("-mypackage");
-        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], parent, overrides);
+        final ClassLoaderLookupPolicy lookupPolicy = new ClassLoaderLookupPolicy(emptySet(), singleton(TEST_CLASS_PACKAGE));
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], parent, lookupPolicy);
         callHi(ext);
     }
 
@@ -143,26 +72,9 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase
     {
         URLClassLoader parent = new URLClassLoader(new URL[] { hello() }, Thread.currentThread().getContextClassLoader());
 
-        Set<String> overrides = new HashSet<>();
-        overrides.add("-mypackage");
-        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] { bye() }, parent, overrides);
-        assertEquals("Bye", callHi(ext));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void illegalOverride()
-    {
-        Set<String> overrides = new HashSet<>();
-        overrides.add("org.mule.module.reboot.MuleContainerBootstrap");
-        new FineGrainedControlClassLoader(new URL[0], null, overrides);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void illegalBlock()
-    {
-        Set<String> overrides = new HashSet<>();
-        overrides.add("-java.util.Collections");
-        new FineGrainedControlClassLoader(new URL[0], null, overrides);
+        final ClassLoaderLookupPolicy lookupPolicy = new ClassLoaderLookupPolicy(emptySet(), singleton(TEST_CLASS_PACKAGE));
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] { bye() }, parent, lookupPolicy);
+        assertEquals(EXPECTED_CHILD_MESSAGE, callHi(ext));
     }
 
     private URL hello()

@@ -8,7 +8,6 @@ package org.mule.module.launcher.application;
 
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.module.artifact.classloader.CompositeClassLoader;
 import org.mule.module.artifact.classloader.FilteringArtifactClassLoader;
 import org.mule.module.artifact.classloader.GoodCitizenClassLoader;
@@ -68,7 +67,7 @@ public class MuleApplicationClassLoaderFactory implements ArtifactClassLoaderFac
             throw new RuntimeException("Unable to create classloader for application", e);
         }
 
-        return new MuleApplicationClassLoader(descriptor.getName(), parent, descriptor.getLoaderOverrides(), nativeLibraryFinderFactory.create(descriptor.getName()), urls);
+        return new MuleApplicationClassLoader(descriptor.getName(), parent, nativeLibraryFinderFactory.create(descriptor.getName()), urls, descriptor.getClassLoaderLookupPolicy());
     }
 
     /**
@@ -157,10 +156,9 @@ public class MuleApplicationClassLoaderFactory implements ArtifactClassLoaderFac
             urls[0] = descriptor.getRuntimeClassesDir();
             System.arraycopy(descriptor.getRuntimeLibs(), 0, urls, 1, descriptor.getRuntimeLibs().length);
 
-            final MuleArtifactClassLoader pluginClassLoader = new MuleArtifactClassLoader(descriptor.getName(), urls, parent, descriptor.getLoaderOverrides());
+            final MuleArtifactClassLoader pluginClassLoader = new MuleArtifactClassLoader(descriptor.getName(), urls, parent, descriptor.getClassLoaderLookupPolicy());
 
-            ArtifactClassLoaderFilter filter = new ArtifactClassLoaderFilter(descriptor);
-            classLoaders.add(new FilteringArtifactClassLoader(descriptor.getName(), pluginClassLoader, filter));
+            classLoaders.add(new FilteringArtifactClassLoader(descriptor.getName(), pluginClassLoader, descriptor.getClassLoaderFilter()));
         }
 
         return new CompositeClassLoader(parent, classLoaders);

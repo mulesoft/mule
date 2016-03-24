@@ -39,7 +39,7 @@ public class FilteringArtifactClassLoader extends ClassLoader
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException
     {
-        if (filter.accepts(name))
+        if (filter.exportsClass(name))
         {
             return pluginClassLoader.loadClass(name);
         }
@@ -52,7 +52,7 @@ public class FilteringArtifactClassLoader extends ClassLoader
     @Override
     public URL getResource(String name)
     {
-        if (filter.accepts(name))
+        if (filter.exportsResource(name))
         {
             return pluginClassLoader.getResource(name);
         }
@@ -67,20 +67,13 @@ public class FilteringArtifactClassLoader extends ClassLoader
     {
         List<URL> filteredResources = new LinkedList<>();
 
-        if (filter.accepts(name))
+        if (filter.exportsResource(name))
         {
             Enumeration<URL> resources = pluginClassLoader.getResources(name);
 
             while (resources.hasMoreElements())
             {
-                URL url = resources.nextElement();
-
-                boolean accepted = filter.accepts(name);
-
-                if (accepted)
-                {
-                    filteredResources.add(url);
-                }
+                filteredResources.add(resources.nextElement());
             }
         }
 

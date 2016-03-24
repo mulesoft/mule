@@ -33,7 +33,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
     public void throwClassNotFoundErrorWhenClassIsNotExported() throws ClassNotFoundException
     {
         ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
-        when(filter.accepts(CLASS_NAME)).thenReturn(false);
+        when(filter.exportsClass(CLASS_NAME)).thenReturn(false);
         filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, null, filter);
 
         filteringArtifactClassLoader.loadClass(CLASS_NAME);
@@ -47,7 +47,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
         classLoader.addClass(CLASS_NAME, expectedClass);
 
         ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
-        when(filter.accepts(CLASS_NAME)).thenReturn(true);
+        when(filter.exportsClass(CLASS_NAME)).thenReturn(true);
 
         filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, classLoader, filter);
         Class<?> aClass = filteringArtifactClassLoader.loadClass(CLASS_NAME);
@@ -58,7 +58,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
     public void filtersResourceWhenNotExported() throws ClassNotFoundException
     {
         ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
-        when(filter.accepts(RESOURCE_NAME)).thenReturn(false);
+        when(filter.exportsClass(RESOURCE_NAME)).thenReturn(false);
         filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, null, filter);
 
         URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
@@ -73,7 +73,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
         classLoader.addResource(RESOURCE_NAME, expectedResource);
 
         ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
-        when(filter.accepts(RESOURCE_NAME)).thenReturn(true);
+        when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
         filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, classLoader, filter);
 
         URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
@@ -88,7 +88,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
         classLoader.addResource(RESOURCE_NAME, blockedResource);
 
         ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
-        when(filter.accepts(RESOURCE_NAME)).thenReturn(false);
+        when(filter.exportsResource(RESOURCE_NAME)).thenReturn(false);
 
         filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, classLoader, filter);
 
@@ -104,7 +104,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
         classLoader.addResource(RESOURCE_NAME, resource);
 
         ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
-        when(filter.accepts(RESOURCE_NAME)).thenReturn(true);
+        when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
 
         filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, classLoader, filter);
 

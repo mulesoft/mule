@@ -7,9 +7,15 @@
 
 package org.mule.module.launcher.plugin;
 
-import org.mule.module.artifact.descriptor.ArtifactDescriptorFactory;
+import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
+import static org.mule.util.Preconditions.checkArgument;
+import org.mule.module.artifact.classloader.ClassLoaderFilter;
+import org.mule.module.artifact.classloader.ClassLoaderFilterFactory;
+import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.module.artifact.classloader.ClassLoaderLookupPolicyFactory;
 import org.mule.module.artifact.descriptor.ArtifactDescriptorCreateException;
-import org.mule.util.StringUtils;
+import org.mule.module.artifact.descriptor.ArtifactDescriptorFactory;
 
 import java.io.File;
 import java.io.FileReader;
@@ -17,10 +23,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
@@ -28,8 +31,25 @@ public class ApplicationPluginDescriptorFactory implements ArtifactDescriptorFac
 {
 
     public static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
-    public static final String PROPERTY_LOADER_EXPORTED = "loader.export";
     public static final String PLUGIN_PROPERTIES = "plugin.properties";
+
+    private final ClassLoaderLookupPolicyFactory classLoaderLookupPolicyFactory;
+    private final ClassLoaderFilterFactory classLoaderFilterFactory;
+
+    /**
+     * Creates a new instance
+     *
+     * @param classLoaderLookupPolicyFactory creates classloader lookup policies for the created descriptors. Not null.
+     * @param classLoaderFilterFactory creates classloader filters for the created descriptors. Not null.
+     */
+    public ApplicationPluginDescriptorFactory(ClassLoaderLookupPolicyFactory classLoaderLookupPolicyFactory, ClassLoaderFilterFactory classLoaderFilterFactory)
+    {
+        checkArgument(classLoaderLookupPolicyFactory != null, "ClassLoaderLookupPolicyFactory cannot be null");
+        checkArgument(classLoaderFilterFactory != null, "ClassLoaderFilterFactory cannot be null");
+
+        this.classLoaderLookupPolicyFactory = classLoaderLookupPolicyFactory;
+        this.classLoaderFilterFactory = classLoaderFilterFactory;
+    }
 
     @Override
     public ApplicationPluginDescriptor create(File pluginFolder) throws ArtifactDescriptorCreateException
@@ -52,23 +72,14 @@ public class ApplicationPluginDescriptorFactory implements ArtifactDescriptorFac
                 throw new ArtifactDescriptorCreateException("Cannot read plugin.properties file", e);
             }
 
-            final String overrideString = props.getProperty(PROPERTY_LOADER_OVERRIDE);
-            if (StringUtils.isNotBlank(overrideString))
-            {
-                Set<String> values = new HashSet<>();
-                final String[] overrides = overrideString.split(",");
-                Collections.addAll(values, overrides);
-                descriptor.setLoaderOverride(values);
-            }
+            final ClassLoaderLookupPolicy classLoaderLookupPolicy = classLoaderLookupPolicyFactory.create(props.getProperty(PROPERTY_LOADER_OVERRIDE));
+            descriptor.setClassLoaderLookupPolicy(classLoaderLookupPolicy);
 
-            String exportedClasses = props.getProperty(PROPERTY_LOADER_EXPORTED);
-            if (StringUtils.isNotBlank(exportedClasses))
-            {
-                Set<String> values = new HashSet<>();
-                final String[] exports = exportedClasses.split(",");
-                Collections.addAll(values, exports);
-                descriptor.setExportedPrefixNames(values);
-            }
+            String exportedClasses = props.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY);
+            String exportedResources = props.getProperty(EXPORTED_RESOURCE_PACKAGES_PROPERTY);
+
+            final ClassLoaderFilter classLoaderFilter = classLoaderFilterFactory.create(exportedClasses, exportedResources);
+            descriptor.setClassLoaderFilter(classLoaderFilter);
         }
 
         try
