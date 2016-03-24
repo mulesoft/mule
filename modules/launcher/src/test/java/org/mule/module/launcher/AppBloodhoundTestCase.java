@@ -6,10 +6,12 @@
  */
 package org.mule.module.launcher;
 
+import static org.apache.commons.io.FileUtils.copyFile;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.api.config.MuleProperties;
+import org.mule.module.launcher.builder.ApplicationPluginFileBuilder;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.plugin.PluginClasspath;
 import org.mule.module.launcher.plugin.PluginDescriptor;
@@ -42,7 +44,8 @@ public class AppBloodhoundTestCase extends AbstractMuleTestCase
     {
         File pluginDir = MuleFoldersUtil.getAppPluginsFolder(APP_NAME);
         pluginDir.mkdirs();
-        copyResourceAs("plugins/groovy-plugin.zip", pluginDir, "groovy-plugin.zip");
+        final File pluginFile = new ApplicationPluginFileBuilder("plugin").usingLibrary("lib/echo-test.jar").getArtifactFile();
+        copyFile(pluginFile, new File(pluginDir, "plugin.zip"));
 
         ApplicationDescriptor desc = new DefaultAppBloodhound().fetch(APP_NAME);
 
@@ -50,10 +53,10 @@ public class AppBloodhoundTestCase extends AbstractMuleTestCase
         assertThat(plugins.size(), equalTo(1));
 
         final PluginDescriptor plugin = plugins.iterator().next();
-        assertThat(plugin.getName(), equalTo("groovy-plugin"));
+        assertThat(plugin.getName(), equalTo("plugin"));
         final PluginClasspath cp = plugin.getClasspath();
         assertThat(cp.toURLs().length, equalTo(2));
-        assertThat(cp.getRuntimeLibs()[0].toExternalForm(), endsWith("groovy-all-1.8.0.jar"));
+        assertThat(cp.getRuntimeLibs()[0].toExternalForm(), endsWith("echo-test.jar"));
     }
 
     @Test

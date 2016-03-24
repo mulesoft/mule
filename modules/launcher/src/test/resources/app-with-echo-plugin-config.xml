@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <flow name="main">
+        <poll frequency="1000">
+            <set-payload value="Hello!!"/>
+        </poll>
+
+        <component class="org.foo.EchoTest"/>
+    </flow>
+</mule>
