@@ -7,18 +7,20 @@
 
 package org.mule.module.artifact.descriptor;
 
+import static org.mule.util.Preconditions.checkArgument;
+import org.mule.module.artifact.classloader.ArtifactClassLoaderFilter;
+import org.mule.module.artifact.classloader.ClassLoaderFilter;
+import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
+
 import java.io.File;
-import java.util.Collections;
-import java.util.Set;
 
 public class ArtifactDescriptor
 {
 
     private String name;
     private File rootFolder;
-    private Set<String> loaderOverrides = Collections.emptySet();
-    private Set<String> exportedPrefixNames = Collections.emptySet();
-    private Set<String> blockedPrefixNames = Collections.emptySet();
+    private ClassLoaderLookupPolicy classLoaderLookupPolicy = ClassLoaderLookupPolicy.NULL_LOOKUP_POLICY;
+    private ClassLoaderFilter classLoaderFilter = ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 
     public String getName()
     {
@@ -45,44 +47,24 @@ public class ArtifactDescriptor
         this.rootFolder = rootFolder;
     }
 
-    public void setLoaderOverride(Set<String> loaderOverrides)
+    public ClassLoaderLookupPolicy getClassLoaderLookupPolicy()
     {
-        if (loaderOverrides == null)
-        {
-            throw new IllegalArgumentException("Loader overrides cannot be null");
-        }
-
-        this.loaderOverrides = Collections.unmodifiableSet(loaderOverrides);
+        return classLoaderLookupPolicy;
     }
 
-    public Set<String> getLoaderOverrides()
+    public void setClassLoaderLookupPolicy(ClassLoaderLookupPolicy classLoaderLookupPolicy)
     {
-        return loaderOverrides;
+        checkArgument(classLoaderLookupPolicy != null, "Classloader lookup policy must be non null");
+        this.classLoaderLookupPolicy = classLoaderLookupPolicy;
     }
 
-    public void setExportedPrefixNames(Set<String> exported)
+    public ClassLoaderFilter getClassLoaderFilter()
     {
-        this.exportedPrefixNames = Collections.unmodifiableSet(exported);
+        return classLoaderFilter;
     }
 
-    /**
-     * @return an immutable set of exported class prefix names
-     */
-    public Set<String> getExportedPrefixNames()
+    public void setClassLoaderFilter(ClassLoaderFilter classLoaderFilter)
     {
-        return exportedPrefixNames;
-    }
-
-    public void setBlockedPrefixNames(Set<String> blocked)
-    {
-        this.blockedPrefixNames = Collections.unmodifiableSet(blocked);
-    }
-
-    /**
-     * @return an immutable set of blocked class prefix names
-     */
-    public Set<String> getBlockedPrefixNames()
-    {
-        return blockedPrefixNames;
+        this.classLoaderFilter = classLoaderFilter;
     }
 }

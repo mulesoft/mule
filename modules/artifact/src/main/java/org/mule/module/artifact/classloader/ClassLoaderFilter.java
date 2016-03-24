@@ -16,8 +16,16 @@ public interface ClassLoaderFilter
     /**
      * Determines if a given name must be accepted or filtered.
      *
-     * @param name class/resource name to check
-     * @return true if the name is accepted and false if must be filtered
+     * @param name class name to check. Non empty.
+     * @return true if the class is exported, false otherwise
      */
-    boolean accepts(String name);
+    boolean exportsClass(String name);
+
+    /**
+     * Determines if a given resource must be accepted or filtered.
+     *
+     * @param name resource name to check. Non empty.
+     * @return true if the resource is exported, false otherwise
+     */
+    boolean exportsResource(String name);
 }

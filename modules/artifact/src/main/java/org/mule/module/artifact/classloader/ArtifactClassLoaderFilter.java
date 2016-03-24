@@ -7,8 +7,11 @@
 
 package org.mule.module.artifact.classloader;
 
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.util.StringUtils;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -23,49 +26,60 @@ import java.util.Set;
 public class ArtifactClassLoaderFilter implements ClassLoaderFilter
 {
 
-    private final ArtifactDescriptor descriptor;
+    public static final ArtifactClassLoaderFilter NULL_CLASSLOADER_FILTER = new ArtifactClassLoaderFilter(Collections.EMPTY_SET, Collections.EMPTY_SET);
 
-    public ArtifactClassLoaderFilter(ArtifactDescriptor descriptor)
+    public static final String EXPORTED_CLASS_PACKAGES_PROPERTY = "artifact.export.classPackages";
+    public static final String EXPORTED_RESOURCE_PACKAGES_PROPERTY = "artifact.export.resourcePackages";
+
+    private static final char PACKAGE_SEPARATOR = '.';
+    private static final String EMPTY_PACKAGE = "";
+    private static final char RESOURCE_SEPARATOR = '/';
+
+    private final Set<String> exportedClassPackages;
+    private final Set<String> exportedResourcePackages;
+
+    /**
+     * Creates a new classLoader filter
+     *
+     * @param exportedClassPackages    class package names to export. Can be empty
+     * @param exportedResourcePackages resource package names to export. Can be empty
+     */
+    public ArtifactClassLoaderFilter(Set<String> exportedClassPackages, Set<String> exportedResourcePackages)
     {
-        this.descriptor = descriptor;
+        checkArgument(exportedClassPackages != null, "Exported class packages cannot be null");
+        checkArgument(exportedResourcePackages != null, "Exported resource packages cannot be null");
+
+        this.exportedClassPackages = exportedClassPackages;
+        this.exportedResourcePackages = exportedResourcePackages;
     }
 
     @Override
-    public boolean accepts(String name)
+    public boolean exportsClass(String className)
     {
-        return !isBlockedClass(name) && isExportedClass(name) || !isBlockedPrefix(name) && isExportedPrefix(name);
+        checkArgument(!StringUtils.isEmpty(className), "Class name cannot be empty");
+        final String packageName = getPackageName(className);
+
+        return exportedClassPackages.contains(packageName);
     }
 
-    private boolean isBlockedPrefix(String name)
+    @Override
+    public boolean exportsResource(String name)
     {
-        return hasListedPrefix(name, descriptor.getBlockedPrefixNames());
+        checkArgument(!StringUtils.isEmpty(name), "Resource name cannot be empty");
+        final String resourcePackage = getResourceFolder(name);
+
+        return exportedResourcePackages.contains(resourcePackage);
     }
 
-    private boolean isBlockedClass(String name)
+    private String getResourceFolder(String resourceName)
     {
-        return descriptor.getBlockedPrefixNames().contains(name);
+        String pkgName = (resourceName.charAt(0) == RESOURCE_SEPARATOR) ? resourceName.substring(1) : resourceName;
+        pkgName = (pkgName.lastIndexOf(RESOURCE_SEPARATOR) < 0) ? EMPTY_PACKAGE : pkgName.substring(0, pkgName.lastIndexOf(RESOURCE_SEPARATOR));
+        return pkgName;
     }
 
-    private boolean isExportedClass(String name)
+    private String getPackageName(String className)
     {
-        return descriptor.getExportedPrefixNames().contains(name);
-    }
-
-    private boolean isExportedPrefix(String name)
-    {
-        return hasListedPrefix(name, descriptor.getExportedPrefixNames());
-    }
-
-    private boolean hasListedPrefix(String name, Set<String> classes)
-    {
-        for (String exported : classes)
-        {
-            if (name.startsWith(exported))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return (className.lastIndexOf(PACKAGE_SEPARATOR) < 0) ? EMPTY_PACKAGE : className.substring(0, className.lastIndexOf(PACKAGE_SEPARATOR));
     }
 }
