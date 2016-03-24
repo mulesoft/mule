@@ -14,10 +14,7 @@
         <http:listener path="in" config-ref="listenerConfig"/>
         <object-to-string-transformer/>
         <test:component logMessageDetails="true"/>
-        <message-properties-transformer>
-            <!-- TODO this should be replaced with enhanced MPT: copy-property syntax -->
-            <add-message-property key="X-Custom-Header" value="#[message.inboundProperties['X-Custom-Header']]"/>
-        </message-properties-transformer>
+        <copy-properties propertyName="X-Custom-Header"/>
         <test:queue name="out"/>
     </flow>
 

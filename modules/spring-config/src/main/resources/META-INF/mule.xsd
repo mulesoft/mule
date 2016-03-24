@@ -3224,58 +3224,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="message-properties-transformer" type="messagePropertiesTransformerType"
-                 substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that can add, delete or rename message properties.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="messagePropertiesTransformerType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractTransformerType">
-                <xsd:choice minOccurs="1" maxOccurs="unbounded">
-                    <xsd:element name="delete-message-property" type="keyType" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Delete message properties matching a regular expression or wildcard.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element name="add-message-property" type="propertyWithDataType" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Add a message property.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element name="rename-message-property" type="keyValueType" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Rename a message property.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element name="add-message-properties" type="mapType" minOccurs="0" maxOccurs="1">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Add a set of message properties.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:choice>
-                <xsd:attribute name="overwrite" type="substitutableBoolean" use="optional" default="true">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            If false, a property is not added if the message already contains a property with that name.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:complexType name="abstractAddPropertyTransformerType">
         <xsd:complexContent>
             <xsd:extension base="commonMessagePartTransformerType">

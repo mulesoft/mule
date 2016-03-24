@@ -15,9 +15,7 @@
 
         <echo-component />
 
-        <message-properties-transformer>
-            <delete-message-property key="MULE_REPLYTO"/>
-        </message-properties-transformer>
+        <remove-property propertyName="MULE_REPLYTO"/>
         <flow-ref name="W10Report"/>
     </flow>
 

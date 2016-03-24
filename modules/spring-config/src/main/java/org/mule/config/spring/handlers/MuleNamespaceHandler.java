@@ -70,7 +70,6 @@ import org.mule.config.spring.parsers.specific.MessageEnricherDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorChainDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessagePropertiesTransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
@@ -284,7 +283,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("custom-transformer", new TransformerMessageProcessorDefinitionParser());
         registerBeanDefinitionParser("auto-transformer", new TransformerMessageProcessorDefinitionParser(AutoTransformer.class));
-        registerBeanDefinitionParser("message-properties-transformer", new MessagePropertiesTransformerDefinitionParser());
         registerMuleBeanDefinitionParser("set-property", new MessageProcessorDefinitionParser(AddPropertyTransformer.class)).addAlias(PROPERTY_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
         registerMuleBeanDefinitionParser("remove-property", new MessageProcessorDefinitionParser(RemovePropertyTransformer.class)).addAlias(PROPERTY_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
         registerBeanDefinitionParser("copy-properties", new MessageProcessorDefinitionParser(CopyPropertiesTransformer.class));

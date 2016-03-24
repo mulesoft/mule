@@ -18,8 +18,6 @@
         <http:listener config-ref="httpConf" path="testInputInvalid"/>
 
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }"/>
-        <message-properties-transformer>
-            <add-message-property key="Content-Type" value="invalidMimeType" />
-        </message-properties-transformer>
+        <set-property propertyName="Content-Type" value="invalidMimeType" />
     </flow>
 </mule>

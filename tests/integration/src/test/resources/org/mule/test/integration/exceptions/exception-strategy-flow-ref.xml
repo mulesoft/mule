@@ -10,12 +10,8 @@
         <flow-ref name="blockWithOwnExceptionStrategy"/>
         <default-exception-strategy>
             <processor-chain>
-                <message-properties-transformer>
-                    <add-message-property key="mainEs" value="yes"/>
-                </message-properties-transformer>
-                <message-properties-transformer>
-                    <add-message-property key="flowRefEs" value="#[sessionVars.flowRefEs]" />
-                </message-properties-transformer>
+                <set-property propertyName="mainEs" value="yes"/>
+                <set-property propertyName="flowRefEs" value="#[sessionVars.flowRefEs]" />
                 <test:queue name="dlq"/>
             </processor-chain>
         </default-exception-strategy>

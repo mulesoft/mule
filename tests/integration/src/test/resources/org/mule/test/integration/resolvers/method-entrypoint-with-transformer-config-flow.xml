@@ -9,9 +9,7 @@
     <spring:bean id="testBean" class="org.mule.test.integration.resolvers.MethodEntryPointWithTransformerComponent"/>
 
     <flow name="testService">
-        <message-properties-transformer>
-            <add-message-property key="method" value="#transformMessage"/>
-        </message-properties-transformer>
+        <set-property propertyName="method" value="#transformMessage"/>
         <component>
             <spring-object bean="testBean"></spring-object>
         </component>
