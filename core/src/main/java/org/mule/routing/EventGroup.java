@@ -517,12 +517,13 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         @Override
         public int compare(MuleEvent event1, MuleEvent event2)
         {
-            int val1 = event1.getFlowVariable(MULE_ARRIVAL_ORDER_PROPERTY) != null ? event1.getFlowVariable
-                    (MULE_ARRIVAL_ORDER_PROPERTY) : -1;
-            int val2 = event2.getFlowVariable(MULE_ARRIVAL_ORDER_PROPERTY) != null ? event1.getFlowVariable
-                    (MULE_ARRIVAL_ORDER_PROPERTY) : -1;
+            return getEventOrder(event1) - getEventOrder(event2);
+        }
 
-            return val1 - val2;
+        private int getEventOrder(MuleEvent event)
+        {
+            Integer orderVariable = event.getFlowVariable(MULE_ARRIVAL_ORDER_PROPERTY);
+            return orderVariable != null ? orderVariable : -1;
         }
     }
 }
