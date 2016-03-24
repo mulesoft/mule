@@ -108,7 +108,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
         {
             final EndpointURI endpointURIForMessage = createEndpointUri(uri);
             outboundEndpoint = createStaticEndpoint(endpointURIForMessage);
-            staticEndpoints.put(endpointURIForMessage.getAddress(), outboundEndpoint);
+            staticEndpoints.put(uri, outboundEndpoint);
         }
 
         return outboundEndpoint;

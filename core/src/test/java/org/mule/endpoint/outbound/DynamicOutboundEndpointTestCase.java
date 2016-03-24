@@ -309,7 +309,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         dynamicOutboundEndpoint.process(testOutboundEvent);
         dynamicOutboundEndpoint.process(testOutboundEvent);
 
-        verify(endpointBuilder, times(1)).buildOutboundEndpoint();
+        verify(endpointBuilder, times(1)).clone();
     }
 
     protected void assertMessageSentEqual(MuleEvent event) throws MuleException
