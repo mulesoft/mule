@@ -17,7 +17,7 @@
 
     <http:request-config name="validCertHttpConfig" protocol="HTTPS" host="localhost" port="${httpsPort}">
         <tls:context>
-            <tls:trust-store path="trustStore" password="mulepassword" />
+            <tls:trust-store path="tls/trustStore" password="mulepassword" />
         </tls:context>
     </http:request-config>
 

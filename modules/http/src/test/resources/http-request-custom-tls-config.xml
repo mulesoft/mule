@@ -10,16 +10,16 @@
 
 
     <tls:context name="globalTlsContext" >
-        <tls:trust-store path="trustStore" password="mulepassword"/>
-        <tls:key-store path="clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
+        <tls:trust-store path="tls/trustStore" password="mulepassword"/>
+        <tls:key-store path="tls/clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
     </tls:context>
 
     <http:request-config name="globalConfig" protocol="HTTPS" host="localhost" port="${httpsPort}" tlsContext-ref="globalTlsContext" />
 
     <http:request-config name="nestedConfig" protocol="HTTPS" host="localhost" port="${httpsPort}">
         <tls:context>
-            <tls:trust-store path="trustStore" password="mulepassword"/>
-            <tls:key-store path="clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
+            <tls:trust-store path="tls/trustStore" password="mulepassword"/>
+            <tls:key-store path="tls/clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
         </tls:context>
     </http:request-config>
 

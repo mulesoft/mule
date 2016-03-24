@@ -7,20 +7,33 @@
 package org.mule.module.http.functional.requester;
 
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.module.http.internal.request.DefaultHttpRequesterConfig.OBJECT_HTTP_CLIENT_FACTORY;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class HttpRequestConnectionsConfigurationTestCase extends AbstractMuleTestCase
 {
-    private MuleContext mockMuleContext = Mockito.mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
+    private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
+
+    @Before
+    public void before()
+    {
+        MuleRegistry registry = mock(MuleRegistry.class);
+        when(registry.get(OBJECT_HTTP_CLIENT_FACTORY)).thenReturn(null);
+        when(mockMuleContext.getRegistry()).thenReturn(registry);
+    }
 
     @Test(expected=InitialisationException.class)
     public void invalidMaxConnections() throws InitialisationException

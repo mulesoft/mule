@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.client.HttpRequestOptions;
@@ -58,7 +59,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends FunctionalTestCas
     public void setUp() throws IOException
     {
         tlsContextFactory = new DefaultTlsContextFactory();
-        tlsContextFactory.setTrustStorePath("trustStore");
+        tlsContextFactory.setTrustStorePath("tls/trustStore");
         tlsContextFactory.setTrustStorePassword("mulepassword");
     }
 

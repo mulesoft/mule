@@ -11,6 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_URI;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.construct.Flow;
@@ -39,7 +40,6 @@ import org.junit.runners.Parameterized;
 public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
 {
 
-    private static final String PROXY_RESPONSE = "HTTP/1.1 200 Connection established\r\n\r\n";
     private static final String OK_RESPONSE = "OK";
     private static final String PATH = "/test?key=value";
 
@@ -75,8 +75,8 @@ public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
      */
     @Parameterized.Parameters
     public static Collection<Object[]> parameters() {
-        return Arrays.asList(new Object[][] {{"ssltest-keystore-with-test-hostname.jks", "ssltest-truststore-with-test-hostname.jks", "test"},
-                {"ssltest-keystore.jks", "ssltest-cacerts.jks", "localhost"}});
+        return Arrays.asList(new Object[][] {{"tls/ssltest-keystore-with-test-hostname.jks", "tls/ssltest-truststore-with-test-hostname.jks", "test"},
+                                             {"tls/ssltest-keystore.jks", "tls/ssltest-cacerts.jks", "localhost"}});
     }
 
     @Override
@@ -122,6 +122,7 @@ public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
      */
     private static class MockProxyServer
     {
+        private static final String PROXY_RESPONSE = "HTTP/1.1 200 Connection established\r\n\r\n";
 
         private int proxyServerPort;
         private int serverPort;

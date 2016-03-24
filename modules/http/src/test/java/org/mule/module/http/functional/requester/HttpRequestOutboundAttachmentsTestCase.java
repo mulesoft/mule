@@ -16,6 +16,7 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.transformer.types.MimeTypes.HTML;
 import static org.mule.transformer.types.MimeTypes.TEXT;
+
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.message.ds.ByteArrayDataSource;
@@ -40,7 +41,7 @@ import org.junit.Test;
 
 public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestTestCase
 {
-    private static final String TEST_FILE_NAME = "realm.properties";
+    private static final String TEST_FILE_NAME = "auth/realm.properties";
     private static final String TEST_PART_NAME = "partName";
 
     @Rule
@@ -109,7 +110,7 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
         flow.process(event);
 
         Part part = getPart(TEST_PART_NAME);
-        assertFormDataContentDisposition(part, TEST_PART_NAME, TEST_FILE_NAME);
+        assertFormDataContentDisposition(part, TEST_PART_NAME, TEST_FILE_NAME.substring(5));
     }
 
     @Test

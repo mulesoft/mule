@@ -13,8 +13,8 @@
     <!-- HTTPS listener configured with a trust-store, client certificates should be validated. -->
     <http:listener-config name="listenerConfigWithTrustStore" protocol="HTTPS" host="localhost" port="${port1}">
         <tls:context>
-            <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
-            <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+            <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
+            <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
         </tls:context>
     </http:listener-config>
 
@@ -31,7 +31,7 @@
     <!-- HTTPS listener configured without a trust-store, client certificates should not be validated. -->
     <http:listener-config name="listenerConfigWithoutTrustStore" protocol="HTTPS" host="localhost" port="${port2}">
         <tls:context>
-            <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+            <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
         </tls:context>
     </http:listener-config>
 
