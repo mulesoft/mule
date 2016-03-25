@@ -7,8 +7,8 @@
 package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -121,7 +121,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         }
         finally
         {
-            if (!(result instanceof VoidMuleEvent) && fireNotification)
+            if (!NonBlockingVoidMuleEvent.getInstance().equals(result) && fireNotification)
             {
                 fireNotification(notificationManager, event.getFlowConstruct(), result != null ? result : event,
                                  messageProcessor,
