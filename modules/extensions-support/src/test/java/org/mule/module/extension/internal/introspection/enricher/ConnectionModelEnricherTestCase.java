@@ -53,7 +53,7 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase
     @Before
     public void before() throws Exception
     {
-        when(describingContext.getDeclarationDescriptor().getDeclaration().getOperations()).thenReturn(asList(connectedOperation, notConnectedOperation));
+        when(describingContext.getExtensionDeclarer().getExtensionDeclaration().getOperations()).thenReturn(asList(connectedOperation, notConnectedOperation));
         when(connectedOperation.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.of(new ConnectionTypeModelProperty(Object.class)));
         when(notConnectedOperation.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.empty());
     }

@@ -10,7 +10,7 @@ import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.ModelProperty;
 import org.mule.extension.api.introspection.ParameterModel;
-import org.mule.extension.api.introspection.declaration.fluent.Declaration;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 
 import com.google.common.collect.ImmutableMap;
@@ -32,7 +32,7 @@ import java.util.Set;
  * describes the nested group.
  * <p>
  * To decouple this class from the representation model (which depending on the
- * context could be a {@link Declaration} or an actual {@link ParameterModel}, this class
+ * context could be a {@link ExtensionDeclaration} or an actual {@link ParameterModel}, this class
  * references parameters by name
  *
  * @since 3.7.0

@@ -8,8 +8,8 @@ package org.mule.module.extension.internal.capability.xml;
 
 import org.mule.extension.api.annotation.capability.Xml;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
-import org.mule.extension.api.introspection.declaration.fluent.Declaration;
-import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.module.extension.internal.introspection.enricher.AbstractAnnotatedModelEnricher;
 import org.mule.module.extension.internal.util.NameUtils;
@@ -18,7 +18,7 @@ import org.mule.util.StringUtils;
 import java.util.function.Supplier;
 
 /**
- * Verifies if the extension is annotated with {@link Xml} and if so, enriches the {@link DeclarationDescriptor}
+ * Verifies if the extension is annotated with {@link Xml} and if so, enriches the {@link ExtensionDeclarer}
  * with a {@link XmlModelProperty}.
  * <p>
  * To get a hold of the {@link Class} on which the {@link Xml} annotation is expected to be, the
@@ -35,16 +35,16 @@ public final class XmlModelEnricher extends AbstractAnnotatedModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        Xml xml = extractAnnotation(describingContext.getDeclarationDescriptor().getDeclaration(), Xml.class);
-        DeclarationDescriptor descriptor = describingContext.getDeclarationDescriptor();
+        Xml xml = extractAnnotation(describingContext.getExtensionDeclarer().getExtensionDeclaration(), Xml.class);
+        ExtensionDeclarer descriptor = describingContext.getExtensionDeclarer();
         descriptor.withModelProperty(createXmlModelProperty(xml, descriptor));
     }
 
-    private XmlModelProperty createXmlModelProperty(Xml xml, DeclarationDescriptor descriptor)
+    private XmlModelProperty createXmlModelProperty(Xml xml, ExtensionDeclarer descriptor)
     {
-        Declaration declaration = descriptor.getDeclaration();
-        String schemaVersion = calculateValue(xml, () -> xml.schemaVersion(), declaration::getVersion);
-        String namespace = calculateValue(xml, () -> xml.namespace(), () -> buildDefaultNamespace(declaration.getName()));
+        ExtensionDeclaration extensionDeclaration = descriptor.getExtensionDeclaration();
+        String schemaVersion = calculateValue(xml, () -> xml.schemaVersion(), extensionDeclaration::getVersion);
+        String namespace = calculateValue(xml, () -> xml.namespace(), () -> buildDefaultNamespace(extensionDeclaration.getName()));
         String schemaLocation = calculateValue(xml, () -> xml.schemaLocation(), () -> buildDefaultLocation(namespace));
         return new XmlModelProperty(schemaVersion, namespace, schemaLocation);
     }

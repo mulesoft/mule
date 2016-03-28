@@ -11,7 +11,7 @@ import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.api.introspection.ExtensionDiscoverer;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
@@ -46,7 +46,6 @@ public final class DefaultExtensionDiscoverer implements ExtensionDiscoverer
         this.serviceRegistry = serviceRegistry;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -62,8 +61,8 @@ public final class DefaultExtensionDiscoverer implements ExtensionDiscoverer
         }
 
         return describers.stream().map(describer -> {
-            Descriptor descriptor = describer.describe(new DefaultDescribingContext());
-            return extensionFactory.createFrom(descriptor);
+            ExtensionDeclarer declarer = describer.describe(new DefaultDescribingContext());
+            return extensionFactory.createFrom(declarer);
         }).collect(new ImmutableListCollector<>());
     }
 }

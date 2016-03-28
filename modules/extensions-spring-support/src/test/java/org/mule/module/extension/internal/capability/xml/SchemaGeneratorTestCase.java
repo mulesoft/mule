@@ -13,20 +13,21 @@ import static org.mockito.Mockito.when;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.capability.xml.schema.SchemaGenerator;
-import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.runtime.connector.basic.GlobalInnerPojoConnector;
 import org.mule.module.extension.internal.runtime.connector.basic.GlobalPojoConnector;
 import org.mule.module.extension.internal.runtime.connector.basic.ListConnector;
 import org.mule.module.extension.internal.runtime.connector.basic.MapConnector;
 import org.mule.module.extension.internal.runtime.connector.basic.StringListConnector;
 import org.mule.module.extension.internal.runtime.connector.basic.TestConnector;
+import org.mule.module.extension.vegan.VeganExtension;
 import org.mule.registry.SpiServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -63,7 +64,8 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
                 {GlobalInnerPojoConnector.class, "global-inner-pojo.xsd"},
                 {MapConnector.class, "map.xsd"},
                 {ListConnector.class, "list.xsd"},
-                {StringListConnector.class, "string-list.xsd"}
+                {StringListConnector.class, "string-list.xsd"},
+                {VeganExtension.class, "vegan.xsd"}
         });
     }
 
@@ -89,8 +91,8 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
     {
         String expectedSchema = IOUtils.getResourceAsString(expectedXSD, getClass());
 
-        Descriptor descriptor = new AnnotationsBasedDescriber(extensionUnderTest).describe(new DefaultDescribingContext()).getRootDeclaration();
-        ExtensionModel extensionModel = extensionFactory.createFrom(descriptor);
+        ExtensionDeclarer declarer = new AnnotationsBasedDescriber(extensionUnderTest).describe(new DefaultDescribingContext());
+        ExtensionModel extensionModel = extensionFactory.createFrom(declarer);
 
         XmlModelProperty capability = extensionModel.getModelProperty(XmlModelProperty.class).get();
 

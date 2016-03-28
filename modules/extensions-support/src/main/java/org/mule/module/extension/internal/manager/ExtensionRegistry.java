@@ -9,15 +9,14 @@ package org.mule.module.extension.internal.manager;
 import static java.lang.String.format;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.util.Preconditions.checkArgument;
-
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ExpirableConfigurationProvider;
 import org.mule.util.collection.ImmutableListCollector;
 
@@ -32,6 +31,7 @@ import com.google.common.collect.Multimaps;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -121,18 +121,10 @@ final class ExtensionRegistry
      * @param key the key for the fetched {@link ConfigurationProvider}
      * @param <T> the generic type for the returned value
      * @return a {@link ConfigurationProvider}
-     * @throws IllegalArgumentException if no provider registered under that {@code key}
      */
-    <T> ConfigurationProvider<T> getConfigurationProvider(String key)
+    <T> Optional<ConfigurationProvider<T>> getConfigurationProvider(String key)
     {
-        ConfigurationProvider<T> configurationProvider = registry.get(key);
-
-        if (configurationProvider == null)
-        {
-            throw new IllegalArgumentException(String.format("There is no registered configurationProvider under name '%s'", key));
-        }
-
-        return configurationProvider;
+        return Optional.ofNullable(registry.get(key));
     }
 
     /**

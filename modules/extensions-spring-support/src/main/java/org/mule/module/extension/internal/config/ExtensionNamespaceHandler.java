@@ -11,9 +11,12 @@ import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.config.spring.MuleArtifactContext;
 import org.mule.extension.api.ExtensionManager;
+import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
@@ -26,6 +29,7 @@ import com.google.common.collect.Multimap;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -95,9 +99,9 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
 
             registerTopLevelParameters(extensionModel);
             registerConfigurations(extensionModel);
-            registerOperations(extensionModel);
-            registerConnectionProviders(extensionModel);
-            registerMessageSources(extensionModel);
+            registerOperations(extensionModel, extensionModel.getOperationModels());
+            registerConnectionProviders(extensionModel.getConnectionProviders());
+            registerMessageSources(extensionModel, extensionModel.getSourceModels());
 
             handledExtensions.put(namespace, extensionModel);
         }
@@ -107,24 +111,30 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
         }
     }
 
-    private void registerOperations(ExtensionModel extensionModel)
+    private void registerOperations(ExtensionModel extensionModel, List<OperationModel> operations)
     {
-        extensionModel.getOperationModels().forEach(operationModel -> registerParser(hyphenize(operationModel.getName()), new OperationBeanDefinitionParser(extensionModel, operationModel)));
+        operations.forEach(operationModel -> registerParser(hyphenize(operationModel.getName()), new OperationBeanDefinitionParser(extensionModel, operationModel)));
     }
 
     private void registerConfigurations(ExtensionModel extensionModel)
     {
-        extensionModel.getConfigurationModels().forEach(configurationModel -> registerParser(configurationModel.getName(), new ConfigurationBeanDefinitionParser((RuntimeConfigurationModel) configurationModel)));
+        extensionModel.getConfigurationModels().forEach(configurationModel -> {
+            registerParser(configurationModel.getName(), new ConfigurationBeanDefinitionParser((RuntimeConfigurationModel) configurationModel));
+            registerOperations(extensionModel, configurationModel.getOperationModels());
+            registerConnectionProviders(configurationModel.getConnectionProviders());
+            registerMessageSources(extensionModel, configurationModel.getSourceModels());
+        });
+
     }
 
-    private void registerConnectionProviders(ExtensionModel extensionModel)
+    private void registerConnectionProviders(List<ConnectionProviderModel> connectionProviders)
     {
-        extensionModel.getConnectionProviders().forEach(providerModel -> registerParser(providerModel.getName(), new ConnectionProviderBeanDefinitionParser(providerModel)));
+        connectionProviders.forEach(providerModel -> registerParser(providerModel.getName(), new ConnectionProviderBeanDefinitionParser(providerModel)));
     }
 
-    private void registerMessageSources(ExtensionModel extensionModel)
+    private void registerMessageSources(ExtensionModel extensionModel, List<SourceModel> sourceModels)
     {
-        extensionModel.getSourceModels().forEach(sourceModel -> registerParser(hyphenize(sourceModel.getName()), new SourceBeanDefinitionParser(extensionModel, sourceModel)));
+        sourceModels.forEach(sourceModel -> registerParser(hyphenize(sourceModel.getName()), new SourceBeanDefinitionParser(extensionModel, sourceModel)));
     }
 
     private void registerTopLevelParameters(ExtensionModel extensionModel)

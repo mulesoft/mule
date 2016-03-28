@@ -8,34 +8,12 @@ package org.mule.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
-import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
-import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.RuntimeConfigurationModel;
-import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
-import org.hamcrest.core.IsInstanceOf;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
 public class HeisenbergDefaultConfigTestCase extends ExtensionFunctionalTestCase
 {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Mock
-    private RuntimeConfigurationModel configurationModel;
-
-    @Mock
-    private ConfigurationProvider<Object> configurationProvider;
 
     @Override
     protected String getConfigFile()
@@ -47,22 +25,5 @@ public class HeisenbergDefaultConfigTestCase extends ExtensionFunctionalTestCase
     public void usesDefaultConfig() throws Exception
     {
         assertThat(getPayloadAsString(runFlow("sayMyName").getMessage()), is("Heisenberg"));
-    }
-
-    @Test
-    public void twoConfigsAndNoConfigRef() throws Exception
-    {
-        ExtensionManager extensionManager = muleContext.getExtensionManager();
-        RuntimeExtensionModel extensionModel = extensionManager.getExtensions().stream().findFirst().get();
-        assertThat(extensionModel.getName(), is(HEISENBERG));
-
-        when(configurationProvider.getName()).thenReturn("secondConfig");
-        when(configurationProvider.getModel()).thenReturn(configurationModel);
-        when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
-
-        extensionManager.registerConfigurationProvider(configurationProvider);
-
-        expectedException.expectCause(IsInstanceOf.<IllegalStateException>instanceOf(IllegalStateException.class));
-        runFlow("sayMyName");
     }
 }

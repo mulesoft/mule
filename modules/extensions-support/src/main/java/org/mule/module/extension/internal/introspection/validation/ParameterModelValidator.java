@@ -16,6 +16,8 @@ import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 
+import java.util.List;
+
 /**
  * Validates that all {@link ParameterModel parameters} provided by the {@link ConfigurationModel configurations},
  * {@link ConnectionProviderModel connection providers} and {@link OperationModel operations}
@@ -36,22 +38,36 @@ public final class ParameterModelValidator implements ModelValidator
     private static final String CONNECTION_PROVIDER = "connection provider";
 
     @Override
-    public void validate(ExtensionModel model) throws IllegalModelDefinitionException
+    public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
     {
-        for (ConfigurationModel configurationModel : model.getConfigurationModels())
+        for (ConfigurationModel configurationModel : extensionModel.getConfigurationModels())
         {
-            configurationModel.getParameterModels().forEach(parameterModel -> validateParameter(parameterModel, configurationModel.getName(), CONFIGURATION, model.getName()));
+            configurationModel.getParameterModels().forEach(parameterModel -> validateParameter(parameterModel, configurationModel.getName(), CONFIGURATION, extensionModel.getName()));
         }
 
-        for (OperationModel operationModel : model.getOperationModels())
-        {
-            operationModel.getParameterModels().forEach(parameterModel -> validateParameter(parameterModel, operationModel.getName(), OPERATION, model.getName()));
-        }
+        validateOperations(extensionModel, extensionModel.getOperationModels());
+        extensionModel.getConfigurationModels().forEach(config -> validateOperations(extensionModel, config.getOperationModels()));
 
-        for (ConnectionProviderModel connectionProviderModel : model.getConnectionProviders())
-        {
-            connectionProviderModel.getParameterModels().forEach(parameterModel -> validateParameter(parameterModel, connectionProviderModel.getName(), CONNECTION_PROVIDER, model.getName()));
-        }
+        validateConnectionProviders(extensionModel, extensionModel.getConnectionProviders());
+        extensionModel.getConfigurationModels().forEach(config -> validateConnectionProviders(extensionModel, config.getConnectionProviders()));
+    }
+
+    private void validateConnectionProviders(ExtensionModel extensionModel, List<ConnectionProviderModel> providers)
+    {
+        providers.forEach(provider -> provider.getParameterModels()
+                .forEach(parameterModel -> validateParameter(parameterModel,
+                                                             provider.getName(),
+                                                             CONNECTION_PROVIDER,
+                                                             extensionModel.getName())));
+    }
+
+    private void validateOperations(ExtensionModel extensionModel, List<OperationModel> operations)
+    {
+        operations.forEach(operation -> operation.getParameterModels()
+                .forEach(parameterModel -> validateParameter(parameterModel,
+                                                             operation.getName(),
+                                                             OPERATION,
+                                                             extensionModel.getName())));
     }
 
     private void validateParameter(ParameterModel parameterModel, String ownerName, String ownerModelType, String extensionName)

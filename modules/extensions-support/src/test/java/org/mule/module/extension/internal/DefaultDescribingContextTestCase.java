@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
-import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -26,14 +26,14 @@ public class DefaultDescribingContextTestCase extends AbstractMuleTestCase
 
     private static final String KEY = "key";
     private static final String VALUE = "value";
-    private DeclarationDescriptor descriptor;
+    private ExtensionDeclarer descriptor;
 
     private DescribingContext context;
 
     @Before
     public void before()
     {
-        descriptor = new DeclarationDescriptor();
+        descriptor = new ExtensionDeclarer();
         context = new DefaultDescribingContext(descriptor);
         context.addParameter(KEY, VALUE);
     }
@@ -41,7 +41,7 @@ public class DefaultDescribingContextTestCase extends AbstractMuleTestCase
     @Test
     public void getDeclarationDescriptor()
     {
-        assertThat(descriptor, is(sameInstance(context.getDeclarationDescriptor())));
+        assertThat(descriptor, is(sameInstance(context.getExtensionDeclarer())));
     }
 
     @Test

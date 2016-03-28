@@ -17,9 +17,12 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.metadata.DefaultMetadataContext;
 import org.mule.api.metadata.MetadataAware;
 import org.mule.api.metadata.MetadataContext;
 import org.mule.api.metadata.MetadataKey;
@@ -28,15 +31,16 @@ import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
 import org.mule.api.metadata.resolving.FailureCode;
 import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.RuntimeOperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.internal.connection.ConnectionManagerAdapter;
-import org.mule.api.metadata.DefaultMetadataContext;
+import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.metadata.MetadataMediator;
 import org.mule.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
@@ -47,6 +51,7 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.util.StringUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -69,7 +74,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public final class OperationMessageProcessor implements MessageProcessor, MuleContextAware, Lifecycle, MetadataAware
+public final class OperationMessageProcessor implements MessageProcessor, MuleContextAware, Lifecycle, FlowConstructAware, MetadataAware
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OperationMessageProcessor.class);
@@ -78,7 +83,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     private final String configurationProviderName;
     private final RuntimeOperationModel operationModel;
     private final ResolverSet resolverSet;
-    private final ExtensionManager extensionManager;
+    private final ExtensionManagerAdapter extensionManager;
     private final String target;
 
     private ExecutionMediator executionMediator;
@@ -87,15 +92,18 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
     private OperationExecutor operationExecutor;
     private MetadataMediator metadataMediator;
 
+    private Optional<ConfigurationProvider<Object>> configurationProvider;
+
     @Inject
     private ConnectionManagerAdapter connectionManager;
+    private FlowConstruct flowConstruct;
 
     public OperationMessageProcessor(RuntimeExtensionModel extensionModel,
                                      RuntimeOperationModel operationModel,
                                      String configurationProviderName,
                                      String target,
                                      ResolverSet resolverSet,
-                                     ExtensionManager extensionManager)
+                                     ExtensionManagerAdapter extensionManager)
     {
         this.extensionModel = extensionModel;
         this.operationModel = operationModel;
@@ -130,8 +138,15 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
 
     private ConfigurationInstance<Object> getConfiguration(MuleEvent event)
     {
-        return StringUtils.isBlank(configurationProviderName) ? extensionManager.getConfiguration(extensionModel, event)
-                                                              : extensionManager.getConfiguration(configurationProviderName, event);
+        return configurationProvider
+                .map(provider -> provider.get(event))
+                .orElseGet(() -> {
+                    if (StringUtils.isBlank(configurationProviderName))
+                    {
+                        return extensionManager.getConfiguration(extensionModel, event);
+                    }
+                    return extensionManager.getConfiguration(configurationProviderName, event);
+                });
     }
 
     private OperationContextAdapter createOperationContext(ConfigurationInstance<Object> configuration, MuleEvent event) throws MuleException
@@ -145,7 +160,31 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         returnDelegate = createReturnDelegate();
         operationExecutor = operationModel.getExecutor().createExecutor();
         executionMediator = new DefaultExecutionMediator(extensionModel, operationModel, connectionManager);
+        configurationProvider = getConfigurationProvider();
         initialiseIfNeeded(operationExecutor, true, muleContext);
+    }
+
+    private Optional<ConfigurationProvider<Object>> getConfigurationProvider()
+    {
+        Optional<ConfigurationProvider<Object>> provider = StringUtils.isBlank(configurationProviderName)
+                                                           ? extensionManager.getConfigurationProvider(extensionModel)
+                                                           : extensionManager.getConfigurationProvider(configurationProviderName);
+
+        if (provider.isPresent())
+        {
+            RuntimeConfigurationModel configurationModel = provider.get().getModel();
+            if (!configurationModel.getOperationModel(operationModel.getName()).isPresent() &&
+                !configurationModel.getExtensionModel().getOperationModel(operationModel.getName()).isPresent())
+            {
+                throw new IllegalOperationException(String.format("Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. " +
+                                                                  "The selected config does not support that operation.",
+                                                                  flowConstruct.getName(),
+                                                                  operationModel.getName(),
+                                                                  provider.get().getName()));
+            }
+        }
+
+        return provider;
     }
 
     private ReturnDelegate createReturnDelegate()
@@ -222,4 +261,9 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         return new DefaultMetadataContext(configuration, connectionManager);
     }
 
+    @Override
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        this.flowConstruct = flowConstruct;
+    }
 }

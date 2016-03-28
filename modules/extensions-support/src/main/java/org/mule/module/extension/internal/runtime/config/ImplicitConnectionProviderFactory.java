@@ -10,7 +10,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils;
+import org.mule.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.List;
 
@@ -25,15 +27,17 @@ public interface ImplicitConnectionProviderFactory
 
     /**
      * Creates a new {@link ConnectionProvider} based on the {@link ConnectionProviderModel} obtained
-     * from invoking {@link ImplicitObjectUtils#getFirstImplicit(List)} on the {@code extensionModel}'s providers.
+     * from invoking {@link ImplicitObjectUtils#getFirstImplicit(List)} on all the providers
+     * available to {@code configurationModel} (under the rules of
+     * {@link MuleExtensionUtils#getAllConnectionProviders(RuntimeConfigurationModel)})
      *
-     * @param configName the name of the configuration that will own the returned {@link ConnectionProvider}
-     * @param extensionModel the model that represents the owning extension
-     * @param event the {@link MuleEvent} that will be used to evaluate any default parameters that requires resolving an expression
-     * @param <Config> the generic type of the config types that the returned provider accepts
-     * @param <Connector> the generic type of the connections that the returned provider produces
+     * @param configName         the name of the configuration that will own the returned {@link ConnectionProvider}
+     * @param configurationModel the model that represents the selected config
+     * @param event              the {@link MuleEvent} that will be used to evaluate any default parameters that requires resolving an expression
+     * @param <Config>           the generic type of the config types that the returned provider accepts
+     * @param <Connector>        the generic type of the connections that the returned provider produces
      * @return a {@link ConnectionProvider}
      * @throws IllegalArgumentException if the {@code extensionModel} doesn't have any {@link ConnectionProviderModel} which can be used implicitly
      */
-    <Config, Connector> ConnectionProvider<Config, Connector> createImplicitConnectionProvider(String configName, ExtensionModel extensionModel, MuleEvent event);
+    <Config, Connector> ConnectionProvider<Config, Connector> createImplicitConnectionProvider(String configName, RuntimeConfigurationModel configurationModel, MuleEvent event);
 }

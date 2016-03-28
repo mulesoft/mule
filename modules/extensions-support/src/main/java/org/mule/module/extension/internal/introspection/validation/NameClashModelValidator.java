@@ -16,7 +16,9 @@ import org.mule.extension.api.introspection.Described;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedListMultimap;
@@ -76,49 +78,11 @@ public final class NameClashModelValidator implements ModelValidator
                                                                                                     configurationModel.getName(),
                                                                                                     "configuration"));
 
-            extensionModel.getOperationModels().stream().forEach(operationModel -> validate(operationModel.getParameterModels(),
-                                                                                            operationNames,
-                                                                                            operationModel.getName(),
-                                                                                            "operation"));
+            validateOperations(extensionModel.getOperationModels());
+            extensionModel.getConfigurationModels().forEach(config -> validateOperations(config.getOperationModels()));
 
-            // Check clash between each operation and its parameters type
-            extensionModel.getOperationModels().stream().forEach(operationModel -> {
-                operationModel.getParameterModels().stream().forEach(parameterModel -> {
-                    validateClash(operationModel.getName(),
-                                  getType(parameterModel.getType()).getName(),
-                                  "operation",
-                                  "argument");
-                });
-            });
-
-            // Check clashes between each operation argument and the connection providers
-            extensionModel.getConnectionProviders().stream().forEach(connectionProviderModel -> {
-                extensionModel.getOperationModels().stream().forEach(operationModel -> {
-                    operationModel.getParameterModels().stream().forEach(parameterModel -> {
-                        validateClash(connectionProviderModel.getName(),
-                                      getType(parameterModel.getType()).getName(),
-                                      "connection provider",
-                                      String.format("operation's (%s) parameter", operationModel.getName()));
-                    });
-                });
-            });
-
-            // Check clashes between each operation argument and the configs
-            extensionModel.getConfigurationModels().stream().forEach(configurationModel -> {
-                extensionModel.getOperationModels().stream().forEach(operationModel -> {
-                    operationModel.getParameterModels().stream().forEach(parameterModel -> {
-                        validateClash(configurationModel.getName(),
-                                      getType(parameterModel.getType()).getName(),
-                                      "configuration",
-                                      String.format("operation's (%s) parameter", operationModel.getName()));
-                    });
-                });
-            });
-
-            extensionModel.getConnectionProviders().stream().forEach(providerModel -> validate(providerModel.getParameterModels(),
-                                                                                               connectionProviderNames,
-                                                                                               providerModel.getName(),
-                                                                                               "connection provider"));
+            validateConnectionProviders(extensionModel.getConnectionProviders());
+            extensionModel.getConfigurationModels().forEach(config -> validateConnectionProviders(config.getConnectionProviders()));
 
             validateClashes(configurationNames, operationNames, CONFIGURATIONS, OPERATIONS);
             validateClashes(configurationNames, connectionProviderNames, CONFIGURATIONS, CONNECTION_PROVIDERS);
@@ -128,6 +92,60 @@ public final class NameClashModelValidator implements ModelValidator
             validateClashes(configurationNames, parameterNames, CONFIGURATIONS, COMPLEX_TYPE_PARAMETERS);
             validateClashes(operationNames, parameterNames, OPERATIONS, COMPLEX_TYPE_PARAMETERS);
             validateClashes(connectionProviderNames, parameterNames, CONNECTION_PROVIDERS, COMPLEX_TYPE_PARAMETERS);
+        }
+
+        private void validateConnectionProviders(List<ConnectionProviderModel> providers)
+        {
+            providers.stream().forEach(providerModel -> validate(providerModel.getParameterModels(),
+                                                                 connectionProviderNames,
+                                                                 providerModel.getName(),
+                                                                 "connection provider"));
+        }
+
+        private void validateOperations(List<OperationModel> operations)
+        {
+            operations.stream().forEach(operationModel -> validate(operationModel.getParameterModels(),
+                                                                   operationNames,
+                                                                   operationModel.getName(),
+                                                                   "operation"));
+
+            // Check clash between each operation and its parameters type
+            operations.stream().forEach(operationModel -> {
+                operationModel.getParameterModels().stream().forEach(parameterModel -> {
+                    validateClash(operationModel.getName(),
+                                  getType(parameterModel.getType()).getName(),
+                                  "operation",
+                                  "argument");
+                });
+            });
+
+            // Check clashes between each operation argument and the connection providers
+            for (ConfigurationModel configuration : extensionModel.getConfigurationModels())
+            {
+                MuleExtensionUtils.getAllConnectionProviders((RuntimeConfigurationModel) configuration).stream()
+                        .forEach(connectionProviderModel -> {
+                            extensionModel.getOperationModels().stream().forEach(operationModel -> {
+                                operationModel.getParameterModels().stream().forEach(parameterModel -> {
+                                    validateClash(connectionProviderModel.getName(),
+                                                  getType(parameterModel.getType()).getName(),
+                                                  "connection provider",
+                                                  String.format("operation's (%s) parameter", operationModel.getName()));
+                                });
+                            });
+                        });
+            }
+
+            // Check clashes between each operation argument and the configs
+            extensionModel.getConfigurationModels().stream().forEach(configurationModel -> {
+                operations.stream().forEach(operationModel -> {
+                    operationModel.getParameterModels().stream().forEach(parameterModel -> {
+                        validateClash(configurationModel.getName(),
+                                      getType(parameterModel.getType()).getName(),
+                                      "configuration",
+                                      String.format("operation's (%s) parameter", operationModel.getName()));
+                    });
+                });
+            });
         }
 
         private void validate(List<ParameterModel> parameters, Set<String> accumulator, String ownerName, String ownerType)

@@ -221,7 +221,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         else
         {
             MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-            List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
+            List<ConfigurationBuilder> builders = new ArrayList<>();
             builders.add(new SimpleConfigurationBuilder(getStartUpProperties()));
 
             //If the annotations module is on the classpath, add the annotations config builder to the list

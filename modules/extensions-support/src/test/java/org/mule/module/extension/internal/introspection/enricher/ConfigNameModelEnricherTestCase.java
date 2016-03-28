@@ -53,7 +53,7 @@ public class ConfigNameModelEnricherTestCase extends AbstractMuleTestCase
     @Before
     public void before() throws Exception
     {
-        when(describingContext.getDeclarationDescriptor().getDeclaration().getConfigurations()).thenReturn(asList(configurationDeclaration));
+        when(describingContext.getExtensionDeclarer().getExtensionDeclaration().getConfigurations()).thenReturn(asList(configurationDeclaration));
         mockImplementingProperty(TestNameAwareConfig.class);
         nameField = getAllFields(TestNameAwareConfig.class, withAnnotation(ConfigName.class)).iterator().next();
     }

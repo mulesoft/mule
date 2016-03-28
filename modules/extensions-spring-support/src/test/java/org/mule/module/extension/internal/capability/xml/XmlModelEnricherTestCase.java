@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.api.annotation.capability.Xml;
-import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.module.extension.internal.DefaultDescribingContext;
@@ -38,13 +38,13 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
     private static final String EXTENSION_HYPHENAZED_NAME = "xml-model";
     private static final String EXTENSION_VERSION = "3.7";
 
-    private DeclarationDescriptor declarationDescriptor = new DeclarationDescriptor();
+    private ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
     private ModelEnricher modelEnricher = new XmlModelEnricher();
 
     @Test
     public void enrichWithCustomValues()
     {
-        declarationDescriptor.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
+        extensionDeclarer.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
         XmlModelProperty xmlProperty = enrich(XmlSupport.class);
 
         assertThat(xmlProperty, is(notNullValue()));
@@ -56,7 +56,7 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
     @Test
     public void enrichWithDefaultValues()
     {
-        declarationDescriptor.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
+        extensionDeclarer.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
         XmlModelProperty xmlProperty = enrich(NoXmlSupport.class);
 
         assertThat(xmlProperty, is(notNullValue()));
@@ -68,7 +68,7 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
     @Test
     public void enrichWithCustomNamespaceValue()
     {
-        declarationDescriptor.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
+        extensionDeclarer.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
         XmlModelProperty xmlProperty = enrich(DefaultXmlExtension.class);
 
         assertThat(xmlProperty, is(notNullValue()));
@@ -80,7 +80,7 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
     @Test
     public void enrichWithCustomSchemaLocationValue()
     {
-        declarationDescriptor.named(EXTENSION).onVersion(EXTENSION_VERSION);
+        extensionDeclarer.named(EXTENSION).onVersion(EXTENSION_VERSION);
         XmlModelProperty xmlProperty = enrich(CustomSchemaLocationXmlExtension.class);
 
         assertThat(xmlProperty, is(notNullValue()));
@@ -91,9 +91,9 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
 
     private XmlModelProperty enrich(Class<?> type)
     {
-        declarationDescriptor.withModelProperty(new ImplementingTypeModelProperty(type));
-        modelEnricher.enrich(new DefaultDescribingContext(declarationDescriptor));
-        return declarationDescriptor.getDeclaration().getModelProperty(XmlModelProperty.class).get();
+        extensionDeclarer.withModelProperty(new ImplementingTypeModelProperty(type));
+        modelEnricher.enrich(new DefaultDescribingContext(extensionDeclarer));
+        return extensionDeclarer.getExtensionDeclaration().getModelProperty(XmlModelProperty.class).get();
     }
 
     @Xml(schemaVersion = SCHEMA_VERSION, namespace = NAMESPACE, schemaLocation = SCHEMA_LOCATION)

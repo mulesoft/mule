@@ -6,8 +6,9 @@
  */
 package org.mule.module.extension.internal;
 
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
-import org.mule.extension.api.introspection.declaration.fluent.Declaration;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -32,8 +33,13 @@ public abstract class AbstractAnnotationsBasedDescriberTestCase extends Abstract
         return new AnnotationsBasedDescriber(type);
     }
 
-    protected OperationDeclaration getOperation(Declaration declaration, final String operationName)
+    protected ExtensionDeclarer describeExtension()
     {
-        return (OperationDeclaration) CollectionUtils.find(declaration.getOperations(), object -> ((OperationDeclaration) object).getName().equals(operationName));
+        return getDescriber().describe(new DefaultDescribingContext());
+    }
+
+    protected OperationDeclaration getOperation(ExtensionDeclaration extensionDeclaration, final String operationName)
+    {
+        return (OperationDeclaration) CollectionUtils.find(extensionDeclaration.getOperations(), object -> ((OperationDeclaration) object).getName().equals(operationName));
     }
 }

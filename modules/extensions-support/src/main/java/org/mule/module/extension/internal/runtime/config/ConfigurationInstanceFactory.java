@@ -60,7 +60,7 @@ public final class ConfigurationInstanceFactory<T>
     {
         this.configurationModel = configurationModel;
         configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
-        requiresConnection = !getConnectedOperations(configurationModel.getExtensionModel()).isEmpty();
+        requiresConnection = !getConnectedOperations(configurationModel).isEmpty();
     }
 
     /**
@@ -83,7 +83,7 @@ public final class ConfigurationInstanceFactory<T>
         ValueResolver<ConnectionProvider> providerResolver;
         if (requiresConnection)
         {
-            providerResolver = new StaticValueResolver<>(implicitConnectionProviderFactory.createImplicitConnectionProvider(name, configurationModel.getExtensionModel(), event));
+            providerResolver = new StaticValueResolver<>(implicitConnectionProviderFactory.createImplicitConnectionProvider(name, configurationModel, event));
         }
         else
         {

@@ -19,7 +19,7 @@ import org.mule.extension.api.introspection.ExtensionDiscoverer;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
-import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -48,7 +48,7 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
     private ServiceRegistry serviceRegistry;
 
     @Mock
-    private Descriptor descriptor;
+    private ExtensionDeclarer extensionDeclarer;
 
     @Mock
     private Describer describer;
@@ -68,8 +68,8 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
     public void scan() throws Exception
     {
         when(serviceRegistry.lookupProviders(Describer.class, getClass().getClassLoader())).thenReturn(Arrays.asList(describer));
-        when(describer.describe(any(DescribingContext.class))).thenReturn(descriptor);
-        when(extensionFactory.createFrom(descriptor)).thenReturn(extensionModel);
+        when(describer.describe(any(DescribingContext.class))).thenReturn(extensionDeclarer);
+        when(extensionFactory.createFrom(extensionDeclarer)).thenReturn(extensionModel);
 
         List<RuntimeExtensionModel> extensionModels = discoverer.discover(getClass().getClassLoader());
         assertThat(extensionModels, hasSize(1));
@@ -78,7 +78,7 @@ public class ExtensionDiscovererTestCase extends AbstractMuleTestCase
 
         verify(serviceRegistry).lookupProviders(Describer.class, getClass().getClassLoader());
         verify(describer).describe(any(DescribingContext.class));
-        verify(extensionFactory).createFrom(descriptor);
+        verify(extensionFactory).createFrom(extensionDeclarer);
     }
 
     @Test(expected = IllegalArgumentException.class)

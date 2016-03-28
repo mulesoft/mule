@@ -20,14 +20,18 @@ import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.Described;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.HasOperationModels;
 import org.mule.extension.api.introspection.InterceptableModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.ParametrizedModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.InterceptorFactory;
@@ -44,6 +48,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -103,17 +108,45 @@ public class MuleExtensionUtils
     }
 
     /**
-     * Returns a {@link List} with all the {@link OperationModel} in the {@code extensionModel}
-     * which require a connection.
+     * Returns a {@link List} with all the {@link OperationModel} available to the {@code configurationModel}
+     * which requires a connection. This will include operations defined at both the
+     * {@link ExtensionModel#getOperationModels()} and {@link ConfigurationModel#getOperationModels()}
+     * level.
      *
-     * @param extensionModel a {@link ExtensionModel}
+     * @param configurationModel a {@link RuntimeConfigurationModel}
      * @return a {@link List} of {@link OperationModel}. It might be empty but will never be {@code null}
      */
-    public static List<OperationModel> getConnectedOperations(ExtensionModel extensionModel)
+    public static List<OperationModel> getConnectedOperations(RuntimeConfigurationModel configurationModel)
     {
-        return extensionModel.getOperationModels().stream()
+        List<OperationModel> operations = new LinkedList<>();
+        operations.addAll(collectConnectedOperations(configurationModel.getExtensionModel()));
+        operations.addAll(collectConnectedOperations(configurationModel));
+
+        return operations;
+    }
+
+    private static List<OperationModel> collectConnectedOperations(HasOperationModels hasOperationModels)
+    {
+        return hasOperationModels.getOperationModels().stream()
                 .filter(o -> o.getModelProperty(ConnectionTypeModelProperty.class).isPresent())
                 .collect(toList());
+    }
+
+    /**
+     * Returns all the {@link ConnectionProviderModel} instances available for the given
+     * {@code configurationModel}. The {@link List} will first contain those
+     * defined at a {@link ConfigurationModel#getConnectionProviders()} level and finally
+     * the ones at {@link ExtensionModel#getConnectionProviders()}
+     *
+     * @param configurationModel a {@link RuntimeConfigurationModel}
+     * @return a {@link List}. Might be empty but will never be {@code null}
+     */
+    public static List<ConnectionProviderModel> getAllConnectionProviders(RuntimeConfigurationModel configurationModel)
+    {
+        return ImmutableList.<ConnectionProviderModel>builder()
+                .addAll(configurationModel.getConnectionProviders())
+                .addAll(configurationModel.getExtensionModel().getConnectionProviders())
+                .build();
     }
 
     public static Class<?> getOperationsConnectionType(ExtensionModel extensionModel)

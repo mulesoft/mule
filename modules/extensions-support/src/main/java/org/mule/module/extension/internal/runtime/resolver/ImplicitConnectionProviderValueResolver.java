@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.runtime.resolver;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.module.extension.internal.runtime.config.DefaultImplicitConnectionProviderFactory;
 import org.mule.module.extension.internal.runtime.config.ImplicitConnectionProviderFactory;
 
@@ -33,14 +33,14 @@ public final class ImplicitConnectionProviderValueResolver implements ValueResol
     private ConnectionProvider connectionProvider = null;
     private Function<MuleEvent, ConnectionProvider> delegate;
 
-    public ImplicitConnectionProviderValueResolver(String name, ExtensionModel extensionModel)
+    public ImplicitConnectionProviderValueResolver(String name, RuntimeConfigurationModel configurationModel)
     {
         delegate = event -> {
             synchronized (this)
             {
                 if (connectionProvider == null)
                 {
-                    connectionProvider = new DefaultImplicitConnectionProviderFactory().createImplicitConnectionProvider(name, extensionModel, event);
+                    connectionProvider = new DefaultImplicitConnectionProviderFactory().createImplicitConnectionProvider(name, configurationModel, event);
                     delegate = nextEvent -> connectionProvider;
                 }
                 return connectionProvider;

@@ -9,11 +9,12 @@ package org.mule.module.extension.internal.runtime.config;
 import static org.mule.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.buildImplicitResolverSet;
 import static org.mule.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 
@@ -29,14 +30,14 @@ public final class DefaultImplicitConnectionProviderFactory implements ImplicitC
      * {@inheritDoc}
      */
     @Override
-    public <Config, Connector> ConnectionProvider<Config, Connector> createImplicitConnectionProvider(String configName, ExtensionModel extensionModel, MuleEvent event)
+    public <Config, Connector> ConnectionProvider<Config, Connector> createImplicitConnectionProvider(String configName, RuntimeConfigurationModel configurationModel, MuleEvent event)
     {
-        RuntimeConnectionProviderModel implicitModel = (RuntimeConnectionProviderModel) getFirstImplicit(extensionModel.getConnectionProviders());
+        RuntimeConnectionProviderModel implicitModel = (RuntimeConnectionProviderModel) getFirstImplicit(getAllConnectionProviders(configurationModel));
 
         if (implicitModel == null)
         {
             throw new IllegalStateException(String.format("Configuration '%s' of extension '%s' does not define a connection provider and none can be created automatically. Please define one.",
-                                                          configName, extensionModel.getName()));
+                                                          configName, configurationModel.getName()));
         }
 
         final ResolverSet resolverSet = buildImplicitResolverSet(implicitModel, event.getMuleContext().getExpressionManager());

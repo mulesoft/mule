@@ -15,7 +15,7 @@ import org.mule.extension.api.annotation.Extensible;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.ExtensionOf;
 import org.mule.extension.api.annotation.Operations;
-import org.mule.extension.api.introspection.declaration.fluent.Declaration;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
 
@@ -52,8 +52,8 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractAnnotationsBa
 
     private void assertOperationExtensionOf(String operationName, Class propertyType)
     {
-        Declaration declaration = getDescriber().describe(new DefaultDescribingContext()).getRootDeclaration().getDeclaration();
-        OperationDeclaration operation = getOperation(declaration, operationName);
+        ExtensionDeclaration extensionDeclaration = getDescriber().describe(new DefaultDescribingContext()).getDeclaration();
+        OperationDeclaration operation = getOperation(extensionDeclaration, operationName);
 
         ExtendingOperationModelProperty<ExtensibleExtension> modelProperty = operation.getModelProperty(ExtendingOperationModelProperty.class).get();
         assertThat(modelProperty.getType(), is(sameInstance(propertyType)));

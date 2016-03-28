@@ -7,8 +7,8 @@
 package org.mule.module.extension;
 
 import org.mule.extension.api.introspection.declaration.DescribingContext;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
-import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
 import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 
 /**
@@ -36,7 +36,7 @@ public abstract class DescriberSupport implements Describer
      * {@inheritDoc}
      */
     @Override
-    public Descriptor describe(DescribingContext context)
+    public ExtensionDeclarer describe(DescribingContext context)
     {
         return delegate.describe(context);
     }

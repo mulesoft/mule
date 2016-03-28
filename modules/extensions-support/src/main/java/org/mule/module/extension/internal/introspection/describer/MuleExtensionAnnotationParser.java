@@ -15,6 +15,8 @@ import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.ParameterGroup;
 import org.mule.extension.api.annotation.RestrictedTo;
+import org.mule.extension.api.annotation.metadata.Content;
+import org.mule.extension.api.annotation.metadata.MetadataKeyParam;
 import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
@@ -22,11 +24,9 @@ import org.mule.extension.api.annotation.param.display.DisplayName;
 import org.mule.extension.api.annotation.param.display.Password;
 import org.mule.extension.api.annotation.param.display.Placement;
 import org.mule.extension.api.annotation.param.display.Text;
-import org.mule.extension.api.annotation.metadata.Content;
-import org.mule.extension.api.annotation.metadata.MetadataKeyParam;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterDescriptor;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.extension.api.introspection.property.DisplayModelPropertyBuilder;
 import org.mule.extension.api.metadata.MetadataModelProperty;
@@ -273,13 +273,13 @@ public final class MuleExtensionAnnotationParser
     }
 
     /**
-     * Enriches the {@link ParameterDescriptor} with a {@link MetadataModelProperty} if the parsedParameter is
+     * Enriches the {@link ParameterDeclarer} with a {@link MetadataModelProperty} if the parsedParameter is
      * annotated either as {@link Content} or {@link MetadataKeyParam}
      *
      * @param parsedParameter the method annotated parameter parsed
-     * @param parameter       the {@link ParameterDescriptor} associated to the parsed parameter
+     * @param parameter       the {@link ParameterDeclarer} associated to the parsed parameter
      */
-    public static void parseMetadataAnnotations(AnnotatedElement parsedParameter, ParameterDescriptor parameter)
+    public static void parseMetadataAnnotations(AnnotatedElement parsedParameter, ParameterDeclarer parameter)
     {
         if (parsedParameter.getAnnotation(Content.class) != null)
         {
