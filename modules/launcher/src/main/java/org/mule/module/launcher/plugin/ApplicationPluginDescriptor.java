@@ -12,6 +12,7 @@ import java.net.URL;
 
 public class ApplicationPluginDescriptor extends ArtifactDescriptor
 {
+    public static final String PLUGIN_PROPERTIES = "plugin.properties";
 
     private URL runtimeClassesDir;
     private URL[] runtimeLibs = new URL[0];

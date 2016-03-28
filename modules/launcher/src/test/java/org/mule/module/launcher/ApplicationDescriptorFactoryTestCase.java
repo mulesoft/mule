@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher;
 
+import static org.apache.commons.io.FileUtils.copyFile;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
@@ -16,6 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.launcher.MuleFoldersUtil.getAppFolder;
 import static org.mule.module.launcher.MuleFoldersUtil.getAppPluginsFolder;
 import org.mule.api.config.MuleProperties;
+import org.mule.module.launcher.builder.ApplicationPluginFileBuilder;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptor;
@@ -48,8 +50,9 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase
     {
         File pluginDir = getAppPluginsFolder(APP_NAME);
         pluginDir.mkdirs();
-        copyResourceAs("plugins/groovy-plugin.zip", pluginDir, "groovy-plugin1.zip");
-        copyResourceAs("plugins/groovy-plugin.zip", pluginDir, "groovy-plugin2.zip");
+        final File pluginFile = new ApplicationPluginFileBuilder("plugin").usingLibrary("lib/echo-test.jar").getArtifactFile();
+        copyFile(pluginFile, new File(pluginDir, "plugin1.zip"));
+        copyFile(pluginFile, new File(pluginDir, "plugin2.zip"));
 
         final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory();
         final ApplicationPluginDescriptorFactory pluginDescriptorFactory = mock(ApplicationPluginDescriptorFactory.class);
