@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.plugin;
 
+import static org.mule.module.launcher.plugin.PluginDescriptor.PLUGIN_PROPERTIES;
 import org.mule.module.launcher.MuleFoldersUtil;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
@@ -63,7 +64,7 @@ public class PluginDescriptorParser
             pd.setName(pluginName);
             pd.setAppDescriptor(appDescriptor);
 
-            final File pluginPropsFile = new File(tmpDir, "plugin.properties");
+            final File pluginPropsFile = new File(tmpDir, PLUGIN_PROPERTIES);
             if (pluginPropsFile.exists())
             {
                 Properties props = new Properties();

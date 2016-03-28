@@ -13,6 +13,8 @@ import java.util.Set;
 
 public class PluginDescriptor
 {
+    public static final String PLUGIN_PROPERTIES = "plugin.properties";
+
     private Set<String> loaderOverride = new HashSet<String>();
     private ApplicationDescriptor appDescriptor;
     private String name;

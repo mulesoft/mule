@@ -20,6 +20,7 @@ public class ApplicationDescriptor
 {
     public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
     public static final String DEFAULT_APP_PROPERTIES_RESOURCE = "mule-app.properties";
+    public static final String DEFAULT_DEPLOY_PROPERTIES_RESOURCE = "mule-deploy.properties";
 
     /**
      * Required to support the '-config spring' shortcut. Don't use a class object so
