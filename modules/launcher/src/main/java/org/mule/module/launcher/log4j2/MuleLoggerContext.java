@@ -45,6 +45,8 @@ import org.apache.logging.log4j.message.MessageFactory;
 class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject
 {
 
+    private final LoggerContextConfigurer loggerContextConfigurer = new LoggerContextConfigurer();
+
     private final URI configFile;
     private final boolean standlone;
     private final ContextSelector contextSelector;
@@ -97,19 +99,14 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject
     @Override
     public synchronized void reconfigure()
     {
-        applyContainerConfiguration();
+        loggerContextConfigurer.configure(this);
         super.reconfigure();
-    }
-
-    private void applyContainerConfiguration()
-    {
-        new LoggerContextConfigurer().configure(this);
     }
 
     @Override
     public void updateLoggers(Configuration config)
     {
-        applyContainerConfiguration();
+        loggerContextConfigurer.update(this);
         super.updateLoggers(config);
     }
 
