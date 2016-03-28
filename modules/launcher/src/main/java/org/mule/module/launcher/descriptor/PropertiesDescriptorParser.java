@@ -28,9 +28,11 @@ public class PropertiesDescriptorParser implements DescriptorParser
     // support not yet implemented for CL reversal
     protected static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
     protected static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";
+    protected static final String PROPERTY_LOG_CONFIG_FILE = "log.configFile";
     protected static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
     protected static final String PROPERTY_SCAN_PACKAGES = "scan.packages";
 
+    @Override
     public ApplicationDescriptor parse(File descriptor, String applicationName) throws IOException
     {
         final Properties p = PropertiesUtils.loadProperties(new FileInputStream(descriptor));
@@ -59,6 +61,11 @@ public class PropertiesDescriptorParser implements DescriptorParser
 
         // supports true (case insensitive), yes, on as positive values
         d.setRedeploymentEnabled(BooleanUtils.toBoolean(p.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, Boolean.TRUE.toString())));
+
+        if (p.containsKey(PROPERTY_LOG_CONFIG_FILE))
+        {
+            d.setLogConfigFile(new File(p.getProperty(PROPERTY_LOG_CONFIG_FILE)));
+        }
 
         final String overrideString = p.getProperty(PROPERTY_LOADER_OVERRIDE);
         if (StringUtils.isNotBlank(overrideString))
@@ -104,6 +111,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
         return MuleContainerBootstrapUtils.getMuleAppDir(appName).getAbsolutePath() + File.separator + path;
     }
 
+    @Override
     public String getSupportedFormat()
     {
         return "properties";

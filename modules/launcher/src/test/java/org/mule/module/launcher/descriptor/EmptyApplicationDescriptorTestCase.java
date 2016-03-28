@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.descriptor;
 
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -39,6 +40,7 @@ public class EmptyApplicationDescriptorTestCase extends AbstractMuleTestCase
         String absolutePathForConfigResource = MuleContainerBootstrapUtils.getMuleAppDefaultConfigFile(APP_NAME).getAbsolutePath();
         assertThat(applicationDescriptor.getAbsoluteResourcePaths()[0], is(absolutePathForConfigResource));
         assertThat(applicationDescriptor.getConfigResourcesFile()[0].getAbsolutePath(), is(absolutePathForConfigResource));
+        assertThat(applicationDescriptor.getLogConfigFile(), is(nullValue()));
     }
 
 }

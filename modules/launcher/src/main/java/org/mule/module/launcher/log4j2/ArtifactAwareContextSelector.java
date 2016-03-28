@@ -6,20 +6,10 @@
  */
 package org.mule.module.launcher.log4j2;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Disposable;
-import org.mule.module.launcher.DirectoryResourceLocator;
-import org.mule.module.launcher.LocalResourceLocator;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
-import org.mule.module.launcher.artifact.ShutdownListener;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 
 import org.apache.logging.log4j.core.LoggerContext;
@@ -57,10 +47,11 @@ import org.apache.logging.log4j.status.StatusLogger;
 class ArtifactAwareContextSelector implements ContextSelector, Disposable
 {
 
-    private static final StatusLogger logger = StatusLogger.getLogger();
+    static final StatusLogger logger = StatusLogger.getLogger();
 
     private LoggerContextCache cache = new LoggerContextCache(this, getClass().getClassLoader());
 
+    private final MuleLoggerContextFactory loggerContextFactory = new MuleLoggerContextFactory();
 
     ArtifactAwareContextSelector()
     {
@@ -120,133 +111,13 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable
         cache.dispose();
     }
 
-    private void destroyLoggersFor(ClassLoader classLoader)
+    public void destroyLoggersFor(ClassLoader classLoader)
     {
         cache.remove(classLoader);
     }
 
-    private NewContextParameters resolveContextParameters(ClassLoader classLoader)
-    {
-        if (classLoader instanceof ArtifactClassLoader)
-        {
-            ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) classLoader;
-            return new NewContextParameters(getArtifactLoggingConfig(artifactClassLoader), artifactClassLoader.getArtifactName());
-        }
-        else
-        {
-            // this is not an app init, use the top-level defaults
-            if (MuleContainerBootstrapUtils.getMuleConfDir() != null)
-            {
-                return new NewContextParameters(
-                        getLogConfig(new DirectoryResourceLocator(MuleContainerBootstrapUtils.getMuleConfDir().getAbsolutePath())),
-                        classLoader.toString());
-            }
-        }
-
-        return null;
-    }
-
     LoggerContext buildContext(final ClassLoader classLoader)
     {
-        NewContextParameters parameters = resolveContextParameters(classLoader);
-        if (parameters == null)
-        {
-            return getDefaultContext();
-        }
-
-        MuleLoggerContext loggerContext = new MuleLoggerContext(parameters.contextName,
-                                                                parameters.loggerConfigFile,
-                                                                classLoader,
-                                                                this,
-                                                                isStandalone());
-
-        if (classLoader instanceof ArtifactClassLoader)
-        {
-            final ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) classLoader;
-
-            artifactClassLoader.addShutdownListener(new ShutdownListener()
-            {
-                @Override
-                public void execute()
-                {
-                    destroyLoggersFor(resolveLoggerContextClassLoader(classLoader));
-                }
-            });
-        }
-
-        return loggerContext;
-    }
-
-
-    private URI getArtifactLoggingConfig(ArtifactClassLoader muleCL)
-    {
-        // Checks if there's an app-specific logging configuration available,
-        // scope the lookup to this classloader only, as getResource() will delegate to parents
-        // locate xml config first, fallback to properties format if not found
-        URI appLogConfig = getLogConfig(muleCL);
-
-        if (appLogConfig != null && logger.isInfoEnabled())
-        {
-            logger.info("Found logging config for application '{}' at '{}'", muleCL.getArtifactName(), appLogConfig);
-        }
-
-        return appLogConfig;
-    }
-
-    private URI getLogConfig(LocalResourceLocator localResourceLocator)
-    {
-        URL appLogConfig = localResourceLocator.findLocalResource("log4j2-test.xml");
-
-        if (appLogConfig == null)
-        {
-            appLogConfig = localResourceLocator.findLocalResource("log4j2.xml");
-        }
-
-        if (appLogConfig == null)
-        {
-            File defaultConfigFile = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf");
-            defaultConfigFile = new File(defaultConfigFile, "log4j2.xml");
-
-            try
-            {
-                appLogConfig = defaultConfigFile.toURI().toURL();
-            }
-            catch (MalformedURLException e)
-            {
-                throw new MuleRuntimeException(createStaticMessage("Could not locate log config in MULE_HOME"), e);
-            }
-        }
-
-        try
-        {
-            return appLogConfig.toURI();
-        }
-        catch (URISyntaxException e)
-        {
-            throw new MuleRuntimeException(createStaticMessage("Could not read log file " + appLogConfig), e);
-        }
-    }
-
-    private LoggerContext getDefaultContext()
-    {
-        return new MuleLoggerContext("Default", this, isStandalone());
-    }
-
-    private boolean isStandalone()
-    {
-        return MuleContainerBootstrapUtils.getMuleConfDir() != null;
-    }
-
-    private class NewContextParameters
-    {
-
-        private final URI loggerConfigFile;
-        private final String contextName;
-
-        private NewContextParameters(URI loggerConfigFile, String contextName)
-        {
-            this.loggerConfigFile = loggerConfigFile;
-            this.contextName = contextName;
-        }
+        return loggerContextFactory.build(classLoader, this);
     }
 }
