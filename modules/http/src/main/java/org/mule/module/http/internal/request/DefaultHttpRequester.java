@@ -221,9 +221,9 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                      try
                                      {
 
+                                         httpResponseToMuleEvent.convert(muleEvent, httpResponse);
                                          notificationHelper.fireNotification(muleEvent, httpRequest.getUri(),
                                                                              muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
-                                         httpResponseToMuleEvent.convert(muleEvent, httpResponse);
                                          resetMuleEventForNewThread(muleEvent);
 
 
@@ -286,7 +286,6 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         {
             notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
             response = getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), resolveAuthentication(muleEvent));
-            notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
         }
         catch (Exception e)
         {
@@ -294,6 +293,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         }
 
         httpResponseToMuleEvent.convert(muleEvent, response);
+        notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
 
         if (resendRequest(muleEvent, checkRetry, authentication))
         {
