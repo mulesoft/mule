@@ -152,7 +152,8 @@ public class DefaultMuleContext implements MuleContext
 
     private ExpressionManager expressionManager;
 
-    private StreamCloserService streamCloserService;
+    private volatile StreamCloserService streamCloserService;
+    private Object streamCloserServiceLock = new Object();
 
     private ClassLoader executionClassLoader;
 
@@ -184,11 +185,14 @@ public class DefaultMuleContext implements MuleContext
     private ExtensionManager extensionManager;
 
     private ObjectSerializer objectSerializer;
-    private DataTypeConversionResolver dataTypeConversionResolver;
+    private volatile DataTypeConversionResolver dataTypeConversionResolver;
+    private Object dataTypeConversionResolverLock = new Object();
 
     private volatile FlowTraceManager flowTraceManager;
+    private Object flowTraceManagerLock = new Object();
 
     private volatile Collection<ExceptionContextProvider> exceptionContextProviders;
+    private Object exceptionContextProvidersLock = new Object();
 
     /**
      * The {@link ArtifactType} indicating if this configuration object is for an application or a domain.
@@ -765,8 +769,14 @@ public class DefaultMuleContext implements MuleContext
     {
         if (this.streamCloserService == null)
         {
-            this.streamCloserService = this.getRegistry().lookupObject(
-                    MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE);
+            synchronized (streamCloserServiceLock)
+            {
+                if (this.streamCloserService == null)
+                {
+                    this.streamCloserService = this.getRegistry().lookupObject(
+                            MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE);
+                }
+            }
         }
 
         return this.streamCloserService;
@@ -960,7 +970,7 @@ public class DefaultMuleContext implements MuleContext
     {
         if (dataTypeConversionResolver == null)
         {
-            synchronized (this)
+            synchronized (dataTypeConversionResolverLock)
             {
                 if (dataTypeConversionResolver == null)
                 {
@@ -1119,7 +1129,7 @@ public class DefaultMuleContext implements MuleContext
     {
         if (flowTraceManager == null)
         {
-            synchronized (this)
+            synchronized (flowTraceManagerLock)
             {
                 if (flowTraceManager == null)
                 {
@@ -1143,7 +1153,7 @@ public class DefaultMuleContext implements MuleContext
     {
         if (exceptionContextProviders == null)
         {
-            synchronized (this)
+            synchronized (exceptionContextProvidersLock)
             {
                 if (exceptionContextProviders == null)
                 {
