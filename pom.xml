@@ -205,7 +205,6 @@
         <jcrVersion>1.0</jcrVersion>
         <jdomVersion>1.1.3</jdomVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
-        <jffiVersion>1.2.9</jffiVersion>
         <jodaTimeVersion>2.9.1</jodaTimeVersion>
         <jschVersion>0.1.51</jschVersion>
         <junitVersion>4.11</junitVersion>
@@ -902,10 +901,6 @@
                         <artifactId>ant-launcher</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>jline</groupId>
-                        <artifactId>jline</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>axion</groupId>
                         <artifactId>axion</artifactId>
                     </exclusion>
@@ -1442,17 +1437,6 @@
                         <artifactId>c3p0</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.github.jnr</groupId>
-                <artifactId>jffi</artifactId>
-                <version>${jffiVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.jnr</groupId>
-                <artifactId>jffi</artifactId>
-                <version>${jffiVersion}</version>
-                <classifier>native</classifier>
             </dependency>
         </dependencies>
 
