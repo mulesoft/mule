@@ -13,6 +13,7 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.context.notification.ConnectorMessageNotification;
 import org.mule.context.notification.ServerNotificationManager;
+import org.mule.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,13 +21,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections.Transformer;
+
 public class TestConnectorMessageNotificationListener implements ServerNotificationListener<ConnectorMessageNotification>
 {
 
     private final CountDownLatch latch;
     private final String expectedExchangePoint;
 
-    private List<String> notificationActionNames = new ArrayList<>();
+    private List<ConnectorMessageNotification> notifications = new ArrayList<>();
 
     public TestConnectorMessageNotificationListener()
     {
@@ -44,8 +48,8 @@ public class TestConnectorMessageNotificationListener implements ServerNotificat
     @Override
     public void onNotification(ConnectorMessageNotification notification)
     {
-        notificationActionNames.add(notification.getActionName());
-        if( latch!=null )
+        notifications.add(notification);
+        if (latch != null)
         {
             assertThat(notification.getEndpoint(), is(expectedExchangePoint));
             latch.countDown();
@@ -54,7 +58,31 @@ public class TestConnectorMessageNotificationListener implements ServerNotificat
 
     public List<String> getNotificationActionNames()
     {
-        return notificationActionNames;
+        return (List<String>) CollectionUtils.collect(notifications, new Transformer()
+        {
+            @Override
+            public Object transform(Object input)
+            {
+                return ((ConnectorMessageNotification) input).getActionName();
+            }
+        });
+    }
+
+    /**
+     * Gets the list of notifications for the action name.
+     * @param actionName
+     * @return The notifications sent for the given action.
+     */
+    public List<ConnectorMessageNotification> getNotifications(final String actionName)
+    {
+        return (List<ConnectorMessageNotification>) CollectionUtils.select(notifications, new Predicate()
+        {
+            @Override
+            public boolean evaluate(Object object)
+            {
+                return ((ConnectorMessageNotification) object).getActionName().equals(actionName);
+            }
+        });
     }
 
     public static ServerNotificationManager register(ServerNotificationManager serverNotificationManager)
