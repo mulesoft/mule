@@ -14,6 +14,22 @@ MULE-9020: BouncyCastle was upgraded to version 1.50.
 MULE-9337: TLSv1 is no longer listed as an enabled protocol, by default only TLSv1.1 and TLSv1.2 will be enabled. If you wish to use TLSv1 you can edit the TLS configuration file (tls-default.conf) and add it back to the enabled protocols entry.
 MULE-9306: Losing flow and session variables when using MuleClient to dispatch/send an event. Exception strategy not caching exceptions after using MuleClient on a JavaComponent.
 MULE-9405: MuleException instead of NPE is now thrown when setting a null value for a context-property in an XstlTransformation.
+MULE-9522: jruby was upgraded to version 1.7.24. Also, the following dependencies were updated:
+    * bytelist: from version 1.0.10 to 1.0.11
+    * jcodings: 1.0.10 to 1.0.16
+    * jffi: 1.2.9 to 1.2.10 (-native too)
+    * jline: removed
+    * jnr-constants: 0.8.4 to 0.9.0
+    * jnr-enxio: 0.4 to 0.9
+    * jnr-ffi: 1.0.4 to 2.0.5 (shaded into mule-module-scripting-jruby)
+    * jnr-posix: 2.5.2 to 3.0.27
+    * jnr-unixsocket: 0.3 to 0.8
+    * joni: 2.0.0 to 2.1.9
+    * jruby-core: 1.7.4 to 1.7.24 (shaded into mule-module-scripting-jruby)
+    * jruby-stdlib: 1.7.4 to 1.7.24
+    * jzlib: 1.1.2 to 1.1.3
+    * nailgun-server: 0.9.1 (new)
+    * yecht: 1.1 (new)
 
 Migration changes from 3.6.x to 3.7.x
 
