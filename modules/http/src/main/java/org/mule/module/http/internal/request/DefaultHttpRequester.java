@@ -187,14 +187,14 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
         }
 
         HttpClient httpClient = requestConfig.getHttpClient();
+        HttpRequest httpRequest;
         HttpResponse response;
 
         try
         {
-            HttpRequest httpRequest = builder.build();
+            httpRequest = builder.build();
             notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
             response = httpClient.send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), authentication);
-            notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
         }
         catch (Exception e)
         {
@@ -202,6 +202,7 @@ public class DefaultHttpRequester implements MessageProcessor, Initialisable, Mu
         }
 
         httpResponseToMuleEvent.convert(muleEvent, response);
+        notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
 
         if (checkRetry && authentication != null && authentication.shouldRetry(muleEvent))
         {

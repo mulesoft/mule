@@ -7,11 +7,15 @@
 package org.mule.module.http.functional.requester;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.api.context.notification.ServerNotification.getActionName;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
+import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.functional.TestConnectorMessageNotificationListener.register;
+import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.module.http.functional.TestConnectorMessageNotificationListener;
@@ -49,6 +53,15 @@ public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCas
         latch.await(1000, TimeUnit.MILLISECONDS);
 
         assertThat(listener.getNotificationActionNames(), contains(getActionName(MESSAGE_REQUEST_BEGIN), getActionName(MESSAGE_REQUEST_END)));
+
+        // End event should have appended http.status and http.reason as inbound properties
+        MuleMessage message = listener.getNotifications(getActionName(MESSAGE_REQUEST_END)).get(0).getSource();
+        assertThat((Integer) message.getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(200));
+        assertThat((String) message.getInboundProperty(HTTP_REASON_PROPERTY), equalTo("OK"));
+
+        MuleMessage requestMessage = listener.getNotifications(getActionName(MESSAGE_REQUEST_BEGIN)).get(0).getSource();
+        assertThat(requestMessage.getUniqueId(), equalTo(message.getUniqueId()));
+        assertThat(requestMessage.getMessageRootId(), equalTo(message.getMessageRootId()));
     }
 
 }

@@ -15,7 +15,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
@@ -89,14 +88,20 @@ public class HttpResponseToMuleEvent
             }
         }
 
+        String requestMessageId = muleEvent.getMessage().getUniqueId();
+        String requestMessageRootId = muleEvent.getMessage().getMessageRootId();
 
-        MuleMessage message = new DefaultMuleMessage(muleEvent.getMessage().getPayload(), inboundProperties,
+        DefaultMuleMessage message = new DefaultMuleMessage(muleEvent.getMessage().getPayload(), inboundProperties,
                                                      null, inboundAttachments, muleContext);
 
         if (encoding != null)
         {
             message.setEncoding(encoding);
         }
+
+        // Setting uniqueId and rootId in order to correlate messages from request to response generated.
+        message.setUniqueId(requestMessageId);
+        message.setMessageRootId(requestMessageRootId);
 
         muleEvent.setMessage(message);
         setResponsePayload(payload, muleEvent);
