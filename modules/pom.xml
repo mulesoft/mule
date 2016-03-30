@@ -45,6 +45,7 @@
         <module>rss</module>
         <module>schedulers</module>
         <module>scripting</module>
+        <module>scripting-jruby</module>
         <module>spring-extras</module>
         <module>spring-config</module>
         <module>spring-security</module>

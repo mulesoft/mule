@@ -75,15 +75,9 @@
 
         <!--Ruby-->
         <dependency>
-            <groupId>org.jruby</groupId>
-            <artifactId>jruby-core</artifactId>
-            <version>1.7.4</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.script</groupId>
-            <artifactId>jruby-engine</artifactId>
-            <version>1.1</version>
-            <classifier>jdk14</classifier>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-scripting-jruby</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Test dependencies -->
