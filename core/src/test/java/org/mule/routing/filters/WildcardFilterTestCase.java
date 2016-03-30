@@ -6,24 +6,26 @@
  */
 package org.mule.routing.filters;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 @SmallTest
 public class WildcardFilterTestCase extends AbstractMuleTestCase
 {
+
+    private WildcardFilter filter = new WildcardFilter();
 
     @Test
     public void testWildcardFilterNoPattern()
     {
         // start with default
-        WildcardFilter filter = new WildcardFilter();
         assertFalse(filter.accept("No tengo dinero"));
 
         // activate a pattern
@@ -50,7 +52,6 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
     @Test
     public void testWildcardFilterPrefix()
     {
-        WildcardFilter filter = new WildcardFilter();
         filter.setPattern("* brown fox");
         assertTrue(filter.accept("The quick brown fox"));
         assertTrue(filter.accept("* brown fox"));
@@ -63,7 +64,6 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
     @Test
     public void testWildcardFilterExactMatch()
     {
-        WildcardFilter filter = new WildcardFilter();
         filter.setPattern("fox");
         assertTrue(filter.accept("fox"));
 
@@ -74,7 +74,6 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
     @Test
     public void testWildcardFilterPrePost()
     {
-        WildcardFilter filter = new WildcardFilter();
         filter.setPattern("* brown *");
         assertTrue(filter.accept("The quick brown fox"));
         assertTrue(filter.accept("* brown fox"));
@@ -101,7 +100,6 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
     @Test
     public void testWildcardFilterMultiplePatterns()
     {
-        WildcardFilter filter = new WildcardFilter();
         filter.setPattern("* brown*, The*");
         assertTrue(filter.accept("The quick brown fox"));
         assertTrue(filter.accept(" brown fox"));
@@ -117,7 +115,6 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
     @Test
     public void testWildcardFilterCasesensitive()
     {
-        WildcardFilter filter = new WildcardFilter();
         filter.setPattern("* brown fox");
         assertFalse(filter.accept("The quick Brown fox"));
         assertTrue(filter.accept("* brown fox"));
@@ -126,10 +123,35 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void testWildcardMidPattern()
+    {
+        filter.setPattern("The quick * fox");
+
+        assertThat(filter.accept("The quick fox"), is(false));
+        assertThat(filter.accept("The quick  black horse"), is(false));
+        assertThat(filter.accept("The brown fox"), is(false));
+        assertThat(filter.accept("The slow fox"), is(false));
+    }
+
+    @Test
+    public void testTwoWildcardsMidPattern()
+    {
+        filter.setPattern("*the quick * fox");
+        assertThat(filter.accept("this is the quick horse"), is(false));
+        assertThat(filter.accept("the quick * fox"), is(false));
+
+        filter.setPattern("the * brown fox*");
+        assertThat(filter.accept("my brown fox"), is(false));
+        assertThat(filter.accept("the brown fox here"), is(false));
+
+        filter.setPattern("the * brown * run");
+        assertThat(filter.accept("the quick brown fox run"), is(false));
+        assertThat(filter.accept("the brown goat"), is(false));
+    }
+
+    @Test
     public void testClassAndSubclass()
     {
-        WildcardFilter filter = new WildcardFilter();
-
         filter.setPattern("java.lang.Throwable+");
         assertTrue(filter.accept(new Exception()));
         assertTrue(filter.accept(new Throwable()));
@@ -144,8 +166,6 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
     @Test
     public void testClassAndSubclassUsingString()
     {
-        WildcardFilter filter = new WildcardFilter();
-
         filter.setPattern("java.lang.Throwable+");
         assertTrue(filter.accept(new Exception().getClass().getName()));
         assertTrue(filter.accept(new Throwable().getClass().getName()));
