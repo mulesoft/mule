@@ -34,6 +34,22 @@ MULE-9160: Log4J was upgraded from 2.1 to 2.5.
 MULE-9501: The wildcard-filter will only work with prefix (*.log), suffix (java.util.*) or enclosing strings (*util*) patterns, as well as the deprecated payload based filter (java.lang.Throwable+) and regular strings.
     In any other case no match will be possible, regardless of the input. The regex-filter should be used for other cases.
     This also affects the wildcard patterns allowed by the file-wildcard-filter, request-wildcard-filter, expression-filter, message-property-filter, exceptions strategies commit-transaction and rollback transaction exception patterns, wildcard patterns used in expressions, among others (complete list can be found in https://www.mulesoft.org/jira/browse/MULE-9501).
+MULE-9522: jruby was upgraded to version 1.7.24. Also, the following dependencies were updated:
+    * bytelist: from version 1.0.10 to 1.0.11
+    * jcodings: 1.0.10 to 1.0.16
+    * jffi: 1.2.9 to 1.2.10 (-native too)
+    * jline: removed
+    * jnr-constants: 0.8.4 to 0.9.0
+    * jnr-enxio: 0.4 to 0.9
+    * jnr-ffi: 1.0.4 to 2.0.5 (shaded into mule-module-scripting-jruby)
+    * jnr-posix: 2.5.2 to 3.0.27
+    * jnr-unixsocket: 0.3 to 0.8
+    * joni: 2.0.0 to 2.1.9
+    * jruby-core: 1.7.4 to 1.7.24 (shaded into mule-module-scripting-jruby)
+    * jruby-stdlib: 1.7.4 to 1.7.24
+    * jzlib: 1.1.2 to 1.1.3
+    * nailgun-server: 0.9.1 (new)
+    * yecht: 1.1 (new)
 
 Migration changes from 3.6.x to 3.7.x
 
