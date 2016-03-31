@@ -36,6 +36,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.SimpleEndpointCache;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.routing.MuleMessageInfoMapping;
 
 import java.util.Map;
 
@@ -234,6 +235,8 @@ public class DefaultLocalMuleClient implements LocalMuleClient
      */
     static public class MuleClientFlowConstruct implements FlowConstruct
     {
+        static MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
+
         MuleContext muleContext;
 
         public MuleClientFlowConstruct(MuleContext muleContext)
@@ -268,7 +271,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
         public MessageInfoMapping getMessageInfoMapping()
         {
-            return null;
+            return messageInfoMapping;
         }
 
         public MessageProcessorChain getMessageProcessorChain()

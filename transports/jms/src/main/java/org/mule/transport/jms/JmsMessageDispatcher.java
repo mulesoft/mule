@@ -6,6 +6,7 @@
  */
 package org.mule.transport.jms;
 
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -142,6 +143,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
             replyTo = getReplyToDestination(msg, session, event, useReplyToDestination, topic);
 
+            msg.setStringProperty(MULE_CORRELATION_ID_PROPERTY, resolveMuleCorrelationId(event));
+            msg.setJMSCorrelationID(resolveJmsCorrelationId(event));
+
             // Set the replyTo property
             if (replyTo != null)
             {
@@ -276,6 +280,35 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    /**
+     * Resolve the value of correlationID that should be used for the JMS Message.  This is done here and not as part of
+     * transformation because of the need for visibility of MuleEvent and OutboundEndpoint.
+     *
+     * @param event the current MuleEvent
+     */
+    protected String resolveJmsCorrelationId(MuleEvent event) throws JMSException
+    {
+        return resolveMuleCorrelationId(event);
+    }
+
+    /**
+     * Resolve the value of Mule correlationID that should be send as a JMS header.  This is done here and not as part of
+     * transformation because of the need for visibility of MuleEvent and OutboundEndpoint.
+     *
+     * @param event the current MuleEvent
+     */
+    private String resolveMuleCorrelationId(MuleEvent event) throws JMSException
+    {
+        if (event.getFlowConstruct() != null && event.getFlowConstruct().getMessageInfoMapping() != null)
+        {
+            return event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(event.getMessage());
+        }
+        else
+        {
+            return defaultMessageInfoMapping.getCorrelationId(event.getMessage());
+        }
+    }
+
     protected MuleMessage createMessageWithJmsMessagePayload(Message jmsMessage) throws Exception
     {
         MuleMessage muleMessage = createMuleMessage(jmsMessage);
@@ -352,13 +385,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         //If we're not using
         if (!(replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic))
         {
-            String jmsCorrelationId = currentMessage.getJMSCorrelationID();
-            if (jmsCorrelationId == null)
-            {
-                jmsCorrelationId = currentMessage.getJMSMessageID();
-            }
-
-            selector = "JMSCorrelationID='" + jmsCorrelationId + "'";
+            selector = "JMSCorrelationID='" + currentMessage.getJMSCorrelationID() + "'";
             if (logger.isDebugEnabled())
             {
                 logger.debug("ReplyTo Selector is: " + selector);

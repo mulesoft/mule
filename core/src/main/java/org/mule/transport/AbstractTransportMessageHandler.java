@@ -18,6 +18,7 @@ import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.transport.Connectable;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MuleMessageFactory;
@@ -25,6 +26,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
+import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.ClassUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -47,7 +49,8 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     protected ConnectableLifecycleManager<O> lifecycleManager;
     // TODO This state info. needs to be incorporated into the ConnectableLifecycleManager
     protected final AtomicBoolean connected = new AtomicBoolean(false);
-    
+    protected final MessageInfoMapping defaultMessageInfoMapping = new MuleMessageInfoMapping();
+
     public AbstractTransportMessageHandler(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;

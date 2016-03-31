@@ -1,27 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way" connector-ref="jmsConnector" />
     <endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way" connector-ref="jmsConnector"/>
 
-    <flow name="sendToQueueIn">
-        <vm:inbound-endpoint path="in" exchange-pattern="one-way" />
+    <flow name="withMuleCorrelationId">
+        <set-property propertyName="#[org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY]" value="custom-cid"/>
         <outbound-endpoint ref="in" />
     </flow>
 
-    <flow name="passFromQueueInToQueueOut">
-        <inbound-endpoint ref="in" />
-        <outbound-endpoint ref="out" />
+    <flow name="withCustomCorrelationId">
+        <outbound-endpoint ref="in" />
+        <expression-message-info-mapping messageIdExpression="#[message.id]" correlationIdExpression="#['custom-cid']"/>
     </flow>
 
-    <flow name="consumeFromQueueOut">
+    <flow name="withNoCorrelationId">
+        <expression-component>_muleMessage.uniqueId='custom-cid'</expression-component>
+        <outbound-endpoint ref="in" />
+    </flow>
+
+    <flow name="withCorrelationIdBridge">
+        <inbound-endpoint ref="in" />
+        <test:assert expression="#[message.correlationId == 'custom-cid']"/>
+        <test:assert expression="#[message.inboundProperties['JMScorrelationId'] == 'custom-cid']"/>
+        <!-- MULE Correlatin ID can be overwritten and will be propagated forward -->
+        <set-property propertyName="#[org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY]" value="custom-cid-2"/>
+        <outbound-endpoint ref="out" exchange-pattern="request-response"/>
+        <test:assert expression="#[message.correlationId == 'custom-cid-2']"/>
+        <test:assert expression="#[message.inboundProperties['JMScorrelationId'] == 'custom-cid-2']"/>
+    </flow>
+
+    <flow name="withCorrelationIdOut">
         <inbound-endpoint ref="out" />
-        <vm:outbound-endpoint path="out" exchange-pattern="one-way" />
+        <test:assert expression="#[message.correlationId == 'custom-cid-2']"/>
+        <test:assert expression="#[message.inboundProperties['JMScorrelationId'] == 'custom-cid-2']"/>
+        <!-- Overwritten MULE Correlatin ID is not used in ReplyTo message -->
+        <set-property propertyName="#[org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY]" value="custom-cid-3"/>
     </flow>
 
 </mule>

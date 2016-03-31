@@ -6,7 +6,6 @@
  */
 package org.mule.transport.jms.transformers;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transaction.Transaction;
@@ -160,12 +159,6 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
             {
                 setJmsPropertySanitizeKeyIfNecessary(msg, key, value);
             }
-        }
-
-        // MULE-6577: Copy Mule message correlation id to JMS message correlation id.
-        if (message.getCorrelationId() != null)
-        {
-            msg.setJMSCorrelationID(message.getCorrelationId());
         }
     }
 
