@@ -171,7 +171,7 @@
 /mule-standalone-${productVersion}/lib/opt/asm-tree-3.1.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjrt-1.8.5.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjweaver-1.8.5.jar
-/mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.32.jar
+/mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.37.jar
 /mule-standalone-${productVersion}/lib/opt/bcpg-jdk15on-1.50.jar
 /mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15on-1.50.jar
 /mule-standalone-${productVersion}/lib/opt/bcprov-jdk15on-1.50.jar
