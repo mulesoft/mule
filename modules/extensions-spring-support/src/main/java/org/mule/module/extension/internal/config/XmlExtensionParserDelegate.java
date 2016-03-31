@@ -605,16 +605,16 @@ final class XmlExtensionParserDelegate
         // check if the pojo is defined inline as a child element
         ElementDescriptor childElement = element.getChildByName(childElementName);
 
-        if (childElement != null)
-        {
-            return getPojoValueResolver(pojoType, childElement);
-        }
-
         // check if this was supplied as an infrastructure parameter
         Object infrastructure = getInfrastructureParameter(getType(pojoType));
         if (infrastructure != null)
         {
             return new StaticValueResolver<>(infrastructure);
+        }
+
+        if (childElement != null)
+        {
+            return getPojoValueResolver(pojoType, childElement);
         }
 
         // last chance, check if this is a top level element

@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.runtime.connector.petstore;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.connection.ConnectionExceptionCode;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionValidationResult;
@@ -42,10 +43,14 @@ public abstract class PetStoreConnectionProvider implements ConnectionProvider<P
     @Optional
     private TlsContextFactory tls;
 
+    @Parameter
+    @Optional
+    private ThreadingProfile threadingProfile;
+
     @Override
     public PetStoreClient connect(PetStoreConnector config)
     {
-        return new PetStoreClient(username, password, tls);
+        return new PetStoreClient(username, password, tls, threadingProfile);
     }
 
     @Override

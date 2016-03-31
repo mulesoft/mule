@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime.connector.petstore;
 
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.Operations;
@@ -30,6 +31,10 @@ public class PetStoreConnector
     @Optional
     private TlsContextFactory tls;
 
+    @Parameter
+    @Optional
+    private ThreadingProfile threadingProfile;
+
     public List<String> getPets()
     {
         return pets;
@@ -38,5 +43,10 @@ public class PetStoreConnector
     public TlsContextFactory getTlsContext()
     {
         return tls;
+    }
+
+    public ThreadingProfile getThreadingProfile()
+    {
+        return threadingProfile;
     }
 }

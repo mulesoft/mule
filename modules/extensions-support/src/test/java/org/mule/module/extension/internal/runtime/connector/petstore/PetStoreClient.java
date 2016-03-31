@@ -9,6 +9,7 @@ package org.mule.module.extension.internal.runtime.connector.petstore;
 import static org.mule.util.Preconditions.checkArgument;
 import static org.mule.util.Preconditions.checkState;
 
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.tls.TlsContextFactory;
 
 import java.util.List;
@@ -19,13 +20,16 @@ public class PetStoreClient
     private String username;
     private String password;
     private TlsContextFactory tlsContext;
-    private int disconnectCount;
 
-    public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory)
+    private ThreadingProfile threadingProfile;
+
+    private int disconnectCount;
+    public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, ThreadingProfile threadingProfile)
     {
         this.username = username;
         this.password = password;
         this.tlsContext = tlsContextFactory;
+        this.threadingProfile = threadingProfile;
     }
 
     public List<String> getPets(String ownerName, PetStoreConnector config)
@@ -63,5 +67,10 @@ public class PetStoreClient
     public TlsContextFactory getTlsContext()
     {
         return tlsContext;
+    }
+
+    public ThreadingProfile getThreadingProfile()
+    {
+        return threadingProfile;
     }
 }

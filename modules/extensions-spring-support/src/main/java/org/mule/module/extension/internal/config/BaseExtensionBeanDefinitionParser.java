@@ -56,7 +56,8 @@ abstract class BaseExtensionBeanDefinitionParser implements BeanDefinitionParser
         this.type = type;
         infrastructureParsers = ImmutableList.of(new PoolingProfileInfrastructureParser(),
                                                  new RetryPolicyInfrastructureParser(),
-                                                 new TlsContextInfrastructureParser());
+                                                 new TlsContextInfrastructureParser(),
+                                                 new ThreadingProfileInfrastructureParser());
     }
 
     /**
