@@ -16,6 +16,7 @@ import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
+import static org.mule.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_VALUE;
@@ -26,6 +27,7 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_SCHEMA_LOCATION;
@@ -44,6 +46,7 @@ import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeN
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.NestedProcessor;
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Extensible;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
@@ -805,6 +808,12 @@ public final class SchemaBuilder
                     return;
                 }
 
+                if (ThreadingProfile.class.isAssignableFrom(clazz))
+                {
+                    addAttributeAndElement(extensionType, all, THREADING_PROFILE_ATTRIBUTE_NAME, MULE_ABSTRACT_THREADING_PROFILE);
+                    return;
+                }
+
                 defaultVisit(objectType);
 
                 if (ExpressionSupport.REQUIRED != parameterModel.getExpressionSupport())
@@ -889,17 +898,24 @@ public final class SchemaBuilder
             importTlsNamespace();
             requiresTls = true;
         }
-        extensionType.getAttributeOrAttributeGroup().add(createAttribute(TLS_ATTRIBUTE_NAME,
+
+        addAttributeAndElement(extensionType, all, TLS_ATTRIBUTE_NAME, TLS_CONTEXT_TYPE);
+    }
+
+    private void addAttributeAndElement(ExtensionType extensionType, ExplicitGroup all, String attributeName, QName elementRef)
+    {
+
+        extensionType.getAttributeOrAttributeGroup().add(createAttribute(attributeName,
                                                                          load(String.class),
                                                                          false,
                                                                          ExpressionSupport.NOT_SUPPORTED));
 
-        TopLevelElement tlsElement = new TopLevelElement();
-        tlsElement.setRef(TLS_CONTEXT_TYPE);
-        tlsElement.setMinOccurs(ZERO);
-        tlsElement.setMaxOccurs("1");
+        TopLevelElement element = new TopLevelElement();
+        element.setRef(elementRef);
+        element.setMinOccurs(ZERO);
+        element.setMaxOccurs("1");
 
-        all.getParticle().add(objectFactory.createElement(tlsElement));
+        all.getParticle().add(objectFactory.createElement(element));
     }
 
     private boolean shouldGeneratePojoChildElements(Class<?> type)

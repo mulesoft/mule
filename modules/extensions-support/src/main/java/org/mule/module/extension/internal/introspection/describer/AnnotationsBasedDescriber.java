@@ -8,6 +8,8 @@ package org.mule.module.extension.internal.introspection.describer;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
+import static org.mule.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
@@ -21,7 +23,9 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getPara
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
 import static org.mule.util.Preconditions.checkArgument;
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Configuration;
 import org.mule.extension.api.annotation.Configurations;
@@ -132,7 +136,9 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void initialiseFieldDescribers()
     {
-        fieldDescribers = ImmutableList.of(new TlsContextFieldDescriber(), new DefaultFieldDescriber(typeLoader));
+        fieldDescribers = ImmutableList.of(new InfrastructureFieldDescriber(TlsContextFactory.class, TLS_ATTRIBUTE_NAME),
+                                           new InfrastructureFieldDescriber(ThreadingProfile.class, THREADING_PROFILE_ATTRIBUTE_NAME),
+                                           new DefaultFieldDescriber(typeLoader));
     }
 
     /**

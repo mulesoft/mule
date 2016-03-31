@@ -56,4 +56,5 @@ public class ExtensionProperties
     public static final String TARGET_ATTRIBUTE = "target";
 
     public static final String TLS_ATTRIBUTE_NAME = "tlsContext";
+    public static final String THREADING_PROFILE_ATTRIBUTE_NAME = "threadingProfile";
 }

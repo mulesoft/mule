@@ -34,6 +34,8 @@ public final class SchemaConstants
     public static final QName MULE_PROPERTY_PLACEHOLDER_TYPE = new QName(MULE_NAMESPACE, "propertyPlaceholderType", MULE_PREFIX);
     public static final QName MULE_ABSTRACT_POOLING_PROFILE_TYPE = new QName(MULE_NAMESPACE, "abstractPoolingProfileType", MULE_PREFIX);
     public static final QName MULE_POOLING_PROFILE_TYPE = new QName(MULE_NAMESPACE, "pooling-profile", MULE_PREFIX);
+    public static final QName MULE_ABSTRACT_THREADING_PROFILE_TYPE = new QName(MULE_NAMESPACE, "abstractServiceThreadingProfileType", MULE_PREFIX);
+    public static final QName MULE_ABSTRACT_THREADING_PROFILE = new QName(MULE_NAMESPACE, "abstract-service-threading-profile", MULE_PREFIX);
     public static final QName MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT = new QName(MULE_EXTENSION_NAMESPACE, "abstractConnectionProvider", MULE_EXTENSION_PREFIX);
     public static final QName MULE_EXTENSION_CONNECTION_PROVIDER_TYPE = new QName(MULE_EXTENSION_NAMESPACE, "abstractConnectionProviderType", MULE_EXTENSION_PREFIX);
     public static final QName MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT = new QName(MULE_EXTENSION_NAMESPACE, "dynamic-config-policy", MULE_EXTENSION_PREFIX);
