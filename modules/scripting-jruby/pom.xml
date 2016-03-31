@@ -12,6 +12,7 @@
     <description>Adds JRuby as a scripting language for Mule Scripting Module</description>
 
     <properties>
+        <licensePath>../../LICENSE_HEADER.txt</licensePath>
         <jffi.version>1.2.10</jffi.version>
     </properties>
 
