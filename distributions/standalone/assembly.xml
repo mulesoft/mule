@@ -164,6 +164,7 @@
                 <include>org.mule.modules:mule-module-pgp</include>
                 <include>org.mule.modules:mule-module-rss</include>
                 <include>org.mule.modules:mule-module-scripting</include>
+                <include>org.mule.modules:mule-module-scripting-jruby</include>
                 <include>org.mule.modules:mule-module-schedulers</include>
                 <include>org.mule.modules:mule-module-spring-config</include>
                 <include>org.mule.modules:mule-module-spring-extras</include>
@@ -247,6 +248,7 @@
                 <exclude>org.mule.modules:mule-module-reboot</exclude>
                 <exclude>org.mule.modules:mule-module-rss</exclude>
                 <exclude>org.mule.modules:mule-module-scripting</exclude>
+                <exclude>org.mule.modules:mule-module-scripting-jruby</exclude>
                 <exclude>org.mule.modules:mule-module-schedulers</exclude>
                 <exclude>org.mule.modules:mule-module-spring-config</exclude>
                 <exclude>org.mule.modules:mule-module-spring-extras</exclude>
