@@ -202,6 +202,11 @@
             <version>1.2</version>
         </dependency>
         <dependency>
+            <groupId>com.headius</groupId>
+            <artifactId>options</artifactId>
+            <version>1.3</version>
+        </dependency>
+        <dependency>
             <groupId>com.martiansoftware</groupId>
             <artifactId>nailgun-server</artifactId>
             <version>0.9.1</version>
