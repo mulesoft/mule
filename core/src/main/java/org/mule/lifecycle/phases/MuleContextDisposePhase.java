@@ -96,7 +96,17 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase
             return;
         }
         //retain default Lifecycle behaviour
-        super.applyLifecycle(o);
+        try
+        {
+            super.applyLifecycle(o);
+        }
+        catch (Exception e)
+        {
+            if (logger.isWarnEnabled())
+            {
+                logger.warn("Failed to dispose object " + o, e);
+            }
+        }
 
         List<AnnotationMetaData> annos = AnnotationUtils.getMethodAnnotations(o.getClass(), PreDestroy.class);
         if (annos.size() == 0)
