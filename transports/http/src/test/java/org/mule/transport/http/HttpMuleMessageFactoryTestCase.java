@@ -6,11 +6,9 @@
  */
 package org.mule.transport.http;
 
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -33,7 +31,6 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.StatusLine;
 import org.apache.commons.httpclient.URI;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 
 public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
@@ -249,16 +246,17 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
 
         Map<String, Object> parsedHeaders = messageFactory.convertHeadersToMap(headers, "http://localhost/");
 
-        assertThat(parsedHeaders.keySet(), Matchers.hasSize(2));
-        assertThat(parsedHeaders.keySet(), Matchers.containsInAnyOrder(HttpConstants.HEADER_COOKIE_SET, HttpConnector.HTTP_COOKIES_PROPERTY));
+        assertTrue(parsedHeaders.keySet().size() == 2);
+        String[] expectedHeaders = new String[]{HttpConstants.HEADER_COOKIE_SET, HttpConnector.HTTP_COOKIES_PROPERTY};
+        assertTrue(parsedHeaders.keySet().containsAll(Arrays.asList(expectedHeaders)));
 
         Cookie[] setCookies = (Cookie[]) parsedHeaders.get(HttpConstants.HEADER_COOKIE_SET);
-        assertThat(setCookies[0].toString(), is(COOKIES[0]));
-        assertThat(setCookies[1].toString(), is(COOKIES[1]));
+        assertTrue(COOKIES[0].equals(setCookies[0].toString()));
+        assertTrue(COOKIES[1].equals(setCookies[1].toString()));
 
         Cookie[] cookies = (Cookie[]) parsedHeaders.get(HttpConnector.HTTP_COOKIES_PROPERTY);
-        assertThat(cookies[0].toString(), is(COOKIES[2]));
-        assertThat(cookies[1].toString(), is(COOKIES[3]));
+        assertTrue(COOKIES[2].equals(cookies[0].toString()));
+        assertTrue(COOKIES[3].equals(cookies[1].toString()));
     }
 
     @Test
