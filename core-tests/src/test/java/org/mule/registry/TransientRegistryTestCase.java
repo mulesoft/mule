@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
@@ -258,6 +259,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase
             return tracker;
         }
 
+        @Override
         public void setMuleContext(MuleContext context)
         {
             tracker.add("setMuleContext");
