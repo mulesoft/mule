@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
  */
 public class MuleMessageInfoMapping implements MessageInfoMapping
 {
+
     public String getCorrelationId(MuleMessage message)
     {
         String id= message.getCorrelationId();
