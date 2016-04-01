@@ -74,12 +74,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>javax.script</groupId>
-            <artifactId>jruby-engine</artifactId>
-            <version>1.1</version>
-            <classifier>jdk14</classifier>
-        </dependency>
-        <dependency>
             <groupId>org.jruby</groupId>
             <artifactId>jruby-stdlib</artifactId>
             <version>1.7.24</version>
