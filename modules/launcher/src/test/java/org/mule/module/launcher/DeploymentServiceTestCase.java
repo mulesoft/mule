@@ -110,41 +110,41 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private static final String EMPTY_DOMAIN_CONFIG_XML = "/empty-domain-config.xml";
 
     // Application plugin file builders
-    private final static ApplicationPluginFileBuilder echoPlugin = new ApplicationPluginFileBuilder("echoPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/echo-test.jar");
-    private final static ApplicationPluginFileBuilder echoPluginWithLib1 = new ApplicationPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/bar-1.0.jar").containingClass("org/foo/Plugin1Echo.clazz");
-    private final static ApplicationPluginFileBuilder echoPluginWithoutLib1 = new ApplicationPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").containingClass("org/foo/Plugin1Echo.clazz");
-    private final static ApplicationPluginFileBuilder echoPluginWithLib2 = new ApplicationPluginFileBuilder("echoPlugin2").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/Plugin2Echo.clazz");
-    private final static ApplicationPluginFileBuilder pluginWithResource = new ApplicationPluginFileBuilder("resourcePlugin").configuredWith(EXPORTED_RESOURCE_PACKAGES_PROPERTY, "/").containingResource("pluginResourceSource.properties", "pluginResource.properties");
+    private final ApplicationPluginFileBuilder echoPlugin = new ApplicationPluginFileBuilder("echoPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/echo-test.jar");
+    private final ApplicationPluginFileBuilder echoPluginWithLib1 = new ApplicationPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/bar-1.0.jar").containingClass("org/foo/Plugin1Echo.clazz");
+    private final ApplicationPluginFileBuilder echoPluginWithoutLib1 = new ApplicationPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").containingClass("org/foo/Plugin1Echo.clazz");
+    private final ApplicationPluginFileBuilder echoPluginWithLib2 = new ApplicationPluginFileBuilder("echoPlugin2").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/Plugin2Echo.clazz");
+    private final ApplicationPluginFileBuilder pluginWithResource = new ApplicationPluginFileBuilder("resourcePlugin").configuredWith(EXPORTED_RESOURCE_PACKAGES_PROPERTY, "/").containingResource("pluginResourceSource.properties", "pluginResource.properties");
 
     // Application file builders
-    private final static ApplicationFileBuilder emptyAppFileBuilder = new ApplicationFileBuilder("empty-app").definedBy("empty-config.xml");
-    private final static ApplicationFileBuilder springPropertyAppFileBuilder = new ApplicationFileBuilder("property-app").definedBy("app-properties-config.xml");
-    private final static ApplicationFileBuilder dummyAppDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app").definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue").containingClass("org/mule/module/launcher/EchoTest.clazz");
-    private final static ApplicationFileBuilder waitAppFileBuilder = new ApplicationFileBuilder("wait-app").definedBy("wait-app-config.xml");
-    private final static ApplicationFileBuilder brokenAppFileBuilder = new ApplicationFileBuilder("broken-app").corrupted();
-    private final static ApplicationFileBuilder incompleteAppFileBuilder = new ApplicationFileBuilder("incomplete-app").definedBy("incomplete-app-config.xml");
-    private final static ApplicationFileBuilder echoPluginAppFileBuilder = new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml").containingPlugin(echoPlugin);
-    private final static ApplicationFileBuilder differentLibPluginAppFileBuilder = new ApplicationFileBuilder("appWithLibDifferentThanPlugin").definedBy("app-plugin-different-lib-config.xml").containingPlugin(echoPluginWithLib1).usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/Plugin2Echo.clazz");
-    private final static ApplicationFileBuilder multiLibPluginAppFileBuilder = new ApplicationFileBuilder("multiPluginLibVersion").definedBy("multi-plugin-app-config.xml").containingPlugin(echoPluginWithLib1).containingPlugin(echoPluginWithLib2);
-    private final static ApplicationFileBuilder resourcePluginAppFileBuilder = new ApplicationFileBuilder("dummyWithPluginResource").definedBy("plugin-resource-app-config.xml").containingPlugin(pluginWithResource);
-    private final static ApplicationFileBuilder sharedLibPluginAppFileBuilder = new ApplicationFileBuilder("shared-plugin-lib-app").definedBy("app-with-echo1-plugin-config.xml").containingPlugin(echoPluginWithoutLib1).sharingLibrary("lib/bar-1.0.jar");
-    private static final ApplicationFileBuilder brokenAppWithFunkyNameAppFileBuilder = new ApplicationFileBuilder("broken-app+", brokenAppFileBuilder);
-    private static final ApplicationFileBuilder dummyDomainApp1FileBuilder = new ApplicationFileBuilder("dummy-domain-app1").definedBy("empty-config.xml").deployedWith("domain", "dummy-domain");
-    private static final ApplicationFileBuilder dummyDomainApp2FileBuilder = new ApplicationFileBuilder("dummy-domain-app2").definedBy("empty-config.xml").deployedWith("domain", "dummy-domain");
-    private static final ApplicationFileBuilder dummyDomainApp3FileBuilder = new ApplicationFileBuilder("dummy-domain-app3").definedBy("bad-app-config.xml").deployedWith("domain", "dummy-domain");
-    private static final ApplicationFileBuilder httpAAppFileBuilder = new ApplicationFileBuilder("shared-http-app-a").definedBy("shared-http-a-app-config.xml").deployedWith("domain", "shared-http-domain");
-    private static final ApplicationFileBuilder httpBAppFileBuilder = new ApplicationFileBuilder("shared-http-app-b").definedBy("shared-http-b-app-config.xml").deployedWith("domain", "shared-http-domain");
+    private final ApplicationFileBuilder emptyAppFileBuilder = new ApplicationFileBuilder("empty-app").definedBy("empty-config.xml");
+    private final ApplicationFileBuilder springPropertyAppFileBuilder = new ApplicationFileBuilder("property-app").definedBy("app-properties-config.xml");
+    private final ApplicationFileBuilder dummyAppDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app").definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue").containingClass("org/mule/module/launcher/EchoTest.clazz");
+    private final ApplicationFileBuilder waitAppFileBuilder = new ApplicationFileBuilder("wait-app").definedBy("wait-app-config.xml");
+    private final ApplicationFileBuilder brokenAppFileBuilder = new ApplicationFileBuilder("broken-app").corrupted();
+    private final ApplicationFileBuilder incompleteAppFileBuilder = new ApplicationFileBuilder("incomplete-app").definedBy("incomplete-app-config.xml");
+    private final ApplicationFileBuilder echoPluginAppFileBuilder = new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml").containingPlugin(echoPlugin);
+    private final ApplicationFileBuilder differentLibPluginAppFileBuilder = new ApplicationFileBuilder("appWithLibDifferentThanPlugin").definedBy("app-plugin-different-lib-config.xml").containingPlugin(echoPluginWithLib1).usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/Plugin2Echo.clazz");
+    private final ApplicationFileBuilder multiLibPluginAppFileBuilder = new ApplicationFileBuilder("multiPluginLibVersion").definedBy("multi-plugin-app-config.xml").containingPlugin(echoPluginWithLib1).containingPlugin(echoPluginWithLib2);
+    private final ApplicationFileBuilder resourcePluginAppFileBuilder = new ApplicationFileBuilder("dummyWithPluginResource").definedBy("plugin-resource-app-config.xml").containingPlugin(pluginWithResource);
+    private final ApplicationFileBuilder sharedLibPluginAppFileBuilder = new ApplicationFileBuilder("shared-plugin-lib-app").definedBy("app-with-echo1-plugin-config.xml").containingPlugin(echoPluginWithoutLib1).sharingLibrary("lib/bar-1.0.jar");
+    private final ApplicationFileBuilder brokenAppWithFunkyNameAppFileBuilder = new ApplicationFileBuilder("broken-app+", brokenAppFileBuilder);
+    private final ApplicationFileBuilder dummyDomainApp1FileBuilder = new ApplicationFileBuilder("dummy-domain-app1").definedBy("empty-config.xml").deployedWith("domain", "dummy-domain");
+    private final ApplicationFileBuilder dummyDomainApp2FileBuilder = new ApplicationFileBuilder("dummy-domain-app2").definedBy("empty-config.xml").deployedWith("domain", "dummy-domain");
+    private final ApplicationFileBuilder dummyDomainApp3FileBuilder = new ApplicationFileBuilder("dummy-domain-app3").definedBy("bad-app-config.xml").deployedWith("domain", "dummy-domain");
+    private final ApplicationFileBuilder httpAAppFileBuilder = new ApplicationFileBuilder("shared-http-app-a").definedBy("shared-http-a-app-config.xml").deployedWith("domain", "shared-http-domain");
+    private final ApplicationFileBuilder httpBAppFileBuilder = new ApplicationFileBuilder("shared-http-app-b").definedBy("shared-http-b-app-config.xml").deployedWith("domain", "shared-http-domain");
 
     // Domain file builders
-    private static final DomainFileBuilder brokenDomainFileBuilder = new DomainFileBuilder("brokenDomain").corrupted();
-    private static final DomainFileBuilder emptyDomainFileBuilder = new DomainFileBuilder("empty-domain").definedBy("empty-domain-config.xml");
-    private static final DomainFileBuilder waitDomainFileBuilder = new DomainFileBuilder("wait-domain").definedBy("wait-domain-config.xml");
-    private static final DomainFileBuilder incompleteDomainFileBuilder = new DomainFileBuilder("incompleteDomain").definedBy("incomplete-domain-config.xml");
-    private static final DomainFileBuilder invalidDomainBundleFileBuilder = new DomainFileBuilder("invalid-domain-bundle").definedBy("incomplete-domain-config.xml").containing(emptyAppFileBuilder);
-    private static final DomainFileBuilder dummyDomainBundleFileBuilder = new DomainFileBuilder("dummy-domain-bundle").containing(new ApplicationFileBuilder(dummyAppDescriptorFileBuilder).deployedWith("domain", "dummy-domain-bundle"));
-    private static final DomainFileBuilder dummyDomainFileBuilder = new DomainFileBuilder("dummy-domain").definedBy("empty-domain-config.xml");
-    private static final DomainFileBuilder sharedHttpDomainFileBuilder = new DomainFileBuilder("shared-http-domain").definedBy("shared-http-domain-config.xml");
-    private static final DomainFileBuilder sharedHttpBundleDomainFileBuilder = new DomainFileBuilder("shared-http-domain").definedBy("shared-http-domain-config.xml").containing(httpAAppFileBuilder).containing(httpBAppFileBuilder);
+    private final DomainFileBuilder brokenDomainFileBuilder = new DomainFileBuilder("brokenDomain").corrupted();
+    private final DomainFileBuilder emptyDomainFileBuilder = new DomainFileBuilder("empty-domain").definedBy("empty-domain-config.xml");
+    private final DomainFileBuilder waitDomainFileBuilder = new DomainFileBuilder("wait-domain").definedBy("wait-domain-config.xml");
+    private final DomainFileBuilder incompleteDomainFileBuilder = new DomainFileBuilder("incompleteDomain").definedBy("incomplete-domain-config.xml");
+    private final DomainFileBuilder invalidDomainBundleFileBuilder = new DomainFileBuilder("invalid-domain-bundle").definedBy("incomplete-domain-config.xml").containing(emptyAppFileBuilder);
+    private final DomainFileBuilder dummyDomainBundleFileBuilder = new DomainFileBuilder("dummy-domain-bundle").containing(new ApplicationFileBuilder(dummyAppDescriptorFileBuilder).deployedWith("domain", "dummy-domain-bundle"));
+    private final DomainFileBuilder dummyDomainFileBuilder = new DomainFileBuilder("dummy-domain").definedBy("empty-domain-config.xml");
+    private final DomainFileBuilder sharedHttpDomainFileBuilder = new DomainFileBuilder("shared-http-domain").definedBy("shared-http-domain-config.xml");
+    private final DomainFileBuilder sharedHttpBundleDomainFileBuilder = new DomainFileBuilder("shared-http-domain").definedBy("shared-http-domain-config.xml").containing(httpAAppFileBuilder).containing(httpBAppFileBuilder);
 
     protected File muleHome;
     protected File appsDir;
@@ -1593,7 +1593,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
 
         addPackedDomainFromBuilder(emptyAppFileBuilder);
-        File dummyDomainFile = new File(DeploymentServiceTestCase.emptyAppFileBuilder.getZipPath());
+        File dummyDomainFile = new File(emptyAppFileBuilder.getZipPath());
         long firstFileTimestamp = dummyDomainFile.lastModified();
 
         assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
@@ -1618,7 +1618,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
 
         addPackedDomainFromBuilder(emptyAppFileBuilder);
-        File dummyDomainFile = new File(DeploymentServiceTestCase.emptyAppFileBuilder.getZipPath());
+        File dummyDomainFile = new File(emptyAppFileBuilder.getZipPath());
         long firstFileTimestamp = dummyDomainFile.lastModified();
 
         assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());

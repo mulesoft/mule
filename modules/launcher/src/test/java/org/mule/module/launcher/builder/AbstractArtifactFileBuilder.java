@@ -11,22 +11,19 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import org.mule.util.ClassUtils;
+import static org.mule.tck.ZipUtils.compress;
+import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.util.FileUtils;
 import org.mule.util.FilenameUtils;
 import org.mule.util.StringUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Defines a builder to create files for mule artifacts.
@@ -154,7 +151,9 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
             }
             else
             {
-                buildZipFile(tempFile);
+                final List<ZipResource> zipResources = new LinkedList<>(resources);
+                zipResources.addAll(getCustomResources());
+                compress(tempFile, zipResources.toArray(new ZipResource[0]));
             }
 
             artifactFile = new File(tempFile.getAbsolutePath());
@@ -168,35 +167,20 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
         assertThat("Cannot change attributes once the artifact file was built", artifactFile, is(nullValue()));
     }
 
-    private void buildZipFile(File tempFile) throws Exception
+    protected ZipResource createPropertiesFile(Properties props, String propertiesFileName) throws IOException
     {
-        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(tempFile));
+        ZipResource result = null;
 
-        try
-        {
-            for (ZipResource zipResource : resources)
-            {
-                addZipResource(out, zipResource);
-            }
-
-            addCustomFileContent(out);
-        }
-        finally
-        {
-            out.close();
-        }
-    }
-
-    protected void createPropertiesFile(ZipOutputStream out, Properties props, String propertiesFileName) throws IOException
-    {
         if (!props.isEmpty())
         {
             final File applicationPropertiesFile = new File(getTempFolder(), propertiesFileName);
             applicationPropertiesFile.deleteOnExit();
             createPropertiesFile(applicationPropertiesFile, props);
 
-            addZipResource(out, new ZipResource(applicationPropertiesFile.getAbsolutePath(), propertiesFileName));
+            result = new ZipResource(applicationPropertiesFile.getAbsolutePath(), propertiesFileName);
         }
+
+        return result;
     }
 
     protected void createPropertiesFile(File file, Properties props)
@@ -212,39 +196,6 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
         }
     }
 
-    protected void addCustomFileContent(ZipOutputStream out) throws Exception
-    {
-    }
-
-    protected void addZipResource(ZipOutputStream out, ZipResource zipResource) throws IOException
-    {
-        URL resourceUrl = ClassUtils.getResource(zipResource.file, ApplicationFileBuilder.class);
-        if (resourceUrl == null)
-        {
-            resourceUrl = new File(zipResource.file).toURI().toURL();
-        }
-        FileInputStream in = new FileInputStream(resourceUrl.getFile());
-        try
-        {
-            // name the file inside the zip  file
-            out.putNextEntry(new ZipEntry(zipResource.alias == null ? zipResource.file : zipResource.alias));
-
-            // buffer size
-            byte[] b = new byte[1024];
-            int count;
-
-            while ((count = in.read(b)) > 0)
-            {
-                System.out.println();
-                out.write(b, 0, count);
-            }
-        }
-        finally
-        {
-            in.close();
-        }
-    }
-
     protected String getTempFolder()
     {
         return System.getProperty("java.io.tmpdir");
@@ -255,16 +206,5 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
         FileUtils.write(tempFile, "This is content represents invalid compressed data");
     }
 
-    protected static final class ZipResource
-    {
-
-        final String file;
-        final String alias;
-
-        protected ZipResource(String file, String alias)
-        {
-            this.file = file;
-            this.alias = alias;
-        }
-    }
+    protected abstract List<ZipResource> getCustomResources() throws Exception;
 }
