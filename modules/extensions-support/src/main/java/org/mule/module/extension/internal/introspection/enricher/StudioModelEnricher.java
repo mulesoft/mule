@@ -9,11 +9,11 @@ package org.mule.module.extension.internal.introspection.enricher;
 import org.mule.extension.api.annotation.capability.CustomStudioEditor;
 import org.mule.extension.api.annotation.capability.StudioProvidedEditor;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
-import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.property.StudioModelProperty;
 
 /**
- * Enriches the {@link DeclarationDescriptor} with a {@link StudioModelProperty}
+ * Enriches the {@link ExtensionDeclarer} with a {@link StudioModelProperty}
  *
  * @since 4.0
  */
@@ -23,10 +23,10 @@ public final class StudioModelEnricher extends AbstractAnnotatedModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        StudioProvidedEditor studioProvidedEditor = extractAnnotation(describingContext.getDeclarationDescriptor().getDeclaration(), StudioProvidedEditor.class);
-        CustomStudioEditor customStudioEditor = extractAnnotation(describingContext.getDeclarationDescriptor().getDeclaration(), CustomStudioEditor.class);
+        StudioProvidedEditor studioProvidedEditor = extractAnnotation(describingContext.getExtensionDeclarer().getExtensionDeclaration(), StudioProvidedEditor.class);
+        CustomStudioEditor customStudioEditor = extractAnnotation(describingContext.getExtensionDeclarer().getExtensionDeclaration(), CustomStudioEditor.class);
 
-        DeclarationDescriptor descriptor = describingContext.getDeclarationDescriptor();
+        ExtensionDeclarer descriptor = describingContext.getExtensionDeclarer();
         descriptor.withModelProperty(createStudioEditorModelProperty(studioProvidedEditor, customStudioEditor));
     }
 

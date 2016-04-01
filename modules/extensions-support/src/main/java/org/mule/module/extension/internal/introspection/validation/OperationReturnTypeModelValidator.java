@@ -13,6 +13,8 @@ import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 
+import java.util.List;
+
 /**
  * Validates that all {@link OperationModel operations} specify
  * a valid return type.
@@ -26,26 +28,32 @@ public class OperationReturnTypeModelValidator implements ModelValidator
 {
 
     @Override
-    public void validate(ExtensionModel model) throws IllegalModelDefinitionException
+    public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
     {
-        for (OperationModel operationModel : model.getOperationModels())
+        doValidate(extensionModel, extensionModel.getOperationModels());
+        extensionModel.getConfigurationModels().forEach(config -> doValidate(extensionModel, config.getOperationModels()));
+    }
+
+    private void doValidate(ExtensionModel extensionModel, List<OperationModel> operations)
+    {
+        for (OperationModel operationModel : operations)
         {
             if (operationModel.getReturnType() == null)
             {
-                throw missingReturnTypeException(model, operationModel);
+                throw missingReturnTypeException(extensionModel, operationModel);
             }
 
             Class<?> returnType = getType(operationModel.getReturnType());
             if (returnType == null)
             {
-                throw missingReturnTypeException(model, operationModel);
+                throw missingReturnTypeException(extensionModel, operationModel);
             }
 
             if (MuleEvent.class.isAssignableFrom(returnType))
             {
                 throw new IllegalOperationModelDefinitionException(String.format("Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are " +
-                                                                 "not allowed to return objects of that type",
-                                                                 operationModel.getName(), model.getName(), MuleEvent.class.getName()));
+                                                                                 "not allowed to return objects of that type",
+                                                                                 operationModel.getName(), extensionModel.getName(), MuleEvent.class.getName()));
             }
         }
     }

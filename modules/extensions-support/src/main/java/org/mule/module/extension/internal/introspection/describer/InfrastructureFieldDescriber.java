@@ -10,8 +10,8 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.introspection.ExpressionSupport;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterDescriptor;
-import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarer;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
 
 import java.lang.reflect.Field;
@@ -30,7 +30,7 @@ public class InfrastructureFieldDescriber implements FieldDescriber
     private Class<?> clazz;
 
     /**
-     * @param clazz   Class of the desired parameter
+     * @param clazz         Class of the desired parameter
      * @param attributeName Name of the attribute for the generated xsd schema
      */
     public InfrastructureFieldDescriber(Class<?> clazz, String attributeName)
@@ -52,20 +52,20 @@ public class InfrastructureFieldDescriber implements FieldDescriber
     }
 
     /**
-     * Generates a {@link ParameterDescriptor} which represents the desired class
+     * Generates a {@link ParameterDeclarer} which represents the desired class
      * in a canonical way. It will not accept expressions and it will have the provided name
      * regardless of how the field was defined
      *
-     * @param field the {@link Field} being processed
-     * @param with  a {@link WithParameters} object used to create the descriptor
-     * @return a {@link ParameterDescriptor} which represents the desired class
+     * @param field    the {@link Field} being processed
+     * @param declarer a {@link ParameterizedDeclarer} object used to create the descriptor
+     * @return a {@link ParameterDeclarer} which represents a {@link TlsContextFactory}
      */
     @Override
-    public ParameterDescriptor describe(Field field, WithParameters with)
+    public ParameterDeclarer describe(Field field, ParameterizedDeclarer declarer)
     {
-        ParameterDescriptor descriptor = field.getAnnotation(Optional.class) != null
-                                         ? with.optionalParameter(attributeName)
-                                         : with.requiredParameter(attributeName);
+        ParameterDeclarer descriptor = field.getAnnotation(Optional.class) != null
+                                       ? declarer.withOptionalParameter(attributeName)
+                                       : declarer.withRequiredParameter(attributeName);
 
         return descriptor.ofType(clazz)
                 .withExpressionSupport(ExpressionSupport.NOT_SUPPORTED)

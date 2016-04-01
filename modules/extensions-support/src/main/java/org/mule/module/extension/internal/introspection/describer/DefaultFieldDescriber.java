@@ -9,8 +9,8 @@ package org.mule.module.extension.internal.introspection.describer;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterDescriptor;
-import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarer;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
 import org.mule.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -53,32 +53,32 @@ final class DefaultFieldDescriber implements FieldDescriber
      * {@inheritDoc}
      */
     @Override
-    public ParameterDescriptor describe(Field field, WithParameters with)
+    public ParameterDeclarer describe(Field field, ParameterizedDeclarer declarer)
     {
         Optional optional = field.getAnnotation(Optional.class);
 
         String parameterName = MuleExtensionAnnotationParser.getAliasName(field);
-        ParameterDescriptor parameterDescriptor;
+        ParameterDeclarer parameterDeclarer;
         MetadataType dataType = IntrospectionUtils.getFieldMetadataType(field, typeLoader);
         if (optional == null)
         {
-            parameterDescriptor = with.requiredParameter(parameterName);
+            parameterDeclarer = declarer.withRequiredParameter(parameterName);
         }
         else
         {
-            parameterDescriptor = with.optionalParameter(parameterName).defaultingTo(getDefaultValue(optional));
+            parameterDeclarer = declarer.withOptionalParameter(parameterName).defaultingTo(getDefaultValue(optional));
         }
 
-        parameterDescriptor.ofType(dataType);
-        parameterDescriptor.withExpressionSupport(IntrospectionUtils.getExpressionSupport(field));
-        parameterDescriptor.withModelProperty(new DeclaringMemberModelProperty(field));
+        parameterDeclarer.ofType(dataType);
+        parameterDeclarer.withExpressionSupport(IntrospectionUtils.getExpressionSupport(field));
+        parameterDeclarer.withModelProperty(new DeclaringMemberModelProperty(field));
 
         DisplayModelProperty displayModelProperty = parseDisplayAnnotations(field, field.getName());
         if (displayModelProperty != null)
         {
-            parameterDescriptor.withModelProperty(displayModelProperty);
+            parameterDeclarer.withModelProperty(displayModelProperty);
         }
 
-        return parameterDescriptor;
+        return parameterDeclarer;
     }
 }

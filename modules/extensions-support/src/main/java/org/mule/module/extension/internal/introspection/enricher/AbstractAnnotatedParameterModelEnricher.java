@@ -8,8 +8,8 @@ package org.mule.module.extension.internal.introspection.enricher;
 
 import org.mule.extension.api.introspection.ModelProperty;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
-import org.mule.extension.api.introspection.declaration.fluent.Declaration;
-import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterizedDeclaration;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
@@ -30,12 +30,12 @@ public abstract class AbstractAnnotatedParameterModelEnricher extends AbstractAn
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        DeclarationDescriptor descriptor = describingContext.getDeclarationDescriptor();
-        Declaration declaration = descriptor.getRootDeclaration().getDeclaration();
+        ExtensionDeclarer descriptor = describingContext.getExtensionDeclarer();
+        ExtensionDeclaration extensionDeclaration = descriptor.getDeclaration();
 
-        enrichParameters(declaration.getConfigurations());
-        enrichParameters(declaration.getConnectionProviders());
-        enrichParameters(declaration.getOperations());
+        enrichParameters(extensionDeclaration.getConfigurations());
+        enrichParameters(extensionDeclaration.getConnectionProviders());
+        enrichParameters(extensionDeclaration.getOperations());
     }
 
     private void enrichParameters(List<? extends ParameterizedDeclaration> models)

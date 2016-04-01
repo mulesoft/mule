@@ -42,7 +42,7 @@ public final class ConfigNameModelEnricher implements ModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        for (ConfigurationDeclaration config : describingContext.getDeclarationDescriptor().getDeclaration().getConfigurations())
+        for (ConfigurationDeclaration config : describingContext.getExtensionDeclarer().getExtensionDeclaration().getConfigurations())
         {
             ImplementingTypeModelProperty typeProperty = config.getModelProperty(ImplementingTypeModelProperty.class).orElse(null);
             if (typeProperty == null)

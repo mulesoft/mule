@@ -28,11 +28,24 @@ public final class TargetParameterModelValidator implements ModelValidator
 {
 
     @Override
-    public void validate(ExtensionModel model) throws IllegalModelDefinitionException
+    public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
     {
         List<String> offenses = new LinkedList<>();
-        for (OperationModel operation : model.getOperationModels())
+        collectOffenses(offenses, extensionModel.getOperationModels());
+        extensionModel.getConfigurationModels().forEach(config -> collectOffenses(offenses, config.getOperationModels()));
+
+        if (!offenses.isEmpty())
         {
+            throw new IllegalOperationModelDefinitionException(String.format(
+                    "Extension '%s' defines operations which have parameters with name '%s', which is a reserved " +
+                    "word in the context of an operation parameter. Offending operations are [%s]",
+                    extensionModel.getName(), TARGET_ATTRIBUTE, Joiner.on(", ").join(offenses)));
+        }
+    }
+
+    private void collectOffenses(List<String> offenses, List<OperationModel> operations)
+    {
+        operations.forEach(operation -> {
             Optional<ParameterModel> offense = operation.getParameterModels().stream()
                     .filter(parameter -> parameter.getName().equals(TARGET_ATTRIBUTE))
                     .findFirst();
@@ -41,14 +54,6 @@ public final class TargetParameterModelValidator implements ModelValidator
             {
                 offenses.add(operation.getName());
             }
-        }
-
-        if (!offenses.isEmpty())
-        {
-            throw new IllegalOperationModelDefinitionException(String.format(
-                    "Extension '%s' defines operations which have parameters with name '%s', which is a reserved " +
-                    "word in the context of an operation parameter. Offending operations are [%s]",
-                    model.getName(), TARGET_ATTRIBUTE, Joiner.on(", ").join(offenses)));
-        }
+        });
     }
 }

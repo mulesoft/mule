@@ -10,7 +10,6 @@ import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import static org.mule.util.Preconditions.checkArgument;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,7 +20,6 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ServiceRegistry;
-import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionDiscoverer;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
@@ -38,6 +36,7 @@ import org.mule.time.Time;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default implementation of {@link ExtensionManager}. This implementation uses standard Java SPI
+ * Default implementation of {@link ExtensionManagerAdapter}. This implementation uses standard Java SPI
  * as a discovery mechanism.
  * <p/>
  * Although it allows registering {@link ConfigurationProvider} instances through the
@@ -56,7 +55,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public final class DefaultExtensionManager implements ExtensionManager, MuleContextAware, Initialisable, Startable, Stoppable
+public final class DefaultExtensionManager implements ExtensionManagerAdapter, MuleContextAware, Initialisable, Startable, Stoppable
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
@@ -161,9 +160,9 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     @Override
     public <C> ConfigurationInstance<C> getConfiguration(String configurationProviderName, Object muleEvent)
     {
-        checkArgument(!StringUtils.isBlank(configurationProviderName), "cannot get configuration from a blank provider name");
-        ConfigurationProvider<C> configurationProvider = extensionRegistry.getConfigurationProvider(configurationProviderName);
-        return configurationProvider.get(muleEvent);
+        return (ConfigurationInstance<C>) getConfigurationProvider(configurationProviderName)
+                .map(provider -> provider.get(muleEvent))
+                .orElseThrow(() -> new IllegalArgumentException(String.format("There is no registered configurationProvider under name '%s'", configurationProviderName)));
     }
 
     /**
@@ -173,14 +172,30 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     @Override
     public <C> ConfigurationInstance<C> getConfiguration(ExtensionModel extensionModel, Object muleEvent)
     {
+        Optional<ConfigurationProvider<C>> provider = getConfigurationProvider(extensionModel);
+        if (provider.isPresent())
+        {
+            return provider.get().get(muleEvent);
+        }
 
+        if (attemptToCreateImplicitConfiguration(extensionModel, (MuleEvent) muleEvent))
+        {
+            return getConfiguration(extensionModel, muleEvent);
+        }
+
+        throw new IllegalStateException(String.format("No config-ref was specified for operation of extension '%s' and no implicit configuration could be inferred. Please define one.",
+                                                      extensionModel.getName()));
+    }
+
+    public <C> Optional<ConfigurationProvider<C>> getConfigurationProvider(ExtensionModel extensionModel)
+    {
         List<ConfigurationProvider> providers = extensionRegistry.getConfigurationProviders(extensionModel);
 
         int matches = providers.size();
 
         if (matches == 1)
         {
-            return providers.get(0).get(muleEvent);
+            return Optional.of(providers.get(0));
         }
         else if (matches > 1)
         {
@@ -188,16 +203,14 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                                                           extensionModel.getName(),
                                                           matches));
         }
-        else
-        {
-            if (attemptToCreateImplicitConfiguration(extensionModel, (MuleEvent) muleEvent))
-            {
-                return getConfiguration(extensionModel, muleEvent);
-            }
 
-            throw new IllegalStateException(String.format("No config-ref was specified for operation of extension '%s' and no implicit configuration could be inferred. Please define one.",
-                                                          extensionModel.getName()));
-        }
+        return Optional.empty();
+    }
+
+    public <C> Optional<ConfigurationProvider<C>> getConfigurationProvider(String configurationProviderName)
+    {
+        checkArgument(!StringUtils.isBlank(configurationProviderName), "cannot get configuration from a blank provider name");
+        return extensionRegistry.getConfigurationProvider(configurationProviderName);
     }
 
     private boolean attemptToCreateImplicitConfiguration(ExtensionModel extensionModel, MuleEvent muleEvent)

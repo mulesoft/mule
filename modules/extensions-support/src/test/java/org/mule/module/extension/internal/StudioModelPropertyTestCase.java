@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.introspection.property.StudioModelProperty;
 import org.mule.module.extension.HeisenbergExtension;
@@ -50,8 +50,8 @@ public class StudioModelPropertyTestCase extends AbstractMuleTestCase
     @Test
     public void verifyPropertyIsPopulated() throws Exception
     {
-        Descriptor descriptor = new AnnotationsBasedDescriber(HeisenbergExtension.class).describe(new DefaultDescribingContext()).getRootDeclaration();
-        ExtensionModel extensionModel = extensionFactory.createFrom(descriptor);
+        ExtensionDeclarer declarer = new AnnotationsBasedDescriber(HeisenbergExtension.class).describe(new DefaultDescribingContext());
+        ExtensionModel extensionModel = extensionFactory.createFrom(declarer);
         StudioModelProperty studioModelProperty = extensionModel.getModelProperty(StudioModelProperty.class).get();
         assertThat(studioModelProperty.getEditorFileName(), is(""));
         assertThat(studioModelProperty.isDerived(), is(true));

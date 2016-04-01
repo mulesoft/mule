@@ -39,6 +39,8 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Kiwi;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.Optional;
 
 import org.junit.Before;
@@ -78,6 +80,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         when(configurationModel.getConfigurationFactory().newInstance()).thenReturn(new TestConfig());
         when(configurationModel.getModelProperty(any())).thenReturn(Optional.empty());
         when(configurationModel.getInterceptorFactories()).thenReturn(asList(() -> interceptor1, () -> interceptor2));
+        when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
         when(configurationModel.getExtensionModel().getOperationModels()).thenReturn(asList(operationModel));
         when(operationModel.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.of(new ConnectionTypeModelProperty(Banana.class)));
 

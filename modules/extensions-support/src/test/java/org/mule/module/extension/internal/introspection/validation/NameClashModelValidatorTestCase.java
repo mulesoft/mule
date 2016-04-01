@@ -11,15 +11,17 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
+
+import com.google.common.collect.ImmutableList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +44,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase
     private ExtensionModel extensionModel;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
-    private ConfigurationModel configurationModel;
+    private RuntimeConfigurationModel configurationModel;
 
     @Mock
     private OperationModel operationModel;
@@ -76,6 +78,8 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase
 
         when(configurationModel.getName()).thenReturn(CONFIG_NAME);
         when(configurationModel.getParameterModels()).thenReturn(asList(simpleConfigParam, topLevelConfigParam));
+        when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
+        when(configurationModel.getConnectionProviders()).thenReturn(ImmutableList.of());
 
         when(operationModel.getName()).thenReturn(OPERATION_NAME);
         when(operationModel.getParameterModels()).thenReturn(asList(simpleOperationParam, topLevelOperationParam));
@@ -140,8 +144,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalModelDefinitionException.class)
     public void connectionProviderNameClashesWithOperationParameterType()
     {
-        ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, Banana.class);
-        when(connectionProviderModel.getName()).thenReturn(Banana.class.getName());
+        ParameterModel offending = getParameter(connectionProviderModel.getName(), Banana.class);
         when(operationModel.getParameterModels()).thenReturn(asList(topLevelOperationParam, offending));
         validate();
     }

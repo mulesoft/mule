@@ -128,6 +128,10 @@ public final class SchemaBuilder
     private final Map<String, NamedGroup> substitutionGroups = new LinkedHashMap<>();
     private final ObjectFactory objectFactory = new ObjectFactory();
     private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+    private final ConfigurationSchemaDelegate configurationSchemaDelegate = new ConfigurationSchemaDelegate(this);
+    private final ConnectionProviderSchemaDelegate connectionProviderSchemaDelegate = new ConnectionProviderSchemaDelegate(this);
+    private final OperationSchemaDelegate operationSchemaDelegate = new OperationSchemaDelegate(this);
+    private final SourceSchemaDelegate sourceSchemaDelegate = new SourceSchemaDelegate(this);
 
     private Schema schema;
     private boolean requiresTls = false;
@@ -210,13 +214,13 @@ public final class SchemaBuilder
 
     public SchemaBuilder registerConnectionProviderElement(ConnectionProviderModel providerModel)
     {
-        new ConnectionProviderSchemaDelegate(this).registerConnectionProviderElement(schema, providerModel);
+        connectionProviderSchemaDelegate.registerConnectionProviderElement(schema, providerModel);
         return this;
     }
 
     public SchemaBuilder registerConfigElement(final RuntimeConfigurationModel configurationModel)
     {
-        new ConfigurationSchemaDelegate(this).registerConfigElement(schema, configurationModel);
+        configurationSchemaDelegate.registerConfigElement(schema, configurationModel);
         return this;
     }
 
@@ -227,14 +231,14 @@ public final class SchemaBuilder
 
     public SchemaBuilder registerOperation(OperationModel operationModel)
     {
-        new OperationSchemaDelegate(this).registerOperation(schema, operationModel);
+        operationSchemaDelegate.registerOperation(schema, operationModel);
         return this;
     }
 
     public SchemaBuilder registerMessageSource(SourceModel sourceModel)
     {
 
-        new SourceSchemaDelegate(this).registerMessageSource(schema, sourceModel);
+        sourceSchemaDelegate.registerMessageSource(schema, sourceModel);
         return this;
     }
 

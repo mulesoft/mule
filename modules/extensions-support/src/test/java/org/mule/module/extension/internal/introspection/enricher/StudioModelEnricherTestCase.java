@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.api.annotation.capability.CustomStudioEditor;
 import org.mule.extension.api.annotation.capability.StudioProvidedEditor;
-import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.introspection.property.StudioModelProperty;
 import org.mule.module.extension.internal.DefaultDescribingContext;
@@ -30,7 +30,7 @@ public class StudioModelEnricherTestCase extends AbstractMuleTestCase
 
     private static final String EXTENSION_STUDIO_EDITOR_FILE_NAME = "custom.xml";
 
-    private DeclarationDescriptor declarationDescriptor = new DeclarationDescriptor();
+    private ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
     private ModelEnricher modelEnricher = new StudioModelEnricher();
 
     @Test
@@ -59,9 +59,9 @@ public class StudioModelEnricherTestCase extends AbstractMuleTestCase
 
     private StudioModelProperty enrich(Class<?> type)
     {
-        declarationDescriptor.withModelProperty(new ImplementingTypeModelProperty(type));
-        modelEnricher.enrich(new DefaultDescribingContext(declarationDescriptor));
-        return declarationDescriptor.getDeclaration().getModelProperty(StudioModelProperty.class).get();
+        extensionDeclarer.withModelProperty(new ImplementingTypeModelProperty(type));
+        modelEnricher.enrich(new DefaultDescribingContext(extensionDeclarer));
+        return extensionDeclarer.getExtensionDeclaration().getModelProperty(StudioModelProperty.class).get();
     }
 
     private void assertExpectedValuesAre(StudioModelProperty studioProperty, String expectedEditor, boolean expectedDerived)

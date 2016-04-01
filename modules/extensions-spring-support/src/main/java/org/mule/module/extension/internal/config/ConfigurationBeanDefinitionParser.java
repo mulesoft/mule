@@ -15,6 +15,7 @@ import org.mule.api.registry.Registry;
 import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.module.extension.internal.util.MuleExtensionUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -65,7 +66,7 @@ final class ConfigurationBeanDefinitionParser extends BaseExtensionBeanDefinitio
 
     private void parseConfigurationProvider(String configName, Element element, BeanDefinitionBuilder builder, ParserContext parserContext)
     {
-        if (configurationModel.getExtensionModel().getConnectionProviders().isEmpty())
+        if (MuleExtensionUtils.getConnectedOperations(configurationModel).isEmpty())
         {
             builder.addConstructorArgValue(new StaticValueResolver<>(null));
             return;
@@ -99,7 +100,7 @@ final class ConfigurationBeanDefinitionParser extends BaseExtensionBeanDefinitio
             }
         }
 
-        builder.addConstructorArgValue(new ImplicitConnectionProviderValueResolver(configName, configurationModel.getExtensionModel()));
+        builder.addConstructorArgValue(new ImplicitConnectionProviderValueResolver(configName, configurationModel));
     }
 
 

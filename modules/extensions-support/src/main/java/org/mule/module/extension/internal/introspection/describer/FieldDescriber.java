@@ -6,13 +6,13 @@
  */
 package org.mule.module.extension.internal.introspection.describer;
 
-import org.mule.extension.api.introspection.declaration.fluent.ParameterDescriptor;
-import org.mule.extension.api.introspection.declaration.fluent.WithParameters;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarer;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
 
 import java.lang.reflect.Field;
 
 /**
- * A delegate object used to derived a {@link ParameterDescriptor}
+ * A delegate object used to derived a {@link ParameterDeclarer}
  * from a {@link Field}
  *
  * @since 4.0
@@ -30,11 +30,11 @@ interface FieldDescriber
     boolean accepts(Field field);
 
     /**
-     * Transforms the given {@code field} into a {@link ParameterDescriptor}
+     * Transforms the given {@code field} into a {@link ParameterDeclarer}
      *
-     * @param field the {@link Field} being processed
-     * @param with  a {@link WithParameters} object used to create the descriptor
-     * @return a {@link ParameterDescriptor}
+     * @param field    the {@link Field} being processed
+     * @param declarer a {@link ParameterizedDeclarer} object used to create the descriptor
+     * @return a {@link ParameterDeclarer}
      */
-    ParameterDescriptor describe(Field field, WithParameters with);
+    ParameterDeclarer describe(Field field, ParameterizedDeclarer declarer);
 }

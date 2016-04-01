@@ -9,17 +9,20 @@ package org.mule.module.extension.internal.introspection.enricher;
 import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
+import static org.mule.module.extension.internal.util.MuleExtensionUtils.getImplementingMethod;
 import org.mule.extension.api.annotation.DataTypeParameters;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.module.extension.internal.ExtensionProperties;
-import org.mule.module.extension.internal.util.IntrospectionUtils;
-import org.mule.module.extension.internal.util.MuleExtensionUtils;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * Enriches operations which were defined in methods annotated with {@link DataTypeParameters} so that
@@ -37,24 +40,30 @@ public final class DataTypeModelEnricher extends AbstractAnnotatedModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        describingContext.getDeclarationDescriptor().getDeclaration().getOperations().forEach(operation -> {
-            Method method = MuleExtensionUtils.getImplementingMethod(operation);
+        final ExtensionDeclaration declaration = describingContext.getExtensionDeclarer().getExtensionDeclaration();
+        doEnrich(declaration, declaration.getOperations());
+        declaration.getConfigurations().forEach(config -> doEnrich(declaration, config.getOperations()));
+    }
+
+    private void doEnrich(ExtensionDeclaration declaration, List<OperationDeclaration> operations)
+    {
+        operations.forEach(operation -> {
+            Method method = getImplementingMethod(operation);
             if (method != null)
             {
                 DataTypeParameters annotation = method.getAnnotation(DataTypeParameters.class);
                 if (annotation != null)
                 {
-                    if (IntrospectionUtils.isVoid(method))
+                    if (isVoid(method))
                     {
                         throw new IllegalModelDefinitionException(String.format(
                                 "Operation '%s' of extension '%s' is void yet requires the ability to change the content metadata." +
                                 " Mutating the content metadata requires an operation with a return type.",
-                                operation.getName(), describingContext.getDeclarationDescriptor().getDeclaration().getName()));
+                                operation.getName(), declaration.getName()));
                     }
                     operation.addParameter(newParameter(MIME_TYPE_PARAMETER_NAME, "The mime type of the payload that this operation outputs."));
                     operation.addParameter(newParameter(ENCODING_PARAMETER_NAME, "The encoding of the payload that this operation outputs."));
                 }
-
             }
         });
     }

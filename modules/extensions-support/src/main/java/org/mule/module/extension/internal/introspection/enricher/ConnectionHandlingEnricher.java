@@ -10,8 +10,11 @@ import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
+
+import java.util.List;
 
 
 /**
@@ -29,9 +32,13 @@ public final class ConnectionHandlingEnricher implements ModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        for (ConnectionProviderDeclaration declaration : describingContext.getDeclarationDescriptor().getDeclaration().getConnectionProviders())
-        {
-            declaration.addModelProperty(new ConnectionHandlingTypeModelProperty(declaration.getFactory().newInstance()));
-        }
+        final ExtensionDeclaration declaration = describingContext.getExtensionDeclarer().getExtensionDeclaration();
+        doEnrich(declaration.getConnectionProviders());
+        declaration.getConfigurations().forEach(c -> doEnrich(c.getConnectionProviders()));
+    }
+
+    private void doEnrich(List<ConnectionProviderDeclaration> providers)
+    {
+        providers.forEach(declaration -> declaration.addModelProperty(new ConnectionHandlingTypeModelProperty(declaration.getFactory().newInstance())));
     }
 }

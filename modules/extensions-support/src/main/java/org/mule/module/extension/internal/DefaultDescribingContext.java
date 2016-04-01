@@ -8,7 +8,7 @@ package org.mule.module.extension.internal;
 
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
-import org.mule.extension.api.introspection.declaration.fluent.DeclarationDescriptor;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,26 +25,25 @@ import org.apache.commons.lang.StringUtils;
 public final class DefaultDescribingContext implements DescribingContext
 {
 
-    private final DeclarationDescriptor declarationDescriptor;
+    private final ExtensionDeclarer extensionDeclarer;
     private final Map<String, Object> customParameters = new HashMap<>();
 
     public DefaultDescribingContext()
     {
-        this(new DeclarationDescriptor());
+        this(new ExtensionDeclarer());
     }
 
-    public DefaultDescribingContext(DeclarationDescriptor declarationDescriptor)
+    public DefaultDescribingContext(ExtensionDeclarer extensionDeclarer)
     {
-        this.declarationDescriptor = declarationDescriptor;
+        this.extensionDeclarer = extensionDeclarer;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public DeclarationDescriptor getDeclarationDescriptor()
+    public ExtensionDeclarer getExtensionDeclarer()
     {
-        return declarationDescriptor;
+        return extensionDeclarer;
     }
 
     /**

@@ -68,7 +68,7 @@ public class DataTypeModelEnricherTestCase extends AbstractMuleTestCase
     @DataTypeParameters
     public void before()
     {
-        when(describingContext.getDeclarationDescriptor().getDeclaration().getOperations()).thenReturn(asList(annotatedOperation, notAnnotatedOperation));
+        when(describingContext.getExtensionDeclarer().getExtensionDeclaration().getOperations()).thenReturn(asList(annotatedOperation, notAnnotatedOperation));
         when(annotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.empty());
         when(notAnnotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.empty());
         when(annotatedOperation.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(Optional.of(new ImplementingMethodModelProperty(method)));

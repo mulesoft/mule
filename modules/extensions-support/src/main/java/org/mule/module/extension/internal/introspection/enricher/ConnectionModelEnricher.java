@@ -8,9 +8,13 @@ package org.mule.module.extension.internal.introspection.enricher;
 
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.module.extension.internal.runtime.connector.ConnectionInterceptor;
+
+import java.util.List;
 
 /**
  * Adds a {@link ConnectionInterceptor} to all {@link OperationModel operations} which
@@ -24,7 +28,14 @@ public class ConnectionModelEnricher implements ModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        describingContext.getDeclarationDescriptor().getDeclaration().getOperations().stream()
+        final ExtensionDeclaration declaration = describingContext.getExtensionDeclarer().getExtensionDeclaration();
+        doEnrich(declaration.getOperations());
+        declaration.getConfigurations().forEach(config -> doEnrich(config.getOperations()));
+    }
+
+    private void doEnrich(List<OperationDeclaration> operations)
+    {
+        operations.stream()
                 .filter(operation -> operation.getModelProperty(ConnectionTypeModelProperty.class).isPresent())
                 .forEach(operation -> operation.addInterceptorFactory(ConnectionInterceptor::new));
     }

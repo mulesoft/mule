@@ -35,8 +35,8 @@ import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.Declaration;
-import org.mule.extension.api.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.SourceDeclaration;
@@ -65,8 +65,8 @@ import java.util.List;
 /**
  * Default implementation of {@link ExtensionFactory}.
  * <p>
- * It transforms {@link Descriptor} instances into fully fledged instances of
- * {@link ImmutableExtensionModel}. Because the {@link Descriptor} is a raw, unvalidated
+ * It transforms {@link ExtensionDeclarer} instances into fully fledged instances of
+ * {@link ImmutableExtensionModel}. Because the {@link ExtensionDeclarer} is a raw, unvalidated
  * object model, this instance uses a fixed list of {@link ModelValidator} to assure
  * that the produced model is legal.
  * <p>
@@ -107,38 +107,38 @@ public final class DefaultExtensionFactory implements ExtensionFactory
      * {@inheritDoc}
      */
     @Override
-    public RuntimeExtensionModel createFrom(Descriptor descriptor)
+    public RuntimeExtensionModel createFrom(ExtensionDeclarer declarer)
     {
-        return createFrom(descriptor, new DefaultDescribingContext(descriptor.getRootDeclaration()));
+        return createFrom(declarer, new DefaultDescribingContext(declarer));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public RuntimeExtensionModel createFrom(Descriptor descriptor, DescribingContext describingContext)
+    public RuntimeExtensionModel createFrom(ExtensionDeclarer declarer, DescribingContext describingContext)
     {
         enrichModel(describingContext);
-        RuntimeExtensionModel extensionModel = toExtension(descriptor.getRootDeclaration().getDeclaration());
+        RuntimeExtensionModel extensionModel = toExtension(declarer.getDeclaration());
         modelValidators.forEach(v -> v.validate(extensionModel));
 
         return extensionModel;
     }
 
-    private RuntimeExtensionModel toExtension(Declaration declaration)
+    private RuntimeExtensionModel toExtension(ExtensionDeclaration extensionDeclaration)
     {
-        validateMuleVersion(declaration);
+        validateMuleVersion(extensionDeclaration);
         ValueHolder<RuntimeExtensionModel> extensionModelValueHolder = new ValueHolder<>();
-        RuntimeExtensionModel extensionModel = new ImmutableRuntimeExtensionModel(declaration.getName(),
-                                                                                  declaration.getDescription(),
-                                                                                  declaration.getVersion(),
-                                                                                  declaration.getVendor(),
-                                                                                  sortConfigurations(toConfigurations(declaration.getConfigurations(), extensionModelValueHolder)),
-                                                                                  alphaSortDescribedList(toOperations(declaration.getOperations())),
-                                                                                  toConnectionProviders(declaration.getConnectionProviders()),
-                                                                                  alphaSortDescribedList(toMessageSources(declaration.getMessageSources())),
-                                                                                  declaration.getModelProperties(),
-                                                                                  declaration.getExceptionEnricherFactory());
+        RuntimeExtensionModel extensionModel = new ImmutableRuntimeExtensionModel(extensionDeclaration.getName(),
+                                                                                  extensionDeclaration.getDescription(),
+                                                                                  extensionDeclaration.getVersion(),
+                                                                                  extensionDeclaration.getVendor(),
+                                                                                  sortConfigurations(toConfigurations(extensionDeclaration.getConfigurations(), extensionModelValueHolder)),
+                                                                                  toOperations(extensionDeclaration.getOperations()),
+                                                                                  toConnectionProviders(extensionDeclaration.getConnectionProviders()),
+                                                                                  toMessageSources(extensionDeclaration.getMessageSources()),
+                                                                                  extensionDeclaration.getModelProperties(),
+                                                                                  extensionDeclaration.getExceptionEnricherFactory());
 
         extensionModelValueHolder.set(extensionModel);
         return extensionModel;
@@ -179,15 +179,16 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                                       extensionModel::get,
                                                       declaration.getConfigurationFactory(),
                                                       toParameters(declaration.getParameters()),
+                                                      toOperations(declaration.getOperations()),
+                                                      toConnectionProviders(declaration.getConnectionProviders()),
+                                                      toMessageSources(declaration.getMessageSources()),
                                                       declaration.getModelProperties(),
                                                       declaration.getInterceptorFactories());
     }
 
     private List<SourceModel> toMessageSources(List<SourceDeclaration> declarations)
     {
-        return declarations.stream()
-                .map(declaration -> toMessageSource(declaration))
-                .collect(toList());
+        return alphaSortDescribedList(declarations.stream().map(this::toMessageSource).collect(toList()));
     }
 
     private RuntimeSourceModel toMessageSource(SourceDeclaration declaration)
@@ -205,7 +206,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
 
     private List<OperationModel> toOperations(List<OperationDeclaration> declarations)
     {
-        return declarations.stream().map(this::toOperation).collect(toList());
+        return alphaSortDescribedList(declarations.stream().map(this::toOperation).collect(toList()));
     }
 
     private RuntimeOperationModel toOperation(OperationDeclaration declaration)
@@ -282,15 +283,15 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                            parameter.getModelProperties());
     }
 
-    private void validateMuleVersion(Declaration declaration)
+    private void validateMuleVersion(ExtensionDeclaration extensionDeclaration)
     {
         try
         {
-            new MuleVersion(declaration.getVersion());
+            new MuleVersion(extensionDeclaration.getVersion());
         }
         catch (IllegalArgumentException e)
         {
-            throw new IllegalArgumentException(String.format("Invalid version %s for extension '%s'", declaration.getVersion(), declaration.getName()));
+            throw new IllegalArgumentException(String.format("Invalid version %s for extension '%s'", extensionDeclaration.getVersion(), extensionDeclaration.getName()));
         }
     }
 
