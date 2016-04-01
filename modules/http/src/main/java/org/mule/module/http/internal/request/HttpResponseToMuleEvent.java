@@ -14,12 +14,10 @@ import static org.mule.module.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.module.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
@@ -109,14 +107,19 @@ public class HttpResponseToMuleEvent
             }
         }
 
-
-        MuleMessage message = new DefaultMuleMessage(muleEvent.getMessage().getPayload(), inboundProperties,
+        String requestMessageId = muleEvent.getMessage().getUniqueId();
+        String requestMessageRootId = muleEvent.getMessage().getMessageRootId();
+        DefaultMuleMessage message = new DefaultMuleMessage(muleEvent.getMessage().getPayload(), inboundProperties,
                                                      null, inboundAttachments, muleContext, muleEvent.getMessage().getDataType());
 
         if (encoding != null)
         {
             message.setEncoding(encoding);
         }
+
+        // Setting uniqueId and rootId in order to correlate messages from request to response generated.
+        message.setUniqueId(requestMessageId);
+        message.setMessageRootId(requestMessageRootId);
 
         muleEvent.setMessage(message);
         setResponsePayload(payload, muleEvent);
