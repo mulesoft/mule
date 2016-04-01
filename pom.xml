@@ -153,7 +153,7 @@
         <antlrVersion>3.5</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
-        <asyncHttpClientVersion>1.9.32</asyncHttpClientVersion>
+        <asyncHttpClientVersion>1.9.37</asyncHttpClientVersion>
         <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.50</bouncycastleVersion>
