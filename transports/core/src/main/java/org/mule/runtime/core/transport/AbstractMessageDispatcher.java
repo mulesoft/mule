@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.transport;
 
+import static org.mule.runtime.core.OptimizedRequestContext.unsafeSetEvent;
+
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -19,6 +20,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -135,7 +137,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                     resultMessage);
             requestEvent.getSession().merge(storedSession);
             MuleEvent resultEvent = new DefaultMuleEvent(resultMessage, requestEvent);
-            OptimizedRequestContext.unsafeSetEvent(resultEvent);
+            unsafeSetEvent(resultEvent);
             return resultEvent;
         }
         else
@@ -269,7 +271,11 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                     {
                         try
                         {
-                            event.getReplyToHandler().processReplyTo(createResponseEvent(result, event), null, null);
+                            resetAccessControl(result);
+                            MuleEvent responseEvent = createResponseEvent(result, event);
+                            // Set RequestContext ThreadLocal in new thread for backwards compatibility
+                            unsafeSetEvent(responseEvent);
+                            event.getReplyToHandler().processReplyTo(responseEvent, null, null);
                         }
                         catch (MessagingException messagingException)
                         {
@@ -305,6 +311,9 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                     @Override
                     public void run()
                     {
+                        resetAccessControl(event);
+                        // Set RequestContext ThreadLocal in new thread for backwards compatibility
+                        unsafeSetEvent(event);
                         event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, exception), null);
                     }
 
@@ -320,6 +329,15 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                 // Handle exception in transport thread if unable to schedule work
                 event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, exception), null);
             }
+        }
+    }
+
+    private void resetAccessControl(Object result)
+    {
+        // Reset access control for new thread
+        if (result instanceof ThreadSafeAccess)
+        {
+            ((ThreadSafeAccess) result).resetAccessControl();
         }
     }
 }
