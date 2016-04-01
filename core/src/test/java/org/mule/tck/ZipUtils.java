@@ -7,12 +7,13 @@
 
 package org.mule.tck;
 
-import org.mule.util.StringUtils;
+import org.mule.util.ClassUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -32,28 +33,13 @@ public class ZipUtils
     public static class ZipResource
     {
 
-        private final File file;
+        private final String file;
         private final String alias;
 
-        public ZipResource(File file)
-        {
-            this(file, null);
-        }
-
-        public ZipResource(File file, String alias)
+        public ZipResource(String file, String alias)
         {
             this.file = file;
             this.alias = alias;
-        }
-
-        public String getName()
-        {
-            return StringUtils.isEmpty(alias) ? file.getName() : alias;
-        }
-
-        public File getFile()
-        {
-            return file;
         }
     }
 
@@ -70,9 +56,15 @@ public class ZipUtils
         {
             for (ZipResource zipResource : resources)
             {
-                try (FileInputStream in = new FileInputStream(zipResource.getFile()))
+                URL resourceUrl = ClassUtils.getResource(zipResource.file, ZipUtils.class);
+                if (resourceUrl == null)
                 {
-                    out.putNextEntry(new ZipEntry(zipResource.getName()));
+                    resourceUrl = new File(zipResource.file).toURI().toURL();
+                }
+
+                try (FileInputStream in = new FileInputStream(resourceUrl.getFile()))
+                {
+                    out.putNextEntry(new ZipEntry(zipResource.alias == null ? zipResource.file : zipResource.alias));
 
                     byte[] buffer = new byte[1024];
 

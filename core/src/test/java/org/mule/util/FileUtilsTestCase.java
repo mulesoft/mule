@@ -12,7 +12,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.tck.ZipUtils;
+import static org.mule.tck.ZipUtils.compress;
+import static org.mule.util.FileUtils.unzip;
+import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -368,7 +370,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
 
         for (int i = 0; i < 2; i++)
         {
-            FileUtils.unzip(zipFile, outputDir);
+            unzip(zipFile, outputDir);
             File testFile = new File(UNZIPPED_FILE_PATH);
             assertTrue(testFile.exists());
         }
@@ -379,12 +381,10 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     {
         final String resourceName = "dummy.xml";
         final String resourceAlias = "folder" + File.separator + resourceName;
-        final File resourceFile = new File(IOUtils.getResourceAsUrl(resourceName, getClass()).getFile());
-
         final File compressedFile = new File(toDir, "test.zip");
-        ZipUtils.compress(compressedFile, new ZipUtils.ZipResource[] {new ZipUtils.ZipResource(resourceFile, resourceAlias)});
+        compress(compressedFile, new ZipResource[] {new ZipResource(resourceName, resourceAlias)});
 
-        FileUtils.unzip(compressedFile, toDir);
+        unzip(compressedFile, toDir);
 
         assertThat(new File(new File(toDir, "folder"), resourceName).exists(), is(true));
     }
