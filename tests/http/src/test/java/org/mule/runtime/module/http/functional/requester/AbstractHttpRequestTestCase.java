@@ -6,19 +6,18 @@
  */
 package org.mule.runtime.module.http.functional.requester;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.module.socket.api.SocketsExtension;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
 
-import com.google.common.base.Supplier;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +36,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 
-public class AbstractHttpRequestTestCase extends FunctionalTestCase
+public class AbstractHttpRequestTestCase extends ExtensionFunctionalTestCase
 {
 
     @Rule
@@ -51,17 +50,15 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
     protected String method;
     protected String uri;
-    protected Multimap<String, String> headers =
-            Multimaps.newMultimap(new CaseInsensitiveMapWrapper<Collection<String>>(HashMap.class), new Supplier<Collection<String>>()
-            {
-                @Override
-                public Collection<String> get()
-                {
-                    return Sets.newHashSet();
-                }
-            });
+    protected Multimap<String, String> headers = Multimaps.newMultimap(new CaseInsensitiveMapWrapper<>(HashMap.class), Sets::newHashSet);
 
     protected String body;
+
+    @Override
+    protected Class<?>[] getAnnotatedExtensionClasses()
+    {
+        return new Class<?>[] {SocketsExtension.class};
+    }
 
     @Before
     public void startServer() throws Exception

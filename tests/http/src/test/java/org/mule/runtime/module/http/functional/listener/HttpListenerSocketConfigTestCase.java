@@ -9,7 +9,8 @@ package org.mule.runtime.module.http.functional.listener;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.module.socket.api.SocketsExtension;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.http.client.fluent.Request;
@@ -18,7 +19,7 @@ import org.apache.http.entity.StringEntity;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerSocketConfigTestCase extends FunctionalTestCase
+public class HttpListenerSocketConfigTestCase extends ExtensionFunctionalTestCase
 {
 
     @Rule
@@ -29,6 +30,12 @@ public class HttpListenerSocketConfigTestCase extends FunctionalTestCase
     protected String getConfigFile()
     {
         return "http-listener-socket-config.xml";
+    }
+
+    @Override
+    protected Class<?>[] getAnnotatedExtensionClasses()
+    {
+        return new Class<?>[] {SocketsExtension.class};
     }
 
     @Test

@@ -25,6 +25,7 @@
         <module>all-extensions</module>
         <module>file</module>
         <module>ftp</module>
+        <module>sockets</module>
         <module>validation</module>
     </modules>
 

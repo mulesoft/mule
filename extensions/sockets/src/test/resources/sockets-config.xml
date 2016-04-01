@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
+
+    <sockets:server-socket-properties name="defaultServerSocketProperties"/>
+
+    <sockets:server-socket-properties name="serverSocketProperties" keepAlive="true" receiveBacklog="200"
+                                      receiveBufferSize="1024" reuseAddress="true" sendBufferSize="2048"
+                                      sendTcpNoDelay="true" serverTimeout="600" timeout="800" linger="700"/>
+
+    <sockets:client-socket-properties name="defaultClientSocketProperties"/>
+
+    <sockets:client-socket-properties name="clientSocketProperties" connectionTimeout="500" keepAlive="true"
+                                      receiveBufferSize="1024" sendBufferSize="2048"
+                                      sendTcpNoDelay="true" timeout="600" linger="700"/>
+
+</mule>
