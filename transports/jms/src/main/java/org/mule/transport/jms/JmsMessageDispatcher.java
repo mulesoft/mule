@@ -186,6 +186,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
             if (useReplyToDestination && replyTo != null)
             {
+                final int timeout = endpoint.getResponseTimeout();
+
                 consumer = createReplyToConsumer(msg, event, session, replyTo, topic);
 
                 if (topic)
@@ -196,8 +198,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     consumer.setMessageListener(listener);
 
                     connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic, endpoint);
-
-                    int timeout = event.getTimeout();
 
                     if (logger.isDebugEnabled())
                     {
@@ -220,8 +220,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
                 else
                 {
-                    int timeout = event.getTimeout();
-
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
