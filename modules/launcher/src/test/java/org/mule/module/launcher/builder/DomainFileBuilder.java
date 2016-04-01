@@ -9,12 +9,12 @@ package org.mule.module.launcher.builder;
 
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import static org.mule.util.Preconditions.checkArgument;
+import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Creates Mule Domain files.
@@ -94,13 +94,17 @@ public class DomainFileBuilder extends AbstractArtifactFileBuilder<DomainFileBui
     }
 
     @Override
-    protected void addCustomFileContent(ZipOutputStream out) throws Exception
+    protected List<ZipResource> getCustomResources() throws Exception
     {
+        final List<ZipResource> customResources = new LinkedList<>();
+
         for (ApplicationFileBuilder application : applications)
         {
             final File applicationFile = application.getArtifactFile();
-            addZipResource(out, new ZipResource(applicationFile.getAbsolutePath(), "apps/" + applicationFile.getName()));
+            customResources.add(new ZipResource(applicationFile.getAbsolutePath(), "apps/" + applicationFile.getName()));
         }
+
+        return customResources;
     }
 
     @Override

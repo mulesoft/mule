@@ -9,12 +9,13 @@ package org.mule.module.launcher.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.mule.module.launcher.plugin.PluginDescriptor.PLUGIN_PROPERTIES;
+import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.util.StringUtils;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Creates Mule Application Plugin files.
@@ -108,16 +109,20 @@ public class ApplicationPluginFileBuilder extends AbstractArtifactFileBuilder<Ap
     }
 
     @Override
-    protected void addCustomFileContent(ZipOutputStream out) throws IOException
+    protected List<ZipResource> getCustomResources() throws Exception
     {
+        final List<ZipResource> customResources = new LinkedList<>();
+
         if (!properties.isEmpty())
         {
             final File applicationPropertiesFile = new File(getTempFolder(), PLUGIN_PROPERTIES);
             applicationPropertiesFile.deleteOnExit();
             createPropertiesFile(applicationPropertiesFile, properties);
 
-            addZipResource(out, new ZipResource(applicationPropertiesFile.getAbsolutePath(), PLUGIN_PROPERTIES));
+            customResources.add(new ZipResource(applicationPropertiesFile.getAbsolutePath(), PLUGIN_PROPERTIES));
         }
+
+        return customResources;
     }
 
     @Override

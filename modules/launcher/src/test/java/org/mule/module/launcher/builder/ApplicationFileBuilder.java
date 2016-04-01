@@ -11,13 +11,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.mule.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import static org.mule.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
+import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.util.FilenameUtils;
 import org.mule.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Creates Mule Application files.
@@ -168,14 +168,27 @@ public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<Applicat
     }
 
     @Override
-    protected void addCustomFileContent(ZipOutputStream out) throws Exception
+    protected List<ZipResource> getCustomResources() throws Exception
     {
+        final List<ZipResource> customResources = new LinkedList<>();
+
         for (ApplicationPluginFileBuilder plugin : plugins)
         {
-            addZipResource(out, new ZipResource(plugin.getArtifactFile().getAbsolutePath(), "plugins/" + plugin.getArtifactFile().getName()));
+            customResources.add(new ZipResource(plugin.getArtifactFile().getAbsolutePath(), "plugins/" + plugin.getArtifactFile().getName()));
         }
 
-        createPropertiesFile(out, this.properties, DEFAULT_APP_PROPERTIES_RESOURCE);
-        createPropertiesFile(out, this.deployProperties, DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
+        final ZipResource appProperties = createPropertiesFile(this.properties, DEFAULT_APP_PROPERTIES_RESOURCE);
+        if (appProperties != null)
+        {
+            customResources.add(appProperties);
+        }
+
+        final ZipResource deployProperties = createPropertiesFile(this.deployProperties, DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
+        if (deployProperties != null)
+        {
+            customResources.add(deployProperties);
+        }
+
+        return customResources;
     }
 }
