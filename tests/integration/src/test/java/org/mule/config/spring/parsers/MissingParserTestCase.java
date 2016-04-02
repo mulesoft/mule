@@ -20,7 +20,7 @@ public class MissingParserTestCase extends AbstractBadConfigTestCase
     @Test
     public void testHelpfulErrorMessage() throws Exception
     {
-        assertErrorContains("Is the module or transport");
+        assertErrorContains("Is the module or extension");
     }
 
 }
