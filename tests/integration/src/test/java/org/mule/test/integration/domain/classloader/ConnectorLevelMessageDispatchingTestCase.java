@@ -11,11 +11,12 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.functional.listener.Callback;
 import org.mule.functional.listener.FlowExecutionListener;
+import org.mule.rule.UseMuleLog4jContextFactory;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.infrastructure.deployment.AbstractFakeMuleServerTestCase;
 import org.mule.test.infrastructure.deployment.FakeMuleServer;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -23,30 +24,28 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-public class ConnectorLevelMessageDispatchingTestCase extends AbstractMuleTestCase
+public class ConnectorLevelMessageDispatchingTestCase extends AbstractFakeMuleServerTestCase
 {
 
     public static final String HELLO_WORLD_APP = "hello-world";
     public static final String HELLO_MULE_APP = "hello-mule";
     @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
-    @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
     @Rule
     public SystemProperty endpointScheme = new SystemProperty("scheme", "http");
+    @Rule
+    public UseMuleLog4jContextFactory muleLogging = new UseMuleLog4jContextFactory();
 
     @Test
     public void verifyClassLoaderIsAppClassLoader() throws Exception
     {
-        FakeMuleServer fakeMuleServer = new FakeMuleServer(temporaryFolder.getRoot().getAbsolutePath());
-        fakeMuleServer.deployDomainFromClasspathFolder("domain/deployable-domains/http-domain-listener", "domain");
-        fakeMuleServer.deployAppFromClasspathFolder("domain/deployable-apps/hello-world-app", HELLO_WORLD_APP);
-        fakeMuleServer.deployAppFromClasspathFolder("domain/deployable-apps/hello-mule-app", HELLO_MULE_APP);
-        fakeMuleServer.start();
-        verifyAppProcessMessageWithAppClassLoader(fakeMuleServer, HELLO_MULE_APP, "http://localhost:%d/service/helloMule");
-        verifyAppProcessMessageWithAppClassLoader(fakeMuleServer, HELLO_WORLD_APP, "http://localhost:%d/service/helloWorld");
+        muleServer.deployDomainFromClasspathFolder("domain/deployable-domains/http-domain-listener", "domain");
+        muleServer.deployAppFromClasspathFolder("domain/deployable-apps/hello-world-app", HELLO_WORLD_APP);
+        muleServer.deployAppFromClasspathFolder("domain/deployable-apps/hello-mule-app", HELLO_MULE_APP);
+        muleServer.start();
+        verifyAppProcessMessageWithAppClassLoader(muleServer, HELLO_MULE_APP, "http://localhost:%d/service/helloMule");
+        verifyAppProcessMessageWithAppClassLoader(muleServer, HELLO_WORLD_APP, "http://localhost:%d/service/helloWorld");
     }
 
     private void verifyAppProcessMessageWithAppClassLoader(FakeMuleServer fakeMuleServer, String appName, String requestUrl) throws MuleException

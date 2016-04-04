@@ -9,9 +9,10 @@ package org.mule;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.log4j2.MuleLog4jContextFactory;
+import org.mule.rule.UseMuleLog4jContextFactory;
 import org.mule.test.infrastructure.deployment.AbstractFakeMuleServerTestCase;
 
 import java.util.LinkedList;
@@ -25,7 +26,7 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -37,11 +38,8 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
     public static final String APP_NAME = "app1";
     public static final String DOMAIN_NAME = "domain";
 
-    @BeforeClass
-    public static void setupClass()
-    {
-        LogManager.setFactory(new MuleLog4jContextFactory());
-    }
+    @Rule
+    public UseMuleLog4jContextFactory muleLogging = new UseMuleLog4jContextFactory();
 
     @Override
     public void setUp() throws Exception
