@@ -6,6 +6,7 @@
  */
 package org.mule.test.infrastructure.deployment;
 
+import static org.apache.commons.io.FileUtils.copyURLToFile;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -34,7 +35,6 @@ import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -230,7 +230,7 @@ public class FakeMuleServer
 
         File confDir = createFolder("conf");
         URL log4jFile = getClass().getResource("/log4j2-test.xml");
-        FileUtils.copyURLToFile(log4jFile, new File(confDir, "log4j2-test.xml"));
+        copyURLToFile(log4jFile, new File(confDir, "log4j2-test.xml"));
 
         createFolder("lib/shared/default");
     }
@@ -265,10 +265,31 @@ public class FakeMuleServer
         deploy(resource, appName);
     }
 
+    /**
+     * Deploys an application from a classpath resource
+     *
+     * @param resource points to the resource to deploy. Non null.
+     * @param targetAppName application name used to deploy the resource. Null to
+     *                      maintain the original resource name
+     * @throws IOException if the resource cannot be accessed
+     */
     public void deploy(String resource, String targetAppName) throws IOException
     {
         URL url = getClass().getResource(resource);
-        addAppArchive(url, targetAppName + ".zip");
+        deploy(url, targetAppName);
+    }
+
+    /**
+     * Deploys an application from an URL
+     *
+     * @param resource points to the resource to deploy. Non null.
+     * @param targetAppName application name used to deploy the resource. Null to
+     *                      maintain the original resource name
+     * @throws IOException if the URL cannot be accessed
+     */
+    public void deploy(URL resource, String targetAppName) throws IOException
+    {
+        addAppArchive(resource, targetAppName + ".zip");
         assertDeploymentSuccess(targetAppName);
     }
 
@@ -280,7 +301,7 @@ public class FakeMuleServer
         // copy is not atomic, copy to a temp file and rename instead (rename is atomic)
         final String tempFileName = new File((targetFile == null ? url.getFile() : targetFile) + ".part").getName();
         final File tempFile = new File(appsDir, tempFileName);
-        FileUtils.copyURLToFile(url, tempFile);
+        copyURLToFile(url, tempFile);
         boolean renamed = tempFile.renameTo(new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part")));
         if (!renamed)
         {
@@ -288,12 +309,28 @@ public class FakeMuleServer
         }
     }
 
-    public void addZippedPlugin(String resource) throws IOException, URISyntaxException
+    /**
+     * Adds a plugin file to the Mule server.
+     *
+     * @param plugin plugin file to add. Non null.
+     * @throws IOException if the plugin file cannot be accessed
+     */
+    public void addZippedPlugin(File plugin) throws IOException
     {
-        URL url = getClass().getClassLoader().getResource(resource).toURI().toURL();
-        String baseName = FilenameUtils.getName(url.getPath());
+        addZippedPlugin(plugin.toURI().toURL());
+    }
+
+    /**
+     * Adds a plugin to the Mule server .
+     *
+     * @param resource points to the plugin to add. Non null.
+     * @throws IOException if the plugin URL cannot be accessed
+     */
+    public void addZippedPlugin(URL resource) throws IOException
+    {
+        String baseName = FilenameUtils.getName(resource.getPath());
         File tempFile = new File(getPluginsDir(), baseName);
-        FileUtils.copyURLToFile(url, tempFile);
+        copyURLToFile(resource, tempFile);
     }
 
     public File getMuleHome()
