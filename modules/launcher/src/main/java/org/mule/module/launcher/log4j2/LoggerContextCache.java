@@ -232,14 +232,21 @@ final class LoggerContextCache implements Disposable
         }
 
         disposedContexts.put(key, loggerContext);
-        executorService.schedule(new Runnable()
+        synchronized (executorService)
         {
-            @Override
-            public void run()
+            if (!executorService.isShutdown())
             {
-                disposedContexts.cleanUp();
+                executorService.schedule(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        disposedContexts.cleanUp();
+                    }
+                }, disposeDelayInMillis + 1, TimeUnit.MILLISECONDS); // add one millisecond to make sure entries will be
+                                                                     // expired
             }
-        }, disposeDelayInMillis +1, TimeUnit.MILLISECONDS); // add one millisecond to make sure entries will be expired
+        }
     }
 
     private int computeKey(ClassLoader classLoader)
@@ -255,7 +262,10 @@ final class LoggerContextCache implements Disposable
     @Override
     public void dispose()
     {
-        executorService.shutdownNow();
+        synchronized (executorService)
+        {
+            executorService.shutdownNow();
+        }
 
         for (LoggerContext loggerContext : activeContexts.asMap().values())
         {
