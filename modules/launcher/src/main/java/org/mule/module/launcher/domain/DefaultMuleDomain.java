@@ -7,7 +7,6 @@
 package org.mule.module.launcher.domain;
 
 import static org.mule.util.SplashScreen.miniSplash;
-import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -17,6 +16,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentStartException;
@@ -24,7 +24,6 @@ import org.mule.module.launcher.DeploymentStopException;
 import org.mule.module.launcher.MuleDeploymentService;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.NullDeploymentListener;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.MuleContextDeploymentListener;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.util.ClassUtils;
@@ -168,10 +167,6 @@ public class DefaultMuleDomain implements Domain
                 if (!cfgBuilder.isConfigured())
                 {
                     List<ConfigurationBuilder> builders = new ArrayList<>(3);
-
-                    // We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder
-                    addAnnotationsConfigBuilderIfPresent(builders);
-
                     builders.add(cfgBuilder);
 
                     DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
@@ -213,18 +208,6 @@ public class DefaultMuleDomain implements Domain
             {
                 scanner.close();
             }
-        }
-    }
-
-    protected void addAnnotationsConfigBuilderIfPresent(List<ConfigurationBuilder> builders) throws Exception
-    {
-        // If the annotations module is on the classpath, add the annotations config builder to
-        // the list. This will enable annotations config for this instance.
-        if (ClassUtils.isClassOnPath(MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
-        {
-            Object configBuilder = ClassUtils.instanciateClass(
-                    MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, ClassUtils.NO_ARGS, getClass());
-            builders.add((ConfigurationBuilder) configBuilder);
         }
     }
 
