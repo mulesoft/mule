@@ -7,7 +7,6 @@
 package org.mule.module.launcher.application;
 
 import static org.mule.util.SplashScreen.miniSplash;
-import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
@@ -23,20 +22,19 @@ import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.module.artifact.classloader.DisposableClassLoader;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.DeploymentStopException;
-import org.mule.module.artifact.classloader.DisposableClassLoader;
 import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.MuleDeploymentService;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.MuleContextDeploymentListener;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.domain.Domain;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
-import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 
 import java.io.File;
@@ -182,9 +180,6 @@ public class DefaultMuleApplication implements Application
                 List<ConfigurationBuilder> builders = new LinkedList<>();
                 builders.add(new ExtensionsManagerConfigurationBuilder());
                 builders.add(createConfigurationBuilderFromApplicationProperties());
-
-                // We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder
-                addAnnotationsConfigBuilderIfPresent(builders);
                 builders.add(cfgBuilder);
 
                 DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
@@ -256,18 +251,6 @@ public class DefaultMuleApplication implements Application
         appProperties.put(MuleProperties.APP_NAME_PROPERTY, getArtifactName());
 
         return new SimpleConfigurationBuilder(appProperties);
-    }
-
-    protected void addAnnotationsConfigBuilderIfPresent(List<ConfigurationBuilder> builders) throws Exception
-    {
-        // If the annotations module is on the classpath, add the annotations config builder to
-        // the list. This will enable annotations config for this instance.
-        if (ClassUtils.isClassOnPath(MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
-        {
-            Object configBuilder = ClassUtils.instanciateClass(
-                    MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, ClassUtils.NO_ARGS, getClass());
-            builders.add((ConfigurationBuilder) configBuilder);
-        }
     }
 
     @Override

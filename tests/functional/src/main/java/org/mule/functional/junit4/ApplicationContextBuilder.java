@@ -7,7 +7,6 @@
 package org.mule.functional.junit4;
 
 import static org.mule.config.bootstrap.ArtifactType.APP;
-
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
@@ -17,8 +16,6 @@ import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.TestingWorkListener;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,13 +61,6 @@ public class ApplicationContextBuilder
         MuleContext context;
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
-        //If the annotations module is on the classpath, add the annotations config builder to the list
-        //This will enable annotations config for this instance
-        if (ClassUtils.isClassOnPath(AbstractMuleContextTestCase.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
-        {
-            builders.add((ConfigurationBuilder) ClassUtils.instanciateClass(AbstractMuleContextTestCase.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER,
-                                                                            ClassUtils.NO_ARGS, getClass()));
-        }
         builders.add(getAppBuilder(this.applicationResources));
         configureMuleContext(muleContextBuilder);
         context = muleContextFactory.createMuleContext(builders, muleContextBuilder);
