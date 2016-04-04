@@ -10,11 +10,11 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.execution.ExecutionCallback;
+import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
@@ -172,15 +172,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             {
                 try
                 {
-                    List messages = getMessages();
-                    if (messages != null && messages.size() > 0)
-                    {
-                        for (Object message : messages)
-                        {
-                            processMessage(message);
-                        }
-                    }
-                    return null;
+                    return doProcess();
                 }
                 catch (Exception e)
                 {
@@ -206,6 +198,37 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                     }
                     ctx.session = null;
                     throw e;
+                }
+            }
+
+            protected MuleEvent doProcess() throws Exception
+            {
+                try
+                {
+                    List messages = getMessages();
+                    if (messages != null && messages.size() > 0)
+                    {
+                        for (Object message : messages)
+                        {
+                            processMessage(message);
+                        }
+                    }
+                    return null;
+                }
+                catch (JMSException e)
+                {
+                    throw new ConnectException(e, XaTransactedJmsMessageReceiver.this);
+                }
+                catch (Exception e)
+                {
+                    if (e.getCause() != null && e.getCause() instanceof JMSException)
+                    {
+                        throw new ConnectException(e.getCause(), XaTransactedJmsMessageReceiver.this);
+                    }
+                    else
+                    {
+                        throw e;
+                    }
                 }
             }
         };
@@ -329,7 +352,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     }
 
     /**
-     * Close Sesison and consumer
+     * Close Session and consumer
      */
     protected void closeResource(boolean force)
     {

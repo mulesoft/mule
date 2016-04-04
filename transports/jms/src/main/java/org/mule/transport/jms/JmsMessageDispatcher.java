@@ -555,7 +555,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     int i = tempReplyTo.toString().indexOf("://");
                     if (i > -1)
                     {
-                        tempReplyTo = tempReplyTo.toString().substring(i+3);
+                        tempReplyTo = tempReplyTo.toString().substring(i + 3);
                     }
                     else
                     {
@@ -623,6 +623,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             released.set(true);
         }
 
+        @Override
         public void onMessage(Message message)
         {
             this.message = message;
