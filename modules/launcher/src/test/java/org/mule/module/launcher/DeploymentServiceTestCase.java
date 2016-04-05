@@ -6,6 +6,8 @@
  */
 package org.mule.module.launcher;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
@@ -30,6 +32,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
+import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -42,6 +45,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.config.StartupContext;
 import org.mule.construct.Flow;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.module.artifact.classloader.MuleClassLoaderLookupPolicy;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationStatus;
 import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
@@ -119,7 +123,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     // Application file builders
     private final ApplicationFileBuilder emptyAppFileBuilder = new ApplicationFileBuilder("empty-app").definedBy("empty-config.xml");
     private final ApplicationFileBuilder springPropertyAppFileBuilder = new ApplicationFileBuilder("property-app").definedBy("app-properties-config.xml");
-    private final ApplicationFileBuilder dummyAppDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app").definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue").containingClass("org/mule/module/launcher/EchoTest.clazz");
+    private final ApplicationFileBuilder dummyAppDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app").definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue").containingClass("org/foo/EchoTest.clazz");
     private final ApplicationFileBuilder waitAppFileBuilder = new ApplicationFileBuilder("wait-app").definedBy("wait-app-config.xml");
     private final ApplicationFileBuilder brokenAppFileBuilder = new ApplicationFileBuilder("broken-app").corrupted();
     private final ApplicationFileBuilder incompleteAppFileBuilder = new ApplicationFileBuilder("incomplete-app").definedBy("incomplete-app-config.xml");
@@ -129,11 +133,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private final ApplicationFileBuilder resourcePluginAppFileBuilder = new ApplicationFileBuilder("dummyWithPluginResource").definedBy("plugin-resource-app-config.xml").containingPlugin(pluginWithResource);
     private final ApplicationFileBuilder sharedLibPluginAppFileBuilder = new ApplicationFileBuilder("shared-plugin-lib-app").definedBy("app-with-echo1-plugin-config.xml").containingPlugin(echoPluginWithoutLib1).sharingLibrary("lib/bar-1.0.jar");
     private final ApplicationFileBuilder brokenAppWithFunkyNameAppFileBuilder = new ApplicationFileBuilder("broken-app+", brokenAppFileBuilder);
-    private final ApplicationFileBuilder dummyDomainApp1FileBuilder = new ApplicationFileBuilder("dummy-domain-app1").definedBy("empty-config.xml").deployedWith("domain", "dummy-domain");
-    private final ApplicationFileBuilder dummyDomainApp2FileBuilder = new ApplicationFileBuilder("dummy-domain-app2").definedBy("empty-config.xml").deployedWith("domain", "dummy-domain");
-    private final ApplicationFileBuilder dummyDomainApp3FileBuilder = new ApplicationFileBuilder("dummy-domain-app3").definedBy("bad-app-config.xml").deployedWith("domain", "dummy-domain");
-    private final ApplicationFileBuilder httpAAppFileBuilder = new ApplicationFileBuilder("shared-http-app-a").definedBy("shared-http-a-app-config.xml").deployedWith("domain", "shared-http-domain");
-    private final ApplicationFileBuilder httpBAppFileBuilder = new ApplicationFileBuilder("shared-http-app-b").definedBy("shared-http-b-app-config.xml").deployedWith("domain", "shared-http-domain");
+    private final ApplicationFileBuilder dummyDomainApp1FileBuilder = new ApplicationFileBuilder("dummy-domain-app1").definedBy("empty-config.xml").deployedWith(PROPERTY_DOMAIN, "dummy-domain");
+    private final ApplicationFileBuilder dummyDomainApp2FileBuilder = new ApplicationFileBuilder("dummy-domain-app2").definedBy("empty-config.xml").deployedWith(PROPERTY_DOMAIN, "dummy-domain");
+    private final ApplicationFileBuilder dummyDomainApp3FileBuilder = new ApplicationFileBuilder("dummy-domain-app3").definedBy("bad-app-config.xml").deployedWith(PROPERTY_DOMAIN, "dummy-domain");
+    private final ApplicationFileBuilder httpAAppFileBuilder = new ApplicationFileBuilder("shared-http-app-a").definedBy("shared-http-a-app-config.xml").deployedWith(PROPERTY_DOMAIN, "shared-http-domain");
+    private final ApplicationFileBuilder httpBAppFileBuilder = new ApplicationFileBuilder("shared-http-app-b").definedBy("shared-http-b-app-config.xml").deployedWith(PROPERTY_DOMAIN, "shared-http-domain");
 
     // Domain file builders
     private final DomainFileBuilder brokenDomainFileBuilder = new DomainFileBuilder("brokenDomain").corrupted();
@@ -141,7 +145,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private final DomainFileBuilder waitDomainFileBuilder = new DomainFileBuilder("wait-domain").definedBy("wait-domain-config.xml");
     private final DomainFileBuilder incompleteDomainFileBuilder = new DomainFileBuilder("incompleteDomain").definedBy("incomplete-domain-config.xml");
     private final DomainFileBuilder invalidDomainBundleFileBuilder = new DomainFileBuilder("invalid-domain-bundle").definedBy("incomplete-domain-config.xml").containing(emptyAppFileBuilder);
-    private final DomainFileBuilder dummyDomainBundleFileBuilder = new DomainFileBuilder("dummy-domain-bundle").containing(new ApplicationFileBuilder(dummyAppDescriptorFileBuilder).deployedWith("domain", "dummy-domain-bundle"));
+    private final DomainFileBuilder dummyDomainBundleFileBuilder = new DomainFileBuilder("dummy-domain-bundle").containing(new ApplicationFileBuilder(dummyAppDescriptorFileBuilder).deployedWith(PROPERTY_DOMAIN, "dummy-domain-bundle"));
     private final DomainFileBuilder dummyDomainFileBuilder = new DomainFileBuilder("dummy-domain").definedBy("empty-domain-config.xml");
     private final DomainFileBuilder sharedHttpDomainFileBuilder = new DomainFileBuilder("shared-http-domain").definedBy("shared-http-domain-config.xml");
     private final DomainFileBuilder sharedHttpBundleDomainFileBuilder = new DomainFileBuilder("shared-http-domain").definedBy("shared-http-domain-config.xml").containing(httpAAppFileBuilder).containing(httpBAppFileBuilder);
@@ -1024,7 +1028,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
-        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new MuleDomainClassLoaderRepository(), new DefaultNativeLibraryFinderFactory()));
+        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new MuleDomainClassLoaderRepository(new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())), new DefaultNativeLibraryFinderFactory()));
         appFactory.setFailOnStopApplication(true);
 
         deploymentService.setAppFactory(appFactory);
@@ -1046,7 +1050,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
-        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new MuleDomainClassLoaderRepository(), new DefaultNativeLibraryFinderFactory()));
+        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new MuleDomainClassLoaderRepository(new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())), new DefaultNativeLibraryFinderFactory()));
         appFactory.setFailOnDisposeApplication(true);
         deploymentService.setAppFactory(appFactory);
         deploymentService.start();
@@ -1271,6 +1275,88 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertApplicationDeploymentSuccess(applicationDeploymentListener, sharedLibPluginAppFileBuilder.getId());
         assertAppsDir(NONE, new String[] {sharedLibPluginAppFileBuilder.getId()}, true);
         assertApplicationAnchorFileExists(sharedLibPluginAppFileBuilder.getId());
+    }
+
+    @Test
+    public void deploysAppWithAppSharedLibPrecedenceOverPluginLib() throws Exception
+    {
+        final ApplicationPluginFileBuilder echoPlugin1WithLib2 = new ApplicationPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").containingClass("org/foo/Plugin1Echo.clazz").usingLibrary("lib/bar-2.0.jar");
+        final ApplicationFileBuilder sharedLibPluginAppPrecedenceFileBuilder = new ApplicationFileBuilder("shared-plugin-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml").containingPlugin(echoPlugin1WithLib2).sharingLibrary("lib/bar-1.0.jar");
+
+        addPackedAppFromBuilder(sharedLibPluginAppPrecedenceFileBuilder);
+
+        deploymentService.start();
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, sharedLibPluginAppPrecedenceFileBuilder.getId());
+        assertAppsDir(NONE, new String[] {sharedLibPluginAppPrecedenceFileBuilder.getId()}, true);
+        assertApplicationAnchorFileExists(sharedLibPluginAppPrecedenceFileBuilder.getId());
+
+        Application application = deploymentService.getApplications().get(0);
+        Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, application.getMuleContext());
+
+        mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
+    }
+
+    @Test
+    public void deploysDomainWithSharedLibPrecedenceOverApplicationSharedLib() throws Exception
+    {
+        final String domainId = "shared-lib";
+        final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml").sharingLibrary("lib/bar-2.0.jar").containingClass("org/foo/Plugin1Echo.clazz").deployedWith(PROPERTY_DOMAIN, domainId);
+        final DomainFileBuilder domainFileBuilder = new DomainFileBuilder(domainId).usingLibrary("lib/bar-1.0.jar").containing(applicationFileBuilder);
+
+        addPackedDomainFromBuilder(domainFileBuilder);
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+        Application application = deploymentService.getApplications().get(0);
+        Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, application.getMuleContext());
+
+        mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
+    }
+
+    @Test
+    public void deploysDomainWithSharedLibPrecedenceOverApplicationLib() throws Exception
+    {
+        final String domainId = "shared-lib";
+        final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml").usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/Plugin1Echo.clazz").deployedWith(PROPERTY_DOMAIN, domainId);
+        final DomainFileBuilder domainFileBuilder = new DomainFileBuilder(domainId).usingLibrary("lib/bar-1.0.jar").containing(applicationFileBuilder);
+
+        addPackedDomainFromBuilder(domainFileBuilder);
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+        Application application = deploymentService.getApplications().get(0);
+        Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, application.getMuleContext());
+
+        mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
+    }
+
+    @Test
+    public void deploysDomainWithSharedLibPrecedenceOverApplicationPluginLib() throws Exception
+    {
+        final String domainId = "shared-lib";
+        final ApplicationPluginFileBuilder pluginFileBuilder = new ApplicationPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").containingClass("org/foo/Plugin1Echo.clazz").usingLibrary("lib/bar-2.0.jar");
+        final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml").containingPlugin(pluginFileBuilder).deployedWith(PROPERTY_DOMAIN, domainId);
+        final DomainFileBuilder domainFileBuilder = new DomainFileBuilder(domainId).usingLibrary("lib/bar-1.0.jar").containing(applicationFileBuilder);
+
+        addPackedDomainFromBuilder(domainFileBuilder);
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+        Application application = deploymentService.getApplications().get(0);
+        Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, application.getMuleContext());
+
+        mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }
 
     @Test
@@ -1928,7 +2014,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
-        TestDomainFactory testDomainFactory = new TestDomainFactory(new MuleDomainClassLoaderRepository());
+        TestDomainFactory testDomainFactory = new TestDomainFactory(new MuleDomainClassLoaderRepository(new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())));
         testDomainFactory.setFailOnStopApplication();
 
         deploymentService.setDomainFactory(testDomainFactory);
@@ -1948,7 +2034,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
-        TestDomainFactory testDomainFactory = new TestDomainFactory(new MuleDomainClassLoaderRepository());
+        TestDomainFactory testDomainFactory = new TestDomainFactory(new MuleDomainClassLoaderRepository(new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())));
         testDomainFactory.setFailOnDisposeApplication();
         deploymentService.setDomainFactory(testDomainFactory);
         deploymentService.start();

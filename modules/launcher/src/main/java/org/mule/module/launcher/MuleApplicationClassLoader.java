@@ -6,7 +6,6 @@
  */
 package org.mule.module.launcher;
 
-import static org.mule.module.artifact.classloader.ClassLoaderLookupPolicy.NULL_LOOKUP_POLICY;
 import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.module.launcher.application.ApplicationClassLoader;
@@ -21,11 +20,6 @@ public class MuleApplicationClassLoader extends MuleArtifactClassLoader implemen
 {
 
     private NativeLibraryFinder nativeLibraryFinder;
-
-    public MuleApplicationClassLoader(String appName, ClassLoader parentCl, NativeLibraryFinder nativeLibraryFinder, List<URL> urls)
-    {
-        this(appName, parentCl, nativeLibraryFinder, urls, NULL_LOOKUP_POLICY);
-    }
 
     public MuleApplicationClassLoader(String appName, ClassLoader parentCl, NativeLibraryFinder nativeLibraryFinder, List<URL> urls, ClassLoaderLookupPolicy lookupPolicy)
     {

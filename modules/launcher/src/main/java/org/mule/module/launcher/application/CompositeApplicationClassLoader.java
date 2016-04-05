@@ -6,127 +6,26 @@
  */
 package org.mule.module.launcher.application;
 
-import org.mule.module.artifact.classloader.CompositeClassLoader;
-import org.mule.module.artifact.classloader.DisposableClassLoader;
-import org.mule.module.launcher.MuleApplicationClassLoader;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.artifact.classloader.ShutdownListener;
+import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
 
-import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Defines a composite classloader for applications
  */
-public class CompositeApplicationClassLoader extends CompositeClassLoader implements ArtifactClassLoader, ApplicationClassLoader
+public class CompositeApplicationClassLoader extends CompositeArtifactClassLoader implements ApplicationClassLoader
 {
 
-    protected static final Log logger = LogFactory.getLog(CompositeApplicationClassLoader.class);
-
-    private final String appName;
-
-    public CompositeApplicationClassLoader(String appName, ClassLoader parent, List<ClassLoader> classLoaders)
+    /**
+     * Creates a new instance
+     *
+     * @param appName name of the artifact owning the created instance.
+     * @param parent parent class loader used to delegate the lookup process. Can be null.
+     * @param classLoaders class loaders to compose. Non empty.
+     * @param lookupPolicy policy used to guide the lookup process. Non null
+     */
+    public CompositeApplicationClassLoader(String appName, ClassLoader parent, List<ClassLoader> classLoaders, ClassLoaderLookupPolicy lookupPolicy)
     {
-        super(parent, classLoaders);
-        this.appName = appName;
+        super(appName, parent, classLoaders, lookupPolicy);
     }
-
-    @Override
-    public String getArtifactName()
-    {
-        return this.appName;
-    }
-
-    @Override
-    public URL findResource(String name)
-    {
-        for (ClassLoader classLoader : classLoaders)
-        {
-            URL resource = findResource(classLoader, name);
-
-            if (resource != null)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug(String.format("Resource '%s' loaded from classLoader '%s", name, classLoader));
-                }
-
-                return resource;
-            }
-        }
-
-        return null;
-    }
-
-    private URL findResource(ClassLoader classLoader, String name)
-    {
-        try
-        {
-            Method findResourceMethod = findDeclaredMethod(classLoader, "findResource", String.class);
-
-            return (URL) findResourceMethod.invoke(classLoader, name);
-        }
-        catch (Exception e)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logReflectionLoadingError(name, classLoader, e, "Resource");
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public URL findLocalResource(String resourceName)
-    {
-        for (ClassLoader classLoader : classLoaders)
-        {
-            if( classLoader instanceof ArtifactClassLoader )
-            {
-                URL resource = ((ArtifactClassLoader)classLoader).findLocalResource(resourceName);
-                if( resource!=null )
-                {
-                    return resource;
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public ClassLoader getClassLoader()
-    {
-        return this;
-    }
-
-    @Override
-    public void dispose()
-    {
-        for (ClassLoader classLoader : classLoaders)
-        {
-            if (classLoader instanceof DisposableClassLoader)
-            {
-                ((DisposableClassLoader) classLoader).dispose();
-            }
-        }
-    }
-
-    @Override
-    public void addShutdownListener(ShutdownListener listener)
-    {
-        for (ClassLoader classLoader : classLoaders)
-        {
-            if (classLoader instanceof MuleApplicationClassLoader)
-            {
-                ((MuleApplicationClassLoader) classLoader).addShutdownListener(listener);
-                return;
-            }
-        }
-    }
-
 }

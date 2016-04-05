@@ -12,8 +12,6 @@ import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXP
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.module.artifact.classloader.ClassLoaderFilter;
 import org.mule.module.artifact.classloader.ClassLoaderFilterFactory;
-import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.module.artifact.classloader.ClassLoaderLookupPolicyFactory;
 import org.mule.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.module.artifact.descriptor.ArtifactDescriptorFactory;
 
@@ -33,21 +31,16 @@ public class ApplicationPluginDescriptorFactory implements ArtifactDescriptorFac
     public static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
     public static final String PLUGIN_PROPERTIES = "plugin.properties";
 
-    private final ClassLoaderLookupPolicyFactory classLoaderLookupPolicyFactory;
     private final ClassLoaderFilterFactory classLoaderFilterFactory;
 
     /**
      * Creates a new instance
-     *
-     * @param classLoaderLookupPolicyFactory creates classloader lookup policies for the created descriptors. Not null.
-     * @param classLoaderFilterFactory creates classloader filters for the created descriptors. Not null.
+     *  @param classLoaderFilterFactory creates classloader filters for the created descriptors. Not null.
      */
-    public ApplicationPluginDescriptorFactory(ClassLoaderLookupPolicyFactory classLoaderLookupPolicyFactory, ClassLoaderFilterFactory classLoaderFilterFactory)
+    public ApplicationPluginDescriptorFactory(ClassLoaderFilterFactory classLoaderFilterFactory)
     {
-        checkArgument(classLoaderLookupPolicyFactory != null, "ClassLoaderLookupPolicyFactory cannot be null");
         checkArgument(classLoaderFilterFactory != null, "ClassLoaderFilterFactory cannot be null");
 
-        this.classLoaderLookupPolicyFactory = classLoaderLookupPolicyFactory;
         this.classLoaderFilterFactory = classLoaderFilterFactory;
     }
 
@@ -71,9 +64,6 @@ public class ApplicationPluginDescriptorFactory implements ArtifactDescriptorFac
             {
                 throw new ArtifactDescriptorCreateException("Cannot read plugin.properties file", e);
             }
-
-            final ClassLoaderLookupPolicy classLoaderLookupPolicy = classLoaderLookupPolicyFactory.create(props.getProperty(PROPERTY_LOADER_OVERRIDE));
-            descriptor.setClassLoaderLookupPolicy(classLoaderLookupPolicy);
 
             String exportedClasses = props.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY);
             String exportedResources = props.getProperty(EXPORTED_RESOURCE_PACKAGES_PROPERTY);

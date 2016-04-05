@@ -11,7 +11,7 @@
 
     <flow name="echo-service">
         <http:listener path="*" config-ref="listenerConfig"/>
-        <component class="org.mule.module.launcher.EchoTest" />
+        <component class="org.foo.EchoTest" />
     </flow>
 
 </mule>

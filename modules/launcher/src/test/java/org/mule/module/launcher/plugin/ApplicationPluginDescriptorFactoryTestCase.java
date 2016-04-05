@@ -22,7 +22,6 @@ import org.mule.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.module.artifact.classloader.ClassLoaderFilter;
 import org.mule.module.artifact.classloader.ClassLoaderFilterFactory;
 import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.module.artifact.classloader.ClassLoaderLookupPolicyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -45,14 +44,12 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
     @Rule
     public TemporaryFolder pluginsFolder = new TemporaryFolder();
 
-    private final ClassLoaderLookupPolicyFactory classLoaderLookupPolicyFactory = mock(ClassLoaderLookupPolicyFactory.class);
     private final ClassLoaderFilterFactory classLoaderFilterFactory = mock(ClassLoaderFilterFactory.class);
-    private ApplicationPluginDescriptorFactory descriptorFactory = new ApplicationPluginDescriptorFactory(classLoaderLookupPolicyFactory, classLoaderFilterFactory);
+    private ApplicationPluginDescriptorFactory descriptorFactory = new ApplicationPluginDescriptorFactory(classLoaderFilterFactory);
 
     @Before
     public void setUp() throws Exception
     {
-        when(classLoaderLookupPolicyFactory.create(null)).thenReturn(ClassLoaderLookupPolicy.NULL_LOOKUP_POLICY);
         when(classLoaderFilterFactory.create(null, null)).thenReturn(ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER);
     }
 
@@ -64,22 +61,6 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
         final ApplicationPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
 
         new PluginDescriptorChecker(pluginFolder).assertPluginDescriptor(pluginDescriptor);
-    }
-
-    @Test
-    public void parsesLoaderOverrides() throws Exception
-    {
-        final File pluginFolder = createPluginFolder();
-
-        final String overrides = "org.foo, org.bar";
-        final ClassLoaderLookupPolicy classLoaderLookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        when(classLoaderLookupPolicyFactory.create(overrides)).thenReturn(classLoaderLookupPolicy);
-
-        new PluginPropertiesBuilder(pluginFolder).overriding(overrides).build();
-
-        final ApplicationPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
-
-        new PluginDescriptorChecker(pluginFolder).configuredWith(classLoaderLookupPolicy).assertPluginDescriptor(pluginDescriptor);
     }
 
     @Test
@@ -150,7 +131,7 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
 
         private final File pluginFolder;
         private URL[] runtimeLibs = new URL[0];;
-        private ClassLoaderLookupPolicy classLoaderLookupPolicy = ClassLoaderLookupPolicy.NULL_LOOKUP_POLICY;
+        private ClassLoaderLookupPolicy classLoaderLookupPolicy = null;
         private ClassLoaderFilter classLoaderFilter = ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 
         public PluginDescriptorChecker(File pluginFolder)
@@ -191,7 +172,6 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
 
             assertRuntimeLibs(pluginDescriptor);
             assertThat(pluginDescriptor.getRootFolder(), equalTo(pluginFolder));
-            assertThat(pluginDescriptor.getClassLoaderLookupPolicy(), is(classLoaderLookupPolicy));
             assertThat(pluginDescriptor.getClassLoaderFilter(), is(classLoaderFilter));
         }
 

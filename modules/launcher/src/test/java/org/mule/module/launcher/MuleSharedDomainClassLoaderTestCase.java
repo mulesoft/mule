@@ -9,8 +9,9 @@ package org.mule.module.launcher;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-
+import static org.mockito.Mockito.mock;
 import org.mule.api.config.MuleProperties;
+import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -19,6 +20,9 @@ import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -37,6 +41,7 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase
     @Rule
     public final SystemProperty muleHomeSystemProperty = new SystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, temporaryFolder.getRoot().getCanonicalPath());
     private final File muleHomeFolder;
+    private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
 
     public MuleSharedDomainClassLoaderTestCase() throws IOException
     {
@@ -51,40 +56,23 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void whenOldDomainExistsUseOldDomain() throws Exception
+    public void findResourcesInProvidedUrls() throws Exception
     {
-        createOldDomainFolder(DEFAULT_DOMAIN_NAME);
         createDomainFolder(DEFAULT_DOMAIN_NAME);
-        createOldDomainResource(DEFAULT_DOMAIN_NAME, RESOURCE_FILE_NAME);
-        MuleSharedDomainClassLoader classLoader = new MuleSharedDomainClassLoader(DEFAULT_DOMAIN_NAME, getClass().getClassLoader());
+        final File resourceFile = createDomainResource(DEFAULT_DOMAIN_NAME, RESOURCE_FILE_NAME);
+        final List<URL> urls = Collections.singletonList(resourceFile.toURI().toURL());
+
+        MuleSharedDomainClassLoader classLoader = new MuleSharedDomainClassLoader(DEFAULT_DOMAIN_NAME, getClass().getClassLoader(), lookupPolicy, urls);
+
         assertThat(classLoader.findResource(RESOURCE_FILE_NAME), notNullValue());
     }
 
-    @Test
-    public void whenOldDomainDonNotExistsUseDomainFolder() throws Exception
+    private File createDomainResource(String domainName, String resourceFile) throws Exception
     {
-        createDomainFolder(DEFAULT_DOMAIN_NAME);
-        createDomainResource(DEFAULT_DOMAIN_NAME, RESOURCE_FILE_NAME);
-        MuleSharedDomainClassLoader classLoader = new MuleSharedDomainClassLoader(DEFAULT_DOMAIN_NAME, getClass().getClassLoader());
-        assertThat(classLoader.findResource(RESOURCE_FILE_NAME), notNullValue());
-    }
+        final File file = new File(getDomainFolder(domainName), resourceFile);
+        assertThat(FileUtils.createFile(file.getAbsolutePath()).exists(), is(true));
 
-    @Test(expected = IllegalArgumentException.class)
-    public void failIfDomainFolderCanNotBeCreated() throws Exception
-    {
-        System.setProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, "not a valid folder");
-        new MuleSharedDomainClassLoader(DEFAULT_DOMAIN_NAME, getClass().getClassLoader());
-    }
-
-
-    private void createOldDomainResource(String domainName, String resourceFile) throws Exception
-    {
-        assertThat(FileUtils.createFile(new File(getOldDomainFolder(domainName), resourceFile).getAbsolutePath()).exists(), is(true));
-    }
-
-    private void createDomainResource(String domainName, String resourceFile) throws Exception
-    {
-        assertThat(FileUtils.createFile(new File(getDomainFolder(domainName), resourceFile).getAbsolutePath()).exists(), is(true));
+        return file;
     }
 
     private void createDomainFolder(String domainName)
@@ -95,15 +83,5 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase
     private File getDomainFolder(String domainName)
     {
         return new File(muleHomeFolder, MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER + File.separator + domainName);  //To change body of created methods use File | Settings | File Templates.
-    }
-
-    private File getOldDomainFolder(String domainName)
-    {
-        return new File(muleHomeFolder, MuleSharedDomainClassLoader.DOMAIN_LIBRARY_FOLDER + File.separator + "shared" + File.separator + domainName);
-    }
-
-    private void createOldDomainFolder(String domainName)
-    {
-        assertThat(getOldDomainFolder(domainName).mkdirs(), is(true));
     }
 }

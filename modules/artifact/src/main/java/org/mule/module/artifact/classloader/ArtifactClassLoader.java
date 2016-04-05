@@ -8,7 +8,7 @@ package org.mule.module.artifact.classloader;
 
 import java.net.URL;
 
-public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourceLocator
+public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourceLocator, ClassLoaderLookupPolicyProvider
 {
 
     /**

@@ -8,9 +8,10 @@ package org.mule.module.launcher;
 
 import static org.mule.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
-
-import org.mule.module.launcher.application.Application;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
+import org.mule.module.artifact.classloader.MuleClassLoaderLookupPolicy;
+import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationFactory;
 import org.mule.module.launcher.application.CompositeApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.DefaultApplicationFactory;
@@ -21,9 +22,12 @@ import org.mule.module.launcher.domain.DomainClassLoaderRepository;
 import org.mule.module.launcher.domain.DomainFactory;
 import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
 import org.mule.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
+import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
 import org.mule.module.launcher.util.DebuggableReentrantLock;
 import org.mule.module.launcher.util.ObservableList;
 import org.mule.util.Preconditions;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
 import java.net.URL;
@@ -32,6 +36,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -46,6 +51,8 @@ import org.apache.commons.logging.LogFactory;
 public class MuleDeploymentService implements DeploymentService
 {
 
+    //TODO(pablo.kraan): MULE-9524: Add a way to configure system packages used on class loading lookup
+    public static final Set<String> SYSTEM_PACKAGES = ImmutableSet.of("java.", "org.mule", "com.mulesoft.mule", "com.mulesoft.module");
     public static final String ARTIFACT_ANCHOR_SUFFIX = "-anchor.txt";
     public static final IOFileFilter ZIP_ARTIFACT_FILTER = new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX), FileFileFilter.FILE);
 
@@ -53,9 +60,9 @@ public class MuleDeploymentService implements DeploymentService
     // fair lock
     private final ReentrantLock deploymentLock = new DebuggableReentrantLock(true);
 
-    private final ObservableList<Application> applications = new ObservableList<Application>();
-    private final ObservableList<Domain> domains = new ObservableList<Domain>();
-    private final List<StartupListener> startupListeners = new ArrayList<StartupListener>();
+    private final ObservableList<Application> applications = new ObservableList<>();
+    private final ObservableList<Domain> domains = new ObservableList<>();
+    private final List<StartupListener> startupListeners = new ArrayList<>();
 
     /**
      * TODO: move to setter as in previous version.
@@ -68,18 +75,21 @@ public class MuleDeploymentService implements DeploymentService
 
     public MuleDeploymentService(ServerPluginClassLoaderManager serverPluginClassLoaderManager)
     {
-        DomainClassLoaderRepository domainClassLoaderRepository = new MuleDomainClassLoaderRepository();
+        final MuleClassLoaderLookupPolicy containerLookupPolicy = new MuleClassLoaderLookupPolicy(Collections.emptyMap(), SYSTEM_PACKAGES);
+
+        DomainClassLoaderRepository domainClassLoaderRepository = new MuleDomainClassLoaderRepository(containerLookupPolicy);
 
         ArtifactClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory(domainClassLoaderRepository, new DefaultNativeLibraryFinderFactory());
         applicationClassLoaderFactory = new CompositeApplicationClassLoaderFactory(applicationClassLoaderFactory, serverPluginClassLoaderManager);
 
         DefaultDomainFactory domainFactory = new DefaultDomainFactory(domainClassLoaderRepository);
         domainFactory.setDeploymentListener(domainDeploymentListener);
-        DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderFactory, domainFactory);
+        final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory()));
+        DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderFactory, domainFactory, applicationDescriptorFactory);
         applicationFactory.setDeploymentListener(applicationDeploymentListener);
 
-        ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<Application>();
-        ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<Domain>();
+        ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>();
+        ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<>();
 
         this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications, deploymentLock, NOP_ARTIFACT_DEPLOYMENT_TEMPLATE);
         this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);

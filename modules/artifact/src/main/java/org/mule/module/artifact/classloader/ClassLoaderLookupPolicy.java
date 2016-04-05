@@ -7,59 +7,36 @@
 
 package org.mule.module.artifact.classloader;
 
-import static java.util.Collections.emptySet;
-import static org.apache.commons.lang.ClassUtils.getPackageName;
-import static org.mule.util.Preconditions.checkArgument;
-
-import java.util.Collections;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * Defines which resources in a class loader should be looked up
- * using parent-first, child-first or child only methods.
+ * using parent-first, child-first or child only strategies.
  * <p/>
- * Default lookup method is parent first. To use child-first, the
+ * Default lookup strategy is parent first. To use child-first, the
  * corresponding package must be added as an overridden. To use
  * child-only, the corresponding package must be added as blocked.
  */
-public class ClassLoaderLookupPolicy
+public interface ClassLoaderLookupPolicy
 {
 
-    public static final ClassLoaderLookupPolicy NULL_LOOKUP_POLICY = new ClassLoaderLookupPolicy(emptySet(), emptySet());
-
-    private final Set<String> overridden;
-    private final Set<String> blocked;
-
     /**
-     * Creates a new lookup policy based on the provided configuration.
+     * Returns the classloader lookup strategy to use for a given class.
      *
-     * @param overridden packages that must use child first lookup method. Non null
-     * @param blocked packages that must use child only lookup method. Non null
+     * @param className class to lookup.
+     * @return the configured lookup strategy for the class's package or
+     * {@link ClassLoaderLookupStrategy#CHILD_FIRST} if not explicit configuration
+     * was defined for the package.
      */
-    public ClassLoaderLookupPolicy(Set<String> overridden, Set<String> blocked)
-    {
-        checkArgument(overridden != null, "Overridden packages cannot be null");
-        checkArgument(blocked != null, "Blocked packages cannot be null");
-
-        this.overridden = Collections.unmodifiableSet(overridden);
-        this.blocked = Collections.unmodifiableSet(blocked);
-    }
+    ClassLoaderLookupStrategy getLookupStrategy(String className);
 
     /**
-     * @return true if the given class name is defined as overridden, false otherwise
+     * Creates a new instance extending the original poclicy configuration
+     *
+     * @param lookupStrategies lookup strategies to use with specific packages. Non null.
+     * @return a new policy containing the lookup strategies from the original policy
+     * and the lookup strategies passed on the parameter.
      */
-    public boolean isOverridden(String className)
-    {
-        final String packageName = getPackageName(className);
-        return overridden.contains(packageName);
-    }
+    ClassLoaderLookupPolicy extend(Map<String, ClassLoaderLookupStrategy> lookupStrategies);
 
-    /**
-     * @return true if the given package name is defined as blocked, false otherwise
-     */
-    public boolean isBlocked(String className)
-    {
-        final String packageName = getPackageName(className);
-        return blocked.contains(packageName);
-    }
 }

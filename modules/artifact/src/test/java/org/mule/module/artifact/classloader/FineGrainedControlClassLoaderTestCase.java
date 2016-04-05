@@ -6,9 +6,12 @@
  */
 package org.mule.module.artifact.classloader;
 
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.module.artifact.classloader.ClassLoaderLookupStrategy.CHILD_FIRST;
+import static org.mule.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
+import static org.mule.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.ClassUtils;
@@ -24,72 +27,125 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase
 {
 
     public static final String TEST_CLASS_PACKAGE = "mypackage";
+    public static final String TEST_CLASS_NAME = TEST_CLASS_PACKAGE + ".MyClass";
     public static final String EXPECTED_CHILD_MESSAGE = "Bye";
     public static final String EXPECTED_PARENT_MESSAGE = "Hello";
 
     @Test
-    public void parentFirst() throws Exception
+    public void usesParentOnlyLookup() throws Exception
     {
-        URLClassLoader parent = new URLClassLoader(new URL[] { hello() }, Thread.currentThread().getContextClassLoader());
+        URLClassLoader parent = new URLClassLoader(new URL[] {getParentResource()}, Thread.currentThread().getContextClassLoader());
 
-        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] { bye() }, parent);
-        assertEquals(EXPECTED_PARENT_MESSAGE, callHi(ext));
-    }
+        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+        when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_ONLY);
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
 
-    @Test
-    public void childResolvesOverridden() throws Exception
-    {
-        URLClassLoader parent = new URLClassLoader(new URL[] { hello() }, Thread.currentThread().getContextClassLoader());
-
-        final ClassLoaderLookupPolicy lookupPolicy = new ClassLoaderLookupPolicy(singleton(TEST_CLASS_PACKAGE), emptySet());
-        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] { bye() }, parent, lookupPolicy);
-
-        assertEquals(EXPECTED_CHILD_MESSAGE, callHi(ext));
-    }
-
-    @Test
-    public void parentResolvesMissingOverride() throws Exception
-    {
-        URLClassLoader parent = new URLClassLoader(new URL[] { hello() }, Thread.currentThread().getContextClassLoader());
-
-                final ClassLoaderLookupPolicy lookupPolicy = new ClassLoaderLookupPolicy(singleton(TEST_CLASS_PACKAGE), emptySet());
-        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], parent, lookupPolicy);
-        assertEquals(EXPECTED_PARENT_MESSAGE, callHi(ext));
+        assertEquals(EXPECTED_PARENT_MESSAGE, invokeTestClassMethod(ext));
     }
 
     @Test(expected = ClassNotFoundException.class)
-    public void blockedParentOverride() throws Exception
+    public void usesParentOnlyLookupAndFails() throws Exception
     {
-        URLClassLoader parent = new URLClassLoader(new URL[] { hello() }, Thread.currentThread().getContextClassLoader());
+        ClassLoader parent = mock(ClassLoader.class);
+        when(parent.loadClass(TEST_CLASS_NAME)).thenThrow(new ClassNotFoundException("ERROR"));
 
-        final ClassLoaderLookupPolicy lookupPolicy = new ClassLoaderLookupPolicy(emptySet(), singleton(TEST_CLASS_PACKAGE));
-        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], parent, lookupPolicy);
-        callHi(ext);
+        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+        when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_ONLY);
+
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
+
+        ext.loadClass(TEST_CLASS_NAME);
     }
 
     @Test
-    public void blockedOverrideIsLoadedInChild() throws Exception
+    public void usesParentFirstLookup() throws Exception
     {
-        URLClassLoader parent = new URLClassLoader(new URL[] { hello() }, Thread.currentThread().getContextClassLoader());
+        URLClassLoader parent = new URLClassLoader(new URL[] {getParentResource()}, Thread.currentThread().getContextClassLoader());
 
-        final ClassLoaderLookupPolicy lookupPolicy = new ClassLoaderLookupPolicy(emptySet(), singleton(TEST_CLASS_PACKAGE));
-        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] { bye() }, parent, lookupPolicy);
-        assertEquals(EXPECTED_CHILD_MESSAGE, callHi(ext));
+        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+        when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_FIRST);
+
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
+
+        assertEquals(EXPECTED_PARENT_MESSAGE, invokeTestClassMethod(ext));
     }
 
-    private URL hello()
+    @Test
+    public void usesParentFirstThenChildLookup() throws Exception
+    {
+        ClassLoader parent = Thread.currentThread().getContextClassLoader();
+
+        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+        when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_FIRST);
+
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
+
+        assertEquals(EXPECTED_CHILD_MESSAGE, invokeTestClassMethod(ext));
+    }
+
+    @Test(expected = ClassNotFoundException.class)
+    public void usesParentFirstAndChildLookupAndFails() throws Exception
+    {
+        doClassNotFoundTest(PARENT_FIRST);
+    }
+
+    @Test
+    public void usesChildFirstLookup() throws Exception
+    {
+        URLClassLoader parent = new URLClassLoader(new URL[] {getParentResource()}, Thread.currentThread().getContextClassLoader());
+
+        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+        when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(CHILD_FIRST);
+
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
+
+        assertEquals(EXPECTED_CHILD_MESSAGE, invokeTestClassMethod(ext));
+    }
+
+    @Test
+    public void usesChildFirstThenParentLookup() throws Exception
+    {
+        URLClassLoader parent = new URLClassLoader(new URL[] {getParentResource()}, Thread.currentThread().getContextClassLoader());
+
+        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+        when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_FIRST);
+
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], parent, lookupPolicy);
+
+        assertEquals(EXPECTED_PARENT_MESSAGE, invokeTestClassMethod(ext));
+    }
+
+    @Test(expected = ClassNotFoundException.class)
+    public void usesChildFirstThenParentLookupAndFails() throws Exception
+    {
+        doClassNotFoundTest(CHILD_FIRST);
+    }
+
+    private void doClassNotFoundTest(ClassLoaderLookupStrategy lookupStrategy) throws Exception
+    {
+        ClassLoader parent = Thread.currentThread().getContextClassLoader();
+
+        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+        when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(lookupStrategy);
+
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], parent, lookupPolicy);
+
+        invokeTestClassMethod(ext);
+    }
+
+    private URL getParentResource()
     {
         return ClassUtils.getResource("classloader-test-hello.jar", this.getClass());
     }
 
-    private URL bye()
+    private URL getChildFileResource()
     {
         return ClassUtils.getResource("classloader-test-bye.jar", this.getClass());
     }
 
-    private String callHi(ClassLoader loader) throws Exception
+    private String invokeTestClassMethod(ClassLoader loader) throws Exception
     {
-        Class cls = loader.loadClass("mypackage.MyClass");
+        Class cls = loader.loadClass(TEST_CLASS_NAME);
         Method method = cls.getMethod("hi");
         return (String) method.invoke(cls.newInstance());
     }
