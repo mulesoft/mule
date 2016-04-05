@@ -52,7 +52,10 @@ public class MuleDeploymentService implements DeploymentService
 {
 
     //TODO(pablo.kraan): MULE-9524: Add a way to configure system packages used on class loading lookup
-    public static final Set<String> SYSTEM_PACKAGES = ImmutableSet.of("java.", "org.mule", "com.mulesoft.mule", "com.mulesoft.module");
+    public static final Set<String> SYSTEM_PACKAGES = ImmutableSet.of(
+            "java.", "org.mule", "com.mulesoft.mule.config", "com.mulesoft.mule.bti", "com.mulesoft.mule.cache",
+            "com.mulesoft.mule.cluster", "com.mulesoft.mule.plugin", "com.mulesoft.mule.saml", "com.mulesoft.mule.throttling",
+            "com.mulesoft.mule.tracking", "com.mulesoft.mule.transaction", "com.mulesoft.module");
     public static final String ARTIFACT_ANCHOR_SUFFIX = "-anchor.txt";
     public static final IOFileFilter ZIP_ARTIFACT_FILTER = new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX), FileFileFilter.FILE);
 
