@@ -93,6 +93,8 @@ import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelEl
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.module.extension.internal.capability.xml.schema.model.Union;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.module.extension.internal.model.SubTypesMapper;
+import org.mule.module.extension.internal.model.property.SubTypesModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.module.extension.internal.util.NameUtils;
@@ -101,8 +103,10 @@ import org.mule.util.ValueHolder;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -135,8 +139,9 @@ public final class SchemaBuilder
 
     private Schema schema;
     private boolean requiresTls = false;
+    private SubTypesMapper subTypesMapping;
 
-    public static SchemaBuilder newSchema(String targetNamespace)
+    public static SchemaBuilder newSchema(ExtensionModel extensionModel, String targetNamespace)
     {
         SchemaBuilder builder = new SchemaBuilder();
         builder.schema = new Schema();
@@ -148,7 +153,16 @@ public final class SchemaBuilder
                 .importMuleNamespace()
                 .importMuleExtensionNamespace();
 
+        Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
+        builder.withTypeMapping(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : new SubTypesMapper(Collections.emptyMap()));
+
         return builder;
+    }
+
+    private SchemaBuilder withTypeMapping(SubTypesMapper subTypesMapping)
+    {
+        this.subTypesMapping = subTypesMapping;
+        return this;
     }
 
     public Schema build()
@@ -830,6 +844,14 @@ public final class SchemaBuilder
                                                         objectType,
                                                         false);
                     }
+                    else
+                    {
+                        List<MetadataType> subTypes = subTypesMapping.getSubTypes(parameterModel.getType());
+                        if (!subTypes.isEmpty())
+                        {
+                            registerPojoSubtypes(subTypes, all);
+                        }
+                    }
                 }
                 else
                 {
@@ -866,9 +888,26 @@ public final class SchemaBuilder
 
             private boolean shouldForceOptional(Class<?> type)
             {
-                return !parameterModel.isRequired() || (IntrospectionUtils.isInstantiable(type) && ExpressionSupport.REQUIRED != parameterModel.getExpressionSupport());
+                return !parameterModel.isRequired() ||
+                       !subTypesMapping.getSubTypes(parameterModel.getType()).isEmpty()||
+                       (IntrospectionUtils.isInstantiable(type) && ExpressionSupport.REQUIRED != parameterModel.getExpressionSupport());
             }
         };
+    }
+
+    private void registerPojoSubtypes(List<MetadataType> subTypes , ExplicitGroup all)
+    {
+        ExplicitGroup choice = new ExplicitGroup();
+        choice.setMinOccurs(ZERO);
+        choice.setMaxOccurs("1");
+
+        subTypes.forEach(subtype -> {
+                    TopLevelElement subtypeElement = createTopLevelElement(hyphenize(IntrospectionUtils.getAliasName(subtype)), ZERO, "1");
+                    subtypeElement.setComplexType(newLocalComplexTypeWithBase((ObjectType) subtype, EMPTY));
+                    choice.getParticle().add(objectFactory.createElement(subtypeElement));
+                });
+
+        all.getParticle().add(objectFactory.createChoice(choice));
     }
 
     private boolean isOperation(MetadataType type)

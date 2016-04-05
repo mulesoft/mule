@@ -35,7 +35,6 @@ public class OperationMessageProcessorFactoryBean extends ExtensionComponentFact
 {
 
     private final String configurationProviderName;
-    private final RuntimeExtensionModel extensionModel;
     private final RuntimeOperationModel operationModel;
     private final ElementDescriptor element;
     private final ExtensionManagerAdapter extensionManager;

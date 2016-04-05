@@ -63,7 +63,7 @@ final class TopLevelParameterTypeFactoryBean extends ExtensionComponentFactoryBe
     {
         if (valueResolver == null)
         {
-            valueResolver = parserDelegate.parseElement(element, EMPTY, metadataType, null);
+            valueResolver = parserDelegate.parseElement(element, EMPTY, EMPTY, metadataType, null);
         }
 
         return valueResolver;

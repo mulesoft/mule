@@ -8,8 +8,8 @@ package org.mule.module.extension.internal.config;
 
 import static org.mule.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
-
 import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -30,11 +30,13 @@ final class ConnectionProviderBeanDefinitionParser extends BaseExtensionBeanDefi
 {
 
     private final ConnectionProviderModel providerModel;
+    private final ExtensionModel extensionModel;
 
-    public ConnectionProviderBeanDefinitionParser(ConnectionProviderModel providerModel)
+    public ConnectionProviderBeanDefinitionParser(ExtensionModel extensionModel, ConnectionProviderModel providerModel)
     {
         super(ConnectionProviderFactoryBean.class);
         this.providerModel = providerModel;
+        this.extensionModel = extensionModel;
     }
 
     @Override
@@ -45,6 +47,7 @@ final class ConnectionProviderBeanDefinitionParser extends BaseExtensionBeanDefi
             parserDelegate.parseConnectionProviderName(element, builder);
         }
 
+        builder.addConstructorArgValue(extensionModel);
         builder.addConstructorArgValue(providerModel);
         builder.addConstructorArgValue(parserDelegate.toElementDescriptorBeanDefinition(element));
 

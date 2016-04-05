@@ -25,6 +25,8 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getSupe
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.metadata.DefaultMetadataResolverFactory;
+import org.mule.api.metadata.NullMetadataResolverFactory;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Configuration;
@@ -36,6 +38,8 @@ import org.mule.extension.api.annotation.ExtensionOf;
 import org.mule.extension.api.annotation.OnException;
 import org.mule.extension.api.annotation.Operations;
 import org.mule.extension.api.annotation.Sources;
+import org.mule.extension.api.annotation.SubTypeMapping;
+import org.mule.extension.api.annotation.SubTypesMapping;
 import org.mule.extension.api.annotation.connector.Providers;
 import org.mule.extension.api.annotation.metadata.MetadataScope;
 import org.mule.extension.api.annotation.param.Connection;
@@ -69,14 +73,13 @@ import org.mule.module.extension.internal.exception.IllegalOperationModelDefinit
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.module.extension.internal.introspection.ParameterGroup;
 import org.mule.module.extension.internal.introspection.VersionResolver;
-import org.mule.api.metadata.DefaultMetadataResolverFactory;
-import org.mule.api.metadata.NullMetadataResolverFactory;
 import org.mule.module.extension.internal.model.property.ConfigTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.module.extension.internal.model.property.SubTypesModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
 import org.mule.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
@@ -158,6 +161,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 .withExceptionEnricherFactory(getExceptionEnricherFactory(extensionType))
                 .withModelProperty(new ImplementingTypeModelProperty(extensionType));
 
+        declareSubTypesMapping(declaration, extensionType);
         declareConfigurations(declaration, extensionType);
         declareOperations(declaration, extensionType);
         declareConnectionProviders(declaration, extensionType);
@@ -169,6 +173,17 @@ public final class AnnotationsBasedDescriber implements Describer
     private String getVersion(Extension extension)
     {
         return versionResolver.resolveVersion(extension);
+    }
+
+    private void declareSubTypesMapping(ExtensionDeclarer declaration, Class<?> extensionType)
+    {
+        SubTypesMapping typesMapping = this.extensionType.getAnnotation(SubTypesMapping.class);
+
+        if (typesMapping != null)
+        {
+            declaration.withModelProperty(new SubTypesModelProperty(
+                    Arrays.stream(typesMapping.value()).collect(Collectors.toMap(SubTypeMapping::baseType, sm -> Arrays.asList(sm.subTypes())))));
+        }
     }
 
     private void declareConfigurations(ExtensionDeclarer declaration, Class<?> extensionType)
@@ -523,6 +538,8 @@ public final class AnnotationsBasedDescriber implements Describer
 
         for (ParsedParameter parsedParameter : descriptors)
         {
+            final Class<?> parameterType = getType(parsedParameter.getType(), typeLoader.getClassLoader());
+
             if (parsedParameter.isAdvertised())
             {
                 ParameterDeclarer parameter = parsedParameter.isRequired()
@@ -537,19 +554,21 @@ public final class AnnotationsBasedDescriber implements Describer
                 {
                     parameter.withModelProperty(displayModelProperty);
                 }
+
                 parseMetadataAnnotations(parsedParameter, parameter);
+
             }
 
             Connection connectionAnnotation = parsedParameter.getAnnotation(Connection.class);
             if (connectionAnnotation != null)
             {
-                operation.withModelProperty(new ConnectionTypeModelProperty(getType(parsedParameter.getType(), typeLoader.getClassLoader())));
+                operation.withModelProperty(new ConnectionTypeModelProperty(parameterType));
             }
 
             UseConfig useConfig = parsedParameter.getAnnotation(UseConfig.class);
             if (useConfig != null)
             {
-                operation.withModelProperty(new ConfigTypeModelProperty(getType(parsedParameter.getType())));
+                operation.withModelProperty(new ConfigTypeModelProperty(parameterType));
             }
         }
     }

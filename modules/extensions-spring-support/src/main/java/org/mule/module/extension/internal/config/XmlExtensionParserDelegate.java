@@ -40,6 +40,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.annotation.GenericTypesAnnotation;
 import org.mule.module.extension.internal.introspection.BasicTypeMetadataVisitor;
+import org.mule.module.extension.internal.model.SubTypesMapper;
 import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.CollectionValueResolver;
@@ -65,11 +66,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -99,6 +102,7 @@ final class XmlExtensionParserDelegate
 
     private Map<Class<?>, Object> infrastructureParameters = new HashMap<>();
     private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+    private SubTypesMapper subTypesMapping = new SubTypesMapper(Collections.emptyMap());
 
     /**
      * Parses the given {@code element} for an attribute named {@code name}. If not found,
@@ -156,7 +160,24 @@ final class XmlExtensionParserDelegate
             return new StaticValueResolver<>(getAttributeValue(element, parameterModel.getName(), parameterModel.getDefaultValue()));
         }
 
-        return parseElement(element, parameterModel.getName(), parameterModel.getType(), parameterModel.getDefaultValue());
+        if (!subTypesMapping.getSubTypes(parameterModel.getType()).isEmpty())
+        {
+            List<MetadataType> subtypes = subTypesMapping.getSubTypes(parameterModel.getType());
+            Optional<MetadataType> subTypeChildElement = subtypes.stream()
+                    .filter(s -> element.getChildByName(hyphenize(IntrospectionUtils.getAliasName(s))) != null)
+                    .findFirst();
+
+            if (subTypeChildElement.isPresent())
+            {
+                return parseElement(element, parameterModel.getName(),
+                                    hyphenize(IntrospectionUtils.getAliasName(subTypeChildElement.get())),
+                                    subTypeChildElement.get(),
+                                    parameterModel.getDefaultValue());
+            }
+        }
+
+        return parseElement(element, parameterModel.getName(), hyphenize(parameterModel.getName()),
+                            parameterModel.getType(), parameterModel.getDefaultValue());
     }
 
     /**
@@ -172,11 +193,11 @@ final class XmlExtensionParserDelegate
      */
     ValueResolver parseElement(final ElementDescriptor element,
                                final String fieldName,
+                               final String elementName,
                                final MetadataType metadataType,
                                final Object defaultValue)
     {
-        final String hyphenizedFieldName = hyphenize(fieldName);
-        final String singularName = singularize(hyphenizedFieldName);
+        final String singularName = singularize(elementName);
         final ValueHolder<ValueResolver> resolverReference = new ValueHolder<>();
 
         metadataType.accept(new MetadataTypeVisitor()
@@ -197,7 +218,7 @@ final class XmlExtensionParserDelegate
             @Override
             public void visitArrayType(ArrayType arrayType)
             {
-                resolverReference.set(parseCollection(element, fieldName, hyphenizedFieldName, singularName, defaultValue, arrayType));
+                resolverReference.set(parseCollection(element, fieldName, elementName, singularName, defaultValue, arrayType));
             }
 
             /**
@@ -207,18 +228,18 @@ final class XmlExtensionParserDelegate
             @Override
             public void visitDictionary(DictionaryType dictionaryType)
             {
-                final String pluralName = pluralize(hyphenizedFieldName);
+                final String pluralName = pluralize(elementName);
                 String parentName;
                 String childname;
-                if (StringUtils.equals(pluralName, hyphenizedFieldName))
+                if (StringUtils.equals(pluralName, elementName))
                 {
-                    parentName = hyphenizedFieldName;
+                    parentName = elementName;
                     childname = singularName;
                 }
                 else
                 {
                     parentName = pluralName;
-                    childname = hyphenizedFieldName;
+                    childname = elementName;
                 }
 
                 resolverReference.set(parseMap(element, fieldName, parentName, childname, defaultValue, dictionaryType));
@@ -227,7 +248,7 @@ final class XmlExtensionParserDelegate
             @Override
             public void visitObject(ObjectType objectType)
             {
-                resolverReference.set(parsePojo(element, fieldName, hyphenizedFieldName, objectType, defaultValue));
+                resolverReference.set(parsePojo(element, fieldName, elementName, objectType, defaultValue));
             }
 
             @Override
@@ -782,5 +803,10 @@ final class XmlExtensionParserDelegate
 
         ValueResolver<?> resolver = parseParameter(element, parameterModel);
         return resolver == null ? new StaticValueResolver(null) : resolver;
+    }
+
+    void setSubTypesMapping(SubTypesMapper subTypesMapping)
+    {
+        this.subTypesMapping = subTypesMapping;
     }
 }

@@ -14,6 +14,7 @@ import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.internal.connection.ConnectionManagerAdapter;
 import org.mule.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
@@ -43,10 +44,11 @@ public class ConnectionProviderFactoryBean extends ExtensionComponentFactoryBean
     @Inject
     private ConnectionManagerAdapter connectionManager;
 
-    public ConnectionProviderFactoryBean(RuntimeConnectionProviderModel providerModel, ElementDescriptor element)
+    public ConnectionProviderFactoryBean(RuntimeExtensionModel extensionModel, RuntimeConnectionProviderModel providerModel, ElementDescriptor element)
     {
         this.providerModel = providerModel;
         this.element = element;
+        this.extensionModel = extensionModel;
     }
 
     /**

@@ -39,6 +39,8 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
+import org.mule.metadata.java.utils.JavaTypeUtils;
+import org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -367,6 +369,12 @@ public final class IntrospectionUtils
     public static ExpressionSupport getExpressionSupport(Expression expressionAnnotation)
     {
         return expressionAnnotation != null ? expressionAnnotation.value() : SUPPORTED;
+    }
+
+    public static String getAliasName(MetadataType metadataType)
+    {
+        Class<?> type = JavaTypeUtils.getType(metadataType);
+        return MuleExtensionAnnotationParser.getAliasName(type.getSimpleName(), type.getAnnotation(Alias.class));
     }
 
     public static String getAlias(Field field)

@@ -73,7 +73,7 @@ public final class MuleExtensionAnnotationParser
         return getAliasName(field.getName(), field.getAnnotation(Alias.class));
     }
 
-    static String getAliasName(String defaultName, Alias aliasAnnotation)
+    public static String getAliasName(String defaultName, Alias aliasAnnotation)
     {
         String alias = aliasAnnotation != null ? aliasAnnotation.value() : null;
         return StringUtils.isEmpty(alias) ? defaultName : alias;

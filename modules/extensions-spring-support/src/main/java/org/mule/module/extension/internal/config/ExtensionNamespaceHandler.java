@@ -23,14 +23,18 @@ import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.module.extension.internal.model.SubTypesMapper;
+import org.mule.module.extension.internal.model.property.SubTypesModelProperty;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -52,10 +56,10 @@ import org.w3c.dom.Element;
 public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
 {
 
-    private ExtensionManager extensionManager;
     private final Map<String, ExtensionModel> handledExtensions = new HashMap<>();
     private final Multimap<ExtensionModel, String> topLevelParameters = HashMultimap.create();
     private final Map<String, BeanDefinitionParser> parsers = new HashMap<>();
+    private ExtensionManager extensionManager;
 
     /**
      * Attempts to get a hold on a {@link ExtensionManager}
@@ -100,7 +104,7 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
             registerTopLevelParameters(extensionModel);
             registerConfigurations(extensionModel);
             registerOperations(extensionModel, extensionModel.getOperationModels());
-            registerConnectionProviders(extensionModel.getConnectionProviders());
+            registerConnectionProviders(extensionModel, extensionModel.getConnectionProviders());
             registerMessageSources(extensionModel, extensionModel.getSourceModels());
 
             handledExtensions.put(namespace, extensionModel);
@@ -121,15 +125,15 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
         extensionModel.getConfigurationModels().forEach(configurationModel -> {
             registerParser(configurationModel.getName(), new ConfigurationBeanDefinitionParser((RuntimeConfigurationModel) configurationModel));
             registerOperations(extensionModel, configurationModel.getOperationModels());
-            registerConnectionProviders(configurationModel.getConnectionProviders());
+            registerConnectionProviders(extensionModel, configurationModel.getConnectionProviders());
             registerMessageSources(extensionModel, configurationModel.getSourceModels());
         });
 
     }
 
-    private void registerConnectionProviders(List<ConnectionProviderModel> connectionProviders)
+    private void registerConnectionProviders(ExtensionModel extensionModel, List<ConnectionProviderModel> connectionProviders)
     {
-        connectionProviders.forEach(providerModel -> registerParser(providerModel.getName(), new ConnectionProviderBeanDefinitionParser(providerModel)));
+        connectionProviders.forEach(providerModel -> registerParser(providerModel.getName(), new ConnectionProviderBeanDefinitionParser(extensionModel, providerModel)));
     }
 
     private void registerMessageSources(ExtensionModel extensionModel, List<SourceModel> sourceModels)
@@ -176,7 +180,20 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
 
     private void registerTopLevelParameter(ExtensionModel extensionModel, Collection<ParameterModel> parameterModels)
     {
-        parameterModels.forEach(parameterModel -> registerTopLevelParameter(extensionModel, parameterModel.getType()));
+        Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
+        SubTypesMapper typeMapping = subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : new SubTypesMapper(Collections.emptyMap());
+
+        parameterModels.forEach(parameterModel -> {
+            List<MetadataType> parameterSubTypes = typeMapping.getSubTypes(parameterModel.getType());
+            if (parameterSubTypes.isEmpty())
+            {
+                registerTopLevelParameter(extensionModel, parameterModel.getType());
+            }
+            else
+            {
+                parameterSubTypes.forEach(subtype -> registerTopLevelParameter(extensionModel, subtype));
+            }
+        });
     }
 
 
