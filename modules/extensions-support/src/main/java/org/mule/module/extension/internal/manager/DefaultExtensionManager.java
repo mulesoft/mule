@@ -244,6 +244,24 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         return extensionRegistry.getExtensions();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<RuntimeExtensionModel> getExtensions(String extensionName)
+    {
+        return extensionRegistry.getExtensions(extensionName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<RuntimeExtensionModel> getExtension(String extensionName, String vendor)
+    {
+        return extensionRegistry.getExtension(extensionName, vendor);
+    }
+
     private ConfigurationExpirationMonitor newConfigurationExpirationMonitor()
     {
         Time freq = getConfigurationExpirationFrequency();
