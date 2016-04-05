@@ -6,9 +6,9 @@
  */
 package org.mule.transport;
 
+import static org.mule.OptimizedRequestContext.unsafeSetEvent;
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.CompletionHandler;
@@ -17,6 +17,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -133,7 +134,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                     resultMessage);
             requestEvent.getSession().merge(storedSession);
             MuleEvent resultEvent = new DefaultMuleEvent(resultMessage, requestEvent);
-            OptimizedRequestContext.unsafeSetEvent(resultEvent);
+            unsafeSetEvent(resultEvent);
             return resultEvent;
         }
         else
@@ -287,7 +288,11 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                     {
                         try
                         {
-                            event.getReplyToHandler().processReplyTo(createResponseEvent(result, event), null, null);
+                            resetAccessControl(result);
+                            MuleEvent responseEvent = createResponseEvent(result, event);
+                            // Set RequestContext ThreadLocal in new thread for backwards compatibility
+                            unsafeSetEvent(responseEvent);
+                            event.getReplyToHandler().processReplyTo(responseEvent, null, null);
                         }
                         catch (MessagingException messagingException)
                         {
@@ -322,6 +327,9 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                     @Override
                     public void run()
                     {
+                        resetAccessControl(event);
+                        // Set RequestContext ThreadLocal in new thread for backwards compatibility
+                        unsafeSetEvent(event);
                         event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, exception), null);
                     }
 
@@ -338,5 +346,15 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                 event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, exception), null);
             }
         }
+
+        private void resetAccessControl(Object result)
+        {
+            // Reset access control for new thread
+            if (result instanceof ThreadSafeAccess)
+            {
+                ((ThreadSafeAccess) result).resetAccessControl();
+            }
+        }
+
     }
 }

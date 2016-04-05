@@ -41,9 +41,12 @@ import org.mule.transport.jms.jndi.SimpleJndiNameResolver;
 import org.mule.transport.jms.redelivery.AutoDiscoveryRedeliveryHandlerFactory;
 import org.mule.transport.jms.redelivery.RedeliveryHandlerFactory;
 import org.mule.util.BeanUtils;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.jms.Connection;
@@ -187,6 +190,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
      */
     private volatile boolean disconnecting;
 
+    private Timer responseTimeoutTimer;
+
     ////////////////////////////////////////////////////////////////////////
     // Methods
     ////////////////////////////////////////////////////////////////////////
@@ -212,6 +217,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        responseTimeoutTimer = new Timer(ThreadNameHelper.getPrefix(muleContext) + name + ".ResponseTimeoutTimer");
         if (jmsSupport == null)
         {
             jmsSupport = createJmsSupport();
@@ -382,6 +388,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             jndiNameResolver.dispose();
         }
+        responseTimeoutTimer.cancel();
     }
 
     protected Object lookupFromJndi(String jndiName) throws NamingException
@@ -1465,5 +1472,16 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     protected Object getOperationResourceFactory()
     {
         return getConnection();
+    }
+
+    /**
+     * Schedules a timeout task used for performing timeout of async responses.
+     *
+     * @param timerTask task to be executed on timeout
+     * @param timeout the number of milliseconds after which the timeout task should be executed
+     */
+    public void scheduleTimeoutTask(TimerTask timerTask, int timeout)
+    {
+        responseTimeoutTimer.schedule(timerTask, timeout);
     }
 }
