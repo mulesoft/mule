@@ -28,6 +28,16 @@ final class ExtensionEntityKey
         this.name = name;
     }
 
+    public String getName()
+    {
+        return name;
+    }
+
+    public String getVendor()
+    {
+        return vendor;
+    }
+
     @Override
     public boolean equals(Object o)
     {

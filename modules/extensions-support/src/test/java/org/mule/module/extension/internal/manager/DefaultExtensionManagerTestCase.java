@@ -11,6 +11,7 @@ import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -51,6 +52,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -196,6 +198,24 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
     {
         discover();
         testEquals(getTestExtensions(), extensionsManager.getExtensions());
+    }
+
+    @Test
+    public void getExtensionByNameAndVendor()
+    {
+        discover();
+        assertThat(extensionsManager.getExtension(EXTENSION2_NAME, MULESOFT).get(), is(sameInstance(extensionModel2)));
+        assertThat(extensionsManager.getExtension(EXTENSION2_NAME, OTHER_VENDOR).get(), is(sameInstance(extensionModel3WithRepeatedName)));
+        assertThat(extensionsManager.getExtension(EXTENSION1_NAME, OTHER_VENDOR).isPresent(), is(false));
+    }
+
+    @Test
+    public void getExtensionsByName()
+    {
+        discover();
+        Set<RuntimeExtensionModel> extensions = extensionsManager.getExtensions(EXTENSION1_NAME);
+        assertThat(extensions, hasSize(1));
+        assertThat(extensions.iterator().next(), is(sameInstance(extensionModel1)));
     }
 
     @Test

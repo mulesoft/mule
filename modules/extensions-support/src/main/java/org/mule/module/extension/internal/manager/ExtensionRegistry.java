@@ -19,6 +19,7 @@ import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ExpirableConfigurationProvider;
 import org.mule.util.collection.ImmutableListCollector;
+import org.mule.util.collection.ImmutableSetCollector;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -90,6 +91,27 @@ final class ExtensionRegistry
     Set<RuntimeExtensionModel> getExtensions()
     {
         return ImmutableSet.copyOf(extensions.values());
+    }
+
+    /**
+     * @return an immutable view of the currently registered {@link ExtensionModel extensionModels}
+     * which name equals {@code extensionName}
+     */
+    Set<RuntimeExtensionModel> getExtensions(String extensionName)
+    {
+        return extensions.entrySet().stream()
+                .filter(entry -> entry.getKey().getName().equals(extensionName))
+                .map(Map.Entry::getValue)
+                .collect(new ImmutableSetCollector<>());
+    }
+
+    /**
+     * @return an {@link Optional} with the {@link ExtensionModel} which name and vendor equals
+     * {@code extensionName} and {@code vendor}
+     */
+    Optional<RuntimeExtensionModel> getExtension(String extensionName, String vendor)
+    {
+        return Optional.ofNullable(extensions.get(new ExtensionEntityKey(extensionName, vendor)));
     }
 
     /**
