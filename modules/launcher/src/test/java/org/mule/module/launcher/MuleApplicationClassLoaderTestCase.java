@@ -6,15 +6,18 @@
  */
 package org.mule.module.launcher;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mule.module.launcher.MuleFoldersUtil.getAppClassesFolder;
 import static org.mule.module.launcher.MuleFoldersUtil.getAppLibFolder;
 import org.mule.api.config.MuleProperties;
+import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.FileUtils;
@@ -86,9 +89,9 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase
         FileUtils.stringToFile(new File(domainDir, RESOURCE_JUST_IN_DOMAIN).getAbsolutePath(), "Some text");
 
         // Create app class loader
-        domainCL = new MuleSharedDomainClassLoader(DOMAIN_NAME, Thread.currentThread().getContextClassLoader());
+        domainCL = new MuleSharedDomainClassLoader(DOMAIN_NAME, Thread.currentThread().getContextClassLoader(), mock(ClassLoaderLookupPolicy.class), emptyList());
 
-        appCL = new MuleApplicationClassLoader(APP_NAME, domainCL, null, urls);
+        appCL = new MuleApplicationClassLoader(APP_NAME, domainCL, null, urls, mock(ClassLoaderLookupPolicy.class));
     }
 
     @After

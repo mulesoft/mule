@@ -15,6 +15,4 @@ import java.io.IOException;
 public interface DescriptorParser
 {
     ApplicationDescriptor parse(File descriptor, String applicationName) throws IOException;
-
-    String getSupportedFormat();
 }

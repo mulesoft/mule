@@ -8,6 +8,8 @@
 package org.mule.module.launcher;
 
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
+import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.module.artifact.classloader.FineGrainedControlClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.MediumTest;
@@ -25,17 +27,18 @@ public class SynchronizedClassLoaderTestCase extends AbstractMuleTestCase
 
     private final CountDownLatch onExclusionZone = new CountDownLatch(2);
     private final CountDownLatch onTestComplete = new CountDownLatch(1);
+    private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
 
     @Test
     public void synchronizesLoadClassInFineGrainedControlClassLoader() throws Exception
     {
-        doLoadClassSynchronizationTest(new FineGrainedControlClassLoader(new URL[] {}, new TestClassLoader()));
+        doLoadClassSynchronizationTest(new FineGrainedControlClassLoader(new URL[] {}, new TestClassLoader(), lookupPolicy));
     }
 
     @Test
     public void synchronizesLoadClassInMuleApplicationClassLoader() throws Exception
     {
-        doLoadClassSynchronizationTest(new MuleApplicationClassLoader("test", new TestClassLoader(), null, Collections.emptyList()));
+        doLoadClassSynchronizationTest(new MuleApplicationClassLoader("test", new TestClassLoader(), null, Collections.emptyList(), lookupPolicy));
     }
 
     private void doLoadClassSynchronizationTest(ClassLoader classLoader) throws InterruptedException

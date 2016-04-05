@@ -101,7 +101,7 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase
 
         public TestArtifactClassLoader(ClassLoader parentCl)
         {
-            super("testArtifact", new URL[0], parentCl);
+            super("testArtifact", new URL[0], parentCl, mock(ClassLoaderLookupPolicy.class));
         }
 
         @Override

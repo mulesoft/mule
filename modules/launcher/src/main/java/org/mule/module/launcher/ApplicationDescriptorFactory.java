@@ -7,20 +7,16 @@
 package org.mule.module.launcher;
 
 import static java.lang.String.format;
-import org.mule.config.PreferredObjectSelector;
-import org.mule.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
-import org.mule.module.artifact.classloader.ClassLoaderLookupPolicyFactory;
-import org.mule.module.artifact.descriptor.ArtifactDescriptorFactory;
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.module.artifact.descriptor.ArtifactDescriptorCreateException;
+import org.mule.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.module.launcher.descriptor.DescriptorParser;
 import org.mule.module.launcher.descriptor.EmptyApplicationDescriptor;
 import org.mule.module.launcher.descriptor.PropertiesDescriptorParser;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptor;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
-import org.mule.util.FilenameUtils;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
@@ -33,17 +29,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.imageio.spi.ServiceRegistry;
-
-import org.apache.commons.collections.MultiMap;
-import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 /**
  * Creates artifact descriptor for application
@@ -52,69 +42,41 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
 {
 
     public static final String SYSTEM_PROPERTY_OVERRIDE = "-O";
-    public static final String PROPERTIES_DESCRIPTOR_PARSER = "properties";
 
-    protected Map<String, DescriptorParser> parserRegistry = new HashMap<>();
-    private ApplicationPluginDescriptorFactory pluginDescriptorFactory = new ApplicationPluginDescriptorFactory(new ClassLoaderLookupPolicyFactory(), new ArtifactClassLoaderFilterFactory());
+    private final ApplicationPluginDescriptorFactory pluginDescriptorFactory;
 
-    public ApplicationDescriptorFactory()
+    public ApplicationDescriptorFactory(ApplicationPluginDescriptorFactory applicationPluginDescriptorFactory)
     {
-        // defaults first
-        parserRegistry.put(PROPERTIES_DESCRIPTOR_PARSER, new PropertiesDescriptorParser(new ClassLoaderLookupPolicyFactory()));
+        checkArgument(applicationPluginDescriptorFactory != null, "ApplicationPluginDescriptorFactory cannot be null");
 
-        final Iterator<DescriptorParser> it = ServiceRegistry.lookupProviders(DescriptorParser.class);
-
-        MultiMap overrides = new MultiValueMap();
-        while (it.hasNext())
-        {
-            final DescriptorParser parser = it.next();
-            overrides.put(parser.getSupportedFormat(), parser);
-        }
-        mergeParserOverrides(overrides);
+        this.pluginDescriptorFactory = applicationPluginDescriptorFactory;
     }
 
     public ApplicationDescriptor create(File artifactFolder) throws ArtifactDescriptorCreateException
     {
-
         if (!artifactFolder.exists())
         {
             throw new IllegalArgumentException(format("Application directory does not exist: '%s'", artifactFolder));
         }
 
         final String appName = artifactFolder.getName();
-
-        @SuppressWarnings("unchecked")
-        Collection<File> deployFiles = FileUtils.listFiles(artifactFolder, new WildcardFileFilter("mule-deploy.*"), null);
-        if (deployFiles.size() > 1)
-        {
-            throw new ArtifactDescriptorCreateException(format("More than one mule-deploy descriptors found in application '%s'", appName));
-        }
-
         ApplicationDescriptor desc;
 
         try
         {
-            // none found, return defaults
-            if (deployFiles.isEmpty())
-            {
-                desc = new EmptyApplicationDescriptor(appName);
-            }
-            else
+            final File deployPropertiesFile = new File(artifactFolder, "mule-deploy.properties");
+            if (deployPropertiesFile.exists())
             {
                 // lookup the implementation by extension
-                final File descriptorFile = deployFiles.iterator().next();
-                final String ext = FilenameUtils.getExtension(descriptorFile.getName());
-                final DescriptorParser descriptorParser = parserRegistry.get(ext);
-
-                if (descriptorParser == null)
-                {
-                    throw new ArtifactDescriptorCreateException(format("Unsupported deployment descriptor format for app '%s': %s", appName, ext));
-                }
-
-                desc = descriptorParser.parse(descriptorFile, appName);
+                final PropertiesDescriptorParser descriptorParser = new PropertiesDescriptorParser();
+                desc = descriptorParser.parse(deployPropertiesFile, appName);
 
                 // app name is external to the deployment descriptor
                 desc.setName(appName);
+            }
+            else
+            {
+                desc = new EmptyApplicationDescriptor(appName);
             }
 
             // get a ref to an optional app props file (right next to the descriptor)
@@ -132,11 +94,6 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
         }
 
         return desc;
-    }
-
-    public void setPluginDescriptorFactory(ApplicationPluginDescriptorFactory pluginDescriptorFactory)
-    {
-        this.pluginDescriptorFactory = pluginDescriptorFactory;
     }
 
     private Set<ApplicationPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor) throws IOException
@@ -217,27 +174,5 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
             }
         }
         desc.setAppProperties(m);
-    }
-
-    /**
-     * Merge default and discovered overrides for descriptor parsers, taking weight into account
-     *
-     * @param overrides discovered parser overrides
-     */
-    protected void mergeParserOverrides(MultiMap overrides)
-    {
-        PreferredObjectSelector<DescriptorParser> selector = new PreferredObjectSelector<>();
-
-        for (Map.Entry<String, DescriptorParser> entry : parserRegistry.entrySet())
-        {
-            @SuppressWarnings("unchecked")
-            final Collection<DescriptorParser> candidates = (Collection<DescriptorParser>) overrides.get(entry.getKey());
-
-            if (candidates != null)
-            {
-                parserRegistry.put(entry.getKey(), selector.select(candidates.iterator()));
-            }
-        }
-
     }
 }

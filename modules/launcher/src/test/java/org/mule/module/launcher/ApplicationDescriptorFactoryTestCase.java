@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.launcher.MuleFoldersUtil.getAppFolder;
 import static org.mule.module.launcher.MuleFoldersUtil.getAppPluginsFolder;
 import org.mule.api.config.MuleProperties;
+import org.mule.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.module.launcher.builder.ApplicationPluginFileBuilder;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
@@ -54,13 +55,11 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase
         copyFile(pluginFile, new File(pluginDir, "plugin1.zip"));
         copyFile(pluginFile, new File(pluginDir, "plugin2.zip"));
 
-        final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory();
         final ApplicationPluginDescriptorFactory pluginDescriptorFactory = mock(ApplicationPluginDescriptorFactory.class);
+        final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(pluginDescriptorFactory);
         final ApplicationPluginDescriptor expectedPluginDescriptor1 = mock(ApplicationPluginDescriptor.class);
         final ApplicationPluginDescriptor expectedPluginDescriptor2 = mock(ApplicationPluginDescriptor.class);
         when(pluginDescriptorFactory.create(any())).thenReturn(expectedPluginDescriptor1).thenReturn(expectedPluginDescriptor2);
-
-        applicationDescriptorFactory.setPluginDescriptorFactory(pluginDescriptorFactory);
 
         ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
 
@@ -77,7 +76,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase
         pluginLibDir.mkdirs();
 
         copyResourceAs("test-jar-with-resources.jar", pluginLibDir, JAR_FILE_NAME);
-        ApplicationDescriptor desc = new ApplicationDescriptorFactory().create(getAppFolder(APP_NAME));
+        ApplicationDescriptor desc = new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())).create(getAppFolder(APP_NAME));
 
         URL[] sharedPluginLibs = desc.getSharedPluginLibs();
 

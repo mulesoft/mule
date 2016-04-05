@@ -7,10 +7,8 @@
 
 package org.mule.module.artifact.descriptor;
 
-import static org.mule.util.Preconditions.checkArgument;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.module.artifact.classloader.ClassLoaderFilter;
-import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
 
 import java.io.File;
 
@@ -19,7 +17,6 @@ public class ArtifactDescriptor
 
     private String name;
     private File rootFolder;
-    private ClassLoaderLookupPolicy classLoaderLookupPolicy = ClassLoaderLookupPolicy.NULL_LOOKUP_POLICY;
     private ClassLoaderFilter classLoaderFilter = ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 
     public String getName()
@@ -45,17 +42,6 @@ public class ArtifactDescriptor
         }
 
         this.rootFolder = rootFolder;
-    }
-
-    public ClassLoaderLookupPolicy getClassLoaderLookupPolicy()
-    {
-        return classLoaderLookupPolicy;
-    }
-
-    public void setClassLoaderLookupPolicy(ClassLoaderLookupPolicy classLoaderLookupPolicy)
-    {
-        checkArgument(classLoaderLookupPolicy != null, "Classloader lookup policy must be non null");
-        this.classLoaderLookupPolicy = classLoaderLookupPolicy;
     }
 
     public ClassLoaderFilter getClassLoaderFilter()

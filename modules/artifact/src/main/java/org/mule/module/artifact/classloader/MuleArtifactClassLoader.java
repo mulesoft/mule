@@ -6,7 +6,6 @@
  */
 package org.mule.module.artifact.classloader;
 
-import static org.mule.module.artifact.classloader.ClassLoaderLookupPolicy.NULL_LOOKUP_POLICY;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
@@ -35,11 +34,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     private LocalResourceLocator localResourceLocator;
 
     private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
-
-    public MuleArtifactClassLoader(String name, URL[] urls, ClassLoader parent)
-    {
-        this(name, urls, parent, NULL_LOOKUP_POLICY);
-    }
 
     public MuleArtifactClassLoader(String name, URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy)
     {

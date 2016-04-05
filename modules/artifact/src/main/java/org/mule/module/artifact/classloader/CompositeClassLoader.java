@@ -7,6 +7,10 @@
 
 package org.mule.module.artifact.classloader;
 
+import static org.mule.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
+import static org.mule.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
+import static org.mule.util.Preconditions.checkArgument;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -25,22 +29,90 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Defines a classloader that delegates classes and resources resolution to
  * a list of classloaders.
+ * <p/>
+ * By using a {@link ClassLoaderLookupPolicy} this classLoader can use
+ * parent-first, parent-only or child-first classloading lookup mode per package.
  */
-public class CompositeClassLoader extends ClassLoader
+public class CompositeClassLoader extends ClassLoader implements ClassLoaderLookupPolicyProvider
 {
 
     protected static final Log logger = LogFactory.getLog(CompositeClassLoader.class);
 
     protected final List<ClassLoader> classLoaders;
+    private final ClassLoaderLookupPolicy lookupPolicy;
 
-    public CompositeClassLoader(ClassLoader parent, List<ClassLoader> classLoaders)
+    /**
+     * Creates a new instance
+     *
+     * @param parent parent class loader used to delegate the lookup process. Can be null.
+     * @param classLoaders class loaders to compose. Non empty.
+     * @param lookupPolicy policy used to guide the lookup process. Non null
+     */
+    public CompositeClassLoader(ClassLoader parent, List<ClassLoader> classLoaders, ClassLoaderLookupPolicy lookupPolicy)
     {
         super(parent);
+        checkArgument(classLoaders != null && !classLoaders.isEmpty(), "Classloaders must have at least a classLoader");
+        checkArgument(lookupPolicy != null, "Lookup policy cannot be null");
+        this.lookupPolicy = lookupPolicy;
         this.classLoaders = new LinkedList<>(classLoaders);
     }
 
     @Override
+    public ClassLoaderLookupPolicy getClassLoaderLookupPolicy()
+    {
+        return lookupPolicy;
+    }
+
+    @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException
+    {
+        return loadClass(name, false);
+    }
+
+    @Override
+    protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
+    {
+        final ClassLoaderLookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(name);
+        Class<?> result;
+
+        if (lookupStrategy == PARENT_ONLY)
+        {
+            result = getParent().loadClass(name);
+        }
+        else if (lookupStrategy == PARENT_FIRST)
+        {
+            try
+            {
+                result = getParent().loadClass(name);
+            }
+            catch (ClassNotFoundException e)
+            {
+                result = doLoadClass(name);
+            }
+        }
+        else
+        {
+            result = doLoadClass(name);
+            if (result == null)
+            {
+                result = getParent().loadClass(name);
+            }
+        }
+
+        if (result != null)
+        {
+            if (resolve)
+            {
+                resolveClass(result);
+            }
+
+            return result;
+        }
+
+        throw new ClassNotFoundException(String.format("Cannot load class '%s'", name));
+    }
+
+    private Class<?> doLoadClass(String name)
     {
         for (ClassLoader classLoader : classLoaders)
         {
@@ -59,51 +131,7 @@ public class CompositeClassLoader extends ClassLoader
                 // Ignoring
             }
         }
-
-        throw new ClassNotFoundException(String.format("Cannot load class '%s'", name));
-    }
-
-    @Override
-    protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
-    {
-        for (ClassLoader classLoader : classLoaders)
-        {
-            try
-            {
-                Class<?> aClass = loadClass(classLoader, name, resolve);
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug(String.format("Class '%s' loaded from classLoader '%s", name, classLoader));
-                }
-
-                return aClass;
-            }
-            catch (ClassNotFoundException e)
-            {
-                // Ignoring
-            }
-        }
-
-        throw new ClassNotFoundException(String.format("Cannot load class '%s'", name));
-    }
-
-    protected Class<?> loadClass(ClassLoader classLoader, String name, boolean resolve) throws ClassNotFoundException
-    {
-        try
-        {
-            Method loadClassMethod = findDeclaredMethod(classLoader, "loadClass", String.class, boolean.class);
-
-            return (Class<?>) loadClassMethod.invoke(classLoader, name, resolve);
-        }
-        catch (Exception e)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logReflectionLoadingError(name, classLoader, e, "Class");
-            }
-        }
-
-        throw new ClassNotFoundException(String.format("Cannot load class '%s'", name));
+        return null;
     }
 
     @Override

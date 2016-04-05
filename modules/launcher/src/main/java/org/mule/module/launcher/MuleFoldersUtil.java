@@ -47,6 +47,11 @@ public class MuleFoldersUtil
         return new File(getDomainsFolder(), domainName);
     }
 
+    public static File getDomainLibFolder(String domainName)
+    {
+        return new File(getDomainFolder(domainName), LIB_FOLDER);
+    }
+
     public static File getAppsFolder()
     {
         return new File(getMuleHomeFolder(), APPS_FOLDER);

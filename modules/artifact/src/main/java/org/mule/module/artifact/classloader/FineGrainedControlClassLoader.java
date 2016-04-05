@@ -6,29 +6,28 @@
  */
 package org.mule.module.artifact.classloader;
 
+import static org.mule.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
+import static org.mule.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
+import static org.mule.util.Preconditions.checkArgument;
+
 import java.net.URL;
 
 /**
  * Defines a {@link ClassLoader} which enables the control of the class
  * loading lookup mode.
- *
  * <p/>
  * By using a {@link ClassLoaderLookupPolicy} this classLoader can use
- * parent-first or child-first classloading lookup mode per package.
+ * parent-first, parent-only or child-first classloading lookup mode per package.
  */
-public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
+public class FineGrainedControlClassLoader extends GoodCitizenClassLoader implements ClassLoaderLookupPolicyProvider
 {
 
     private final ClassLoaderLookupPolicy lookupPolicy;
 
-    public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent)
-    {
-        this(urls, parent, ClassLoaderLookupPolicy.NULL_LOOKUP_POLICY);
-    }
-
     public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy)
     {
         super(urls, parent);
+        checkArgument(lookupPolicy != null, "Lookup policy cannot be null");
         this.lookupPolicy = lookupPolicy;
     }
 
@@ -41,34 +40,15 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
         {
             return result;
         }
-        boolean overrideMatch = lookupPolicy.isOverridden(name) || lookupPolicy.isBlocked(name);
 
-        if (overrideMatch)
+        final ClassLoaderLookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(name);
+
+        if (lookupStrategy == PARENT_ONLY)
         {
-            boolean blockedMatch = lookupPolicy.isBlocked(name);
-
-            if (blockedMatch)
-            {
-                // load this class from the child ONLY, don't attempt parent, let CNFE exception propagate
-                result = findClass(name);
-            }
-            else
-            {
-                // load this class from the child
-                try
-                {
-                    result = findClass(name);
-                }
-                catch (ClassNotFoundException e)
-                {
-                    // let it fail with CNFE
-                    result = findParentClass(name);
-                }
-            }
+            result = findParentClass(name);
         }
-        else
+        else if (lookupStrategy == PARENT_FIRST)
         {
-            // no overrides, regular parent-first lookup
             try
             {
                 result = findParentClass(name);
@@ -76,6 +56,17 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
             catch (ClassNotFoundException e)
             {
                 result = findClass(name);
+            }
+        }
+        else
+        {
+            try
+            {
+                result = findClass(name);
+            }
+            catch (ClassNotFoundException e)
+            {
+                result = findParentClass(name);
             }
         }
 
@@ -103,5 +94,11 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
     protected Class<?> findClass(String name) throws ClassNotFoundException
     {
         return super.findClass(name);
+    }
+
+    @Override
+    public ClassLoaderLookupPolicy getClassLoaderLookupPolicy()
+    {
+        return lookupPolicy;
     }
 }

@@ -27,12 +27,14 @@ public class DefaultApplicationFactory implements ApplicationFactory
 
     private final ArtifactClassLoaderFactory applicationClassLoaderFactory;
     private final DomainFactory domainFactory;
+    private final ApplicationDescriptorFactory applicationDescriptorFactory;
     protected DeploymentListener deploymentListener;
 
-    public DefaultApplicationFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory, DomainFactory domainFactory)
+    public DefaultApplicationFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory, DomainFactory domainFactory, ApplicationDescriptorFactory applicationDescriptorFactory)
     {
         this.applicationClassLoaderFactory = applicationClassLoaderFactory;
         this.domainFactory = domainFactory;
+        this.applicationDescriptorFactory = applicationDescriptorFactory;
     }
 
     public void setDeploymentListener(DeploymentListener deploymentListener)
@@ -47,7 +49,7 @@ public class DefaultApplicationFactory implements ApplicationFactory
             throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);
         }
 
-        ArtifactDescriptorFactory<ApplicationDescriptor> applicationDescriptorFactory = new ApplicationDescriptorFactory();
+        ArtifactDescriptorFactory<ApplicationDescriptor> applicationDescriptorFactory = this.applicationDescriptorFactory;
         final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
         final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(new File(appsDir, appName));
 

@@ -7,9 +7,6 @@
 package org.mule.module.launcher.descriptor;
 
 import static org.mule.module.reboot.MuleContainerBootstrapUtils.getMuleAppDir;
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.module.artifact.classloader.ClassLoaderLookupPolicyFactory;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
@@ -24,24 +21,11 @@ public class PropertiesDescriptorParser implements DescriptorParser
 {
     protected static final String PROPERTY_ENCODING = "encoding";
     protected static final String PROPERTY_CONFIG_BUILDER = "config.builder";
-    protected static final String PROPERTY_DOMAIN = "domain";
+    public static final String PROPERTY_DOMAIN = "domain";
     // support not yet implemented for CL reversal
     protected static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
     protected static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";
     protected static final String PROPERTY_LOG_CONFIG_FILE = "log.configFile";
-    protected static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
-    private final ClassLoaderLookupPolicyFactory classLoaderLookupPolicyFactory;
-
-    /**
-     * Creates a new properties descriptor parser.
-     *
-     * @param classLoaderLookupPolicyFactory creates classloader lookup policies for the created descriptors. Not null.
-     */
-    public PropertiesDescriptorParser(ClassLoaderLookupPolicyFactory classLoaderLookupPolicyFactory)
-    {
-        checkArgument(classLoaderLookupPolicyFactory != null, "ClassLoaderLookupPolicyFactory cannot be null");
-        this.classLoaderLookupPolicyFactory = classLoaderLookupPolicyFactory;
-    }
 
     @Override
     public ApplicationDescriptor parse(File descriptor, String applicationName) throws IOException
@@ -77,10 +61,6 @@ public class PropertiesDescriptorParser implements DescriptorParser
         {
             d.setLogConfigFile(new File(p.getProperty(PROPERTY_LOG_CONFIG_FILE)));
         }
-
-        final ClassLoaderLookupPolicy classLoaderLookupPolicy = classLoaderLookupPolicyFactory.create(p.getProperty(PROPERTY_LOADER_OVERRIDE));
-        d.setClassLoaderLookupPolicy(classLoaderLookupPolicy);
-
         return d;
     }
 
@@ -114,11 +94,5 @@ public class PropertiesDescriptorParser implements DescriptorParser
     protected String toAbsoluteFile(String path, String appName)
     {
         return getMuleAppDir(appName).getAbsolutePath() + File.separator + path;
-    }
-
-    @Override
-    public String getSupportedFormat()
-    {
-        return "properties";
     }
 }

@@ -6,9 +6,15 @@
  */
 package org.mule.module.launcher.application;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
+import org.mule.module.artifact.classloader.MuleClassLoaderLookupPolicy;
+import org.mule.module.launcher.ApplicationDescriptorFactory;
 import org.mule.module.launcher.domain.DefaultDomainFactory;
 import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
+import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
 
 import java.io.IOException;
 
@@ -24,7 +30,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory
 
     public TestApplicationFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory)
     {
-        super(applicationClassLoaderFactory, new DefaultDomainFactory(new MuleDomainClassLoaderRepository()));
+        super(applicationClassLoaderFactory, new DefaultDomainFactory(new MuleDomainClassLoaderRepository(new MuleClassLoaderLookupPolicy(emptyMap(), emptySet()))), new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())));
     }
 
     @Override

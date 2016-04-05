@@ -7,18 +7,22 @@
 
 package org.mule.module.launcher.application;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.module.launcher.MuleFoldersUtil.getAppClassesFolder;
 import static org.mule.module.launcher.MuleFoldersUtil.getAppLibFolder;
 import org.mule.api.config.MuleProperties;
+import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.module.artifact.classloader.CompositeClassLoader;
-import org.mule.module.artifact.classloader.GoodCitizenClassLoader;
+import org.mule.module.artifact.classloader.FineGrainedControlClassLoader;
 import org.mule.module.launcher.MuleApplicationClassLoader;
 import org.mule.module.launcher.MuleFoldersUtil;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
@@ -62,6 +66,7 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
     private MuleSharedDomainClassLoader domainCL;
 
     private File jarFile;
+    private ClassLoaderLookupPolicy domainLookupPolicy;
 
     @Before
     public void createAppClassLoader() throws IOException
@@ -94,7 +99,9 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
         FileUtils.stringToFile(new File(domainDir, RESOURCE_JUST_IN_DOMAIN).getAbsolutePath(), "Some text");
 
         // Create app class loader
-        domainCL = new MuleSharedDomainClassLoader(DOMAIN_NAME, Thread.currentThread().getContextClassLoader());
+        domainLookupPolicy = mock(ClassLoaderLookupPolicy.class);
+        when(domainLookupPolicy.extend(any())).thenReturn(mock(ClassLoaderLookupPolicy.class));
+        domainCL = new MuleSharedDomainClassLoader(DOMAIN_NAME, Thread.currentThread().getContextClassLoader(), domainLookupPolicy, emptyList());
     }
 
     @After
@@ -154,6 +161,15 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
         when(domainClassLoaderRepository.getDomainClassLoader(DOMAIN_NAME)).thenReturn(domainCL);
         final NativeLibraryFinderFactory nativeLibraryFinderFactory = mock(NativeLibraryFinderFactory.class);
         MuleApplicationClassLoaderFactory classLoaderFactory = new MuleApplicationClassLoaderFactory(domainClassLoaderRepository, nativeLibraryFinderFactory);
+        final PackageDiscoverer packageDiscoverer = mock(PackageDiscoverer.class);
+        final Set<String> packages = new HashSet<>();
+        packages.add("org.foo");
+        when(packageDiscoverer.findPackages(any())).thenReturn(packages);
+        classLoaderFactory.setPackageDiscoverer(packageDiscoverer);
+        final ClassLoaderLookupPolicy sharedLibLookupPolicy = mock(ClassLoaderLookupPolicy.class);
+        when(domainLookupPolicy.extend(anyMap())).thenReturn(sharedLibLookupPolicy);
+        final ClassLoaderLookupPolicy pluginLookupPolicy = mock(ClassLoaderLookupPolicy.class);
+        when(sharedLibLookupPolicy.extend(anyMap())).thenReturn(pluginLookupPolicy);
 
         final ApplicationDescriptor descriptor = new ApplicationDescriptor();
         descriptor.setName(APP_NAME);
@@ -166,9 +182,11 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
         descriptor.setSharedPluginLibs(new URL[] {jarFile.toURI().toURL()});
 
         final MuleApplicationClassLoader artifactClassLoader = (MuleApplicationClassLoader) classLoaderFactory.create(descriptor);
+
         assertThat(artifactClassLoader.getURLs(), is(equalTo(artifactClassLoader.getURLs())));
         assertThat(artifactClassLoader.getParent(), is(instanceOf(CompositeClassLoader.class)));
-        assertThat(artifactClassLoader.getParent().getParent(), is(instanceOf(GoodCitizenClassLoader.class)));
+        assertThat(artifactClassLoader.getParent().getParent(), is(instanceOf(FineGrainedControlClassLoader.class)));
+        assertThat(((FineGrainedControlClassLoader) artifactClassLoader.getParent().getParent()).getClassLoaderLookupPolicy(), is(sharedLibLookupPolicy));
         assertThat(artifactClassLoader.getParent().getParent().getParent(), is(domainCL));
     }
 }

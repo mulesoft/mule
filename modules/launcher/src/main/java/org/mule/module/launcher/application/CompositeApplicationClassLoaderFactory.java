@@ -6,9 +6,9 @@
  */
 package org.mule.module.launcher.application;
 
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.launcher.ServerPluginClassLoaderManager;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 import java.util.LinkedList;
@@ -44,7 +44,7 @@ public class CompositeApplicationClassLoaderFactory implements ArtifactClassLoad
             classLoaders.add(appClassLoader.getClassLoader());
             classLoaders.addAll(pluginClassLoaders);
 
-            appClassLoader = new CompositeApplicationClassLoader(descriptor.getName(), appClassLoader.getClassLoader().getParent(), classLoaders);
+            appClassLoader = new CompositeApplicationClassLoader(descriptor.getName(),  appClassLoader.getClassLoader().getParent(), classLoaders, appClassLoader.getClassLoaderLookupPolicy());
         }
 
         return appClassLoader;
