@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
@@ -27,6 +28,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.metadata.MuleMetadataManager;
 import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.module.extension.internal.AbstractInterceptableContractTestCase;
 import org.mule.tck.size.SmallTest;
@@ -188,6 +190,17 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractInterce
     }
 
     @Test
+    public void disposeMetadataCacheWhenConfigIsDisposed() throws Exception
+    {
+        MuleMetadataManager muleMetadataManager = muleContext.getRegistry().lookupObject(MuleMetadataManager.class);
+        muleMetadataManager.getCache(NAME);
+        interceptable.initialise();
+        valueDisposed();
+        Thread.sleep(1000);
+        assertThat(muleMetadataManager.getCaches().entrySet(), empty());
+    }
+
+    @Test
     public void getName()
     {
         assertThat(interceptable.getName(), is(NAME));
@@ -217,4 +230,5 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractInterce
         interceptable.initialise();
         assertThat(interceptable.getStatistics(), is(notNullValue()));
     }
+
 }

@@ -11,6 +11,7 @@ import org.mule.DynamicDataTypeConversionResolver;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.metadata.MuleMetadataManager;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.store.ObjectStore;
@@ -105,6 +106,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR, new MuleConnectorOperationLocator());
         registry.registerObject(MuleProperties.OBJECT_TIME_SUPPLIER, new TimeSupplier());
         registry.registerObject(MuleProperties.OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext));
+        registry.registerObject(MuleProperties.OBJECT_METADATA_MANAGER, new MuleMetadataManager());
     }
 
     private void registerLocalObjectStoreManager(MuleContext muleContext, MuleRegistry registry) throws RegistrationException

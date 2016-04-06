@@ -19,6 +19,7 @@ import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
 import org.mule.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.api.metadata.resolving.FailureCode;
+import org.mule.api.metadata.resolving.MetadataFailure;
 import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.extension.api.metadata.NullMetadataKey;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
@@ -48,6 +49,10 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected static final String CONTENT_AND_OUTPUT_METADATA_WITHOUT_KEY_PARAM = "contentAndOutputMetadataWithoutKeyParam";
     protected static final String CONTENT_METADATA_WITHOUT_KEYS_WITH_KEY_PARAM = "contentMetadataWithoutKeysWithKeyParam";
     protected static final String OUTPUT_METADATA_WITHOUT_KEYS_WITH_KEY_PARAM = "outputMetadataWithoutKeysWithKeyParam";
+    protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER = "contentAndOutputWithCacheResolver";
+    protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_SPECIFIC_CONFIG = "contentAndOutputWithCacheResolverWithSpecificConfig";
+    protected static final String CONTENT_ONLY_CACHE_RESOLVER = "contentOnlyCacheResolver";
+
 
     protected final NullMetadataKey nullMetadataKey = new NullMetadataKey();
     protected MetadataType personType;
@@ -109,16 +114,17 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected void assertFailure(MetadataResult<?> result, String msgContains, FailureCode failureCode, String traceContains) throws IOException
     {
         assertThat(result.isSuccess(), is(false));
-        assertThat(result.getFailure().get().getFailureCode(), is(failureCode));
+        MetadataFailure metadataFailure = result.getFailure().get();
+        assertThat(metadataFailure.getFailureCode(), is(failureCode));
 
         if (!StringUtils.isBlank(msgContains))
         {
-            assertThat(result.getFailure().get().getMessage(), containsString(msgContains));
+            assertThat(metadataFailure.getMessage(), containsString(msgContains));
         }
 
         if (!StringUtils.isBlank(traceContains))
         {
-            assertThat(result.getFailure().get().getReason(), containsString(traceContains));
+            assertThat(metadataFailure.getReason(), containsString(traceContains));
         }
     }
 

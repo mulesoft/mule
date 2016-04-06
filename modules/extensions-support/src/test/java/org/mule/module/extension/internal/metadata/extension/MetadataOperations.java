@@ -17,6 +17,7 @@ import org.mule.module.extension.internal.metadata.extension.resolver.TestConten
 import org.mule.module.extension.internal.metadata.extension.resolver.TestContentResolverWithoutKeyResolver;
 import org.mule.module.extension.internal.metadata.extension.resolver.TestOutputResolverWithKeyResolver;
 import org.mule.module.extension.internal.metadata.extension.resolver.TestOutputResolverWithoutKeyResolver;
+import org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache;
 
 public class MetadataOperations
 {
@@ -107,6 +108,26 @@ public class MetadataOperations
     // With KeyParam
     @MetadataScope(outputResolver = TestOutputResolverWithoutKeyResolver.class)
     public Object outputMetadataWithoutKeysWithKeyParam(@Connection MetadataConnection connection, @MetadataKeyParam String type)
+    {
+        return null;
+    }
+
+    // Resolver for output and content
+    // Without keysResolver
+    // With KeyParam
+    // Uses Cache
+    @MetadataScope(outputResolver = TestResolverWithCache.class, contentResolver = TestResolverWithCache.class)
+    public Object contentAndOutputCacheResolver(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
+    {
+        return null;
+    }
+
+    // Resolver for content
+    // Without keysResolver
+    // With KeyParam
+    // Uses Cache
+    @MetadataScope(contentResolver = TestResolverWithCache.class)
+    public Object contentOnlyCacheResolver(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
     {
         return null;
     }

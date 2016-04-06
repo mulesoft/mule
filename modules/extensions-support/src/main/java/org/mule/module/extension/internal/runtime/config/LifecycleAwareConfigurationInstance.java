@@ -10,11 +10,17 @@ import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.api.metadata.MetadataNotification.DISPOSE_METADATA_CACHE;
 import static org.mule.util.Preconditions.checkState;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connector.ConnectionManager;
+import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.metadata.MetadataNotification;
+import org.mule.api.metadata.MuleMetadataManager;
+import org.mule.api.registry.RegistrationException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.introspection.RuntimeConfigurationModel;
@@ -65,6 +71,9 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
     private TimeSupplier timeSupplier;
 
     @Inject
+    private MuleContext muleContext;
+
+    @Inject
     private ConnectionManager connectionManager;
 
     /**
@@ -106,6 +115,16 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
         {
             initStats();
             doInitialise();
+            muleContext.registerListener((CustomNotificationListener<MetadataNotification>) notification -> {
+                try
+                {
+                    muleContext.getRegistry().lookupObject(MuleMetadataManager.class).disposeCache(name);
+                }
+                catch (RegistrationException e)
+                {
+                    throw new RuntimeException("Error while looking for the registered MetadataManager instance", e);
+                }
+            });
         }
         catch (Exception e)
         {
@@ -158,6 +177,7 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
     {
         disposeIfNeeded(value, LOGGER);
         disposeIfNeeded(connectionProvider, LOGGER);
+        muleContext.fireNotification(new MetadataNotification(DISPOSE_METADATA_CACHE));
         super.dispose();
     }
 
@@ -170,7 +190,6 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
         }
 
         initialiseIfNeeded(value, true, muleContext);
-
         super.initialise();
     }
 

@@ -15,6 +15,8 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -32,6 +34,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.metadata.DataType;
 import org.mule.api.metadata.MetadataKey;
+import org.mule.api.metadata.MuleMetadataManager;
 import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
 import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.api.temporary.MuleMessage;
@@ -52,8 +55,8 @@ import org.mule.internal.connection.ConnectionProviderWrapper;
 import org.mule.internal.connection.DefaultConnectionManager;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
-import org.mule.module.extension.internal.metadata.extension.resolver.TestNoConfigMetadataResolver;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.module.extension.internal.metadata.extension.resolver.TestNoConfigMetadataResolver;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -72,6 +75,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -98,15 +102,11 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     @Mock
     private ConnectionManagerAdapter connectionManagerAdapter;
-
     @Mock
     private OperationExecutorFactory operationExecutorFactory;
 
     @Mock(extraInterfaces = {Lifecycle.class, MuleContextAware.class})
     private OperationExecutor operationExecutor;
-
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MuleContext muleContext;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private ResolverSet resolverSet;
@@ -116,6 +116,9 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleEvent event;
+
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private MuleContext context;
 
     @Mock
     private ConfigurationInstance<Object> configurationInstance;
@@ -148,8 +151,12 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     private ConfigurationProvider<Object> configurationProvider;
 
     private OperationMessageProcessor messageProcessor;
+
     private String configurationName = CONFIG_NAME;
     private String target = EMPTY;
+
+    @InjectMocks
+    private MuleMetadataManager metadataManager;
     private DefaultConnectionManager connectionManager;
 
     @Before
@@ -199,11 +206,14 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         when(configurationModel.getOperationModel(OPERATION_NAME)).thenReturn(Optional.of(operationModel));
 
-        connectionManager = new DefaultConnectionManager(muleContext);
+        metadataManager = new MuleMetadataManager();
+        //when(metadataManager.getCache(anyString())).thenReturn(mock(MetadataCache.class));
+
+        connectionManager = new DefaultConnectionManager(context);
         connectionManager.initialise();
         when(connectionProviderWrapper.getRetryPolicyTemplate()).thenReturn(connectionManager.getDefaultRetryPolicyTemplate());
 
-        when(extensionManager.getConfiguration(CONFIG_NAME, event)).thenReturn(configurationInstance);
+        when(extensionManager.getConfiguration(anyString(), anyObject())).thenReturn(configurationInstance);
         when(extensionManager.getConfiguration(extensionModel, event)).thenReturn(configurationInstance);
         when(extensionManager.getConfigurationProvider(extensionModel)).thenReturn(Optional.of(configurationProvider));
         when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(Optional.of(configurationProvider));
@@ -418,7 +428,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     @Test
     public void initialise() throws Exception
     {
-        verify((MuleContextAware) operationExecutor).setMuleContext(muleContext);
+        verify((MuleContextAware) operationExecutor).setMuleContext(context);
         verify((Initialisable) operationExecutor).initialise();
     }
 
@@ -497,9 +507,9 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     private OperationMessageProcessor createOperationMessageProcessor() throws Exception
     {
         OperationMessageProcessor messageProcessor = new OperationMessageProcessor(extensionModel, operationModel, configurationName, target, resolverSet, extensionManager);
-        messageProcessor.setMuleContext(muleContext);
-        muleContext.getInjector().inject(connectionManager);
+        messageProcessor.setMuleContext(context);
         messageProcessor.initialise();
+        muleContext.getInjector().inject(messageProcessor);
         return messageProcessor;
     }
 

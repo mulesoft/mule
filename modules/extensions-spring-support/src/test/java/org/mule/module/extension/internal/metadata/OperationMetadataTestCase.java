@@ -6,18 +6,25 @@
  */
 package org.mule.module.extension.internal.metadata;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import org.mule.api.metadata.MetadataCache;
 import org.mule.api.metadata.MetadataKey;
+import org.mule.api.metadata.MetadataManager;
+import org.mule.api.metadata.MuleMetadataManager;
 import org.mule.api.metadata.ProcessorId;
-import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
+import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.extension.api.metadata.NullMetadataKey;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -258,4 +265,36 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
 
         assertThat(metadataDescriptor.getParametersMetadata(), empty());
     }
+
+    @Test
+    public void dynamicOutputAndContentWithCache() throws Exception
+    {
+        processorId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
+        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata(nullMetadataKey);
+
+        assertThat(metadataDescriptor.getContentMetadata().get().getType(),
+                   is(equalTo(metadataDescriptor.getOutputMetadata().getPayloadMetadata().getType())));
+
+    }
+
+    @Test
+    public void multipleCaches() throws Exception
+    {
+        // using the base config
+        processorId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
+        getOperationDynamicMetadata(nullMetadataKey);
+        processorId = new ProcessorId(OUTPUT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        getOperationDynamicMetadata(nullMetadataKey);
+
+        // using the alternative-config
+        processorId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_SPECIFIC_CONFIG, FIRST_PROCESSOR_INDEX);
+        getOperationDynamicMetadata(nullMetadataKey);
+
+        MuleMetadataManager metadataManager = (MuleMetadataManager) muleContext.getRegistry().lookupObject(MetadataManager.class);
+        Map<String, ? extends MetadataCache> caches = metadataManager.getCaches();
+
+        assertThat(caches.keySet(), hasSize(2));
+        assertThat(caches.keySet(), hasItems("config", "alternative-config"));
+    }
+
 }

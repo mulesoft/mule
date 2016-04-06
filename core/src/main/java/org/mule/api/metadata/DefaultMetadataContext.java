@@ -23,17 +23,20 @@ public class DefaultMetadataContext implements MetadataContext
 
     private final ConfigurationInstance<?> configInstance;
     private final ConnectionManager connectionManager;
+    private final MetadataCache cache;
 
     /**
      * Retrieves the configuration for the related component
      *
      * @param configInstance    instance of the configuration of a component
      * @param connectionManager {@link ConnectionManager} which is able to find a connection for the component using the {@param configInstance}
+     * @param cache             instance of the {@link MetadataCache} for this configuration
      */
-    public DefaultMetadataContext(ConfigurationInstance<Object> configInstance, ConnectionManager connectionManager)
+    public DefaultMetadataContext(ConfigurationInstance<Object> configInstance, ConnectionManager connectionManager, MetadataCache cache)
     {
         this.configInstance = configInstance;
         this.connectionManager = connectionManager;
+        this.cache = cache;
     }
 
     /**
@@ -64,5 +67,12 @@ public class DefaultMetadataContext implements MetadataContext
 
         return Optional.of((C) connectionManager.getConnection(configInstance.getValue()).getConnection());
     }
+
+    @Override
+    public MetadataCache getCache()
+    {
+        return cache;
+    }
+
 
 }

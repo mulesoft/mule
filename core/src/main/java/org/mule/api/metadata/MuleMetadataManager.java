@@ -13,7 +13,11 @@ import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.Flow;
 
+import com.google.common.collect.ImmutableMap;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -36,6 +40,8 @@ public class MuleMetadataManager implements MetadataManager
 
     @Inject
     private MuleContext muleContext;
+
+    private final Map<String, MetadataCache> caches = new HashMap<>();
 
     /**
      * {@inheritDoc}
@@ -64,6 +70,30 @@ public class MuleMetadataManager implements MetadataManager
     {
         return exceptionHandledMetadataFetch(componentId, MetadataAware::getMetadata,
                                              String.format(EXCEPTION_RESOLVING_OPERATION_METADATA, componentId));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void disposeCache(String id)
+    {
+        caches.remove(id);
+    }
+
+    public MetadataCache getCache(String id)
+    {
+        MetadataCache cache = caches.get(id);
+        if (cache == null)
+        {
+            DefaultMetadataCache defaultMetadataCache = new DefaultMetadataCache();
+            caches.put(id, defaultMetadataCache);
+            return defaultMetadataCache;
+        }
+        else
+        {
+            return cache;
+        }
     }
 
     private <T> MetadataResult<T> exceptionHandledMetadataFetch(ComponentId componentId, MetadataDelegate<T> metadataSupplier, String failureMessage)
@@ -125,4 +155,8 @@ public class MuleMetadataManager implements MetadataManager
         MetadataResult<T> get(MetadataAware processor) throws MetadataResolvingException;
     }
 
+    public Map<String, ? extends MetadataCache> getCaches()
+    {
+        return ImmutableMap.copyOf(caches);
+    }
 }
