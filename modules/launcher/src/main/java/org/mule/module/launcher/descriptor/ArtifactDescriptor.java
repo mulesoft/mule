@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Represents an abstract description of an {@link Artifact}
+ * Represents a base description of an {@link Artifact}
  */
 public class ArtifactDescriptor
 {

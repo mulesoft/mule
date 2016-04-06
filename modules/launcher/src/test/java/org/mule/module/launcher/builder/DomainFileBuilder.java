@@ -11,7 +11,6 @@ import static org.mule.module.launcher.descriptor.ArtifactDescriptor.DEFAULT_DEP
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.tck.ZipUtils.ZipResource;
-import org.mule.util.Preconditions;
 import org.mule.util.StringUtils;
 
 import java.io.File;
@@ -107,8 +106,8 @@ public class DomainFileBuilder extends AbstractArtifactFileBuilder<DomainFileBui
     public DomainFileBuilder deployedWith(String propertyName, String propertyValue)
     {
         checkImmutable();
-        Preconditions.checkArgument(!StringUtils.isEmpty(propertyName), "Property name cannot be empty");
-        Preconditions.checkArgument(propertyValue != null, "Property value cannot be null");
+        checkArgument(!StringUtils.isEmpty(propertyName), "Property name cannot be empty");
+        checkArgument(propertyValue != null, "Property value cannot be null");
         deployProperties.put(propertyName, propertyValue);
         return this;
     }

@@ -44,6 +44,7 @@ import org.apache.commons.collections.map.MultiValueMap;
 public class DefaultAppBloodhound implements AppBloodhound
 {
 
+    public static final String MULE_WILDCARD_DEPLOY_FILE = "mule-deploy.*";
     // file extension -> parser implementation
     protected Map<String, DescriptorParser> parserRegistry = new HashMap<String, DescriptorParser>();
     public static final String SYSTEM_PROPERTY_OVERRIDE = "-O";
@@ -67,7 +68,7 @@ public class DefaultAppBloodhound implements AppBloodhound
     public ApplicationDescriptor fetch(String appName) throws IOException
     {
         File appDir = getAppFolder(appName);
-        final File descriptorFile = getDeploymentFile(appDir, appName);
+        final File descriptorFile = getDeploymentFile(appDir, appName, MULE_WILDCARD_DEPLOY_FILE);
         ApplicationDescriptor desc;
 
         // none found, return defaults

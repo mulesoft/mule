@@ -30,9 +30,10 @@ public class ArtifactFactoryUtils
      *
      * @param artifactDir the artifact directory where the deployment file should be present
      * @param artifactName the artifact whose deployment file is needed
+     * @param pattern the pattern the deployment file should match
      * @return the artifact's deployment file or {@code null} if none was found
      */
-    public static File getDeploymentFile(File artifactDir, String artifactName)
+    public static File getDeploymentFile(File artifactDir, String artifactName, String pattern)
     {
         if (!artifactDir.exists())
         {
@@ -42,7 +43,7 @@ public class ArtifactFactoryUtils
         }
         // list mule-deploy.* files
         @SuppressWarnings("unchecked")
-        Collection<File> deployFiles = FileUtils.listFiles(artifactDir, new WildcardFileFilter("mule-deploy.*"), null);
+        Collection<File> deployFiles = FileUtils.listFiles(artifactDir, new WildcardFileFilter(pattern), null);
         if (deployFiles.size() > 1)
         {
             // TODO need some kind of an InvalidAppFormatException
