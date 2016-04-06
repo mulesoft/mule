@@ -27,10 +27,12 @@ import static org.mule.extension.api.introspection.declaration.tck.TestHttpConne
 import static org.mule.extension.api.introspection.declaration.tck.TestHttpConnectorDeclarer.STATIC_RESOURCE_OPERATION_NAME;
 import static org.mule.extension.api.introspection.declaration.tck.TestHttpConnectorDeclarer.VENDOR;
 import static org.mule.extension.api.introspection.declaration.tck.TestHttpConnectorDeclarer.VERSION;
+
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
 import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.tck.TestHttpConnectorDeclarer;
@@ -130,8 +132,8 @@ public class ComplexExtensionDeclarationTestCase extends BaseExtensionDeclaratio
     {
         ConnectionProviderModel provider = extensionModel.getConfigurationModel(REQUESTER_CONFIG_NAME).get().getConnectionProviders().get(0);
         assertThat(provider.getName(), is(REQUESTER_PROVIDER));
-        assertThat(provider.getConfigurationType(), equalTo(REQUESTER_CONNECTION_PROVIDER_CONFIG_TYPE));
-        assertThat(provider.getConnectionType(), equalTo(REQUESTER_CONNECTION_PROVIDER_CONNECTION_TYPE));
+        assertThat(((RuntimeConnectionProviderModel) provider).getConfigurationType(), equalTo(REQUESTER_CONNECTION_PROVIDER_CONFIG_TYPE));
+        assertThat(((RuntimeConnectionProviderModel) provider).getConnectionType(), equalTo(REQUESTER_CONNECTION_PROVIDER_CONNECTION_TYPE));
     }
 
     @Override

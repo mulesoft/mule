@@ -8,11 +8,13 @@ package org.mule.module.extension.internal.introspection.validation;
 
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getOperationsConnectionType;
+
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
 import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 
@@ -44,15 +46,15 @@ public final class ConnectionProviderModelValidator implements ModelValidator
     private void validateConnectionProviders(ExtensionModel extensionModel, Class<?> connectionType)
     {
         extensionModel.getConnectionProviders().stream().forEach(providerModel -> {
-            validateConfigType(providerModel, extensionModel);
+            validateConfigType((RuntimeConnectionProviderModel) providerModel, extensionModel);
             if (connectionType != null)
             {
-                validateConnectionTypes(providerModel, extensionModel, connectionType);
+                validateConnectionTypes((RuntimeConnectionProviderModel) providerModel, extensionModel, connectionType);
             }
         });
     }
 
-    private void validateConfigType(ConnectionProviderModel providerModel, ExtensionModel extensionModel)
+    private void validateConfigType(RuntimeConnectionProviderModel providerModel, ExtensionModel extensionModel)
     {
         Class<?> providerConfigType = providerModel.getConfigurationType();
         for (ConfigurationModel configurationModel : extensionModel.getConfigurationModels())
@@ -70,7 +72,7 @@ public final class ConnectionProviderModelValidator implements ModelValidator
         }
     }
 
-    private void validateConnectionTypes(ConnectionProviderModel providerModel, ExtensionModel extensionModel, Class<?> connectionType)
+    private void validateConnectionTypes(RuntimeConnectionProviderModel providerModel, ExtensionModel extensionModel, Class<?> connectionType)
     {
         if (!connectionType.isAssignableFrom(providerModel.getConnectionType()))
         {
