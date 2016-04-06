@@ -40,7 +40,7 @@ public class ConnectorLevelMessageDispatchingTestCase extends AbstractFakeMuleSe
     @Test
     public void verifyClassLoaderIsAppClassLoader() throws Exception
     {
-        muleServer.deployDomainFromClasspathFolder("domain/deployable-domains/http-domain-listener", "domain");
+        muleServer.deployDomainFromClasspathFolder("domain/deployable-domains/http-connector-domain", "domain");
         muleServer.deployAppFromClasspathFolder("domain/deployable-apps/hello-world-app", HELLO_WORLD_APP);
         muleServer.deployAppFromClasspathFolder("domain/deployable-apps/hello-mule-app", HELLO_MULE_APP);
         muleServer.start();
