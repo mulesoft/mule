@@ -9,7 +9,7 @@ package org.mule.endpoint.outbound;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.processor.AbstractRequestResponseMessageProcessor;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ import java.util.List;
  * //TODO This can became a standard MessageProcessor in the response chain if/when
  * event has a (immutable) reference to request message.
  */
-public class OutboundResponsePropertiesMessageProcessor extends AbstractInterceptingMessageProcessor
+public class OutboundResponsePropertiesMessageProcessor extends AbstractRequestResponseMessageProcessor
 {
 
     private OutboundEndpoint endpoint;
@@ -30,24 +30,23 @@ public class OutboundResponsePropertiesMessageProcessor extends AbstractIntercep
         this.endpoint = endpoint;
     }
 
-    public MuleEvent process(MuleEvent event) throws MuleException
+    @Override
+    protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
     {
-        MuleEvent responseEvent = processNext(event);
-
-        if (isEventValid(responseEvent))
+        if (isEventValid(response))
         {
             // Properties which should be carried over from the request message
             // to the response message
             List<String> responseProperties = endpoint.getResponseProperties();
             for (String propertyName : responseProperties)
             {
-                Object propertyValue = event.getMessage().getOutboundProperty(propertyName);
+                Object propertyValue = request.getMessage().getOutboundProperty(propertyName);
                 if (propertyValue != null)
                 {
-                    responseEvent.getMessage().setOutboundProperty(propertyName, propertyValue);
+                    response.getMessage().setOutboundProperty(propertyName, propertyValue);
                 }
             }
         }
-        return responseEvent;
+        return response;
     }
 }

@@ -82,7 +82,7 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
             responseEvent = processNext(processRequest(responseEvent));
             if (!(responseEvent instanceof NonBlockingVoidMuleEvent))
             {
-                responseEvent = processResponse(responseEvent);
+                responseEvent = processResponse(responseEvent, event);
             }
         }
         catch (Exception exception)

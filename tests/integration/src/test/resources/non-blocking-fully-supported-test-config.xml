@@ -14,12 +14,7 @@
         </expression-language>
     </configuration>
 
-    <flow name="defaultFlow">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
-        <test:non-blocking-processor/>
-    </flow>
-
-    <flow name="nonBlockingFlow">
+    <flow name="flow">
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <test:non-blocking-processor/>
     </flow>
@@ -179,8 +174,15 @@
     </flow>
 
     <flow name="testOutboundEndpoint">
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
-        <outbound-endpoint address="test://test" exchange-pattern="request-response" />
+        <set-property propertyName="foo" value="bar"/>
+        <outbound-endpoint address="test://test" exchange-pattern="request-response">
+            <property key="responseProperties" value="foo"/>
+        </outbound-endpoint>
+        <test:assert expression="#[assertPayload()]" />
+        <test:assert expression="#[message.outboundProperties['foo'] == 'bar']" />
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread]"/>
     </flow>
 
     <flow name="testOutboundEndpointError">

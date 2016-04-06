@@ -23,7 +23,7 @@ import org.mule.api.transport.ReplyToHandler;
  *
  * In order to define the process during the request phase you should override the
  * {@link #processRequest(org.mule.api.MuleEvent)} method. Symmetrically, if you need to define a process to be executed
- * during the response phase, then you should override the {@link #processResponse(org.mule.api.MuleEvent)} method.
+ * during the response phase, then you should override the {@link #processResponse(MuleEvent, MuleEvent)} method.
  * <p/>
  *
  * In some cases you'll have some code that should be always executed, even if an error occurs, for those cases you
@@ -53,7 +53,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
         MessagingException exception = null;
         try
         {
-            return processResponse(processNext(processRequest(event)));
+            return processResponse(processNext(processRequest(event)), event);
         }
         catch (MessagingException e)
         {
@@ -77,7 +77,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
             MuleEvent result = processNext(processRequest(event));
             if (!(result instanceof NonBlockingVoidMuleEvent))
             {
-                MuleEvent after = processResponse(result);
+                MuleEvent after = processResponse(result, event);
                 processFinally(after, null);
                 return after;
             }
@@ -93,15 +93,15 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
         }
     }
 
-    protected ReplyToHandler createReplyToHandler(final MuleEvent event)
+    protected ReplyToHandler createReplyToHandler(final MuleEvent request)
     {
-        final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
+        final ReplyToHandler originalReplyToHandler = request.getReplyToHandler();
         return new ReplyToHandler()
         {
             @Override
             public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
             {
-                MuleEvent response = processResponse(recreateEventWithOriginalReplyToHandler(event, originalReplyToHandler));
+                MuleEvent response = processResponse(recreateEventWithOriginalReplyToHandler(event, originalReplyToHandler), request);
                 if (!NonBlockingVoidMuleEvent.getInstance().equals(response))
                 {
                     originalReplyToHandler.processReplyTo(response, null, null);
@@ -137,25 +137,40 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
     /**
      * Processes the request phase before the next message processor is invoked.
      *
-     * @param event event to be processed.
+     * @param request event to be processed.
      * @return result of request processing.
      * @throws MuleException exception thrown by implementations of this method whiile performing response processing
      */
-    protected MuleEvent processRequest(MuleEvent event) throws MuleException
+    protected MuleEvent processRequest(MuleEvent request) throws MuleException
     {
-        return event;
+        return request;
     }
 
     /**
      * Processes the response phase after the next message processor and it's response phase have been invoked
      *
-     * @param event event to be processed.
+     * @param response response event to be processed.
+     * @param request the request event
      * @return result of response processing.
      * @throws MuleException exception thrown by implementations of this method whiile performing response processing
      */
-    protected MuleEvent processResponse(MuleEvent event) throws MuleException
+    protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
     {
-        return event;
+        return processResponse(response);
+    }
+
+    /**
+     * Processes the response phase after the next message processor and it's response phase have been invoked.  This
+     * method is deprecated, use {@link #processResponse(MuleEvent, MuleEvent)} instead.
+     *
+     * @param response response event to be processed.
+     * @return result of response processing.
+     * @throws MuleException exception thrown by implementations of this method whiile performing response processing
+     */
+    @Deprecated
+    protected MuleEvent processResponse(MuleEvent response) throws MuleException
+    {
+        return response;
     }
 
     /**

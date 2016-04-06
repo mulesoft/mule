@@ -222,7 +222,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
             MuleEvent result = processNext(copyEventForEnrichment(new DefaultMuleEvent(event, createReplyToHandler(event))));
             if (!(result instanceof NonBlockingVoidMuleEvent))
             {
-                result = processResponse(result);
+                result = processResponse(result, event);
             }
             return result;
         }
@@ -233,18 +233,18 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
         }
 
         @Override
-        protected MuleEvent processResponse(MuleEvent event) throws MuleException
+        protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
         {
             // Reset access control on current event instance for continued flow processing
             ((ThreadSafeAccess) eventToEnrich).resetAccessControl();
 
             final ExpressionManager expressionManager = eventToEnrich.getMuleContext().getExpressionManager();
 
-            if (event != null && !VoidMuleEvent.getInstance().equals(eventToEnrich))
+            if (response != null && !VoidMuleEvent.getInstance().equals(eventToEnrich))
             {
                 for (EnrichExpressionPair pair : enrichExpressionPairs)
                 {
-                    enrich(eventToEnrich.getMessage(), event.getMessage(), pair.getSource(), pair.getTarget(),
+                    enrich(eventToEnrich.getMessage(), response.getMessage(), pair.getSource(), pair.getTarget(),
                            expressionManager);
                 }
             }
@@ -252,7 +252,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
             if (muleContext != null
                 && muleContext.getConfiguration().isEnricherPropagatesSessionVariableChanges())
             {
-                eventToEnrich = new DefaultMuleEvent(eventToEnrich.getMessage(), eventToEnrich, event.getSession());
+                eventToEnrich = new DefaultMuleEvent(eventToEnrich.getMessage(), eventToEnrich, response.getSession());
             }
 
             return OptimizedRequestContext.unsafeSetEvent(eventToEnrich);
