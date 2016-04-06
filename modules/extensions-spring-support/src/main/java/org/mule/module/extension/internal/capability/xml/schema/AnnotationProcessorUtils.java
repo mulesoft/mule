@@ -110,23 +110,26 @@ public final class AnnotationProcessorUtils
                 continue;
             }
 
-            Class<?>[] operationsClasses = ((Operations) getAnnotationFromType(processingEnvironment, (TypeElement) rootElement, Operations.class)).value();
-            List<AnnotationValue> annotationValues = getAnnotationFieldValue(rootElement, Operations.class, VALUE);
-
-            for (Class<?> operationClass : operationsClasses)
+            Operations operationsAnnotation = getAnnotationFromType(processingEnvironment, (TypeElement) rootElement, Operations.class);
+            if (operationsAnnotation != null)
             {
-                Element operationClassElement = getElementForClass(annotationValues, operationClass);
-                if (operationClassElement != null)
+                final Class<?>[] operationsClasses = operationsAnnotation.value();
+                List<AnnotationValue> annotationValues = getAnnotationFieldValue(rootElement, Operations.class, VALUE);
+
+                for (Class<?> operationClass : operationsClasses)
                 {
-                    for (Method operation : IntrospectionUtils.getOperationMethods(operationClass))
+                    Element operationClassElement = getElementForClass(annotationValues, operationClass);
+                    if (operationClassElement != null)
                     {
-                        operationClassElement.getEnclosedElements().stream()
-                                .filter(e -> e.getSimpleName().toString().equals(operation.getName()))
-                                .findFirst().ifPresent(operationMethodElement -> methods.put(operation.getName(), operationMethodElement));
+                        for (Method operation : IntrospectionUtils.getOperationMethods(operationClass))
+                        {
+                            operationClassElement.getEnclosedElements().stream()
+                                    .filter(e -> e.getSimpleName().toString().equals(operation.getName()))
+                                    .findFirst().ifPresent(operationMethodElement -> methods.put(operation.getName(), operationMethodElement));
+                        }
                     }
                 }
             }
-
         }
 
         return methods.build();
@@ -140,8 +143,8 @@ public final class AnnotationProcessorUtils
     private static Element getElementForClass(List<AnnotationValue> annotationValues, Class<?> clazz)
     {
         return annotationValues.stream()
-                            .map(e -> ((DeclaredType) e.getValue()).asElement())
-                            .filter(e -> e.getSimpleName().toString().equals(clazz.getSimpleName())).findFirst().orElse(null);
+                .map(e -> ((DeclaredType) e.getValue()).asElement())
+                .filter(e -> e.getSimpleName().toString().equals(clazz.getSimpleName())).findFirst().orElse(null);
     }
 
     static Map<String, VariableElement> getFieldsAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation)
