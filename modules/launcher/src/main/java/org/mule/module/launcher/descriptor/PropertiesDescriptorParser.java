@@ -17,23 +17,23 @@ import java.util.Properties;
 
 import org.apache.commons.lang.BooleanUtils;
 
-public class PropertiesDescriptorParser implements DescriptorParser
+public class PropertiesDescriptorParser implements DescriptorParser<ApplicationDescriptor>
 {
+    public static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";
     protected static final String PROPERTY_ENCODING = "encoding";
     protected static final String PROPERTY_CONFIG_BUILDER = "config.builder";
     public static final String PROPERTY_DOMAIN = "domain";
     // support not yet implemented for CL reversal
     protected static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
-    protected static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";
     protected static final String PROPERTY_LOG_CONFIG_FILE = "log.configFile";
 
     @Override
-    public ApplicationDescriptor parse(File descriptor, String applicationName) throws IOException
+    public ApplicationDescriptor parse(File descriptor, String artifactName) throws IOException
     {
         final Properties p = PropertiesUtils.loadProperties(new FileInputStream(descriptor));
 
         ApplicationDescriptor d = new ApplicationDescriptor();
-        d.setName(applicationName);
+        d.setName(artifactName);
         d.setEncoding(p.getProperty(PROPERTY_ENCODING));
         d.setConfigurationBuilder(p.getProperty(PROPERTY_CONFIG_BUILDER));
         d.setDomain(p.getProperty(PROPERTY_DOMAIN));
@@ -50,7 +50,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
         }
         d.setConfigResources(urls);
 
-        String[] absoluteResourcePaths = convertConfigResourcesToAbsolutePatch(urls, applicationName);
+        String[] absoluteResourcePaths = convertConfigResourcesToAbsolutePatch(urls, artifactName);
         d.setAbsoluteResourcePaths(absoluteResourcePaths);
         d.setConfigResourcesFile(convertConfigResourcesToFile(absoluteResourcePaths));
 

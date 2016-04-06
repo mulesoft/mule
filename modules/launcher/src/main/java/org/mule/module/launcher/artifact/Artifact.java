@@ -10,13 +10,16 @@ import org.mule.api.MuleContext;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.InstallException;
+import org.mule.module.launcher.descriptor.RedeployableArtifactDescriptor;
 
 import java.io.File;
 
 /**
  * An Artifact is an abstract representation of a deployable unit within the mule container.
+ *
+ * @param <D> The type of the artifact's descriptor
  */
-public interface Artifact
+public interface Artifact<D extends RedeployableArtifactDescriptor>
 {
 
     /**
@@ -48,6 +51,11 @@ public interface Artifact
      * @return the artifact identifier
      */
     String getArtifactName();
+
+    /**
+     * @return the artifact descriptor
+     */
+    D getDescriptor();
 
     /**
      * @return an array with the configuration files of the artifact. Never returns null.

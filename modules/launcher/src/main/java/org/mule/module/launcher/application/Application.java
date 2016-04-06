@@ -11,12 +11,10 @@ import org.mule.module.launcher.artifact.Artifact;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.domain.Domain;
 
-public interface Application extends Artifact
+public interface Application extends Artifact<ApplicationDescriptor>
 {
 
     MuleContext getMuleContext();
-
-    ApplicationDescriptor getDescriptor();
 
     /**
      * @return the domain associated with the application.

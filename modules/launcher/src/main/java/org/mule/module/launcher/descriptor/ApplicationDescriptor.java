@@ -17,12 +17,11 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class ApplicationDescriptor extends ArtifactDescriptor
+public class ApplicationDescriptor extends RedeployableArtifactDescriptor
 {
 
     public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
     public static final String DEFAULT_APP_PROPERTIES_RESOURCE = "mule-app.properties";
-    public static final String DEFAULT_DEPLOY_PROPERTIES_RESOURCE = "mule-deploy.properties";
 
     /**
      * Required to support the '-config spring' shortcut. Don't use a class object so
@@ -39,7 +38,6 @@ public class ApplicationDescriptor extends ArtifactDescriptor
     private File[] configResourcesFile;
     private Map<String, String> appProperties = new HashMap<String, String>();
 
-    private boolean redeploymentEnabled = true;
     private File logConfigFile;
     private Set<ApplicationPluginDescriptor> plugins = new HashSet<ApplicationPluginDescriptor>(0);
     private URL[] sharedPluginLibs = new URL[0];
@@ -118,16 +116,6 @@ public class ApplicationDescriptor extends ArtifactDescriptor
     public File[] getConfigResourcesFile()
     {
         return configResourcesFile;
-    }
-
-    public boolean isRedeploymentEnabled()
-    {
-        return redeploymentEnabled;
-    }
-
-    public void setRedeploymentEnabled(boolean redeploymentEnabled)
-    {
-        this.redeploymentEnabled = redeploymentEnabled;
     }
 
     public void setLogConfigFile(File logConfigFile)
