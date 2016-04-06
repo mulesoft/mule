@@ -29,7 +29,7 @@ public class EmptyApplicationDescriptor extends ApplicationDescriptor
         setConfigResourcesFile(new File[] {configPathFile});
     }
 
-    public String getAppName()
+    public String getName()
     {
         return appName;
     }

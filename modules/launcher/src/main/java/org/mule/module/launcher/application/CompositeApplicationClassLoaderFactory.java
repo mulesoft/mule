@@ -43,7 +43,7 @@ public class CompositeApplicationClassLoaderFactory implements ApplicationClassL
             classLoaders.add(appClassLoader.getClassLoader());
             classLoaders.addAll(pluginClassLoaders);
 
-            appClassLoader = new CompositeApplicationClassLoader(descriptor.getAppName(), classLoaders);
+            appClassLoader = new CompositeApplicationClassLoader(descriptor.getName(), classLoaders);
         }
 
         return appClassLoader;

@@ -21,6 +21,7 @@ public class MuleFoldersUtil
     public static final String EXECUTION_FOLDER = ".mule";
     public static final String LIB_FOLDER = "lib";
     public static final String APPS_FOLDER = "apps";
+    public static final String DOMAINS_FOLDER = "domains";
     public static final String PLUGINS_FOLDER = "plugins";
 
     private MuleFoldersUtil()
@@ -39,9 +40,19 @@ public class MuleFoldersUtil
         return new File(getMuleHomeFolder(), APPS_FOLDER);
     }
 
+    public static File getDomainsFolder()
+    {
+        return new File(getMuleHomeFolder(), DOMAINS_FOLDER);
+    }
+
     public static File getAppFolder(String appName)
     {
         return new File(getAppsFolder(), appName);
+    }
+
+    public static File getDomainFolder(String domainName)
+    {
+        return new File(getDomainsFolder(), domainName);
     }
 
     public static File getAppLibFolder(String appName)

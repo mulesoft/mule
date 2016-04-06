@@ -11,6 +11,8 @@ import org.mule.module.launcher.DeploymentException;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.ShutdownListener;
+import org.mule.module.launcher.descriptor.DomainDescriptor;
+import org.mule.module.launcher.descriptor.EmptyDomainDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.Preconditions;
 
@@ -26,8 +28,9 @@ public class MuleDomainClassLoaderRepository implements DomainClassLoaderReposit
     private ArtifactClassLoader defaultDomainArtifactClassLoader;
 
     @Override
-    public synchronized ArtifactClassLoader getDomainClassLoader(String domain)
+    public synchronized ArtifactClassLoader getDomainClassLoader(DomainDescriptor descriptor)
     {
+        String domain = descriptor.getName();
         Preconditions.checkArgument(domain != null, "Domain name cannot be null");
         if (domain.equals(DomainFactory.DEFAULT_DOMAIN_NAME))
         {
@@ -38,10 +41,16 @@ public class MuleDomainClassLoaderRepository implements DomainClassLoaderReposit
             return domainArtifactClassLoaders.get(domain);
         }
         validateDomain(domain);
-        ArtifactClassLoader classLoader = new MuleSharedDomainClassLoader(domain, getClass().getClassLoader());
+        ArtifactClassLoader classLoader = new MuleSharedDomainClassLoader(domain, getClass().getClassLoader(), descriptor.getLoaderOverride());
         classLoader = createClassLoaderUnregisterWrapper(classLoader);
         domainArtifactClassLoaders.put(domain, classLoader);
         return classLoader;
+    }
+
+    @Override
+    public synchronized ArtifactClassLoader getDomainClassLoader(String domain)
+    {
+        return getDomainClassLoader(new EmptyDomainDescriptor(domain));
     }
 
     @Override

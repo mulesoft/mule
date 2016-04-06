@@ -522,20 +522,26 @@ public class DeploymentDirectoryWatcher implements Runnable
 
     private void redeployModifiedDomains()
     {
-        redeployModifiedArtifacts(domains, domainTimestampListener, domainArchiveDeployer);
+        Collection redeployableDomains = getArtifactsToRedeploy(domains);
+        redeployModifiedArtifacts(redeployableDomains, domainTimestampListener, domainArchiveDeployer);
     }
 
     private void redeployModifiedApplications()
     {
-        Collection redeployableApplications = CollectionUtils.select(applications, new Predicate()
+        Collection redeployableApplications = getArtifactsToRedeploy(applications);
+        redeployModifiedArtifacts(redeployableApplications, applicationTimestampListener, applicationArchiveDeployer);
+    }
+
+    private <T extends Artifact> Collection getArtifactsToRedeploy(Collection<T> collection)
+    {
+        return CollectionUtils.select(collection, new Predicate()
         {
             @Override
             public boolean evaluate(Object object)
             {
-                return ((Application) object).getDescriptor().isRedeploymentEnabled();
+                return ((Artifact) object).getDescriptor().isRedeploymentEnabled();
             }
         });
-        redeployModifiedArtifacts(redeployableApplications, applicationTimestampListener, applicationArchiveDeployer);
     }
 
     private <T extends Artifact> void redeployModifiedArtifacts(Collection<T> artifacts, ArtifactTimestampListener<T> artifactTimestampListener, ArchiveDeployer<T> artifactArchiveDeployer)

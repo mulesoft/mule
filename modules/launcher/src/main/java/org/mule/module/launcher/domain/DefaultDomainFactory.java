@@ -6,7 +6,13 @@
  */
 package org.mule.module.launcher.domain;
 
+import static org.mule.module.launcher.MuleFoldersUtil.getDomainFolder;
+import static org.mule.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
+import static org.mule.module.launcher.descriptor.ArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import org.mule.module.launcher.DeploymentListener;
+import org.mule.module.launcher.descriptor.DomainDescriptor;
+import org.mule.module.launcher.descriptor.DomainDescriptorParser;
+import org.mule.module.launcher.descriptor.EmptyDomainDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
@@ -19,12 +25,14 @@ public class DefaultDomainFactory implements DomainFactory
 
     private final DomainClassLoaderRepository domainClassLoaderRepository;
     private final Map<String, Domain> domains = new HashMap<String, Domain>();
+    private final DomainDescriptorParser domainDescriptorParser;
 
     protected DeploymentListener deploymentListener;
 
     public DefaultDomainFactory(DomainClassLoaderRepository domainClassLoaderRepository)
     {
         this.domainClassLoaderRepository = domainClassLoaderRepository;
+        this.domainDescriptorParser = new DomainDescriptorParser();
     }
 
     public void setDeploymentListener(DeploymentListener deploymentListener)
@@ -49,11 +57,36 @@ public class DefaultDomainFactory implements DomainFactory
         {
             throw new IllegalArgumentException("Mule application name may not contain spaces: " + artifactName);
         }
-        DefaultMuleDomain defaultMuleDomain = new DefaultMuleDomain(domainClassLoaderRepository, artifactName);
+        DomainDescriptor descriptor = findDomain(artifactName);
+        DefaultMuleDomain defaultMuleDomain = new DefaultMuleDomain(domainClassLoaderRepository, descriptor);
         defaultMuleDomain.setDeploymentListener(deploymentListener);
         DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
         domains.put(artifactName, domainWrapper);
         return domainWrapper;
+    }
+
+    private DomainDescriptor findDomain(String domainName) throws IOException
+    {
+        if (DEFAULT_DOMAIN_NAME.equals(domainName))
+        {
+            return new EmptyDomainDescriptor(DEFAULT_DOMAIN_NAME);
+        }
+
+        final File deploymentFile = getDeploymentFile(getDomainFolder(domainName), domainName, DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
+
+        DomainDescriptor descriptor;
+
+        if (deploymentFile != null)
+        {
+            descriptor = domainDescriptorParser.parse(deploymentFile);
+            descriptor.setName(domainName);
+        }
+        else
+        {
+            descriptor = new EmptyDomainDescriptor(domainName);
+        }
+
+        return descriptor;
     }
 
     @Override

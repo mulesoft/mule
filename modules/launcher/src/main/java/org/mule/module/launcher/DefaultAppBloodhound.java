@@ -6,6 +6,8 @@
  */
 package org.mule.module.launcher;
 
+import static org.mule.module.launcher.MuleFoldersUtil.getAppFolder;
+import static org.mule.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.PreferredObjectSelector;
 import org.mule.config.i18n.MessageFactory;
@@ -15,7 +17,6 @@ import org.mule.module.launcher.descriptor.EmptyApplicationDescriptor;
 import org.mule.module.launcher.descriptor.PropertiesDescriptorParser;
 import org.mule.module.launcher.plugin.PluginDescriptor;
 import org.mule.module.launcher.plugin.PluginDescriptorParser;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.FilenameUtils;
 import org.mule.util.PropertiesUtils;
@@ -36,7 +37,6 @@ import javax.imageio.spi.ServiceRegistry;
 
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.collections.map.MultiValueMap;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 /**
  *
@@ -44,6 +44,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 public class DefaultAppBloodhound implements AppBloodhound
 {
 
+    public static final String MULE_WILDCARD_DEPLOY_FILE = "mule-deploy.*";
     // file extension -> parser implementation
     protected Map<String, DescriptorParser> parserRegistry = new HashMap<String, DescriptorParser>();
     public static final String SYSTEM_PROPERTY_OVERRIDE = "-O";
@@ -66,36 +67,17 @@ public class DefaultAppBloodhound implements AppBloodhound
 
     public ApplicationDescriptor fetch(String appName) throws IOException
     {
-        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
-        File appDir = new File(appsDir, appName);
-        if (!appDir.exists())
-        {
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage(
-                            String.format("Application directory does not exist: '%s'", appDir)));
-        }
-        // list mule-deploy.* files
-        @SuppressWarnings("unchecked")
-        Collection<File> deployFiles = FileUtils.listFiles(appDir, new WildcardFileFilter("mule-deploy.*"), null);
-        if (deployFiles.size() > 1)
-        {
-            // TODO need some kind of an InvalidAppFormatException
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage(
-                            String.format("More than one mule-deploy descriptors found in application '%s'", appName)));
-        }
-
+        File appDir = getAppFolder(appName);
+        final File descriptorFile = getDeploymentFile(appDir, appName, MULE_WILDCARD_DEPLOY_FILE);
         ApplicationDescriptor desc;
 
         // none found, return defaults
-        if (deployFiles.isEmpty())
+        if (descriptorFile == null)
         {
             desc = new EmptyApplicationDescriptor(appName);
         }
         else
         {
-            // lookup the implementation by extension
-            final File descriptorFile = deployFiles.iterator().next();
             final String ext = FilenameUtils.getExtension(descriptorFile.getName());
             final DescriptorParser descriptorParser = parserRegistry.get(ext);
 
@@ -109,7 +91,7 @@ public class DefaultAppBloodhound implements AppBloodhound
 
             desc = descriptorParser.parse(descriptorFile, appName);
             // app name is external to the deployment descriptor
-            desc.setAppName(appName);
+            desc.setName(appName);
         }
 
         // get a ref to an optional app props file (right next to the descriptor)

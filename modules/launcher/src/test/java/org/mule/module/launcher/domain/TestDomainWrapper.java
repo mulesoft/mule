@@ -12,6 +12,7 @@ import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.launcher.descriptor.DomainDescriptor;
 
 import java.io.File;
 
@@ -92,6 +93,12 @@ public class TestDomainWrapper implements Domain
     public String getArtifactName()
     {
         return delegate.getArtifactName();
+    }
+
+    @Override
+    public DomainDescriptor getDescriptor()
+    {
+        return delegate.getDescriptor();
     }
 
     @Override

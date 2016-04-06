@@ -27,6 +27,7 @@ import org.mule.module.launcher.application.NullDeploymentListener;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.MuleContextDeploymentListener;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.module.launcher.descriptor.DomainDescriptor;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 
@@ -49,23 +50,23 @@ public class DefaultMuleDomain implements Domain
     protected transient final Log deployLogger = LogFactory.getLog(MuleDeploymentService.class);
 
     private final DomainClassLoaderRepository domainClassLoaderRepository;
-    private final String name;
+    private final DomainDescriptor descriptor;
     private MuleContext muleContext;
     private DeploymentListener deploymentListener;
     private ArtifactClassLoader deploymentClassLoader;
 
     private File configResourceFile;
 
-    public DefaultMuleDomain(DomainClassLoaderRepository domainClassLoaderRepository, String name)
+    public DefaultMuleDomain(DomainClassLoaderRepository domainClassLoaderRepository, DomainDescriptor descriptor)
     {
         this.domainClassLoaderRepository = domainClassLoaderRepository;
         this.deploymentListener = new NullDeploymentListener();
-        this.name = name;
+        this.descriptor = descriptor;
         refreshClassLoaderAndLoadConfigResourceFile();
     }
 
     private void refreshClassLoaderAndLoadConfigResourceFile(){
-        this.deploymentClassLoader = domainClassLoaderRepository.getDomainClassLoader(name);
+        this.deploymentClassLoader = domainClassLoaderRepository.getDomainClassLoader(descriptor);
         URL resource = deploymentClassLoader.findLocalResource(DOMAIN_CONFIG_FILE_LOCATION);
         if (resource != null)
         {
@@ -87,7 +88,7 @@ public class DefaultMuleDomain implements Domain
 
     public String getName()
     {
-        return name;
+        return descriptor.getName();
     }
 
     @Override
@@ -179,7 +180,7 @@ public class DefaultMuleDomain implements Domain
                     {
                         muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
                     }
-                    DomainMuleContextBuilder domainMuleContextBuilder = new DomainMuleContextBuilder(name);
+                    DomainMuleContextBuilder domainMuleContextBuilder = new DomainMuleContextBuilder(descriptor.getName());
                     muleContext = muleContextFactory.createMuleContext(builders, domainMuleContextBuilder);
                 }
             }
@@ -314,7 +315,13 @@ public class DefaultMuleDomain implements Domain
     @Override
     public String getArtifactName()
     {
-        return name;
+        return descriptor.getName();
+    }
+
+    @Override
+    public DomainDescriptor getDescriptor()
+    {
+        return descriptor;
     }
 
     @Override

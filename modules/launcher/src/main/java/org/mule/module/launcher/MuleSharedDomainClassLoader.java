@@ -16,6 +16,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Load $MULE_HOME/lib/shared/<domain> libraries.
@@ -30,10 +32,15 @@ public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader imp
     private File domainDir;
     private File domainLibraryFolder;
 
-    @SuppressWarnings("unchecked")
     public MuleSharedDomainClassLoader(String domain, ClassLoader parent)
     {
-        super(new URL[0], parent);
+        this(domain, parent, Collections.<String>emptySet());
+    }
+
+    @SuppressWarnings("unchecked")
+    public MuleSharedDomainClassLoader(String domain, ClassLoader parent, Set<String> loaderOverrides)
+    {
+        super(new URL[0], parent, loaderOverrides);
         try
         {
             if (domain == null)

@@ -9,6 +9,7 @@ package org.mule.module.launcher.artifact;
 import org.mule.api.MuleContext;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.InstallException;
+import org.mule.module.launcher.descriptor.ArtifactDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +20,7 @@ import java.io.IOException;
  * must be executed with deployment (app) classloader in the context, and not Mule system
  * classloader.
  */
-public class ArtifactWrapper<T extends Artifact> implements Artifact
+public class ArtifactWrapper<T extends Artifact<D>, D extends ArtifactDescriptor> implements Artifact<D>
 {
 
     private T delegate;
@@ -80,6 +81,12 @@ public class ArtifactWrapper<T extends Artifact> implements Artifact
     public String getArtifactName()
     {
         return delegate.getArtifactName();
+    }
+
+    @Override
+    public D getDescriptor()
+    {
+        return delegate.getDescriptor();
     }
 
     @Override

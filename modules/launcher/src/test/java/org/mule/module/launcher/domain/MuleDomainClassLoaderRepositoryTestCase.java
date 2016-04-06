@@ -6,52 +6,61 @@
  */
 package org.mule.module.launcher.domain;
 
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.launcher.MuleFoldersUtil.getDomainsFolder;
+import static org.mule.module.launcher.MuleFoldersUtil.getMuleLibFolder;
 import static org.mule.module.launcher.MuleSharedDomainClassLoader.OLD_DOMAIN_LIBRARY_FOLDER;
 import static org.mule.module.launcher.domain.DomainFactory.DEFAULT_DOMAIN_NAME;
 import static org.mule.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
-
-import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.DeploymentException;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.module.launcher.descriptor.DomainDescriptor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.hamcrest.core.Is;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.After;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-public class MuleDomainClassLoaderRepositoryTestCase extends AbstractMuleTestCase
+public class MuleDomainClassLoaderRepositoryTestCase extends AbstractDomainTestCase
 {
-
-    @ClassRule
-    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
-    @Rule
-    public final SystemProperty muleHomeSystemProperty = new SystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, temporaryFolder.getRoot().getCanonicalPath());
-    private final File muleHomeFolder;
 
     public MuleDomainClassLoaderRepositoryTestCase() throws IOException
     {
-        muleHomeFolder = temporaryFolder.getRoot();
+    }
+
+    @After
+    public void tearDown()
+    {
+        deleteIfNeeded(getDomainsFolder());
+        deleteIfNeeded(new File(getMuleLibFolder(), "shared"));
+    }
+
+    private void deleteIfNeeded(File file)
+    {
+        if (file.exists())
+        {
+            deleteQuietly(file);
+        }
     }
 
     @Test
     public void createClassLoaderUsingEmptyDomain()
     {
-        createOldDomainDefaultDir();
+        createDomainDir(OLD_DOMAIN_LIBRARY_FOLDER, DEFAULT_DOMAIN_NAME);
         assertThat(new MuleDomainClassLoaderRepository().getDefaultDomainClassLoader().getArtifactName(), Is.is(DEFAULT_DOMAIN_NAME));
     }
 
     @Test
     public void createClassLoaderUsingDefaultDomain()
     {
+        createDomainDir(MULE_DOMAIN_FOLDER, DEFAULT_DOMAIN_NAME);
         assertThat(new MuleDomainClassLoaderRepository().getDomainClassLoader(DEFAULT_DOMAIN_NAME).getArtifactName(), is(DEFAULT_DOMAIN_NAME));
     }
 
@@ -59,7 +68,7 @@ public class MuleDomainClassLoaderRepositoryTestCase extends AbstractMuleTestCas
     public void createClassLoaderUsingCustomDomain()
     {
         String domainName = "custom-domain";
-        assertThat(new File(muleHomeFolder, MULE_DOMAIN_FOLDER + File.separator + domainName).mkdirs(), is(true));
+        createDomainDir(MULE_DOMAIN_FOLDER, domainName);
         assertThat(new MuleDomainClassLoaderRepository().getDomainClassLoader(domainName).getClassLoader(), instanceOf(MuleSharedDomainClassLoader.class));
     }
 
@@ -69,10 +78,28 @@ public class MuleDomainClassLoaderRepositoryTestCase extends AbstractMuleTestCas
         new MuleDomainClassLoaderRepository().getDomainClassLoader("someDomain");
     }
 
-    private void createOldDomainDefaultDir()
+    @Test
+    public void createClassLoaderFromDomainDescriptor()
     {
-        assertThat(new File(muleHomeFolder, OLD_DOMAIN_LIBRARY_FOLDER + File.separator + "default").mkdirs(), is(true));
+        String domainName = "descriptor-domain";
+        DomainDescriptor descriptor = getTestDescriptor(domainName);
+
+        createDomainDir(MULE_DOMAIN_FOLDER, domainName);
+        ClassLoader domainClassLoader = new MuleDomainClassLoaderRepository().getDomainClassLoader(descriptor).getClassLoader();
+        assertThat(domainClassLoader, instanceOf(MuleSharedDomainClassLoader.class));
+        assertThat(((MuleSharedDomainClassLoader) domainClassLoader).isOverridden("org.mycompany.mymodule.MyClass"), is(true));
+        assertThat(((MuleSharedDomainClassLoader) domainClassLoader).isOverridden("org.mycompany.MyClass"), is(false));
+
     }
 
+    private DomainDescriptor getTestDescriptor(String name)
+    {
+        DomainDescriptor descriptor = new DomainDescriptor();
+        Set<String> domainLoaderOverride = new HashSet<>();
+        domainLoaderOverride.add("org.mycompany.mymodule");
+        descriptor.setName(name);
+        descriptor.setLoaderOverride(domainLoaderOverride);
+        return descriptor;
+    }
 
 }

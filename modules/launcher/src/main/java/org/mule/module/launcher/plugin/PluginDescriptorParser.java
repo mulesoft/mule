@@ -57,7 +57,7 @@ public class PluginDescriptorParser
             final String pluginName = StringUtils.removeEnd(pluginZip, ".zip");
             // must unpack as there's no straightforward way for a ClassLoader to use a jar within another jar/zip
             final File tmpDir = new File(MuleContainerBootstrapUtils.getMuleTmpDir(),
-                                         appDescriptor.getAppName() + "/plugins/" + pluginName);
+                                         appDescriptor.getName() + "/plugins/" + pluginName);
             // TODO fix unzip impl to not stumble over existing dirs
             FileUtils.unzip(new File(pluginsDir, pluginZip), tmpDir);
             final PluginDescriptor pd = new PluginDescriptor();
