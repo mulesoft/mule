@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
@@ -30,10 +31,10 @@ public class SensingNullRequestResponseMessageProcessor extends AbstractRequestR
     }
 
     @Override
-    protected MuleEvent processResponse(MuleEvent event) throws MuleException
+    protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
     {
         responseThread = Thread.currentThread();
-        return super.processRequest(event);
+        return super.processRequest(response);
     }
 
     public void assertRequestResponseThreadsDifferent()

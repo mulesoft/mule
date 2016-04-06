@@ -17,9 +17,16 @@
     </configuration>
 
     <flow name="testOutboundEndpoint">
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
-        <transports:outbound-endpoint address="test://test" exchange-pattern="request-response" />
-    </flow>
+        <set-property propertyName="foo" value="bar"/>
+        <transports:outbound-endpoint address="test://test" exchange-pattern="request-response">
+            <property key="responseProperties" value="foo"/>
+        </transports:outbound-endpoint>
+        <test:assert expression="#[assertPayload()]" />
+        <test:assert expression="#[message.outboundProperties['foo'] == 'bar']" />
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread]"/>
+     </flow>
 
     <flow name="testOutboundEndpointError">
         <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>

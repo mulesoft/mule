@@ -7,9 +7,12 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.runtime.api.execution.CompletionHandler;
+import org.mule.runtime.api.execution.ExceptionCallback;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.RoutingException;
@@ -53,11 +56,11 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
         {
             throw new RoutingException(event, (OutboundEndpoint) endpoint);
         }
-        return event.getMessage();
+        return event.getMessage().createInboundMessage();
     }
 
     @Override
-    protected void doSendNonBlocking(MuleEvent event, CompletionHandler<MuleMessage, Exception, Void> completionHandler)
+    protected void doSendNonBlocking(MuleEvent event, final CompletionHandler<MuleMessage, Exception, Void> completionHandler)
     {
         if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail"))
         {
@@ -67,9 +70,28 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
         {
             try
             {
+                final MuleMessage response = event.getMessage().createInboundMessage();
+                event = new DefaultMuleEvent(event, new ReplyToHandler()
+                {
+                    @Override
+                    public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo)
+                    {
+                        completionHandler.onCompletion(response, (ExceptionCallback<Void, Exception>) (exception ->
+                        {
+                            // TODO MULE-9629
+                            return null;
+                        }));
+                    }
+
+                    @Override
+                    public void processExceptionReplyTo(MessagingException exception, Object replyTo)
+                    {
+                        completionHandler.onFailure(exception);
+                    }
+                });
                 nonBlockingProcessor.process(event);
             }
-            catch (MuleException e)
+            catch (Exception e)
             {
                 completionHandler.onFailure(e);
             }

@@ -15,13 +15,26 @@ import static org.mule.functional.functional.FlowAssert.verify;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestCase
 {
 
     public static String FOO = "foo";
+    private ProcessingStrategy processingStrategy;
 
     @Override
     protected String getConfigFile()
@@ -29,18 +42,34 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
         return "non-blocking-fully-supported-test-config.xml";
     }
 
-    @Test
-    public void defaultFlow() throws Exception
+    public NonBlockingFullySupportedFunctionalTestCase(ProcessingStrategy processingStrategy)
     {
-        flowRunner("defaultFlow").withPayload(TEST_MESSAGE).withExchangePAttern(getMessageExchnagePattern())
-                .nonBlocking().run();
+        this.processingStrategy = processingStrategy;
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                                             {new DefaultFlowProcessingStrategy()},
+                                             {new NonBlockingProcessingStrategy()}});
+    }
+
+    @Override
+    protected void configureMuleContext(MuleContextBuilder contextBuilder)
+    {
+        DefaultMuleConfiguration configuration = new DefaultMuleConfiguration();
+        configuration.setDefaultProcessingStrategy(processingStrategy);
+        contextBuilder.setMuleConfiguration(configuration);
     }
 
     @Test
-    public void nonBlockingFlow() throws Exception
+    public void flow() throws Exception
     {
-        flowRunner("nonBlockingFlow").withPayload(TEST_MESSAGE).withExchangePAttern(getMessageExchnagePattern())
-                .nonBlocking().run();
+        flowRunner("flow").withPayload(TEST_MESSAGE)
+                          .withExchangePAttern(getMessageExchnagePattern())
+                          .nonBlocking()
+                          .run();
     }
 
     @Test

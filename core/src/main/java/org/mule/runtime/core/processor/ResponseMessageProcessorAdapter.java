@@ -47,15 +47,15 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
     }
 
     @Override
-    protected MuleEvent processResponse(MuleEvent event) throws MuleException
+    protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
     {
-        if (responseProcessor == null || !isEventValid(event))
+        if (responseProcessor == null || !isEventValid(response))
         {
-            return event;
+            return response;
         }
         else
         {
-            return new CopyOnNullNonBlockingProcessorExecutor(event, Collections.singletonList(responseProcessor),
+            return new CopyOnNullNonBlockingProcessorExecutor(response, Collections.singletonList(responseProcessor),
                                                               MessageProcessorExecutionTemplate
                                                                       .createExecutionTemplate(), true).execute();
         }

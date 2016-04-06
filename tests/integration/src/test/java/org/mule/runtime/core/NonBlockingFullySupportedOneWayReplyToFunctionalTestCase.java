@@ -6,8 +6,33 @@
  */
 package org.mule.runtime.core;
 
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
+@RunWith(Parameterized.class)
 public class NonBlockingFullySupportedOneWayReplyToFunctionalTestCase extends NonBlockingFullySupportedFunctionalTestCase
 {
+
+    public NonBlockingFullySupportedOneWayReplyToFunctionalTestCase(ProcessingStrategy processingStrategy)
+    {
+        super(processingStrategy);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                                             {new DefaultFlowProcessingStrategy()},
+                                             {new NonBlockingProcessingStrategy()}});
+    }
 
     @Override
     protected MessageExchangePattern getMessageExchnagePattern()
