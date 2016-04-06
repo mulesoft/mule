@@ -207,10 +207,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             }
 
             @Override
-            protected MuleEvent processResponse(MuleEvent event) throws MuleException
+            protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
             {
-                copyAttachmentsResponse(event);
-                return super.processResponse(event);
+                copyAttachmentsResponse(response);
+                return super.processResponse(response, request);
             }
         };
     }
@@ -229,13 +229,13 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             }
 
             @Override
-            protected MuleEvent processResponse(MuleEvent event) throws MuleException
+            protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
             {
                 if (propertyValue != null)
                 {
-                    event.getMessage().setInvocationProperty(propertyName, propertyValue);
+                    response.getMessage().setInvocationProperty(propertyName, propertyValue);
                 }
-                return super.processResponse(event);
+                return super.processResponse(response, request);
             }
         };
     }
@@ -264,15 +264,15 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             }
 
             @Override
-            protected MuleEvent processResponse(MuleEvent event) throws MuleException
+            protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
             {
                 // Ensure that the http.status code inbound property (if present) is a String.
-                Object statusCode = event.getMessage().getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, null);
+                Object statusCode = response.getMessage().getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, null);
                 if (statusCode != null && !(statusCode instanceof String))
                 {
-                    event.getMessage().setProperty(HttpConnector.HTTP_STATUS_PROPERTY, statusCode.toString(), PropertyScope.INBOUND);
+                    response.getMessage().setProperty(HttpConnector.HTTP_STATUS_PROPERTY, statusCode.toString(), PropertyScope.INBOUND);
                 }
-                return super.processResponse(event);
+                return super.processResponse(response, request);
             }
         };
     }

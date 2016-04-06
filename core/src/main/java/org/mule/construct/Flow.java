@@ -41,6 +41,7 @@ import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
+import org.mule.work.SerialWorkManager;
 
 /**
  * This implementation of {@link AbstractPipeline} adds the following functionality:
@@ -75,6 +76,10 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
         if (processingStrategy instanceof NonBlockingProcessingStrategy)
         {
             workManager = ((NonBlockingProcessingStrategy) processingStrategy).createWorkManager(this);
+        }
+        else
+        {
+            workManager = new SerialWorkManager();
         }
     }
 

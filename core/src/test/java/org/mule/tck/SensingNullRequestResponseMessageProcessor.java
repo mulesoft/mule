@@ -30,10 +30,10 @@ public class SensingNullRequestResponseMessageProcessor extends AbstractRequestR
     }
 
     @Override
-    protected MuleEvent processResponse(MuleEvent event) throws MuleException
+    protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
     {
         responseThread = Thread.currentThread();
-        return super.processRequest(event);
+        return super.processRequest(response);
     }
 
     public void assertRequestResponseThreadsDifferent()
