@@ -34,8 +34,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.IOUtils;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -53,13 +51,14 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class SchemaGeneratorTestCase extends AbstractMuleTestCase
 {
+    private SchemaGenerator generator;
+    private ExtensionFactory extensionFactory;
 
     @Parameterized.Parameter(0)
     public Class<?> extensionUnderTest;
+
     @Parameterized.Parameter(1)
     public String expectedXSD;
-    private SchemaGenerator generator;
-    private ExtensionFactory extensionFactory;
 
     @Parameterized.Parameters(name = "{1}")
     public static Collection<Object[]> data()
