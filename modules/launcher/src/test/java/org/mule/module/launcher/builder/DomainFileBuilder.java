@@ -11,9 +11,8 @@ import static org.mule.module.launcher.descriptor.ArtifactDescriptor.DEFAULT_DEP
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.tck.ZipUtils.ZipResource;
+import org.mule.util.Preconditions;
 import org.mule.util.StringUtils;
-
-import com.google.common.base.Preconditions;
 
 import java.io.File;
 import java.util.LinkedList;

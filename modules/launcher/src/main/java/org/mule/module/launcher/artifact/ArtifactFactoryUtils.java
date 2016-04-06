@@ -15,16 +15,25 @@ import java.util.Collection;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
+/**
+ * Utility class providing useful methods when creating {@link Artifact}s.
+ */
 public class ArtifactFactoryUtils
 {
+
+    private ArtifactFactoryUtils()
+    {
+    }
+
     /**
-     * @param lookupDirectory the directory where the artifact should be present
+     * Finds the deployment file within a given artifact.
+     *
+     * @param artifactDir the artifact directory where the deployment file should be present
      * @param artifactName the artifact whose deployment file is needed
      * @return the artifact's deployment file or {@code null} if none was found
      */
-    public static File getDeploymentFile(File lookupDirectory, String artifactName)
+    public static File getDeploymentFile(File artifactDir, String artifactName)
     {
-        File artifactDir = new File(lookupDirectory, artifactName);
         if (!artifactDir.exists())
         {
             throw new MuleRuntimeException(
@@ -42,7 +51,7 @@ public class ArtifactFactoryUtils
                             String.format("More than one mule-deploy descriptors found in artifact '%s'", artifactName)));
         }
 
-        if(deployFiles.isEmpty())
+        if (deployFiles.isEmpty())
         {
             return null;
         }

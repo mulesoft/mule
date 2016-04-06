@@ -16,6 +16,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -33,7 +34,7 @@ public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader imp
 
     public MuleSharedDomainClassLoader(String domain, ClassLoader parent)
     {
-        this(domain, parent, null);
+        this(domain, parent, Collections.<String>emptySet());
     }
 
     @SuppressWarnings("unchecked")

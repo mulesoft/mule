@@ -102,7 +102,7 @@ public class DefaultMuleDomain implements Domain
     {
         String configBuilderClassName = determineConfigBuilderClassNameForApplication(application);
         ConfigurationBuilder configurationBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
-                                                                                                       new Object[] {((ApplicationDescriptor)application.getDescriptor()).getAbsoluteResourcePaths()}, application.getArtifactClassLoader().getClassLoader());
+                                                                                                       new Object[] {application.getDescriptor().getAbsoluteResourcePaths()}, application.getArtifactClassLoader().getClassLoader());
 
         if (!containsSharedResources())
         {
@@ -125,7 +125,7 @@ public class DefaultMuleDomain implements Domain
     protected String determineConfigBuilderClassNameForApplication(Application defaultMuleApplication)
     {
         // Provide a shortcut for Spring: "-builder spring"
-        final String builderFromDesc = ((ApplicationDescriptor) defaultMuleApplication.getDescriptor()).getConfigurationBuilder();
+        final String builderFromDesc = defaultMuleApplication.getDescriptor().getConfigurationBuilder();
         if ("spring".equalsIgnoreCase(builderFromDesc))
         {
             return ApplicationDescriptor.CLASSNAME_SPRING_CONFIG_BUILDER;

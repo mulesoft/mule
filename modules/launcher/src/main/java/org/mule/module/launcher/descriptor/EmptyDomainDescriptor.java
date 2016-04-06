@@ -6,6 +6,9 @@
  */
 package org.mule.module.launcher.descriptor;
 
+/**
+ * Represents the description of a domain when none is given
+ */
 public class EmptyDomainDescriptor extends DomainDescriptor
 {
     public EmptyDomainDescriptor(String name)

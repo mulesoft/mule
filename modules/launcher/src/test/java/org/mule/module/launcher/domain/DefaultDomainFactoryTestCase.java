@@ -10,7 +10,10 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.module.launcher.descriptor.ArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
+import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_LOADER_OVERRIDE;
+import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
 import static org.mule.module.launcher.domain.DomainFactory.DEFAULT_DOMAIN_NAME;
 import static org.mule.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
 
@@ -26,11 +29,10 @@ import org.junit.Test;
 
 public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase
 {
-    private DomainFactory domainFactory;
+    private DomainFactory domainFactory = new DefaultDomainFactory(new MuleDomainClassLoaderRepository());
 
     public DefaultDomainFactoryTestCase() throws IOException
     {
-        this.domainFactory = new DefaultDomainFactory(new MuleDomainClassLoaderRepository());
     }
 
     @Test
@@ -71,10 +73,10 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase
 
     private void createDeployPropertiesFile(String domainName) throws FileNotFoundException, UnsupportedEncodingException
     {
-        File properties = new File(muleHomeFolder + File.separator + MULE_DOMAIN_FOLDER + File.separator + domainName, DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
+        File properties = new File(getDomainFolder(domainName), DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
         PrintWriter writer = new PrintWriter(properties, "UTF8");
-        writer.println("redeployment.enabled=false");
-        writer.println("loader.override=org.mycom.MyClass,org.yourcom");
+        writer.println(PROPERTY_REDEPLOYMENT_ENABLED + "=false");
+        writer.println(PROPERTY_LOADER_OVERRIDE + "=org.mycom.MyClass,org.yourcom");
         writer.close();
     }
 }

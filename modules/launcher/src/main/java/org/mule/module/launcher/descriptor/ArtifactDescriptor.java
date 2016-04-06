@@ -6,9 +6,14 @@
  */
 package org.mule.module.launcher.descriptor;
 
+import org.mule.module.launcher.artifact.Artifact;
+
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Represents an abstract description of an {@link Artifact}
+ */
 public class ArtifactDescriptor
 {
     public static final String DEFAULT_DEPLOY_PROPERTIES_RESOURCE = "mule-deploy.properties";

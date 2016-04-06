@@ -6,9 +6,12 @@
  */
 package org.mule.module.launcher.domain;
 
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.launcher.MuleFoldersUtil.getDomainsFolder;
+import static org.mule.module.launcher.MuleFoldersUtil.getMuleLibFolder;
 import static org.mule.module.launcher.MuleSharedDomainClassLoader.OLD_DOMAIN_LIBRARY_FOLDER;
 import static org.mule.module.launcher.domain.DomainFactory.DEFAULT_DOMAIN_NAME;
 import static org.mule.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
@@ -16,11 +19,13 @@ import org.mule.module.launcher.DeploymentException;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
 import org.mule.module.launcher.descriptor.DomainDescriptor;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.hamcrest.core.Is;
+import org.junit.After;
 import org.junit.Test;
 
 public class MuleDomainClassLoaderRepositoryTestCase extends AbstractDomainTestCase
@@ -28,6 +33,21 @@ public class MuleDomainClassLoaderRepositoryTestCase extends AbstractDomainTestC
 
     public MuleDomainClassLoaderRepositoryTestCase() throws IOException
     {
+    }
+
+    @After
+    public void tearDown()
+    {
+        deleteIfNeeded(getDomainsFolder());
+        deleteIfNeeded(new File(getMuleLibFolder(), "shared"));
+    }
+
+    private void deleteIfNeeded(File file)
+    {
+        if (file.exists())
+        {
+            deleteQuietly(file);
+        }
     }
 
     @Test

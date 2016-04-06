@@ -9,8 +9,8 @@ package org.mule.module.launcher.domain;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.application.DefaultMuleApplication;
 import org.mule.module.launcher.artifact.Artifact;
+import org.mule.module.launcher.descriptor.DomainDescriptor;
 
 /**
  * A domain is a deployable Artifact that contains shared resources for {@link org.mule.module.launcher.application.Application}
@@ -18,7 +18,7 @@ import org.mule.module.launcher.artifact.Artifact;
  * A domain can just consist of a set of jar libraries to share between the domain applications or it can also contain shared
  * resources such as connectors or other mule components.
  */
-public interface Domain extends Artifact
+public interface Domain extends Artifact<DomainDescriptor>
 {
     /**
      * Domain configuration file name

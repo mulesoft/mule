@@ -6,9 +6,11 @@
  */
 package org.mule.module.launcher.domain;
 
+import static org.mule.module.launcher.MuleFoldersUtil.getDomainFolder;
+import static org.mule.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import org.mule.module.launcher.DeploymentListener;
-import org.mule.module.launcher.artifact.ArtifactFactoryUtils;
 import org.mule.module.launcher.descriptor.DomainDescriptor;
+import org.mule.module.launcher.descriptor.DomainDescriptorParser;
 import org.mule.module.launcher.descriptor.EmptyDomainDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
@@ -69,8 +71,7 @@ public class DefaultDomainFactory implements DomainFactory
             return new EmptyDomainDescriptor(DEFAULT_DOMAIN_NAME);
         }
 
-        final File appsDir = MuleContainerBootstrapUtils.getMuleDomainsDir();
-        final File deploymentFile = ArtifactFactoryUtils.getDeploymentFile(appsDir, domainName);
+        final File deploymentFile = getDeploymentFile(getDomainFolder(domainName), domainName);
 
         DomainDescriptor descriptor;
 

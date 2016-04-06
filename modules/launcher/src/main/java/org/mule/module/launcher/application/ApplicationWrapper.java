@@ -7,6 +7,7 @@
 package org.mule.module.launcher.application;
 
 import org.mule.module.launcher.artifact.ArtifactWrapper;
+import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.domain.Domain;
 
 import java.io.IOException;
@@ -17,7 +18,7 @@ import java.io.IOException;
  * must be executed with deployment (app) classloader in the context, and not Mule system
  * classloader.
  */
-public class ApplicationWrapper extends ArtifactWrapper<Application> implements Application
+public class ApplicationWrapper extends ArtifactWrapper<Application, ApplicationDescriptor> implements Application
 {
 
     protected ApplicationWrapper(Application delegate) throws IOException

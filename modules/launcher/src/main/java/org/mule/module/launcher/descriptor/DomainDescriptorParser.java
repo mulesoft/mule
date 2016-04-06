@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.domain;
+package org.mule.module.launcher.descriptor;
 
-import org.mule.module.launcher.descriptor.DomainDescriptor;
-import org.mule.util.PropertiesUtils;
+import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_LOADER_OVERRIDE;
+import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
+import static org.mule.util.PropertiesUtils.loadProperties;
 import org.mule.util.StringUtils;
 
 import java.io.File;
@@ -21,17 +22,14 @@ import java.util.Set;
 import org.apache.commons.lang.BooleanUtils;
 
 /**
- * Descriptor parser that only handles loader overrides and redeployment properties, the only ones currently supported by domains.
+ * Descriptor parser exclusive for domains.
  */
 public class DomainDescriptorParser
 {
 
-    private static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
-    private static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";
-
     public DomainDescriptor parse(File descriptor) throws IOException
     {
-        final Properties properties = PropertiesUtils.loadProperties(new FileInputStream(descriptor));
+        final Properties properties = loadProperties(new FileInputStream(descriptor));
         DomainDescriptor domainDescriptor = new DomainDescriptor();
 
         domainDescriptor.setRedeploymentEnabled(BooleanUtils.toBoolean(properties.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, Boolean.TRUE.toString())));

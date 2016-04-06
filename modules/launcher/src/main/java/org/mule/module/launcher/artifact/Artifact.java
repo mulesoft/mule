@@ -16,7 +16,7 @@ import java.io.File;
 /**
  * An Artifact is an abstract representation of a deployable unit within the mule container.
  */
-public interface Artifact
+public interface Artifact<D extends ArtifactDescriptor>
 {
 
     /**
@@ -52,7 +52,7 @@ public interface Artifact
     /**
      * @return the artifact descriptor
      */
-    ArtifactDescriptor getDescriptor();
+    D getDescriptor();
 
     /**
      * @return an array with the configuration files of the artifact. Never returns null.

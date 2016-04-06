@@ -20,7 +20,7 @@ import java.io.IOException;
  * must be executed with deployment (app) classloader in the context, and not Mule system
  * classloader.
  */
-public class ArtifactWrapper<T extends Artifact> implements Artifact
+public class ArtifactWrapper<T extends Artifact<D>, D extends ArtifactDescriptor> implements Artifact<D>
 {
 
     private T delegate;
@@ -84,7 +84,7 @@ public class ArtifactWrapper<T extends Artifact> implements Artifact
     }
 
     @Override
-    public ArtifactDescriptor getDescriptor()
+    public D getDescriptor()
     {
         return delegate.getDescriptor();
     }

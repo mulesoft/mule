@@ -6,17 +6,17 @@
  */
 package org.mule.module.launcher;
 
+import static org.mule.module.launcher.MuleFoldersUtil.getAppFolder;
+import static org.mule.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.PreferredObjectSelector;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.module.launcher.artifact.ArtifactFactoryUtils;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.descriptor.DescriptorParser;
 import org.mule.module.launcher.descriptor.EmptyApplicationDescriptor;
 import org.mule.module.launcher.descriptor.PropertiesDescriptorParser;
 import org.mule.module.launcher.plugin.PluginDescriptor;
 import org.mule.module.launcher.plugin.PluginDescriptorParser;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.FilenameUtils;
 import org.mule.util.PropertiesUtils;
@@ -66,8 +66,8 @@ public class DefaultAppBloodhound implements AppBloodhound
 
     public ApplicationDescriptor fetch(String appName) throws IOException
     {
-        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
-        final File descriptorFile = ArtifactFactoryUtils.getDeploymentFile(appsDir, appName);
+        File appDir = getAppFolder(appName);
+        final File descriptorFile = getDeploymentFile(appDir, appName);
         ApplicationDescriptor desc;
 
         // none found, return defaults
@@ -93,7 +93,6 @@ public class DefaultAppBloodhound implements AppBloodhound
             desc.setName(appName);
         }
 
-        File appDir = new File(appsDir, appName);
         // get a ref to an optional app props file (right next to the descriptor)
         final File appPropsFile = new File(appDir, ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE);
         setApplicationProperties(desc, appPropsFile);
