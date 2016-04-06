@@ -9,6 +9,7 @@ package org.mule.module.launcher.artifact;
 import org.mule.api.MuleContext;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.InstallException;
+import org.mule.module.launcher.descriptor.ArtifactDescriptor;
 
 import java.io.File;
 
@@ -47,6 +48,11 @@ public interface Artifact
      * @return the artifact identifier
      */
     String getArtifactName();
+
+    /**
+     * @return the artifact descriptor
+     */
+    ArtifactDescriptor getDescriptor();
 
     /**
      * @return an array with the configuration files of the artifact. Never returns null.

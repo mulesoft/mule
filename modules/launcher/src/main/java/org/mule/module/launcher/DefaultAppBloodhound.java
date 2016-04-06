@@ -9,6 +9,7 @@ package org.mule.module.launcher;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.PreferredObjectSelector;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.launcher.artifact.ArtifactFactoryUtils;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.descriptor.DescriptorParser;
 import org.mule.module.launcher.descriptor.EmptyApplicationDescriptor;
@@ -36,7 +37,6 @@ import javax.imageio.spi.ServiceRegistry;
 
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.collections.map.MultiValueMap;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 /**
  *
@@ -67,35 +67,16 @@ public class DefaultAppBloodhound implements AppBloodhound
     public ApplicationDescriptor fetch(String appName) throws IOException
     {
         final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
-        File appDir = new File(appsDir, appName);
-        if (!appDir.exists())
-        {
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage(
-                            String.format("Application directory does not exist: '%s'", appDir)));
-        }
-        // list mule-deploy.* files
-        @SuppressWarnings("unchecked")
-        Collection<File> deployFiles = FileUtils.listFiles(appDir, new WildcardFileFilter("mule-deploy.*"), null);
-        if (deployFiles.size() > 1)
-        {
-            // TODO need some kind of an InvalidAppFormatException
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage(
-                            String.format("More than one mule-deploy descriptors found in application '%s'", appName)));
-        }
-
+        final File descriptorFile = ArtifactFactoryUtils.getDeploymentFile(appsDir, appName);
         ApplicationDescriptor desc;
 
         // none found, return defaults
-        if (deployFiles.isEmpty())
+        if (descriptorFile == null)
         {
             desc = new EmptyApplicationDescriptor(appName);
         }
         else
         {
-            // lookup the implementation by extension
-            final File descriptorFile = deployFiles.iterator().next();
             final String ext = FilenameUtils.getExtension(descriptorFile.getName());
             final DescriptorParser descriptorParser = parserRegistry.get(ext);
 
@@ -109,9 +90,10 @@ public class DefaultAppBloodhound implements AppBloodhound
 
             desc = descriptorParser.parse(descriptorFile, appName);
             // app name is external to the deployment descriptor
-            desc.setAppName(appName);
+            desc.setName(appName);
         }
 
+        File appDir = new File(appsDir, appName);
         // get a ref to an optional app props file (right next to the descriptor)
         final File appPropsFile = new File(appDir, ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE);
         setApplicationProperties(desc, appPropsFile);

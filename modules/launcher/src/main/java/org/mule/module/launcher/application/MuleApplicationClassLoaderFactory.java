@@ -61,6 +61,6 @@ public class MuleApplicationClassLoaderFactory implements ApplicationClassLoader
             parent = new MulePluginsClassLoader(parent, plugins);
         }
 
-        return new MuleApplicationClassLoader(descriptor.getAppName(), parent, descriptor.getLoaderOverride(), nativeLibraryFinderFactory.create(descriptor.getAppName()));
+        return new MuleApplicationClassLoader(descriptor.getName(), parent, descriptor.getLoaderOverride(), nativeLibraryFinderFactory.create(descriptor.getName()));
     }
 }

@@ -7,6 +7,7 @@
 package org.mule.module.launcher.domain;
 
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
+import org.mule.module.launcher.descriptor.DomainDescriptor;
 
 /**
  * Repository for domain class loaders.
@@ -16,6 +17,12 @@ import org.mule.module.launcher.artifact.ArtifactClassLoader;
  */
 public interface DomainClassLoaderRepository
 {
+
+    /**
+     * @param descriptor {@link DomainDescriptor} of the domain owner of the class loader
+     * @return the ArtifactClassLoader used by the domain.
+     */
+    ArtifactClassLoader getDomainClassLoader(DomainDescriptor descriptor);
 
     /**
      * @param domain name of the domain owner of the class loader

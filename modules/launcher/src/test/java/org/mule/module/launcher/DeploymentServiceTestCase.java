@@ -131,6 +131,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private final DomainFileBuilder invalidDomainBundleFileBuilder = new DomainFileBuilder("invalid-domain-bundle").definedBy("incomplete-domain-config.xml").containing(emptyAppFileBuilder);
     private final DomainFileBuilder dummyDomainBundleFileBuilder = new DomainFileBuilder("dummy-domain-bundle").containing(new ApplicationFileBuilder(dummyAppDescriptorFileBuilder).deployedWith("domain", "dummy-domain-bundle"));
     private final DomainFileBuilder dummyDomainFileBuilder = new DomainFileBuilder("dummy-domain").definedBy("empty-domain-config.xml");
+    private final DomainFileBuilder dummyUndeployableDomainFileBuilder = new DomainFileBuilder("dummy-undeployable-domain").definedBy("empty-domain-config.xml").deployedWith("redeployment.enabled", "false");
     private final DomainFileBuilder sharedHttpDomainFileBuilder = new DomainFileBuilder("shared-http-domain").definedBy("shared-http-domain-config.xml");
     private final DomainFileBuilder sharedHttpBundleDomainFileBuilder = new DomainFileBuilder("shared-http-domain").definedBy("shared-http-domain-config.xml").containing(httpAAppFileBuilder).containing(httpBAppFileBuilder);
 
@@ -2232,6 +2233,28 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void doesNotRedeployDomainWithRedeploymentDisabled() throws Exception
+    {
+        addExplodedDomainFromBuilder(dummyUndeployableDomainFileBuilder, dummyUndeployableDomainFileBuilder.getId());
+        addPackedAppFromBuilder(emptyAppFileBuilder, "empty-app.zip");
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, dummyUndeployableDomainFileBuilder.getId());
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+
+        reset(domainDeploymentListener);
+        reset(applicationDeploymentListener);
+
+        //change domain and app since once the app redeploys we can check the domain did not
+        doRedeployDomainByChangingConfigFileWithGoodOne(dummyUndeployableDomainFileBuilder);
+        doRedeployAppByChangingConfigFileWithGoodOne(emptyAppFileBuilder.getDeployedPath());
+
+        assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+        verify(domainDeploymentListener, never()).onDeploymentSuccess(dummyUndeployableDomainFileBuilder.getId());
+    }
+
+    @Test
     public void redeploysDomainAndFails() throws Exception
     {
         addExplodedDomainFromBuilder(dummyDomainFileBuilder, dummyDomainFileBuilder.getId());
@@ -2350,17 +2373,22 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void doRedeployDummyDomainByChangingConfigFileWithGoodOne() throws URISyntaxException, IOException
     {
-        doRedeployDummyDomainByChangingConfigFile("/empty-domain-config.xml");
+        doRedeployDomainByChangingConfigFile("/empty-domain-config.xml", dummyDomainFileBuilder);
+    }
+
+    private void doRedeployDomainByChangingConfigFileWithGoodOne(DomainFileBuilder domain) throws URISyntaxException, IOException
+    {
+        doRedeployDomainByChangingConfigFile("/empty-domain-config.xml", domain);
     }
 
     private void doRedeployDummyDomainByChangingConfigFileWithBadOne() throws URISyntaxException, IOException
     {
-        doRedeployDummyDomainByChangingConfigFile("/bad-domain-config.xml");
+        doRedeployDomainByChangingConfigFile("/bad-domain-config.xml", dummyDomainFileBuilder);
     }
 
-    private void doRedeployDummyDomainByChangingConfigFile(String configFile) throws URISyntaxException, IOException
+    private void doRedeployDomainByChangingConfigFile(String configFile, DomainFileBuilder domain) throws URISyntaxException, IOException
     {
-        File originalConfigFile = new File(new File(domainsDir, dummyDomainFileBuilder.getDeployedPath()), dummyDomainFileBuilder.getConfigFile());
+        File originalConfigFile = new File(new File(domainsDir, domain.getDeployedPath()), domain.getConfigFile());
         assertThat("Cannot find domain config file: " + originalConfigFile, originalConfigFile.exists(), is(true));
         URL url = getClass().getResource(configFile);
         File newConfigFile = new File(url.toURI());

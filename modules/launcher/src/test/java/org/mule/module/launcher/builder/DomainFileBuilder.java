@@ -7,14 +7,18 @@
 
 package org.mule.module.launcher.builder;
 
+import static org.mule.module.launcher.descriptor.ArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.util.StringUtils;
 
+import com.google.common.base.Preconditions;
+
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Creates Mule Domain files.
@@ -23,6 +27,7 @@ public class DomainFileBuilder extends AbstractArtifactFileBuilder<DomainFileBui
 {
 
     private List<ApplicationFileBuilder> applications = new LinkedList<>();
+    private Properties deployProperties = new Properties();
 
     /**
      * Creates a new builder
@@ -93,6 +98,22 @@ public class DomainFileBuilder extends AbstractArtifactFileBuilder<DomainFileBui
         return this;
     }
 
+    /**
+     * Adds a property into the domain deployment properties file.
+     *
+     * @param propertyName name fo the property to add. Non empty
+     * @param propertyValue value of the property to add. Non null.
+     * @return the same builder instance
+     */
+    public DomainFileBuilder deployedWith(String propertyName, String propertyValue)
+    {
+        checkImmutable();
+        Preconditions.checkArgument(!StringUtils.isEmpty(propertyName), "Property name cannot be empty");
+        Preconditions.checkArgument(propertyValue != null, "Property value cannot be null");
+        deployProperties.put(propertyName, propertyValue);
+        return this;
+    }
+
     @Override
     protected List<ZipResource> getCustomResources() throws Exception
     {
@@ -102,6 +123,12 @@ public class DomainFileBuilder extends AbstractArtifactFileBuilder<DomainFileBui
         {
             final File applicationFile = application.getArtifactFile();
             customResources.add(new ZipResource(applicationFile.getAbsolutePath(), "apps/" + applicationFile.getName()));
+        }
+
+        final ZipResource deployProperties = createPropertiesFile(this.deployProperties, DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
+        if (deployProperties != null)
+        {
+            customResources.add(deployProperties);
         }
 
         return customResources;
