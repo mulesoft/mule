@@ -6,13 +6,13 @@
  */
 package org.mule.module.launcher.descriptor;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
- *
+ * Represents the description of a domain when none is given
  */
-public interface DescriptorParser<D extends RedeployableArtifactDescriptor>
+public class EmptyDomainDescriptor extends DomainDescriptor
 {
-    D parse(File descriptor, String artifactName) throws IOException;
+    public EmptyDomainDescriptor(String name)
+    {
+        this.setName(name);
+    }
 }

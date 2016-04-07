@@ -9,7 +9,6 @@ package org.mule.module.launcher;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import static org.mule.util.SplashScreen.miniSplash;
-
 import org.mule.config.StartupContext;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.artifact.Artifact;
@@ -38,7 +37,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
@@ -522,20 +520,19 @@ public class DeploymentDirectoryWatcher implements Runnable
 
     private void redeployModifiedDomains()
     {
-        redeployModifiedArtifacts(domains, domainTimestampListener, domainArchiveDeployer);
+        Collection redeployableDomains = getArtifactsToRedeploy(domains);
+        redeployModifiedArtifacts(redeployableDomains, domainTimestampListener, domainArchiveDeployer);
     }
 
     private void redeployModifiedApplications()
     {
-        Collection redeployableApplications = CollectionUtils.select(applications, new Predicate()
-        {
-            @Override
-            public boolean evaluate(Object object)
-            {
-                return ((Application) object).getDescriptor().isRedeploymentEnabled();
-            }
-        });
+        Collection redeployableApplications = getArtifactsToRedeploy(applications);
         redeployModifiedArtifacts(redeployableApplications, applicationTimestampListener, applicationArchiveDeployer);
+    }
+
+    private <T extends Artifact> Collection getArtifactsToRedeploy(Collection<T> collection)
+    {
+        return CollectionUtils.select(collection, object -> ((Artifact) object).getDescriptor().isRedeploymentEnabled());
     }
 
     private <T extends Artifact> void redeployModifiedArtifacts(Collection<T> artifacts, ArtifactTimestampListener<T> artifactTimestampListener, ArchiveDeployer<T> artifactArchiveDeployer)

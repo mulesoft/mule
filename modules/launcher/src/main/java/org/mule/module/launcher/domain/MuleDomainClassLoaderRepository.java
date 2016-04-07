@@ -22,6 +22,8 @@ import org.mule.module.launcher.MuleFoldersUtil;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
 import org.mule.module.launcher.application.FilePackageDiscoverer;
 import org.mule.module.launcher.application.PackageDiscoverer;
+import org.mule.module.launcher.descriptor.DomainDescriptor;
+import org.mule.module.launcher.descriptor.EmptyDomainDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.Preconditions;
 import org.mule.util.SystemUtils;
@@ -59,8 +61,9 @@ public class MuleDomainClassLoaderRepository implements DomainClassLoaderReposit
     }
 
     @Override
-    public synchronized ArtifactClassLoader getDomainClassLoader(String domain)
+    public synchronized ArtifactClassLoader getDomainClassLoader(DomainDescriptor descriptor)
     {
+        String domain = descriptor.getName();
         Preconditions.checkArgument(domain != null, "Domain name cannot be null");
         if (domain.equals(DomainFactory.DEFAULT_DOMAIN_NAME))
         {
@@ -137,6 +140,12 @@ public class MuleDomainClassLoaderRepository implements DomainClassLoaderReposit
         {
             throw new DeploymentException(CoreMessages.createStaticMessage(format("Cannot read domain '%s' libraries", domain)), e);
         }
+    }
+
+    @Override
+    public synchronized ArtifactClassLoader getDomainClassLoader(String domain)
+    {
+        return getDomainClassLoader(new EmptyDomainDescriptor(domain));
     }
 
     @Override

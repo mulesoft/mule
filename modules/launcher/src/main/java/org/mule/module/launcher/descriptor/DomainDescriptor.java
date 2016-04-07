@@ -6,13 +6,9 @@
  */
 package org.mule.module.launcher.descriptor;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
- *
+ * Represents the description of a domain.
  */
-public interface DescriptorParser<D extends RedeployableArtifactDescriptor>
+public class DomainDescriptor extends RedeployableArtifactDescriptor
 {
-    D parse(File descriptor, String artifactName) throws IOException;
 }

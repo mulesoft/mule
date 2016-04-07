@@ -6,49 +6,52 @@
  */
 package org.mule.module.launcher.domain;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.launcher.domain.DomainFactory.DEFAULT_DOMAIN_NAME;
-import org.mule.api.config.MuleProperties;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.module.artifact.classloader.MuleClassLoaderLookupPolicy;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.mule.module.launcher.MuleFoldersUtil.getDomainsFolder;
+import static org.mule.module.launcher.MuleFoldersUtil.getMuleLibFolder;
+import static org.mule.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
 import org.mule.module.launcher.DeploymentException;
-import org.mule.module.launcher.MuleFoldersUtil;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.module.launcher.descriptor.DomainDescriptor;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.After;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-public class MuleDomainClassLoaderRepositoryTestCase extends AbstractMuleTestCase
+public class MuleDomainClassLoaderRepositoryTestCase extends AbstractDomainTestCase
 {
-
-    @ClassRule
-    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
-    @Rule
-    public final SystemProperty muleHomeSystemProperty = new SystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, temporaryFolder.getRoot().getCanonicalPath());
-    private final File muleHomeFolder;
-    private final ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), emptySet());
 
     public MuleDomainClassLoaderRepositoryTestCase() throws IOException
     {
-        muleHomeFolder = temporaryFolder.getRoot();
+    }
+
+    @After
+    public void tearDown()
+    {
+        deleteIfNeeded(getDomainsFolder());
+        deleteIfNeeded(new File(getMuleLibFolder(), "shared"));
+    }
+
+    private void deleteIfNeeded(File file)
+    {
+        if (file.exists())
+        {
+            deleteQuietly(file);
+        }
     }
 
     @Test
     public void createClassLoaderUsingDefaultDomain()
     {
+        createDomainDir(MULE_DOMAIN_FOLDER, DEFAULT_DOMAIN_NAME);
         assertThat(new MuleDomainClassLoaderRepository(lookupPolicy).getDomainClassLoader(DEFAULT_DOMAIN_NAME).getArtifactName(), is(DEFAULT_DOMAIN_NAME));
     }
 
@@ -56,9 +59,7 @@ public class MuleDomainClassLoaderRepositoryTestCase extends AbstractMuleTestCas
     public void createClassLoaderUsingCustomDomain()
     {
         String domainName = "custom-domain";
-        final File domainFolder = MuleFoldersUtil.getDomainFolder(domainName);
-        assertThat(domainFolder.mkdirs(), is(true));
-
+        createDomainDir(MULE_DOMAIN_FOLDER, domainName);
         final ArtifactClassLoader domainClassLoader = new MuleDomainClassLoaderRepository(lookupPolicy).getDomainClassLoader(domainName);
 
         assertThat(domainClassLoader.getClassLoader(), instanceOf(MuleSharedDomainClassLoader.class));
@@ -69,5 +70,25 @@ public class MuleDomainClassLoaderRepositoryTestCase extends AbstractMuleTestCas
     public void validateDomainBeforeCreatingClassLoader()
     {
         new MuleDomainClassLoaderRepository(lookupPolicy).getDomainClassLoader("someDomain");
+    }
+
+    @Test
+    public void createClassLoaderFromDomainDescriptor()
+    {
+        String domainName = "descriptor-domain";
+        DomainDescriptor descriptor = getTestDescriptor(domainName);
+        createDomainDir(MULE_DOMAIN_FOLDER, domainName);
+        ArtifactClassLoader domainClassLoader = new MuleDomainClassLoaderRepository(lookupPolicy).getDomainClassLoader(descriptor);
+
+        assertThat(domainClassLoader.getClassLoader(), instanceOf(MuleSharedDomainClassLoader.class));
+        assertThat(domainClassLoader.getArtifactName(), equalTo(domainName));
+    }
+
+    private DomainDescriptor getTestDescriptor(String name)
+    {
+        DomainDescriptor descriptor = new DomainDescriptor();
+        descriptor.setName(name);
+        descriptor.setRedeploymentEnabled(false);
+        return descriptor;
     }
 }
