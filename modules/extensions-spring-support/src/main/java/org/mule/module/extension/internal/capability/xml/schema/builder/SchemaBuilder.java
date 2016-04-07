@@ -93,9 +93,8 @@ import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelCo
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.module.extension.internal.capability.xml.schema.model.Union;
-import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
-import org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
+import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.module.extension.internal.util.NameUtils;
@@ -903,7 +902,7 @@ public final class SchemaBuilder
         choice.setMaxOccurs("1");
 
         subTypes.forEach(subtype -> {
-                    TopLevelElement subtypeElement = createTopLevelElement(hyphenize(MuleExtensionAnnotationParser.getAliasName(subtype)), ZERO, "1");
+                    TopLevelElement subtypeElement = createTopLevelElement(hyphenize(IntrospectionUtils.getAliasName(subtype)), ZERO, "1");
                     subtypeElement.setComplexType(newLocalComplexTypeWithBase((ObjectType) subtype, EMPTY));
                     choice.getParticle().add(objectFactory.createElement(subtypeElement));
                 });

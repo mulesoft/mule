@@ -21,7 +21,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
-import org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
+import org.mule.module.extension.internal.util.IntrospectionUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -110,13 +110,13 @@ public final class ParameterModelValidator implements ModelValidator
     private void validateNameCollisionWithSubtypes(String ownerName, String ownerModelType, String extensionName, List<String> parameterNames, ParameterModel parameterModel)
     {
         Optional<MetadataType> subTypeWithNameCollision = subTypesMapping.getSubTypes(parameterModel.getType()).stream()
-                .filter(subtype -> parameterNames.contains(hyphenize(MuleExtensionAnnotationParser.getAliasName(subtype)))).findFirst();
+                .filter(subtype -> parameterNames.contains(hyphenize(IntrospectionUtils.getAliasName(subtype)))).findFirst();
 
         if (subTypeWithNameCollision.isPresent())
         {
             throw new IllegalParameterModelDefinitionException(
                     String.format("The parameter [%s] in the %s [%s] from the extension [%s] can't have the same name as the ClassName or Alias of the declared subType [%s] for parameter [%s]",
-                                  MuleExtensionAnnotationParser.getAliasName(subTypeWithNameCollision.get()), ownerModelType, ownerName, extensionName,
+                                  IntrospectionUtils.getAliasName(subTypeWithNameCollision.get()), ownerModelType, ownerName, extensionName,
                                   JavaTypeUtils.getType(subTypeWithNameCollision.get()).getSimpleName(), parameterModel.getName()));
         }
     }
