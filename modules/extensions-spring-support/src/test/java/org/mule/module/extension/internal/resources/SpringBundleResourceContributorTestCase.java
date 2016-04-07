@@ -14,12 +14,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.SubTypesModelProperty;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.extension.api.resources.GeneratedResource;
 import org.mule.extension.api.resources.ResourcesGenerator;
 import org.mule.module.extension.internal.capability.xml.SpringBundleResourceContributor;
 import org.mule.module.extension.internal.config.ExtensionNamespaceHandler;
-import org.mule.module.extension.internal.model.property.SubTypesModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

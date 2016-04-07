@@ -14,11 +14,11 @@ import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.SubTypesModelProperty;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
-import org.mule.module.extension.internal.model.SubTypesMapper;
-import org.mule.module.extension.internal.model.property.SubTypesModelProperty;
+import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 
 import java.util.Collections;
@@ -45,47 +45,45 @@ public final class ParameterModelValidator implements ModelValidator
     private static final String OPERATION = "operation";
     private static final String CONNECTION_PROVIDER = "connection provider";
 
+    private SubTypesMappingContainer subTypesMapping;
+
     @Override
     public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
     {
-
         Optional<SubTypesModelProperty> subTypesDeclaration = extensionModel.getModelProperty(SubTypesModelProperty.class);
-        SubTypesMapper typeMapping = subTypesDeclaration.isPresent() ? subTypesDeclaration.get().getSubTypesMapping() : new SubTypesMapper(Collections.emptyMap());
+        subTypesMapping = new SubTypesMappingContainer(subTypesDeclaration.isPresent() ? subTypesDeclaration.get().getSubTypesMapping() : Collections.emptyMap());
 
         extensionModel.getConfigurationModels().stream()
                 .forEach(config -> validateParameters(config.getParameterModels(), config.getName(),
-                                                      CONFIGURATION, extensionModel.getName(), typeMapping));
+                                                      CONFIGURATION, extensionModel.getName()));
 
-        validateOperations(extensionModel, extensionModel.getOperationModels(), typeMapping);
-        extensionModel.getConfigurationModels().forEach(config -> validateOperations(extensionModel, config.getOperationModels(), typeMapping));
+        validateOperations(extensionModel, extensionModel.getOperationModels());
+        extensionModel.getConfigurationModels().forEach(config -> validateOperations(extensionModel, config.getOperationModels()));
 
-        validateConnectionProviders(extensionModel, extensionModel.getConnectionProviders(), typeMapping);
-        extensionModel.getConfigurationModels().forEach(config -> validateConnectionProviders(extensionModel, config.getConnectionProviders(), typeMapping));
+        validateConnectionProviders(extensionModel, extensionModel.getConnectionProviders());
+        extensionModel.getConfigurationModels().forEach(config -> validateConnectionProviders(extensionModel, config.getConnectionProviders()));
     }
 
-    private void validateConnectionProviders(ExtensionModel extensionModel, List<ConnectionProviderModel> providers, SubTypesMapper typeMapping)
+    private void validateConnectionProviders(ExtensionModel extensionModel, List<ConnectionProviderModel> providers)
     {
         providers.forEach(provider -> validateParameters(provider.getParameterModels(), provider.getName(),
-                                                         CONNECTION_PROVIDER, extensionModel.getName(), typeMapping));
+                                                         CONNECTION_PROVIDER, extensionModel.getName()));
     }
 
-    private void validateOperations(ExtensionModel extensionModel, List<OperationModel> operations, SubTypesMapper typeMapping)
+    private void validateOperations(ExtensionModel extensionModel, List<OperationModel> operations)
     {
         operations.forEach(operation -> validateParameters(operation.getParameterModels(), operation.getName(),
-                                                           OPERATION, extensionModel.getName(), typeMapping));
+                                                           OPERATION, extensionModel.getName()));
     }
 
-    private void validateParameters(List<ParameterModel> parameters, String ownerName, String ownerModelType, String extensionName, SubTypesMapper typeMapping)
+    private void validateParameters(List<ParameterModel> parameters, String ownerName, String ownerModelType, String extensionName)
     {
         List<String> parameterHyphenizedNames = parameters.stream().map(p -> hyphenize(p.getName())).collect(Collectors.toList());
 
         parameters.stream().forEach(parameterModel -> {
-
             validateParameter(parameterModel, ownerName, ownerModelType, extensionName);
-
-            validateNameCollisionWithSubtypes(ownerName, ownerModelType, extensionName, typeMapping, parameterHyphenizedNames, parameterModel);
+            validateNameCollisionWithSubtypes(ownerName, ownerModelType, extensionName, parameterHyphenizedNames, parameterModel);
         });
-
     }
 
     private void validateParameter(ParameterModel parameterModel, String ownerName, String ownerModelType, String extensionName)
@@ -106,9 +104,9 @@ public final class ParameterModelValidator implements ModelValidator
         }
     }
 
-    private void validateNameCollisionWithSubtypes(String ownerName, String ownerModelType, String extensionName, SubTypesMapper typeMapping, List<String> parameterNames, ParameterModel parameterModel)
+    private void validateNameCollisionWithSubtypes(String ownerName, String ownerModelType, String extensionName, List<String> parameterNames, ParameterModel parameterModel)
     {
-        Optional<MetadataType> subTypeWithNameCollision = typeMapping.getSubTypes(parameterModel.getType()).stream()
+        Optional<MetadataType> subTypeWithNameCollision = subTypesMapping.getSubTypes(parameterModel.getType()).stream()
                 .filter(subtype -> parameterNames.contains(hyphenize(IntrospectionUtils.getAliasName(subtype)))).findFirst();
 
         if (subTypeWithNameCollision.isPresent())

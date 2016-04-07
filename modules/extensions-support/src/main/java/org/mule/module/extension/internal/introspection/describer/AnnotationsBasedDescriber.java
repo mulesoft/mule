@@ -17,6 +17,7 @@ import static org.mule.module.extension.internal.introspection.describer.MuleExt
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
@@ -38,7 +39,6 @@ import org.mule.extension.api.annotation.ExtensionOf;
 import org.mule.extension.api.annotation.OnException;
 import org.mule.extension.api.annotation.Operations;
 import org.mule.extension.api.annotation.Sources;
-import org.mule.extension.api.annotation.SubTypeMapping;
 import org.mule.extension.api.annotation.SubTypesMapping;
 import org.mule.extension.api.annotation.connector.Providers;
 import org.mule.extension.api.annotation.metadata.MetadataScope;
@@ -47,6 +47,7 @@ import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
+import org.mule.extension.api.introspection.SubTypesModelProperty;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclarer;
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclarer;
@@ -67,6 +68,7 @@ import org.mule.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.extension.api.introspection.property.DisplayModelPropertyBuilder;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
@@ -79,7 +81,6 @@ import org.mule.module.extension.internal.model.property.ExtendingOperationModel
 import org.mule.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.module.extension.internal.model.property.SubTypesModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
 import org.mule.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
@@ -98,6 +99,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -177,12 +179,17 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareSubTypesMapping(ExtensionDeclarer declaration, Class<?> extensionType)
     {
-        SubTypesMapping typesMapping = this.extensionType.getAnnotation(SubTypesMapping.class);
+        SubTypesMapping typesMapping = extensionType.getAnnotation(SubTypesMapping.class);
 
         if (typesMapping != null)
         {
-            declaration.withModelProperty(new SubTypesModelProperty(
-                    Arrays.stream(typesMapping.value()).collect(Collectors.toMap(SubTypeMapping::baseType, sm -> Arrays.asList(sm.subTypes())))));
+            Map<MetadataType, List<MetadataType>> subTypesMap = Arrays.stream(typesMapping.value()).collect(Collectors.toMap(
+                    mapping -> getMetadataType(mapping.baseType(), typeLoader),
+                    mapping -> Arrays.stream(mapping.subTypes())
+                            .map(subType -> getMetadataType(subType, typeLoader))
+                            .collect(Collectors.toList())));
+
+            declaration.withModelProperty(new SubTypesModelProperty(subTypesMap));
         }
     }
 

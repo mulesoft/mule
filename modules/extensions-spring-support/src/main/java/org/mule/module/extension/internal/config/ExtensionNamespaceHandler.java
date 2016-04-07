@@ -17,14 +17,14 @@ import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.SourceModel;
+import org.mule.extension.api.introspection.SubTypesModelProperty;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.module.extension.internal.model.SubTypesMapper;
-import org.mule.module.extension.internal.model.property.SubTypesModelProperty;
+import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -181,7 +181,7 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
     private void registerTopLevelParameter(ExtensionModel extensionModel, Collection<ParameterModel> parameterModels)
     {
         Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
-        SubTypesMapper typeMapping = subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : new SubTypesMapper(Collections.emptyMap());
+        SubTypesMappingContainer typeMapping = new SubTypesMappingContainer(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : Collections.emptyMap());
 
         parameterModels.forEach(parameterModel -> {
             List<MetadataType> parameterSubTypes = typeMapping.getSubTypes(parameterModel.getType());

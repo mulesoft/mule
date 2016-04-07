@@ -40,7 +40,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.annotation.GenericTypesAnnotation;
 import org.mule.module.extension.internal.introspection.BasicTypeMetadataVisitor;
-import org.mule.module.extension.internal.model.SubTypesMapper;
+import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
 import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.CollectionValueResolver;
@@ -102,7 +102,7 @@ final class XmlExtensionParserDelegate
 
     private Map<Class<?>, Object> infrastructureParameters = new HashMap<>();
     private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-    private SubTypesMapper subTypesMapping = new SubTypesMapper(Collections.emptyMap());
+    private SubTypesMappingContainer subTypesMapping = new SubTypesMappingContainer(Collections.emptyMap());
 
     /**
      * Parses the given {@code element} for an attribute named {@code name}. If not found,
@@ -805,7 +805,7 @@ final class XmlExtensionParserDelegate
         return resolver == null ? new StaticValueResolver(null) : resolver;
     }
 
-    void setSubTypesMapping(SubTypesMapper subTypesMapping)
+    void setSubTypesMapping(SubTypesMappingContainer subTypesMapping)
     {
         this.subTypesMapping = subTypesMapping;
     }

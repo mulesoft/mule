@@ -13,8 +13,8 @@ import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMeta
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.SubTypesModelProperty;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
-import org.mule.module.extension.internal.model.property.SubTypesModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

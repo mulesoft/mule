@@ -79,6 +79,18 @@ public final class IntrospectionUtils
     }
 
     /**
+     * Returns a {@link MetadataType} representing the given {@link Class} type.
+     *
+     * @param type     the {@link Class} being introspected
+     * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
+     * @return a {@link MetadataType}
+     */
+    public static MetadataType getMetadataType(Class<?> type, ClassTypeLoader typeLoader)
+    {
+        return typeLoader.load(ResolvableType.forClass(type).getType());
+    }
+
+    /**
      * Returns a {@link MetadataType} representing the given {@link Method}'s return type.
      * If the {@code method} returns a {@link MuleMessage}, then it returns the type
      * of the {@code Payload} generic. If the {@link MuleMessage} type is being used

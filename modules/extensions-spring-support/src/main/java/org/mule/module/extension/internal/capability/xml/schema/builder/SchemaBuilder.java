@@ -57,6 +57,7 @@ import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.ParametrizedModel;
 import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.SourceModel;
+import org.mule.extension.api.introspection.SubTypesModelProperty;
 import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.extension.api.introspection.declaration.type.TypeUtils;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -92,9 +93,8 @@ import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelCo
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.module.extension.internal.capability.xml.schema.model.Union;
+import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
-import org.mule.module.extension.internal.model.SubTypesMapper;
-import org.mule.module.extension.internal.model.property.SubTypesModelProperty;
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.module.extension.internal.util.NameUtils;
@@ -139,7 +139,7 @@ public final class SchemaBuilder
 
     private Schema schema;
     private boolean requiresTls = false;
-    private SubTypesMapper subTypesMapping;
+    private SubTypesMappingContainer subTypesMapping;
 
     public static SchemaBuilder newSchema(ExtensionModel extensionModel, String targetNamespace)
     {
@@ -154,14 +154,14 @@ public final class SchemaBuilder
                 .importMuleExtensionNamespace();
 
         Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
-        builder.withTypeMapping(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : new SubTypesMapper(Collections.emptyMap()));
+        builder.withTypeMapping(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : Collections.emptyMap());
 
         return builder;
     }
 
-    private SchemaBuilder withTypeMapping(SubTypesMapper subTypesMapping)
+    private SchemaBuilder withTypeMapping(Map<MetadataType, List<MetadataType>> subTypesMapping)
     {
-        this.subTypesMapping = subTypesMapping;
+        this.subTypesMapping = new SubTypesMappingContainer(subTypesMapping);
         return this;
     }
 
