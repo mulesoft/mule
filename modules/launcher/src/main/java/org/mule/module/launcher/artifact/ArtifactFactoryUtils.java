@@ -6,14 +6,11 @@
  */
 package org.mule.module.launcher.artifact;
 
+import static org.mule.module.launcher.descriptor.RedeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.util.FileUtils;
 
 import java.io.File;
-import java.util.Collection;
-
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 /**
  * Utility class providing useful methods when creating {@link Artifact}s.
@@ -29,11 +26,9 @@ public class ArtifactFactoryUtils
      * Finds the deployment file within a given artifact.
      *
      * @param artifactDir the artifact directory where the deployment file should be present
-     * @param artifactName the artifact whose deployment file is needed
-     * @param pattern the pattern the deployment file should match
      * @return the artifact's deployment file or {@code null} if none was found
      */
-    public static File getDeploymentFile(File artifactDir, String artifactName, String pattern)
+    public static File getDeploymentFile(File artifactDir)
     {
         if (!artifactDir.exists())
         {
@@ -41,24 +36,14 @@ public class ArtifactFactoryUtils
                     MessageFactory.createStaticMessage(
                             String.format("Artifact directory does not exist: '%s'", artifactDir)));
         }
-        // list mule-deploy.* files
-        @SuppressWarnings("unchecked")
-        Collection<File> deployFiles = FileUtils.listFiles(artifactDir, new WildcardFileFilter(pattern), null);
-        if (deployFiles.size() > 1)
-        {
-            // TODO need some kind of an InvalidAppFormatException
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage(
-                            String.format("More than one mule-deploy descriptors found in artifact '%s'", artifactName)));
-        }
-
-        if (deployFiles.isEmpty())
+        File deployFile = new File(artifactDir, DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
+        if (!deployFile.exists())
         {
             return null;
         }
         else
         {
-            return deployFiles.iterator().next();
+            return deployFile;
         }
     }
 

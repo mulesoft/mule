@@ -7,6 +7,7 @@
 package org.mule.module.launcher;
 
 import static java.lang.String.format;
+import static org.mule.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.module.artifact.descriptor.ArtifactDescriptorFactory;
@@ -64,15 +65,12 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
 
         try
         {
-            final File deployPropertiesFile = new File(artifactFolder, "mule-deploy.properties");
-            if (deployPropertiesFile.exists())
+            final File deployPropertiesFile = getDeploymentFile(artifactFolder);
+            if (deployPropertiesFile != null)
             {
                 // lookup the implementation by extension
                 final PropertiesDescriptorParser descriptorParser = new PropertiesDescriptorParser();
                 desc = descriptorParser.parse(deployPropertiesFile, appName);
-
-                // app name is external to the deployment descriptor
-                desc.setName(appName);
             }
             else
             {
