@@ -56,7 +56,7 @@ final class ConfigurationProviderFactoryBean extends ExtensionComponentFactoryBe
         this.connectionProviderResolver = connectionProviderResolver;
         this.timeSupplier = timeSupplier;
         this.muleContext = muleContext;
-
+        this.extensionModel = configurationModel.getExtensionModel();
     }
 
     @Override

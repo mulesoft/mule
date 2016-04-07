@@ -13,9 +13,12 @@ import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMeta
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.SubTypesModelProperty;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +49,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase
     public void before()
     {
         when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
+        when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
         when(operationModel.getName()).thenReturn("dummyOperation");
     }
 

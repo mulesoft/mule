@@ -43,7 +43,6 @@ final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryB
 {
 
     private final ElementDescriptor element;
-    private final RuntimeExtensionModel extensionModel;
     private final RuntimeSourceModel sourceModel;
     private final String configurationProviderName;
     private final MuleContext muleContext;

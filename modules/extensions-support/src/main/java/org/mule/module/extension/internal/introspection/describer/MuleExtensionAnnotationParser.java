@@ -70,13 +70,7 @@ public final class MuleExtensionAnnotationParser
 
     static String getAliasName(Field field)
     {
-        return getAliasName(field.getName(), field.getAnnotation(Alias.class));
-    }
-
-    static String getAliasName(String defaultName, Alias aliasAnnotation)
-    {
-        String alias = aliasAnnotation != null ? aliasAnnotation.value() : null;
-        return StringUtils.isEmpty(alias) ? defaultName : alias;
+        return IntrospectionUtils.getAliasName(field.getName(), field.getAnnotation(Alias.class));
     }
 
     public static String getMemberName(BaseDeclaration<?> declaration, String defaultName)
@@ -159,7 +153,7 @@ public final class MuleExtensionAnnotationParser
         ParsedParameter parameter = new ParsedParameter(annotations);
         parameter.setAdvertised(shouldAdvertise(metadataType, annotations));
 
-        parameter.setName(getAliasName(paramName, (Alias) annotations.get(Alias.class)));
+        parameter.setName(IntrospectionUtils.getAliasName(paramName, (Alias) annotations.get(Alias.class)));
         parameter.setType(metadataType);
 
         Optional optional = (Optional) annotations.get(Optional.class);

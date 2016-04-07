@@ -27,6 +27,7 @@ import org.mule.module.extension.internal.runtime.connector.basic.ListConnector;
 import org.mule.module.extension.internal.runtime.connector.basic.MapConnector;
 import org.mule.module.extension.internal.runtime.connector.basic.StringListConnector;
 import org.mule.module.extension.internal.runtime.connector.basic.TestConnector;
+import org.mule.module.extension.internal.runtime.connector.subtypes.SubTypesMappingConnector;
 import org.mule.module.extension.vegan.VeganExtension;
 import org.mule.registry.SpiServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -50,9 +51,14 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class SchemaGeneratorTestCase extends AbstractMuleTestCase
 {
-
     private SchemaGenerator generator;
     private ExtensionFactory extensionFactory;
+
+    @Parameterized.Parameter(0)
+    public Class<?> extensionUnderTest;
+
+    @Parameterized.Parameter(1)
+    public String expectedXSD;
 
     @Parameterized.Parameters(name = "{1}")
     public static Collection<Object[]> data()
@@ -65,15 +71,10 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
                 {MapConnector.class, "map.xsd"},
                 {ListConnector.class, "list.xsd"},
                 {StringListConnector.class, "string-list.xsd"},
-                {VeganExtension.class, "vegan.xsd"}
+                {VeganExtension.class, "vegan.xsd"},
+                {SubTypesMappingConnector.class, "subtypes.xsd"}
         });
     }
-
-    @Parameterized.Parameter(0)
-    public Class<?> extensionUnderTest;
-
-    @Parameterized.Parameter(1)
-    public String expectedXSD;
 
     @Before
     public void before()

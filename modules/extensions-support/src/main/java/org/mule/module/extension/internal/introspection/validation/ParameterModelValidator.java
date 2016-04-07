@@ -6,17 +6,25 @@
  */
 package org.mule.module.extension.internal.introspection.validation;
 
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toList;
 import static org.mule.extension.api.introspection.ParameterModel.RESERVED_NAMES;
+import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.SubTypesModelProperty;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
+import org.mule.module.extension.internal.util.IntrospectionUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Validates that all {@link ParameterModel parameters} provided by the {@link ConfigurationModel configurations},
@@ -37,13 +45,20 @@ public final class ParameterModelValidator implements ModelValidator
     private static final String OPERATION = "operation";
     private static final String CONNECTION_PROVIDER = "connection provider";
 
+    private SubTypesMappingContainer subTypesMapping;
+
     @Override
     public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
     {
-        for (ConfigurationModel configurationModel : extensionModel.getConfigurationModels())
-        {
-            configurationModel.getParameterModels().forEach(parameterModel -> validateParameter(parameterModel, configurationModel.getName(), CONFIGURATION, extensionModel.getName()));
-        }
+
+        Optional<SubTypesMappingContainer> typesMapping = extensionModel.getModelProperty(SubTypesModelProperty.class)
+                .map(p -> new SubTypesMappingContainer(p.getSubTypesMapping()));
+
+        subTypesMapping = typesMapping.isPresent() ? typesMapping.get() : new SubTypesMappingContainer(emptyMap());
+
+        extensionModel.getConfigurationModels().stream()
+                .forEach(config -> validateParameters(config.getParameterModels(), config.getName(),
+                                                      CONFIGURATION, extensionModel.getName()));
 
         validateOperations(extensionModel, extensionModel.getOperationModels());
         extensionModel.getConfigurationModels().forEach(config -> validateOperations(extensionModel, config.getOperationModels()));
@@ -54,20 +69,24 @@ public final class ParameterModelValidator implements ModelValidator
 
     private void validateConnectionProviders(ExtensionModel extensionModel, List<ConnectionProviderModel> providers)
     {
-        providers.forEach(provider -> provider.getParameterModels()
-                .forEach(parameterModel -> validateParameter(parameterModel,
-                                                             provider.getName(),
-                                                             CONNECTION_PROVIDER,
-                                                             extensionModel.getName())));
+        providers.forEach(provider -> validateParameters(provider.getParameterModels(), provider.getName(),
+                                                         CONNECTION_PROVIDER, extensionModel.getName()));
     }
 
     private void validateOperations(ExtensionModel extensionModel, List<OperationModel> operations)
     {
-        operations.forEach(operation -> operation.getParameterModels()
-                .forEach(parameterModel -> validateParameter(parameterModel,
-                                                             operation.getName(),
-                                                             OPERATION,
-                                                             extensionModel.getName())));
+        operations.forEach(operation -> validateParameters(operation.getParameterModels(), operation.getName(),
+                                                           OPERATION, extensionModel.getName()));
+    }
+
+    private void validateParameters(List<ParameterModel> parameters, String ownerName, String ownerModelType, String extensionName)
+    {
+        List<String> parameterHyphenizedNames = parameters.stream().map(p -> hyphenize(p.getName())).collect(toList());
+
+        parameters.stream().forEach(parameterModel -> {
+            validateParameter(parameterModel, ownerName, ownerModelType, extensionName);
+            validateNameCollisionWithSubtypes(ownerName, ownerModelType, extensionName, parameterHyphenizedNames, parameterModel);
+        });
     }
 
     private void validateParameter(ParameterModel parameterModel, String ownerName, String ownerModelType, String extensionName)
@@ -85,6 +104,20 @@ public final class ParameterModelValidator implements ModelValidator
         if (parameterModel.isRequired() && parameterModel.getDefaultValue() != null)
         {
             throw new IllegalParameterModelDefinitionException(String.format("The parameter [%s] in the %s [%s] from the extension [%s] is required, and must not provide a default value", parameterModel.getName(), ownerModelType, ownerName, extensionName));
+        }
+    }
+
+    private void validateNameCollisionWithSubtypes(String ownerName, String ownerModelType, String extensionName, List<String> parameterNames, ParameterModel parameterModel)
+    {
+        Optional<MetadataType> subTypeWithNameCollision = subTypesMapping.getSubTypes(parameterModel.getType()).stream()
+                .filter(subtype -> parameterNames.contains(hyphenize(IntrospectionUtils.getAliasName(subtype)))).findFirst();
+
+        if (subTypeWithNameCollision.isPresent())
+        {
+            throw new IllegalParameterModelDefinitionException(
+                    String.format("The parameter [%s] in the %s [%s] from the extension [%s] can't have the same name as the ClassName or Alias of the declared subType [%s] for parameter [%s]",
+                                  IntrospectionUtils.getAliasName(subTypeWithNameCollision.get()), ownerModelType, ownerName, extensionName,
+                                  JavaTypeUtils.getType(subTypeWithNameCollision.get()).getSimpleName(), parameterModel.getName()));
         }
     }
 }

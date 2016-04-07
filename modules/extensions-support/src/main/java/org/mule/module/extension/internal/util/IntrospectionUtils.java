@@ -39,6 +39,7 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
+import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -74,6 +75,18 @@ public final class IntrospectionUtils
 
     private IntrospectionUtils()
     {
+    }
+
+    /**
+     * Returns a {@link MetadataType} representing the given {@link Class} type.
+     *
+     * @param type     the {@link Class} being introspected
+     * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
+     * @return a {@link MetadataType}
+     */
+    public static MetadataType getMetadataType(Class<?> type, ClassTypeLoader typeLoader)
+    {
+        return typeLoader.load(ResolvableType.forClass(type).getType());
     }
 
     /**
@@ -367,6 +380,18 @@ public final class IntrospectionUtils
     public static ExpressionSupport getExpressionSupport(Expression expressionAnnotation)
     {
         return expressionAnnotation != null ? expressionAnnotation.value() : SUPPORTED;
+    }
+
+    public static String getAliasName(MetadataType metadataType)
+    {
+        Class<?> type = JavaTypeUtils.getType(metadataType);
+        return getAliasName(type.getSimpleName(), type.getAnnotation(Alias.class));
+    }
+
+    public static String getAliasName(String defaultName, Alias aliasAnnotation)
+    {
+        String alias = aliasAnnotation != null ? aliasAnnotation.value() : null;
+        return StringUtils.isEmpty(alias) ? defaultName : alias;
     }
 
     public static String getAlias(Field field)

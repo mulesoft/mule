@@ -6,6 +6,10 @@
  */
 package org.mule.module.extension.internal.config;
 
+import org.mule.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.extension.api.introspection.SubTypesModelProperty;
+import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
+
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 
@@ -22,10 +26,18 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 abstract class ExtensionComponentFactoryBean<T> implements FactoryBean<T>, HasExtensionParserDelegate
 {
 
+    protected RuntimeExtensionModel extensionModel;
     protected XmlExtensionParserDelegate parserDelegate;
 
     public void setParserDelegate(XmlExtensionParserDelegate parserDelegate)
     {
         this.parserDelegate = parserDelegate;
+
+        if (extensionModel != null && extensionModel.getModelProperty(SubTypesModelProperty.class).isPresent())
+        {
+            this.parserDelegate.setSubTypesMapping(
+                    new SubTypesMappingContainer(extensionModel.getModelProperty(SubTypesModelProperty.class).get().getSubTypesMapping()));
+        }
     }
+
 }

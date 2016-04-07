@@ -6,6 +6,9 @@
  */
 package org.mule.module.extension.internal.introspection.describer;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
@@ -17,6 +20,7 @@ import static org.mule.module.extension.internal.introspection.describer.MuleExt
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
+import static org.mule.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
@@ -25,6 +29,8 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getSupe
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.connection.ConnectionProvider;
+import org.mule.api.metadata.DefaultMetadataResolverFactory;
+import org.mule.api.metadata.NullMetadataResolverFactory;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Configuration;
@@ -36,6 +42,7 @@ import org.mule.extension.api.annotation.ExtensionOf;
 import org.mule.extension.api.annotation.OnException;
 import org.mule.extension.api.annotation.Operations;
 import org.mule.extension.api.annotation.Sources;
+import org.mule.extension.api.annotation.SubTypesMapping;
 import org.mule.extension.api.annotation.connector.Providers;
 import org.mule.extension.api.annotation.metadata.MetadataScope;
 import org.mule.extension.api.annotation.param.Connection;
@@ -43,6 +50,7 @@ import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
+import org.mule.extension.api.introspection.SubTypesModelProperty;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclarer;
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclarer;
@@ -63,14 +71,13 @@ import org.mule.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.extension.api.introspection.property.DisplayModelPropertyBuilder;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.module.extension.internal.introspection.ParameterGroup;
 import org.mule.module.extension.internal.introspection.VersionResolver;
-import org.mule.api.metadata.DefaultMetadataResolverFactory;
-import org.mule.api.metadata.NullMetadataResolverFactory;
 import org.mule.module.extension.internal.model.property.ConfigTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
@@ -91,12 +98,11 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -158,6 +164,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 .withExceptionEnricherFactory(getExceptionEnricherFactory(extensionType))
                 .withModelProperty(new ImplementingTypeModelProperty(extensionType));
 
+        declareSubTypesMapping(declaration, extensionType);
         declareConfigurations(declaration, extensionType);
         declareOperations(declaration, extensionType);
         declareConnectionProviders(declaration, extensionType);
@@ -169,6 +176,22 @@ public final class AnnotationsBasedDescriber implements Describer
     private String getVersion(Extension extension)
     {
         return versionResolver.resolveVersion(extension);
+    }
+
+    private void declareSubTypesMapping(ExtensionDeclarer declaration, Class<?> extensionType)
+    {
+        SubTypesMapping typesMapping = extensionType.getAnnotation(SubTypesMapping.class);
+
+        if (typesMapping != null)
+        {
+            Map<MetadataType, List<MetadataType>> subTypesMap = stream(typesMapping.value()).collect(toMap(
+                    mapping -> getMetadataType(mapping.baseType(), typeLoader),
+                    mapping -> stream(mapping.subTypes())
+                            .map(subType -> getMetadataType(subType, typeLoader))
+                            .collect(toList())));
+
+            declaration.withModelProperty(new SubTypesModelProperty(subTypesMap));
+        }
     }
 
     private void declareConfigurations(ExtensionDeclarer declaration, Class<?> extensionType)
@@ -523,6 +546,8 @@ public final class AnnotationsBasedDescriber implements Describer
 
         for (ParsedParameter parsedParameter : descriptors)
         {
+            final Class<?> parameterType = getType(parsedParameter.getType(), typeLoader.getClassLoader());
+
             if (parsedParameter.isAdvertised())
             {
                 ParameterDeclarer parameter = parsedParameter.isRequired()
@@ -537,30 +562,32 @@ public final class AnnotationsBasedDescriber implements Describer
                 {
                     parameter.withModelProperty(displayModelProperty);
                 }
+
                 parseMetadataAnnotations(parsedParameter, parameter);
+
             }
 
             Connection connectionAnnotation = parsedParameter.getAnnotation(Connection.class);
             if (connectionAnnotation != null)
             {
-                operation.withModelProperty(new ConnectionTypeModelProperty(getType(parsedParameter.getType(), typeLoader.getClassLoader())));
+                operation.withModelProperty(new ConnectionTypeModelProperty(parameterType));
             }
 
             UseConfig useConfig = parsedParameter.getAnnotation(UseConfig.class);
             if (useConfig != null)
             {
-                operation.withModelProperty(new ConfigTypeModelProperty(getType(parsedParameter.getType())));
+                operation.withModelProperty(new ConfigTypeModelProperty(parameterType));
             }
         }
     }
 
     private void checkAnnotationIsNotUsedMoreThanOnce(Method method, OperationDeclarer operation, Class annotationClass)
     {
-        Stream<java.lang.reflect.Parameter> parametersStream = Arrays
-                .stream(method.getParameters())
+        Stream<java.lang.reflect.Parameter> parametersStream =
+                stream(method.getParameters())
                 .filter(parameter -> parameter.isAnnotationPresent(annotationClass));
 
-        List<java.lang.reflect.Parameter> parameterList = parametersStream.collect(Collectors.toList());
+        List<java.lang.reflect.Parameter> parameterList = parametersStream.collect(toList());
 
         if (parameterList.size() > 1)
         {

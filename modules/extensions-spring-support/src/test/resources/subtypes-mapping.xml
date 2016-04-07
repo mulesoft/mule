@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/subtypes http://www.mulesoft.org/schema/mule/subtypes/current/mule-subtypes.xsd">
+
+    <subtypes:config name="config">
+        <subtypes:connection>
+            <subtypes:triangle-alias height="2" area="1"/>
+            <subtypes:house-door locked="true"/>
+        </subtypes:connection>
+
+        <subtypes:explicit-square side="2" area="4"/>
+        <subtypes:car-door color="red"/>
+        <subtypes:final-pojo someString="message"/>
+        <subtypes:square side="1" area="1"/>
+    </subtypes:config>
+
+    <flow name="shapeRetriever">
+        <subtypes:shape-retriever>
+            <subtypes:square side="4" area="16"/>
+        </subtypes:shape-retriever>
+    </flow>
+
+    <flow name="doorRetriever">
+        <subtypes:door-retriever>
+            <subtypes:car-door color="blue"/>
+        </subtypes:door-retriever>
+    </flow>
+
+    <flow name="configRetriever">
+        <subtypes:config-retriever/>
+    </flow>
+
+    <flow name="connectionRetriever">
+        <subtypes:connection-retriever/>
+    </flow>
+
+    <flow name="subtypedAndConcreteParameters">
+        <subtypes:subtyped-and-concrete-parameters>
+            <subtypes:triangle-alias height="4" area="2"/>
+            <subtypes:house-door locked="false"/>
+            <subtypes:final-pojo-param someString="asChild"/>
+        </subtypes:subtyped-and-concrete-parameters>
+    </flow>
+
+    <subtypes:car-door name="global-car-door" color="white"/>
+    <subtypes:house-door name="global-house-door" locked="true"/>
+    <subtypes:square name="global-square" side="3" area="9"/>
+    <subtypes:triangle-alias name="global-triangle" height="6" area="3"/>
+    <subtypes:final-pojo name="global-final-pojo" someString="globalString"/>
+
+    <flow name="subtypedAndConcreteParametersAsAttributes">
+        <subtypes:subtyped-and-concrete-parameters
+                doorParam="global-car-door"
+                shapeParam="global-square"
+                finalPojoParam="global-final-pojo"
+        />
+    </flow>
+</mule>
