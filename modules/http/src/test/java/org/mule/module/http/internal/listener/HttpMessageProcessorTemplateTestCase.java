@@ -7,7 +7,9 @@
 package org.mule.module.http.internal.listener;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -15,6 +17,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.api.transformer.DataType.STRING_DATA_TYPE;
@@ -97,7 +100,8 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase
 
         HttpResponseReadyCallback responseReadyCallback = mock(HttpResponseReadyCallback.class);
         RuntimeException expected = new RuntimeException("Some exception");
-        doThrow(expected).when(responseReadyCallback).responseReady(any(HttpResponse.class), any(ResponseStatusCallback.class));
+        ArgumentCaptor<HttpResponse> httpResponseCaptor = ArgumentCaptor.forClass(HttpResponse.class);
+        doThrow(expected).when(responseReadyCallback).responseReady(httpResponseCaptor.capture(), any(ResponseStatusCallback.class));
 
         HttpMessageProcessorTemplate httpMessageProcessorTemplate = new HttpMessageProcessorTemplate(
                 testEvent,
@@ -107,9 +111,19 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase
                 HttpResponseBuilder.emptyInstance(mock(MuleContext.class)));
 
         ResponseCompletionCallback responseCompletionCallback = mock(ResponseCompletionCallback.class);
-        httpMessageProcessorTemplate.sendResponseToClient(testEvent, responseCompletionCallback);
 
-        verify(responseCompletionCallback).responseSentWithFailure(expected, testEvent);
+        try
+        {
+            httpMessageProcessorTemplate.sendResponseToClient(testEvent, responseCompletionCallback);
+            fail("Expected exception");
+        }
+        catch (RuntimeException e)
+        {
+            assertThat(e, sameInstance(expected));
+        }
+
+        verify(responseCompletionCallback, never()).responseSentWithFailure(expected, testEvent);
+        assertThat(httpResponseCaptor.getValue().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
     }
 
     private MuleEvent createMockEvent()

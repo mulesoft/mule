@@ -24,7 +24,8 @@ public interface ResponseCompletionCallback
      *
      * @param e the exception thrown during response writing
      * @param event the event that was the source for the response.
+     * @return the event that is the result of the exception strategy.
      */
-    void responseSentWithFailure(Exception e, MuleEvent event);
+    MuleEvent responseSentWithFailure(Exception e, MuleEvent event);
 
 }

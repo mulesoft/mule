@@ -17,6 +17,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transport.ExceptionHandlingReplyToHandlerDecorator;
@@ -100,9 +101,10 @@ public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessi
             }
 
             @Override
-            public void responseSentWithFailure(Exception e, MuleEvent event)
+            public MuleEvent responseSentWithFailure(Exception e, MuleEvent event)
             {
                 phaseResultNotifier.phaseFailure(e);
+                return event;
             }
         };
     }
@@ -118,31 +120,33 @@ public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessi
             }
 
             @Override
-            public void responseSentWithFailure(final Exception e, final MuleEvent event)
+            public MuleEvent responseSentWithFailure(final Exception e, final MuleEvent event)
             {
-                executeCallback(new Callback()
+                return executeCallback(new Callback()
                 {
                     @Override
-                    public void execute() throws Exception
+                    public MuleEvent execute() throws Exception
                     {
                         ((DefaultMuleEvent) event).resetAccessControl();
-                        exceptionListener.handleException(e, event);
+                        final MuleEvent exceptionStrategyResult = exceptionListener.handleException(e, event);
                         phaseResultNotifier.phaseSuccessfully();
+                        return exceptionStrategyResult;
                     }
                 }, phaseResultNotifier);
             }
         };
     }
 
-    private void executeCallback(final Callback callback, PhaseResultNotifier phaseResultNotifier)
+    private MuleEvent executeCallback(final Callback callback, PhaseResultNotifier phaseResultNotifier)
     {
         try
         {
-            callback.execute();
+            return callback.execute();
         }
         catch (Exception callbackException)
         {
             phaseResultNotifier.phaseFailure(callbackException);
+            throw new MuleRuntimeException(callbackException);
         }
     }
 
@@ -159,7 +163,7 @@ public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessi
     private interface Callback
     {
 
-        void execute() throws Exception;
+        MuleEvent execute() throws Exception;
 
     }
 
