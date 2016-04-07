@@ -6,14 +6,14 @@
  */
 package org.mule.module.extension.internal.runtime.connector.subtypes;
 
-public class SubtypesConnectorConnection
+public class SubTypesConnectorConnection
 {
 
     private Shape shape;
     private Door door;
 
 
-    public SubtypesConnectorConnection(Shape shape, Door door)
+    public SubTypesConnectorConnection(Shape shape, Door door)
     {
         this.shape = shape;
         this.door = door;

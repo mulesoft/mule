@@ -14,8 +14,8 @@ import org.mule.extension.api.annotation.capability.Xml;
 import org.mule.extension.api.annotation.connector.Providers;
 
 @Extension(name = "SubtypesConnector", description = "Test connector for pojo subtype mapping")
-@Operations(TestOperationsWithSubtypeMapping.class)
-@Providers(SubtypesConnectionProvider.class)
+@Operations(TestOperationsWithSubTypeMapping.class)
+@Providers(SubTypesConnectionProvider.class)
 @SubTypeMapping(baseType = Shape.class, subTypes = {Square.class, Triangle.class})
 @SubTypeMapping(baseType = Door.class, subTypes = {HouseDoor.class, CarDoor.class})
 @Xml(namespace = "subtypes", schemaLocation = "http://www.mulesoft.org/schema/mule/subtypes")

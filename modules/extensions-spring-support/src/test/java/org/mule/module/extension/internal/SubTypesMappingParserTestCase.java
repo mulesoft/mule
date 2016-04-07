@@ -17,7 +17,7 @@ import org.mule.module.extension.internal.runtime.connector.subtypes.FinalPojo;
 import org.mule.module.extension.internal.runtime.connector.subtypes.HouseDoor;
 import org.mule.module.extension.internal.runtime.connector.subtypes.Square;
 import org.mule.module.extension.internal.runtime.connector.subtypes.SubTypesMappingConnector;
-import org.mule.module.extension.internal.runtime.connector.subtypes.SubtypesConnectorConnection;
+import org.mule.module.extension.internal.runtime.connector.subtypes.SubTypesConnectorConnection;
 import org.mule.module.extension.internal.runtime.connector.subtypes.Triangle;
 
 import java.util.List;
@@ -86,9 +86,9 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
     {
         MuleEvent responseEvent = flowRunner("connectionRetriever").withPayload("").run();
 
-        assertThat(responseEvent.getMessage().getPayload(), instanceOf(SubtypesConnectorConnection.class));
+        assertThat(responseEvent.getMessage().getPayload(), instanceOf(SubTypesConnectorConnection.class));
 
-        SubtypesConnectorConnection payload = (SubtypesConnectorConnection) responseEvent.getMessage().getPayload();
+        SubTypesConnectorConnection payload = (SubTypesConnectorConnection) responseEvent.getMessage().getPayload();
         assertThat(payload.getDoor(), instanceOf(HouseDoor.class));
         assertThat(payload.getShape(), instanceOf(Triangle.class));
         assertThat(payload.getShape().getArea(), is(1));
