@@ -29,6 +29,7 @@ import org.mule.api.endpoint.EndpointNotFoundException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.MessageFactory;
@@ -253,7 +254,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             {
                 final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
 
-                event = new DefaultMuleEvent(event, new ReplyToHandler()
+                event = new DefaultMuleEvent(event, new NonBlockingReplyToHandler()
                 {
                     @Override
                     public void processReplyTo(MuleEvent responseEvent, MuleMessage returnMessage, Object replyTo) throws MuleException

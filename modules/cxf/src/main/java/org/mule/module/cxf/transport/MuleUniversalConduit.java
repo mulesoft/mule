@@ -21,6 +21,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.MessageFactory;
@@ -252,7 +253,7 @@ public class MuleUniversalConduit extends AbstractConduit
             {
                 final ReplyToHandler originalReplyToHandler = reqEvent.getReplyToHandler();
 
-                reqEvent = new DefaultMuleEvent(reqEvent, new ReplyToHandler()
+                reqEvent = new DefaultMuleEvent(reqEvent, new NonBlockingReplyToHandler()
                 {
                     @Override
                     public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException

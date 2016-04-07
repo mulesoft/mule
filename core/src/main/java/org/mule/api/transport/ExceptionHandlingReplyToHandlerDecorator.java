@@ -23,7 +23,7 @@ import org.mule.api.exception.MessagingExceptionHandler;
  * {@link ReplyToHandler#processExceptionReplyTo(org.mule.api.MessagingException, Object)} depending on the
  * result of {@link org.mule.api.MessagingException#handled()} after the MessagingExceptionHandler has been invoked.
  */
-public class ExceptionHandlingReplyToHandlerDecorator implements ReplyToHandler
+public class ExceptionHandlingReplyToHandlerDecorator implements NonBlockingReplyToHandler
 {
 
     private final MessagingExceptionHandler messagingExceptionHandler;
