@@ -55,7 +55,9 @@ public class MuleDeploymentService implements DeploymentService
     public static final Set<String> SYSTEM_PACKAGES = ImmutableSet.of(
             "java.", "org.mule", "com.mulesoft.mule.config", "com.mulesoft.mule.bti", "com.mulesoft.mule.cache",
             "com.mulesoft.mule.cluster", "com.mulesoft.mule.plugin", "com.mulesoft.mule.saml", "com.mulesoft.mule.throttling",
-            "com.mulesoft.mule.tracking", "com.mulesoft.mule.transaction", "com.mulesoft.module");
+            "com.mulesoft.mule.tracking", "com.mulesoft.mule.transaction", "com.mulesoft.module",
+            "org.apache.logging.log4j", "org.slf4j", "org.apache.commons.logging", "org.apache.log4j"
+    );
     public static final String ARTIFACT_ANCHOR_SUFFIX = "-anchor.txt";
     public static final IOFileFilter ZIP_ARTIFACT_FILTER = new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX), FileFileFilter.FILE);
 
