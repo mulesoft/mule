@@ -24,7 +24,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.metadata.DefaultMetadataContext;
 import org.mule.api.metadata.MetadataAware;
-import org.mule.api.metadata.MetadataCache;
 import org.mule.api.metadata.MetadataContext;
 import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.MetadataResolvingException;
@@ -267,8 +266,7 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
 
         //TODO MULE-9530: Improve id creation, this won't work with dynamic configurations
         String cacheId =  configuration.getName();
-        MetadataCache cache = metadataManager.getCache(cacheId);
-        return new DefaultMetadataContext(configuration, connectionManager, cache);
+        return new DefaultMetadataContext(configuration, connectionManager, metadataManager.getCache(cacheId));
     }
 
     @Override

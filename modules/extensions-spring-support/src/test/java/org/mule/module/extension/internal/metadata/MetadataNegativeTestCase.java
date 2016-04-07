@@ -82,7 +82,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     }
 
     @Test
-    public void dynamicContentWithCacheMustFail() throws Exception
+    public void fetchMissingElementFromCache() throws Exception
     {
         processorId = new ProcessorId(CONTENT_ONLY_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
         MetadataResult<OperationMetadataDescriptor> metadata = metadataManager.getMetadata(processorId, nullMetadataKey);

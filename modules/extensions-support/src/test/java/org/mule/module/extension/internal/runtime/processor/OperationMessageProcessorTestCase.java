@@ -75,7 +75,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -155,7 +154,6 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     private String configurationName = CONFIG_NAME;
     private String target = EMPTY;
 
-    @InjectMocks
     private MuleMetadataManager metadataManager;
     private DefaultConnectionManager connectionManager;
 
@@ -207,7 +205,6 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         when(configurationModel.getOperationModel(OPERATION_NAME)).thenReturn(Optional.of(operationModel));
 
         metadataManager = new MuleMetadataManager();
-        //when(metadataManager.getCache(anyString())).thenReturn(mock(MetadataCache.class));
 
         connectionManager = new DefaultConnectionManager(context);
         connectionManager.initialise();

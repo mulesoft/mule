@@ -10,7 +10,6 @@ import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
@@ -31,6 +30,8 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.metadata.MuleMetadataManager;
 import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.module.extension.internal.AbstractInterceptableContractTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
 
@@ -196,8 +197,7 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractInterce
         muleMetadataManager.getCache(NAME);
         interceptable.initialise();
         valueDisposed();
-        Thread.sleep(1000);
-        assertThat(muleMetadataManager.getCaches().entrySet(), empty());
+        new PollingProber(10, 1).check(new JUnitLambdaProbe(() -> muleMetadataManager.getCaches().entrySet().isEmpty()));
     }
 
     @Test
@@ -230,5 +230,4 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractInterce
         interceptable.initialise();
         assertThat(interceptable.getStatistics(), is(notNullValue()));
     }
-
 }

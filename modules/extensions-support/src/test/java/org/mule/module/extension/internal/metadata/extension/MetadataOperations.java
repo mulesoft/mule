@@ -22,110 +22,79 @@ import org.mule.module.extension.internal.metadata.extension.resolver.TestResolv
 public class MetadataOperations
 {
 
-    // Resolver for content only, ignores Object return type
-    // With keysResolver and KeyParam
-    @MetadataScope( keysResolver = TestContentResolverWithKeyResolver.class,
-                    contentResolver = TestContentResolverWithKeyResolver.class)
+    @MetadataScope(keysResolver = TestContentResolverWithKeyResolver.class,
+            contentResolver = TestContentResolverWithKeyResolver.class)
     public Object contentMetadataWithKeyParam(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
     {
         return null;
     }
 
-    // Resolver for output only, ignores @Content Object
-    // With keysResolver and KeyParam
-    @MetadataScope( keysResolver = TestOutputResolverWithKeyResolver.class,
-                    outputResolver = TestOutputResolverWithKeyResolver.class)
+    @MetadataScope(keysResolver = TestOutputResolverWithKeyResolver.class,
+            outputResolver = TestOutputResolverWithKeyResolver.class)
     public Object outputMetadataWithKeyParam(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
     {
         return null;
     }
 
-    // Resolver for content and output type
-    // With keysResolver and KeyParam
-    @MetadataScope( keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
-                    contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
-                    outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
+    @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
+            contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
+            outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
     public Object contentAndOutputMetadataWithKeyParam(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
     {
         return null;
     }
 
-    // Resolver for content and output type, no @Content param, resolves only output
-    // With keysResolver and KeyParam
-    @MetadataScope( keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
-                    contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
-                    outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
+    @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
+            contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
+            outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
     public Object outputOnlyWithoutContentParam(@Connection MetadataConnection connection, @MetadataKeyParam String type)
     {
         return null;
     }
 
-    // Resolver for content and output type, no return type, resolves only @Content
-    // With key and KeyParam
-    @MetadataScope( keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
-                    contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
-                    outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
+    @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
+            contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
+            outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
     public void contentOnlyIgnoresOutput(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
     {
     }
 
-
-    // Resolver for content only, ignores Object return type
-    // Without keysResolver and KeyParam
     @MetadataScope(contentResolver = TestContentResolverWithoutKeyResolver.class)
     public Object contentMetadataWithoutKeyParam(@Connection MetadataConnection connection, @Content Object content)
     {
         return null;
     }
 
-    // Resolver for output only, ignores @Content Object
-    // Without keysResolver and KeyParam
     @MetadataScope(outputResolver = TestOutputResolverWithoutKeyResolver.class)
     public Object outputMetadataWithoutKeyParam(@Connection MetadataConnection connection, @Content Object content)
     {
         return null;
     }
 
-    // Resolver for content and output types
-    // Without keysResolver and KeyParam
-    @MetadataScope( contentResolver = TestContentAndOutputResolverWithoutKeyResolver.class,
-                    outputResolver = TestContentAndOutputResolverWithoutKeyResolver.class)
+    @MetadataScope(contentResolver = TestContentAndOutputResolverWithoutKeyResolver.class,
+            outputResolver = TestContentAndOutputResolverWithoutKeyResolver.class)
     public Object contentAndOutputMetadataWithoutKeyParam(@Connection MetadataConnection connection, @Content Object content)
     {
         return null;
     }
 
-    // Resolver for content only
-    // Without keysResolver
-    // With KeyParam
     @MetadataScope(contentResolver = TestContentResolverWithoutKeyResolver.class)
     public void contentMetadataWithoutKeysWithKeyParam(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
     {
     }
 
-    // Resolver for output only
-    // Without keysResolver
-    // With KeyParam
     @MetadataScope(outputResolver = TestOutputResolverWithoutKeyResolver.class)
     public Object outputMetadataWithoutKeysWithKeyParam(@Connection MetadataConnection connection, @MetadataKeyParam String type)
     {
         return null;
     }
 
-    // Resolver for output and content
-    // Without keysResolver
-    // With KeyParam
-    // Uses Cache
     @MetadataScope(outputResolver = TestResolverWithCache.class, contentResolver = TestResolverWithCache.class)
     public Object contentAndOutputCacheResolver(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
     {
         return null;
     }
 
-    // Resolver for content
-    // Without keysResolver
-    // With KeyParam
-    // Uses Cache
     @MetadataScope(contentResolver = TestResolverWithCache.class)
     public Object contentOnlyCacheResolver(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
     {
