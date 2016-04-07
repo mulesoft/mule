@@ -13,7 +13,7 @@ import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.extension.api.annotation.Parameter;
 
-public class SubtypesConnectionProvider implements ConnectionProvider<SubTypesMappingConnector, SubtypesConnectorConnection>
+public class SubTypesConnectionProvider implements ConnectionProvider<SubTypesMappingConnector, SubTypesConnectorConnection>
 {
 
     @Parameter
@@ -24,24 +24,24 @@ public class SubtypesConnectionProvider implements ConnectionProvider<SubTypesMa
 
 
     @Override
-    public SubtypesConnectorConnection connect(SubTypesMappingConnector subtypesPojoConnector) throws ConnectionException
+    public SubTypesConnectorConnection connect(SubTypesMappingConnector subtypesPojoConnector) throws ConnectionException
     {
-        return new SubtypesConnectorConnection(abstractShape, doorInterface);
+        return new SubTypesConnectorConnection(abstractShape, doorInterface);
     }
 
     @Override
-    public void disconnect(SubtypesConnectorConnection subtypesConnectorConnection)
+    public void disconnect(SubTypesConnectorConnection subtypesConnectorConnection)
     {
     }
 
     @Override
-    public ConnectionValidationResult validate(SubtypesConnectorConnection subtypesConnectorConnection)
+    public ConnectionValidationResult validate(SubTypesConnectorConnection subtypesConnectorConnection)
     {
         return ConnectionValidationResult.success();
     }
 
     @Override
-    public ConnectionHandlingStrategy<SubtypesConnectorConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<SubTypesMappingConnector, SubtypesConnectorConnection> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<SubTypesConnectorConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<SubTypesMappingConnector, SubTypesConnectorConnection> handlingStrategyFactory)
     {
         return handlingStrategyFactory.supportsPooling();
     }

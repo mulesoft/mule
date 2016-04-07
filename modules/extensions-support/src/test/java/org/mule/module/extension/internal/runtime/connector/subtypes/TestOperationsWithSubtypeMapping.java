@@ -12,7 +12,7 @@ import org.mule.extension.api.annotation.param.UseConfig;
 import java.util.Arrays;
 import java.util.List;
 
-public class TestOperationsWithSubtypeMapping
+public class TestOperationsWithSubTypeMapping
 {
 
     public Shape shapeRetriever(Shape shape)
@@ -30,7 +30,7 @@ public class TestOperationsWithSubtypeMapping
         return config;
     }
 
-    public SubtypesConnectorConnection connectionRetriever(@Connection SubtypesConnectorConnection connection)
+    public SubTypesConnectorConnection connectionRetriever(@Connection SubTypesConnectorConnection connection)
     {
         return connection;
     }
