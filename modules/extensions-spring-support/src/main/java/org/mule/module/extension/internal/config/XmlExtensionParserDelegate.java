@@ -41,6 +41,7 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.annotation.GenericTypesAnnotation;
 import org.mule.module.extension.internal.introspection.BasicTypeMetadataVisitor;
 import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
+import org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
 import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.CollectionValueResolver;
@@ -164,13 +165,13 @@ final class XmlExtensionParserDelegate
         {
             List<MetadataType> subtypes = subTypesMapping.getSubTypes(parameterModel.getType());
             Optional<MetadataType> subTypeChildElement = subtypes.stream()
-                    .filter(s -> element.getChildByName(hyphenize(IntrospectionUtils.getAliasName(s))) != null)
+                    .filter(s -> element.getChildByName(hyphenize(MuleExtensionAnnotationParser.getAliasName(s))) != null)
                     .findFirst();
 
             if (subTypeChildElement.isPresent())
             {
                 return parseElement(element, parameterModel.getName(),
-                                    hyphenize(IntrospectionUtils.getAliasName(subTypeChildElement.get())),
+                                    hyphenize(MuleExtensionAnnotationParser.getAliasName(subTypeChildElement.get())),
                                     subTypeChildElement.get(),
                                     parameterModel.getDefaultValue());
             }

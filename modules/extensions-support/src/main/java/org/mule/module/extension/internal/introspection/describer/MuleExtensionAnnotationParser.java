@@ -79,6 +79,12 @@ public final class MuleExtensionAnnotationParser
         return StringUtils.isEmpty(alias) ? defaultName : alias;
     }
 
+    public static String getAliasName(MetadataType metadataType)
+    {
+        Class<?> type = JavaTypeUtils.getType(metadataType);
+        return MuleExtensionAnnotationParser.getAliasName(type.getSimpleName(), type.getAnnotation(Alias.class));
+    }
+
     public static String getMemberName(BaseDeclaration<?> declaration, String defaultName)
     {
         return declaration.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField().getName()).orElse(defaultName);

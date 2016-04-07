@@ -6,6 +6,8 @@
  */
 package org.mule.module.extension.internal.introspection.validation;
 
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toList;
 import static org.mule.extension.api.introspection.ParameterModel.RESERVED_NAMES;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
@@ -19,12 +21,10 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
-import org.mule.module.extension.internal.util.IntrospectionUtils;
+import org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Validates that all {@link ParameterModel parameters} provided by the {@link ConfigurationModel configurations},
@@ -50,8 +50,11 @@ public final class ParameterModelValidator implements ModelValidator
     @Override
     public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
     {
-        Optional<SubTypesModelProperty> subTypesDeclaration = extensionModel.getModelProperty(SubTypesModelProperty.class);
-        subTypesMapping = new SubTypesMappingContainer(subTypesDeclaration.isPresent() ? subTypesDeclaration.get().getSubTypesMapping() : Collections.emptyMap());
+
+        Optional<SubTypesMappingContainer> typesMapping = extensionModel.getModelProperty(SubTypesModelProperty.class)
+                .map(p -> new SubTypesMappingContainer(p.getSubTypesMapping()));
+
+        subTypesMapping = typesMapping.isPresent() ? typesMapping.get() : new SubTypesMappingContainer(emptyMap());
 
         extensionModel.getConfigurationModels().stream()
                 .forEach(config -> validateParameters(config.getParameterModels(), config.getName(),
@@ -78,7 +81,7 @@ public final class ParameterModelValidator implements ModelValidator
 
     private void validateParameters(List<ParameterModel> parameters, String ownerName, String ownerModelType, String extensionName)
     {
-        List<String> parameterHyphenizedNames = parameters.stream().map(p -> hyphenize(p.getName())).collect(Collectors.toList());
+        List<String> parameterHyphenizedNames = parameters.stream().map(p -> hyphenize(p.getName())).collect(toList());
 
         parameters.stream().forEach(parameterModel -> {
             validateParameter(parameterModel, ownerName, ownerModelType, extensionName);
@@ -107,13 +110,13 @@ public final class ParameterModelValidator implements ModelValidator
     private void validateNameCollisionWithSubtypes(String ownerName, String ownerModelType, String extensionName, List<String> parameterNames, ParameterModel parameterModel)
     {
         Optional<MetadataType> subTypeWithNameCollision = subTypesMapping.getSubTypes(parameterModel.getType()).stream()
-                .filter(subtype -> parameterNames.contains(hyphenize(IntrospectionUtils.getAliasName(subtype)))).findFirst();
+                .filter(subtype -> parameterNames.contains(hyphenize(MuleExtensionAnnotationParser.getAliasName(subtype)))).findFirst();
 
         if (subTypeWithNameCollision.isPresent())
         {
             throw new IllegalParameterModelDefinitionException(
                     String.format("The parameter [%s] in the %s [%s] from the extension [%s] can't have the same name as the ClassName or Alias of the declared subType [%s] for parameter [%s]",
-                                  IntrospectionUtils.getAliasName(subTypeWithNameCollision.get()), ownerModelType, ownerName, extensionName,
+                                  MuleExtensionAnnotationParser.getAliasName(subTypeWithNameCollision.get()), ownerModelType, ownerName, extensionName,
                                   JavaTypeUtils.getType(subTypeWithNameCollision.get()).getSimpleName(), parameterModel.getName()));
         }
     }

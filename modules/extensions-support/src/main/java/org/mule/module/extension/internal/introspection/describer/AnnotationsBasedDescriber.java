@@ -6,6 +6,9 @@
  */
 package org.mule.module.extension.internal.introspection.describer;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
@@ -95,13 +98,11 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -183,11 +184,11 @@ public final class AnnotationsBasedDescriber implements Describer
 
         if (typesMapping != null)
         {
-            Map<MetadataType, List<MetadataType>> subTypesMap = Arrays.stream(typesMapping.value()).collect(Collectors.toMap(
+            Map<MetadataType, List<MetadataType>> subTypesMap = stream(typesMapping.value()).collect(toMap(
                     mapping -> getMetadataType(mapping.baseType(), typeLoader),
-                    mapping -> Arrays.stream(mapping.subTypes())
+                    mapping -> stream(mapping.subTypes())
                             .map(subType -> getMetadataType(subType, typeLoader))
-                            .collect(Collectors.toList())));
+                            .collect(toList())));
 
             declaration.withModelProperty(new SubTypesModelProperty(subTypesMap));
         }
@@ -582,11 +583,11 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void checkAnnotationIsNotUsedMoreThanOnce(Method method, OperationDeclarer operation, Class annotationClass)
     {
-        Stream<java.lang.reflect.Parameter> parametersStream = Arrays
-                .stream(method.getParameters())
+        Stream<java.lang.reflect.Parameter> parametersStream =
+                stream(method.getParameters())
                 .filter(parameter -> parameter.isAnnotationPresent(annotationClass));
 
-        List<java.lang.reflect.Parameter> parameterList = parametersStream.collect(Collectors.toList());
+        List<java.lang.reflect.Parameter> parameterList = parametersStream.collect(toList());
 
         if (parameterList.size() > 1)
         {
