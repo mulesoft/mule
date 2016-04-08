@@ -12,7 +12,7 @@
 
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-file</artifactId>
-    <packaging>jar</packaging>
+    <packaging>mule-extension</packaging>
 
     <name>Mule File Connector</name>
     <description>A Mule extension that provides functionality to manage files in a local file system</description>
@@ -22,6 +22,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-file-extension-common</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
