@@ -30,7 +30,7 @@ public class DefaultMetadataContext implements MetadataContext
      *
      * @param configInstance    instance of the configuration of a component
      * @param connectionManager {@link ConnectionManager} which is able to find a connection for the component using the {@param configInstance}
-     * @param cache             instance of the {@link MetadataCache} for this configuration
+     * @param cache             instance of the {@link MetadataCache} for this context
      */
     public DefaultMetadataContext(ConfigurationInstance<Object> configInstance, ConnectionManager connectionManager, MetadataCache cache)
     {
@@ -73,6 +73,4 @@ public class DefaultMetadataContext implements MetadataContext
     {
         return cache;
     }
-
-
 }

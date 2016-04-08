@@ -22,39 +22,31 @@ import org.mule.module.extension.internal.metadata.extension.resolver.TestResolv
 public class MetadataOperations
 {
 
-    @MetadataScope(keysResolver = TestContentResolverWithKeyResolver.class,
-            contentResolver = TestContentResolverWithKeyResolver.class)
+    @MetadataScope(keysResolver = TestContentResolverWithKeyResolver.class, contentResolver = TestContentResolverWithKeyResolver.class)
     public Object contentMetadataWithKeyParam(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
     {
         return null;
     }
 
-    @MetadataScope(keysResolver = TestOutputResolverWithKeyResolver.class,
-            outputResolver = TestOutputResolverWithKeyResolver.class)
+    @MetadataScope(keysResolver = TestOutputResolverWithKeyResolver.class, outputResolver = TestOutputResolverWithKeyResolver.class)
     public Object outputMetadataWithKeyParam(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
     {
         return null;
     }
 
-    @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
-            contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
-            outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
+    @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class, contentResolver = TestContentAndOutputResolverWithKeyResolver.class, outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
     public Object contentAndOutputMetadataWithKeyParam(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
     {
         return null;
     }
 
-    @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
-            contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
-            outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
+    @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class, contentResolver = TestContentAndOutputResolverWithKeyResolver.class, outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
     public Object outputOnlyWithoutContentParam(@Connection MetadataConnection connection, @MetadataKeyParam String type)
     {
         return null;
     }
 
-    @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
-            contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
-            outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
+    @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class, contentResolver = TestContentAndOutputResolverWithKeyResolver.class, outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
     public void contentOnlyIgnoresOutput(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
     {
     }
@@ -71,8 +63,7 @@ public class MetadataOperations
         return null;
     }
 
-    @MetadataScope(contentResolver = TestContentAndOutputResolverWithoutKeyResolver.class,
-            outputResolver = TestContentAndOutputResolverWithoutKeyResolver.class)
+    @MetadataScope(contentResolver = TestContentAndOutputResolverWithoutKeyResolver.class, outputResolver = TestContentAndOutputResolverWithoutKeyResolver.class)
     public Object contentAndOutputMetadataWithoutKeyParam(@Connection MetadataConnection connection, @Content Object content)
     {
         return null;
@@ -101,8 +92,7 @@ public class MetadataOperations
         return null;
     }
 
-    @MetadataScope(keysResolver = TestResolverWithCache.class,
-            outputResolver = TestResolverWithCache.class)
+    @MetadataScope(keysResolver = TestResolverWithCache.class, outputResolver = TestResolverWithCache.class)
     public Object outputAndMetadataKeyCacheResolver(@Connection MetadataConnection connection, @MetadataKeyParam String type)
     {
         return null;

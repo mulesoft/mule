@@ -20,11 +20,11 @@ public class ConfigurationInstanceNotification extends CustomNotification
     private static final int CONFIGURATION_INSTANCE_ACTION_BASE = (CUSTOM_EVENT_ACTION_START_RANGE + 4) * 5;
     private static int ACTION_INDEX = 0;
 
-    public static final int CONFIGURATION_BEING_STOPPED = ++ACTION_INDEX + CONFIGURATION_INSTANCE_ACTION_BASE;
+    public static final int CONFIGURATION_STOPPED = ++ACTION_INDEX + CONFIGURATION_INSTANCE_ACTION_BASE;
 
     static
     {
-        registerAction("Configuration instance is stopped", CONFIGURATION_BEING_STOPPED);
+        registerAction("Configuration instance is stopped", CONFIGURATION_STOPPED);
     }
 
     private final ConfigurationInstance configurationInstance;
@@ -39,8 +39,7 @@ public class ConfigurationInstanceNotification extends CustomNotification
     @Override
     public String toString()
     {
-        return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier
-               + ", timestamp=" + timestamp + "}";
+        return String.format("%s {action=%s, resourceId=%s, timestamp=%s}", EVENT_NAME, getActionName(action), resourceIdentifier, timestamp);
     }
 
     public ConfigurationInstance getConfigurationInstance()

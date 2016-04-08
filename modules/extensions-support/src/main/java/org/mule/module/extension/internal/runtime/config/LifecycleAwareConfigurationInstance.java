@@ -10,7 +10,7 @@ import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.api.config.ConfigurationInstanceNotification.CONFIGURATION_BEING_STOPPED;
+import static org.mule.api.config.ConfigurationInstanceNotification.CONFIGURATION_STOPPED;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -148,14 +148,20 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
     @Override
     public void stop() throws MuleException
     {
-        stopIfNeeded(value);
-        if (connectionProvider.isPresent())
+        try
         {
-            connectionManager.unbind(value);
-            stopIfNeeded(connectionProvider);
+            stopIfNeeded(value);
+            if (connectionProvider.isPresent())
+            {
+                connectionManager.unbind(value);
+                stopIfNeeded(connectionProvider);
+            }
+            super.stop();
         }
-        muleContext.fireNotification(new ConfigurationInstanceNotification(this, CONFIGURATION_BEING_STOPPED));
-        super.stop();
+        finally
+        {
+            muleContext.fireNotification(new ConfigurationInstanceNotification(this, CONFIGURATION_STOPPED));
+        }
     }
 
     /**

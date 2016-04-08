@@ -6,6 +6,7 @@
  */
 package org.mule.api.metadata;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationInstanceNotification;
@@ -15,8 +16,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
 import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.api.source.MessageSource;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.Flow;
 import org.mule.context.notification.NotificationException;
 
@@ -56,13 +55,14 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
     public MuleMetadataManager()
     {
         caches = CacheBuilder.newBuilder().build(
-            new CacheLoader<String, MetadataCache>() {
-                @Override
-                public MetadataCache load(String id) throws Exception
+                new CacheLoader<String, MetadataCache>()
                 {
-                    return new DefaultMetadataCache();
-                }
-            });
+                    @Override
+                    public MetadataCache load(String id) throws Exception
+                    {
+                        return new DefaultMetadataCache();
+                    }
+                });
     }
 
     /**
@@ -78,10 +78,10 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
             muleContext.registerListener((CustomNotificationListener<ConfigurationInstanceNotification>) notification -> {
                 try
                 {
-                    if (notification.getAction() == ConfigurationInstanceNotification.CONFIGURATION_BEING_STOPPED)
+                    if (notification.getAction() == ConfigurationInstanceNotification.CONFIGURATION_STOPPED)
                     {
                         String name = ((ConfigurationInstanceNotification) notification).getConfigurationInstance().getName();
-                        muleContext.getRegistry().lookupObject(MuleMetadataManager.class).disposeCache(name);
+                        disposeCache(name);
                     }
                 }
                 catch (Exception e)
@@ -92,7 +92,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
         }
         catch (NotificationException e)
         {
-            throw new InitialisationException(CoreMessages.createStaticMessage("Could not register ConfigurationInstanceListener"), e, this);
+            throw new InitialisationException(createStaticMessage("Could not register ConfigurationInstanceListener"), e, this);
         }
     }
 
@@ -142,8 +142,13 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
         }
         catch (ExecutionException e)
         {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage("Could not get the cache with id:" + id), e);
+            throw new MuleRuntimeException(createStaticMessage("Could not get the cache with id:" + id), e);
         }
+    }
+
+    public Map<String, ? extends MetadataCache> getMetadataCaches()
+    {
+        return ImmutableMap.copyOf(caches.asMap());
     }
 
     private <T> MetadataResult<T> exceptionHandledMetadataFetch(ComponentId componentId, MetadataDelegate<T> metadataSupplier, String failureMessage)
@@ -168,7 +173,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
         Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(componentId.getFlowName());
         if (flow == null)
         {
-            throw new InvalidComponentIdException(MessageFactory.createStaticMessage(String.format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())));
+            throw new InvalidComponentIdException(createStaticMessage(String.format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())));
         }
         try
         {
@@ -180,7 +185,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
                 }
                 catch (IndexOutOfBoundsException | NumberFormatException e)
                 {
-                    throw new InvalidComponentIdException(MessageFactory.createStaticMessage(String.format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())), e);
+                    throw new InvalidComponentIdException(createStaticMessage(String.format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())), e);
                 }
             }
             else
@@ -188,25 +193,20 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
                 final MessageSource messageSource = flow.getMessageSource();
                 if (messageSource == null)
                 {
-                    throw new InvalidComponentIdException(MessageFactory.createStaticMessage(SOURCE_NOT_FOUND));
+                    throw new InvalidComponentIdException(createStaticMessage(SOURCE_NOT_FOUND));
                 }
                 return (MetadataAware) messageSource;
             }
         }
         catch (ClassCastException e)
         {
-            throw new InvalidComponentIdException(MessageFactory.createStaticMessage(PROCESSOR_NOT_METADATA_AWARE), e);
+            throw new InvalidComponentIdException(createStaticMessage(PROCESSOR_NOT_METADATA_AWARE), e);
         }
     }
 
     private interface MetadataDelegate<T>
     {
-
         MetadataResult<T> get(MetadataAware processor) throws MetadataResolvingException;
-    }
 
-    public Map<String, ? extends MetadataCache> getMetadataCaches()
-    {
-        return ImmutableMap.copyOf(caches.asMap());
     }
 }
