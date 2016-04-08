@@ -178,9 +178,15 @@
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <set-property propertyName="foo" value="bar"/>
         <outbound-endpoint address="test://test" exchange-pattern="request-response">
+            <set-variable variableName="endpointRequestMPInvoked" value="true"/>
+            <response>
+                <set-variable variableName="endpointResponseMPInvoked" value="true"/>
+            </response>
             <property key="responseProperties" value="foo"/>
         </outbound-endpoint>
         <test:assert expression="#[assertPayload()]" />
+        <test:assert expression="#[flowVars['endpointRequestMPInvoked'] == 'true']" />
+        <test:assert expression="#[flowVars['endpointResponseMPInvoked'] == 'true']" />
         <test:assert expression="#[message.outboundProperties['foo'] == 'bar']" />
         <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread]"/>
     </flow>

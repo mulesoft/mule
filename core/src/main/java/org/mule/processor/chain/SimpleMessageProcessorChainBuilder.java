@@ -11,6 +11,10 @@ import org.mule.api.processor.MessageProcessor;
 
 import java.util.LinkedList;
 
+/**
+ * Deprecated. Use {@link DefaultMessageProcessorChainBuilder} instead.
+ */
+@Deprecated
 public class SimpleMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder
 {
 
