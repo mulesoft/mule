@@ -25,14 +25,14 @@ import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
-import org.mule.runtime.core.processor.chain.SimpleMessageProcessorChainBuilder;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessorChainBuilder
+public class EndpointMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder
 {
 
     protected ImmutableEndpoint endpoint;
