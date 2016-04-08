@@ -32,21 +32,25 @@
         <dependency>
             <groupId>org.mule.extensions</groupId>
             <artifactId>mule-extensions-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

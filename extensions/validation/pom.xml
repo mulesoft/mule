@@ -12,7 +12,7 @@
 
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-validation</artifactId>
-    <packaging>jar</packaging>
+    <packaging>mule-extension</packaging>
 
     <name>Mule Validation Extension</name>
     <description>A Mule extension that provides functionality for performing validations</description>
