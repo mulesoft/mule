@@ -7,10 +7,11 @@
 package org.mule.module.extension.internal.metadata.extension;
 
 import org.mule.api.temporary.MuleMessage;
-import org.mule.extension.api.annotation.metadata.MetadataScope;
-import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.annotation.metadata.Content;
 import org.mule.extension.api.annotation.metadata.MetadataKeyParam;
+import org.mule.extension.api.annotation.metadata.MetadataScope;
+import org.mule.extension.api.annotation.param.Connection;
+import org.mule.extension.api.introspection.metadata.NullMetadataResolver;
 import org.mule.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 import org.mule.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithoutKeyResolver;
 import org.mule.module.extension.internal.metadata.extension.resolver.TestContentResolverWithKeyResolver;
@@ -19,7 +20,10 @@ import org.mule.module.extension.internal.metadata.extension.resolver.TestOutput
 import org.mule.module.extension.internal.metadata.extension.resolver.TestOutputResolverWithoutKeyResolver;
 import org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache;
 
-public class MetadataOperations
+@MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
+        contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
+        outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
+public class MetadataOperations extends MetadataOperationsParent
 {
 
     @MetadataScope(keysResolver = TestContentResolverWithKeyResolver.class, contentResolver = TestContentResolverWithKeyResolver.class)
@@ -86,6 +90,11 @@ public class MetadataOperations
         return null;
     }
 
+    public Object shouldInheritOperationResolvers(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
+    {
+        return null;
+    }
+
     @MetadataScope(contentResolver = TestResolverWithCache.class)
     public Object contentOnlyCacheResolver(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
     {
@@ -98,12 +107,13 @@ public class MetadataOperations
         return null;
     }
 
-
+    @MetadataScope(outputResolver = NullMetadataResolver.class)
     public MuleMessage messageAttributesNullTypeMetadata()
     {
         return null;
     }
 
+    @MetadataScope(outputResolver = NullMetadataResolver.class)
     public MuleMessage<Object, String> messageAttributesPersonTypeMetadata()
     {
         return null;

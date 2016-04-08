@@ -31,6 +31,7 @@ import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +40,7 @@ import org.junit.Test;
 public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCase
 {
 
-    private static final String MESSAGE_ATTRIBUTES_personType_METADATA = "messageAttributesPersonTypeMetadata";
+    private static final String MESSAGE_ATTRIBUTES_PERSON_TYPE_METADATA = "messageAttributesPersonTypeMetadata";
     private static final String MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA = "messageAttributesNullTypeMetadata";
     private static final String CONFIG = "config";
     private static final String ALTERNATIVE_CONFIG = "alternative-config";
@@ -72,8 +73,11 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
 
         final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
-        assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, void.class);
+        assertInheritedResolvers(metadataDescriptor);
+    }
 
+    private void assertInheritedResolvers(ComponentMetadataDescriptor metadataDescriptor) throws IOException
+    {
         assertThat(metadataDescriptor.getParametersMetadata().size(), is(1));
         assertExpectedType(metadataDescriptor.getParametersMetadata().get(0), "type", String.class);
 
@@ -206,7 +210,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void messageAttributesStringTypeMetadata() throws Exception
     {
-        componentId = new ProcessorId(MESSAGE_ATTRIBUTES_personType_METADATA, FIRST_PROCESSOR_INDEX);
+        componentId  = new ProcessorId(MESSAGE_ATTRIBUTES_PERSON_TYPE_METADATA, FIRST_PROCESSOR_INDEX);
 
         final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), Object.class, String.class);
@@ -287,6 +291,37 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
         assertThat(metadataDescriptor.getContentMetadata().get().getType(),
                    is(equalTo(metadataDescriptor.getOutputMetadata().getPayloadMetadata().getType())));
 
+    }
+
+    @Test
+    public void shouldInheritOperationResolvers() throws Exception
+    {
+        componentId = new ProcessorId(SHOULD_INHERIT_OPERATION_RESOLVERS, FIRST_PROCESSOR_INDEX);
+
+        assertInheritedResolvers();
+    }
+
+    @Test
+    public void shouldInheritExtensionResolvers() throws Exception
+    {
+        componentId = new ProcessorId(SHOULD_INHERIT_EXTENSION_RESOLVERS, FIRST_PROCESSOR_INDEX);
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
+        assertInheritedResolvers(metadataDescriptor);
+    }
+
+    @Test
+    public void shouldInheritOperationParentResolvers() throws Exception
+    {
+        componentId = new ProcessorId(SHOULD_INHERIT_OPERATION_PARENT_RESOLVERS, FIRST_PROCESSOR_INDEX);
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
+        assertInheritedResolvers(metadataDescriptor);
+    }
+
+    private void assertInheritedResolvers() throws IOException
+    {
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
+        assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, void.class);
+        assertInheritedResolvers(metadataDescriptor);
     }
 
     @Test

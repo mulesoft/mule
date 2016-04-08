@@ -50,6 +50,7 @@ import com.google.common.base.Predicates;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -425,5 +426,19 @@ public final class IntrospectionUtils
                 .filter(p -> p.getModelProperty(MetadataModelProperty.class).isPresent() &&
                              p.getModelProperty(MetadataModelProperty.class).get().isMetadataKeyParam())
                 .findFirst();
+    }
+
+    /**
+     * Looks for the annotation in the given class. If the annotation is not found, it keeps looking recursively
+     * for it in the superClass until it finds it or there is no superClass to analyze.
+     */
+    public static <T extends Annotation> T getAnnotationFromClassHierarchy(Class<?> annotatedClass, Class<T> annotationClass){
+        T annotation = annotatedClass.getAnnotation(annotationClass);
+        if (annotation != null){
+            return annotation;
+        }
+
+        return annotatedClass.getSuperclass() != null && !annotatedClass.getSuperclass().isAssignableFrom(Object.class) ?
+               getAnnotationFromClassHierarchy(annotatedClass.getSuperclass(), annotationClass) : null;
     }
 }

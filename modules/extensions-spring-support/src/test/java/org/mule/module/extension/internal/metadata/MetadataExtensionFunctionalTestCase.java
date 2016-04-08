@@ -57,6 +57,10 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected static final String CONTENT_ONLY_CACHE_RESOLVER = "contentOnlyCacheResolver";
     protected static final String OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER = "outputAndMetadataKeyCacheResolver";
     protected static final String SOURCE_METADATA = "sourceMetadata";
+    protected static final String SHOULD_INHERIT_OPERATION_RESOLVERS = "shouldInheritOperationResolvers";
+    protected static final String SHOULD_INHERIT_EXTENSION_RESOLVERS = "shouldInheritExtensionResolvers";
+    protected static final String SHOULD_INHERIT_OPERATION_PARENT_RESOLVERS = "shouldInheritOperationParentResolvers";
+
 
     protected final NullMetadataKey nullMetadataKey = new NullMetadataKey();
     protected MetadataType personType;

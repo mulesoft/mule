@@ -301,7 +301,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 .withAttributesOfType(typeLoader.load(sourceGenerics.get(1)))
                 .withExceptionEnricherFactory(getExceptionEnricherFactory(sourceType))
                 .withModelProperty(new ImplementingTypeModelProperty(sourceType))
-                .withMetadataResolverFactory(getMetadataResolverFactory(extensionType, sourceType));
+                .withMetadataResolverFactory(getMetadataResolverFactoryFromClass(extensionType, sourceType));
 
         declareSingleParameters(getParameterFields(sourceType), source, (ModelPropertyContributor) MuleExtensionAnnotationParser::parseMetadataAnnotations);
         declareParameterGroups(sourceType, source);
@@ -462,26 +462,41 @@ public final class AnnotationsBasedDescriber implements Describer
                     .whichReturns(IntrospectionUtils.getMethodReturnType(method, typeLoader))
                     .withAttributesOfType(IntrospectionUtils.getMethodReturnAttributesType(method, typeLoader))
                     .withExceptionEnricherFactory(getExceptionEnricherFactory(method))
-                    .withMetadataResolverFactory(getMetadataResolverFactory(extensionType, method));
+                    .withMetadataResolverFactory(getMetadataResolverFactoryFromMethod(extensionType, method.getDeclaringClass(), method));
 
             declareOperationParameters(method, operation);
             calculateExtendedTypes(actingClass, method, operation);
         }
     }
 
-    private MetadataResolverFactory getMetadataResolverFactory(Class<?> extensionType, AnnotatedElement annotatedElement)
+    private MetadataResolverFactory getMetadataResolverFactory(MetadataScope scopeAnnotation) // (Class<?> extensionType, Class<?> declaringClass)
     {
-        MetadataScope scopeAnnotation = annotatedElement.getAnnotation(MetadataScope.class);
-        scopeAnnotation = scopeAnnotation == null ? extensionType.getAnnotation(MetadataScope.class) : scopeAnnotation;
+        return scopeAnnotation == null ? new NullMetadataResolverFactory() :
+               new DefaultMetadataResolverFactory(scopeAnnotation.keysResolver(),
+                                                  scopeAnnotation.contentResolver(),
+                                                  scopeAnnotation.outputResolver());
+    }
 
-        if (scopeAnnotation != null)
-        {
-            return new DefaultMetadataResolverFactory(scopeAnnotation.keysResolver(),
-                                                      scopeAnnotation.contentResolver(),
-                                                      scopeAnnotation.outputResolver());
-        }
+    /**
+     * Checks if the method is annotated with {@link MetadataScope}, if not looks whether the
+     * operation class containing the method is annotated or not. And lastly, if no annotation
+     * was found so far, checks if the extension class is annotated.
+     */
+    private MetadataResolverFactory getMetadataResolverFactoryFromMethod(Class<?> extensionType, Class<?> declaringClass, Method method){
+        MetadataScope scopeAnnotation = method.getAnnotation(MetadataScope.class);
+        return scopeAnnotation != null ? getMetadataResolverFactory(scopeAnnotation) : getMetadataResolverFactoryFromClass(extensionType, declaringClass);
+    }
 
-        return new NullMetadataResolverFactory();
+    /**
+     * Checks if the class (may be source or operation class) is annotated with {@link MetadataScope},
+     * if it doesn't then looks if the extension class is annotated.
+     */
+    private MetadataResolverFactory getMetadataResolverFactoryFromClass(Class<?> extensionType, Class<?> declaringClass)
+    {
+        MetadataScope scopeAnnotation = IntrospectionUtils.getAnnotationFromClassHierarchy(declaringClass, MetadataScope.class);
+        scopeAnnotation = scopeAnnotation != null ? scopeAnnotation :
+               IntrospectionUtils.getAnnotationFromClassHierarchy(extensionType, MetadataScope.class);
+        return getMetadataResolverFactory(scopeAnnotation);
     }
 
     private void declareConnectionProviders(HasConnectionProviderDeclarer declarer, Class<?> extensionType)
