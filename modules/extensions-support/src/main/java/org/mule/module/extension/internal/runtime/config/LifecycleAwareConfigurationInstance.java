@@ -10,8 +10,11 @@ import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.api.config.ConfigurationInstanceNotification.CONFIGURATION_STOPPED;
 import static org.mule.util.Preconditions.checkState;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.ConfigurationInstanceNotification;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connector.ConnectionManager;
 import org.mule.api.lifecycle.InitialisationException;
@@ -63,6 +66,9 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
 
     @Inject
     private TimeSupplier timeSupplier;
+
+    @Inject
+    private MuleContext muleContext;
 
     @Inject
     private ConnectionManager connectionManager;
@@ -134,20 +140,28 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
     }
 
     /**
-     * Propagates this lifecycle phase into the the {@link #value} and each item in {@link #getInterceptors()}
+     * Propagates this lifecycle phase into the the {@link #value} and each item in {@link #getInterceptors()}.
+     * Also triggers a {@link ConfigurationInstanceNotification} that is being stopped.
      *
      * @throws MuleException if an exception is found
      */
     @Override
     public void stop() throws MuleException
     {
-        stopIfNeeded(value);
-        if (connectionProvider.isPresent())
+        try
         {
-            connectionManager.unbind(value);
-            stopIfNeeded(connectionProvider);
+            stopIfNeeded(value);
+            if (connectionProvider.isPresent())
+            {
+                connectionManager.unbind(value);
+                stopIfNeeded(connectionProvider);
+            }
+            super.stop();
         }
-        super.stop();
+        finally
+        {
+            muleContext.fireNotification(new ConfigurationInstanceNotification(this, CONFIGURATION_STOPPED));
+        }
     }
 
     /**
@@ -170,7 +184,6 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
         }
 
         initialiseIfNeeded(value, true, muleContext);
-
         super.initialise();
     }
 

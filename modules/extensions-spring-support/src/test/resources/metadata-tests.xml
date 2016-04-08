@@ -9,68 +9,88 @@
         <metadata:connection/>
     </metadata:config>
 
+    <metadata:config name="alternative-config">
+        <metadata:connection/>
+    </metadata:config>
+
     <flow name="contentMetadataWithKeyParam">
-        <metadata:content-metadata-with-key-param type="Person"/>
+        <metadata:content-metadata-with-key-param config-ref="config" type="Person"/>
     </flow>
 
     <flow name="outputMetadataWithKeyParam">
-        <metadata:output-metadata-with-key-param type="Person"/>
+        <metadata:output-metadata-with-key-param config-ref="config" type="Person"/>
     </flow>
 
     <flow name="contentAndOutputMetadataWithKeyParam">
-        <metadata:content-and-output-metadata-with-key-param type="Person"/>
+        <metadata:content-and-output-metadata-with-key-param config-ref="config" type="Person"/>
     </flow>
 
     <flow name="outputOnlyWithoutContentParam">
-        <metadata:output-only-without-content-param type="Person"/>
+        <metadata:output-only-without-content-param config-ref="config" type="Person"/>
     </flow>
 
     <flow name="contentOnlyIgnoresOutput">
-        <metadata:content-only-ignores-output type="Person"/>
+        <metadata:content-only-ignores-output config-ref="config" type="Person"/>
     </flow>
 
     <flow name="contentMetadataWithoutKeyParam">
-        <metadata:content-metadata-without-key-param/>
+        <metadata:content-metadata-without-key-param config-ref="config" />
     </flow>
 
     <flow name="outputMetadataWithoutKeyParam">
-        <metadata:output-metadata-without-key-param/>
+        <metadata:output-metadata-without-key-param config-ref="config" />
     </flow>
 
     <flow name="contentAndOutputMetadataWithoutKeyParam">
-        <metadata:content-and-output-metadata-without-key-param/>
+        <metadata:content-and-output-metadata-without-key-param config-ref="config" />
     </flow>
 
     <flow name="contentMetadataWithoutKeysWithKeyParam">
-        <metadata:content-metadata-without-keys-with-key-param type="Person"/>
+        <metadata:content-metadata-without-keys-with-key-param config-ref="config" type="Person"/>
     </flow>
 
     <flow name="outputMetadataWithoutKeysWithKeyParam">
-        <metadata:output-metadata-without-keys-with-key-param type="Person"/>
+        <metadata:output-metadata-without-keys-with-key-param config-ref="config" type="Person"/>
     </flow>
 
     <flow name="failWithResolvingException">
-        <metadata:fail-with-resolving-exception type="Person"/>
+        <metadata:fail-with-resolving-exception config-ref="config" type="Person"/>
     </flow>
 
     <flow name="failWithRuntimeException">
-        <metadata:fail-with-runtime-exception type="Person"/>
+        <metadata:fail-with-runtime-exception config-ref="config" type="Person"/>
     </flow>
 
     <flow name="keyParamWithoutKeyResolver">
-        <metadata:key-param-without-key-resolver type="Person"/>
+        <metadata:key-param-without-key-resolver config-ref="config" type="Person"/>
     </flow>
 
     <flow name="messageAttributesNullTypeMetadata">
-        <metadata:message-attributes-null-type-metadata/>
+        <metadata:message-attributes-null-type-metadata config-ref="config" />
     </flow>
 
     <flow name="messageAttributesPersonTypeMetadata">
-        <metadata:message-attributes-person-type-metadata/>
+        <metadata:message-attributes-person-type-metadata config-ref="config" />
+    </flow>
+
+    <flow name="contentAndOutputWithCacheResolver">
+        <metadata:content-and-output-cache-resolver config-ref="config" type="Person"/>
+    </flow>
+
+    <flow name="contentAndOutputWithCacheResolverWithSpecificConfig">
+        <metadata:content-and-output-cache-resolver config-ref="alternative-config" type="Person"/>
+    </flow>
+
+    <flow name="contentOnlyCacheResolver">
+        <metadata:content-only-cache-resolver config-ref="config" type="Person"/>
+    </flow>
+
+    <flow name="outputAndMetadataKeyCacheResolver">
+        <metadata:output-and-metadata-key-cache-resolver config-ref="config" type="Person"/>
     </flow>
 
     <flow name="loggerFlow">
         <logger message="Logger"/>
-        <metadata:output-metadata-without-keys-with-key-param type="Person"/>
+        <metadata:output-metadata-without-keys-with-key-param config-ref="config" type="Person"/>
     </flow>
 </mule>

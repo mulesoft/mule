@@ -27,8 +27,11 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.metadata.MuleMetadataManager;
 import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.module.extension.internal.AbstractInterceptableContractTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
 
@@ -185,6 +188,15 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractInterce
         {
             verify((Disposable) connectionProvider.get()).dispose();
         }
+    }
+
+    @Test
+    public void disposeMetadataCacheWhenConfigIsDisposed() throws Exception
+    {
+        MuleMetadataManager muleMetadataManager = muleContext.getRegistry().lookupObject(MuleMetadataManager.class);
+        muleMetadataManager.getMetadataCache(NAME);
+        interceptable.stop();
+        new PollingProber(1000, 100).check(new JUnitLambdaProbe(() -> muleMetadataManager.getMetadataCaches().entrySet().isEmpty()));
     }
 
     @Test

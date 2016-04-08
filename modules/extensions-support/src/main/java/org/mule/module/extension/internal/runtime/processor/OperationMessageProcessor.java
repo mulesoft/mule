@@ -27,6 +27,7 @@ import org.mule.api.metadata.MetadataAware;
 import org.mule.api.metadata.MetadataContext;
 import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.MetadataResolvingException;
+import org.mule.api.metadata.MuleMetadataManager;
 import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
 import org.mule.api.metadata.resolving.FailureCode;
 import org.mule.api.metadata.resolving.MetadataResult;
@@ -96,6 +97,10 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
 
     @Inject
     private ConnectionManagerAdapter connectionManager;
+
+    @Inject
+    private MuleMetadataManager metadataManager;
+
     private FlowConstruct flowConstruct;
 
     public OperationMessageProcessor(RuntimeExtensionModel extensionModel,
@@ -258,7 +263,10 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         }
 
         ConfigurationInstance<Object> configuration = getConfiguration(getInitialiserEvent(muleContext));
-        return new DefaultMetadataContext(configuration, connectionManager);
+
+        //TODO MULE-9530: Improve id creation, this won't work with dynamic configurations
+        String cacheId =  configuration.getName();
+        return new DefaultMetadataContext(configuration, connectionManager, metadataManager.getMetadataCache(cacheId));
     }
 
     @Override

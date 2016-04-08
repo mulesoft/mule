@@ -6,14 +6,27 @@
  */
 package org.mule.api.metadata;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.ConfigurationInstanceNotification;
+import org.mule.api.context.notification.CustomNotificationListener;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
 import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.api.source.MessageSource;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.Flow;
+import org.mule.context.notification.NotificationException;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -25,7 +38,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class MuleMetadataManager implements MetadataManager
+public class MuleMetadataManager implements MetadataManager, Initialisable
 {
 
     private static final String EXCEPTION_RESOLVING_OPERATION_METADATA = "An exception occurred while resolving Operation %s metadata";
@@ -36,6 +49,52 @@ public class MuleMetadataManager implements MetadataManager
 
     @Inject
     private MuleContext muleContext;
+
+    private final LoadingCache<String, MetadataCache> caches;
+
+    public MuleMetadataManager()
+    {
+        caches = CacheBuilder.newBuilder().build(
+                new CacheLoader<String, MetadataCache>()
+                {
+                    @Override
+                    public MetadataCache load(String id) throws Exception
+                    {
+                        return new DefaultMetadataCache();
+                    }
+                });
+    }
+
+    /**
+     * Initialize this instance by registering a {@link CustomNotificationListener}
+     *
+     * @throws InitialisationException
+     */
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        try
+        {
+            muleContext.registerListener((CustomNotificationListener<ConfigurationInstanceNotification>) notification -> {
+                try
+                {
+                    if (notification.getAction() == ConfigurationInstanceNotification.CONFIGURATION_STOPPED)
+                    {
+                        String name = ((ConfigurationInstanceNotification) notification).getConfigurationInstance().getName();
+                        disposeCache(name);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException("Error while looking for the MetadataManager in the registry", e);
+                }
+            });
+        }
+        catch (NotificationException e)
+        {
+            throw new InitialisationException(createStaticMessage("Could not register ConfigurationInstanceListener"), e, this);
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -66,6 +125,32 @@ public class MuleMetadataManager implements MetadataManager
                                              String.format(EXCEPTION_RESOLVING_OPERATION_METADATA, componentId));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void disposeCache(String id)
+    {
+        caches.invalidate(id);
+    }
+
+    public MetadataCache getMetadataCache(String id)
+    {
+        try
+        {
+            return caches.get(id);
+        }
+        catch (ExecutionException e)
+        {
+            throw new MuleRuntimeException(createStaticMessage("Could not get the cache with id:" + id), e);
+        }
+    }
+
+    public Map<String, ? extends MetadataCache> getMetadataCaches()
+    {
+        return ImmutableMap.copyOf(caches.asMap());
+    }
+
     private <T> MetadataResult<T> exceptionHandledMetadataFetch(ComponentId componentId, MetadataDelegate<T> metadataSupplier, String failureMessage)
     {
         try
@@ -88,7 +173,7 @@ public class MuleMetadataManager implements MetadataManager
         Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(componentId.getFlowName());
         if (flow == null)
         {
-            throw new InvalidComponentIdException(MessageFactory.createStaticMessage(String.format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())));
+            throw new InvalidComponentIdException(createStaticMessage(String.format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())));
         }
         try
         {
@@ -100,7 +185,7 @@ public class MuleMetadataManager implements MetadataManager
                 }
                 catch (IndexOutOfBoundsException | NumberFormatException e)
                 {
-                    throw new InvalidComponentIdException(MessageFactory.createStaticMessage(String.format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())), e);
+                    throw new InvalidComponentIdException(createStaticMessage(String.format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())), e);
                 }
             }
             else
@@ -108,21 +193,20 @@ public class MuleMetadataManager implements MetadataManager
                 final MessageSource messageSource = flow.getMessageSource();
                 if (messageSource == null)
                 {
-                    throw new InvalidComponentIdException(MessageFactory.createStaticMessage(SOURCE_NOT_FOUND));
+                    throw new InvalidComponentIdException(createStaticMessage(SOURCE_NOT_FOUND));
                 }
                 return (MetadataAware) messageSource;
             }
         }
         catch (ClassCastException e)
         {
-            throw new InvalidComponentIdException(MessageFactory.createStaticMessage(PROCESSOR_NOT_METADATA_AWARE), e);
+            throw new InvalidComponentIdException(createStaticMessage(PROCESSOR_NOT_METADATA_AWARE), e);
         }
     }
 
     private interface MetadataDelegate<T>
     {
-
         MetadataResult<T> get(MetadataAware processor) throws MetadataResolvingException;
-    }
 
+    }
 }
