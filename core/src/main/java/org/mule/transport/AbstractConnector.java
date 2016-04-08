@@ -7,7 +7,6 @@
 package org.mule.transport;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-
 import org.mule.AbstractAnnotatedObject;
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
@@ -65,7 +64,7 @@ import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.AbstractRedeliveryPolicy;
 import org.mule.processor.IdempotentRedeliveryPolicy;
 import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
-import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.retry.async.AsynchronousRetryTemplate;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.session.SerializeAndEncodeSessionHandler;
@@ -2640,7 +2639,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
         }
         else
         {
-            SimpleMessageProcessorChainBuilder builder = new SimpleMessageProcessorChainBuilder();
+            DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
             builder.setName("dispatcher processor chain for '" + endpoint.getAddress() + "'");
             LaxAsyncInterceptingMessageProcessor async = new LaxAsyncInterceptingMessageProcessor(
                 new WorkManagerSource()
