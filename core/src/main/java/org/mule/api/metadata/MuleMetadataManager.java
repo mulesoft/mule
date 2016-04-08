@@ -7,17 +7,27 @@
 package org.mule.api.metadata;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.ConfigurationInstanceNotification;
+import org.mule.api.context.notification.CustomNotificationListener;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
 import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.api.source.MessageSource;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.Flow;
+import org.mule.context.notification.NotificationException;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -29,7 +39,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class MuleMetadataManager implements MetadataManager
+public class MuleMetadataManager implements MetadataManager, Initialisable
 {
 
     private static final String EXCEPTION_RESOLVING_OPERATION_METADATA = "An exception occurred while resolving Operation %s metadata";
@@ -41,7 +51,50 @@ public class MuleMetadataManager implements MetadataManager
     @Inject
     private MuleContext muleContext;
 
-    private final Map<String, MetadataCache> caches = new HashMap<>();
+    private final LoadingCache<String, MetadataCache> caches;
+
+    public MuleMetadataManager()
+    {
+        caches = CacheBuilder.newBuilder().build(
+            new CacheLoader<String, MetadataCache>() {
+                @Override
+                public MetadataCache load(String id) throws Exception
+                {
+                    return new DefaultMetadataCache();
+                }
+            });
+    }
+
+    /**
+     * Initialize this instance by registering a {@link CustomNotificationListener}
+     *
+     * @throws InitialisationException
+     */
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        try
+        {
+            muleContext.registerListener((CustomNotificationListener<ConfigurationInstanceNotification>) notification -> {
+                try
+                {
+                    if (notification.getAction() == ConfigurationInstanceNotification.CONFIGURATION_BEING_STOPPED)
+                    {
+                        String name = ((ConfigurationInstanceNotification) notification).getConfigurationInstance().getName();
+                        muleContext.getRegistry().lookupObject(MuleMetadataManager.class).disposeCache(name);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException("Error while looking for the MetadataManager in the registry", e);
+                }
+            });
+        }
+        catch (NotificationException e)
+        {
+            throw new InitialisationException(CoreMessages.createStaticMessage("Could not register ConfigurationInstanceListener"), e, this);
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -78,21 +131,18 @@ public class MuleMetadataManager implements MetadataManager
     @Override
     public void disposeCache(String id)
     {
-        caches.remove(id);
+        caches.invalidate(id);
     }
 
-    public MetadataCache getCache(String id)
+    public MetadataCache getMetadataCache(String id)
     {
-        MetadataCache cache = caches.get(id);
-        if (cache == null)
+        try
         {
-            DefaultMetadataCache defaultMetadataCache = new DefaultMetadataCache();
-            caches.put(id, defaultMetadataCache);
-            return defaultMetadataCache;
+            return caches.get(id);
         }
-        else
+        catch (ExecutionException e)
         {
-            return cache;
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage("Could not get the cache with id:" + id), e);
         }
     }
 
@@ -155,8 +205,8 @@ public class MuleMetadataManager implements MetadataManager
         MetadataResult<T> get(MetadataAware processor) throws MetadataResolvingException;
     }
 
-    public Map<String, ? extends MetadataCache> getCaches()
+    public Map<String, ? extends MetadataCache> getMetadataCaches()
     {
-        return ImmutableMap.copyOf(caches);
+        return ImmutableMap.copyOf(caches.asMap());
     }
 }

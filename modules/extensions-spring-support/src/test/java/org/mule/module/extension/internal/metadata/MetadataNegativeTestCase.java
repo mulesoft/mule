@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.metadata;
 
-import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.ERROR_MESSAGE;
+import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.MISSING_ELEMENT_ERROR_MESSAGE;
 import org.mule.api.metadata.InvalidComponentIdException;
 import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.MetadataResolvingException;
@@ -87,7 +87,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
         processorId = new ProcessorId(CONTENT_ONLY_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
         MetadataResult<OperationMetadataDescriptor> metadata = metadataManager.getMetadata(processorId, nullMetadataKey);
 
-        assertFailure(metadata, ERROR_MESSAGE, FailureCode.UNKNOWN, MetadataResolvingException.class.getName());
+        assertFailure(metadata, MISSING_ELEMENT_ERROR_MESSAGE, FailureCode.UNKNOWN, MetadataResolvingException.class.getName());
     }
 
 

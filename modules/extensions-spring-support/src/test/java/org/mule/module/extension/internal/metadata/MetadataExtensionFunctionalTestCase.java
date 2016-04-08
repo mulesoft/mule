@@ -50,8 +50,9 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected static final String CONTENT_METADATA_WITHOUT_KEYS_WITH_KEY_PARAM = "contentMetadataWithoutKeysWithKeyParam";
     protected static final String OUTPUT_METADATA_WITHOUT_KEYS_WITH_KEY_PARAM = "outputMetadataWithoutKeysWithKeyParam";
     protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER = "contentAndOutputWithCacheResolver";
-    protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_SPECIFIC_CONFIG = "contentAndOutputWithCacheResolverWithSpecificConfig";
+    protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG = "contentAndOutputWithCacheResolverWithSpecificConfig";
     protected static final String CONTENT_ONLY_CACHE_RESOLVER = "contentOnlyCacheResolver";
+    protected static final String OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER = "outputAndMetadataKeyCacheResolver";
 
 
     protected final NullMetadataKey nullMetadataKey = new NullMetadataKey();

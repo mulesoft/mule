@@ -194,10 +194,9 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractInterce
     public void disposeMetadataCacheWhenConfigIsDisposed() throws Exception
     {
         MuleMetadataManager muleMetadataManager = muleContext.getRegistry().lookupObject(MuleMetadataManager.class);
-        muleMetadataManager.getCache(NAME);
-        interceptable.initialise();
-        valueDisposed();
-        new PollingProber(10, 1).check(new JUnitLambdaProbe(() -> muleMetadataManager.getCaches().entrySet().isEmpty()));
+        muleMetadataManager.getMetadataCache(NAME);
+        interceptable.stop();
+        new PollingProber(1000, 100).check(new JUnitLambdaProbe(() -> muleMetadataManager.getMetadataCaches().entrySet().isEmpty()));
     }
 
     @Test

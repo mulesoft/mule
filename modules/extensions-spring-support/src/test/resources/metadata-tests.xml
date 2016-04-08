@@ -85,6 +85,10 @@
         <metadata:content-only-cache-resolver config-ref="config" type="Person"/>
     </flow>
 
+    <flow name="outputAndMetadataKeyCacheResolver">
+        <metadata:output-and-metadata-key-cache-resolver config-ref="config" type="Person"/>
+    </flow>
+
     <flow name="loggerFlow">
         <logger message="Logger"/>
         <metadata:output-metadata-without-keys-with-key-param config-ref="config" type="Person"/>

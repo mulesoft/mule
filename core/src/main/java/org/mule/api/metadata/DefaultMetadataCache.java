@@ -6,20 +6,22 @@
  */
 package org.mule.api.metadata;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Default immutable implementation of {@link MetadataCache}
  *
  * @since 4.0
  */
-final class DefaultMetadataCache implements MetadataCache
+public final class DefaultMetadataCache implements MetadataCache
 {
 
-    private final Map<Serializable, Serializable> cache = new HashMap<>();
+    private final Map<Serializable, Serializable> cache = new ConcurrentHashMap<>();
 
     /**
      * {@inheritDoc}
@@ -45,7 +47,12 @@ final class DefaultMetadataCache implements MetadataCache
     @Override
     public <T extends Serializable> Optional<T> get(Serializable key)
     {
-        return Optional.ofNullable((T) cache.get(key));
+        return Optional.ofNullable((T)cache.get(key));
+    }
+
+    public Map<Serializable, Serializable> asMap()
+    {
+        return ImmutableMap.copyOf(cache);
     }
 
 }

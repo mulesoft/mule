@@ -101,6 +101,14 @@ public class MetadataOperations
         return null;
     }
 
+    @MetadataScope(keysResolver = TestResolverWithCache.class,
+            outputResolver = TestResolverWithCache.class)
+    public Object outputAndMetadataKeyCacheResolver(@Connection MetadataConnection connection, @MetadataKeyParam String type)
+    {
+        return null;
+    }
+
+
     public MuleMessage messageAttributesNullTypeMetadata()
     {
         return null;

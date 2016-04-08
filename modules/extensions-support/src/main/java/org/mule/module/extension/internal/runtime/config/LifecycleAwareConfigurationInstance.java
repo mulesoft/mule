@@ -10,17 +10,14 @@ import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.api.metadata.MetadataNotification.DISPOSE_METADATA_CACHE;
+import static org.mule.api.config.ConfigurationInstanceNotification.CONFIGURATION_BEING_STOPPED;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.ConfigurationInstanceNotification;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connector.ConnectionManager;
-import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.metadata.MetadataNotification;
-import org.mule.api.metadata.MuleMetadataManager;
-import org.mule.api.registry.RegistrationException;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.introspection.RuntimeConfigurationModel;
@@ -115,16 +112,6 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
         {
             initStats();
             doInitialise();
-            muleContext.registerListener((CustomNotificationListener<MetadataNotification>) notification -> {
-                try
-                {
-                    muleContext.getRegistry().lookupObject(MuleMetadataManager.class).disposeCache(name);
-                }
-                catch (RegistrationException e)
-                {
-                    throw new RuntimeException("Error while looking for the registered MetadataManager instance", e);
-                }
-            });
         }
         catch (Exception e)
         {
@@ -153,7 +140,8 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
     }
 
     /**
-     * Propagates this lifecycle phase into the the {@link #value} and each item in {@link #getInterceptors()}
+     * Propagates this lifecycle phase into the the {@link #value} and each item in {@link #getInterceptors()}.
+     * Also triggers a {@link ConfigurationInstanceNotification} that is being stopped.
      *
      * @throws MuleException if an exception is found
      */
@@ -166,6 +154,7 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
             connectionManager.unbind(value);
             stopIfNeeded(connectionProvider);
         }
+        muleContext.fireNotification(new ConfigurationInstanceNotification(this, CONFIGURATION_BEING_STOPPED));
         super.stop();
     }
 
@@ -177,7 +166,6 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
     {
         disposeIfNeeded(value, LOGGER);
         disposeIfNeeded(connectionProvider, LOGGER);
-        muleContext.fireNotification(new MetadataNotification(DISPOSE_METADATA_CACHE));
         super.dispose();
     }
 

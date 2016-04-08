@@ -6,6 +6,8 @@
  */
 package org.mule.module.extension.internal.metadata.extension.resolver;
 
+import static org.mule.module.extension.internal.metadata.TestMetadataUtils.APPLICATION_JAVA_MIME_TYPE;
+import static org.mule.module.extension.internal.metadata.TestMetadataUtils.BRAND;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.metadata.MetadataCache;
 import org.mule.api.metadata.MetadataContext;
@@ -13,49 +15,64 @@ import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.MetadataResolvingException;
 import org.mule.api.metadata.resolving.FailureCode;
 import org.mule.api.metadata.resolving.MetadataContentResolver;
+import org.mule.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.JavaTypeLoader;
+import org.mule.module.extension.internal.metadata.TestMetadataUtils;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
 
-public class TestResolverWithCache implements MetadataContentResolver, MetadataOutputResolver
+public class TestResolverWithCache implements MetadataContentResolver, MetadataOutputResolver, MetadataKeysResolver
 {
 
-    private static final String CACHE_ELEMENT_KEY = "ACCOUNT";
-    public static final String ERROR_MESSAGE = "Cache element was expected. There was no element in the cache for the key: " + CACHE_ELEMENT_KEY;
+    public static final String MISSING_ELEMENT_ERROR_MESSAGE = "Missing element in the cache. There was no element in the cache for the key: " + BRAND;
+    public static final int AGE_VALUE = 16;
+    public static final String NAME_VALUE = "Juan";
+    public static final String BRAND_VALUE = "Nikdidas";
 
     @Override
     public MetadataType getContentMetadata(MetadataContext context, MetadataKey key) throws MetadataResolvingException, ConnectionException
     {
         MetadataCache cache = context.getCache();
-        Optional<? extends Serializable> element = cache.get(CACHE_ELEMENT_KEY);
+        Optional<? extends Serializable> element = cache.get(BRAND);
         if (!element.isPresent())
         {
-            throw new MetadataResolvingException(ERROR_MESSAGE, FailureCode.RESOURCE_UNAVAILABLE);
+            throw new MetadataResolvingException(MISSING_ELEMENT_ERROR_MESSAGE, FailureCode.RESOURCE_UNAVAILABLE);
         }
 
-        return buildMetadataType((Class) element.get());
+        return buildMetadataType((String) element.get());
     }
 
     @Override
     public MetadataType getOutputMetadata(MetadataContext context, MetadataKey key) throws MetadataResolvingException, ConnectionException
     {
         MetadataCache cache = context.getCache();
-        if (cache.get(CACHE_ELEMENT_KEY).isPresent())
+        Optional<String> brand = cache.get(BRAND);
+        if (brand.isPresent())
         {
-            return buildMetadataType((Class) cache.get(CACHE_ELEMENT_KEY).get());
+            String serializable = brand.get();
+            return buildMetadataType(serializable);
         }
-
-        Class cachedModel = SerializableAccount.class;
-        cache.put(CACHE_ELEMENT_KEY, cachedModel);
+        String cachedModel = BRAND_VALUE;
+        cache.put(BRAND, cachedModel);
         return buildMetadataType(cachedModel);
     }
 
-    private MetadataType buildMetadataType(Class model)
+    private MetadataType buildMetadataType(String model)
     {
-        return new JavaTypeLoader(this.getClass().getClassLoader()).load(model);
+        return BaseTypeBuilder.create(new MetadataFormat(model, model, APPLICATION_JAVA_MIME_TYPE)).objectType().build();
+    }
+
+    @Override
+    public List<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
+    {
+        context.getCache().put(TestMetadataUtils.AGE, AGE_VALUE);
+        context.getCache().put(TestMetadataUtils.NAME, NAME_VALUE);
+        return TestMetadataUtils.getKeys(context);
     }
 
     private final class SerializableAccount implements Serializable

@@ -13,6 +13,13 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.extension.internal.metadata.TestMetadataUtils.AGE;
+import static org.mule.module.extension.internal.metadata.TestMetadataUtils.BRAND;
+import static org.mule.module.extension.internal.metadata.TestMetadataUtils.NAME;
+import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
+import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
+import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
+import org.mule.api.metadata.DefaultMetadataCache;
 import org.mule.api.metadata.MetadataCache;
 import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.MetadataManager;
@@ -33,6 +40,8 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
 
     private static final String MESSAGE_ATTRIBUTES_personType_METADATA = "messageAttributesPersonTypeMetadata";
     private static final String MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA = "messageAttributesNullTypeMetadata";
+    private static final String CONFIG = "config";
+    private static final String ALTERNATIVE_CONFIG = "alternative-config";
 
     @Test
     public void getMetadataKeysWithKeyParam() throws Exception
@@ -280,21 +289,45 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void multipleCaches() throws Exception
     {
-        // using the base config
-        processorId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
-        getOperationDynamicMetadata(nullMetadataKey);
+        // using config
+        processorId = new ProcessorId(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
+        getOperationDynamicMetadata();
         processorId = new ProcessorId(OUTPUT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
-        getOperationDynamicMetadata(nullMetadataKey);
+        getOperationDynamicMetadata();
 
-        // using the alternative-config
-        processorId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_SPECIFIC_CONFIG, FIRST_PROCESSOR_INDEX);
-        getOperationDynamicMetadata(nullMetadataKey);
+        // using alternative-config
+        processorId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG, FIRST_PROCESSOR_INDEX);
+        getOperationDynamicMetadata();
 
         MuleMetadataManager metadataManager = (MuleMetadataManager) muleContext.getRegistry().lookupObject(MetadataManager.class);
-        Map<String, ? extends MetadataCache> caches = metadataManager.getCaches();
+        Map<String, ? extends MetadataCache> caches = metadataManager.getMetadataCaches();
 
         assertThat(caches.keySet(), hasSize(2));
-        assertThat(caches.keySet(), hasItems("config", "alternative-config"));
+        assertThat(caches.keySet(), hasItems(CONFIG, ALTERNATIVE_CONFIG));
     }
 
+    @Test
+    public void elementsAreStoredInCaches() throws Exception
+    {
+        // using config
+        processorId = new ProcessorId(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
+        metadataManager.getMetadataKeys(processorId);
+        getOperationDynamicMetadata();
+
+        // using alternative-config
+        processorId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG, FIRST_PROCESSOR_INDEX);
+        getOperationDynamicMetadata();
+
+        MuleMetadataManager metadataManager = (MuleMetadataManager) muleContext.getRegistry().lookupObject(MetadataManager.class);
+        DefaultMetadataCache configCache = (DefaultMetadataCache) metadataManager.getMetadataCaches().get(CONFIG);
+
+        assertThat(configCache.asMap().keySet(), hasItems(AGE, NAME, BRAND));
+        assertThat(configCache.get(AGE).get(), is(AGE_VALUE));
+        assertThat(configCache.get(NAME).get(), is(NAME_VALUE));
+        assertThat(configCache.get(BRAND).get(), is(BRAND_VALUE));
+
+        DefaultMetadataCache alternativeConfigCache = (DefaultMetadataCache) metadataManager.getMetadataCaches().get(ALTERNATIVE_CONFIG);
+        assertThat(alternativeConfigCache.asMap().keySet(), hasItems(BRAND));
+        assertThat(alternativeConfigCache.get(BRAND).get(), is(BRAND_VALUE));
+    }
 }
