@@ -172,7 +172,8 @@ public class UdpConnector extends AbstractConnector
 
     DatagramSocket getServerSocket(ImmutableEndpoint endpoint) throws Exception
     {
-        return (DatagramSocket) socketFactory.makeObject(endpoint);
+    	UdpSocketKey socketKey = new UdpSocketKey(endpoint);
+        return (DatagramSocket) socketFactory.makeObject(socketKey);
     }
 
     void releaseSocket(DatagramSocket socket, ImmutableEndpoint endpoint) throws Exception
