@@ -56,7 +56,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
         {
             throw new RoutingException(event, (OutboundEndpoint) endpoint);
         }
-        return event.getMessage().createInboundMessage();
+        return event.getMessage();
     }
 
     @Override
@@ -70,7 +70,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
         {
             try
             {
-                final MuleMessage response = event.getMessage().createInboundMessage();
+                final MuleMessage response = event.getMessage();
                 event = new DefaultMuleEvent(event, new ReplyToHandler()
                 {
                     @Override

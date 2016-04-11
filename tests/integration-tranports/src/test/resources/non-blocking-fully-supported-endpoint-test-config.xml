@@ -22,9 +22,9 @@
         <set-property propertyName="foo" value="bar"/>
         <transports:outbound-endpoint address="test://test" exchange-pattern="request-response">
             <set-variable variableName="endpointRequestMPInvoked" value="true"/>
-            <response>
+            <transports:response>
                 <set-variable variableName="endpointResponseMPInvoked" value="true"/>
-            </response>
+            </transports:response>
             <property key="responseProperties" value="foo"/>
         </transports:outbound-endpoint>
         <test:assert expression="#[assertPayload()]" />
