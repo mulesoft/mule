@@ -10,20 +10,24 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.processor.chain.SimpleMessageProcessorChainBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
-public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessorChainBuilder
+/**
+ * Implementation of {@link DefaultMessageProcessorChainBuilder} that injects the
+ * {@link org.mule.api.endpoint.OutboundEndpoint} instance into message processors that implement {@link EndpointAware}
+ */
+public class OutboundEndpointMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder
 {
 
     protected ImmutableEndpoint endpoint;
 
-    public EndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint, FlowConstruct flowConstruct)
+    public OutboundEndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint, FlowConstruct flowConstruct)
     {
         super(flowConstruct);
         this.endpoint = endpoint;
     }
 
-    public EndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint)
+    public OutboundEndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
     }
