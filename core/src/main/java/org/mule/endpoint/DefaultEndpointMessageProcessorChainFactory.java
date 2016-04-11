@@ -143,20 +143,20 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, MessageProcessor target) throws MuleException
     {
         // -- REQUEST CHAIN --
-        DefaultMessageProcessorChainBuilder requestChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint);
+        DefaultMessageProcessorChainBuilder requestChainBuilder = new OutboundEndpointMessageProcessorChainBuilder(endpoint);
         requestChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' request chain");
         // Default MPs
         requestChainBuilder.chain(createOutboundMessageProcessors(endpoint));
         // Configured MPs (if any)
         requestChainBuilder.chain(endpoint.getMessageProcessors());
-        
+        requestChainBuilder.chain(target);
+
         // -- INVOKE MESSAGE DISPATCHER --
         if (target == null)
         {
             throw new ConfigurationException(MessageFactory.createStaticMessage("No listener (target) has been set for this endpoint"));
         }
-        requestChainBuilder.chain(target);
-        
+
         if (!endpoint.getExchangePattern().hasResponse())
         {
             return requestChainBuilder.build();
@@ -173,7 +173,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     
             // Compose request and response chains. We do this so that if the request
             // chain returns early the response chain is still invoked.
-            DefaultMessageProcessorChainBuilder compositeChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint);
+            DefaultMessageProcessorChainBuilder compositeChainBuilder = new OutboundEndpointMessageProcessorChainBuilder(endpoint);
             compositeChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' composite request/response chain");
             compositeChainBuilder.chain(requestChainBuilder.build(), responseChainBuilder.build());
             return compositeChainBuilder.build();
