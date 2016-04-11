@@ -29,6 +29,7 @@ import org.mule.registry.AbstractRegistryBroker;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 
@@ -37,9 +38,9 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
 
 
     protected Map<String, LifecyclePhase> phases = new HashMap<>();
-    protected TreeMap<String, LifecycleCallback> callbacks = new TreeMap<>();
+    protected SortedMap<String, LifecycleCallback> callbacks = new TreeMap<>();
     protected MuleContext muleContext;
-    private final LifecycleInterceptor lifecycleInterceptor = new InitDisposeLifecycleInterceptor();
+    private final LifecycleInterceptor initDisposeLifecycleInterceptor = new InitDisposeLifecycleInterceptor();
 
     public RegistryLifecycleManager(String id, Registry object, MuleContext muleContext)
     {
@@ -106,7 +107,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
         {
             if (Initialisable.PHASE_NAME.equals(phaseName) || Disposable.PHASE_NAME.equals(phaseName))
             {
-                ((HasLifecycleInterceptor) callback).setLifecycleInterceptor(lifecycleInterceptor);
+                ((HasLifecycleInterceptor) callback).setLifecycleInterceptor(initDisposeLifecycleInterceptor);
             }
         }
 
