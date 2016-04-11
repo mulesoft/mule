@@ -9,9 +9,11 @@ package org.mule.lifecycle;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.HasLifecycleInterceptor;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.lifecycle.LifecycleInterceptor;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.RegistryLifecycleHelpers;
 import org.mule.api.lifecycle.Startable;
@@ -27,14 +29,18 @@ import org.mule.registry.AbstractRegistryBroker;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 
 public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry> implements RegistryLifecycleHelpers
 {
-    protected Map<String, LifecyclePhase> phases = new HashMap<String, LifecyclePhase>();
-    protected TreeMap<String, LifecycleCallback> callbacks = new TreeMap<String, LifecycleCallback>();
+
+
+    protected Map<String, LifecyclePhase> phases = new HashMap<>();
+    protected SortedMap<String, LifecycleCallback> callbacks = new TreeMap<>();
     protected MuleContext muleContext;
+    private final LifecycleInterceptor initDisposeLifecycleInterceptor = new InitDisposeLifecycleInterceptor();
 
     public RegistryLifecycleManager(String id, Registry object, MuleContext muleContext)
     {
@@ -56,14 +62,17 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
         registerPhase(Disposable.PHASE_NAME, new MuleContextDisposePhase(), callback);
     }
 
-    public RegistryLifecycleManager(String id, Registry object, Map<String, LifecyclePhase> phases )
+    public RegistryLifecycleManager(String id, Registry object, Map<String, LifecyclePhase> phases)
     {
         super(id, object);
         RegistryLifecycleCallback callback = new RegistryLifecycleCallback(this);
 
-        registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, new LifecycleCallback(){
+        registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, new LifecycleCallback()
+        {
             public void onTransition(String phaseName, Object object) throws MuleException
-            { }});
+            {
+            }
+        });
 
         for (Map.Entry<String, LifecyclePhase> entry : phases.entrySet())
         {
@@ -89,13 +98,19 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
 
     protected void registerPhase(String phaseName, LifecyclePhase phase)
     {
-        phaseNames.add(phaseName);
-        callbacks.put(phaseName, new RegistryLifecycleCallback(this));
-        phases.put(phaseName, phase);
+        registerPhase(phaseName, phase, new RegistryLifecycleCallback(this));
     }
 
     protected void registerPhase(String phaseName, LifecyclePhase phase, LifecycleCallback callback)
     {
+        if (callback instanceof HasLifecycleInterceptor)
+        {
+            if (Initialisable.PHASE_NAME.equals(phaseName) || Disposable.PHASE_NAME.equals(phaseName))
+            {
+                ((HasLifecycleInterceptor) callback).setLifecycleInterceptor(initDisposeLifecycleInterceptor);
+            }
+        }
+
         phaseNames.add(phaseName);
         callbacks.put(phaseName, callback);
         phases.put(phaseName, phase);
@@ -163,30 +178,30 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     public void applyPhase(Object object, String fromPhase, String toPhase) throws LifecycleException
     {
         //TODO i18n
-        if(fromPhase == null || toPhase==null)
+        if (fromPhase == null || toPhase == null)
         {
             throw new IllegalArgumentException("toPhase and fromPhase must be null");
         }
-        if(!phaseNames.contains(fromPhase))
+        if (!phaseNames.contains(fromPhase))
         {
             throw new IllegalArgumentException("fromPhase '" + fromPhase + "' not a valid phase.");
         }
-        if(!phaseNames.contains(toPhase))
+        if (!phaseNames.contains(toPhase))
         {
             throw new IllegalArgumentException("toPhase '" + fromPhase + "' not a valid phase.");
         }
         boolean start = false;
         for (String phaseName : phaseNames)
         {
-            if(start)
+            if (start)
             {
                 phases.get(phaseName).applyLifecycle(object);
             }
-            if(toPhase.equals(phaseName))
+            if (toPhase.equals(phaseName))
             {
                 break;
             }
-            if(phaseName.equals(fromPhase))
+            if (phaseName.equals(fromPhase))
             {
                 start = true;
             }
@@ -199,7 +214,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
         String lastPhase = NotInLifecyclePhase.PHASE_NAME;
         for (String phase : completedPhases)
         {
-            if(isDirectTransition(lastPhase, phase))
+            if (isDirectTransition(lastPhase, phase))
             {
                 LifecyclePhase lp = phases.get(phase);
                 lp.applyLifecycle(object);
@@ -207,5 +222,4 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
             }
         }
     }
-
 }
