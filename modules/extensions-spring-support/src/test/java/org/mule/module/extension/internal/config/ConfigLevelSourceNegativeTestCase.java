@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.config;
 import org.mule.functional.junit4.InvalidExtensionConfigTestCase;
 import org.mule.module.extension.vegan.VeganExtension;
 
-public class ConfigLevelOperationNegativeTestCase extends InvalidExtensionConfigTestCase
+public class ConfigLevelSourceNegativeTestCase extends InvalidExtensionConfigTestCase
 {
 
     @Override
@@ -21,6 +21,6 @@ public class ConfigLevelOperationNegativeTestCase extends InvalidExtensionConfig
     @Override
     protected String getConfigFile()
     {
-        return "vegan-invalid-config-for-operations.xml";
+        return "vegan-invalid-config-for-sources.xml";
     }
 }

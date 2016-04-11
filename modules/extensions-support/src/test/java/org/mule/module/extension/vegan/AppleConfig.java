@@ -9,10 +9,12 @@ package org.mule.module.extension.vegan;
 import static org.mule.module.extension.vegan.VeganExtension.APPLE;
 import org.mule.extension.api.annotation.Configuration;
 import org.mule.extension.api.annotation.Operations;
+import org.mule.extension.api.annotation.Sources;
 import org.mule.extension.api.annotation.connector.Providers;
 
 @Configuration(name = APPLE)
 @Operations(EatAppleOperation.class)
+@Sources(HarvestApplesSource.class)
 @Providers(VeganAppleConnectionProvider.class)
 public class AppleConfig
 {

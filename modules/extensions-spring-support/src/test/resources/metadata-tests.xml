@@ -34,15 +34,15 @@
     </flow>
 
     <flow name="contentMetadataWithoutKeyParam">
-        <metadata:content-metadata-without-key-param config-ref="config" />
+        <metadata:content-metadata-without-key-param config-ref="config"/>
     </flow>
 
     <flow name="outputMetadataWithoutKeyParam">
-        <metadata:output-metadata-without-key-param config-ref="config" />
+        <metadata:output-metadata-without-key-param config-ref="config"/>
     </flow>
 
     <flow name="contentAndOutputMetadataWithoutKeyParam">
-        <metadata:content-and-output-metadata-without-key-param config-ref="config" />
+        <metadata:content-and-output-metadata-without-key-param config-ref="config"/>
     </flow>
 
     <flow name="contentMetadataWithoutKeysWithKeyParam">
@@ -66,11 +66,11 @@
     </flow>
 
     <flow name="messageAttributesNullTypeMetadata">
-        <metadata:message-attributes-null-type-metadata config-ref="config" />
+        <metadata:message-attributes-null-type-metadata config-ref="config"/>
     </flow>
 
     <flow name="messageAttributesPersonTypeMetadata">
-        <metadata:message-attributes-person-type-metadata config-ref="config" />
+        <metadata:message-attributes-person-type-metadata config-ref="config"/>
     </flow>
 
     <flow name="contentAndOutputWithCacheResolver">
@@ -92,5 +92,14 @@
     <flow name="loggerFlow">
         <logger message="Logger"/>
         <metadata:output-metadata-without-keys-with-key-param config-ref="config" type="Person"/>
+    </flow>
+
+    <flow name="sourceMetadata">
+        <metadata:metadata-source config-ref="config" type="Person"/>
+        <logger/>
+    </flow>
+
+    <flow name="flowWithoutSource">
+        <logger/>
     </flow>
 </mule>

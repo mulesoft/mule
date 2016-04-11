@@ -20,6 +20,7 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
+
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Expression;
@@ -28,8 +29,8 @@ import org.mule.extension.api.annotation.ParameterGroup;
 import org.mule.extension.api.annotation.param.Ignore;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.extension.api.introspection.ComponentModel;
 import org.mule.extension.api.introspection.ExpressionSupport;
-import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.ParameterModel;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.metadata.MetadataModelProperty;
@@ -64,9 +65,10 @@ import java.util.function.Supplier;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.core.ResolvableType;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 /**
- * Set of utility operations to get insights about objects and their operations
+ * Set of utility operations to get insights about objects and their components
  *
  * @since 3.7.0
  */
@@ -257,7 +259,7 @@ public final class IntrospectionUtils
         return Arrays.stream(interfaceType.getGenerics()).map(ResolvableType::getRawClass).collect(toList());
     }
 
-    public static List<Class<?>> getSuperClassGenerics(Class<?> type, Class<?> superClass)
+    public static List<Type> getSuperClassGenerics(Class<?> type, Class<?> superClass)
     {
         Class<?> searchClass = type;
 
@@ -270,9 +272,7 @@ public final class IntrospectionUtils
                 Type superType = searchClass.getGenericSuperclass();
                 if (superType instanceof ParameterizedType)
                 {
-                    return Arrays.stream(((ParameterizedType) superType).getActualTypeArguments())
-                            .map(generic -> (Class<?>) generic)
-                            .collect(toList());
+                    return Arrays.stream(((ParameterizedType) superType).getActualTypeArguments()).collect(toList());
                 }
             }
             searchClass = searchClass.getSuperclass();
@@ -326,9 +326,9 @@ public final class IntrospectionUtils
         return isVoid(method.getReturnType());
     }
 
-    public static boolean isVoid(OperationModel operationModel)
+    public static boolean isVoid(ComponentModel componentModel)
     {
-        return operationModel.getReturnType() instanceof NullType;
+        return componentModel.getReturnType() instanceof NullType;
     }
 
     private static boolean isVoid(Class<?> type)
@@ -412,17 +412,17 @@ public final class IntrospectionUtils
         return sourceType.getSimpleName();
     }
 
-    public static java.util.Optional<ParameterModel> getContentParameter(OperationModel operation)
+    public static java.util.Optional<ParameterModel> getContentParameter(ComponentModel component)
     {
-        return operation.getParameterModels().stream()
+        return component.getParameterModels().stream()
                 .filter(p -> p.getModelProperty(MetadataModelProperty.class).isPresent() &&
                              p.getModelProperty(MetadataModelProperty.class).get().isContent())
                 .findFirst();
     }
 
-    public static java.util.Optional<ParameterModel> getMetadataKeyParam(OperationModel operation)
+    public static java.util.Optional<ParameterModel> getMetadataKeyParam(ComponentModel component)
     {
-        return operation.getParameterModels().stream()
+        return component.getParameterModels().stream()
                 .filter(p -> p.getModelProperty(MetadataModelProperty.class).isPresent() &&
                              p.getModelProperty(MetadataModelProperty.class).get().isMetadataKeyParam())
                 .findFirst();

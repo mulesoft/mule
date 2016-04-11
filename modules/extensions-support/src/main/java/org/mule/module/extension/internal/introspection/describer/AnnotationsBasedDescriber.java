@@ -27,6 +27,7 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getPara
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.metadata.DefaultMetadataResolverFactory;
@@ -98,6 +99,8 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -115,7 +118,7 @@ public final class AnnotationsBasedDescriber implements Describer
 {
 
     public static final String DEFAULT_CONNECTION_PROVIDER_NAME = "connection";
-    public static final String CUSTOM_CONNECTION_PROVIDER_SUFFIX = "-" + DEFAULT_CONNECTION_PROVIDER_NAME;
+    private static final String CUSTOM_CONNECTION_PROVIDER_SUFFIX = "-" + DEFAULT_CONNECTION_PROVIDER_NAME;
 
     private final Class<?> extensionType;
     private final VersionResolver versionResolver;
@@ -283,7 +286,7 @@ public final class AnnotationsBasedDescriber implements Describer
         //TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
         SourceDeclarer source = declarer.withMessageSource(getSourceName(sourceType));
 
-        List<Class<?>> sourceGenerics = getSuperClassGenerics(sourceType, Source.class);
+        List<Type> sourceGenerics = getSuperClassGenerics(sourceType, Source.class);
 
         if (sourceGenerics.size() != 2)
         {
@@ -297,14 +300,22 @@ public final class AnnotationsBasedDescriber implements Describer
                 .whichReturns(typeLoader.load(sourceGenerics.get(0)))
                 .withAttributesOfType(typeLoader.load(sourceGenerics.get(1)))
                 .withExceptionEnricherFactory(getExceptionEnricherFactory(sourceType))
-                .withModelProperty(new ImplementingTypeModelProperty(sourceType));
+                .withModelProperty(new ImplementingTypeModelProperty(sourceType))
+                .withMetadataResolverFactory(getMetadataResolverFactory(extensionType, sourceType));
 
-        declareAnnotatedParameters(sourceType, source);
+        declareSingleParameters(getParameterFields(sourceType), source, (ModelPropertyContributor) MuleExtensionAnnotationParser::parseMetadataAnnotations);
+        declareParameterGroups(sourceType, source);
+
     }
 
     private void declareAnnotatedParameters(Class<?> annotatedType, ParameterizedDeclarer parameterDeclarer)
     {
         declareSingleParameters(getParameterFields(annotatedType), parameterDeclarer);
+        declareParameterGroups(annotatedType, parameterDeclarer);
+    }
+
+    private void declareParameterGroups(Class<?> annotatedType, ParameterizedDeclarer parameterDeclarer)
+    {
         List<ParameterGroup> groups = declareConfigurationParametersGroups(annotatedType, parameterDeclarer, null);
         if (!CollectionUtils.isEmpty(groups) && parameterDeclarer instanceof HasModelProperties)
         {
@@ -374,7 +385,7 @@ public final class AnnotationsBasedDescriber implements Describer
                                               : DisplayModelPropertyBuilder.create(parameterDisplayProperty);
 
         // Inherit parent placement model properties
-        DisplayModelProperty groupDisplay = null;
+        DisplayModelProperty groupDisplay;
         DisplayModelProperty parentDisplay = parent != null ? parent.getModelProperty(DisplayModelProperty.class).orElse(null) : null;
         if (parentDisplay != null)
         {
@@ -397,10 +408,14 @@ public final class AnnotationsBasedDescriber implements Describer
         return parameter;
     }
 
-    private Set<ParameterDeclarer> declareSingleParameters(Collection<Field> parameterFields, ParameterizedDeclarer parameterDeclarer)
+    private Set<ParameterDeclarer> declareSingleParameters(Collection<Field> parameterFields, ParameterizedDeclarer parameterDeclarer, ModelPropertyContributor... contributors)
     {
         return parameterFields.stream()
-                .map(field -> getFieldDescriber(field).describe(field, parameterDeclarer))
+                .map(field -> {
+                    final ParameterDeclarer describe = getFieldDescriber(field).describe(field, parameterDeclarer);
+                    Arrays.stream(contributors).forEach(contributor -> contributor.contribute(field, describe));
+                    return describe;
+                })
                 .collect(new ImmutableSetCollector<>());
     }
 
@@ -454,9 +469,9 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private MetadataResolverFactory getMetadataResolverFactory(Class<?> extensionType, Method method)
+    private MetadataResolverFactory getMetadataResolverFactory(Class<?> extensionType, AnnotatedElement annotatedElement)
     {
-        MetadataScope scopeAnnotation = method.getAnnotation(MetadataScope.class);
+        MetadataScope scopeAnnotation = annotatedElement.getAnnotation(MetadataScope.class);
         scopeAnnotation = scopeAnnotation == null ? extensionType.getAnnotation(MetadataScope.class) : scopeAnnotation;
 
         if (scopeAnnotation != null)
@@ -585,7 +600,7 @@ public final class AnnotationsBasedDescriber implements Describer
     {
         Stream<java.lang.reflect.Parameter> parametersStream =
                 stream(method.getParameters())
-                .filter(parameter -> parameter.isAnnotationPresent(annotationClass));
+                        .filter(parameter -> parameter.isAnnotationPresent(annotationClass));
 
         List<java.lang.reflect.Parameter> parameterList = parametersStream.collect(toList());
 
@@ -606,5 +621,11 @@ public final class AnnotationsBasedDescriber implements Describer
         {
             parameter.withModelProperty(new TypeRestrictionModelProperty<>(restriction));
         }
+    }
+
+    private interface ModelPropertyContributor
+    {
+
+        void contribute(AnnotatedElement annotatedElement, HasModelProperties descriptor);
     }
 }

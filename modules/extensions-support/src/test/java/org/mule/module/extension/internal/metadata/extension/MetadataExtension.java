@@ -8,12 +8,14 @@ package org.mule.module.extension.internal.metadata.extension;
 
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.Operations;
+import org.mule.extension.api.annotation.Sources;
 import org.mule.extension.api.annotation.capability.Xml;
 import org.mule.extension.api.annotation.connector.Providers;
 
 @Extension(name = "Metadata")
 @Operations({MetadataOperations.class, MetadataFailureOperations.class})
 @Providers(MetadataConnectionProvider.class)
+@Sources(MetadataSource.class)
 @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/metadata", namespace = "metadata", schemaVersion = "3.7")
 public class MetadataExtension
 {

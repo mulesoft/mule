@@ -15,11 +15,11 @@ import org.mule.api.metadata.MetadataAware;
 import org.mule.api.metadata.MetadataContext;
 import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.MetadataResolvingException;
-import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
+import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.api.metadata.descriptor.builder.MetadataDescriptorBuilder;
-import org.mule.api.metadata.descriptor.builder.OperationMetadataDescriptorBuilder;
+import org.mule.api.metadata.descriptor.builder.ComponentMetadataDescriptorBuilder;
 import org.mule.api.metadata.resolving.MetadataContentResolver;
 import org.mule.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.api.metadata.resolving.MetadataOutputResolver;
@@ -27,7 +27,7 @@ import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.extension.api.annotation.metadata.Content;
 import org.mule.extension.api.annotation.metadata.MetadataKeyParam;
 import org.mule.extension.api.introspection.ParameterModel;
-import org.mule.extension.api.introspection.RuntimeOperationModel;
+import org.mule.extension.api.introspection.RuntimeComponentModel;
 import org.mule.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.extension.api.metadata.NullMetadataKey;
 import org.mule.metadata.api.model.MetadataType;
@@ -46,7 +46,7 @@ import java.util.stream.Stream;
  * <p/>
  * This mediator will coordinate the resolvers: {@link MetadataResolverFactory},
  * {@link MetadataKeysResolver}, {@link MetadataContentResolver} and {@link MetadataOutputResolver},
- * and the descriptors that represent their results: {@link OperationMetadataDescriptor},
+ * and the descriptors that represent their results: {@link ComponentMetadataDescriptor},
  * {@link OutputMetadataDescriptor} and {@link TypeMetadataDescriptor}
  *
  * @since 4.0
@@ -54,17 +54,17 @@ import java.util.stream.Stream;
 public class MetadataMediator
 {
 
-    private final RuntimeOperationModel operationModel;
+    private final RuntimeComponentModel componentModel;
     private final MetadataResolverFactory resolverFactory;
     private final Optional<ParameterModel> contentParameter;
     private final Optional<ParameterModel> metadataKeyParam;
 
-    public MetadataMediator(RuntimeOperationModel operationModel)
+    public MetadataMediator(RuntimeComponentModel componentModel)
     {
-        this.operationModel = operationModel;
-        this.resolverFactory = operationModel.getMetadataResolverFactory();
-        this.contentParameter = IntrospectionUtils.getContentParameter(operationModel);
-        this.metadataKeyParam = IntrospectionUtils.getMetadataKeyParam(operationModel);
+        this.componentModel = componentModel;
+        this.resolverFactory = componentModel.getMetadataResolverFactory();
+        this.contentParameter = IntrospectionUtils.getContentParameter(componentModel);
+        this.metadataKeyParam = IntrospectionUtils.getMetadataKeyParam(componentModel);
     }
 
     /**
@@ -97,34 +97,34 @@ public class MetadataMediator
     }
 
     /**
-     * Resolves the {@link OperationMetadataDescriptor} for the associated {@link MetadataAware} Component using
+     * Resolves the {@link ComponentMetadataDescriptor} for the associated {@link MetadataAware} Component using
      * only the static types of the Component parameters, attributes and output.
      *
-     * @return An {@link OperationMetadataDescriptor} with the Static Metadata representation
+     * @return An {@link ComponentMetadataDescriptor} with the Static Metadata representation
      * of the Component.
      */
-    public MetadataResult<OperationMetadataDescriptor> getMetadata()
+    public MetadataResult<ComponentMetadataDescriptor> getMetadata()
     {
-        OperationMetadataDescriptorBuilder operationDescriptorBuilder = MetadataDescriptorBuilder.operationDescriptor(operationModel.getName())
+        ComponentMetadataDescriptorBuilder componentDescriptorBuilder = MetadataDescriptorBuilder.componentDescriptor(componentModel.getName())
                 .withParametersDescriptor(getParametersMetadataDescriptors())
                 .withOutputDescriptor(getOutputMetadataDescriptor());
 
         Optional<TypeMetadataDescriptor> contentDescriptor = getContentMetadataDescriptor();
         if (contentDescriptor.isPresent())
         {
-            operationDescriptorBuilder.withContentDescriptor(contentDescriptor.get());
+            componentDescriptorBuilder.withContentDescriptor(contentDescriptor.get());
         }
 
-        return success(operationDescriptorBuilder.build());
+        return success(componentDescriptorBuilder.build());
     }
 
     /**
-     * Resolves the {@link OperationMetadataDescriptor} for the associated {@link MetadataAware} Component using
+     * Resolves the {@link ComponentMetadataDescriptor} for the associated {@link MetadataAware} Component using
      * static and dynamic resolving of the Component parameters, attributes and output.
      * <p>
      * If Component's {@link Content} parameter has a {@link MetadataContentResolver} associated or
      * its Output has a {@link MetadataOutputResolver} associated that can be used to resolve dynamic {@link MetadataType},
-     * then the {@link OperationMetadataDescriptor} will contain those Dynamic types instead of the static type declaration.
+     * then the {@link ComponentMetadataDescriptor} will contain those Dynamic types instead of the static type declaration.
      * <p>
      * When neither {@link Content} nor Output have Dynamic types, then invoking this method is the
      * same as invoking {@link this#getMetadata()}
@@ -136,24 +136,24 @@ public class MetadataMediator
      * @return Successful {@link MetadataResult} if the MetadataTypes are resolved without errors
      * Failure {@link MetadataResult} when the Metadata retrieval of any element fails for any reason
      */
-    public MetadataResult<OperationMetadataDescriptor> getMetadata(MetadataContext context, MetadataKey key)
+    public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataContext context, MetadataKey key)
     {
         MetadataResult<OutputMetadataDescriptor> outputResult = getOutputMetadataDescriptor(context, key);
         Optional<MetadataResult<TypeMetadataDescriptor>> contentDescriptor = getContentMetadataDescriptor(context, key);
 
-        OperationMetadataDescriptorBuilder operationDescriptorBuilder = MetadataDescriptorBuilder.operationDescriptor(operationModel.getName())
+        ComponentMetadataDescriptorBuilder componentDescriptorBuilder = MetadataDescriptorBuilder.componentDescriptor(componentModel.getName())
                 .withParametersDescriptor(getParametersMetadataDescriptors())
                 .withOutputDescriptor(outputResult.get());
 
         if (!contentDescriptor.isPresent())
         {
-            return outputResult.isSuccess() ? success(operationDescriptorBuilder.build()) : failure(operationDescriptorBuilder.build(), outputResult);
+            return outputResult.isSuccess() ? success(componentDescriptorBuilder.build()) : failure(componentDescriptorBuilder.build(), outputResult);
         }
 
         MetadataResult<TypeMetadataDescriptor> contentResult = contentDescriptor.get();
-        operationDescriptorBuilder.withContentDescriptor(contentResult.get());
+        componentDescriptorBuilder.withContentDescriptor(contentResult.get());
 
-        return mergeResults(operationDescriptorBuilder.build(), outputResult, contentResult);
+        return mergeResults(componentDescriptorBuilder.build(), outputResult, contentResult);
     }
 
     /**
@@ -165,7 +165,7 @@ public class MetadataMediator
      */
     private List<TypeMetadataDescriptor> getParametersMetadataDescriptors()
     {
-        Stream<ParameterModel> parameters = operationModel.getParameterModels().stream();
+        Stream<ParameterModel> parameters = componentModel.getParameterModels().stream();
 
         if (contentParameter.isPresent())
         {
@@ -224,8 +224,8 @@ public class MetadataMediator
     private OutputMetadataDescriptor getOutputMetadataDescriptor()
     {
         return MetadataDescriptorBuilder.outputDescriptor()
-                .withAttributesType(operationModel.getAttributesType())
-                .withReturnType(operationModel.getReturnType())
+                .withAttributesType(componentModel.getAttributesType())
+                .withReturnType(componentModel.getReturnType())
                 .build();
     }
 
@@ -245,7 +245,7 @@ public class MetadataMediator
 
         OutputMetadataDescriptor descriptor = MetadataDescriptorBuilder.outputDescriptor()
                 .withReturnType(outputMetadataResult.get())
-                .withAttributesType(operationModel.getAttributesType()).build();
+                .withAttributesType(componentModel.getAttributesType()).build();
 
         return outputMetadataResult.isSuccess() ? success(descriptor) : failure(descriptor, outputMetadataResult);
     }
@@ -282,18 +282,18 @@ public class MetadataMediator
      */
     private MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final MetadataKey key)
     {
-        if (IntrospectionUtils.isVoid(operationModel))
+        if (IntrospectionUtils.isVoid(componentModel))
         {
-            return success(operationModel.getReturnType());
+            return success(componentModel.getReturnType());
         }
 
-        return resolveMetadataType(operationModel.getReturnType(),
+        return resolveMetadataType(componentModel.getReturnType(),
                                    () -> resolverFactory.getOutputResolver().getOutputMetadata(context, key));
     }
 
     /**
      * Uses the {@link MetadataDelegate} to resolve dynamic metadata of the component, executing internally
-     * one of the {@link MetadataType}resolving operations:
+     * one of the {@link MetadataType}resolving components:
      * {@link MetadataContentResolver#getContentMetadata} or {@link MetadataOutputResolver#getOutputMetadata}
      *
      * @param staticType static type used as default if no dynamic type is available

@@ -56,7 +56,7 @@ public final class ConnectionProviderModelValidator implements ModelValidator
 
     private void validateConfigType(RuntimeConnectionProviderModel providerModel, ExtensionModel extensionModel)
     {
-        Class<?> providerConfigType = providerModel.getConfigurationType();
+        Class<?> providerConfigType = ((RuntimeConnectionProviderModel) providerModel).getConfigurationType();
         for (ConfigurationModel configurationModel : extensionModel.getConfigurationModels())
         {
             ImplementingTypeModelProperty typeProperty = configurationModel.getModelProperty(ImplementingTypeModelProperty.class).orElse(null);
@@ -74,12 +74,15 @@ public final class ConnectionProviderModelValidator implements ModelValidator
 
     private void validateConnectionTypes(RuntimeConnectionProviderModel providerModel, ExtensionModel extensionModel, Class<?> connectionType)
     {
-        if (!connectionType.isAssignableFrom(providerModel.getConnectionType()))
+        final Class extensionConnectionType = ((RuntimeConnectionProviderModel) providerModel).getConnectionType();
+        if (!connectionType.isAssignableFrom(extensionConnectionType))
         {
             throw new IllegalConnectionProviderModelDefinitionException(String.format("Extension '%s' defines a connection provider of name '%s' which yields connections of type '%s'. " +
                                                                                       "However, the extension's operations expect connections of type '%s'. Please make sure that all connection " +
                                                                                       "providers in the extension can be used with all its operations",
-                                                                                      extensionModel.getName(), providerModel.getName(), providerModel.getConnectionType().getName(),
+                                                                                      extensionModel.getName(),
+                                                                                      providerModel.getName(),
+                                                                                      extensionConnectionType.getName(),
                                                                                       connectionType.getName()));
         }
     }

@@ -23,6 +23,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -34,8 +35,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.metadata.DataType;
 import org.mule.api.metadata.MetadataKey;
-import org.mule.api.metadata.MuleMetadataManager;
-import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
+import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.introspection.ExceptionEnricherFactory;
@@ -68,6 +68,7 @@ import org.mule.tck.size.SmallTest;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -154,7 +155,6 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     private String configurationName = CONFIG_NAME;
     private String target = EMPTY;
 
-    private MuleMetadataManager metadataManager;
     private DefaultConnectionManager connectionManager;
 
     @Before
@@ -202,9 +202,8 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         when(configurationProvider.get(event)).thenReturn(configurationInstance);
         when(configurationProvider.getModel()).thenReturn(configurationModel);
 
-        when(configurationModel.getOperationModel(OPERATION_NAME)).thenReturn(Optional.of(operationModel));
-
-        metadataManager = new MuleMetadataManager();
+        when(configurationModel.getOperationModels()).thenReturn(Collections.singletonList(operationModel));
+        when(configurationModel.getSourceModels()).thenReturn(Collections.emptyList());
 
         connectionManager = new DefaultConnectionManager(context);
         connectionManager.initialise();
@@ -468,7 +467,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     @Test
     public void getOperationStaticMetadata() throws Exception
     {
-        MetadataResult<OperationMetadataDescriptor> metadata = messageProcessor.getMetadata();
+        MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata();
 
         verify(metadataResolverFactory, never()).getContentResolver();
         verify(metadataResolverFactory, never()).getOutputResolver();
@@ -489,7 +488,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     {
         MetadataKey keyMock = mock(MetadataKey.class);
         when(keyMock.getId()).thenReturn(TestNoConfigMetadataResolver.KeyIds.STRING.name());
-        MetadataResult<OperationMetadataDescriptor> metadata = messageProcessor.getMetadata(keyMock);
+        MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata(keyMock);
 
         assertThat(metadata.isSuccess(), is(true));
 

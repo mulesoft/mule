@@ -7,13 +7,14 @@
 package org.mule.api.metadata;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationInstanceNotification;
 import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
+import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.Flow;
@@ -41,9 +42,9 @@ import javax.inject.Inject;
 public class MuleMetadataManager implements MetadataManager, Initialisable
 {
 
-    private static final String EXCEPTION_RESOLVING_OPERATION_METADATA = "An exception occurred while resolving Operation %s metadata";
-    private static final String PROCESSOR_NOT_METADATA_AWARE = "Operation is not MetadataAware, no information available";
-    private static final String EXCEPTION_RESOLVING_METADATA_KEYS = "An exception occurred while resolving Operation MetadataKeys";
+    private static final String EXCEPTION_RESOLVING_COMPONENT_METADATA = "An exception occurred while resolving Component %s metadata";
+    private static final String PROCESSOR_NOT_METADATA_AWARE = "Component is not MetadataAware, no information available";
+    private static final String EXCEPTION_RESOLVING_METADATA_KEYS = "An exception occurred while resolving Component MetadataKeys";
     private static final String SOURCE_NOT_FOUND = "Flow doesn't contain a message source";
     private static final String PROCESSOR_NOT_FOUND = "Processor doesn't exist in the given index [%s]";
 
@@ -109,20 +110,20 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
      * {@inheritDoc}
      */
     @Override
-    public MetadataResult<OperationMetadataDescriptor> getMetadata(ComponentId componentId, MetadataKey key)
+    public MetadataResult<ComponentMetadataDescriptor> getMetadata(ComponentId componentId, MetadataKey key)
     {
         return exceptionHandledMetadataFetch(componentId, processor -> processor.getMetadata(key),
-                                             String.format(EXCEPTION_RESOLVING_OPERATION_METADATA, componentId));
+                                             String.format(EXCEPTION_RESOLVING_COMPONENT_METADATA, componentId));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public MetadataResult<OperationMetadataDescriptor> getMetadata(ComponentId componentId)
+    public MetadataResult<ComponentMetadataDescriptor> getMetadata(ComponentId componentId)
     {
         return exceptionHandledMetadataFetch(componentId, MetadataAware::getMetadata,
-                                             String.format(EXCEPTION_RESOLVING_OPERATION_METADATA, componentId));
+                                             String.format(EXCEPTION_RESOLVING_COMPONENT_METADATA, componentId));
     }
 
     /**
@@ -155,7 +156,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
     {
         try
         {
-            return metadataSupplier.get(findMetadataAwareExecutable(componentId));
+            return metadataSupplier.get(findMetadataAwareComponent(componentId));
         }
         catch (InvalidComponentIdException e)
         {
@@ -167,7 +168,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
         }
     }
 
-    private MetadataAware findMetadataAwareExecutable(ComponentId componentId) throws InvalidComponentIdException
+    private MetadataAware findMetadataAwareComponent(ComponentId componentId) throws InvalidComponentIdException
     {
         //FIXME MULE-9496 : Use flow paths to obtain Processors
         Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(componentId.getFlowName());

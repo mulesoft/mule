@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
@@ -22,6 +23,7 @@ import org.mule.extension.api.introspection.SourceModel;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.extension.api.runtime.source.SourceFactory;
 import org.mule.internal.connection.ConnectionManagerAdapter;
+import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.module.extension.internal.runtime.source.SourceConfigurer;
@@ -84,7 +86,8 @@ final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryB
                                                                           getSourceFactory(resolverSet),
                                                                           configurationProviderName,
                                                                           getThreadingProfile(),
-                                                                          retryPolicyTemplate);
+                                                                          retryPolicyTemplate,
+                                                                          (ExtensionManagerAdapter) muleContext.getExtensionManager());
         muleContext.getInjector().inject(messageSource);
 
         return messageSource;

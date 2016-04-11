@@ -19,13 +19,14 @@ import static org.mule.module.extension.internal.metadata.TestMetadataUtils.NAME
 import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
+
 import org.mule.api.metadata.DefaultMetadataCache;
 import org.mule.api.metadata.MetadataCache;
 import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.MetadataManager;
 import org.mule.api.metadata.MuleMetadataManager;
 import org.mule.api.metadata.ProcessorId;
-import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
+import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.extension.api.metadata.NullMetadataKey;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
@@ -46,8 +47,8 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void getMetadataKeysWithKeyParam() throws Exception
     {
-        processorId = new ProcessorId(OUTPUT_METADATA_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
-        final MetadataResult<List<MetadataKey>> metadataKeys = metadataManager.getMetadataKeys(processorId);
+        componentId = new ProcessorId(OUTPUT_METADATA_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        final MetadataResult<List<MetadataKey>> metadataKeys = metadataManager.getMetadataKeys(componentId);
         assertThat(metadataKeys.isSuccess(), is(true));
         assertThat(metadataKeys.get().size(), is(3));
     }
@@ -55,8 +56,8 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void getMetadataKeysWithoutKeyParam() throws Exception
     {
-        processorId = new ProcessorId(CONTENT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
-        final MetadataResult<List<MetadataKey>> metadataKeys = metadataManager.getMetadataKeys(processorId);
+        componentId = new ProcessorId(CONTENT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        final MetadataResult<List<MetadataKey>> metadataKeys = metadataManager.getMetadataKeys(componentId);
         assertThat(metadataKeys.isSuccess(), is(true));
         assertThat(metadataKeys.get().size(), is(1));
         assertThat(metadataKeys.get().get(0), instanceOf(NullMetadataKey.class));
@@ -65,9 +66,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void dynamicOperationMetadata() throws Exception
     {
-        processorId = new ProcessorId(CONTENT_AND_OUTPUT_METADATA_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(CONTENT_AND_OUTPUT_METADATA_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata();
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, void.class);
 
@@ -81,9 +82,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void staticOperationMetadata() throws Exception
     {
-        processorId = new ProcessorId(CONTENT_AND_OUTPUT_METADATA_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(CONTENT_AND_OUTPUT_METADATA_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationStaticMetadata();
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentStaticMetadata();
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), Object.class, void.class);
 
@@ -98,9 +99,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     public void dynamicOutputWithoutContentParam() throws Exception
     {
         // Resolver for content and output type, no @Content param, resolves only output, with keysResolver and KeyParam
-        processorId = new ProcessorId(OUTPUT_ONLY_WITHOUT_CONTENT_PARAM, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(OUTPUT_ONLY_WITHOUT_CONTENT_PARAM, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata();
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, void.class);
 
@@ -114,9 +115,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     public void dynamicContentWithoutOutput() throws Exception
     {
         // Resolver for content and output type, no return type, resolves only @Content, with key and KeyParam
-        processorId = new ProcessorId(CONTENT_ONLY_IGNORES_OUTPUT, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(CONTENT_ONLY_IGNORES_OUTPUT, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata();
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), void.class, void.class);
 
@@ -130,9 +131,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void operationOutputWithoutKeyParam() throws Exception
     {
-        processorId = new ProcessorId(OUTPUT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(OUTPUT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata();
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, void.class);
 
@@ -145,9 +146,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void contentAndOutputMetadataWithoutKeyParam() throws Exception
     {
-        processorId = new ProcessorId(CONTENT_AND_OUTPUT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(CONTENT_AND_OUTPUT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata();
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, void.class);
 
@@ -160,9 +161,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void contentMetadataWithoutKeysWithKeyParam() throws Exception
     {
-        processorId = new ProcessorId(CONTENT_METADATA_WITHOUT_KEYS_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(CONTENT_METADATA_WITHOUT_KEYS_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata();
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), void.class, void.class);
 
@@ -176,9 +177,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void outputMetadataWithoutKeysWithKeyParam() throws Exception
     {
-        processorId = new ProcessorId(OUTPUT_METADATA_WITHOUT_KEYS_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(OUTPUT_METADATA_WITHOUT_KEYS_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata();
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, void.class);
@@ -192,9 +193,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void messageAttributesNullTypeMetadata() throws Exception
     {
-        processorId = new ProcessorId(MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationStaticMetadata();
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentStaticMetadata();
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), ExtensionsTestUtils.TYPE_BUILDER.anyType().build(), void.class);
 
         assertThat(metadataDescriptor.getParametersMetadata(), empty());
@@ -203,9 +204,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void messageAttributesStringTypeMetadata() throws Exception
     {
-        processorId = new ProcessorId(MESSAGE_ATTRIBUTES_personType_METADATA, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(MESSAGE_ATTRIBUTES_personType_METADATA, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata();
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), Object.class, String.class);
 
         assertThat(metadataDescriptor.getParametersMetadata(), empty());
@@ -214,9 +215,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void getContentMetadataWithKey() throws Exception
     {
-        processorId = new ProcessorId(CONTENT_METADATA_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(CONTENT_METADATA_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata();
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), Object.class, void.class);
@@ -231,9 +232,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void getOutputMetadataWithKey() throws Exception
     {
-        processorId = new ProcessorId(OUTPUT_METADATA_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(OUTPUT_METADATA_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata();
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, void.class);
@@ -248,9 +249,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void dynamicContentWithoutKeyParam() throws Exception
     {
-        processorId = new ProcessorId(CONTENT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(CONTENT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata(nullMetadataKey);
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata(nullMetadataKey);
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), Object.class, void.class);
 
@@ -263,9 +264,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void dynamicOutputWithoutKeyParam() throws Exception
     {
-        processorId = new ProcessorId(OUTPUT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        componentId = new ProcessorId(OUTPUT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
 
-        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata(nullMetadataKey);
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata(nullMetadataKey);
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, void.class);
 
@@ -278,8 +279,8 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     @Test
     public void dynamicOutputAndContentWithCache() throws Exception
     {
-        processorId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
-        final OperationMetadataDescriptor metadataDescriptor = getOperationDynamicMetadata(nullMetadataKey);
+        componentId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata(nullMetadataKey);
 
         assertThat(metadataDescriptor.getContentMetadata().get().getType(),
                    is(equalTo(metadataDescriptor.getOutputMetadata().getPayloadMetadata().getType())));
@@ -290,14 +291,14 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     public void multipleCaches() throws Exception
     {
         // using config
-        processorId = new ProcessorId(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
-        getOperationDynamicMetadata();
-        processorId = new ProcessorId(OUTPUT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
-        getOperationDynamicMetadata();
+        componentId = new ProcessorId(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
+        getComponentDynamicMetadata();
+        componentId = new ProcessorId(OUTPUT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
+        getComponentDynamicMetadata();
 
         // using alternative-config
-        processorId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG, FIRST_PROCESSOR_INDEX);
-        getOperationDynamicMetadata();
+        componentId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG, FIRST_PROCESSOR_INDEX);
+        getComponentDynamicMetadata();
 
         MuleMetadataManager metadataManager = (MuleMetadataManager) muleContext.getRegistry().lookupObject(MetadataManager.class);
         Map<String, ? extends MetadataCache> caches = metadataManager.getMetadataCaches();
@@ -310,13 +311,13 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     public void elementsAreStoredInCaches() throws Exception
     {
         // using config
-        processorId = new ProcessorId(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
-        metadataManager.getMetadataKeys(processorId);
-        getOperationDynamicMetadata();
+        componentId = new ProcessorId(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
+        metadataManager.getMetadataKeys(componentId);
+        getComponentDynamicMetadata();
 
         // using alternative-config
-        processorId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG, FIRST_PROCESSOR_INDEX);
-        getOperationDynamicMetadata();
+        componentId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG, FIRST_PROCESSOR_INDEX);
+        getComponentDynamicMetadata();
 
         MuleMetadataManager metadataManager = (MuleMetadataManager) muleContext.getRegistry().lookupObject(MetadataManager.class);
         DefaultMetadataCache configCache = (DefaultMetadataCache) metadataManager.getMetadataCaches().get(CONFIG);
