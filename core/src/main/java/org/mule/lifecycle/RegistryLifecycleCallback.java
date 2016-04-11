@@ -7,8 +7,10 @@
 package org.mule.lifecycle;
 
 import org.mule.api.MuleException;
+import org.mule.api.lifecycle.HasLifecycleInterceptor;
 import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.lifecycle.LifecycleInterceptor;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.registry.Registry;
 import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
@@ -26,11 +28,13 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>
+public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLifecycleInterceptor
 {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistryLifecycleCallback.class);
 
     protected final RegistryLifecycleManager registryLifecycleManager;
+    private LifecycleInterceptor interceptor = new NullLifecycleInterceptor();
 
     public RegistryLifecycleCallback(RegistryLifecycleManager registryLifecycleManager)
     {
@@ -67,6 +71,8 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>
             doApplyLifecycle(phase, duplicates, lifecycleObject, targetsObj);
             lifecycleObject.firePostNotification(registryLifecycleManager.muleContext);
         }
+
+        interceptor.onPhaseCompleted(phase);
     }
 
     private void doApplyLifecycle(LifecyclePhase phase, Set<Object> duplicates, LifecycleObject lifecycleObject, Collection<?> targetObjects) throws LifecycleException
@@ -88,8 +94,22 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>
                 LOGGER.debug("lifecycle phase: " + phase.getName() + " for object: " + target);
             }
 
-            phase.applyLifecycle(target);
-            duplicates.add(target);
+            if (interceptor.beforeLifecycle(phase, target))
+            {
+                phase.applyLifecycle(target);
+                duplicates.add(target);
+                interceptor.afterLifecycle(phase, target);
+            }
+            else
+            {
+                if (LOGGER.isDebugEnabled())
+                {
+                    LOGGER.debug(String.format("Skipping the application of the '%s' lifecycle phase over a certain object " +
+                                               "because a %s interceptor of type [%s] indicated so. Object is: %s",
+                                               phase.getName(), LifecycleInterceptor.class.getSimpleName(),
+                                               interceptor.getClass().getName(), target));
+                }
+            }
         }
 
         // the target object might have created and registered a new object
@@ -106,5 +126,11 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>
     protected Collection<?> lookupObjectsForLifecycle(LifecycleObject lo)
     {
         return registryLifecycleManager.getLifecycleObject().lookupObjectsForLifecycle(lo.getType());
+    }
+
+    @Override
+    public void setLifecycleInterceptor(LifecycleInterceptor interceptor)
+    {
+        this.interceptor = interceptor;
     }
 }
