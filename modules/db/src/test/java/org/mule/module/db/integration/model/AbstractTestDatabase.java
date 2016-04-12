@@ -54,8 +54,10 @@ public abstract class AbstractTestDatabase
 
     public static void executeDdl(Connection connection, String ddl) throws SQLException
     {
-        QueryRunner qr = new QueryRunner();
-        qr.update(connection, ddl);
+        try (Statement statement = connection.createStatement())
+        {
+            statement.executeUpdate(ddl);
+        }
     }
 
     public void executeUpdate(Connection connection, String updateSql) throws SQLException
