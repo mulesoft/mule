@@ -12,7 +12,6 @@ import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
-
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -35,9 +34,6 @@ import org.mule.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.util.StringUtils;
-
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,17 +147,10 @@ public final class OperationMessageProcessor extends ExtensionComponent implemen
     }
 
     /**
-     * Validates if the current operation is valid for the set configuration.
-     * In case that the validation fails, the method will throw a {@link IllegalOperationException}
+     * Validates that the {@link #operationModel} is valid for the given {@code configurationProvider}
+     *
+     * @throws IllegalSourceException If the validation fails
      */
-    private void validateOperationConfiguration(BooleanSupplier configurationContainsModel, BooleanSupplier extensionContainsModel, Supplier<String> stringSupplier)
-    {
-        if (configurationContainsModel.getAsBoolean() && extensionContainsModel.getAsBoolean())
-        {
-            throw new IllegalComponentException(stringSupplier.get());
-        }
-    }
-
     @Override
     protected void validateOperationConfiguration(ConfigurationProvider<Object> configurationProvider)
     {

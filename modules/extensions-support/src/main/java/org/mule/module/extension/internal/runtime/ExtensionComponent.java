@@ -7,7 +7,6 @@
 package org.mule.module.extension.internal.runtime;
 
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
@@ -74,6 +73,12 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
         this.metadataMediator = new MetadataMediator(componentModel);
     }
 
+    /**
+     * Makes sure that the operation is valid by invoking {@link #validateOperationConfiguration(ConfigurationProvider)}
+     * and then delegates on {@link #doInitialise()} for custom initialisation
+     *
+     * @throws InitialisationException if a fatal error occurs causing the Mule instance to shutdown
+     */
     @Override
     public final void initialise() throws InitialisationException
     {
@@ -87,7 +92,21 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
         doInitialise();
     }
 
+    /**
+     * Implementors will use this method to perform their own initialisation
+     * logic
+     *
+     * @throws InitialisationException if a fatal error occurs causing the Mule instance to shutdown
+     */
     protected abstract void doInitialise() throws InitialisationException;
+
+    /**
+     * Validates that the configuration returned by the {@code configurationProvider}
+     * is compatible with the associated {@link RuntimeComponentModel}
+     *
+     * @param configurationProvider
+     */
+    protected abstract void validateOperationConfiguration(ConfigurationProvider<Object> configurationProvider);
 
     @Override
     public void setMuleContext(MuleContext context)
@@ -167,7 +186,5 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
                                                            : extensionManager.getConfigurationProvider(configurationProviderName);
         return provider;
     }
-
-    protected abstract void validateOperationConfiguration(ConfigurationProvider<Object> configurationProvider);
 
 }
