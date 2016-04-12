@@ -227,6 +227,7 @@ public class FakeMuleServer
         logsDir = createFolder("logs");
         pluginsDir = createFolder("plugins");
         domainsDir = createFolder("domains");
+        createFolder("domains/default");
 
         File confDir = createFolder("conf");
         URL log4jFile = getClass().getResource("/log4j2-test.xml");
