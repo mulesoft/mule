@@ -20,16 +20,16 @@ import org.apache.commons.logging.LogFactory;
  * Defines a {@link ClassLoader} that filter which classes and resources can
  * be resolved based on a {@link ClassLoaderFilter}
  */
-public class FilteringArtifactClassLoader extends ClassLoader
+public class FilteringArtifactClassLoader extends ClassLoader implements ArtifactClassLoader
 {
 
     protected static final Log logger = LogFactory.getLog(FilteringArtifactClassLoader.class);
 
     private String artifactName;
-    private final ClassLoader pluginClassLoader;
+    private final ArtifactClassLoader pluginClassLoader;
     private final ClassLoaderFilter filter;
 
-    public FilteringArtifactClassLoader(String artifactName, ClassLoader pluginClassLoader, ClassLoaderFilter filter)
+    public FilteringArtifactClassLoader(String artifactName, ArtifactClassLoader pluginClassLoader, ClassLoaderFilter filter)
     {
         this.artifactName = artifactName;
         this.pluginClassLoader = pluginClassLoader;
@@ -41,7 +41,7 @@ public class FilteringArtifactClassLoader extends ClassLoader
     {
         if (filter.exportsClass(name))
         {
-            return pluginClassLoader.loadClass(name);
+            return pluginClassLoader.getClassLoader().loadClass(name);
         }
         else
         {
@@ -54,7 +54,7 @@ public class FilteringArtifactClassLoader extends ClassLoader
     {
         if (filter.exportsResource(name))
         {
-            return pluginClassLoader.getResource(name);
+            return pluginClassLoader.getClassLoader().getResource(name);
         }
         else
         {
@@ -69,7 +69,7 @@ public class FilteringArtifactClassLoader extends ClassLoader
 
         if (filter.exportsResource(name))
         {
-            Enumeration<URL> resources = pluginClassLoader.getResources(name);
+            Enumeration<URL> resources = pluginClassLoader.getClassLoader().getResources(name);
 
             while (resources.hasMoreElements())
             {
@@ -81,10 +81,58 @@ public class FilteringArtifactClassLoader extends ClassLoader
     }
 
     @Override
+    public URL findResource(String name)
+    {
+        return pluginClassLoader.findResource(name);
+    }
+
+    @Override
+    public Enumeration<URL> findResources(String name) throws IOException
+    {
+        return pluginClassLoader.findResources(name);
+    }
+
+    @Override
     public String toString()
     {
         return String.format("%s[%s]@%s", getClass().getName(),
                              artifactName,
                              Integer.toHexString(System.identityHashCode(this)));
+    }
+
+    @Override
+    public String getArtifactName()
+    {
+        return pluginClassLoader.getArtifactName();
+    }
+
+    @Override
+    public ClassLoader getClassLoader()
+    {
+        return pluginClassLoader.getClassLoader();
+    }
+
+    @Override
+    public void addShutdownListener(ShutdownListener listener)
+    {
+        pluginClassLoader.addShutdownListener(listener);
+    }
+
+    @Override
+    public ClassLoaderLookupPolicy getClassLoaderLookupPolicy()
+    {
+        return pluginClassLoader.getClassLoaderLookupPolicy();
+    }
+
+    @Override
+    public void dispose()
+    {
+        pluginClassLoader.dispose();
+    }
+
+    @Override
+    public URL findLocalResource(String resourceName)
+    {
+        return pluginClassLoader.findLocalResource(resourceName);
     }
 }

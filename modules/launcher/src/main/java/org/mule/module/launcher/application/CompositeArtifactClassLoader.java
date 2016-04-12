@@ -7,43 +7,54 @@
 
 package org.mule.module.launcher.application;
 
+import static java.util.stream.Collectors.toCollection;
+import org.mule.module.artifact.Artifact;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.module.artifact.classloader.CompositeClassLoader;
 import org.mule.module.artifact.classloader.DisposableClassLoader;
+import org.mule.module.artifact.classloader.EnumerationAdapter;
 import org.mule.module.artifact.classloader.ShutdownListener;
 import org.mule.module.launcher.MuleApplicationClassLoader;
 
-import java.lang.reflect.Method;
+import java.io.IOException;
 import java.net.URL;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Composite classloader to use on {@link org.mule.module.launcher.artifact.Artifact}
+ * Composite classloader to use on {@link Artifact}
  */
 public class CompositeArtifactClassLoader extends CompositeClassLoader implements ArtifactClassLoader
 {
 
     protected static final Log logger = LogFactory.getLog(CompositeApplicationClassLoader.class);
-    private final List<ClassLoader> classLoaders;
     private final String artifactName;
+    private final List<ArtifactClassLoader> artifactClassLoaders;
 
     /**
      * Creates a new instance
-     *
-     * @param artifactName name of the artifact owning the created instance.
-     * @param parent parent class loader used to delegate the lookup process. Can be null.
-     * @param classLoaders class loaders to compose. Non empty.
-     * @param lookupPolicy policy used to guide the lookup process. Non null
+     *  @param artifactName         name of the artifact owning the created instance.
+     * @param parent               parent class loader used to delegate the lookup process. Can be null.
+     * @param artifactClassLoaders artifact class loaders to compose. Non empty.
+     * @param lookupPolicy         policy used to guide the lookup process. Non null
      */
-    public CompositeArtifactClassLoader(String artifactName, ClassLoader parent, List<ClassLoader> classLoaders, ClassLoaderLookupPolicy lookupPolicy)
+    public CompositeArtifactClassLoader(String artifactName, ClassLoader parent, List<ArtifactClassLoader> artifactClassLoaders, ClassLoaderLookupPolicy lookupPolicy)
     {
-        super(parent, classLoaders, lookupPolicy);
+        super(parent, getClassLoaders(artifactClassLoaders), lookupPolicy);
         this.artifactName = artifactName;
-        this.classLoaders = classLoaders;
+        this.artifactClassLoaders = artifactClassLoaders;
+    }
+
+    private static List<ClassLoader> getClassLoaders(List<ArtifactClassLoader> artifactClassLoaders)
+    {
+        return artifactClassLoaders.stream().map(ArtifactClassLoader::getClassLoader).collect(toCollection(LinkedList::new));
     }
 
     @Override
@@ -55,15 +66,15 @@ public class CompositeArtifactClassLoader extends CompositeClassLoader implement
     @Override
     public URL findResource(String name)
     {
-        for (ClassLoader classLoader : classLoaders)
+        for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders)
         {
-            URL resource = findResource(classLoader, name);
+            final URL resource = artifactClassLoader.findResource(name);
 
             if (resource != null)
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug(String.format("Resource '%s' loaded from classLoader '%s", name, classLoader));
+                    logger.debug(String.format("Resource '%s' loaded from classLoader '%s", name, artifactClassLoader));
                 }
 
                 return resource;
@@ -73,37 +84,38 @@ public class CompositeArtifactClassLoader extends CompositeClassLoader implement
         return null;
     }
 
-    private URL findResource(ClassLoader classLoader, String name)
+    @Override
+    public Enumeration<URL> findResources(String name) throws IOException
     {
-        try
-        {
-            Method findResourceMethod = findDeclaredMethod(classLoader, "findResource", String.class);
+        final Map<String, URL> resources = new HashMap<>();
 
-            return (URL) findResourceMethod.invoke(classLoader, name);
-        }
-        catch (Exception e)
+        for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders)
         {
-            if (logger.isDebugEnabled())
+            Enumeration<URL> partialResources = artifactClassLoader.findResources(name);
+
+            while (partialResources.hasMoreElements())
             {
-                logReflectionLoadingError(name, classLoader, e, "Resource");
+                URL url = partialResources.nextElement();
+                if (resources.get(url.toString()) == null)
+                {
+                    resources.put(url.toString(), url);
+                }
             }
         }
 
-        return null;
+        return new EnumerationAdapter<>(resources.values());
     }
 
     @Override
     public URL findLocalResource(String resourceName)
     {
-        for (ClassLoader classLoader : classLoaders)
+        for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders)
         {
-            if( classLoader instanceof ArtifactClassLoader )
+            URL resource = artifactClassLoader.findLocalResource(resourceName);
+
+            if (resource != null)
             {
-                URL resource = ((ArtifactClassLoader)classLoader).findLocalResource(resourceName);
-                if( resource!=null )
-                {
-                    return resource;
-                }
+                return resource;
             }
         }
         return null;

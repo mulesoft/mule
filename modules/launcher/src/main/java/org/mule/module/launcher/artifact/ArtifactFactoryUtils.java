@@ -6,9 +6,10 @@
  */
 package org.mule.module.launcher.artifact;
 
-import static org.mule.module.launcher.descriptor.RedeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
+import static org.mule.module.launcher.descriptor.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.artifact.Artifact;
 
 import java.io.File;
 

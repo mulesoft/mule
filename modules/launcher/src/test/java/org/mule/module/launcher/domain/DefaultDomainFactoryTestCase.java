@@ -11,9 +11,9 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.launcher.MuleFoldersUtil.getDomainFolder;
-import static org.mule.module.launcher.descriptor.RedeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
+import static org.mule.module.launcher.descriptor.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
-import static org.mule.module.launcher.domain.DomainFactory.DEFAULT_DOMAIN_NAME;
+import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
 
 import java.io.File;
@@ -28,7 +28,7 @@ import org.junit.Test;
 
 public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase
 {
-    private DomainFactory domainFactory = new DefaultDomainFactory(new MuleDomainClassLoaderRepository(lookupPolicy));
+    private DomainFactory domainFactory = new DefaultDomainFactory(new DomainClassLoaderFactory(lookupPolicy), new DefaultDomainManager());
 
     public DefaultDomainFactoryTestCase() throws IOException
     {

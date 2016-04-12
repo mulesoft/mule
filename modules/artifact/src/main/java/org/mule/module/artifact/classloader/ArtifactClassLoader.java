@@ -6,7 +6,9 @@
  */
 package org.mule.module.artifact.classloader;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Enumeration;
 
 public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourceLocator, ClassLoaderLookupPolicyProvider
 {
@@ -21,6 +23,18 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
      * @return the resource URL, null if it doesn't exists.
      */
     URL findResource(String resource);
+
+    /**
+     * Returns an enumeration of {@link java.net.URL <tt>URL</tt>} objects
+     * representing all the resources with the given name which are local
+     * to the classloader
+     *
+     * @param name The resource name
+     * @return An enumeration of {@link java.net.URL <tt>URL</tt>} objects for
+     * the resources
+     * @throws IOException If I/O errors occur
+     */
+    Enumeration<URL> findResources(final String name) throws IOException;
 
     /**
      * ClassLoader is an abstract class. Not an interface.

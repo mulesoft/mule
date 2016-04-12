@@ -7,12 +7,12 @@
 package org.mule.module.launcher;
 
 import static org.mule.util.SplashScreen.miniSplash;
-
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.NullDeploymentListener;
-import org.mule.module.launcher.artifact.Artifact;
+import org.mule.module.artifact.Artifact;
 import org.mule.module.launcher.artifact.ArtifactFactory;
+import org.mule.module.launcher.artifact.DeployableArtifact;
 import org.mule.module.launcher.util.ObservableList;
 import org.mule.util.CollectionUtils;
 import org.mule.util.StringUtils;
@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  * - Avoid already deployed artifacts to be redeployed
  * - Deploys, undeploys, redeploys packaged and exploded artifacts
  */
-public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeployer<T>
+public class DefaultArchiveDeployer<T extends DeployableArtifact> implements ArchiveDeployer<T>
 {
 
     public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
@@ -541,6 +541,9 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         deploymentListener.onDeploymentStart(artifact.getArtifactName());
         try
         {
+            artifact = artifactFactory.createArtifact(artifact.getArtifactName());
+            trackArtifact(artifact);
+
             deployer.deploy(artifact);
             artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
             deploymentListener.onDeploymentSuccess(artifact.getArtifactName());

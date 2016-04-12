@@ -32,19 +32,19 @@ public class CompositeApplicationClassLoaderFactory implements ArtifactClassLoad
     }
 
     @Override
-    public ArtifactClassLoader create(ApplicationDescriptor descriptor)
+    public ArtifactClassLoader create(ArtifactClassLoader parent, ApplicationDescriptor descriptor)
     {
-        List<ClassLoader> pluginClassLoaders = serverPluginClassLoaderManager.getPluginClassLoaders();
+        ArtifactClassLoader appClassLoader = applicationClassLoaderFactory.create(parent, descriptor);
 
-        ArtifactClassLoader appClassLoader = applicationClassLoaderFactory.create(descriptor);
+        List<ArtifactClassLoader> pluginClassLoaders = serverPluginClassLoaderManager.getPluginClassLoaders();
 
         if (!pluginClassLoaders.isEmpty())
         {
-            List<ClassLoader> classLoaders = new LinkedList<>();
-            classLoaders.add(appClassLoader.getClassLoader());
+            List<ArtifactClassLoader> classLoaders = new LinkedList<>();
+            classLoaders.add(appClassLoader);
             classLoaders.addAll(pluginClassLoaders);
 
-            appClassLoader = new CompositeApplicationClassLoader(descriptor.getName(),  appClassLoader.getClassLoader().getParent(), classLoaders, appClassLoader.getClassLoaderLookupPolicy());
+            appClassLoader = new CompositeApplicationClassLoader(descriptor.getName(), appClassLoader.getClassLoader().getParent(), classLoaders, appClassLoader.getClassLoaderLookupPolicy());
         }
 
         return appClassLoader;

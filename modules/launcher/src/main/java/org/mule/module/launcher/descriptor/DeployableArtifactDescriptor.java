@@ -8,7 +8,10 @@ package org.mule.module.launcher.descriptor;
 
 import org.mule.module.artifact.descriptor.ArtifactDescriptor;
 
-public class RedeployableArtifactDescriptor extends ArtifactDescriptor
+/**
+ * Describes an artifact that is deployable on the container
+ */
+public class DeployableArtifactDescriptor extends ArtifactDescriptor
 {
     public static final String DEFAULT_DEPLOY_PROPERTIES_RESOURCE = "mule-deploy.properties";
 

@@ -7,17 +7,17 @@
 package org.mule.module.launcher;
 
 import org.mule.config.i18n.MessageFactory;
-import org.mule.module.launcher.artifact.Artifact;
+import org.mule.module.launcher.artifact.DeployableArtifact;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDeployer
+public class DefaultArtifactDeployer<T extends DeployableArtifact> implements ArtifactDeployer<T>
 {
 
     protected transient final Log logger = LogFactory.getLog(getClass());
 
-    public void deploy(Artifact artifact)
+    public void deploy(T artifact)
     {
         try
         {
@@ -39,7 +39,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         }
     }
 
-    public void undeploy(Artifact artifact)
+    public void undeploy(T artifact)
     {
         try
         {
@@ -58,7 +58,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         }
     }
 
-    private void tryToDisposeArtifact(Artifact artifact)
+    private void tryToDisposeArtifact(T artifact)
     {
         try
         {
@@ -70,7 +70,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         }
     }
 
-    private void tryToStopArtifact(Artifact artifact)
+    private void tryToStopArtifact(T artifact)
     {
 
         try

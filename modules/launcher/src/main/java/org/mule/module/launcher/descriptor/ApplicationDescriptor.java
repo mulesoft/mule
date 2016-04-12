@@ -6,8 +6,10 @@
  */
 package org.mule.module.launcher.descriptor;
 
-import org.mule.module.artifact.descriptor.ArtifactDescriptor;
+import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptor;
+import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -17,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class ApplicationDescriptor extends RedeployableArtifactDescriptor
+public class ApplicationDescriptor extends DeployableArtifactDescriptor
 {
 
     public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
@@ -31,7 +33,7 @@ public class ApplicationDescriptor extends RedeployableArtifactDescriptor
 
     private String encoding;
     private String configurationBuilder;
-    private String domain;
+    private String domain = DEFAULT_DOMAIN_NAME;
     private String packagesToScan;
     private String[] configResources = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
     private String[] absoluteResourcePaths;
@@ -85,6 +87,7 @@ public class ApplicationDescriptor extends RedeployableArtifactDescriptor
 
     public void setDomain(String domain)
     {
+        checkArgument(!StringUtils.isEmpty(domain), "Domain name cannot be empty");
         this.domain = domain;
     }
 

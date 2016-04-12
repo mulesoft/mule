@@ -6,6 +6,8 @@
  */
 package org.mule.module.launcher.artifact;
 
+import org.mule.module.artifact.Artifact;
+
 import java.io.File;
 import java.io.IOException;
 

@@ -6,6 +6,8 @@
  */
 package org.mule.module.launcher;
 
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
+
 import java.util.List;
 
 public interface ServerPluginClassLoaderManager
@@ -16,12 +18,12 @@ public interface ServerPluginClassLoaderManager
      *
      * @param classLoader plugin classloader to add. Non null
      */
-    void addPluginClassLoader(ClassLoader classLoader);
+    void addPluginClassLoader(ArtifactClassLoader classLoader);
 
     /**
      * Immutable list of current plugin classloaders
      *
-     * @return list of classlaoders. Non null
+     * @return list of classloaders. Non null
      */
-    List<ClassLoader> getPluginClassLoaders();
+    List<ArtifactClassLoader> getPluginClassLoaders();
 }

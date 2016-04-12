@@ -9,10 +9,11 @@ package org.mule.module.launcher.application;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.module.artifact.classloader.DisposableClassLoader;
 import org.mule.module.artifact.classloader.EnumerationMatcher;
-import org.mule.module.artifact.classloader.TestClassLoader;
+import org.mule.module.artifact.classloader.TestArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -45,7 +46,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     public final InputStream APP_LOADED_STREAM_RESOURCE = mock(InputStream.class);
     public final InputStream PLUGIN_LOADED_STREAM_RESOURCE = mock(InputStream.class);
     private final TestApplicationClassLoader appClassLoader = new TestApplicationClassLoader();
-    private final TestClassLoader pluginClassLoader = new SubTestClassLoader();
+    private final TestArtifactClassLoader pluginClassLoader = new SubTestClassLoader();
     private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
 
 
@@ -61,7 +62,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         appClassLoader.addClass(CLASS_NAME, APP_LOADED_CLASS);
         pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
 
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders, lookupPolicy);
 
@@ -74,7 +75,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     {
         pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
 
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders, lookupPolicy);
 
@@ -85,7 +86,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     @Test(expected = ClassNotFoundException.class)
     public void failsToLoadClassWhenIsNotDefinedInAnyClassLoader() throws Exception
     {
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, mock(ClassLoader.class), classLoaders, lookupPolicy);
 
@@ -98,7 +99,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         appClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
         pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders, lookupPolicy);
 
@@ -111,7 +112,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     {
         pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders, lookupPolicy);
 
@@ -122,7 +123,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     @Test
     public void returnsNullResourceWhenIsNotDefinedInAnyClassLoader() throws Exception
     {
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders, lookupPolicy);
 
@@ -136,7 +137,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         appClassLoader.addStreamResource(RESOURCE_NAME, APP_LOADED_STREAM_RESOURCE);
         pluginClassLoader.addStreamResource(RESOURCE_NAME, PLUGIN_LOADED_STREAM_RESOURCE);
 
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders, lookupPolicy);
 
@@ -149,7 +150,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     {
         pluginClassLoader.addStreamResource(RESOURCE_NAME, PLUGIN_LOADED_STREAM_RESOURCE);
 
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders, lookupPolicy);
 
@@ -160,7 +161,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     @Test
     public void returnsNullStreamResourceWhenIsNotDefinedInAnyClassLoader() throws Exception
     {
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders, lookupPolicy);
 
@@ -174,7 +175,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         appClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
         pluginClassLoader.addResource(PLUGIN_RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders, lookupPolicy);
 
@@ -193,7 +194,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         appClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
         pluginClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
 
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders, lookupPolicy);
 
@@ -213,7 +214,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         appClassLoader.addResource(RESOURCE_NAME, APP_LOADED_RESOURCE);
         pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders, lookupPolicy);
 
@@ -226,7 +227,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     {
         pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
 
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders, lookupPolicy);
 
@@ -237,7 +238,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     @Test
     public void returnsNullFindingResourceWhenIsNotDefinedInAnyClassLoader() throws Exception
     {
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, null, classLoaders, lookupPolicy);
 
@@ -248,7 +249,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
     @Test
     public void disposesApplicationClassLoaders() throws Exception
     {
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
+        List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
         CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, Thread.currentThread().getContextClassLoader(), classLoaders, lookupPolicy);
 
@@ -256,16 +257,16 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         assertThat(appClassLoader.disposed, equalTo(true));
     }
 
-    private List<ClassLoader> getClassLoaders(ClassLoader... expectedClassLoaders)
+    private List<ArtifactClassLoader> getClassLoaders(ArtifactClassLoader... expectedClassLoaders)
     {
-        List<ClassLoader> classLoaders = new LinkedList<>();
+        List<ArtifactClassLoader> classLoaders = new LinkedList<>();
 
         Collections.addAll(classLoaders, expectedClassLoaders);
 
         return classLoaders;
     }
 
-    public static class TestApplicationClassLoader extends TestClassLoader implements DisposableClassLoader
+    public static class TestApplicationClassLoader extends TestArtifactClassLoader implements DisposableClassLoader
     {
 
         private boolean disposed;
@@ -279,7 +280,7 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
 
     // Used to ensure that the composite classloader is able to access
     // protected methods in subclasses by reflection
-    public static class SubTestClassLoader extends TestClassLoader
+    public static class SubTestClassLoader extends TestArtifactClassLoader
     {
 
     }

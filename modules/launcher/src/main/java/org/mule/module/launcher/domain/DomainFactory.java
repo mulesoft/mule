@@ -8,16 +8,10 @@ package org.mule.module.launcher.domain;
 
 import org.mule.module.launcher.artifact.ArtifactFactory;
 
-import java.io.IOException;
-
 /**
  * Factory for {@link Domain} artifact creation
  */
 public interface DomainFactory extends ArtifactFactory<Domain>
 {
-
-    String DEFAULT_DOMAIN_NAME = "default";
-
-    public Domain createDefaultDomain() throws IOException;
 
 }

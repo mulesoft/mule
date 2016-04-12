@@ -49,20 +49,9 @@ import org.apache.commons.io.FileUtils;
  * The value added by this class in comparison to a traditional
  * {@link FunctionalTestCase} is that before creating
  * the {@link MuleContext}, it creates a {@link ExtensionManager}
- * and automatically discovers extensions by delegating on
- * {@link ExtensionManager#discoverExtensions(ClassLoader)}.
+ * and registers the extensions provided on the test.
  * <p/>
- * By default, standard extension discovery will be
- * performed by invoking {@link ExtensionManager#discoverExtensions(ClassLoader)}.
- * Although this behavior suits most use cases, it can be time consuming because of
- * all the classpath scanning and the overhead of initialising extensions that
- * are most likely not used in this tests. As the number of extensions available grows,
- * the problem gets worst. For those cases,  you can override the {@link #getDescribers()}
- * and specify which describers are to be used to initialise the extensions manager. In that way,
- * extensions discovery is skipped and you only initialise what you need.
- * <p/>
- * Once extensions are discovered and described,
- * a {@link ResourcesGenerator} is used to automatically
+ * Once extensions are registered, a {@link ResourcesGenerator} is used to automatically
  * generate any backing resources needed (for example, XSD schemas, spring bundles,
  * service registration files, etc).
  * <p/>
@@ -166,14 +155,7 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
             }
         }
 
-        if (ArrayUtils.isEmpty(describers))
-        {
-            extensionManager.discoverExtensions(getClass().getClassLoader());
-        }
-        else
-        {
-            loadExtensionsFromDescribers(extensionManager, describers);
-        }
+        loadExtensionsFromDescribers(extensionManager, describers);
 
         ResourcesGenerator generator = new ExtensionsTestInfrastructureResourcesGenerator(serviceRegistry, generatedResourcesDirectory);
 

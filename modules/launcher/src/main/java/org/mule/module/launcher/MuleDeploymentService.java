@@ -8,19 +8,22 @@ package org.mule.module.launcher;
 
 import static org.mule.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.module.artifact.classloader.MuleClassLoaderLookupPolicy;
 import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.application.ApplicationFactory;
 import org.mule.module.launcher.application.CompositeApplicationClassLoaderFactory;
 import org.mule.module.launcher.application.DefaultApplicationFactory;
 import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
+import org.mule.module.launcher.artifact.ArtifactFactory;
+import org.mule.module.launcher.descriptor.DomainDescriptor;
 import org.mule.module.launcher.domain.DefaultDomainFactory;
+import org.mule.module.launcher.domain.DefaultDomainManager;
 import org.mule.module.launcher.domain.Domain;
-import org.mule.module.launcher.domain.DomainClassLoaderRepository;
 import org.mule.module.launcher.domain.DomainFactory;
-import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
+import org.mule.module.launcher.domain.DomainManager;
+import org.mule.module.launcher.domain.DomainClassLoaderFactory;
 import org.mule.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
 import org.mule.module.launcher.util.DebuggableReentrantLock;
@@ -77,20 +80,29 @@ public class MuleDeploymentService implements DeploymentService
     private final ArchiveDeployer<Domain> domainDeployer;
     private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
     private DefaultArchiveDeployer<Application> applicationDeployer;
+    private final DomainManager domainManager = new DefaultDomainManager();
 
     public MuleDeploymentService(ServerPluginClassLoaderManager serverPluginClassLoaderManager)
     {
         final MuleClassLoaderLookupPolicy containerLookupPolicy = new MuleClassLoaderLookupPolicy(Collections.emptyMap(), SYSTEM_PACKAGES);
 
-        DomainClassLoaderRepository domainClassLoaderRepository = new MuleDomainClassLoaderRepository(containerLookupPolicy);
+        ArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory = new DomainClassLoaderFactory(containerLookupPolicy);
 
-        ArtifactClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory(domainClassLoaderRepository, new DefaultNativeLibraryFinderFactory());
+        ArtifactClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory());
         applicationClassLoaderFactory = new CompositeApplicationClassLoaderFactory(applicationClassLoaderFactory, serverPluginClassLoaderManager);
 
-        DefaultDomainFactory domainFactory = new DefaultDomainFactory(domainClassLoaderRepository);
+        DefaultDomainFactory domainFactory = new DefaultDomainFactory(domainClassLoaderFactory, domainManager);
         domainFactory.setDeploymentListener(domainDeploymentListener);
+        try
+        {
+            domainFactory.createArtifact(DEFAULT_DOMAIN_NAME);
+        }
+        catch (IOException e)
+        {
+            throw new IllegalStateException("Cannot create default domain");
+        }
         final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory()));
-        DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderFactory, domainFactory, applicationDescriptorFactory);
+        DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderFactory, applicationDescriptorFactory, domainManager);
         applicationFactory.setDeploymentListener(applicationDeploymentListener);
 
         ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>();
@@ -101,7 +113,7 @@ public class MuleDeploymentService implements DeploymentService
         this.domainDeployer = new DomainArchiveDeployer(
                 new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains, deploymentLock,
                         new DomainDeploymentTemplate(applicationDeployer, this)),
-                applicationDeployer, applicationMuleDeployer, this);
+                applicationDeployer, this);
         this.domainDeployer.setDeploymentListener(domainDeploymentListener);
         this.deploymentDirectoryWatcher = new DeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, deploymentLock);
     }
@@ -189,7 +201,7 @@ public class MuleDeploymentService implements DeploymentService
         return domainDeployer.getArtifactsZombieMap();
     }
 
-    public void setAppFactory(ApplicationFactory appFactory)
+    public void setAppFactory(ArtifactFactory<Application> appFactory)
     {
         this.applicationDeployer.setArtifactFactory(appFactory);
     }

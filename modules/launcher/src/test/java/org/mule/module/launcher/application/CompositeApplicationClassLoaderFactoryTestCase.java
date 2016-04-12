@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.launcher.ServerPluginClassLoaderManager;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
@@ -38,10 +38,10 @@ public class CompositeApplicationClassLoaderFactoryTestCase extends AbstractMule
     public void createsDefaultApplicationClassLoaderWhenNoPluginInstalled() throws Exception
     {
         ClassLoader expectedClassLoader = Thread.currentThread().getContextClassLoader();
-        when(applicationClassLoaderFactory.create(appDescriptor).getClassLoader()).thenReturn(expectedClassLoader);
+        when(applicationClassLoaderFactory.create(null, appDescriptor).getClassLoader()).thenReturn(expectedClassLoader);
         when(serverPluginClassLoaderManager.getPluginClassLoaders()).thenReturn(Collections.EMPTY_LIST);
 
-        ClassLoader appClassLoader = pluginAwareClassLoaderFactory.create(appDescriptor).getClassLoader();
+        ClassLoader appClassLoader = pluginAwareClassLoaderFactory.create(null, appDescriptor).getClassLoader();
 
         assertThat(appClassLoader, equalTo(expectedClassLoader));
     }
@@ -50,14 +50,16 @@ public class CompositeApplicationClassLoaderFactoryTestCase extends AbstractMule
     public void createsCompositeWhenPluginsInstalled() throws Exception
     {
         TestClassLoader appClassLoader = new TestClassLoader();
-        when(applicationClassLoaderFactory.create(appDescriptor).getClassLoader()).thenReturn(appClassLoader);
+        when(applicationClassLoaderFactory.create(null, appDescriptor).getClassLoader()).thenReturn(appClassLoader);
 
+        final List<ArtifactClassLoader> artifactClassLoaders = new LinkedList<>();
         TestClassLoader pluginClassLoader = new TestClassLoader();
-        List<ClassLoader> pluginClassLoaders = new LinkedList<ClassLoader>();
-        pluginClassLoaders.add(pluginClassLoader);
-        when(serverPluginClassLoaderManager.getPluginClassLoaders()).thenReturn(pluginClassLoaders);
+        ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
+        when(artifactClassLoader.getClassLoader()).thenReturn(pluginClassLoader);
+        artifactClassLoaders.add(artifactClassLoader);
+        when(serverPluginClassLoaderManager.getPluginClassLoaders()).thenReturn(artifactClassLoaders);
 
-        ClassLoader createdClassLoader = pluginAwareClassLoaderFactory.create(appDescriptor).getClassLoader();
+        ClassLoader createdClassLoader = pluginAwareClassLoaderFactory.create(null, appDescriptor).getClassLoader();
 
         createdClassLoader.getResource("foo");
         assertThat(appClassLoader.loadedResource, equalTo(true));

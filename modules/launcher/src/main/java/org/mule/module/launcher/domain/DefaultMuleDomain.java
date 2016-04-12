@@ -48,7 +48,6 @@ public class DefaultMuleDomain implements Domain
     protected transient final Log logger = LogFactory.getLog(getClass());
     protected transient final Log deployLogger = LogFactory.getLog(MuleDeploymentService.class);
 
-    private final DomainClassLoaderRepository domainClassLoaderRepository;
     private final DomainDescriptor descriptor;
     private MuleContext muleContext;
     private DeploymentListener deploymentListener;
@@ -56,16 +55,15 @@ public class DefaultMuleDomain implements Domain
 
     private File configResourceFile;
 
-    public DefaultMuleDomain(DomainClassLoaderRepository domainClassLoaderRepository, DomainDescriptor descriptor)
+    public DefaultMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader)
     {
-        this.domainClassLoaderRepository = domainClassLoaderRepository;
+        this.deploymentClassLoader = deploymentClassLoader;
         this.deploymentListener = new NullDeploymentListener();
         this.descriptor = descriptor;
         refreshClassLoaderAndLoadConfigResourceFile();
     }
 
     private void refreshClassLoaderAndLoadConfigResourceFile(){
-        this.deploymentClassLoader = domainClassLoaderRepository.getDomainClassLoader(descriptor);
         URL resource = deploymentClassLoader.findLocalResource(DOMAIN_CONFIG_FILE_LOCATION);
         if (resource != null)
         {
