@@ -58,7 +58,6 @@ public class FtpConnector implements FileConnectorConfig
      */
     @Parameter
     @Optional(defaultValue = "BINARY")
-    //TODO: MULE-9213
     private FtpTransferMode transferMode;
 
     /**
@@ -109,7 +108,6 @@ public class FtpConnector implements FileConnectorConfig
      * <p>
      * Defaults to {@code true}.
      */
-    //TODO: MULE-9213
     @Parameter
     @Optional(defaultValue = "true")
     private boolean passive = true;
