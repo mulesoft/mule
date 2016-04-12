@@ -32,6 +32,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
+import static org.mule.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
@@ -180,6 +181,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         domainsDir = new File(muleHome, "domains");
         domainsDir.mkdirs();
         System.setProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, muleHome.getCanonicalPath());
+
+        final File domainFolder = getDomainFolder(DEFAULT_DOMAIN_NAME);
+        assertThat(domainFolder.mkdirs(), is(true));
 
         new File(muleHome, "lib/shared/default").mkdirs();
 
@@ -1499,9 +1503,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-        assertDomainDir(NONE, new String[] {emptyDomainFileBuilder.getId()}, true);
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, emptyDomainFileBuilder.getId()}, true);
 
-        final Domain domain = findADomain(emptyDomainFileBuilder.getId(), 1);
+        final Domain domain = findADomain(emptyDomainFileBuilder.getId());
         assertNotNull(domain);
         assertNotNull(domain.getMuleContext());
         assertDomainAnchorFileExists(emptyDomainFileBuilder.getId());
@@ -1579,9 +1583,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainBundleFileBuilder.getId());
 
-        assertDomainDir(NONE, new String[] {dummyDomainBundleFileBuilder.getId()}, true);
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, dummyDomainBundleFileBuilder.getId()}, true);
 
-        final Domain domain = findADomain(dummyDomainBundleFileBuilder.getId(), 1);
+        final Domain domain = findADomain(dummyDomainBundleFileBuilder.getId());
         assertNotNull(domain);
         assertNull(domain.getMuleContext());
 
@@ -1636,7 +1640,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         assertDeploymentFailure(domainDeploymentListener, invalidDomainBundleFileBuilder.getId());
 
-        assertDomainDir(NONE, new String[] {invalidDomainBundleFileBuilder.getId()}, true);
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, invalidDomainBundleFileBuilder.getId()}, true);
 
         assertAppsDir(NONE, new String[] {}, true);
     }
@@ -1650,9 +1654,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-        assertDomainDir(NONE, new String[] {emptyDomainFileBuilder.getId()}, true);
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, emptyDomainFileBuilder.getId()}, true);
 
-        final Domain domain = findADomain(emptyDomainFileBuilder.getId(), 1);
+        final Domain domain = findADomain(emptyDomainFileBuilder.getId());
         assertNotNull(domain);
         assertNotNull(domain.getMuleContext());
         assertDomainAnchorFileExists(emptyDomainFileBuilder.getId());
@@ -1667,7 +1671,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentFailure(domainDeploymentListener, brokenDomainFileBuilder.getId());
 
-        assertDomainDir(new String[] {brokenDomainFileBuilder.getDeployedPath()}, NONE, true);
+        assertDomainDir(new String[] {brokenDomainFileBuilder.getDeployedPath()}, new String[] {DEFAULT_DOMAIN_NAME}, true);
 
         assertDomainAnchorFileDoesNotExists(brokenDomainFileBuilder.getId());
 
@@ -1687,7 +1691,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentFailure(domainDeploymentListener, brokenDomainFileBuilder.getId());
 
-        assertDomainDir(new String[] {brokenDomainFileBuilder.getDeployedPath()}, NONE, true);
+        assertDomainDir(new String[] {brokenDomainFileBuilder.getDeployedPath()}, new String[] {DEFAULT_DOMAIN_NAME}, true);
 
         assertDomainAnchorFileDoesNotExists(brokenDomainFileBuilder.getId());
 
@@ -1709,8 +1713,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
 
-        assertDomainDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
-        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME,  emptyAppFileBuilder.getId()}, true);
+        assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
 
         reset(domainDeploymentListener);
 
@@ -1719,8 +1723,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertUndeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
         assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
-        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
-        assertDomainDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+        assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, emptyAppFileBuilder.getId()}, true);
     }
 
     @Test
@@ -1734,8 +1738,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
 
-        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
-        Domain firstDomain = deploymentService.getDomains().get(0);
+        assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
+        Domain firstDomain = findADomain(emptyAppFileBuilder.getId());
 
         reset(domainDeploymentListener);
 
@@ -1744,8 +1748,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertUndeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
         assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
-        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
-        Domain secondDomain = deploymentService.getDomains().get(0);
+        assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
+        Domain secondDomain = findADomain(emptyAppFileBuilder.getId());
 
         assertNotSame(firstDomain, secondDomain);
     }
@@ -1787,8 +1791,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
 
-        assertDomainDir(NONE, new String[] {dummyDomainFileBuilder.getId()}, true);
-        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, dummyDomainFileBuilder.getId()}, true);
+        assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
 
         reset(domainDeploymentListener);
 
@@ -1797,8 +1801,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
-        assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getDomains().size());
-        assertDomainDir(NONE, new String[] {dummyDomainFileBuilder.getId()}, true);
+        assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, dummyDomainFileBuilder.getId()}, true);
     }
 
     protected void alterTimestampIfNeeded(File file, long firstTimestamp)
@@ -1819,7 +1823,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
 
         assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
-        assertDomainDir(NONE, new String[] {emptyDomainFileBuilder.getId()}, true);
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, emptyDomainFileBuilder.getId()}, true);
         assertDomainAnchorFileExists(emptyDomainFileBuilder.getId());
     }
 
@@ -1849,7 +1853,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         addExplodedDomainFromBuilder(emptyDomainFileBuilder);
 
         assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
-        assertDomainDir(NONE, new String[] {emptyDomainFileBuilder.getId()}, true);
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, emptyDomainFileBuilder.getId()}, true);
         assertDomainAnchorFileExists(emptyDomainFileBuilder.getId());
     }
 
@@ -1863,7 +1867,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentFailure(domainDeploymentListener, "domain with spaces");
 
         // Maintains app dir created
-        assertDomainDir(NONE, new String[] {"domain with spaces"}, true);
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, "domain with spaces"}, true);
         final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
         assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
@@ -1883,7 +1887,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentFailure(domainDeploymentListener, "domain with spaces");
 
         // Maintains app dir created
-        assertDomainDir(NONE, new String[] {"domain with spaces"}, true);
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, "domain with spaces"}, true);
         final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
         assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
@@ -1921,7 +1925,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
         // Maintains app dir created
-        assertDomainDir(NONE, new String[] {incompleteDomainFileBuilder.getId()}, true);
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, incompleteDomainFileBuilder.getId()}, true);
         final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
         assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
@@ -1939,7 +1943,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
         // Maintains app dir created
-        assertDomainDir(NONE, new String[] {incompleteDomainFileBuilder.getId()}, true);
+        assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, incompleteDomainFileBuilder.getId()}, true);
         final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
@@ -1970,7 +1974,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
 
         assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
-        final Domain domain = findADomain(emptyAppFileBuilder.getId(), 1);
+        final Domain domain = findADomain(emptyAppFileBuilder.getId());
         domain.stop();
 
         deploymentService.undeploy(domain);
@@ -1998,7 +2002,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             @Override
             public void perform()
             {
-                Domain domain = findADomain(dummyDomainFileBuilder.getId(), 1);
+                Domain domain = findADomain(dummyDomainFileBuilder.getId());
                 deploymentService.undeploy(domain);
             }
         });
@@ -2191,7 +2195,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentSuccess(applicationDeploymentListener, httpBAppFileBuilder.getId());
 
         // Ensure resources are registered at domain's registry
-        Domain domain = findADomain(sharedHttpDomainFileBuilder.getId(), 1);
+        Domain domain = findADomain(sharedHttpDomainFileBuilder.getId());
         assertThat(domain.getMuleContext().getRegistry().get("http-listener-config"), not(is(nullValue())));
 
         ArtifactClassLoader initialArtifactClassLoader = domain.getArtifactClassLoader();
@@ -2213,7 +2217,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDeploymentSuccess(applicationDeploymentListener, httpAAppFileBuilder.getId());
         assertDeploymentSuccess(applicationDeploymentListener, httpBAppFileBuilder.getId());
 
-        domain = findADomain(sharedHttpDomainFileBuilder.getId(), 1);
+        domain = findADomain(sharedHttpDomainFileBuilder.getId());
         ArtifactClassLoader artifactClassLoaderAfterRedeployment = domain.getArtifactClassLoader();
 
         // Ensure that after redeployment the domain's class loader has changed
@@ -2949,14 +2953,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     /**
-     * Find a deployed domain, performing some basic assertions.
+     * Finds a deployed domain
      */
-    private Domain findADomain(final String domainName, int totalAppsExpected)
+    private Domain findADomain(final String domainName)
     {
-        // list all apps to validate total count
-        final List<Domain> apps = deploymentService.getDomains();
-        assertNotNull(apps);
-        assertEquals(totalAppsExpected, apps.size());
         final Domain domain = deploymentService.findDomain(domainName);
         assertNotNull(domain);
         return domain;
