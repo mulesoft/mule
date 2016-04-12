@@ -240,14 +240,21 @@ public class SftpConnector extends AbstractConnector
             }
             else
             {
-                if (client != null && client.isConnected())
+                if (client != null)
                 {
-                    ObjectPool pool = getClientPool(endpoint);
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Releasing connection for endpoint " + endpoint.getEndpointURI());
                     }
-                    pool.returnObject(client);
+                    if (!client.isConnected())
+                    {
+                        doDestroyClient(endpoint, client);
+                    }
+                    else
+                    {
+                        ObjectPool pool = getClientPool(endpoint);
+                        pool.returnObject(client);
+                    }
                 }
             }
         }
@@ -261,12 +268,17 @@ public class SftpConnector extends AbstractConnector
     {
         if (useConnectionPool())
         {
-            if ((client != null) && (client.isConnected()))
+            if (client != null)
             {
-                ObjectPool pool = getClientPool(endpoint);
-                pool.invalidateObject(client);
+                doDestroyClient(endpoint, client);
             }
         }
+    }
+
+    protected void doDestroyClient(ImmutableEndpoint endpoint, SftpClient client) throws Exception
+    {
+        ObjectPool pool = getClientPool(endpoint);
+        pool.invalidateObject(client);
     }
 
     protected synchronized ObjectPool getClientPool(ImmutableEndpoint endpoint)
