@@ -83,44 +83,58 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
     public void sendResponseToClient(MuleEvent muleEvent, ResponseCompletionCallback responseCompletationCallback) throws MuleException
     {
         final org.mule.module.http.internal.domain.response.HttpResponseBuilder responseBuilder = new org.mule.module.http.internal.domain.response.HttpResponseBuilder();
-        try
-        {
-            final HttpResponse httpResponse = buildResponse(muleEvent, responseBuilder, responseCompletationCallback);
-            responseReadyCallback.responseReady(httpResponse, getResponseFailureCallback(responseCompletationCallback, muleEvent));
-        }
-        catch (Exception e)
-        {
-            // Handle errors that occur while sending the response
-            responseCompletationCallback.responseSentWithFailure(e, muleEvent);
-        }
+        final HttpResponse httpResponse = buildResponse(muleEvent, responseBuilder, responseCompletationCallback);
+        responseReadyCallback.responseReady(httpResponse, getResponseFailureCallback(responseCompletationCallback, muleEvent));
+    }
+
+    protected HttpResponse buildErrorResponse()
+    {
+        final org.mule.module.http.internal.domain.response.HttpResponseBuilder errorResponseBuilder = new org.mule.module.http.internal.domain.response.HttpResponseBuilder();
+        final HttpResponse errorResponse = errorResponseBuilder.setStatusCode(INTERNAL_SERVER_ERROR.getStatusCode())
+                                                               .setReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
+                                                               .build();
+        return errorResponse;
     }
 
     protected HttpResponse buildResponse(MuleEvent muleEvent, final org.mule.module.http.internal.domain.response.HttpResponseBuilder responseBuilder,
-                                         ResponseCompletionCallback responseCompletationCallback) throws MessagingException
+                                         ResponseCompletionCallback responseCompletationCallback)
+    {
+        addThrottlingHeaders(responseBuilder);
+        final HttpResponse httpResponse;
+
+        if (muleEvent == null)
+        {
+            // If the event was filtered, return an empty response with status code 200 OK.
+            httpResponse = responseBuilder.setStatusCode(OK_STATUS_CODE).build();
+        }
+        else
+        {
+            httpResponse = doBuildResponse(muleEvent, responseBuilder, responseCompletationCallback);
+        }
+        return httpResponse;
+    }
+
+    protected HttpResponse doBuildResponse(MuleEvent muleEvent, final org.mule.module.http.internal.domain.response.HttpResponseBuilder responseBuilder,
+                                           ResponseCompletionCallback responseCompletationCallback)
     {
         try
         {
-            addThrottlingHeaders(responseBuilder);
-            final HttpResponse httpResponse;
-
-            if (muleEvent == null)
-            {
-                // If the event was filtered, return an empty response with status code 200 OK.
-                httpResponse = responseBuilder.setStatusCode(OK_STATUS_CODE).build();
-            }
-            else
-            {
-                httpResponse = this.responseBuilder.build(responseBuilder, muleEvent);
-            }
-            return httpResponse;
+            return this.responseBuilder.build(responseBuilder, muleEvent);
         }
         catch (Exception e)
         {
-            // Handle errors that occur while building the response
-            responseCompletationCallback.responseSentWithFailure(e, muleEvent);
-            return responseBuilder.setStatusCode(INTERNAL_SERVER_ERROR.getStatusCode())
-                                  .setReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
-                                  .build();
+            try
+            {
+                // Handle errors that occur while building the response.
+                MuleEvent exceptionStrategyResult = responseCompletationCallback.responseSentWithFailure(e, muleEvent);
+                // Send the result from the event that was built from the Exception Strategy.
+                return this.responseBuilder.build(responseBuilder, exceptionStrategyResult);
+            }
+            catch (Exception innerException)
+            {
+                // The failure occurred while executing the ES, or while building the response from the result of the ES
+                return buildErrorResponse();
+            }
         }
     }
 
@@ -131,7 +145,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
             @Override
             public void responseSendFailure(Throwable throwable)
             {
-                responseCompletationCallback.responseSentWithFailure(getException(throwable), muleEvent);
+                responseReadyCallback.responseReady(buildErrorResponse(), this);
             }
 
             @Override
@@ -140,15 +154,6 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
                 responseCompletationCallback.responseSentSuccessfully();
             }
         };
-    }
-
-    private Exception getException(Throwable throwable)
-    {
-        if (throwable instanceof Exception)
-        {
-            return (Exception) throwable;
-        }
-        return new Exception(throwable);
     }
 
     @Override

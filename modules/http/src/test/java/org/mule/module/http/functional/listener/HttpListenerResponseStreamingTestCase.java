@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static org.apache.http.client.fluent.Request.Get;
+import static org.apache.http.client.fluent.Request.Post;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -24,14 +26,15 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
-import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 
 public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
 {
 
-    public static final String TEST_BODY = RandomStringUtils.randomAlphabetic(100*1024);
+    private static final int DEFAULT_TIMEOUT = 1000;
+
+    public static final String TEST_BODY = RandomStringUtils.randomAlphabetic(100 * 1024);
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
 
@@ -45,7 +48,10 @@ public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTe
 
     protected void testResponseIsContentLengthEncoding(String url, HttpVersion httpVersion) throws IOException
     {
-        final Response response = Request.Get(url).version(httpVersion).connectTimeout(1000).socketTimeout(1000).execute();
+        final Response response = Get(url).version(httpVersion)
+                                          .connectTimeout(DEFAULT_TIMEOUT)
+                                          .socketTimeout(DEFAULT_TIMEOUT)
+                                          .execute();
         final HttpResponse httpResponse = response.returnResponse();
         final Header transferEncodingHeader = httpResponse.getFirstHeader(TRANSFER_ENCODING);
         final Header contentLengthHeader = httpResponse.getFirstHeader(CONTENT_LENGTH);
@@ -61,7 +67,11 @@ public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTe
 
     protected void testResponseIsChunkedEncoding(String url, HttpVersion httpVersion) throws IOException
     {
-        final Response response = Request.Post(url).version(httpVersion).connectTimeout(1000).socketTimeout(1000).bodyByteArray(TEST_BODY.getBytes()).execute();
+        final Response response = Post(url).version(httpVersion)
+                                           .connectTimeout(DEFAULT_TIMEOUT)
+                                           .socketTimeout(DEFAULT_TIMEOUT)
+                                           .bodyByteArray(TEST_BODY.getBytes())
+                                           .execute();
         final HttpResponse httpResponse = response.returnResponse();
         final Header transferEncodingHeader = httpResponse.getFirstHeader(TRANSFER_ENCODING);
         final Header contentLengthHeader = httpResponse.getFirstHeader(CONTENT_LENGTH);
@@ -73,7 +83,11 @@ public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTe
 
     protected void testResponseIsNotChunkedEncoding(String url, HttpVersion httpVersion) throws IOException
     {
-        final Response response = Request.Post(url).version(httpVersion).connectTimeout(1000).socketTimeout(1000).bodyByteArray(TEST_BODY.getBytes()).execute();
+        final Response response = Post(url).version(httpVersion)
+                                           .connectTimeout(DEFAULT_TIMEOUT)
+                                           .socketTimeout(DEFAULT_TIMEOUT)
+                                           .bodyByteArray(TEST_BODY.getBytes())
+                                           .execute();
         final HttpResponse httpResponse = response.returnResponse();
         final Header transferEncodingHeader = httpResponse.getFirstHeader(TRANSFER_ENCODING);
         final Header contentLengthHeader = httpResponse.getFirstHeader(CONTENT_LENGTH);
