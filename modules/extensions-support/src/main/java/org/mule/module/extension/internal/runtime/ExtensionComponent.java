@@ -13,6 +13,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DefaultMetadataContext;
 import org.mule.api.metadata.MetadataAware;
 import org.mule.api.metadata.MetadataContext;
@@ -22,9 +24,7 @@ import org.mule.api.metadata.MuleMetadataManager;
 import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.api.metadata.resolving.FailureCode;
 import org.mule.api.metadata.resolving.MetadataResult;
-import org.mule.extension.api.introspection.ComponentModel;
 import org.mule.extension.api.introspection.RuntimeComponentModel;
-import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
@@ -32,12 +32,10 @@ import org.mule.internal.connection.ConnectionManagerAdapter;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.metadata.MetadataMediator;
 import org.mule.module.extension.internal.runtime.config.DynamicConfigurationProvider;
-import org.mule.module.extension.internal.runtime.processor.IllegalComponentException;
 import org.mule.module.extension.internal.runtime.processor.OperationMessageProcessor;
 import org.mule.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +49,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public abstract class ExtensionComponent implements MuleContextAware, MetadataAware, FlowConstructAware
+public abstract class ExtensionComponent implements MuleContextAware, MetadataAware, FlowConstructAware, Initialisable
 {
 
     private final RuntimeExtensionModel extensionModel;
@@ -75,6 +73,21 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
         this.extensionManager = extensionManager;
         this.metadataMediator = new MetadataMediator(componentModel);
     }
+
+    @Override
+    public final void initialise() throws InitialisationException
+    {
+        Optional<ConfigurationProvider<Object>> provider = getConfigurationProvider();
+
+        if (provider.isPresent())
+        {
+            validateOperationConfiguration(provider.get());
+        }
+
+        doInitialise();
+    }
+
+    protected abstract void doInitialise() throws InitialisationException;
 
     @Override
     public void setMuleContext(MuleContext context)
@@ -147,11 +160,14 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
                 });
     }
 
-    protected Optional<ConfigurationProvider<Object>> getConfigurationProvider()
+    private Optional<ConfigurationProvider<Object>> getConfigurationProvider()
     {
         Optional<ConfigurationProvider<Object>> provider = StringUtils.isBlank(configurationProviderName)
                                                            ? extensionManager.getConfigurationProvider(extensionModel)
                                                            : extensionManager.getConfigurationProvider(configurationProviderName);
         return provider;
     }
+
+    protected abstract void validateOperationConfiguration(ConfigurationProvider<Object> configurationProvider);
+
 }
