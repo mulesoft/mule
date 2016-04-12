@@ -9,6 +9,7 @@ package org.mule.module.extension.internal.introspection.describer;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.util.Preconditions.checkState;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.Alias;
@@ -26,6 +27,7 @@ import org.mule.extension.api.annotation.param.display.Placement;
 import org.mule.extension.api.annotation.param.display.Text;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
+import org.mule.extension.api.introspection.declaration.fluent.HasModelProperties;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.extension.api.introspection.property.DisplayModelPropertyBuilder;
@@ -273,7 +275,7 @@ public final class MuleExtensionAnnotationParser
      * @param parsedParameter the method annotated parameter parsed
      * @param parameter       the {@link ParameterDeclarer} associated to the parsed parameter
      */
-    public static void parseMetadataAnnotations(AnnotatedElement parsedParameter, ParameterDeclarer parameter)
+    public static void parseMetadataAnnotations(AnnotatedElement parsedParameter, HasModelProperties parameter)
     {
         if (parsedParameter.getAnnotation(Content.class) != null)
         {

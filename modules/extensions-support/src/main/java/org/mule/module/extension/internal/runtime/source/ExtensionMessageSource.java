@@ -12,16 +12,15 @@ import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.util.concurrent.ThreadNameHelper.getPrefix;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.execution.CompletionHandler;
 import org.mule.api.lifecycle.InitialisationException;
@@ -35,19 +34,21 @@ import org.mule.api.temporary.MuleMessage;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.execution.MessageProcessContext;
 import org.mule.execution.MessageProcessingManager;
-import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.RuntimeSourceModel;
-import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ExceptionCallback;
 import org.mule.extension.api.runtime.MessageHandler;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.extension.api.runtime.source.SourceContext;
 import org.mule.extension.api.runtime.source.SourceFactory;
+import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.module.extension.internal.runtime.exception.ExceptionEnricherManager;
+import org.mule.module.extension.internal.runtime.processor.IllegalOperationException;
+import org.mule.module.extension.internal.runtime.processor.IllegalSourceException;
 import org.mule.util.ExceptionUtils;
-import org.mule.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -60,25 +61,23 @@ import org.slf4j.LoggerFactory;
 /**
  * A {@link MessageSource} which connects the Extensions API with the Mule runtime by
  * connecting a {@link Source} with a flow represented by a {@link #messageProcessor}
- * <p/>
+ * <p>
  * This class implements the {@link Lifecycle} interface and propagates all of its events to
  * the underlying {@link Source}. It will also perform dependency injection on it and will
  * responsible for properly invokin {@link Source#setSourceContext(SourceContext)}
  *
  * @since 4.0
  */
-public class ExtensionMessageSource implements MessageSource,
+public class ExtensionMessageSource extends ExtensionComponent implements MessageSource,
         MessageHandler<Object, Serializable>,
         ExceptionCallback<Throwable>,
-        Lifecycle,
-        FlowConstructAware
+        Lifecycle
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionMessageSource.class);
 
-    private final ExtensionModel extensionModel;
+    private final RuntimeSourceModel sourceModel;
     private final SourceFactory sourceFactory;
-    private final String configurationProviderName;
     private final ThreadingProfile threadingProfile;
     private final RetryPolicyTemplate retryPolicyTemplate;
     private final ExceptionEnricherManager exceptionEnricherManager;
@@ -91,27 +90,21 @@ public class ExtensionMessageSource implements MessageSource,
                                   SourceFactory sourceFactory,
                                   String configurationProviderName,
                                   ThreadingProfile threadingProfile,
-                                  RetryPolicyTemplate retryPolicyTemplate)
+                                  RetryPolicyTemplate retryPolicyTemplate,
+                                  ExtensionManagerAdapter managerAdapter)
     {
-        this.extensionModel = extensionModel;
+        super(extensionModel, sourceModel, configurationProviderName, managerAdapter);
+        this.sourceModel = sourceModel;
         this.sourceFactory = sourceFactory;
-        this.configurationProviderName = configurationProviderName;
         this.threadingProfile = threadingProfile;
         this.retryPolicyTemplate = retryPolicyTemplate;
         this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, sourceModel);
     }
 
     private MessageProcessor messageProcessor;
-    private FlowConstruct flowConstruct;
-
-    @Inject
-    private MuleContext muleContext;
 
     @Inject
     private MessageProcessingManager messageProcessingManager;
-
-    @Inject
-    private ExtensionManager extensionManager;
 
     @Override
     public void handle(MuleMessage<Object, Serializable> message, CompletionHandler<MuleMessage<Object, Serializable>, Exception> completionHandler)
@@ -153,7 +146,7 @@ public class ExtensionMessageSource implements MessageSource,
     }
 
     @Override
-    public void initialise() throws InitialisationException
+    public void doInitialise() throws InitialisationException
     {
         try
         {
@@ -213,14 +206,6 @@ public class ExtensionMessageSource implements MessageSource,
         disposeIfNeeded(this, LOGGER);
     }
 
-    private <T> ConfigurationInstance<T> fetchConfigurationInstance()
-    {
-
-        MuleEvent event = getInitialiserEvent(muleContext);
-        return StringUtils.isBlank(configurationProviderName) ? extensionManager.getConfiguration(extensionModel, event)
-                                                              : extensionManager.getConfiguration(configurationProviderName, event);
-    }
-
     private void stopWorkManager()
     {
         if (workManager != null)
@@ -260,7 +245,7 @@ public class ExtensionMessageSource implements MessageSource,
     {
         source = new SourceWrapper(sourceFactory.createSource());
         source.setFlowConstruct(flowConstruct);
-        source.setSourceContext(new ImmutableSourceContext(this, this, fetchConfigurationInstance()));
+        source.setSourceContext(new ImmutableSourceContext(this, this, getConfiguration(getInitialiserEvent(muleContext))));
 
         initialiseIfNeeded(source, true, muleContext);
     }
@@ -378,17 +363,28 @@ public class ExtensionMessageSource implements MessageSource,
         messageProcessor = listener;
     }
 
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
-    }
-
-
     private void notifyExceptionAndShutDown(Throwable exception)
     {
         LOGGER.error(String.format("Message source '%s' on flow '%s' threw exception. Shutting down it forever...", source.getName(), flowConstruct.getName()), exception);
         shutdown();
     }
 
+    /**
+     * Validates if the current source is valid for the set configuration.
+     * In case that the validation fails, the method will throw a {@link IllegalSourceException}
+     */
+    @Override
+    protected void validateOperationConfiguration(ConfigurationProvider<Object> configurationProvider)
+    {
+        RuntimeConfigurationModel configurationModel = configurationProvider.getModel();
+        if (!configurationModel.getSourceModel(sourceModel.getName()).isPresent() &&
+            !configurationModel.getExtensionModel().getSourceModel(sourceModel.getName()).isPresent())
+        {
+            throw new IllegalOperationException(String.format("Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. " +
+                                                              "The selected config does not support that operation.",
+                                                              flowConstruct.getName(),
+                                                              sourceModel.getName(),
+                                                              configurationProvider.getName()));
+        }
+    }
 }

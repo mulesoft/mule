@@ -9,13 +9,14 @@ package org.mule.module.extension.internal.metadata;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
+import org.mule.api.metadata.ComponentId;
 import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.MetadataKeyBuilder;
 import org.mule.api.metadata.MetadataManager;
 import org.mule.api.metadata.MuleMetadataManager;
-import org.mule.api.metadata.ProcessorId;
-import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
+import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.api.metadata.resolving.FailureCode;
@@ -30,6 +31,9 @@ import org.mule.module.extension.internal.metadata.extension.MetadataExtension;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
@@ -53,16 +57,20 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG = "contentAndOutputWithCacheResolverWithSpecificConfig";
     protected static final String CONTENT_ONLY_CACHE_RESOLVER = "contentOnlyCacheResolver";
     protected static final String OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER = "outputAndMetadataKeyCacheResolver";
-
+    protected static final String SOURCE_METADATA = "sourceMetadata";
 
     protected final NullMetadataKey nullMetadataKey = new NullMetadataKey();
     protected MetadataType personType;
 
     protected MetadataKey personKey;
-    protected ProcessorId processorId;
+    protected ComponentId componentId;
     protected MuleEvent event;
     protected MetadataManager metadataManager;
     protected ClassTypeLoader typeLoader;
+
+    protected static final List<MetadataKey> METADATA_KEYS = new MetadataConnection().getEntities().stream()
+            .map(e -> MetadataKeyBuilder.newKey(e).build())
+            .collect(Collectors.toList());
 
     @Override
     protected Class<?>[] getAnnotatedExtensionClasses()
@@ -91,25 +99,25 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
         personType = TestMetadataUtils.getMetadata(personKey);
     }
 
-    protected OperationMetadataDescriptor getOperationDynamicMetadata()
+    protected ComponentMetadataDescriptor getComponentDynamicMetadata()
     {
-        return getOperationDynamicMetadata(personKey);
+        return getComponentDynamicMetadata(personKey);
     }
 
-    protected OperationMetadataDescriptor getOperationDynamicMetadata(MetadataKey key)
+    protected ComponentMetadataDescriptor getComponentDynamicMetadata(MetadataKey key)
     {
-        MetadataResult<OperationMetadataDescriptor> operationMetadata = metadataManager.getMetadata(processorId, key);
-        assertThat(operationMetadata.isSuccess(), is(true));
+        MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId, key);
+        assertThat(componentMetadata.isSuccess(), is(true));
 
-        return operationMetadata.get();
+        return componentMetadata.get();
     }
 
-    protected OperationMetadataDescriptor getOperationStaticMetadata()
+    protected ComponentMetadataDescriptor getComponentStaticMetadata()
     {
-        MetadataResult<OperationMetadataDescriptor> operationMetadata = metadataManager.getMetadata(processorId);
-        assertThat(operationMetadata.isSuccess(), is(true));
+        MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId);
+        assertThat(componentMetadata.isSuccess(), is(true));
 
-        return operationMetadata.get();
+        return componentMetadata.get();
     }
 
     protected void assertFailure(MetadataResult<?> result, String msgContains, FailureCode failureCode, String traceContains) throws IOException
@@ -129,19 +137,19 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
         }
     }
 
-    protected void assertExpectedOutput(OutputMetadataDescriptor outputDescriptor, Class<?> payloadType, Class<?> attributesType) throws IOException
+    protected void assertExpectedOutput(OutputMetadataDescriptor outputDescriptor, Type payloadType, Type attributesType) throws IOException
     {
         assertExpectedType(outputDescriptor.getPayloadMetadata(), "Message.Payload", payloadType);
         assertExpectedType(outputDescriptor.getAttributesMetadata(), "Message.Attributes", attributesType);
     }
 
-    protected void assertExpectedOutput(OutputMetadataDescriptor outputDescriptor, MetadataType payloadType, Class<?> attributesType) throws IOException
+    protected void assertExpectedOutput(OutputMetadataDescriptor outputDescriptor, MetadataType payloadType, Type attributesType) throws IOException
     {
         assertExpectedType(outputDescriptor.getPayloadMetadata(), "Message.Payload", payloadType);
         assertExpectedType(outputDescriptor.getAttributesMetadata(), "Message.Attributes", attributesType);
     }
 
-    protected void assertExpectedType(TypeMetadataDescriptor param, String name, Class<?> type) throws IOException
+    protected void assertExpectedType(TypeMetadataDescriptor param, String name, Type type) throws IOException
     {
         if (!StringUtils.isBlank(name))
         {

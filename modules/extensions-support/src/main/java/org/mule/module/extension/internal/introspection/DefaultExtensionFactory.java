@@ -13,8 +13,10 @@ import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORT
 import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
+
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
+import org.mule.extension.api.introspection.ComponentModel;
 import org.mule.extension.api.introspection.ConfigurationModel;
 import org.mule.extension.api.introspection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionFactory;
@@ -61,6 +63,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Default implementation of {@link ExtensionFactory}.
@@ -201,7 +204,8 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                                declaration.getSourceFactory(),
                                                declaration.getModelProperties(),
                                                declaration.getInterceptorFactories(),
-                                               declaration.getExceptionEnricherFactory());
+                                               declaration.getExceptionEnricherFactory(),
+                                               declaration.getMetadataResolverFactory());
     }
 
     private List<OperationModel> toOperations(List<OperationDeclaration> declarations)

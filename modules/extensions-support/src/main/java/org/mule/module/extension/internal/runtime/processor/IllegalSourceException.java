@@ -7,19 +7,19 @@
 package org.mule.module.extension.internal.runtime.processor;
 
 /**
- * A {@link IllegalComponentException} which marks that a current operation is not valid or is misconfigured
+ * A {@link IllegalComponentException} which marks that a selected Source is not valid or is misconfigured
  *
  * @since 4.0
  */
-public class IllegalOperationException extends IllegalComponentException
+public class IllegalSourceException extends IllegalComponentException
 {
 
-    public IllegalOperationException(String message)
+    public IllegalSourceException(String message)
     {
         super(message);
     }
 
-    public IllegalOperationException(String message, Throwable cause)
+    public IllegalSourceException(String message, Throwable cause)
     {
         super(message, cause);
     }

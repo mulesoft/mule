@@ -12,25 +12,11 @@ import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.metadata.DefaultMetadataContext;
-import org.mule.api.metadata.MetadataAware;
-import org.mule.api.metadata.MetadataContext;
-import org.mule.api.metadata.MetadataKey;
-import org.mule.api.metadata.MetadataResolvingException;
-import org.mule.api.metadata.MuleMetadataManager;
-import org.mule.api.metadata.descriptor.OperationMetadataDescriptor;
-import org.mule.api.metadata.resolving.FailureCode;
-import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.extension.api.introspection.OperationModel;
 import org.mule.extension.api.introspection.RuntimeConfigurationModel;
@@ -40,21 +26,14 @@ import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
-import org.mule.internal.connection.ConnectionManagerAdapter;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.module.extension.internal.metadata.MetadataMediator;
 import org.mule.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.module.extension.internal.runtime.ExecutionMediator;
+import org.mule.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.module.extension.internal.runtime.config.DynamicConfigurationProvider;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.util.StringUtils;
-
-import java.util.List;
-import java.util.Optional;
-
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,33 +54,19 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public final class OperationMessageProcessor implements MessageProcessor, MuleContextAware, Lifecycle, FlowConstructAware, MetadataAware
+public final class OperationMessageProcessor extends ExtensionComponent implements MessageProcessor, Lifecycle
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OperationMessageProcessor.class);
 
     private final RuntimeExtensionModel extensionModel;
-    private final String configurationProviderName;
     private final RuntimeOperationModel operationModel;
     private final ResolverSet resolverSet;
-    private final ExtensionManagerAdapter extensionManager;
     private final String target;
 
     private ExecutionMediator executionMediator;
     private ReturnDelegate returnDelegate;
-    private MuleContext muleContext;
     private OperationExecutor operationExecutor;
-    private MetadataMediator metadataMediator;
-
-    private Optional<ConfigurationProvider<Object>> configurationProvider;
-
-    @Inject
-    private ConnectionManagerAdapter connectionManager;
-
-    @Inject
-    private MuleMetadataManager metadataManager;
-
-    private FlowConstruct flowConstruct;
 
     public OperationMessageProcessor(RuntimeExtensionModel extensionModel,
                                      RuntimeOperationModel operationModel,
@@ -110,13 +75,11 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
                                      ResolverSet resolverSet,
                                      ExtensionManagerAdapter extensionManager)
     {
+        super(extensionModel, operationModel, configurationProviderName, extensionManager);
         this.extensionModel = extensionModel;
         this.operationModel = operationModel;
-        this.configurationProviderName = configurationProviderName;
         this.resolverSet = resolverSet;
-        this.extensionManager = extensionManager;
         this.target = target;
-        this.metadataMediator = new MetadataMediator(operationModel);
     }
 
     @Override
@@ -141,55 +104,18 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         }
     }
 
-    private ConfigurationInstance<Object> getConfiguration(MuleEvent event)
-    {
-        return configurationProvider
-                .map(provider -> provider.get(event))
-                .orElseGet(() -> {
-                    if (StringUtils.isBlank(configurationProviderName))
-                    {
-                        return extensionManager.getConfiguration(extensionModel, event);
-                    }
-                    return extensionManager.getConfiguration(configurationProviderName, event);
-                });
-    }
-
     private OperationContextAdapter createOperationContext(ConfigurationInstance<Object> configuration, MuleEvent event) throws MuleException
     {
         return new DefaultOperationContext(configuration, resolverSet.resolve(event), operationModel, event);
     }
 
     @Override
-    public void initialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         returnDelegate = createReturnDelegate();
         operationExecutor = operationModel.getExecutor().createExecutor();
         executionMediator = new DefaultExecutionMediator(extensionModel, operationModel, connectionManager);
-        configurationProvider = getConfigurationProvider();
         initialiseIfNeeded(operationExecutor, true, muleContext);
-    }
-
-    private Optional<ConfigurationProvider<Object>> getConfigurationProvider()
-    {
-        Optional<ConfigurationProvider<Object>> provider = StringUtils.isBlank(configurationProviderName)
-                                                           ? extensionManager.getConfigurationProvider(extensionModel)
-                                                           : extensionManager.getConfigurationProvider(configurationProviderName);
-
-        if (provider.isPresent())
-        {
-            RuntimeConfigurationModel configurationModel = provider.get().getModel();
-            if (!configurationModel.getOperationModel(operationModel.getName()).isPresent() &&
-                !configurationModel.getExtensionModel().getOperationModel(operationModel.getName()).isPresent())
-            {
-                throw new IllegalOperationException(String.format("Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. " +
-                                                                  "The selected config does not support that operation.",
-                                                                  flowConstruct.getName(),
-                                                                  operationModel.getName(),
-                                                                  provider.get().getName()));
-            }
-        }
-
-        return provider;
     }
 
     private ReturnDelegate createReturnDelegate()
@@ -220,58 +146,23 @@ public final class OperationMessageProcessor implements MessageProcessor, MuleCo
         disposeIfNeeded(operationExecutor, LOGGER);
     }
 
-    @Override
-    public void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
-
     /**
-     * {@inheritDoc}
+     * Validates that the {@link #operationModel} is valid for the given {@code configurationProvider}
+     *
+     * @throws IllegalSourceException If the validation fails
      */
     @Override
-    public MetadataResult<List<MetadataKey>> getMetadataKeys() throws MetadataResolvingException
+    protected void validateOperationConfiguration(ConfigurationProvider<Object> configurationProvider)
     {
-        return metadataMediator.getMetadataKeys(getMetadataContext());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MetadataResult<OperationMetadataDescriptor> getMetadata() throws MetadataResolvingException
-    {
-        return metadataMediator.getMetadata();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MetadataResult<OperationMetadataDescriptor> getMetadata(MetadataKey key) throws MetadataResolvingException
-    {
-        return metadataMediator.getMetadata(getMetadataContext(), key);
-    }
-
-    private MetadataContext getMetadataContext() throws MetadataResolvingException
-    {
-        //TODO MULE-9530: Improve Config retrieval for Metadata resolution
-        if (!StringUtils.isBlank(configurationProviderName) &&
-            muleContext.getRegistry().get(configurationProviderName) instanceof DynamicConfigurationProvider)
+        RuntimeConfigurationModel configurationModel = configurationProvider.getModel();
+        if (!configurationModel.getOperationModel(operationModel.getName()).isPresent() &&
+            !configurationModel.getExtensionModel().getOperationModel(operationModel.getName()).isPresent())
         {
-            throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic", FailureCode.INVALID_CONFIGURATION);
+            throw new IllegalOperationException(String.format("Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. " +
+                                                              "The selected config does not support that operation.",
+                                                              flowConstruct.getName(),
+                                                              operationModel.getName(),
+                                                              configurationProvider.getName()));
         }
-
-        ConfigurationInstance<Object> configuration = getConfiguration(getInitialiserEvent(muleContext));
-
-        //TODO MULE-9530: Improve id creation, this won't work with dynamic configurations
-        String cacheId =  configuration.getName();
-        return new DefaultMetadataContext(configuration, connectionManager, metadataManager.getMetadataCache(cacheId));
-    }
-
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
     }
 }

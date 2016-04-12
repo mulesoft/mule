@@ -8,22 +8,9 @@
 
     <vegan:apple-config name="apple"/>
     <vegan:banana-config name="banana"/>
-    <vegan:kiwi-config name="kiwi"/>
 
-    <flow name="appleOk">
-        <vegan:eat-apple config-ref="apple"/>
-    </flow>
-
-    <flow name="bananaOk">
-        <vegan:eat-banana config-ref="banana"/>
-    </flow>
-
-    <flow name="kiwiOk">
-        <vegan:eat-kiwi config-ref="kiwi"/>
-    </flow>
-
-    <flow name="appleSourceOk">
-        <vegan:harvest-apples config-ref="apple"/>
+    <flow name="harvest-apples">
+        <vegan:harvest-apples config-ref="banana"/>
         <logger/>
     </flow>
 
