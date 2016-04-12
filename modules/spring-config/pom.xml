@@ -13,10 +13,6 @@
         Mule Builder for use with Spring 2.X Namespace based XML configuration.
     </description>
     
-    <properties>
-        <springCglibVersion>3.2.2</springCglibVersion>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -55,6 +51,7 @@
 
     <properties>
         <licensePath>../../LICENSE_HEADER.txt</licensePath>
+        <springCglibVersion>3.2.2</springCglibVersion>
     </properties>
 
     <dependencies>
