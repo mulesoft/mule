@@ -12,6 +12,46 @@
     <description>
         Mule Builder for use with Spring 2.X Namespace based XML configuration.
     </description>
+    
+    <properties>
+        <springCglibVersion>3.2.2</springCglibVersion>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Build a jar with cglib shaded for spring -->
+                            <artifactSet>
+                                <includes>
+                                    <include>cglib:cglib</include>
+                                </includes>
+                            </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>net.sf.cglib</pattern>
+                                    <shadedPattern>org.springframework.cglib</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.objectweb.asm</pattern>
+                                    <shadedPattern>org.springframework.asm</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>        
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
@@ -27,6 +67,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>${springCglibVersion}</version>
         </dependency>
 
         <!-- Unit tests -->
