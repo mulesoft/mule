@@ -8,7 +8,6 @@ package org.mule.module.launcher;
 
 import static org.mule.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
-import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.module.artifact.classloader.MuleClassLoaderLookupPolicy;
@@ -21,9 +20,9 @@ import org.mule.module.launcher.descriptor.DomainDescriptor;
 import org.mule.module.launcher.domain.DefaultDomainFactory;
 import org.mule.module.launcher.domain.DefaultDomainManager;
 import org.mule.module.launcher.domain.Domain;
+import org.mule.module.launcher.domain.DomainClassLoaderFactory;
 import org.mule.module.launcher.domain.DomainFactory;
 import org.mule.module.launcher.domain.DomainManager;
-import org.mule.module.launcher.domain.DomainClassLoaderFactory;
 import org.mule.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
 import org.mule.module.launcher.util.DebuggableReentrantLock;
@@ -93,14 +92,7 @@ public class MuleDeploymentService implements DeploymentService
 
         DefaultDomainFactory domainFactory = new DefaultDomainFactory(domainClassLoaderFactory, domainManager);
         domainFactory.setDeploymentListener(domainDeploymentListener);
-        try
-        {
-            domainFactory.createArtifact(DEFAULT_DOMAIN_NAME);
-        }
-        catch (IOException e)
-        {
-            throw new IllegalStateException("Cannot create default domain");
-        }
+
         final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory()));
         DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderFactory, applicationDescriptorFactory, domainManager);
         applicationFactory.setDeploymentListener(applicationDeploymentListener);
