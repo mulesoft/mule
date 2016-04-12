@@ -15,6 +15,9 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+/**
+ * Defines an Oracle test database to use with ojdbc7 driver.
+ */
 public class OracleTestDatabase extends AbstractTestDatabase
 {
 
@@ -202,7 +205,7 @@ public class OracleTestDatabase extends AbstractTestDatabase
     @Override
     public DataType getIdFieldInputMetaDataType()
     {
-        return DataType.STRING;
+        return DataType.DECIMAL;
     }
 
     @Override
