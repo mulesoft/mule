@@ -7,6 +7,7 @@
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -32,6 +33,7 @@ import org.mule.work.MuleWorkManager;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,6 +49,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 {
 
     protected Log logger = LogFactory.getLog(getClass());
+    private AtomicBoolean consumablePayloadWarned = new AtomicBoolean(false);
 
     protected MessageProcessor delegate;
 
@@ -116,11 +119,20 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         }
     }
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (event.isTransacted())
         {
             throw new MessagingException(CoreMessages.asyncDoesNotSupportTransactions(), event, this);
+        }
+
+        final MuleMessage message = event.getMessage();
+        if (consumablePayloadWarned.compareAndSet(false, true) && message instanceof DefaultMuleMessage && ((DefaultMuleMessage) message).isConsumable())
+        {
+            logger.warn(String.format("Using 'async' router with consumable payload (%s) may lead to unexpected results." +
+                                      " Please ensure that only one of the branches actually consumes the payload, or transform it by using an <object-to-byte-array-transformer>.",
+                    message.getPayload().getClass().getName()));
         }
 
         if (target != null)
