@@ -4,3 +4,4 @@
 /target
 /*.iml
 /.mule
+/dependency-reduced-pom.xml
