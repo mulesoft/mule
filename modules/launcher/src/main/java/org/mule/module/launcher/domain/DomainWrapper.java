@@ -8,7 +8,6 @@ package org.mule.module.launcher.domain;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.artifact.DeployableArtifactWrapper;
 import org.mule.module.launcher.descriptor.DomainDescriptor;
@@ -59,10 +58,4 @@ public class DomainWrapper extends DeployableArtifactWrapper<Domain, DomainDescr
             domainFactory.dispose(this);
         }
     }
-
-    @Override
-    public void start() throws DeploymentStartException
-    {
-    }
-
 }
