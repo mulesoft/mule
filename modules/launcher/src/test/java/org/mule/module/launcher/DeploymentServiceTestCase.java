@@ -33,6 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
 import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
+import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -54,8 +55,11 @@ import org.mule.module.launcher.builder.ApplicationFileBuilder;
 import org.mule.module.launcher.builder.ApplicationPluginFileBuilder;
 import org.mule.module.launcher.builder.DomainFileBuilder;
 import org.mule.module.launcher.builder.TestArtifactDescriptor;
+import org.mule.module.launcher.descriptor.DomainDescriptor;
+import org.mule.module.launcher.domain.DefaultDomainManager;
+import org.mule.module.launcher.domain.DefaultMuleDomain;
 import org.mule.module.launcher.domain.Domain;
-import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
+import org.mule.module.launcher.domain.DomainClassLoaderFactory;
 import org.mule.module.launcher.domain.TestDomainFactory;
 import org.mule.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -705,7 +709,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         File originalConfigFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
         assertThat(originalConfigFile.exists(), is(true));
-        URL url = getClass().getResource(EMPTY_DOMAIN_CONFIG_XML);
+        URL url = getClass().getResource(EMPTY_APP_CONFIG_XML);
         File newConfigFile = new File(url.toURI());
         FileUtils.copyFile(newConfigFile, originalConfigFile);
         assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppFileBuilder.getId());
@@ -1029,7 +1033,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
-        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new MuleDomainClassLoaderRepository(new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())), new DefaultNativeLibraryFinderFactory()));
+        final DefaultDomainManager domainManager = new DefaultDomainManager();
+        domainManager.addDomain(createDefaultDomain());
+
+        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()), domainManager);
         appFactory.setFailOnStopApplication(true);
 
         deploymentService.setAppFactory(appFactory);
@@ -1051,7 +1058,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
-        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new MuleDomainClassLoaderRepository(new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())), new DefaultNativeLibraryFinderFactory()));
+        final DefaultDomainManager domainManager = new DefaultDomainManager();
+        domainManager.addDomain(createDefaultDomain());
+
+        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()), domainManager);
         appFactory.setFailOnDisposeApplication(true);
         deploymentService.setAppFactory(appFactory);
         deploymentService.start();
@@ -1297,6 +1307,20 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, application.getMuleContext());
 
         mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
+    }
+
+    @Test
+    public void deploysAppZipWithExtensionPlugin() throws Exception
+    {
+        ApplicationPluginFileBuilder extensionPlugin = new ApplicationPluginFileBuilder("extensionPlugin")
+                .usingLibrary("lib/mule-module-hello-4.0-SNAPSHOT.jar")
+                .configuredWith(EXPORTED_RESOURCE_PACKAGES_PROPERTY, "/, META-INF");
+        ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin").definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
+        addPackedAppFromBuilder(applicationFileBuilder);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
     }
 
     @Test
@@ -2015,7 +2039,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
-        TestDomainFactory testDomainFactory = new TestDomainFactory(new MuleDomainClassLoaderRepository(new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())));
+        TestDomainFactory testDomainFactory = new TestDomainFactory(new DomainClassLoaderFactory(new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())));
         testDomainFactory.setFailOnStopApplication();
 
         deploymentService.setDomainFactory(testDomainFactory);
@@ -2035,7 +2059,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
-        TestDomainFactory testDomainFactory = new TestDomainFactory(new MuleDomainClassLoaderRepository(new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())));
+        TestDomainFactory testDomainFactory = new TestDomainFactory(new DomainClassLoaderFactory(new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())));
         testDomainFactory.setFailOnDisposeApplication();
         deploymentService.setDomainFactory(testDomainFactory);
         deploymentService.start();
@@ -2914,6 +2938,14 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         final Application app = deploymentService.findApplication(appName);
         assertNotNull(app);
         return app;
+    }
+
+    private DefaultMuleDomain createDefaultDomain()
+    {
+        DomainDescriptor descriptor = new DomainDescriptor();
+        descriptor.setName(DEFAULT_DOMAIN_NAME);
+
+        return new DefaultMuleDomain(descriptor, new DomainClassLoaderFactory(new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())).create(null, descriptor));
     }
 
     /**

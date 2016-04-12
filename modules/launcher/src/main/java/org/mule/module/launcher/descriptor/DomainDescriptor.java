@@ -9,6 +9,6 @@ package org.mule.module.launcher.descriptor;
 /**
  * Represents the description of a domain.
  */
-public class DomainDescriptor extends RedeployableArtifactDescriptor
+public class DomainDescriptor extends DeployableArtifactDescriptor
 {
 }

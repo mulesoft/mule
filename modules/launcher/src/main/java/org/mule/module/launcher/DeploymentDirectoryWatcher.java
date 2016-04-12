@@ -11,7 +11,9 @@ import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import static org.mule.util.SplashScreen.miniSplash;
 import org.mule.config.StartupContext;
 import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.artifact.Artifact;
+import org.mule.module.artifact.Artifact;
+import org.mule.module.launcher.artifact.DeployableArtifact;
+import org.mule.module.launcher.descriptor.DeployableArtifactDescriptor;
 import org.mule.module.launcher.domain.Domain;
 import org.mule.module.launcher.util.DebuggableReentrantLock;
 import org.mule.module.launcher.util.ElementAddedEvent;
@@ -217,11 +219,11 @@ public class DeploymentDirectoryWatcher implements Runnable
         }
     }
 
-    private void stopArtifacts(List<? extends Artifact> artifacts)
+    private void stopArtifacts(List<? extends DeployableArtifact> artifacts)
     {
         Collections.reverse(artifacts);
 
-        for (Artifact artifact : artifacts)
+        for (DeployableArtifact artifact : artifacts)
         {
             try
             {
@@ -530,9 +532,9 @@ public class DeploymentDirectoryWatcher implements Runnable
         redeployModifiedArtifacts(redeployableApplications, applicationTimestampListener, applicationArchiveDeployer);
     }
 
-    private <T extends Artifact> Collection getArtifactsToRedeploy(Collection<T> collection)
+    private <T extends DeployableArtifact> Collection getArtifactsToRedeploy(Collection<T> collection)
     {
-        return CollectionUtils.select(collection, object -> ((Artifact) object).getDescriptor().isRedeploymentEnabled());
+        return CollectionUtils.select(collection, object -> ((DeployableArtifactDescriptor) ((DeployableArtifact) object).getDescriptor()).isRedeploymentEnabled());
     }
 
     private <T extends Artifact> void redeployModifiedArtifacts(Collection<T> artifacts, ArtifactTimestampListener<T> artifactTimestampListener, ArchiveDeployer<T> artifactArchiveDeployer)

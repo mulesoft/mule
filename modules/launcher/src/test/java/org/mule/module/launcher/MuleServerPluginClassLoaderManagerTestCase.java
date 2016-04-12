@@ -9,6 +9,8 @@ package org.mule.module.launcher;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -29,7 +31,7 @@ public class MuleServerPluginClassLoaderManagerTestCase extends AbstractMuleTest
     @Test
     public void addsPluginClassLoaders() throws Exception
     {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        final ArtifactClassLoader classLoader = mock(ArtifactClassLoader.class);
         pluginClassLoaderManager.addPluginClassLoader(classLoader);
 
         assertThat(pluginClassLoaderManager.getPluginClassLoaders().size(), equalTo(1));

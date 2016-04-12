@@ -6,17 +6,14 @@
  */
 package org.mule.module.launcher;
 
-import org.mule.module.launcher.artifact.Artifact;
-
-import java.io.IOException;
-import java.net.URL;
+import org.mule.module.launcher.artifact.DeployableArtifact;
 
 /**
  * Deployes and Undeploys artifacts in the container.
  *
  * @param <T> artifact type
  */
-public interface ArtifactDeployer<T extends Artifact>
+public interface ArtifactDeployer<T extends DeployableArtifact>
 {
 
     /**

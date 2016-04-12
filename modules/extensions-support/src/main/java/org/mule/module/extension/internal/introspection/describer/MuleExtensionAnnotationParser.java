@@ -117,7 +117,7 @@ public final class MuleExtensionAnnotationParser
             }
             else
             {
-                ParsedParameter parsedParameter = doParseParameter(paramNames.get(i), parameterTypes[i], annotations);
+                ParsedParameter parsedParameter = doParseParameter(paramNames.get(i), parameterTypes[i], annotations, typeLoader.getClassLoader());
                 parsedParameters.add(parsedParameter);
             }
         }
@@ -137,7 +137,7 @@ public final class MuleExtensionAnnotationParser
             {
                 ParsedParameter parsedParameter = doParseParameter(field.getName(),
                                                                    getFieldMetadataType(field, typeLoader),
-                                                                   toMap(field.getAnnotations()));
+                                                                   toMap(field.getAnnotations()), typeLoader.getClassLoader());
                 if (parsedParameter != null)
                 {
                     parsedParameters.add(parsedParameter);
@@ -148,10 +148,10 @@ public final class MuleExtensionAnnotationParser
 
     private static ParsedParameter doParseParameter(String paramName,
                                                     MetadataType metadataType,
-                                                    Map<Class<? extends Annotation>, Annotation> annotations)
+                                                    Map<Class<? extends Annotation>, Annotation> annotations, ClassLoader classLoader)
     {
         ParsedParameter parameter = new ParsedParameter(annotations);
-        parameter.setAdvertised(shouldAdvertise(metadataType, annotations));
+        parameter.setAdvertised(shouldAdvertise(metadataType, annotations, classLoader));
 
         parameter.setName(IntrospectionUtils.getAliasName(paramName, (Alias) annotations.get(Alias.class)));
         parameter.setType(metadataType);
@@ -175,9 +175,9 @@ public final class MuleExtensionAnnotationParser
         return parameter;
     }
 
-    private static boolean shouldAdvertise(MetadataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations)
+    private static boolean shouldAdvertise(MetadataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations, ClassLoader classLoader)
     {
-        return !(IMPLICIT_ARGUMENT_TYPES.contains(JavaTypeUtils.getType(parameterType)) ||
+        return !(IMPLICIT_ARGUMENT_TYPES.contains(JavaTypeUtils.getType(parameterType, classLoader)) ||
                  annotations.containsKey(UseConfig.class) ||
                  annotations.containsKey(Connection.class));
     }

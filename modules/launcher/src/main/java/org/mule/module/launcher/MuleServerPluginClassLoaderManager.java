@@ -6,6 +6,8 @@
  */
 package org.mule.module.launcher;
 
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,10 +15,10 @@ import java.util.List;
 public class MuleServerPluginClassLoaderManager implements ServerPluginClassLoaderManager
 {
 
-    private final List<ClassLoader> classLoaders = new LinkedList<ClassLoader>();
+    private final List<ArtifactClassLoader> classLoaders = new LinkedList<>();
 
     @Override
-    public void addPluginClassLoader(ClassLoader classLoader)
+    public void addPluginClassLoader(ArtifactClassLoader classLoader)
     {
         synchronized (classLoaders)
         {
@@ -25,7 +27,7 @@ public class MuleServerPluginClassLoaderManager implements ServerPluginClassLoad
     }
 
     @Override
-    public List<ClassLoader> getPluginClassLoaders()
+    public List<ArtifactClassLoader> getPluginClassLoaders()
     {
         synchronized (classLoaders)
         {

@@ -49,7 +49,10 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
         ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
         when(filter.exportsClass(CLASS_NAME)).thenReturn(true);
 
-        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, classLoader, filter);
+        ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
+        when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, artifactClassLoader, filter);
         Class<?> aClass = filteringArtifactClassLoader.loadClass(CLASS_NAME);
         assertThat(aClass, equalTo(expectedClass));
     }
@@ -74,7 +77,10 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
 
         ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
         when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
-        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, classLoader, filter);
+        ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
+        when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, artifactClassLoader, filter);
 
         URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
         assertThat(resource, equalTo(expectedResource));
@@ -90,7 +96,10 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
         ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
         when(filter.exportsResource(RESOURCE_NAME)).thenReturn(false);
 
-        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, classLoader, filter);
+        ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
+        when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, artifactClassLoader, filter);
 
         Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
         assertThat(resources, EnumerationMatcher.equalTo(Collections.EMPTY_LIST));
@@ -106,7 +115,10 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
         ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
         when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
 
-        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, classLoader, filter);
+        ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
+        when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, artifactClassLoader, filter);
 
         Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
         assertThat(resources, EnumerationMatcher.equalTo(Collections.singletonList(resource)));

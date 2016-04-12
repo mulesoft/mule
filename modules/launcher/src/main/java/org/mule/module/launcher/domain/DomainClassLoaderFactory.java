@@ -12,10 +12,12 @@ import static java.util.Collections.emptyMap;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.mule.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.module.launcher.MuleFoldersUtil.getDomainLibFolder;
+import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.artifact.classloader.ClassLoaderLookupStrategy;
+import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.module.artifact.classloader.ClassLoaderLookupStrategy;
 import org.mule.module.artifact.classloader.ShutdownListener;
 import org.mule.module.launcher.DeploymentException;
 import org.mule.module.launcher.MuleFoldersUtil;
@@ -23,15 +25,16 @@ import org.mule.module.launcher.MuleSharedDomainClassLoader;
 import org.mule.module.launcher.application.FilePackageDiscoverer;
 import org.mule.module.launcher.application.PackageDiscoverer;
 import org.mule.module.launcher.descriptor.DomainDescriptor;
-import org.mule.module.launcher.descriptor.EmptyDomainDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.Preconditions;
 import org.mule.util.SystemUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,16 +44,23 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class MuleDomainClassLoaderRepository implements DomainClassLoaderRepository
+/**
+ * Creates {@link ArtifactClassLoader} for domain artifacts.
+ */
+public class DomainClassLoaderFactory implements ArtifactClassLoaderFactory<DomainDescriptor>
 {
-    protected static final Log logger = LogFactory.getLog(MuleDomainClassLoaderRepository.class);
+    protected static final Log logger = LogFactory.getLog(DomainClassLoaderFactory.class);
 
     private final ClassLoaderLookupPolicy containerLookupPolicy;
     private Map<String, ArtifactClassLoader> domainArtifactClassLoaders = new HashMap<>();
-    private ArtifactClassLoader defaultDomainArtifactClassLoader;
     private PackageDiscoverer packageDiscoverer = new FilePackageDiscoverer();
 
-    public MuleDomainClassLoaderRepository(ClassLoaderLookupPolicy containerLookupPolicy)
+    /**
+     * Creates new instance
+     *
+     * @param containerLookupPolicy policy used to customize the classloading process for this classloader.
+     */
+    public DomainClassLoaderFactory(ClassLoaderLookupPolicy containerLookupPolicy)
     {
         this.containerLookupPolicy = containerLookupPolicy;
     }
@@ -61,27 +71,50 @@ public class MuleDomainClassLoaderRepository implements DomainClassLoaderReposit
     }
 
     @Override
-    public synchronized ArtifactClassLoader getDomainClassLoader(DomainDescriptor descriptor)
+    public ArtifactClassLoader create(ArtifactClassLoader parent, DomainDescriptor descriptor)
     {
         String domain = descriptor.getName();
         Preconditions.checkArgument(domain != null, "Domain name cannot be null");
-        if (domain.equals(DomainFactory.DEFAULT_DOMAIN_NAME))
+
+        ArtifactClassLoader domainClassLoader = domainArtifactClassLoaders.get(domain);
+        if (domainClassLoader != null)
         {
-            return getDefaultDomainClassLoader();
+            return domainClassLoader;
         }
-        if (domainArtifactClassLoaders.containsKey(domain))
+        else
         {
-            return domainArtifactClassLoaders.get(domain);
+            synchronized (this)
+            {
+                domainClassLoader = domainArtifactClassLoaders.get(domain);
+                if (domainClassLoader == null)
+                {
+                    if (domain.equals(DEFAULT_DOMAIN_NAME))
+                    {
+                        domainClassLoader = getDefaultDomainClassLoader();
+                    }
+                    else
+                    {
+                        domainClassLoader = getCustomDomainClassLoader(domain);
+                    }
+
+                    domainArtifactClassLoaders.put(domain, domainClassLoader);
+                }
+            }
         }
+
+        return domainClassLoader;
+    }
+
+    private ArtifactClassLoader getCustomDomainClassLoader(String domain)
+    {
         validateDomain(domain);
         final List<URL> urls = getDomainUrls(domain);
         final Map<String, ClassLoaderLookupStrategy> domainLookStrategies = getLookStrategiesFrom(urls);
         final ClassLoaderLookupPolicy domainLookupPolicy = containerLookupPolicy.extend(domainLookStrategies);
 
         ArtifactClassLoader classLoader = new MuleSharedDomainClassLoader(domain, getClass().getClassLoader(), domainLookupPolicy, urls);
-        classLoader = createClassLoaderUnregisterWrapper(classLoader);
-        domainArtifactClassLoaders.put(domain, classLoader);
-        return classLoader;
+
+        return createClassLoaderUnregisterWrapper(classLoader);
     }
 
     private Map<String, ClassLoaderLookupStrategy> getLookStrategiesFrom(List<URL> libraries)
@@ -142,22 +175,9 @@ public class MuleDomainClassLoaderRepository implements DomainClassLoaderReposit
         }
     }
 
-    @Override
-    public synchronized ArtifactClassLoader getDomainClassLoader(String domain)
+    private ArtifactClassLoader getDefaultDomainClassLoader()
     {
-        return getDomainClassLoader(new EmptyDomainDescriptor(domain));
-    }
-
-    @Override
-    public ArtifactClassLoader getDefaultDomainClassLoader()
-    {
-        if (defaultDomainArtifactClassLoader != null)
-        {
-            return defaultDomainArtifactClassLoader;
-        }
-        ArtifactClassLoader classLoader = new MuleSharedDomainClassLoader(DomainFactory.DEFAULT_DOMAIN_NAME, getClass().getClassLoader(), containerLookupPolicy.extend(emptyMap()), emptyList());
-        defaultDomainArtifactClassLoader = createClassLoaderUnregisterWrapper(classLoader);
-        return defaultDomainArtifactClassLoader;
+        return new MuleSharedDomainClassLoader(DEFAULT_DOMAIN_NAME, getClass().getClassLoader(), containerLookupPolicy.extend(emptyMap()), emptyList());
     }
 
     private void validateDomain(String domain)
@@ -183,6 +203,12 @@ public class MuleDomainClassLoaderRepository implements DomainClassLoaderReposit
             public URL findResource(String resource)
             {
                 return classLoader.findResource(resource);
+            }
+
+            @Override
+            public Enumeration<URL> findResources(String name) throws IOException
+            {
+                return classLoader.findResources(name);
             }
 
             @Override

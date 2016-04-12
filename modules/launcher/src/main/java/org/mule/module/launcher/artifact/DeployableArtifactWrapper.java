@@ -10,7 +10,7 @@ import org.mule.api.MuleContext;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.InstallException;
-import org.mule.module.launcher.descriptor.RedeployableArtifactDescriptor;
+import org.mule.module.launcher.descriptor.DeployableArtifactDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,12 +21,12 @@ import java.io.IOException;
  * must be executed with deployment (app) classloader in the context, and not Mule system
  * classloader.
  */
-public class ArtifactWrapper<T extends Artifact<D>, D extends RedeployableArtifactDescriptor> implements Artifact<D>
+public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extends DeployableArtifactDescriptor> implements DeployableArtifact<D>
 {
 
     private T delegate;
 
-    protected ArtifactWrapper(T artifact) throws IOException
+    protected DeployableArtifactWrapper(T artifact) throws IOException
     {
         this.delegate = artifact;
     }

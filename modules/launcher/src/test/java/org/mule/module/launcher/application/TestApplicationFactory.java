@@ -6,20 +6,16 @@
  */
 package org.mule.module.launcher.application;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
-import org.mule.module.artifact.classloader.MuleClassLoaderLookupPolicy;
 import org.mule.module.launcher.ApplicationDescriptorFactory;
-import org.mule.module.launcher.domain.DefaultDomainFactory;
-import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
+import org.mule.module.launcher.domain.DomainManager;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
 
 import java.io.IOException;
 
 /**
- * Creates a {@link ApplicationFactory} that returns {@link TestApplicationWrapper}
+ * Creates a {@link DefaultApplicationFactory} that returns {@link TestApplicationWrapper}
  * instances in order to simulate errors on application deployment phases.
  */
 public class TestApplicationFactory extends DefaultApplicationFactory
@@ -28,9 +24,9 @@ public class TestApplicationFactory extends DefaultApplicationFactory
     private boolean failOnStopApplication;
     private boolean failOnDisposeApplication;
 
-    public TestApplicationFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory)
+    public TestApplicationFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory, DomainManager domainManager)
     {
-        super(applicationClassLoaderFactory, new DefaultDomainFactory(new MuleDomainClassLoaderRepository(new MuleClassLoaderLookupPolicy(emptyMap(), emptySet()))), new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())));
+        super(applicationClassLoaderFactory, new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())), domainManager);
     }
 
     @Override

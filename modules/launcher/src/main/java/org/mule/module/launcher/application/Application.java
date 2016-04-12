@@ -7,11 +7,11 @@
 package org.mule.module.launcher.application;
 
 import org.mule.api.MuleContext;
-import org.mule.module.launcher.artifact.Artifact;
+import org.mule.module.launcher.artifact.DeployableArtifact;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.domain.Domain;
 
-public interface Application extends Artifact<ApplicationDescriptor>
+public interface Application extends DeployableArtifact<ApplicationDescriptor>
 {
 
     MuleContext getMuleContext();

@@ -6,8 +6,12 @@
  */
 package org.mule.module.launcher.domain;
 
+import static java.lang.String.format;
 import static org.mule.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
+import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
+import static org.mule.util.Preconditions.checkArgument;
+import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.descriptor.DomainDescriptor;
 import org.mule.module.launcher.descriptor.DomainDescriptorParser;
@@ -16,21 +20,21 @@ import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class DefaultDomainFactory implements DomainFactory
 {
 
-    private final DomainClassLoaderRepository domainClassLoaderRepository;
-    private final Map<String, Domain> domains = new HashMap<String, Domain>();
+    private final ArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory;
+    private final DomainManager domainManager;
     private final DomainDescriptorParser domainDescriptorParser;
 
     protected DeploymentListener deploymentListener;
 
-    public DefaultDomainFactory(DomainClassLoaderRepository domainClassLoaderRepository)
+    public DefaultDomainFactory(ArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory, DomainManager domainManager)
     {
-        this.domainClassLoaderRepository = domainClassLoaderRepository;
+        checkArgument(domainManager != null, "Domain manager cannot be null");
+        this.domainClassLoaderFactory = domainClassLoaderFactory;
+        this.domainManager = domainManager;
         this.domainDescriptorParser = new DomainDescriptorParser();
     }
 
@@ -40,27 +44,22 @@ public class DefaultDomainFactory implements DomainFactory
     }
 
     @Override
-    public Domain createDefaultDomain() throws IOException
-    {
-        return createArtifact(DEFAULT_DOMAIN_NAME);
-    }
-
-    @Override
     public Domain createArtifact(String artifactName) throws IOException
     {
-        if (domains.containsKey(artifactName))
+        Domain domain = domainManager.getDomain(artifactName);
+        if (domain != null)
         {
-            return domains.get(artifactName);
+            throw new IllegalArgumentException(format("Domain '%s'  already exists", artifactName));
         }
         if (artifactName.contains(" "))
         {
-            throw new IllegalArgumentException("Mule application name may not contain spaces: " + artifactName);
+            throw new IllegalArgumentException("Mule domain name may not contain spaces: " + artifactName);
         }
         DomainDescriptor descriptor = findDomain(artifactName);
-        DefaultMuleDomain defaultMuleDomain = new DefaultMuleDomain(domainClassLoaderRepository, descriptor);
+        DefaultMuleDomain defaultMuleDomain = new DefaultMuleDomain(descriptor, domainClassLoaderFactory.create(null, descriptor));
         defaultMuleDomain.setDeploymentListener(deploymentListener);
         DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
-        domains.put(artifactName, domainWrapper);
+        domainManager.addDomain(domainWrapper);
         return domainWrapper;
     }
 
@@ -95,11 +94,11 @@ public class DefaultDomainFactory implements DomainFactory
 
     public void dispose(DomainWrapper domain)
     {
-        domains.remove(domain.getArtifactName());
+        domainManager.removeDomain(domain.getArtifactName());
     }
 
     public void start(DomainWrapper domainWrapper)
     {
-        domains.put(domainWrapper.getArtifactName(), domainWrapper);
+        domainManager.addDomain(domainWrapper);
     }
 }

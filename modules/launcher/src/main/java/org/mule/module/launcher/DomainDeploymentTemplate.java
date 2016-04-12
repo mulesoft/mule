@@ -7,7 +7,7 @@
 package org.mule.module.launcher;
 
 import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.artifact.Artifact;
+import org.mule.module.artifact.Artifact;
 import org.mule.module.launcher.domain.Domain;
 
 import java.util.Collection;

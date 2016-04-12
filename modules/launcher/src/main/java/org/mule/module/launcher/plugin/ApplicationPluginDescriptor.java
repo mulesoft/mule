@@ -6,11 +6,11 @@
  */
 package org.mule.module.launcher.plugin;
 
-import org.mule.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.module.launcher.descriptor.DeployableArtifactDescriptor;
 
 import java.net.URL;
 
-public class ApplicationPluginDescriptor extends ArtifactDescriptor
+public class ApplicationPluginDescriptor extends DeployableArtifactDescriptor
 {
     public static final String PLUGIN_PROPERTIES = "plugin.properties";
 

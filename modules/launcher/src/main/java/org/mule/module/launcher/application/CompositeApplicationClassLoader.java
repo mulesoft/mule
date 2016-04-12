@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.application;
 
+import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
 
 import java.util.List;
@@ -18,14 +19,13 @@ public class CompositeApplicationClassLoader extends CompositeArtifactClassLoade
 
     /**
      * Creates a new instance
-     *
-     * @param appName name of the artifact owning the created instance.
+     *  @param appName name of the artifact owning the created instance.
      * @param parent parent class loader used to delegate the lookup process. Can be null.
-     * @param classLoaders class loaders to compose. Non empty.
+     * @param artifactClassLoaders artifact classLoaders to compose. Non empty.
      * @param lookupPolicy policy used to guide the lookup process. Non null
      */
-    public CompositeApplicationClassLoader(String appName, ClassLoader parent, List<ClassLoader> classLoaders, ClassLoaderLookupPolicy lookupPolicy)
+    public CompositeApplicationClassLoader(String appName, ClassLoader parent, List<ArtifactClassLoader> artifactClassLoaders, ClassLoaderLookupPolicy lookupPolicy)
     {
-        super(appName, parent, classLoaders, lookupPolicy);
+        super(appName, parent, artifactClassLoaders, lookupPolicy);
     }
 }

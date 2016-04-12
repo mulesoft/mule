@@ -10,9 +10,9 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- *
+ * Parses an artifact descriptor
  */
-public interface DescriptorParser<D extends RedeployableArtifactDescriptor>
+public interface DescriptorParser<D extends DeployableArtifactDescriptor>
 {
     D parse(File descriptor, String artifactName) throws IOException;
 }

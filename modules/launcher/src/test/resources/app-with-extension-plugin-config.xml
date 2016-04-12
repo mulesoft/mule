@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:hello="http://www.mulesoft.org/schema/mule/hello"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/hello http://www.mulesoft.org/schema/mule/hello/current/mule-hello.xsd">
+
+    <hello:config name="pepe" message="Hello!!!"/>
+
+    <flow name="main">
+        <poll frequency="1000">
+            <set-payload value=""/>
+        </poll>
+
+        <hello:print-message/>
+    </flow>
+</mule>

@@ -4,22 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.module.launcher.artifact;
 
 import org.mule.api.MuleContext;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.module.artifact.Artifact;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.InstallException;
-import org.mule.module.launcher.descriptor.RedeployableArtifactDescriptor;
-
-import java.io.File;
+import org.mule.module.launcher.descriptor.DeployableArtifactDescriptor;
 
 /**
  * An Artifact is an abstract representation of a deployable unit within the mule container.
  *
  * @param <D> The type of the artifact's descriptor
  */
-public interface Artifact<D extends RedeployableArtifactDescriptor>
+public interface DeployableArtifact<D extends DeployableArtifactDescriptor> extends Artifact<D>
 {
 
     /**
@@ -46,27 +45,6 @@ public interface Artifact<D extends RedeployableArtifactDescriptor>
      * Dispose the artifact. Most commonly this includes the release of the resources held by the artifact
      */
     void dispose();
-
-    /**
-     * @return the artifact identifier
-     */
-    String getArtifactName();
-
-    /**
-     * @return the artifact descriptor
-     */
-    D getDescriptor();
-
-    /**
-     * @return an array with the configuration files of the artifact. Never returns null.
-     *         If there's no configuration file then returns an empty array.
-     */
-    File[] getResourceFiles();
-
-    /**
-     * @return class loader responsible for loading resources for this artifact.
-     */
-    ArtifactClassLoader getArtifactClassLoader();
 
     /**
      * @return MuleContext created from the artifact configurations files.

@@ -46,7 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @since 3.7.0
  */
-final class ExtensionRegistry
+public final class ExtensionRegistry
 {
 
     private final LoadingCache<ExtensionModel, List<ConfigurationProvider>> providersByExtension = CacheBuilder.newBuilder().build(new CacheLoader<ExtensionModel, List<ConfigurationProvider>>()
@@ -68,7 +68,7 @@ final class ExtensionRegistry
      *
      * @param registry the {@link MuleRegistry} to use for holding instances
      */
-    ExtensionRegistry(MuleRegistry registry)
+    public ExtensionRegistry(MuleRegistry registry)
     {
         this.registry = registry;
     }

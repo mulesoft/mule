@@ -10,7 +10,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.artifact.ArtifactWrapper;
+import org.mule.module.launcher.artifact.DeployableArtifactWrapper;
 import org.mule.module.launcher.descriptor.DomainDescriptor;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ import java.io.IOException;
 /**
  * Domain wrapper used to notify domain factory that a domain has been disposed or started.
  */
-public class DomainWrapper extends ArtifactWrapper<Domain, DomainDescriptor> implements Domain
+public class DomainWrapper extends DeployableArtifactWrapper<Domain, DomainDescriptor> implements Domain
 {
 
     private final DefaultDomainFactory domainFactory;
@@ -63,8 +63,6 @@ public class DomainWrapper extends ArtifactWrapper<Domain, DomainDescriptor> imp
     @Override
     public void start() throws DeploymentStartException
     {
-        super.start();
-        domainFactory.start(this);
     }
 
 }
