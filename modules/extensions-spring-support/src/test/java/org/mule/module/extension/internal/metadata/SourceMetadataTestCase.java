@@ -8,6 +8,7 @@ package org.mule.module.extension.internal.metadata;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 
 import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.SourceId;
@@ -42,6 +43,7 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase
         assertThat(metadataKeysResult.isSuccess(), is(true));
         final List<MetadataKey> metadataKeys = metadataKeysResult.get();
         assertThat(metadataKeys.size(), is(3));
+        assertThat(metadataKeys, contains(METADATA_KEYS.toArray()));
     }
 
     @Test

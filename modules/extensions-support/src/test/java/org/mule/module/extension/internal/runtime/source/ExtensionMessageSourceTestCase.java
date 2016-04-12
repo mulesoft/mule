@@ -158,8 +158,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
 
         muleContext.getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
 
-        when(configurationModel.getSourceModels()).thenReturn(Collections.singletonList(sourceModel));
-        when(configurationModel.getOperationModels()).thenReturn(Collections.emptyList());
+        when(configurationModel.getSourceModel(SOURCE_NAME)).thenReturn(Optional.of(sourceModel));
         when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(Optional.of(configurationProvider));
         when(configurationProvider.get(configureMockEvent(event))).thenReturn(configurationInstance);
         when(configurationProvider.getModel()).thenReturn(configurationModel);

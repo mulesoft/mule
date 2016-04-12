@@ -55,7 +55,6 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
 {
 
     private final RuntimeExtensionModel extensionModel;
-    private final RuntimeComponentModel componentModel;
     private final String configurationProviderName;
     protected final ExtensionManagerAdapter extensionManager;
 
@@ -72,7 +71,6 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     protected ExtensionComponent(RuntimeExtensionModel extensionModel, RuntimeComponentModel componentModel, String configurationProviderName, ExtensionManagerAdapter extensionManager)
     {
         this.extensionModel = extensionModel;
-        this.componentModel = componentModel;
         this.configurationProviderName = configurationProviderName;
         this.extensionManager = extensionManager;
         this.metadataMediator = new MetadataMediator(componentModel);
@@ -85,7 +83,6 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     }
 
     /**
-     * 2
      * {@inheritDoc}
      */
     @Override
@@ -150,55 +147,11 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
                 });
     }
 
-    private Optional<ConfigurationProvider<Object>> getConfigurationProvider()
+    protected Optional<ConfigurationProvider<Object>> getConfigurationProvider()
     {
         Optional<ConfigurationProvider<Object>> provider = StringUtils.isBlank(configurationProviderName)
                                                            ? extensionManager.getConfigurationProvider(extensionModel)
                                                            : extensionManager.getConfigurationProvider(configurationProviderName);
         return provider;
-    }
-
-    /**
-     * Validates if the current component is valid for the set configuration.
-     * In case that the validation fails, the method will throw a {@link IllegalComponentException}
-     */
-    protected void validateComponentConfiguration()
-    {
-        final List<ComponentModel> componentModels = new ArrayList<>();
-        final List<ComponentModel> componentModelsFromExtension = new ArrayList<>();
-        Optional<ConfigurationProvider<Object>> provider = getConfigurationProvider();
-
-        if (provider.isPresent())
-        {
-            RuntimeConfigurationModel configurationModel = provider.get().getModel();
-
-            componentModels.addAll(configurationModel.getSourceModels());
-            componentModels.addAll(configurationModel.getOperationModels());
-
-            componentModelsFromExtension.addAll(extensionModel.getSourceModels());
-            componentModelsFromExtension.addAll(extensionModel.getOperationModels());
-
-            if (!containsComponent(componentModels, componentModel.getName()) &&
-                !containsComponent(componentModelsFromExtension, componentModel.getName()))
-            {
-                throw new IllegalComponentException(String.format("Flow '%s' defines an usage of the component '%s' which points to configuration '%s'. " +
-                                                                  "The selected config does not support that operation.",
-                                                                  flowConstruct.getName(),
-                                                                  componentModel.getName(),
-                                                                  provider.get().getName()));
-            }
-        }
-    }
-
-    private boolean containsComponent(List<ComponentModel> componentModels, String name)
-    {
-        for (ComponentModel model : componentModels)
-        {
-            if (model.getName().equals(name))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 }

@@ -19,10 +19,13 @@ import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.extension.api.introspection.ComponentModel;
 import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.RuntimeOperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
@@ -33,6 +36,10 @@ import org.mule.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,7 +118,7 @@ public final class OperationMessageProcessor extends ExtensionComponent implemen
     @Override
     public void initialise() throws InitialisationException
     {
-        validateComponentConfiguration();
+        validateOperationConfiguration();
         returnDelegate = createReturnDelegate();
         operationExecutor = operationModel.getExecutor().createExecutor();
         executionMediator = new DefaultExecutionMediator(extensionModel, operationModel, connectionManager);
@@ -144,5 +151,28 @@ public final class OperationMessageProcessor extends ExtensionComponent implemen
     public void dispose()
     {
         disposeIfNeeded(operationExecutor, LOGGER);
+    }
+
+    /**
+     * Validates if the current operation is valid for the set configuration.
+     * In case that the validation fails, the method will throw a {@link IllegalOperationException}
+     */
+    private void validateOperationConfiguration()
+    {
+        Optional<ConfigurationProvider<Object>> provider = getConfigurationProvider();
+
+        if (provider.isPresent())
+        {
+            RuntimeConfigurationModel configurationModel = provider.get().getModel();
+            if (!configurationModel.getOperationModel(operationModel.getName()).isPresent() &&
+                !configurationModel.getExtensionModel().getOperationModel(operationModel.getName()).isPresent())
+            {
+                throw new IllegalOperationException(String.format("Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. " +
+                                                                  "The selected config does not support that operation.",
+                                                                  flowConstruct.getName(),
+                                                                  operationModel.getName(),
+                                                                  provider.get().getName()));
+            }
+        }
     }
 }

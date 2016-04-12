@@ -202,8 +202,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         when(configurationProvider.get(event)).thenReturn(configurationInstance);
         when(configurationProvider.getModel()).thenReturn(configurationModel);
 
-        when(configurationModel.getOperationModels()).thenReturn(Collections.singletonList(operationModel));
-        when(configurationModel.getSourceModels()).thenReturn(Collections.emptyList());
+        when(configurationModel.getOperationModel(OPERATION_NAME)).thenReturn(Optional.of(operationModel));
 
         connectionManager = new DefaultConnectionManager(context);
         connectionManager.initialise();

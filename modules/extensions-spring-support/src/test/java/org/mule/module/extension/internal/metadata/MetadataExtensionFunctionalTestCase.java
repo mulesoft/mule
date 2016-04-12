@@ -32,6 +32,8 @@ import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
@@ -65,6 +67,10 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected MuleEvent event;
     protected MetadataManager metadataManager;
     protected ClassTypeLoader typeLoader;
+
+    protected static final List<MetadataKey> METADATA_KEYS = new MetadataConnection().getEntities().stream()
+            .map(e -> MetadataKeyBuilder.newKey(e).build())
+            .collect(Collectors.toList());
 
     @Override
     protected Class<?>[] getAnnotatedExtensionClasses()

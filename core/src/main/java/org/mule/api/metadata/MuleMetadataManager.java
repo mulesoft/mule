@@ -42,8 +42,8 @@ import javax.inject.Inject;
 public class MuleMetadataManager implements MetadataManager, Initialisable
 {
 
-    private static final String EXCEPTION_RESOLVING_COMPONENT_METADATA = "An exception occurred while resolving Component %s metadata";
-    private static final String PROCESSOR_NOT_METADATA_AWARE = "Component is not MetadataAware, no information available";
+    private static final String EXCEPTION_RESOLVING_COMPONENT_METADATA = "An exception occurred while resolving metadata for component '%s'";
+    private static final String COMPONENT_NOT_METADATA_AWARE = "Component is not MetadataAware, no information available";
     private static final String EXCEPTION_RESOLVING_METADATA_KEYS = "An exception occurred while resolving Component MetadataKeys";
     private static final String SOURCE_NOT_FOUND = "Flow doesn't contain a message source";
     private static final String PROCESSOR_NOT_FOUND = "Processor doesn't exist in the given index [%s]";
@@ -201,7 +201,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
         }
         catch (ClassCastException e)
         {
-            throw new InvalidComponentIdException(createStaticMessage(PROCESSOR_NOT_METADATA_AWARE), e);
+            throw new InvalidComponentIdException(createStaticMessage(COMPONENT_NOT_METADATA_AWARE), e);
         }
     }
 

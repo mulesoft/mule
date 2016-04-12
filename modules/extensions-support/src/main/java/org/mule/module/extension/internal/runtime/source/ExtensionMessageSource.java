@@ -34,8 +34,12 @@ import org.mule.api.temporary.MuleMessage;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.execution.MessageProcessContext;
 import org.mule.execution.MessageProcessingManager;
+import org.mule.extension.api.introspection.ComponentModel;
+import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.extension.api.introspection.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.RuntimeSourceModel;
+import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ExceptionCallback;
 import org.mule.extension.api.runtime.MessageHandler;
 import org.mule.extension.api.runtime.source.Source;
@@ -44,9 +48,14 @@ import org.mule.extension.api.runtime.source.SourceFactory;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.module.extension.internal.runtime.exception.ExceptionEnricherManager;
+import org.mule.module.extension.internal.runtime.processor.IllegalComponentException;
+import org.mule.module.extension.internal.runtime.processor.IllegalOperationException;
+import org.mule.module.extension.internal.runtime.processor.IllegalSourceException;
 import org.mule.util.ExceptionUtils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -72,10 +81,12 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionMessageSource.class);
 
+    private final RuntimeSourceModel sourceModel;
     private final SourceFactory sourceFactory;
     private final ThreadingProfile threadingProfile;
     private final RetryPolicyTemplate retryPolicyTemplate;
     private final ExceptionEnricherManager exceptionEnricherManager;
+    private final ExtensionModel extensionModel;
 
     private SourceWrapper source;
     private WorkManager workManager;
@@ -89,9 +100,11 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
                                   ExtensionManagerAdapter managerAdapter)
     {
         super(extensionModel, sourceModel, configurationProviderName, managerAdapter);
+        this.sourceModel = sourceModel;
         this.sourceFactory = sourceFactory;
         this.threadingProfile = threadingProfile;
         this.retryPolicyTemplate = retryPolicyTemplate;
+        this.extensionModel = extensionModel;
         this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, sourceModel);
     }
 
@@ -142,7 +155,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     @Override
     public void initialise() throws InitialisationException
     {
-        validateComponentConfiguration();
+        validateSourceConfiguration();
         try
         {
             createSource();
@@ -362,5 +375,28 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     {
         LOGGER.error(String.format("Message source '%s' on flow '%s' threw exception. Shutting down it forever...", source.getName(), flowConstruct.getName()), exception);
         shutdown();
+    }
+
+    /**
+     * Validates if the current source is valid for the set configuration.
+     * In case that the validation fails, the method will throw a {@link IllegalSourceException}
+     */
+    private void validateSourceConfiguration()
+    {
+        Optional<ConfigurationProvider<Object>> provider = getConfigurationProvider();
+
+        if (provider.isPresent())
+        {
+            RuntimeConfigurationModel configurationModel = provider.get().getModel();
+            if (!configurationModel.getSourceModel(sourceModel.getName()).isPresent() &&
+                !configurationModel.getExtensionModel().getSourceModel(sourceModel.getName()).isPresent())
+            {
+                throw new IllegalOperationException(String.format("Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. " +
+                                                                  "The selected config does not support that operation.",
+                                                                  flowConstruct.getName(),
+                                                                  sourceModel.getName(),
+                                                                  provider.get().getName()));
+            }
+        }
     }
 }

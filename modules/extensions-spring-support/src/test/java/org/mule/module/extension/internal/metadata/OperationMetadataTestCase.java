@@ -6,6 +6,7 @@
  */
 package org.mule.module.extension.internal.metadata;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
@@ -48,9 +49,11 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     public void getMetadataKeysWithKeyParam() throws Exception
     {
         componentId = new ProcessorId(OUTPUT_METADATA_WITH_KEY_PARAM, FIRST_PROCESSOR_INDEX);
-        final MetadataResult<List<MetadataKey>> metadataKeys = metadataManager.getMetadataKeys(componentId);
-        assertThat(metadataKeys.isSuccess(), is(true));
-        assertThat(metadataKeys.get().size(), is(3));
+        final MetadataResult<List<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
+        assertThat(metadataKeysResult.isSuccess(), is(true));
+        final List<MetadataKey> metadataKeys = metadataKeysResult.get();
+        assertThat(metadataKeys.size(), is(3));
+        assertThat(metadataKeys, contains(METADATA_KEYS.toArray()));
     }
 
     @Test
