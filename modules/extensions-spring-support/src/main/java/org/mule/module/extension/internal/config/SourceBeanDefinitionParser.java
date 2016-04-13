@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.config;
 import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import org.mule.api.source.MessageSource;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.SourceModel;
+import org.mule.extension.api.introspection.source.SourceModel;
 import org.mule.extension.api.runtime.source.Source;
 
 import org.springframework.beans.MutablePropertyValues;

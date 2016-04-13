@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.metadata;
+package org.mule.internal.metadata;
+
+import org.mule.api.metadata.MetadataCache;
 
 import com.google.common.collect.ImmutableMap;
 

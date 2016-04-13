@@ -8,9 +8,9 @@ package org.mule.module.extension.internal.introspection.utils;
 
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import org.mule.api.expression.ExpressionManager;
-import org.mule.extension.api.introspection.ExpressionSupport;
-import org.mule.extension.api.introspection.ParameterModel;
-import org.mule.extension.api.introspection.ParametrizedModel;
+import org.mule.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.extension.api.introspection.parameter.ParameterModel;
+import org.mule.extension.api.introspection.parameter.ParametrizedModel;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;

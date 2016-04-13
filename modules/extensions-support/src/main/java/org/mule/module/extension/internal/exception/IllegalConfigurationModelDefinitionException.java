@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.exception;
 
 
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.config.ConfigurationModel;
 
 /**
  * A specialization of {@link IllegalModelDefinitionException} which marks that a {@link ConfigurationModel} is invalid

@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.introspection.describer;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.introspection.ExpressionSupport;
+import org.mule.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;

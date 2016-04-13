@@ -14,8 +14,8 @@ import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getPar
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getResolver;
 import org.mule.api.MuleEvent;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.ParameterModel;
-import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.parameter.ParameterModel;
+import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;

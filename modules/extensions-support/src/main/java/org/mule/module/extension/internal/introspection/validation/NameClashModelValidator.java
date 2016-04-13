@@ -10,13 +10,13 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.ConfigurationModel;
-import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.extension.api.introspection.config.ConfigurationModel;
+import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.Described;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.OperationModel;
-import org.mule.extension.api.introspection.ParameterModel;
-import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.operation.OperationModel;
+import org.mule.extension.api.introspection.parameter.ParameterModel;
+import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.module.extension.internal.util.MuleExtensionUtils;
 

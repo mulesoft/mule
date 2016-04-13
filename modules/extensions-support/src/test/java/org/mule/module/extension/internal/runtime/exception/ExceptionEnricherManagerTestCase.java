@@ -14,10 +14,10 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import org.mule.api.connection.ConnectionException;
-import org.mule.extension.api.introspection.ExceptionEnricher;
-import org.mule.extension.api.introspection.ExceptionEnricherFactory;
+import org.mule.extension.api.introspection.exception.ExceptionEnricher;
+import org.mule.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.extension.api.introspection.RuntimeSourceModel;
+import org.mule.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.module.extension.exception.HeisenbergException;
 import org.mule.tck.size.SmallTest;
 

@@ -14,7 +14,7 @@ import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.extension.api.annotation.Expression;
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.introspection.ExpressionSupport;
+import org.mule.extension.api.introspection.parameter.ExpressionSupport;
 
 public class TestConnectionProvider implements ConnectionProvider<TestConnector, Object>
 {

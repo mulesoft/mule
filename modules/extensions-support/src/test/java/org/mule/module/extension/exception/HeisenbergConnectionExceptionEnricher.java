@@ -7,7 +7,7 @@
 package org.mule.module.extension.exception;
 
 import org.mule.api.connection.ConnectionException;
-import org.mule.extension.api.introspection.ExceptionEnricher;
+import org.mule.extension.api.introspection.exception.ExceptionEnricher;
 
 public class HeisenbergConnectionExceptionEnricher implements ExceptionEnricher
 {

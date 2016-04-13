@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.api.MuleEvent;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.operation.OperationModel;
 import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

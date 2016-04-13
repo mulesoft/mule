@@ -11,7 +11,7 @@ import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.Operations;
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.introspection.ExpressionSupport;
+import org.mule.extension.api.introspection.parameter.ExpressionSupport;
 
 import java.util.List;
 

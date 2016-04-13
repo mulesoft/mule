@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.runtime.connector.basic;
 import org.mule.extension.api.annotation.Expression;
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.introspection.ExpressionSupport;
+import org.mule.extension.api.introspection.parameter.ExpressionSupport;
 
 public class Owner
 {

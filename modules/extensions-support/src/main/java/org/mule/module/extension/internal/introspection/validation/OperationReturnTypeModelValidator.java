@@ -10,7 +10,7 @@ import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import org.mule.api.MuleEvent;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.operation.OperationModel;
 import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 
 import java.util.List;

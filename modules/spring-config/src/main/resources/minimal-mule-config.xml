@@ -105,7 +105,7 @@
 
         <spring:bean name="_muleConnectionManager" class="org.mule.internal.connection.DefaultConnectionManager" />
 
-        <spring:bean name="_muleMetadataManager" class="org.mule.api.metadata.MuleMetadataManager" />
+        <spring:bean name="_muleMetadataManager" class="org.mule.internal.metadata.MuleMetadataManager" />
 
         <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
         the transformers will be available even when using the TransientRegistry only -->

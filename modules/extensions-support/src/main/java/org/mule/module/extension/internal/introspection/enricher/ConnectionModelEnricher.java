@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection.enricher;
 
-import org.mule.extension.api.introspection.OperationModel;
+import org.mule.extension.api.introspection.operation.OperationModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;

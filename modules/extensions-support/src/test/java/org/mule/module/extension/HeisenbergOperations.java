@@ -23,7 +23,7 @@ import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.annotation.param.display.DisplayName;
 import org.mule.extension.api.annotation.param.display.Placement;
-import org.mule.extension.api.introspection.ExpressionSupport;
+import org.mule.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.module.extension.exception.CureCancerExceptionEnricher;
 import org.mule.module.extension.exception.HealthException;
 import org.mule.module.extension.exception.HeisenbergException;

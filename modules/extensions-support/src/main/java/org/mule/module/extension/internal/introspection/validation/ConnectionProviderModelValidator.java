@@ -10,11 +10,11 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getImpl
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getOperationsConnectionType;
 
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.ConfigurationModel;
-import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.extension.api.introspection.config.ConfigurationModel;
+import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.OperationModel;
-import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
+import org.mule.extension.api.introspection.operation.OperationModel;
+import org.mule.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 

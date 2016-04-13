@@ -12,7 +12,7 @@ import static org.mule.module.extension.internal.capability.xml.schema.model.Sch
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.TYPE_SUFFIX;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 
-import org.mule.extension.api.introspection.SourceModel;
+import org.mule.extension.api.introspection.source.SourceModel;
 import org.mule.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.module.extension.internal.capability.xml.schema.model.ExtensionType;

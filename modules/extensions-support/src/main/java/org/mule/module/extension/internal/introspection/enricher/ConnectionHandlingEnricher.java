@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.introspection.enricher;
 
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;

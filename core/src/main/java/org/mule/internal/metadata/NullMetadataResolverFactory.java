@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.metadata;
+package org.mule.internal.metadata;
 
 import org.mule.api.metadata.resolving.MetadataContentResolver;
 import org.mule.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.extension.api.metadata.NullMetadataResolver;
+import org.mule.extension.api.introspection.metadata.NullMetadataResolver;
 
 /**
  * Null implementation of a {@link MetadataResolverFactory}, which returns
