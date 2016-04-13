@@ -74,13 +74,13 @@ public abstract class AbstractSftpFunctionalTestCase extends FunctionalTestCase
 
     }
 
-    private void setUpServer()
+    protected void setUpServer()
     {
         sftpServer = new SftpServer(sftpPort.getNumber());
         sftpServer.start();
     }
 
-    private void cleanUpTestFolder()
+    protected void cleanUpTestFolder()
     {
         try
         {
