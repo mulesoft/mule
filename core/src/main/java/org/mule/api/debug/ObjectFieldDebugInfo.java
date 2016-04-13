@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @since 3.8.0
  */
-public class ObjectFieldDebugInfo extends FieldDebugInfo<List<FieldDebugInfo>>
+public class ObjectFieldDebugInfo extends FieldDebugInfo<List<FieldDebugInfo<?>>>
 {
     /**
      * Creates debug information for an object
@@ -27,7 +27,7 @@ public class ObjectFieldDebugInfo extends FieldDebugInfo<List<FieldDebugInfo>>
      * @param fields a {@link List} containing debug information for the
      *               object's fields. Non null.
      */
-    ObjectFieldDebugInfo(String name, Class type, List<FieldDebugInfo> fields)
+    ObjectFieldDebugInfo(String name, String type, List<FieldDebugInfo<?>> fields)
     {
         super(name, type, fields);
 

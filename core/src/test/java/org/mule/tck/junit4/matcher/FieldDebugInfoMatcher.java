@@ -17,33 +17,33 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-public class FieldDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo>
+public class FieldDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo<?>>
 {
 
     private final String name;
-    private final Class type;
+    private final String type;
     private final Matcher matcher;
 
     public FieldDebugInfoMatcher(String name, Class type, Object value)
     {
         this.name = name;
-        this.type = type;
+        this.type = type.getName();
         this.matcher = equalTo(value);
     }
 
     public FieldDebugInfoMatcher(String name, Class type, Matcher matcher)
     {
         this.name = name;
-        this.type = type;
+        this.type = type.getName();
         this.matcher = matcher;
     }
 
     @Override
-    public boolean matchesSafely(FieldDebugInfo item)
+    public boolean matchesSafely(FieldDebugInfo<?> item)
     {
         boolean sameValue = matcher.matches(item.getValue());
 
-        return name.equals(item.getName()) && sameValue && type == item.getType();
+        return name.equals(item.getName()) && sameValue && type.equals(item.getType());
     }
 
     public void describeTo(Description description)
@@ -53,13 +53,13 @@ public class FieldDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo>
     }
 
     @Factory
-    public static Matcher<FieldDebugInfo> fieldLike(String name, Class type, Object value)
+    public static Matcher<FieldDebugInfo<?>> fieldLike(String name, Class type, Object value)
     {
         return new FieldDebugInfoMatcher(name, type, value);
     }
 
     @Factory
-    public static Matcher<FieldDebugInfo> fieldLike(String name, Class type, Matcher matcher)
+    public static Matcher<FieldDebugInfo<?>> fieldLike(String name, Class type, Matcher matcher)
     {
         if (matcher == null)
         {

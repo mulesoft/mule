@@ -82,7 +82,7 @@ public class DynamicBulkUpdateMessageProcessorTestCase extends AbstractMuleTestC
         final DynamicBulkUpdateMessageProcessor dynamicBulkUpdateMessageProcessor = new DynamicBulkUpdateMessageProcessor(dbConfigResolver, queryResolver, null, NOT_SUPPORTED, Collections.singletonList(QueryType.UPDATE));
         dynamicBulkUpdateMessageProcessor.setMuleContext(muleContext);
 
-        final List<FieldDebugInfo> debugInfo = dynamicBulkUpdateMessageProcessor.getDebugInfo(event);
+        final List<FieldDebugInfo<?>> debugInfo = dynamicBulkUpdateMessageProcessor.getDebugInfo(event);
 
         assertThat(debugInfo, is(not(nullValue())));
         assertThat(debugInfo.size(), equalTo(1));
@@ -107,15 +107,15 @@ public class DynamicBulkUpdateMessageProcessorTestCase extends AbstractMuleTestC
         final DynamicBulkUpdateMessageProcessor dynamicBulkUpdateMessageProcessor = new DynamicBulkUpdateMessageProcessor(dbConfigResolver, queryResolver, null, NOT_SUPPORTED, Collections.singletonList(QueryType.UPDATE));
         dynamicBulkUpdateMessageProcessor.setMuleContext(muleContext);
 
-        final List<FieldDebugInfo> debugInfo = dynamicBulkUpdateMessageProcessor.getDebugInfo(event);
+        final List<FieldDebugInfo<?>> debugInfo = dynamicBulkUpdateMessageProcessor.getDebugInfo(event);
 
         assertThat(debugInfo.size(), equalTo(1));
         assertThat(debugInfo, hasItem(fieldLike(QUERIES_DEBUG_FIELD, List.class, queryResolutionException)));
     }
 
-    private List<Matcher<FieldDebugInfo>> createExpectedQueryMatchers()
+    private List<Matcher<FieldDebugInfo<?>>> createExpectedQueryMatchers()
     {
-        final List<Matcher<FieldDebugInfo>> queryMatchers = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> queryMatchers = new ArrayList<>();
         queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY1, QUERY_TEMPLATE1));
         queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY2, QUERY_TEMPLATE2));
 

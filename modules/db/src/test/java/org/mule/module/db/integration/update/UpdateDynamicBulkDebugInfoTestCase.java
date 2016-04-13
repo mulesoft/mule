@@ -65,16 +65,16 @@ public class UpdateDynamicBulkDebugInfoTestCase extends UpdateBulkTestCase
 
         final MuleEvent muleEvent = getTestEvent(planetNames);
 
-        final List<FieldDebugInfo> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
+        final List<FieldDebugInfo<?>> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
 
         assertThat(debugInfo, is(not(nullValue())));
         assertThat(debugInfo.size(), equalTo(1));
         assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, createExpectedQueryMatchers())));
     }
 
-    private List<Matcher<FieldDebugInfo>> createExpectedQueryMatchers()
+    private List<Matcher<FieldDebugInfo<?>>> createExpectedQueryMatchers()
     {
-        final List<Matcher<FieldDebugInfo>> queriesDebugInfo = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> queriesDebugInfo = new ArrayList<>();
         queriesDebugInfo.add(createQueryFieldDebugInfoMatcher(QUERY1, new QueryTemplate("update PLANET set NAME='Mercury' where NAME='EARTH'", UPDATE, Collections.<QueryParam>emptyList())));
         queriesDebugInfo.add(createQueryFieldDebugInfoMatcher(QUERY2, new QueryTemplate("update PLANET set NAME='Mercury' where NAME='MARS'", UPDATE, Collections.<QueryParam>emptyList())));
 

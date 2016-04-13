@@ -68,14 +68,14 @@ public class SelectParameterizedQueryDebugInfoTestCase extends AbstractDbIntegra
         final MuleEvent muleEvent = getTestEvent(TEST_MESSAGE);
         final String expectedPosition = "3";
         muleEvent.getMessage().setInvocationProperty("position", expectedPosition);
-        final List<FieldDebugInfo> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
+        final List<FieldDebugInfo<?>> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
 
         assertThat(debugInfo, is(not(nullValue())));
         assertThat(debugInfo.size(), equalTo(3));
         assertThat(debugInfo, hasItem(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, "SELECT * FROM PLANET WHERE POSITION = ? AND NAME = 'Earth'")));
         assertThat(debugInfo, hasItem(fieldLike(TYPE_DEBUG_FIELD, String.class, "SELECT")));
 
-        final List<Matcher<FieldDebugInfo>> paramMatchers = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> paramMatchers = new ArrayList<>();
         paramMatchers.add(fieldLike(PARAM1, String.class, expectedPosition));
         assertThat(debugInfo, hasItem(objectLike(INPUT_PARAMS_DEBUG_FIELD, List.class, paramMatchers)));
     }

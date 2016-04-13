@@ -16,7 +16,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.debug.Debuggable;
+import org.mule.api.debug.DebugInfoProvider;
 import org.mule.api.debug.FieldDebugInfo;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -44,7 +44,7 @@ import java.util.List;
 /**
  * Base class for database message processors.
  */
-public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMessageProcessor implements Initialisable, InterceptingMessageProcessor, OperationMetaDataEnabled, Debuggable
+public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMessageProcessor implements Initialisable, InterceptingMessageProcessor, OperationMetaDataEnabled, DebugInfoProvider
 {
 
     protected final DbConfigResolver dbConfigResolver;
@@ -200,9 +200,9 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
     }
 
     @Override
-    public List<FieldDebugInfo> getDebugInfo(MuleEvent muleEvent)
+    public List<FieldDebugInfo<?>> getDebugInfo(MuleEvent muleEvent)
     {
-        List<FieldDebugInfo> debugInfo = new ArrayList<>();
+        List<FieldDebugInfo<?>> debugInfo = new ArrayList<>();
 
         DbConfig dbConfig;
         try
@@ -250,7 +250,7 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
         }
     }
 
-    protected abstract List<FieldDebugInfo> getMessageProcessorDebugInfo(DbConnection connection, MuleEvent muleEvent);
+    protected abstract List<FieldDebugInfo<?>> getMessageProcessorDebugInfo(DbConnection connection, MuleEvent muleEvent);
 
     protected abstract List<QueryType> getValidQueryTypes();
 
