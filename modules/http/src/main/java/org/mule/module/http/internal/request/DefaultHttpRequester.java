@@ -23,7 +23,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
-import org.mule.api.debug.Debuggable;
+import org.mule.api.debug.DebugInfoProvider;
 import org.mule.api.debug.FieldDebugInfo;
 import org.mule.api.debug.FieldDebugInfoFactory;
 import org.mule.api.lifecycle.Initialisable;
@@ -55,7 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor implements Initialisable, MuleContextAware, FlowConstructAware, Debuggable
+public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor implements Initialisable, MuleContextAware, FlowConstructAware, DebugInfoProvider
 {
 
     public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
@@ -606,9 +606,9 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     }
 
     @Override
-    public List<FieldDebugInfo> getDebugInfo(final MuleEvent event)
+    public List<FieldDebugInfo<?>> getDebugInfo(final MuleEvent event)
     {
-        final List<FieldDebugInfo> fields = new ArrayList<>();
+        final List<FieldDebugInfo<?>> fields = new ArrayList<>();
         fields.add(createFieldDebugInfo(URI_DEBUG, String.class, new FieldDebugInfoFactory.FieldEvaluator()
         {
             @Override

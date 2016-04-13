@@ -95,27 +95,27 @@ public class PreparedBulkUpdateMessageProcessorDebugInfoTestCase extends Abstrac
         PreparedBulkUpdateMessageProcessor processor = new PreparedBulkUpdateMessageProcessor(dbConfigResolver, queryResolver, null, NOT_SUPPORTED, Collections.singletonList(UPDATE), paramValueResolver);
         processor.setMuleContext(muleContext);
 
-        final List<FieldDebugInfo> debugInfo = processor.getDebugInfo(event);
+        final List<FieldDebugInfo<?>> debugInfo = processor.getDebugInfo(event);
 
         assertThat(debugInfo.size(), equalTo(2));
 
 
-        List<Matcher<FieldDebugInfo>> fieldMatchers = new ArrayList<>();
+        List<Matcher<FieldDebugInfo<?>>> fieldMatchers = new ArrayList<>();
         fieldMatchers.add(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, QUERY_SQL));
         fieldMatchers.add(fieldLike(TYPE_DEBUG_FIELD, String.class, UPDATE.toString()));
         assertThat(debugInfo, hasItem(objectLike(QUERY_DEBUG_FIELD, Query.class, fieldMatchers)));
         assertThat(debugInfo, hasItem(objectLike(INPUT_PARAMS_DEBUG_FIELD, List.class, createExpectedParamSetMatchers())));
     }
 
-    private List<Matcher<FieldDebugInfo>> createExpectedParamSetMatchers()
+    private List<Matcher<FieldDebugInfo<?>>> createExpectedParamSetMatchers()
     {
-        final List<Matcher<FieldDebugInfo>> paramSets = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> paramSets = new ArrayList<>();
 
-        final List<Matcher<FieldDebugInfo>> paramSet1 = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> paramSet1 = new ArrayList<>();
         paramSet1.add(fieldLike(PARAM1, String.class, EARTH.getName()));
         paramSets.add(objectLike(PARAM_SET1, List.class, paramSet1));
 
-        final List<Matcher<FieldDebugInfo>> paramSet2 = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> paramSet2 = new ArrayList<>();
         paramSet2.add(fieldLike(PARAM1, String.class, MARS.getName()));
         paramSets.add(objectLike(PARAM_SET2, List.class, paramSet2));
         return paramSets;

@@ -22,6 +22,6 @@ public class FiledErrorDebugInfoTestCase extends AbstractFieldDebugInfoTestCase<
     @Override
     protected void createFieldDebugInfo(String name, Class type, Exception value)
     {
-        new ErrorFieldDebugInfo(name, type, value);
+        FieldDebugInfoFactory.createFieldDebugInfo(name, type, value);
     }
 }
