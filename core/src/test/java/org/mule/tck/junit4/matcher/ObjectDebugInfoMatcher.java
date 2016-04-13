@@ -20,22 +20,22 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-public class ObjectDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo>
+public class ObjectDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo<?>>
 {
 
     private final String name;
-    private final Class type;
-    private final List<Matcher<FieldDebugInfo>> fieldMatchers;
+    private final String type;
+    private final List<Matcher<FieldDebugInfo<?>>> fieldMatchers;
 
-    public ObjectDebugInfoMatcher(String name, Class type, List<Matcher<FieldDebugInfo>> fieldMatchers)
+    public ObjectDebugInfoMatcher(String name, Class type, List<Matcher<FieldDebugInfo<?>>> fieldMatchers)
     {
         this.name = name;
-        this.type = type;
+        this.type = type.getName();
         this.fieldMatchers = fieldMatchers;
     }
 
     @Override
-    protected boolean matchesSafely(FieldDebugInfo fieldDebugInfo)
+    protected boolean matchesSafely(FieldDebugInfo<?> fieldDebugInfo)
     {
         if (!name.equals(fieldDebugInfo.getName()))
         {
@@ -53,7 +53,7 @@ public class ObjectDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo>
         }
 
         final ObjectFieldDebugInfo objectFieldDebugInfo = (ObjectFieldDebugInfo) fieldDebugInfo;
-        final List<FieldDebugInfo> fieldDebugInfos = objectFieldDebugInfo.getValue();
+        final List<FieldDebugInfo<?>> fieldDebugInfos = objectFieldDebugInfo.getValue();
 
         if (fieldMatchers.size() != fieldDebugInfos.size())
         {
@@ -62,7 +62,7 @@ public class ObjectDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo>
 
         try
         {
-            for (Matcher<FieldDebugInfo> fieldMatcher : fieldMatchers)
+            for (Matcher<FieldDebugInfo<?>> fieldMatcher : fieldMatchers)
             {
                 assertThat(fieldDebugInfos, hasItem(fieldMatcher));
             }
@@ -81,7 +81,7 @@ public class ObjectDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo>
     {
         description.appendText(format("an %s with name: '%s' type: '%s' and containing [ ", ObjectFieldDebugInfo.class.getSimpleName(), name, type));
         boolean firstMatcher = true;
-        for (Matcher<FieldDebugInfo> fieldMatcher : fieldMatchers)
+        for (Matcher<FieldDebugInfo<?>> fieldMatcher : fieldMatchers)
         {
             if (firstMatcher)
             {
@@ -97,7 +97,7 @@ public class ObjectDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo>
     }
 
     @Factory
-    public static Matcher<FieldDebugInfo> objectLike(String name, Class type, List<Matcher<FieldDebugInfo>> fieldMatchers)
+    public static Matcher<FieldDebugInfo<?>> objectLike(String name, Class type, List<Matcher<FieldDebugInfo<?>>> fieldMatchers)
     {
         return new ObjectDebugInfoMatcher(name, type, fieldMatchers);
     }

@@ -22,6 +22,6 @@ public class SimpleFieldDebugInfoTestCase extends AbstractFieldDebugInfoTestCase
     @Override
     protected void createFieldDebugInfo(String name, Class type, String value)
     {
-        new SimpleFieldDebugInfo(name, type, value);
+        FieldDebugInfoFactory.createFieldDebugInfo(name, type, value);
     }
 }

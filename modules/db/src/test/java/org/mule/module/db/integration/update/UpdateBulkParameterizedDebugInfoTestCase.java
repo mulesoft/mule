@@ -79,12 +79,12 @@ public class UpdateBulkParameterizedDebugInfoTestCase extends AbstractDbIntegrat
 
         final MuleEvent muleEvent = getTestEvent(planetNames);
 
-        final List<FieldDebugInfo> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
+        final List<FieldDebugInfo<?>> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
 
         assertThat(debugInfo, is(not(nullValue())));
         assertThat(debugInfo.size(), equalTo(2));
 
-        List<Matcher<FieldDebugInfo>> queryMatcher = new ArrayList<>();
+        List<Matcher<FieldDebugInfo<?>>> queryMatcher = new ArrayList<>();
         queryMatcher.add(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, "update PLANET set NAME='Mercury' where NAME=?"));
         queryMatcher.add(fieldLike(TYPE_DEBUG_FIELD, String.class, UPDATE.toString()));
 
@@ -92,15 +92,15 @@ public class UpdateBulkParameterizedDebugInfoTestCase extends AbstractDbIntegrat
         assertThat(debugInfo, hasItem(objectLike(INPUT_PARAMS_DEBUG_FIELD, List.class, createExpectedParamSetMatchers())));
     }
 
-    private List<Matcher<FieldDebugInfo>> createExpectedParamSetMatchers()
+    private List<Matcher<FieldDebugInfo<?>>> createExpectedParamSetMatchers()
     {
-        final List<Matcher<FieldDebugInfo>> paramSetMatchers = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> paramSetMatchers = new ArrayList<>();
 
-        final List<Matcher<FieldDebugInfo>> paramSet1 = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> paramSet1 = new ArrayList<>();
         paramSet1.add(fieldLike(PARAM1, String.class, EARTH.getName()));
         paramSetMatchers.add(objectLike(PARAM_SET1, List.class, paramSet1));
 
-        final List<Matcher<FieldDebugInfo>> paramSet2 = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> paramSet2 = new ArrayList<>();
         paramSet2.add(fieldLike(PARAM1, String.class, MARS.getName()));
         paramSetMatchers.add(objectLike(PARAM_SET2, List.class, paramSet2));
         return paramSetMatchers;

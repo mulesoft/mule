@@ -72,12 +72,12 @@ public class BulkExecuteDebugInfoTestCase extends AbstractDbIntegrationTestCase
 
         final MuleEvent muleEvent = getTestEvent(TEST_MESSAGE);
 
-        final List<FieldDebugInfo> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
+        final List<FieldDebugInfo<?>> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
 
         assertThat(debugInfo, is(not(nullValue())));
         assertThat(debugInfo.size(), equalTo(1));
 
-        final List<Matcher<FieldDebugInfo>> queryMatchers = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> queryMatchers = new ArrayList<>();
         queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY1, QUERY_TEMPLATE1));
         queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY2, QUERY_TEMPLATE2));
 

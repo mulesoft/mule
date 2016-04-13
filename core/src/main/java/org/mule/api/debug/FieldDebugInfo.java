@@ -8,6 +8,7 @@
 package org.mule.api.debug;
 
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.util.StringUtils;
 
 /**
@@ -25,7 +26,7 @@ public abstract class FieldDebugInfo<T>
 {
 
     private final String name;
-    private final Class type;
+    private final String type;
     private final T value;
 
     /**
@@ -35,7 +36,7 @@ public abstract class FieldDebugInfo<T>
      * @param type field's type.
      * @param value field's value. Can be null.
      */
-    FieldDebugInfo(String name, Class type, T value)
+    FieldDebugInfo(String name, String type, T value)
     {
         checkArgument(!StringUtils.isEmpty(name), "Name cannot be empty");
 
@@ -54,7 +55,7 @@ public abstract class FieldDebugInfo<T>
         return value;
     }
 
-    public Class getType()
+    public String getType()
     {
         return type;
     }

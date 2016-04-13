@@ -117,12 +117,12 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         doDebugInfoTest(message, event, null);
     }
 
-    private void doDebugInfoTest(DefaultMuleMessage message, DefaultMuleEvent event, List<Matcher<FieldDebugInfo>> securityFieldMatchers) throws InitialisationException
+    private void doDebugInfoTest(DefaultMuleMessage message, DefaultMuleEvent event, List<Matcher<FieldDebugInfo<?>>> securityFieldMatchers) throws InitialisationException
     {
         configureRequesterExpressions();
         addRequesterProperties(message);
 
-        final List<FieldDebugInfo> debugInfo = requester.getDebugInfo(event);
+        final List<FieldDebugInfo<?>> debugInfo = requester.getDebugInfo(event);
 
         assertThat(debugInfo.size(), equalTo(9));
         assertThat(debugInfo, hasItem(fieldLike(URI_DEBUG, String.class, String.format("http://%s:%s/", HOST, PORT))));
@@ -132,7 +132,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         assertThat(debugInfo, hasItem(fieldLike(FOLLOW_REDIRECTS_DEBUG, Boolean.class, TRUE)));
         assertThat(debugInfo, hasItem(fieldLike(PARSE_RESPONSE_DEBUG, Boolean.class, TRUE)));
         assertThat(debugInfo, hasItem(fieldLike(RESPONSE_TIMEOUT_DEBUG, Integer.class, RESPONSE_TIMEOUT)));
-        List<Matcher<FieldDebugInfo>> paramMatchers = new ArrayList<>();
+        List<Matcher<FieldDebugInfo<?>>> paramMatchers = new ArrayList<>();
         paramMatchers.add(fieldLike(PARAM_NAME1, String.class, PARAM_VALUE1));
         paramMatchers.add(fieldLike(PARAM_NAME2, List.class, contains(PARAM_VALUE1, PARAM_VALUE2)));
         assertThat(debugInfo, hasItem(objectLike(QUERY_PARAMS_DEBUG, List.class, paramMatchers)));
@@ -147,9 +147,9 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         }
     }
 
-    private List<Matcher<FieldDebugInfo>> getSecurityFieldsMatchers()
+    private List<Matcher<FieldDebugInfo<?>>> getSecurityFieldsMatchers()
     {
-        final List<Matcher<FieldDebugInfo>> securityFields = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> securityFields = new ArrayList<>();
         securityFields.add(fieldLike(USERNAME_DEBUG, String.class, USERNAME));
         securityFields.add(fieldLike(DOMAIN_DEBUG, String.class, DOMAIN));
         securityFields.add(fieldLike(PASSWORD_DEBUG, String.class, PASSWORD));

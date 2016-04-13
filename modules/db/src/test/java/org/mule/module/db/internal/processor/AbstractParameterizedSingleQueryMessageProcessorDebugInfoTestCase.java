@@ -51,7 +51,7 @@ public abstract class AbstractParameterizedSingleQueryMessageProcessorDebugInfoT
 
         AbstractSingleQueryDbMessageProcessor processor = createMessageProcessor();
 
-        final List<FieldDebugInfo> debugInfo = processor.getDebugInfo(event);
+        final List<FieldDebugInfo<?>> debugInfo = processor.getDebugInfo(event);
 
         assertQueryDebugInfo(debugInfo, NAME_PARAM, POSITION_PARAM);
     }
@@ -68,18 +68,18 @@ public abstract class AbstractParameterizedSingleQueryMessageProcessorDebugInfoT
 
         AbstractSingleQueryDbMessageProcessor processor = createMessageProcessor();
 
-        final List<FieldDebugInfo> debugInfo = processor.getDebugInfo(event);
+        final List<FieldDebugInfo<?>> debugInfo = processor.getDebugInfo(event);
 
         assertQueryDebugInfo(debugInfo, PARAM1, PARAM2);
     }
 
-    protected void assertQueryDebugInfo(List<FieldDebugInfo> debugInfo, String paramName1, String paramName2)
+    protected void assertQueryDebugInfo(List<FieldDebugInfo<?>> debugInfo, String paramName1, String paramName2)
     {
         assertThat(debugInfo.size(), equalTo(3));
         assertThat(debugInfo, hasItem(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, getSqlText())));
         assertThat(debugInfo, hasItem(fieldLike(TYPE_DEBUG_FIELD, String.class, getQueryType().toString())));
 
-        final List<Matcher<FieldDebugInfo>> paramMatchers = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> paramMatchers = new ArrayList<>();
         paramMatchers.add(fieldLike(paramName1, String.class, EARTH.getName()));
         paramMatchers.add(fieldLike(paramName2, String.class, EARTH.getPosition()));
         assertThat(debugInfo, hasItem(objectLike(INPUT_PARAMS_DEBUG_FIELD, List.class, paramMatchers)));

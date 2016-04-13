@@ -51,7 +51,7 @@ public abstract class AbstractSingleQueryMessageProcessorDebugInfoTestCase exten
 
         AbstractSingleQueryDbMessageProcessor processor = createMessageProcessor();
 
-        final List<FieldDebugInfo> debugInfo = processor.getDebugInfo(event);
+        final List<FieldDebugInfo<?>> debugInfo = processor.getDebugInfo(event);
 
         assertThat(debugInfo.size(), equalTo(1));
         assertThat(debugInfo, hasItem(fieldLike("Config", DbConfig.class, connectionErrorDebugInfo)));
@@ -69,7 +69,7 @@ public abstract class AbstractSingleQueryMessageProcessorDebugInfoTestCase exten
 
         AbstractSingleQueryDbMessageProcessor processor = createMessageProcessor();
 
-        final List<FieldDebugInfo> debugInfo = processor.getDebugInfo(event);
+        final List<FieldDebugInfo<?>> debugInfo = processor.getDebugInfo(event);
 
         assertThat(debugInfo.size(), equalTo(1));
         assertThat(debugInfo, hasItem(fieldLike("Connection", DbConnection.class, debugInfoError)));
@@ -88,7 +88,7 @@ public abstract class AbstractSingleQueryMessageProcessorDebugInfoTestCase exten
 
         AbstractSingleQueryDbMessageProcessor processor = createMessageProcessor();
 
-        final List<FieldDebugInfo> debugInfo = processor.getDebugInfo(event);
+        final List<FieldDebugInfo<?>> debugInfo = processor.getDebugInfo(event);
 
         assertThat(debugInfo.size(), equalTo(1));
         assertThat(debugInfo, hasItem(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, resolutionException)));

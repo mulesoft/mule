@@ -55,10 +55,10 @@ public abstract class AbstractSingleQueryDbMessageProcessor extends AbstractDbMe
     protected abstract Object doExecuteQuery(DbConnection connection, Query query) throws SQLException;
 
     @Override
-    protected List<FieldDebugInfo> getMessageProcessorDebugInfo(DbConnection connection, MuleEvent muleEvent)
+    protected List<FieldDebugInfo<?>> getMessageProcessorDebugInfo(DbConnection connection, MuleEvent muleEvent)
     {
         MuleEvent eventToUse = resolveSource(muleEvent);
-        final List<FieldDebugInfo> fields = new ArrayList<>();
+        final List<FieldDebugInfo<?>> fields = new ArrayList<>();
 
         Query resolvedQuery;
         try

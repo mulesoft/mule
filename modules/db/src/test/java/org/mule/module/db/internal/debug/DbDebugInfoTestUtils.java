@@ -37,9 +37,9 @@ public class DbDebugInfoTestUtils
      * @param queryTemplate query to compare with the debug info
      * @return a non null matcher
      */
-    public static Matcher<FieldDebugInfo> createQueryFieldDebugInfoMatcher(String name, QueryTemplate queryTemplate)
+    public static Matcher<FieldDebugInfo<?>> createQueryFieldDebugInfoMatcher(String name, QueryTemplate queryTemplate)
     {
-        final List<Matcher<FieldDebugInfo>> queryMatcher = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> queryMatcher = new ArrayList<>();
         queryMatcher.add(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, queryTemplate.getSqlText()));
         queryMatcher.add(fieldLike(TYPE_DEBUG_FIELD, String.class, queryTemplate.getType().toString()));
 
