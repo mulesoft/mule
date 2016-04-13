@@ -8,6 +8,7 @@ package org.mule.module.launcher;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static org.apache.commons.io.FileUtils.copyFile;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
@@ -672,7 +673,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         File originalConfigFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
         URL url = getClass().getResource(BROKEN_CONFIG_XML);
         File newConfigFile = new File(url.toURI());
-        FileUtils.copyFile(newConfigFile, originalConfigFile);
+        copyFile(newConfigFile, originalConfigFile);
 
         assertDeploymentFailure(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
         assertStatus(dummyAppDescriptorFileBuilder.getId(), ApplicationStatus.DEPLOYMENT_FAILED);
@@ -694,7 +695,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertThat(originalConfigFile.exists(), is(true));
         URL url = getClass().getResource(BROKEN_CONFIG_XML);
         File newConfigFile = new File(url.toURI());
-        FileUtils.copyFile(newConfigFile, originalConfigFile);
+        copyFile(newConfigFile, originalConfigFile);
 
         assertDeploymentFailure(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
         assertStatus(dummyAppDescriptorFileBuilder.getId(), ApplicationStatus.DEPLOYMENT_FAILED);
@@ -715,7 +716,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertThat(originalConfigFile.exists(), is(true));
         URL url = getClass().getResource(EMPTY_APP_CONFIG_XML);
         File newConfigFile = new File(url.toURI());
-        FileUtils.copyFile(newConfigFile, originalConfigFile);
+        copyFile(newConfigFile, originalConfigFile);
         assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
         addPackedAppFromBuilder(emptyAppFileBuilder);
@@ -731,16 +732,23 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
 
         addExplodedAppFromBuilder(incompleteAppFileBuilder);
-
-
         assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
         reset(applicationDeploymentListener);
 
-        File originalConfigFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
-        URL url = getClass().getResource(EMPTY_DOMAIN_CONFIG_XML);
-        File newConfigFile = new File(url.toURI());
-        FileUtils.copyFile(newConfigFile, originalConfigFile);
+        ReentrantLock deploymentLock = deploymentService.getLock();
+        deploymentLock.lock();
+        try
+        {
+            File originalConfigFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
+            URL url = getClass().getResource(EMPTY_DOMAIN_CONFIG_XML);
+            File newConfigFile = new File(url.toURI());
+            copyFile(newConfigFile, originalConfigFile);
+        }
+        finally
+        {
+            deploymentLock.unlock();
+        }
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
@@ -981,7 +989,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(applicationDeploymentListener);
 
         URL url = getClass().getResource(EMPTY_DOMAIN_CONFIG_XML);
-        FileUtils.copyFile(new File(url.toURI()), configFile);
+        copyFile(new File(url.toURI()), configFile);
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
     }
@@ -2536,7 +2544,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertThat("Original config file doe snot exists: " + originalConfigFile, originalConfigFile.exists(), is(true));
         URL url = getClass().getResource(configFile);
         File newConfigFile = new File(url.toURI());
-        FileUtils.copyFile(newConfigFile, originalConfigFile);
+        copyFile(newConfigFile, originalConfigFile);
     }
 
     private void doRedeployDummyDomainByChangingConfigFileWithGoodOne() throws URISyntaxException, IOException
@@ -2560,7 +2568,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertThat("Cannot find domain config file: " + originalConfigFile, originalConfigFile.exists(), is(true));
         URL url = getClass().getResource(configFile);
         File newConfigFile = new File(url.toURI());
-        FileUtils.copyFile(newConfigFile, originalConfigFile);
+        copyFile(newConfigFile, originalConfigFile);
     }
 
     private void doRedeployFixedDomainAfterBrokenDomain() throws Exception
@@ -2572,7 +2580,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         File originalConfigFile = new File(domainsDir + "/incompleteDomain", "mule-domain-config.xml");
         URL url = getClass().getResource("/empty-domain-config.xml");
         File newConfigFile = new File(url.toURI());
-        FileUtils.copyFile(newConfigFile, originalConfigFile);
+        copyFile(newConfigFile, originalConfigFile);
         assertDeploymentSuccess(domainDeploymentListener, "incompleteDomain");
 
         addPackedDomainFromBuilder(emptyAppFileBuilder);
