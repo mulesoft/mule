@@ -35,6 +35,7 @@ public class UdpSocketFactory implements KeyedPoolableObjectFactory
     {
         UdpSocketKey socketKey = (UdpSocketKey)key;
         DatagramSocket socket;
+        
         ImmutableEndpoint ep = socketKey.getEndpoint();
         if(ep instanceof InboundEndpoint)
         {
