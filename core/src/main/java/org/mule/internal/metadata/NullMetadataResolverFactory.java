@@ -10,6 +10,7 @@ import org.mule.api.metadata.resolving.MetadataContentResolver;
 import org.mule.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.extension.api.introspection.metadata.MetadataResolverFactory;
+import org.mule.extension.api.introspection.metadata.NullMetadataResolver;
 
 /**
  * Null implementation of a {@link MetadataResolverFactory}, which returns

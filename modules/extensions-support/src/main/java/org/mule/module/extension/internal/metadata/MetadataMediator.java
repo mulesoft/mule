@@ -29,7 +29,7 @@ import org.mule.extension.api.annotation.metadata.MetadataKeyParam;
 import org.mule.extension.api.introspection.RuntimeComponentModel;
 import org.mule.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.extension.api.introspection.parameter.ParameterModel;
-import org.mule.internal.metadata.NullMetadataKey;
+import org.mule.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.util.collection.ImmutableListCollector;
