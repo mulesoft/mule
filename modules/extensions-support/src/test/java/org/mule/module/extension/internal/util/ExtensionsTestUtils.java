@@ -18,7 +18,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.config.MuleManifest;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.metadata.api.ClassTypeLoader;

@@ -6,9 +6,9 @@
  */
 package org.mule.module.extension;
 
-import static org.mule.extension.api.introspection.ExpressionSupport.LITERAL;
-import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
+import static org.mule.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
+import static org.mule.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;

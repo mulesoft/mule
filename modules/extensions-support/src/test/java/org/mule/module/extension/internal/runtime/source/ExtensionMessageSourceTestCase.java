@@ -47,12 +47,11 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.execution.MessageProcessingManager;
-import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.ExceptionEnricher;
-import org.mule.extension.api.introspection.ExceptionEnricherFactory;
-import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.exception.ExceptionEnricher;
+import org.mule.extension.api.introspection.exception.ExceptionEnricherFactory;
+import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.extension.api.introspection.RuntimeSourceModel;
+import org.mule.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.source.Source;
@@ -66,7 +65,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.ExceptionUtils;
 
 import java.nio.charset.Charset;
-import java.util.Collections;
 import java.util.Optional;
 
 import javax.resource.spi.work.Work;

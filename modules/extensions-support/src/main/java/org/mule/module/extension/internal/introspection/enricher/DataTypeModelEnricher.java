@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection.enricher;
 
-import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
+import static org.mule.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;

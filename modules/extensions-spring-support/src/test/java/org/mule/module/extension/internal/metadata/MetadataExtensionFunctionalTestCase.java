@@ -15,7 +15,7 @@ import org.mule.api.metadata.ComponentId;
 import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.MetadataKeyBuilder;
 import org.mule.api.metadata.MetadataManager;
-import org.mule.api.metadata.MuleMetadataManager;
+import org.mule.internal.metadata.MuleMetadataManager;
 import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.api.metadata.descriptor.TypeMetadataDescriptor;

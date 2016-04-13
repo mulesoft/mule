@@ -28,12 +28,12 @@ import static org.mule.extension.api.introspection.declaration.tck.TestHttpConne
 import static org.mule.extension.api.introspection.declaration.tck.TestHttpConnectorDeclarer.VENDOR;
 import static org.mule.extension.api.introspection.declaration.tck.TestHttpConnectorDeclarer.VERSION;
 
-import org.mule.extension.api.introspection.ConfigurationModel;
-import org.mule.extension.api.introspection.ConnectionProviderModel;
-import org.mule.extension.api.introspection.OperationModel;
-import org.mule.extension.api.introspection.ParameterModel;
-import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
-import org.mule.extension.api.introspection.SourceModel;
+import org.mule.extension.api.introspection.config.ConfigurationModel;
+import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.extension.api.introspection.operation.OperationModel;
+import org.mule.extension.api.introspection.parameter.ParameterModel;
+import org.mule.extension.api.introspection.connection.RuntimeConnectionProviderModel;
+import org.mule.extension.api.introspection.source.SourceModel;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.tck.TestHttpConnectorDeclarer;
 import org.mule.metadata.api.model.BinaryType;

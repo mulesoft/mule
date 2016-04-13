@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.config;
 
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.extension.api.introspection.SubTypesModelProperty;
+import org.mule.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
 
 import org.springframework.beans.factory.FactoryBean;

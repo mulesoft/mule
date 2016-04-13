@@ -11,9 +11,9 @@ import static org.mule.module.extension.internal.introspection.utils.ImplicitObj
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.extension.api.introspection.ConfigurationModel;
+import org.mule.extension.api.introspection.config.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 

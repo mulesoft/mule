@@ -10,7 +10,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
+import org.mule.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
 import org.mule.internal.connection.CachedConnectionProviderWrapper;
 import org.mule.internal.connection.ConnectionManagerAdapter;

@@ -9,31 +9,30 @@ package org.mule.module.extension.internal.introspection;
 import static java.util.stream.Collectors.toList;
 import static org.mule.api.expression.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.api.expression.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
-import static org.mule.extension.api.introspection.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.extension.api.introspection.ExpressionSupport.REQUIRED;
+import static org.mule.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
-import org.mule.extension.api.introspection.ComponentModel;
-import org.mule.extension.api.introspection.ConfigurationModel;
-import org.mule.extension.api.introspection.ConnectionProviderModel;
+import org.mule.extension.api.introspection.config.ConfigurationModel;
+import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ImmutableExtensionModel;
-import org.mule.extension.api.introspection.ImmutableParameterModel;
-import org.mule.extension.api.introspection.ImmutableRuntimeConfigurationModel;
-import org.mule.extension.api.introspection.ImmutableRuntimeConnectionProviderModel;
+import org.mule.extension.api.introspection.parameter.ImmutableParameterModel;
+import org.mule.extension.api.introspection.config.ImmutableRuntimeConfigurationModel;
+import org.mule.extension.api.introspection.connection.ImmutableRuntimeConnectionProviderModel;
 import org.mule.extension.api.introspection.ImmutableRuntimeExtensionModel;
-import org.mule.extension.api.introspection.ImmutableRuntimeOperationModel;
-import org.mule.extension.api.introspection.ImmutableRuntimeSourceModel;
-import org.mule.extension.api.introspection.OperationModel;
-import org.mule.extension.api.introspection.ParameterModel;
-import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
+import org.mule.extension.api.introspection.operation.ImmutableRuntimeOperationModel;
+import org.mule.extension.api.introspection.source.ImmutableRuntimeSourceModel;
+import org.mule.extension.api.introspection.operation.OperationModel;
+import org.mule.extension.api.introspection.parameter.ParameterModel;
+import org.mule.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.extension.api.introspection.RuntimeOperationModel;
-import org.mule.extension.api.introspection.RuntimeSourceModel;
-import org.mule.extension.api.introspection.SourceModel;
+import org.mule.extension.api.introspection.operation.RuntimeOperationModel;
+import org.mule.extension.api.introspection.source.RuntimeSourceModel;
+import org.mule.extension.api.introspection.source.SourceModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
@@ -63,7 +62,6 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Default implementation of {@link ExtensionFactory}.

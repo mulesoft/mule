@@ -9,8 +9,8 @@ package org.mule.module.extension.internal.introspection.validation;
 import static org.mule.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.OperationModel;
-import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.operation.OperationModel;
+import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 
 import com.google.common.base.Joiner;

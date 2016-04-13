@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.metadata;
+package org.mule.internal.metadata;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 
@@ -14,6 +14,12 @@ import org.mule.api.config.ConfigurationInstanceNotification;
 import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.metadata.ComponentId;
+import org.mule.api.metadata.MetadataAware;
+import org.mule.api.metadata.MetadataCache;
+import org.mule.api.metadata.MetadataKey;
+import org.mule.api.metadata.MetadataManager;
+import org.mule.api.metadata.MetadataResolvingException;
 import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.api.source.MessageSource;

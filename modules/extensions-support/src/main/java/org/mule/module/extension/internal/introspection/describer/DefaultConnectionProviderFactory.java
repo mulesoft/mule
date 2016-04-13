@@ -12,7 +12,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.ConnectionProviderFactory;
+import org.mule.extension.api.introspection.connection.ConnectionProviderFactory;
 
 /**
  * Creates instances of {@link ConnectionProvider} based on a {@link #providerClass}

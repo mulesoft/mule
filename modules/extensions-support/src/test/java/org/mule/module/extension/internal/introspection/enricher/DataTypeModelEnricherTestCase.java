@@ -19,7 +19,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
+import static org.mule.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;

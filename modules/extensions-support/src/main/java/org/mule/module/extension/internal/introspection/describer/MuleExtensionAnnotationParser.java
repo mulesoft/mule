@@ -31,7 +31,7 @@ import org.mule.extension.api.introspection.declaration.fluent.HasModelPropertie
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.extension.api.introspection.property.DisplayModelPropertyBuilder;
-import org.mule.extension.api.metadata.MetadataModelProperty;
+import org.mule.extension.api.introspection.property.MetadataModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;

@@ -14,8 +14,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.extension.api.introspection.RuntimeConfigurationModel;
-import org.mule.extension.api.introspection.RuntimeConnectionProviderModel;
+import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**

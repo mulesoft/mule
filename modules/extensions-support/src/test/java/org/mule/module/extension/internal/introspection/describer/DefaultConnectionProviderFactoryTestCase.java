@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.ConnectionProviderFactory;
+import org.mule.extension.api.introspection.connection.ConnectionProviderFactory;
 import org.mule.module.extension.internal.runtime.connector.petstore.SimplePetStoreConnectionProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

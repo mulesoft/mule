@@ -11,7 +11,7 @@ import org.mule.DynamicDataTypeConversionResolver;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
-import org.mule.api.metadata.MuleMetadataManager;
+import org.mule.internal.metadata.MuleMetadataManager;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.store.ObjectStore;

@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.api.registry.ServiceRegistry;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.SubTypesModelProperty;
+import org.mule.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.extension.api.resources.GeneratedResource;
 import org.mule.extension.api.resources.ResourcesGenerator;

@@ -11,9 +11,9 @@ import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInit
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.extension.api.introspection.ConfigurationModel;
-import org.mule.extension.api.introspection.OperationModel;
-import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.config.ConfigurationModel;
+import org.mule.extension.api.introspection.operation.OperationModel;
+import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 

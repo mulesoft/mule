@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.util;
 
-import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 import java.lang.reflect.Field;

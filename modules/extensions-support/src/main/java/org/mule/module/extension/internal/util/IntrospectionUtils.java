@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.util;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.extension.api.introspection.ExpressionSupport.SUPPORTED;
+import static org.mule.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.metadata.java.JavaTypeLoader.JAVA;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
@@ -30,10 +30,10 @@ import org.mule.extension.api.annotation.param.Ignore;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ComponentModel;
-import org.mule.extension.api.introspection.ExpressionSupport;
-import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.extension.api.metadata.MetadataModelProperty;
+import org.mule.extension.api.introspection.property.MetadataModelProperty;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -65,7 +65,6 @@ import java.util.function.Supplier;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.core.ResolvableType;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 /**
  * Set of utility operations to get insights about objects and their components

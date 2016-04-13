@@ -21,11 +21,11 @@ import static org.mule.module.extension.internal.metadata.extension.resolver.Tes
 import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
 
-import org.mule.api.metadata.DefaultMetadataCache;
+import org.mule.internal.metadata.DefaultMetadataCache;
 import org.mule.api.metadata.MetadataCache;
 import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.MetadataManager;
-import org.mule.api.metadata.MuleMetadataManager;
+import org.mule.internal.metadata.MuleMetadataManager;
 import org.mule.api.metadata.ProcessorId;
 import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.api.metadata.resolving.MetadataResult;

@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.introspection;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.ModelProperty;
-import org.mule.extension.api.introspection.ParameterModel;
+import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 

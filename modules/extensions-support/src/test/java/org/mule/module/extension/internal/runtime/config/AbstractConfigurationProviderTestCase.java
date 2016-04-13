@@ -13,7 +13,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mule.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import org.mule.api.MuleEvent;
-import org.mule.extension.api.introspection.RuntimeConfigurationModel;
+import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

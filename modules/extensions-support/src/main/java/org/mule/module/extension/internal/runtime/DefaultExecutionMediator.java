@@ -14,7 +14,7 @@ import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.extension.api.introspection.RuntimeOperationModel;
+import org.mule.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.extension.api.runtime.ConfigurationStats;
 import org.mule.extension.api.runtime.Interceptor;
