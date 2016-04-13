@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -21,7 +22,7 @@ import org.mule.runtime.module.extension.HeisenbergExtension;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.introspection.enricher.StudioModelEnricher;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -44,13 +45,13 @@ public class StudioModelPropertyTestCase extends AbstractMuleTestCase
         ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
         when(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader)).thenReturn(asList(new StudioModelEnricher()));
 
-        extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
+        extensionFactory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
     }
 
     @Test
     public void verifyPropertyIsPopulated() throws Exception
     {
-        ExtensionDeclarer declarer = new AnnotationsBasedDescriber(HeisenbergExtension.class).describe(new DefaultDescribingContext());
+        ExtensionDeclarer declarer = new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion())).describe(new DefaultDescribingContext());
         ExtensionModel extensionModel = extensionFactory.createFrom(declarer);
         StudioModelProperty studioModelProperty = extensionModel.getModelProperty(StudioModelProperty.class).get();
         assertThat(studioModelProperty.getEditorFileName(), is(""));

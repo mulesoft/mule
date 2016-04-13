@@ -6,88 +6,78 @@
  */
 package org.mule.runtime.module.launcher.application;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import org.mule.runtime.core.DefaultMuleContext;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
-import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
-import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.extension.api.manifest.ExtensionManifest;
+import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerAdapterFactory;
+import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapterFactory;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.ServiceLoader;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link org.mule.runtime.core.api.config.ConfigurationBuilder}
- * that register a {@link ExtensionManager} if it's present in the classpath
+ * Implementation of {@link ConfigurationBuilder} that registers a {@link ExtensionManager}
  *
  * @since 4.0
  */
 public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractConfigurationBuilder
 {
 
-    private static Log logger = LogFactory.getLog(ApplicationExtensionsManagerConfigurationBuilder.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(ApplicationExtensionsManagerConfigurationBuilder.class);
 
+    private final ExtensionManagerAdapterFactory extensionManagerAdapterFactory;
     private final List<ApplicationPlugin> applicationPlugins;
 
     public ApplicationExtensionsManagerConfigurationBuilder(List<ApplicationPlugin> applicationPlugins)
     {
+        this(applicationPlugins, new DefaultExtensionManagerAdapterFactory());
+    }
+
+    public ApplicationExtensionsManagerConfigurationBuilder(List<ApplicationPlugin> applicationPlugins, ExtensionManagerAdapterFactory extensionManagerAdapterFactory)
+    {
         this.applicationPlugins = applicationPlugins;
+        this.extensionManagerAdapterFactory = extensionManagerAdapterFactory;
     }
 
     @Override
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
-        ExtensionManager extensionManager = new DefaultExtensionManager();
-        ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
-        initialiseIfNeeded(extensionManager, muleContext);
+        final ExtensionManagerAdapter extensionManager = createExtensionManager(muleContext);
 
         for (ApplicationPlugin applicationPlugin : applicationPlugins)
         {
-            final ServiceLoader<Describer> describers = ServiceLoader.load(Describer.class, new ClassLoader(null)
+            URL manifestUrl = applicationPlugin.getArtifactClassLoader().findResource("META-INF/" + EXTENSION_MANIFEST_FILE_NAME);
+            if (manifestUrl == null)
             {
-                @Override
-                public Class<?> loadClass(String name) throws ClassNotFoundException
-                {
-                    return applicationPlugin.getArtifactClassLoader().getClassLoader().loadClass(name);
-                }
-
-                @Override
-                protected URL findResource(String name)
-                {
-                    return applicationPlugin.getArtifactClassLoader().findResource(name);
-                }
-
-                @Override
-                protected Enumeration<URL> findResources(String name) throws IOException
-                {
-                    return applicationPlugin.getArtifactClassLoader().findResources(name);
-                }
-            });
-
-            for (Describer describer : describers)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Discovered extension: " + describer.getClass().getName());
-                }
-
-                ExtensionDeclarer declarer = describer.describe(new DefaultDescribingContext());
-                final DefaultExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), applicationPlugin.getArtifactClassLoader().getClassLoader());
-                final RuntimeExtensionModel extensionModel = extensionFactory.createFrom(declarer);
-                extensionManager.registerExtension(extensionModel);
+                continue;
             }
+
+            if (LOGGER.isDebugEnabled())
+            {
+                LOGGER.debug("Discovered extension " + applicationPlugin.getArtifactName());
+            }
+            ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
+            extensionManager.registerExtension(extensionManifest, applicationPlugin.getArtifactClassLoader().getClassLoader());
+        }
+    }
+
+    private ExtensionManagerAdapter createExtensionManager(MuleContext muleContext) throws InitialisationException
+    {
+        try
+        {
+            return extensionManagerAdapterFactory.createExtensionManager(muleContext);
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, muleContext);
         }
     }
 }

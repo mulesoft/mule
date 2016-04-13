@@ -27,8 +27,15 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
+import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
+import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -66,20 +73,14 @@ import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFac
 import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.runtime.extension.api.introspection.property.DisplayModelPropertyBuilder;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
+import org.mule.runtime.extension.api.manifest.DescriberManifest;
 import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
-import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
-import org.mule.runtime.core.util.ArrayUtils;
-import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
-import org.mule.runtime.module.extension.internal.introspection.VersionResolver;
+import org.mule.runtime.module.extension.internal.introspection.version.VersionResolver;
 import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
@@ -118,6 +119,18 @@ import java.util.stream.Stream;
 public final class AnnotationsBasedDescriber implements Describer
 {
 
+    /**
+     * The ID which represents {@code this} {@link Describer} in a
+     * {@link DescriberManifest}
+     */
+    public static final String DESCRIBER_ID = "annotations";
+
+    /**
+     * A {@link DescriberManifest} property key which points to the class
+     * which should be introspected by instances of this class
+     */
+    public static final String TYPE_PROPERTY_NAME = "type";
+
     public static final String DEFAULT_CONNECTION_PROVIDER_NAME = "connection";
     private static final String CUSTOM_CONNECTION_PROVIDER_SUFFIX = "-" + DEFAULT_CONNECTION_PROVIDER_NAME;
 
@@ -130,11 +143,6 @@ public final class AnnotationsBasedDescriber implements Describer
      * an specific {@link Field}
      */
     private List<FieldDescriber> fieldDescribers;
-
-    public AnnotationsBasedDescriber(Class<?> extensionType)
-    {
-        this(extensionType, new ManifestBasedVersionResolver(extensionType));
-    }
 
     public AnnotationsBasedDescriber(Class<?> extensionType, VersionResolver versionResolver)
     {

@@ -6,69 +6,59 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertSame;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
-import org.mule.runtime.extension.api.resources.spi.GenerableResourceContributor;
+import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
+@RunWith(MockitoJUnitRunner.class)
 public abstract class ResourcesGeneratorContractTestCase extends AbstractMuleTestCase
 {
 
+    protected static final String RESOURCE_PATH = "path";
+    protected static final byte[] RESOURCE_CONTENT = "hello world!".getBytes();
+
     protected ResourcesGenerator generator;
 
-    protected ServiceRegistry serviceRegistry;
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    protected GeneratedResourceFactory resourceFactory;
+
+    @Mock
+    protected ExtensionModel extensionModel;
+
+    protected List<GeneratedResourceFactory> resourceFactories;
 
     @Before
     public void before()
     {
-        serviceRegistry = mock(ServiceRegistry.class, RETURNS_DEEP_STUBS);
+        when(resourceFactory.generateResource(extensionModel)).thenReturn(Optional.of(new GeneratedResource(RESOURCE_PATH, RESOURCE_CONTENT)));
+        resourceFactories = Arrays.asList(resourceFactory);
         generator = buildGenerator();
+
     }
 
     protected abstract ResourcesGenerator buildGenerator();
 
     @Test
-    public void getOrCreateResource()
-    {
-        final String filepath = "path";
-        GeneratedResource resource = generator.get(filepath);
-
-        assertNotNull(resource);
-        assertEquals(filepath, resource.getFilePath());
-        assertNotNull(resource.getContentBuilder());
-
-        assertSame(resource, generator.get(filepath));
-    }
-
-    @Test
     public void generate()
     {
-        GenerableResourceContributor contributor = mock(GenerableResourceContributor.class);
-        when(serviceRegistry.lookupProviders(same(GenerableResourceContributor.class), any(ClassLoader.class)))
-                .thenReturn(Arrays.asList(contributor));
-
-        ExtensionModel extensionModel = mock(ExtensionModel.class);
-
         generator.generateFor(extensionModel);
-
-        verify(contributor).contribute(extensionModel, generator);
+        verify(resourceFactory).generateResource(extensionModel);
     }
 }

@@ -10,19 +10,21 @@ import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.extension.HeisenbergExtension;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaGenerator;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
+import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
 import org.mule.runtime.module.extension.internal.runtime.connector.basic.GlobalInnerPojoConnector;
 import org.mule.runtime.module.extension.internal.runtime.connector.basic.GlobalPojoConnector;
 import org.mule.runtime.module.extension.internal.runtime.connector.basic.ListConnector;
@@ -93,7 +95,7 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
     {
         String expectedSchema = IOUtils.getResourceAsString(expectedXSD, getClass());
 
-        ExtensionDeclarer declarer = new AnnotationsBasedDescriber(extensionUnderTest).describe(new DefaultDescribingContext());
+        ExtensionDeclarer declarer = new AnnotationsBasedDescriber(extensionUnderTest, new StaticVersionResolver(getProductVersion())).describe(new DefaultDescribingContext());
         ExtensionModel extensionModel = extensionFactory.createFrom(declarer);
 
         XmlModelProperty capability = extensionModel.getModelProperty(XmlModelProperty.class).get();

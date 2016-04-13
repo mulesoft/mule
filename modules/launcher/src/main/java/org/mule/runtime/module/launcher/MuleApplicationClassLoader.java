@@ -11,9 +11,7 @@ import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.launcher.application.ApplicationClassLoader;
 import org.mule.runtime.module.launcher.nativelib.NativeLibraryFinder;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.List;
 
 public class MuleApplicationClassLoader extends MuleArtifactClassLoader implements ApplicationClassLoader
@@ -26,24 +24,6 @@ public class MuleApplicationClassLoader extends MuleArtifactClassLoader implemen
         super(appName, urls.toArray(new URL[0]), parentCl, lookupPolicy);
 
         this.nativeLibraryFinder = nativeLibraryFinder;
-    }
-
-    @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException
-    {
-        return super.findClass(name);
-    }
-
-    @Override
-    public URL getResource(String name)
-    {
-        return super.getResource(name);
-    }
-
-    @Override
-    public Enumeration<URL> getResources(String name) throws IOException
-    {
-        return super.getResources(name);
     }
 
     @Override

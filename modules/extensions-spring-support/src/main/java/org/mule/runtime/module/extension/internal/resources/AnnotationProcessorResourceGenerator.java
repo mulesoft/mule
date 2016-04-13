@@ -9,12 +9,13 @@ package org.mule.runtime.module.extension.internal.resources;
 
 import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
+import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.FileObject;
@@ -26,14 +27,20 @@ import javax.tools.FileObject;
  *
  * @since 3.7.0
  */
-final class AnnotationProcessorResourceGenerator extends AbstractResourcesGenerator
+public final class AnnotationProcessorResourceGenerator extends AbstractResourcesGenerator
 {
 
     private final ProcessingEnvironment processingEnv;
 
-    public AnnotationProcessorResourceGenerator(ProcessingEnvironment processingEnv, ServiceRegistry serviceRegistry)
+    /**
+     * Creates a new instance
+     *
+     * @param resourceFactories the {@link GeneratedResourceFactory} instances used to generated resources
+     * @param processingEnv     the current {@link ProcessingEnvironment}
+     */
+    public AnnotationProcessorResourceGenerator(List<GeneratedResourceFactory> resourceFactories, ProcessingEnvironment processingEnv)
     {
-        super(serviceRegistry);
+        super(resourceFactories);
         this.processingEnv = processingEnv;
     }
 
@@ -43,7 +50,7 @@ final class AnnotationProcessorResourceGenerator extends AbstractResourcesGenera
         FileObject file;
         try
         {
-            file = processingEnv.getFiler().createResource(SOURCE_OUTPUT, EMPTY, resource.getFilePath());
+            file = processingEnv.getFiler().createResource(SOURCE_OUTPUT, EMPTY, resource.getPath());
         }
         catch (IOException e)
         {
@@ -52,7 +59,7 @@ final class AnnotationProcessorResourceGenerator extends AbstractResourcesGenera
 
         try (OutputStream out = file.openOutputStream())
         {
-            out.write(resource.getContentBuilder().toString().getBytes());
+            out.write(resource.getContent());
             out.flush();
         }
         catch (IOException e)
@@ -63,7 +70,7 @@ final class AnnotationProcessorResourceGenerator extends AbstractResourcesGenera
 
     private RuntimeException wrapException(Exception e, GeneratedResource resource)
     {
-        return new RuntimeException(String.format("Could not write generated resource '%s'", resource.getFilePath()), e);
+        return new RuntimeException(String.format("Could not write generated resource '%s'", resource.getPath()), e);
     }
 
 }
