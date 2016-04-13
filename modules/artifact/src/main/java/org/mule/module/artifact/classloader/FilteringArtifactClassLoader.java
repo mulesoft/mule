@@ -109,7 +109,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     @Override
     public ClassLoader getClassLoader()
     {
-        return pluginClassLoader.getClassLoader();
+        return this;
     }
 
     @Override
@@ -127,7 +127,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     @Override
     public void dispose()
     {
-        pluginClassLoader.dispose();
+        // Nothing to do here as this is just wrapper for another classLoader
     }
 
     @Override
