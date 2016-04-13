@@ -66,7 +66,7 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
                 @Override
                 protected URL findResource(String name)
                 {
-                    return super.findResource(name);
+                    return applicationPlugin.getArtifactClassLoader().findResource(name);
                 }
 
                 @Override
@@ -80,7 +80,7 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
             {
                 if (logger.isDebugEnabled())
                 {
-                    System.out.println("Discovered extension: " + describer.getClass().getName());
+                    logger.debug("Discovered extension: " + describer.getClass().getName());
                 }
 
                 ExtensionDeclarer declarer = describer.describe(new DefaultDescribingContext());
