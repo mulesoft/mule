@@ -23,10 +23,10 @@ public class ErrorFieldDebugInfo extends FieldDebugInfo<Throwable>
      * obtaining field's information
      *
      * @param name name of the created field. Must be a not blank {@link String}
-     * @param type class of the field. Cannot be null.
+     * @param type type of the field. Cannot be null.
      * @param error error that prevents to obtain field debug info. Cannot be null
      */
-    ErrorFieldDebugInfo(String name, Class type, Throwable error)
+    ErrorFieldDebugInfo(String name, String type, Throwable error)
     {
         super(name, type, error);
         checkArgument(type != null, "Type cannot be null");

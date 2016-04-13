@@ -16,22 +16,22 @@ import java.util.Map;
 import org.junit.Test;
 
 @SmallTest
-public class ObjectFieldDebugInfoTestCase extends AbstractFieldDebugInfoTestCase<List<FieldDebugInfo>>
+public class ObjectFieldDebugInfoTestCase extends AbstractFieldDebugInfoTestCase<List<FieldDebugInfo<?>>>
 {
 
     public static final String FIELD_NAME = "foo";
 
     @Override
-    protected List<FieldDebugInfo> getValue()
+    protected List<FieldDebugInfo<?>> getValue()
     {
-        final SimpleFieldDebugInfo fieldDebugInfo = new SimpleFieldDebugInfo(FIELD_NAME, String.class, "test");
-        return Collections.<FieldDebugInfo>singletonList(fieldDebugInfo);
+        final SimpleFieldDebugInfo fieldDebugInfo = FieldDebugInfoFactory.createFieldDebugInfo(FIELD_NAME, String.class, "test");
+        return Collections.<FieldDebugInfo<?>>singletonList(fieldDebugInfo);
     }
 
     @Override
-    protected void createFieldDebugInfo(String name, Class type, List<FieldDebugInfo> value)
+    protected void createFieldDebugInfo(String name, Class type, List<FieldDebugInfo<?>> value)
     {
-        new ObjectFieldDebugInfo(name, type, value);
+        FieldDebugInfoFactory.createFieldDebugInfo(name, type, value);
     }
 
     @Test(expected = IllegalArgumentException.class)

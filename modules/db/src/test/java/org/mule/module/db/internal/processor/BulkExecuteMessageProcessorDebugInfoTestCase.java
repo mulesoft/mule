@@ -77,7 +77,7 @@ public class BulkExecuteMessageProcessorDebugInfoTestCase extends AbstractMuleTe
 
         final BulkExecuteMessageProcessor bulkExecuteMessageProcessor = new BulkExecuteMessageProcessor(dbConfigResolver, bulkQueryResolver, null, NOT_SUPPORTED);
 
-        final List<FieldDebugInfo> debugInfo = bulkExecuteMessageProcessor.getDebugInfo(event);
+        final List<FieldDebugInfo<?>> debugInfo = bulkExecuteMessageProcessor.getDebugInfo(event);
 
         assertThat(debugInfo.size(), equalTo(1));
         assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, createExpectedQueryMatchers())));
@@ -96,7 +96,7 @@ public class BulkExecuteMessageProcessorDebugInfoTestCase extends AbstractMuleTe
 
         final BulkExecuteMessageProcessor bulkExecuteMessageProcessor = new BulkExecuteMessageProcessor(dbConfigResolver, bulkQueryResolver, null, NOT_SUPPORTED);
 
-        final List<FieldDebugInfo> debugInfo = bulkExecuteMessageProcessor.getDebugInfo(event);
+        final List<FieldDebugInfo<?>> debugInfo = bulkExecuteMessageProcessor.getDebugInfo(event);
 
         assertThat(debugInfo.size(), equalTo(1));
         assertThat(debugInfo, hasItem(fieldLike(QUERIES_DEBUG_FIELD, List.class, queryResolutionException)));
@@ -117,18 +117,18 @@ public class BulkExecuteMessageProcessorDebugInfoTestCase extends AbstractMuleTe
 
         final BulkExecuteMessageProcessor bulkExecuteMessageProcessor = new BulkExecuteMessageProcessor(dbConfigResolver, bulkQueryResolver, null, NOT_SUPPORTED);
 
-        final List<FieldDebugInfo> debugInfo = bulkExecuteMessageProcessor.getDebugInfo(event);
+        final List<FieldDebugInfo<?>> debugInfo = bulkExecuteMessageProcessor.getDebugInfo(event);
 
         assertThat(debugInfo.size(), equalTo(1));
-        final FieldDebugInfo fieldDebugInfo = debugInfo.get(0);
+        final FieldDebugInfo<?> fieldDebugInfo = debugInfo.get(0);
         assertThat(fieldDebugInfo.getName(), equalTo(QUERIES_DEBUG_FIELD));
-        assertThat(fieldDebugInfo.getType(), Matchers.<Class>equalTo(List.class));
+        assertThat(fieldDebugInfo.getType(), equalTo(List.class.getName()));
         assertThat(fieldDebugInfo.getValue(), instanceOf(IllegalArgumentException.class));
     }
 
-    private List<Matcher<FieldDebugInfo>> createExpectedQueryMatchers()
+    private List<Matcher<FieldDebugInfo<?>>> createExpectedQueryMatchers()
     {
-        final List<Matcher<FieldDebugInfo>> queriesDebugInfo = new ArrayList<>();
+        final List<Matcher<FieldDebugInfo<?>>> queriesDebugInfo = new ArrayList<>();
         queriesDebugInfo.add(createQueryFieldDebugInfoMatcher(QUERY1, QUERY_TEMPLATE1));
         queriesDebugInfo.add(createQueryFieldDebugInfoMatcher(QUERY2, QUERY_TEMPLATE2));
 

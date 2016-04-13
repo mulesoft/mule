@@ -24,7 +24,7 @@ public class SimpleFieldDebugInfo extends FieldDebugInfo<Object>
      * @param type class of the field. Cannot be null.
      * @param value value of the field. Can be null
      */
-    SimpleFieldDebugInfo(String name, Class type, Object value)
+    SimpleFieldDebugInfo(String name, String type, Object value)
     {
         super(name, type, value);
         checkArgument(type != null, "Type cannot be null");
