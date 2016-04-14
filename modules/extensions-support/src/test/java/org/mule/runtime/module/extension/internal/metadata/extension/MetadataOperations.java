@@ -12,7 +12,6 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyParam;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
-import org.mule.module.extension.internal.metadata.extension.MetadataOperationsParent;
 import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithoutKeyResolver;
 import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentResolverWithKeyResolver;

@@ -14,6 +14,7 @@ import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
+import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -28,10 +29,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class XmlModelEnricherTestCase extends AbstractMuleTestCase
 {
 
-    private static final String SCHEMA_VERSION = "1.0";
     private static final String NAMESPACE = "namespace";
-    private static final String SCHEMA_LOCATION = "SCHEMA_LOCATION";
-    private static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/%s";
+    private static final String NAMESPACE_LOCATION = "NAMESPACE_LOCATION";
+    private static final String DEFAULT_NAMESPACE_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/%s";
+    private static final String DEFAULT_SCHEMA_LOCATION_MASK = "%s/current/%s";
+    private static final String XSD_FILENAME_MASK = "mule-%s.xsd";
 
     private static final String EXTENSION = "Extension";
     private static final String EXTENSION_NAME = "Xml Model " + EXTENSION;
@@ -48,9 +50,13 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
         XmlModelProperty xmlProperty = enrich(XmlSupport.class);
 
         assertThat(xmlProperty, is(notNullValue()));
-        assertThat(xmlProperty.getSchemaVersion(), is(SCHEMA_VERSION));
+        assertThat(xmlProperty.getSchemaVersion(), is(EXTENSION_VERSION));
         assertThat(xmlProperty.getNamespace(), is(NAMESPACE));
-        assertThat(xmlProperty.getSchemaLocation(), is(SCHEMA_LOCATION));
+        assertThat(xmlProperty.getNamespaceUri(), is(NAMESPACE_LOCATION));
+        assertThat(xmlProperty.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, NAMESPACE)));
+        assertThat(xmlProperty.getSchemaLocation(), is(String.format(DEFAULT_SCHEMA_LOCATION_MASK,
+                                                                     NAMESPACE_LOCATION,
+                                                                     String.format(XSD_FILENAME_MASK, NAMESPACE))));
     }
 
     @Test
@@ -62,7 +68,11 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
         assertThat(xmlProperty, is(notNullValue()));
         assertThat(xmlProperty.getSchemaVersion(), is(EXTENSION_VERSION));
         assertThat(xmlProperty.getNamespace(), is(EXTENSION_HYPHENAZED_NAME));
-        assertThat(xmlProperty.getSchemaLocation(), equalTo(String.format(DEFAULT_SCHEMA_LOCATION_MASK, EXTENSION_HYPHENAZED_NAME)));
+        assertThat(xmlProperty.getNamespaceUri(), equalTo(String.format(DEFAULT_NAMESPACE_LOCATION_MASK, EXTENSION_HYPHENAZED_NAME)));
+        assertThat(xmlProperty.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, EXTENSION_HYPHENAZED_NAME)));
+        assertThat(xmlProperty.getSchemaLocation(), is(String.format(DEFAULT_SCHEMA_LOCATION_MASK,
+                                                                     String.format(DEFAULT_NAMESPACE_LOCATION_MASK, EXTENSION_HYPHENAZED_NAME),
+                                                                     String.format(XSD_FILENAME_MASK, EXTENSION_HYPHENAZED_NAME))));
     }
 
     @Test
@@ -74,7 +84,11 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
         assertThat(xmlProperty, is(notNullValue()));
         assertThat(xmlProperty.getSchemaVersion(), is(EXTENSION_VERSION));
         assertThat(xmlProperty.getNamespace(), is(NAMESPACE));
-        assertThat(xmlProperty.getSchemaLocation(), equalTo(String.format(DEFAULT_SCHEMA_LOCATION_MASK, NAMESPACE)));
+        assertThat(xmlProperty.getNamespaceUri(), equalTo(String.format(DEFAULT_NAMESPACE_LOCATION_MASK, NAMESPACE)));
+        assertThat(xmlProperty.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, NAMESPACE)));
+        assertThat(xmlProperty.getSchemaLocation(), is(String.format(DEFAULT_SCHEMA_LOCATION_MASK,
+                                                                     String.format(DEFAULT_NAMESPACE_LOCATION_MASK, NAMESPACE),
+                                                                     String.format(XSD_FILENAME_MASK, NAMESPACE))));
     }
 
     @Test
@@ -86,7 +100,11 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
         assertThat(xmlProperty, is(notNullValue()));
         assertThat(xmlProperty.getSchemaVersion(), is(EXTENSION_VERSION));
         assertThat(xmlProperty.getNamespace(), is(EXTENSION.toLowerCase()));
-        assertThat(xmlProperty.getSchemaLocation(), equalTo(SCHEMA_LOCATION));
+        assertThat(xmlProperty.getNamespaceUri(), equalTo(NAMESPACE_LOCATION));
+        assertThat(xmlProperty.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, hyphenize(EXTENSION))));
+        assertThat(xmlProperty.getSchemaLocation(), is(String.format(DEFAULT_SCHEMA_LOCATION_MASK,
+                                                                     NAMESPACE_LOCATION,
+                                                                     String.format(XSD_FILENAME_MASK, hyphenize(EXTENSION)))));
     }
 
     private XmlModelProperty enrich(Class<?> type)
@@ -96,7 +114,7 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
         return extensionDeclarer.getExtensionDeclaration().getModelProperty(XmlModelProperty.class).get();
     }
 
-    @Xml(schemaVersion = SCHEMA_VERSION, namespace = NAMESPACE, schemaLocation = SCHEMA_LOCATION)
+    @Xml(namespace = NAMESPACE, namespaceLocation = NAMESPACE_LOCATION)
     private static class XmlSupport
     {
 
@@ -108,7 +126,7 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
 
     }
 
-    @Xml(schemaLocation = SCHEMA_LOCATION)
+    @Xml(namespaceLocation = NAMESPACE_LOCATION)
     private static class CustomSchemaLocationXmlExtension
     {
 

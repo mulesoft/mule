@@ -94,7 +94,7 @@ public class PetStoreRetryPolicyConnectionTestCase extends ExtensionFunctionalTe
     @Extension(name = "petstore", description = "PetStore Test connector")
     @Operations(PetStoreOperationsWithFailures.class)
     @Providers({PooledPetStoreConnectionProviderWithFailureInvalidConnection.class, PooledPetStoreConnectionProviderWithValidConnection.class})
-    @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore", schemaVersion = "4.0")
+    @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore")
     public static class PetStoreConnectorWithConnectionFailure extends PetStoreConnector
     {
     }

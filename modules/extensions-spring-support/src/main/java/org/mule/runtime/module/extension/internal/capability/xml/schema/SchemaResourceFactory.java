@@ -27,6 +27,6 @@ public class SchemaResourceFactory extends AbstractXmlResourceFactory
     protected GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty)
     {
         String schema = new SchemaGenerator().generate(extensionModel, xmlModelProperty);
-        return new GeneratedResource(getXsdFileName(xmlModelProperty), schema.getBytes());
+        return new GeneratedResource(xmlModelProperty.getXsdFileName(), schema.getBytes());
     }
 }

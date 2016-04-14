@@ -44,15 +44,18 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Repeatable;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -125,6 +128,31 @@ public final class MuleExtensionAnnotationParser
         }
 
         return parsedParameters;
+    }
+
+    static <T extends Annotation> List<T> parseRepeatableAnnotation(Class<?> extensionType, Class<T> annotation,
+                                                                    Function<Annotation, T[]> containerConsumer)
+    {
+        List<T> annotationDeclarations = Collections.emptyList();
+
+        Repeatable repeatableContainer = annotation.getAnnotation(Repeatable.class);
+        if (repeatableContainer != null)
+        {
+            //TODO FIXME look parent objects
+            Annotation container = extensionType.getAnnotation(repeatableContainer.value());
+            if (container != null)
+            {
+                annotationDeclarations = ImmutableList.copyOf(containerConsumer.apply(container));
+            }
+        }
+
+        T singleDeclaration = extensionType.getAnnotation(annotation);
+        if (singleDeclaration != null)
+        {
+            annotationDeclarations = ImmutableList.of(singleDeclaration);
+        }
+
+        return annotationDeclarations;
     }
 
     private static void parseGroupParameters(MetadataType parameterType, List<ParsedParameter> parsedParameters, ClassTypeLoader typeLoader)

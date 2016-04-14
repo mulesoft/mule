@@ -20,7 +20,7 @@ public class SpringHandlerBundleResourceFactory extends AbstractXmlResourceFacto
 {
 
     static final String GENERATED_FILE_NAME = "spring.handlers";
-    static final String BUNDLE_MASK = "%s=%s";
+    static final String BUNDLE_MASK = "%s=%s\n";
 
     /**
      * {@inheritDoc}
@@ -28,7 +28,7 @@ public class SpringHandlerBundleResourceFactory extends AbstractXmlResourceFacto
     @Override
     protected GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty)
     {
-        String content = String.format(BUNDLE_MASK, xmlModelProperty.getSchemaLocation(), ExtensionNamespaceHandler.class.getName());
+        String content = String.format(BUNDLE_MASK, xmlModelProperty.getNamespaceUri(), ExtensionNamespaceHandler.class.getName());
         return new GeneratedResource(GENERATED_FILE_NAME, escape(content).getBytes());
     }
 }

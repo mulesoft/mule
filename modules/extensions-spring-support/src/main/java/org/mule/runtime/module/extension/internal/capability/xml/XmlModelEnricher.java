@@ -11,11 +11,8 @@ import org.mule.runtime.extension.api.introspection.declaration.DescribingContex
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
+import static org.mule.runtime.module.extension.internal.capability.xml.XmlModelUtils.createXmlModelProperty;
 import org.mule.runtime.module.extension.internal.introspection.enricher.AbstractAnnotatedModelEnricher;
-import org.mule.runtime.module.extension.internal.util.NameUtils;
-import org.mule.runtime.core.util.StringUtils;
-
-import java.util.function.Supplier;
 
 /**
  * Verifies if the extension is annotated with {@link Xml} and if so, enriches the {@link ExtensionDeclarer}
@@ -30,57 +27,13 @@ import java.util.function.Supplier;
 public final class XmlModelEnricher extends AbstractAnnotatedModelEnricher
 {
 
-    private static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/%s";
-
     @Override
     public void enrich(DescribingContext describingContext)
     {
         Xml xml = extractAnnotation(describingContext.getExtensionDeclarer().getExtensionDeclaration(), Xml.class);
         ExtensionDeclarer descriptor = describingContext.getExtensionDeclarer();
-        descriptor.withModelProperty(createXmlModelProperty(xml, descriptor));
-    }
-
-    private XmlModelProperty createXmlModelProperty(Xml xml, ExtensionDeclarer descriptor)
-    {
         ExtensionDeclaration extensionDeclaration = descriptor.getExtensionDeclaration();
-        String schemaVersion = calculateValue(xml, () -> xml.schemaVersion(), extensionDeclaration::getVersion);
-        String namespace = calculateValue(xml, () -> xml.namespace(), () -> buildDefaultNamespace(extensionDeclaration.getName()));
-        String schemaLocation = calculateValue(xml, () -> xml.schemaLocation(), () -> buildDefaultLocation(namespace));
-        return new XmlModelProperty(schemaVersion, namespace, schemaLocation);
-    }
-
-    private String calculateValue(Xml xml, Supplier<String> value, Supplier<String> fallback)
-    {
-        if (xml != null)
-        {
-            String result = value.get();
-            if (StringUtils.isNotBlank(result))
-            {
-                return result;
-            }
-        }
-        return fallback.get();
-    }
-
-    private String buildDefaultLocation(String namespace)
-    {
-        return String.format(DEFAULT_SCHEMA_LOCATION_MASK, namespace);
-    }
-
-    private String buildDefaultNamespace(String declarationName)
-    {
-        String namespace = StringUtils.deleteWhitespace(declarationName);
-        namespace = removeFromName(namespace, "extension");
-        namespace = removeFromName(namespace, "connector");
-        namespace = removeFromName(namespace, "module");
-        namespace = StringUtils.isBlank(namespace) ? declarationName : namespace;
-        return NameUtils.hyphenize(namespace);
-
-    }
-
-    private String removeFromName(String name, String word)
-    {
-        return StringUtils.removeEndIgnoreCase(name, word);
+        descriptor.withModelProperty(createXmlModelProperty(xml, extensionDeclaration.getName(), extensionDeclaration.getVersion()));
     }
 
 }

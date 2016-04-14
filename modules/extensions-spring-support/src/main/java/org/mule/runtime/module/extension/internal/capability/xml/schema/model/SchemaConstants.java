@@ -29,6 +29,7 @@ public final class SchemaConstants
     public static final String MULE_TLS_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd";
     public static final String OPERATION_SUBSTITUTION_GROUP_SUFFIX = "-OperationGroup";
     public static final String GROUP_SUFFIX = "-group";
+    public static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/%s";
 
     public static final QName MULE_ABSTRACT_EXTENSION = new QName(MULE_NAMESPACE, "abstract-extension", MULE_PREFIX);
     public static final QName MULE_PROPERTY_PLACEHOLDER_TYPE = new QName(MULE_NAMESPACE, "propertyPlaceholderType", MULE_PREFIX);
@@ -81,6 +82,7 @@ public final class SchemaConstants
     public static final String ATTRIBUTE_NAME_NAME = "name";
     public static final String XSD_EXTENSION = ".xsd";
     public static final String DISABLE_VALIDATION = "disableValidation";
+    public static final String CURRENT_VERSION = "current";
 
     /**
      * Human friendly description for {@link ExtensionProperties#TARGET_ATTRIBUTE}

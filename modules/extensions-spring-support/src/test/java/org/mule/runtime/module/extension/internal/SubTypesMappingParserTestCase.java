@@ -10,15 +10,18 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.CarDoor;
-import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.FinalPojo;
-import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.HouseDoor;
-import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.Square;
-import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.SubTypesMappingConnector;
-import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.SubTypesConnectorConnection;
-import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.Triangle;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.module.extension.HeisenbergExtension;
+import org.mule.runtime.module.extension.subtypes.CarDoor;
+import org.mule.runtime.module.extension.subtypes.FinalPojo;
+import org.mule.runtime.module.extension.subtypes.HouseDoor;
+import org.mule.runtime.module.extension.subtypes.Square;
+import org.mule.runtime.module.extension.subtypes.SubTypesConnectorConnection;
+import org.mule.runtime.module.extension.subtypes.SubTypesMappingConnector;
+import org.mule.runtime.module.extension.subtypes.Triangle;
+import org.mule.runtime.module.extension.vegan.VeganCookBook;
+import org.mule.runtime.module.extension.vegan.VeganExtension;
 
 import java.util.List;
 
@@ -30,13 +33,25 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
     @Override
     protected Class<?>[] getAnnotatedExtensionClasses()
     {
-        return new Class<?>[] {SubTypesMappingConnector.class};
+        return new Class<?>[] {VeganExtension.class, HeisenbergExtension.class, SubTypesMappingConnector.class};
     }
 
     @Override
     protected String getConfigFile()
     {
         return "subtypes-mapping.xml";
+    }
+
+    @Test
+    public void importedType() throws Exception
+    {
+        MuleEvent responseEvent = flowRunner("shapeRetriever").withPayload("").run();
+
+        assertThat(responseEvent.getMessage().getPayload(), instanceOf(Square.class));
+
+        Square payload = (Square) responseEvent.getMessage().getPayload();
+        assertThat(payload.getSide(), is(4));
+        assertThat(payload.getArea(), is(16));
     }
 
     @Test
@@ -130,5 +145,7 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
 
         assertThat(payload.get(2), instanceOf(FinalPojo.class));
         assertThat(((FinalPojo) payload.get(2)).getSomeString(), is("globalString"));
+
+        assertThat(payload.get(2), instanceOf(VeganCookBook.class));
     }
 }

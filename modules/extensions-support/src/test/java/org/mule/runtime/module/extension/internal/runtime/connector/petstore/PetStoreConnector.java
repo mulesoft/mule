@@ -20,7 +20,7 @@ import java.util.List;
 @Extension(name = "petstore", description = "PetStore Test connector")
 @Operations(PetStoreOperations.class)
 @Providers({SimplePetStoreConnectionProvider.class, PooledPetStoreConnectionProvider.class, PoolablePetStoreConnectionProvider.class})
-@Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore", schemaVersion = "4.0")
+@Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore")
 public class PetStoreConnector
 {
 

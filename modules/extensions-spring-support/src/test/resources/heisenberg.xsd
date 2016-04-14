@@ -183,7 +183,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.KnockeableDoor">
-                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -208,7 +208,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.Ricin">
-                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -514,7 +514,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.WeaponWeaponAttributes">
-                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>

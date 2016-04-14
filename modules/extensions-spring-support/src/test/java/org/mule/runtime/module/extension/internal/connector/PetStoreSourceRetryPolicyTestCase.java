@@ -86,7 +86,7 @@ public class PetStoreSourceRetryPolicyTestCase extends ExtensionFunctionalTestCa
     }
 
     @Extension(name = "petstore", description = "PetStore Test connector")
-    @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore", schemaVersion = "4.0")
+    @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore")
     @Sources(PetStoreSource.class)
     public static class PetStoreConnectorWithSource extends PetStoreConnector
     {
