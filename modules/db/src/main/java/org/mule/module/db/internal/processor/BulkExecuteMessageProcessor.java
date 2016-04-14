@@ -110,7 +110,7 @@ public class BulkExecuteMessageProcessor extends AbstractDbMessageProcessor
             return fields;
         }
 
-        final List<FieldDebugInfo> queries = new ArrayList<>();
+        final List<FieldDebugInfo<?>> queries = new ArrayList<>();
 
         int queryIndex = 1;
         for (QueryTemplate queryTemplate : bulkQuery.getQueryTemplates())
