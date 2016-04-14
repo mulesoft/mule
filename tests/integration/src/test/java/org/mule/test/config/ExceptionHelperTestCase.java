@@ -9,8 +9,6 @@ package org.mule.test.config;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -38,6 +36,9 @@ import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
 
 @SmallTest
 public class ExceptionHelperTestCase extends AbstractMuleTestCase
@@ -116,12 +117,12 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
         catch (Exception e)
         {
             assertThat(ExceptionHelper.getExceptionStack(e), StringByLineMatcher.matchesLineByLine(
-                    "foo (org.mule.api.DefaultMuleException)",
-                    "  org.mule.test.config.ExceptionHelperTestCase$1$1.execute:",
-                    "  org.apache.commons.collections.CollectionUtils.forAllDo:",
-                    "  org.mule.test.config.ExceptionHelperTestCase$1.execute:",
-                    "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries:",
-                    "  (" + (calls + 13) + " more...)")); // recursive
+                    "foo \\(org.mule.api.DefaultMuleException\\)",
+                    "  org.mule.test.config.ExceptionHelperTestCase\\$1\\$1.execute\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                    "  org.apache.commons.collections.CollectionUtils.forAllDo\\(CollectionUtils.java:[0-9]+\\)",
+                    "  org.mule.test.config.ExceptionHelperTestCase\\$1.execute\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                    "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                    "  \\(" + (calls + 13) + " more...\\)")); // recursive
         }
     }
 
@@ -151,17 +152,17 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
     	catch (Exception e)
     	{
     		assertThat(ExceptionHelper.getExceptionStack(e), StringByLineMatcher.matchesLineByLine(
-    				"foo (org.mule.api.DefaultMuleException)",
-    				"  org.mule.test.config.ExceptionHelperTestCase$2$1.compareTo:",
-    				"  org.apache.commons.collections.comparators.ComparableComparator.compare:",
-    				"  java.util", // Collections.sort
-    				"  java.util", // Collections.sort
-    				"  java.util", // Collections.sort
-    				"  java.util", // Collections.sort
-    				"  java.util", // Collections.sort
-    				"  org.mule.test.config.ExceptionHelperTestCase$2.execute:",
-    				"  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries:",
-    				"  (" + (calls + 13) + " more...)")); // recursive
+                    "foo \\(org.mule.api.DefaultMuleException\\)",
+                    "  org.mule.test.config.ExceptionHelperTestCase\\$2\\$1.compareTo\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                    "  org.apache.commons.collections.comparators.ComparableComparator.compare\\(ComparableComparator.java:[0-9]+\\)",
+                    "  java.util.*", // Collections.sort
+                    "  java.util.*", // Collections.sort
+                    "  java.util.*", // Collections.sort
+                    "  java.util.*", // Collections.sort
+                    "  java.util.*", // Collections.sort
+                    "  org.mule.test.config.ExceptionHelperTestCase\\$2.execute\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                    "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                    "  \\(" + (calls + 13) + " more...\\)")); // recursive
     	}
     }
     
@@ -184,11 +185,11 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
         catch (Exception e)
         {
             assertThat(ExceptionHelper.getExceptionStack(e), StringByLineMatcher.matchesLineByLine(
-                    "foo (org.mule.api.DefaultMuleException)",
-                    "  org.mule.test.config.ExceptionHelperTestCase$3.execute:",
-                    "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries:",
-                    "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries:",
-                    "  (" + (calls + 12) + " more...)")); // recursive
+                    "foo \\(org.mule.api.DefaultMuleException\\)",
+                    "  org.mule.test.config.ExceptionHelperTestCase\\$3.execute\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                    "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                    "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                    "  \\(" + (calls + 12) + " more...\\)")); // recursive
         }
     }
 
@@ -232,7 +233,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
 
             for (String expectedEntry : expectedEntries)
             {
-                if (!stackEntries[i].contains(expectedEntry))
+                if (!stackEntries[i].matches(expectedEntry))
                 {
                     return false;
                 }
