@@ -592,6 +592,8 @@ public final class ExceptionHelper
                    .append(stackTraceElement.getClassName())
                    .append(".")
                    .append(stackTraceElement.getMethodName())
+                   .append("(")
+                   .append(stackTraceElement.getFileName())
                    .append(":")
                    .append(stackTraceElement.getLineNumber())
                    .append(")")
