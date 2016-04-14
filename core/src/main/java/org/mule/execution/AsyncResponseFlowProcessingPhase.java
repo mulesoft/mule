@@ -10,7 +10,6 @@ import static org.mule.context.notification.BaseConnectorMessageNotification.MES
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_RESPONSE;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleRuntimeException;
@@ -112,7 +111,6 @@ public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessi
                     @Override
                     public MuleEvent execute() throws Exception
                     {
-                        ((DefaultMuleEvent) event).resetAccessControl();
                         final MuleEvent exceptionStrategyResult = exceptionListener.handleException(e, event);
                         phaseResultNotifier.phaseSuccessfully();
                         return exceptionStrategyResult;
