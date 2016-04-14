@@ -16,8 +16,8 @@
 
     <flow name="echoService">
         <http:listener path="services/Echo" config-ref="listenerConfig"/>
-        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent"/>
-        <component class="org.mule.component.simple.EchoComponent"/>
+        <cxf:simple-service serviceClass="org.mule.runtime.core.component.simple.EchoComponent"/>
+        <component class="org.mule.runtime.core.component.simple.EchoComponent"/>
     </flow>
 
 </mule>

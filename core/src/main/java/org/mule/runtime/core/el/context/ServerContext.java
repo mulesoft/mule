@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.context;
+package org.mule.runtime.core.el.context;
 
-import org.mule.el.datetime.DateTime;
-import org.mule.util.NetworkUtils;
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.el.datetime.DateTime;
+import org.mule.runtime.core.util.NetworkUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.net.UnknownHostException;
 import java.util.Calendar;

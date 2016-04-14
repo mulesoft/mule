@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.component;
+package org.mule.runtime.core.api.component;
 
-import org.mule.api.model.EntryPointResolverSet;
-import org.mule.api.object.ObjectFactory;
-import org.mule.component.PooledJavaComponent;
-import org.mule.object.PrototypeObjectFactory;
-import org.mule.object.SingletonObjectFactory;
+import org.mule.runtime.core.api.model.EntryPointResolverSet;
+import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.component.PooledJavaComponent;
+import org.mule.runtime.core.object.PrototypeObjectFactory;
+import org.mule.runtime.core.object.SingletonObjectFactory;
 
 import java.util.List;
 

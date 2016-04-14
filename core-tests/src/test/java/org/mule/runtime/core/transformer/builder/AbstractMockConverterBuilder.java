@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.builder;
+package org.mule.runtime.core.transformer.builder;
 
 import static org.mockito.Mockito.doReturn;
 
-import org.mule.api.transformer.Converter;
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Converter;
+import org.mule.runtime.core.api.transformer.Transformer;
 
 public abstract class AbstractMockConverterBuilder<T extends AbstractMockConverterBuilder<T>> extends AbstractMockTransformerBuilder<T>
 {

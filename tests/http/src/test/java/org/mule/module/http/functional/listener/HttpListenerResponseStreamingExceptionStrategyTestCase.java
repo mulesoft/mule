@@ -16,12 +16,12 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

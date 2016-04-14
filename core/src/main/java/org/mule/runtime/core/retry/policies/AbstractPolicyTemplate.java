@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.retry.policies;
+package org.mule.runtime.core.retry.policies;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.context.WorkManager;
-import org.mule.api.retry.RetryCallback;
-import org.mule.api.retry.RetryContext;
-import org.mule.api.retry.RetryNotifier;
-import org.mule.api.retry.RetryPolicy;
-import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.retry.DefaultRetryContext;
-import org.mule.retry.PolicyStatus;
-import org.mule.retry.RetryPolicyExhaustedException;
-import org.mule.retry.notifiers.ConnectNotifier;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.retry.RetryCallback;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.RetryNotifier;
+import org.mule.runtime.core.api.retry.RetryPolicy;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.retry.DefaultRetryContext;
+import org.mule.runtime.core.retry.PolicyStatus;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
+import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
 
 import java.io.InterruptedIOException;
 import java.util.Map;

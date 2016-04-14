@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.api.metadata.DataType.STRING_DATA_TYPE;
-import static org.mule.transformer.types.DataTypeFactory.create;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
+import static org.mule.runtime.core.transformer.types.DataTypeFactory.create;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.math.BigDecimal;

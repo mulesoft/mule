@@ -6,12 +6,12 @@
  */
 package org.mule.module.cxf.builder;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.construct.Pipeline;
-import org.mule.api.lifecycle.CreateException;
-import org.mule.api.source.MessageSource;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.MuleJAXWSInvoker;
@@ -31,7 +31,7 @@ import org.apache.cxf.service.invoker.Invoker;
  * Builds a CXF web service MessageProcessor using either the JAX-WS or
  * simple frontends.  It must be configured in the following way:
  * <ul>
- * <li>If it is part of a {@link org.mule.construct.Flow}, then the serviceClass
+ * <li>If it is part of a {@link org.mule.runtime.core.construct.Flow}, then the serviceClass
  * attribute must be supplied.</li>
  * <li>The builder will use the JAX-WS frontend by default.</li>
  */

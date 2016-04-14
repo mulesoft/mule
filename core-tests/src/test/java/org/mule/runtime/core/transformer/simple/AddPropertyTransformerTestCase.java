@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.anyString;
@@ -12,8 +12,8 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import org.mule.PropertyScope;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.tck.size.SmallTest;
 

@@ -8,9 +8,9 @@ package org.mule.module.xml.functional;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
 import org.mule.tck.junit4.rule.SystemProperty;

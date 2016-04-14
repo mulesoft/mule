@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.monitor;
+package org.mule.runtime.core.util.monitor;
 
-import org.mule.api.MuleContext;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.concurrent.DaemonThreadFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;
 
 import java.util.Iterator;
 import java.util.Map;

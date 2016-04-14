@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServerNotificationHandler;
-import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 
 /**
  * Optimized to make a quick decision on a particular class of messages.

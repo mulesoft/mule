@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.lifecycle;
+package org.mule.runtime.core.lifecycle;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,13 +12,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.lifecycle.LifecycleState;
-import org.mule.api.lifecycle.LifecycleStateEnabled;
-import org.mule.api.lifecycle.Startable;
-import org.mule.context.notification.NotificationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import static org.mockito.Mockito.mock;

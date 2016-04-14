@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.filters;
+package org.mule.runtime.core.routing.filters;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.PropertyScope.OUTBOUND;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.message.DefaultExceptionPayload;
+import static org.mule.runtime.core.PropertyScope.OUTBOUND;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 

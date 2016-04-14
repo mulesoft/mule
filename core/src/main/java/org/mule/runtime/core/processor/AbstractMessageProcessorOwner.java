@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.api.AnnotatedObject;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorContainer;
-import org.mule.api.processor.MessageProcessorPathElement;
-import org.mule.util.NotificationUtils;
+import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorContainer;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.util.NotificationUtils;
 
 import javax.xml.namespace.QName;
 import java.util.Collections;

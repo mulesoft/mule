@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.retry.policies;
+package org.mule.runtime.core.retry.policies;
 
-import org.mule.api.retry.RetryPolicy;
-import org.mule.retry.PolicyStatus;
+import org.mule.runtime.core.api.retry.RetryPolicy;
+import org.mule.runtime.core.retry.PolicyStatus;
 
 /**
  * This policy is basically a placeholder.  It does not attempt to retry at all.

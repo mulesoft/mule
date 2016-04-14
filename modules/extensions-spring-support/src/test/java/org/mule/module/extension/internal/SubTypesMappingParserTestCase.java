@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.module.extension.internal.runtime.connector.subtypes.CarDoor;
 import org.mule.module.extension.internal.runtime.connector.subtypes.FinalPojo;

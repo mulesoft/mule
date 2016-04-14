@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification.processors;
+package org.mule.runtime.core.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.source.CompositeMessageSource;
-import org.mule.api.source.MessageSource;
-import org.mule.component.ComponentException;
-import org.mule.construct.Flow;
-import org.mule.context.notification.Node;
-import org.mule.context.notification.RestrictedNode;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.source.CompositeMessageSource;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.component.ComponentException;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.context.notification.Node;
+import org.mule.runtime.core.context.notification.RestrictedNode;
 
 import java.util.Arrays;
 import java.util.List;

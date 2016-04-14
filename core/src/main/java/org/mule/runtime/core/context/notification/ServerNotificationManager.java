@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.context.WorkManager;
-import org.mule.api.context.notification.BlockingServerEvent;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServerNotificationHandler;
-import org.mule.api.context.notification.ServerNotificationListener;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -45,7 +45,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * <p>However, measurements showed that there was still a small impact on speed in some
  * cases.  To improve behaviour further the
- * {@link org.mule.context.notification.OptimisedNotificationHandler} was
+ * {@link org.mule.runtime.core.context.notification.OptimisedNotificationHandler} was
  * added.  This allows a service that generates notifications to cache locally a handler
  * optimised for a particular class.
  *

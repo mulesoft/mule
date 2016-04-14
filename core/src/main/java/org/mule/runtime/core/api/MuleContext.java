@@ -4,43 +4,43 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api;
+package org.mule.runtime.core.api;
 
-import org.mule.DataTypeConversionResolver;
-import org.mule.TransformationService;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.context.WorkManager;
-import org.mule.api.context.notification.FlowTraceManager;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServerNotificationListener;
-import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.RollbackSourceCallback;
-import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.api.execution.ExceptionContextProvider;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.registry.Registry;
-import org.mule.api.security.SecurityManager;
-import org.mule.api.serialization.ObjectSerializer;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStoreManager;
-import org.mule.api.util.StreamCloserService;
-import org.mule.config.bootstrap.ArtifactType;
-import org.mule.config.bootstrap.BootstrapServiceDiscoverer;
-import org.mule.context.notification.NotificationException;
-import org.mule.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.DataTypeConversionResolver;
+import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.context.notification.FlowTraceManager;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.RollbackSourceCallback;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.api.security.SecurityManager;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.util.StreamCloserService;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
+import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.management.stats.AllStatistics;
-import org.mule.management.stats.ProcessingTimeWatcher;
-import org.mule.util.lock.LockFactory;
-import org.mule.util.queue.QueueManager;
+import org.mule.runtime.core.management.stats.AllStatistics;
+import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
+import org.mule.runtime.core.util.lock.LockFactory;
+import org.mule.runtime.core.util.queue.QueueManager;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -200,10 +200,10 @@ public interface MuleContext extends Lifecycle
     ExtensionManager getExtensionManager();
 
     /**
-     * The instance of {@link org.mule.api.serialization.ObjectSerializer}
+     * The instance of {@link org.mule.runtime.core.api.serialization.ObjectSerializer}
      * to be used to serialize/deserealize objects
      *
-     * @return a {@link org.mule.api.serialization.ObjectSerializer}
+     * @return a {@link org.mule.runtime.core.api.serialization.ObjectSerializer}
      * @since 3.7.0
      */
     ObjectSerializer getObjectSerializer();
@@ -236,9 +236,9 @@ public interface MuleContext extends Lifecycle
     ThreadingProfile getDefaultThreadingProfile();
 
     /**
-     * Returns the configured {@link org.mule.api.util.StreamCloserService}
+     * Returns the configured {@link org.mule.runtime.core.api.util.StreamCloserService}
      *
-     * @return a {@link org.mule.api.util.StreamCloserService}
+     * @return a {@link org.mule.runtime.core.api.util.StreamCloserService}
      * @since 3.5.0
      */
     public StreamCloserService getStreamCloserService();
@@ -264,7 +264,7 @@ public interface MuleContext extends Lifecycle
     /**
      * Returns the Expression Manager configured for this instance of Mule
      * @return the Expression Manager configured for this instance of Mule
-     * @see org.mule.api.expression.ExpressionManager
+     * @see org.mule.runtime.core.api.expression.ExpressionManager
      */
     ExpressionManager getExpressionManager();
 
@@ -320,7 +320,7 @@ public interface MuleContext extends Lifecycle
     Map<QName, Set<Object>> getConfigurationAnnotations();
 
     /**
-     * @return default exception strategy. If no default exception strategy was configured it returns {@link org.mule.exception.DefaultMessagingExceptionStrategy}
+     * @return default exception strategy. If no default exception strategy was configured it returns {@link org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy}
      */
     MessagingExceptionHandler getDefaultExceptionStrategy();
 
@@ -330,7 +330,7 @@ public interface MuleContext extends Lifecycle
     SingleResourceTransactionFactoryManager getTransactionFactoryManager();
 
     /**
-     * @return a non null {@link org.mule.DataTypeConversionResolver} instance to resolve implicit data type conversions
+     * @return a non null {@link org.mule.runtime.core.DataTypeConversionResolver} instance to resolve implicit data type conversions
      */
     DataTypeConversionResolver getDataTypeConverterResolver();
     
@@ -384,7 +384,7 @@ public interface MuleContext extends Lifecycle
 
     /**
      * Gets application wide instance of {@link TransformationService} used for applying
-     * {@link org.mule.api.transformer.Transformer}'s to a {@link MuleMessage} and for obtaining different
+     * {@link org.mule.runtime.core.api.transformer.Transformer}'s to a {@link MuleMessage} and for obtaining different
      * representations of the message payload.
      *
      * @return transformation service

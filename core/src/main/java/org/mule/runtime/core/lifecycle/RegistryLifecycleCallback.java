@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.lifecycle;
+package org.mule.runtime.core.lifecycle;
 
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.HasLifecycleInterceptor;
-import org.mule.api.lifecycle.LifecycleCallback;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecycleInterceptor;
-import org.mule.api.lifecycle.LifecyclePhase;
-import org.mule.api.registry.Registry;
-import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.HasLifecycleInterceptor;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
+import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
+import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.lifecycle.phases.ContainerManagedLifecyclePhase;
 
 import java.util.Collection;
 import java.util.HashSet;

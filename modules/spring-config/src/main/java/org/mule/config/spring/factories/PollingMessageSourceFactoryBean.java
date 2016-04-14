@@ -6,13 +6,13 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.schedule.SchedulerFactory;
-import org.mule.source.polling.MessageProcessorPollingOverride;
-import org.mule.source.polling.PollingMessageSource;
-import org.mule.source.polling.schedule.FixedFrequencySchedulerFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.schedule.SchedulerFactory;
+import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride;
+import org.mule.runtime.core.source.polling.PollingMessageSource;
+import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
 
 import org.springframework.beans.factory.FactoryBean;
 

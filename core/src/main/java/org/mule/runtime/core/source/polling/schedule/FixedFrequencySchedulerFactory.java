@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.source.polling.schedule;
+package org.mule.runtime.core.source.polling.schedule;
 
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.schedule.Scheduler;
-import org.mule.api.schedule.SchedulerFactory;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.schedule.Scheduler;
+import org.mule.runtime.core.api.schedule.SchedulerFactory;
 
 import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
- * Implementation of {@link org.mule.api.schedule.SchedulerFactory} for a {@link org.mule.source.polling.schedule.FixedFrequencyScheduler}.
+ * Implementation of {@link org.mule.runtime.core.api.schedule.SchedulerFactory} for a {@link org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler}.
  * </p>
  *
  * @since 3.5.0

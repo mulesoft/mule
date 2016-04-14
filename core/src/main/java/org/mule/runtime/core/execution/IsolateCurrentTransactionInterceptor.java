@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.transaction.TransactionCoordination;
 
 public class IsolateCurrentTransactionInterceptor<T> implements ExecutionInterceptor<T>
 {

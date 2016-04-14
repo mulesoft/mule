@@ -8,9 +8,9 @@ package org.mule.test.integration.domain.classloader;
 
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.functional.listener.Callback;
 import org.mule.functional.listener.FlowExecutionListener;
 import org.mule.rule.UseMuleLog4jContextFactory;

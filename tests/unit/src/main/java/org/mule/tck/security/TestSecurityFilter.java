@@ -6,15 +6,15 @@
  */
 package org.mule.tck.security;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.CryptoFailureException;
-import org.mule.api.security.EncryptionStrategyNotFoundException;
-import org.mule.api.security.SecurityException;
-import org.mule.api.security.SecurityProviderNotFoundException;
-import org.mule.api.security.UnauthorisedException;
-import org.mule.api.security.UnknownAuthenticationTypeException;
-import org.mule.security.AbstractAuthenticationFilter;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
+import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 
 public class TestSecurityFilter extends AbstractAuthenticationFilter
 {

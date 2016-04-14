@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.mvel;
+package org.mule.runtime.core.el.mvel;
 
-import org.mule.api.MuleContext;
-import org.mule.el.context.AppContext;
-import org.mule.el.context.MuleInstanceContext;
-import org.mule.el.context.ServerContext;
-import org.mule.el.function.DateTimeExpressionLanguageFuntion;
-import org.mule.el.function.RegexExpressionLanguageFuntion;
-import org.mule.el.function.WildcardExpressionLanguageFuntion;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.el.context.AppContext;
+import org.mule.runtime.core.el.context.MuleInstanceContext;
+import org.mule.runtime.core.el.context.ServerContext;
+import org.mule.runtime.core.el.function.DateTimeExpressionLanguageFuntion;
+import org.mule.runtime.core.el.function.RegexExpressionLanguageFuntion;
+import org.mule.runtime.core.el.function.WildcardExpressionLanguageFuntion;
 import org.mule.mvel2.ParserConfiguration;
 
 public class StaticVariableResolverFactory extends MVELExpressionLanguageContext

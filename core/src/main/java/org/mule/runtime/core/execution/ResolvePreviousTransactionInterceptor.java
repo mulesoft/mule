@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transaction.TransactionException;
-import org.mule.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.core.transaction.TransactionCoordination;
 
 class ResolvePreviousTransactionInterceptor<T> implements ExecutionInterceptor<T>
 {

@@ -6,7 +6,7 @@
  */
 package org.mule.serialization;
 
-import org.mule.api.serialization.SerializationException;
+import org.mule.runtime.core.api.serialization.SerializationException;
 
 import org.junit.Test;
 

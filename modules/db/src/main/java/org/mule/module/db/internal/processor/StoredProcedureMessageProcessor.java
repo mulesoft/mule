@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Executes an stored procedure query on a database.
  * <p/>
- * Both database and queries are resolved, if required, using the {@link org.mule.api.MuleEvent} being processed.
+ * Both database and queries are resolved, if required, using the {@link org.mule.runtime.core.api.MuleEvent} being processed.
  */
 
 public class StoredProcedureMessageProcessor extends AbstractSingleQueryDbMessageProcessor

@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.component.simple;
+package org.mule.runtime.core.component.simple;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 

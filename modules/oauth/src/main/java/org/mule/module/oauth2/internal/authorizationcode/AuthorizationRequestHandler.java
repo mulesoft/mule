@@ -6,19 +6,19 @@
  */
 package org.mule.module.oauth2.internal.authorizationcode;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.listener.HttpListener;
 import org.mule.module.http.api.listener.HttpListenerBuilder;
 import org.mule.module.oauth2.internal.DynamicFlowFactory;
 import org.mule.module.oauth2.internal.StateEncoder;
-import org.mule.util.AttributeEvaluator;
+import org.mule.runtime.core.util.AttributeEvaluator;
 
 import java.net.MalformedURLException;
 import java.net.URL;

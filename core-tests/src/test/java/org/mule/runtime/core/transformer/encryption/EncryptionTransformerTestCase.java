@@ -4,18 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.encryption;
+package org.mule.runtime.core.transformer.encryption;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.CryptoFailureException;
-import org.mule.api.transformer.Transformer;
-import org.mule.security.PasswordBasedEncryptionStrategy;
-import org.mule.transformer.AbstractTransformerTestCase;
+import static org.junit.Assert.fail;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
+import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
-
-import static org.junit.Assert.fail;
 
 public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
 {

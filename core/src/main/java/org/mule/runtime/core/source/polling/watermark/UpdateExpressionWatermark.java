@@ -5,17 +5,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.source.polling.watermark;
+package org.mule.runtime.core.source.polling.watermark;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.InvalidExpressionException;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.store.ObjectStore;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.source.polling.MessageProcessorPollingInterceptor;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.expression.InvalidExpressionException;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.source.polling.MessageProcessorPollingInterceptor;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;

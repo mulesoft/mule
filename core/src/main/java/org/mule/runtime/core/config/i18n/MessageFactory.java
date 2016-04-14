@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.i18n;
+package org.mule.runtime.core.config.i18n;
 
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -47,7 +47,7 @@ public abstract class MessageFactory
      */
     protected static String getBundlePath(String bundleName)
     {
-        return "META-INF.services.org.mule.i18n." + bundleName + "-messages";
+        return "META-INF.services.org.mule.runtime.core.i18n." + bundleName + "-messages";
     }
     
     /**

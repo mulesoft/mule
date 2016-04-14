@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.source.polling.schedule;
+package org.mule.runtime.core.source.polling.schedule;
 
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleCallback;
-import org.mule.api.schedule.Scheduler;
-import org.mule.lifecycle.DefaultLifecycleManager;
-import org.mule.lifecycle.SimpleLifecycleManager;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
+import org.mule.runtime.core.api.schedule.Scheduler;
+import org.mule.runtime.core.lifecycle.DefaultLifecycleManager;
+import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.component;
+package org.mule.runtime.core.api.component;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.model.EntryPointResolverSet;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.model.EntryPointResolverSet;
 
 /** <code>LifecycleAdapterFactory</code> TODO (document class) */
 public interface LifecycleAdapterFactory

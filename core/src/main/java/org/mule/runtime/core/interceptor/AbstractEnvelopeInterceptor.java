@@ -4,22 +4,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.interceptor;
+package org.mule.runtime.core.interceptor;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.OptimizedRequestContext;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.interceptor.Interceptor;
-import org.mule.api.connector.ReplyToHandler;
-import org.mule.management.stats.ProcessingTime;
-import org.mule.processor.AbstractRequestResponseMessageProcessor;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.interceptor.Interceptor;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.management.stats.ProcessingTime;
+import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 
 /**
  * <code>EnvelopeInterceptor</code> is an intercepter that will fire before and after

@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml.xstream;
+package org.mule.runtime.core.transformers.xml.xstream;
 
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.transformers.xml.AbstractXmlTransformerTestCase;
+import org.mule.runtime.core.transformers.xml.AbstractXmlTransformerTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;

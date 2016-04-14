@@ -6,9 +6,9 @@
  */
 package org.mule.module.management.mbean;
 
-import org.mule.api.MuleContext;
-import org.mule.construct.AbstractFlowConstruct;
-import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.construct.AbstractFlowConstruct;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.module.management.support.JmxSupport;
 import org.mule.module.management.support.JmxSupportFactory;

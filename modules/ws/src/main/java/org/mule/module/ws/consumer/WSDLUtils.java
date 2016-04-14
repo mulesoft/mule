@@ -7,7 +7,7 @@
 package org.mule.module.ws.consumer;
 
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.io.StringWriter;

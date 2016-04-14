@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.schedule;
+package org.mule.runtime.core.api.schedule;
 
-import org.mule.api.NameableObject;
-import org.mule.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
 
 /**
  * <p>
  * An scheduler is a class that arrange jobs in a define schedule. Once the Scheduler starts it launch a thread that
  * triggers an action, when stopped, that action is not executed anymore, unless it is scheduled on demand by
- * the method {@link org.mule.api.schedule.Scheduler#schedule()}
+ * the method {@link org.mule.runtime.core.api.schedule.Scheduler#schedule()}
  * </p>
  * <p>
  * The initialization of a Scheduler is thought to be the stage where it reserves resources to schedule. While the
@@ -21,7 +21,7 @@ import org.mule.api.lifecycle.Lifecycle;
  * </p>
  * <p>
  * This interface implements {@link NameableObject} the name of the Scheduler is used as its identifier in the
- * {@link org.mule.api.registry.MuleRegistry}
+ * {@link org.mule.runtime.core.api.registry.MuleRegistry}
  * </p>
  * <p>
  * The recommended way to create a Scheduler is by a {@link SchedulerFactory}, this will allow other users to hook the

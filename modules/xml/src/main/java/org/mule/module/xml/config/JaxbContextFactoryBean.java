@@ -6,7 +6,7 @@
  */
 package org.mule.module.xml.config;
 
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import javax.xml.bind.JAXBContext;
 

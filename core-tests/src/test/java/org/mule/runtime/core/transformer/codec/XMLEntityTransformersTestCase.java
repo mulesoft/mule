@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.codec;
+package org.mule.runtime.core.transformer.codec;
 
-import org.mule.api.transformer.Transformer;
-import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 public class XMLEntityTransformersTestCase extends AbstractTransformerTestCase
 {

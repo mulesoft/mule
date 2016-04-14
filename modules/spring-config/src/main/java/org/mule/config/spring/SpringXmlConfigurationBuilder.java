@@ -6,14 +6,14 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
-import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.lifecycle.Startable;
-import org.mule.config.ConfigResource;
-import org.mule.config.builders.AbstractResourceConfigurationBuilder;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.DomainMuleContextAwareConfigurationBuilder;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.config.ConfigResource;
+import org.mule.runtime.core.config.builders.AbstractResourceConfigurationBuilder;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -6,16 +6,16 @@
  */
 package org.mule.module.launcher;
 
-import static org.mule.util.SplashScreen.miniSplash;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
+import static org.mule.runtime.core.util.SplashScreen.miniSplash;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.NullDeploymentListener;
 import org.mule.module.artifact.Artifact;
 import org.mule.module.launcher.artifact.ArtifactFactory;
 import org.mule.module.launcher.artifact.DeployableArtifact;
 import org.mule.module.launcher.util.ObservableList;
-import org.mule.util.CollectionUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;

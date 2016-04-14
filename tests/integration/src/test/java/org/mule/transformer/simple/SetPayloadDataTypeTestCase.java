@@ -5,16 +5,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.LocalMuleClient;
 import org.mule.api.metadata.DataType;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
-import org.mule.transformer.types.MimeTypes;
+import org.mule.runtime.core.transformer.types.MimeTypes;
 
 import org.junit.Test;
 

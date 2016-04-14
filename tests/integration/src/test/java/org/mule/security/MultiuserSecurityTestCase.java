@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.security;
+package org.mule.runtime.core.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.EncryptionStrategy;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.HashMap;

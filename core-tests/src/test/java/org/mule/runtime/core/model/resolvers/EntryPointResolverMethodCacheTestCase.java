@@ -4,19 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.model.resolvers;
+package org.mule.runtime.core.model.resolvers;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.model.InvocationResult;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.lang.reflect.Method;
 
 import junit.framework.AssertionFailedError;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 public class EntryPointResolverMethodCacheTestCase extends AbstractMuleTestCase
 {

@@ -6,8 +6,8 @@
  */
 package org.mule.config.spring.processors;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.config.spring.SpringRegistry;
 
 import java.util.Map;

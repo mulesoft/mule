@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor.chain;
+package org.mule.runtime.core.processor.chain;
 
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleEvent;
-import org.mule.api.processor.ProcessorExecutor;
-import org.mule.api.connector.ReplyToHandler;
-import org.mule.construct.Flow;
-import org.mule.processor.BlockingProcessorExecutor;
-import org.mule.processor.NonBlockingProcessorExecutor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.processor.ProcessorExecutor;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.processor.BlockingProcessorExecutor;
+import org.mule.runtime.core.processor.NonBlockingProcessorExecutor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

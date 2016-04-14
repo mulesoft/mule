@@ -6,10 +6,10 @@
  */
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 /**
  * Converts a FruitBowl to a FruitBasket (for testing obviously :)

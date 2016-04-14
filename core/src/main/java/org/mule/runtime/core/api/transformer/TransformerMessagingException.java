@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.transformer;
+package org.mule.runtime.core.api.transformer;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.config.i18n.Message;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * An exception that occurred while transforming a message.

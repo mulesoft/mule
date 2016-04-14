@@ -6,13 +6,13 @@
  */
 package org.mule.module.management.mbean;
 
-import org.mule.MuleServer;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.config.MuleManifest;
-import org.mule.util.IOUtils;
-import org.mule.util.NetworkUtils;
-import org.mule.util.StringMessageUtils;
+import org.mule.runtime.core.MuleServer;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.NetworkUtils;
+import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;

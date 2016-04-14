@@ -14,9 +14,9 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 
-import org.mule.api.MuleContext;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.RegistrationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.api.tls.TlsContextFactory;

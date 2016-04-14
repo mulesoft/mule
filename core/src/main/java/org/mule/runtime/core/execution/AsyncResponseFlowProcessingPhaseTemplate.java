@@ -4,30 +4,30 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 
 /**
- * Template methods for {@link org.mule.api.source.MessageSource} specific behavior during
+ * Template methods for {@link org.mule.runtime.core.api.source.MessageSource} specific behavior during
  * flow execution.
  */
 public interface AsyncResponseFlowProcessingPhaseTemplate extends MessageProcessTemplate
 {
 
     /**
-     * @return a {@link org.mule.api.MuleEvent} created from the original message
+     * @return a {@link org.mule.runtime.core.api.MuleEvent} created from the original message
      */
     MuleEvent getMuleEvent() throws MuleException;
 
     /**
-     * Routes the {@link org.mule.api.MuleEvent} through the processors chain
+     * Routes the {@link org.mule.runtime.core.api.MuleEvent} through the processors chain
      *
-     * @param muleEvent {@link org.mule.api.MuleEvent} created from the raw message of this context
-     * @return the response {@link org.mule.api.MuleEvent}
-     * @throws org.mule.api.MuleException
+     * @param muleEvent {@link org.mule.runtime.core.api.MuleEvent} created from the raw message of this context
+     * @return the response {@link org.mule.runtime.core.api.MuleEvent}
+     * @throws org.mule.runtime.core.api.MuleException
      */
     MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException;
 

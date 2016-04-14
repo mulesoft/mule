@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.message.processing;
+package org.mule.runtime.core.message.processing;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -14,22 +14,22 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.execution.EndPhaseTemplate;
-import org.mule.execution.FlowProcessingPhase;
-import org.mule.execution.FlowProcessingPhaseTemplate;
-import org.mule.execution.MessageProcessContext;
-import org.mule.execution.MessageProcessPhase;
-import org.mule.execution.MessageProcessTemplate;
-import org.mule.execution.MuleMessageProcessingManager;
-import org.mule.execution.PhaseResultNotifier;
-import org.mule.execution.ValidationPhase;
-import org.mule.execution.ValidationPhaseTemplate;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.execution.EndPhaseTemplate;
+import org.mule.runtime.core.execution.FlowProcessingPhase;
+import org.mule.runtime.core.execution.FlowProcessingPhaseTemplate;
+import org.mule.runtime.core.execution.MessageProcessContext;
+import org.mule.runtime.core.execution.MessageProcessPhase;
+import org.mule.runtime.core.execution.MessageProcessTemplate;
+import org.mule.runtime.core.execution.MuleMessageProcessingManager;
+import org.mule.runtime.core.execution.PhaseResultNotifier;
+import org.mule.runtime.core.execution.ValidationPhase;
+import org.mule.runtime.core.execution.ValidationPhaseTemplate;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;

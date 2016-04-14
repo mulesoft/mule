@@ -7,12 +7,12 @@
 
 package org.mule.module.db.internal.util;
 
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 
 /**
- * Reads files using {@link org.mule.util.IOUtils}
+ * Reads files using {@link org.mule.runtime.core.util.IOUtils}
  */
 public class DefaultFileReader implements FileReader
 {

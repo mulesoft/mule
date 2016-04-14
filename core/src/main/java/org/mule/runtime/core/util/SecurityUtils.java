@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
 
-import org.mule.api.config.MuleProperties;
-import org.mule.api.security.tls.TlsConfiguration;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.security.tls.TlsConfiguration;
 
 import java.security.Provider;
 import java.security.Security;

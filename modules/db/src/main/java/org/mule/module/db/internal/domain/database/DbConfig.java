@@ -7,8 +7,8 @@
 
 package org.mule.module.db.internal.domain.database;
 
-import org.mule.api.AnnotatedObject;
-import org.mule.api.NamedObject;
+import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.core.api.NamedObject;
 import org.mule.common.Testable;
 import org.mule.common.metadata.ConnectorMetaDataEnabled;
 import org.mule.module.db.internal.domain.connection.DbConnectionFactory;

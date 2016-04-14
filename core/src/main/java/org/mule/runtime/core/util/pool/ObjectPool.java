@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.pool;
+package org.mule.runtime.core.util.pool;
 
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.object.ObjectFactory;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.object.ObjectFactory;
 
 /**
  * <code>ObjectPool</code> is a simple pooling interface for objects

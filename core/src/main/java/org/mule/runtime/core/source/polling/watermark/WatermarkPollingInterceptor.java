@@ -5,14 +5,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.source.polling.watermark;
+package org.mule.runtime.core.source.polling.watermark;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.source.polling.MessageProcessorPollingInterceptor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.source.polling.MessageProcessorPollingInterceptor;
 
 /**
  * Implementation of {@link MessageProcessorPollingInterceptor} that retrieves the

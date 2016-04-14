@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.filters;
+package org.mule.runtime.core.routing.filters;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.routing.filter.Filter;
-import org.mule.api.routing.filter.ObjectFilter;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 
 /**
  * <code>EqualsFilter</code> is a filter for comparing two objects using the

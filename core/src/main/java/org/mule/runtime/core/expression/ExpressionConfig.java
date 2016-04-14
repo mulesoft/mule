@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.expression;
+package org.mule.runtime.core.expression;
 
-import org.mule.api.expression.ExpressionManager;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
  * A simple configuration object for holding the common Expression evaluator configuration. The

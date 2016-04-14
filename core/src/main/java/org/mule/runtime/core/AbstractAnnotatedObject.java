@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule;
+package org.mule.runtime.core;
 
-import org.mule.api.AnnotatedObject;
+import org.mule.runtime.core.api.AnnotatedObject;
 
 import java.util.Collections;
 import java.util.Map;

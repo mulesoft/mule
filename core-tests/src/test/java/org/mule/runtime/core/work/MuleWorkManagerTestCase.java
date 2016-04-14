@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.work;
+package org.mule.runtime.core.work;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import org.mule.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.resource.spi.work.Work;

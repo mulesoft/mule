@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.registry;
+package org.mule.runtime.core.api.registry;
 
-import org.mule.api.MuleException;
-import org.mule.api.agent.Agent;
-import org.mule.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.api.metadata.DataType;
-import org.mule.api.schedule.Scheduler;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.util.Predicate;
+import org.mule.runtime.core.api.schedule.Scheduler;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.util.Predicate;
 
 import java.util.Collection;
 import java.util.List;
@@ -36,7 +36,7 @@ public interface MuleRegistry extends LifecycleRegistry
 
     /**
      * Determines whether Inject processors should get executed on an object added to the registry
-     * Inject processors are responsible for processing inject interfaces such as {@link org.mule.api.context.MuleContextAware}
+     * Inject processors are responsible for processing inject interfaces such as {@link org.mule.runtime.core.api.context.MuleContextAware}
      */
     int INJECT_PROCESSORS_BYPASS_FLAG = 0x02;
 
@@ -56,7 +56,7 @@ public interface MuleRegistry extends LifecycleRegistry
     FlowConstruct lookupFlowConstruct(String name);
 
     /**
-     * This method will return a list of {@link org.mule.api.transformer.Transformer} objects that accept the given
+     * This method will return a list of {@link org.mule.runtime.core.api.transformer.Transformer} objects that accept the given
      * input and return the given output type of object
      *
      * @param source The  desired input type for the transformer
@@ -110,7 +110,7 @@ public interface MuleRegistry extends LifecycleRegistry
      *
      * @param object the object to process
      * @return the same object with any processors and lifecycle methods called
-     * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change or process object processors for the object.
+     * @throws org.mule.runtime.core.api.MuleException if the registry fails to perform the lifecycle change or process object processors for the object.
      */
     Object applyProcessorsAndLifecycle(Object object) throws MuleException;
 
@@ -122,7 +122,7 @@ public interface MuleRegistry extends LifecycleRegistry
      *
      * @param object the object to process
      * @return the same object with any processors called
-     * @throws org.mule.api.MuleException if the registry fails to process object processors for the object.
+     * @throws org.mule.runtime.core.api.MuleException if the registry fails to process object processors for the object.
      */
     Object applyProcessors(Object object) throws MuleException;
 

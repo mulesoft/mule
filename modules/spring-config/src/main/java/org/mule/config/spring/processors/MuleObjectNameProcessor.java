@@ -6,9 +6,9 @@
  */
 package org.mule.config.spring.processors;
 
-import org.mule.api.NameableObject;
-import org.mule.api.agent.Agent;
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.api.transformer.Transformer;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;

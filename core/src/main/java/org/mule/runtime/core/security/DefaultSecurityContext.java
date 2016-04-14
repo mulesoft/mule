@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.security;
+package org.mule.runtime.core.security;
 
-import org.mule.api.security.Authentication;
-import org.mule.api.security.SecurityContext;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.SecurityContext;
 
 /**
  * Trivial {@link SecurityContext} implementation which simply holds the {@link Authentication} object.

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.graph;
+package org.mule.runtime.core.transformer.graph;
 
-import org.mule.api.transformer.Converter;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Transformer;
 
 import java.util.Collections;
 import java.util.Comparator;

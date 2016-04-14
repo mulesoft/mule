@@ -12,7 +12,7 @@ import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.delegate.AbstractParallelDelegatingDefinitionParser;
 import org.mule.config.spring.util.SpringXMLUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Attr;

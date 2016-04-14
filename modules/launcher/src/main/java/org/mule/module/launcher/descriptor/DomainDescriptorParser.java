@@ -7,7 +7,7 @@
 package org.mule.module.launcher.descriptor;
 
 import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
-import static org.mule.util.PropertiesUtils.loadProperties;
+import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 
 import java.io.File;
 import java.io.FileInputStream;

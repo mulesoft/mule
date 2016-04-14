@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.registry.RegistryBroker;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.registry.RegistryBroker;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Kiwi;

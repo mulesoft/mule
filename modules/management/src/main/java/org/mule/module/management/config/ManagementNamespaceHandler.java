@@ -6,7 +6,7 @@
  */
 package org.mule.module.management.config;
 
-import org.mule.agent.Log4jNotificationLoggerAgent;
+import org.mule.runtime.core.agent.Log4jNotificationLoggerAgent;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;

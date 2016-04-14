@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api;
+package org.mule.runtime.core.api;
 
-import org.mule.api.security.SecurityContext;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.api.metadata.DataType;
-import org.mule.message.SessionHandler;
+import org.mule.runtime.core.message.SessionHandler;
 
 import java.io.Serializable;
 import java.util.Set;

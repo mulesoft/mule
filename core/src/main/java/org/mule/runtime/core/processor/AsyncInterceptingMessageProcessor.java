@@ -4,30 +4,30 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.VoidMuleEvent;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.construct.MessageProcessorPathResolver;
-import org.mule.api.context.WorkManager;
-import org.mule.api.context.WorkManagerSource;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.MessagingExceptionHandlerAware;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.AsyncMessageNotification;
-import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
-import org.mule.interceptor.ProcessingTimeInterceptor;
-import org.mule.transaction.MuleTransactionConfig;
-import org.mule.work.AbstractMuleEventWork;
-import org.mule.work.MuleWorkManager;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.context.WorkManagerSource;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.context.notification.AsyncMessageNotification;
+import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
+import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
+import org.mule.runtime.core.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.work.AbstractMuleEventWork;
+import org.mule.runtime.core.work.MuleWorkManager;
 
 /**
  * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to

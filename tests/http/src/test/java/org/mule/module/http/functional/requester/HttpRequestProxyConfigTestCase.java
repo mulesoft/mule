@@ -10,14 +10,14 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MessagingException;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
 import org.mule.module.http.internal.request.NtlmProxyConfig;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.IOException;
 import java.net.ServerSocket;

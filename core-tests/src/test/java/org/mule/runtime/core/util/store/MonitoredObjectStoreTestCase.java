@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.ObjectStoreNotAvaliableException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.Serializable;

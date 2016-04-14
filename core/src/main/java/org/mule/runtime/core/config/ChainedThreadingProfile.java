@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config;
+package org.mule.runtime.core.config;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.context.WorkManager;
-import org.mule.config.pool.ThreadPoolFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.config.pool.ThreadPoolFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -21,7 +21,7 @@ import java.util.concurrent.ThreadFactory;
  * This was written (perhaps too far in advance) with an eye to how we will manage default values
  * in a dynamic environment.  Since very little has been decided in that direction the correct
  * behaviour is unclear - changing the default value of "dynamic"
- * {@link org.mule.config.ChainedThreadingProfile#ChainedThreadingProfile(ThreadingProfile)}
+ * {@link org.mule.runtime.core.config.ChainedThreadingProfile#ChainedThreadingProfile(ThreadingProfile)}
  * will switch behaviour between dynamic and static chaining.
  *
  * <p>Note that within Spring, as far as I understand things, object creation is always ordered

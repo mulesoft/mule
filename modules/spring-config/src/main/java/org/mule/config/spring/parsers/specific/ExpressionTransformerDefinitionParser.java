@@ -11,8 +11,8 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributesWhenNoChildren;
-import org.mule.expression.ExpressionConfig;
-import org.mule.expression.transformers.ExpressionArgument;
+import org.mule.runtime.core.expression.ExpressionConfig;
+import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.GenericBeanDefinition;

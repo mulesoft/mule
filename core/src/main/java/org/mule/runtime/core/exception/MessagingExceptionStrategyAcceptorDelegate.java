@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.exception;
+package org.mule.runtime.core.exception;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.processor.AbstractMuleObjectOwner;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
 /**
- * Allows to use {@link org.mule.api.exception.MessagingExceptionHandler} as {@link org.mule.api.exception.MessagingExceptionHandlerAcceptor}.
+ * Allows to use {@link org.mule.runtime.core.api.exception.MessagingExceptionHandler} as {@link org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor}.
  */
 public class MessagingExceptionStrategyAcceptorDelegate extends AbstractMuleObjectOwner<MessagingExceptionHandler> implements MessagingExceptionHandlerAcceptor
 {

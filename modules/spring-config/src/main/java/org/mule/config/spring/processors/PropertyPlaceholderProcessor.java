@@ -6,10 +6,10 @@
  */
 package org.mule.config.spring.processors;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.PropertyFactory;
-import org.mule.api.context.MuleContextAware;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.PropertyFactory;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.io.IOException;
 import java.util.HashMap;

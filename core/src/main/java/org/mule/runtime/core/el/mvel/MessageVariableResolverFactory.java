@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.mvel;
+package org.mule.runtime.core.el.mvel;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.el.VariableAssignmentCallback;
-import org.mule.PropertyScope;
-import org.mule.el.context.FlowVariableMapContext;
-import org.mule.el.context.MessageContext;
-import org.mule.el.context.MessagePropertyMapContext;
-import org.mule.el.context.SessionVariableMapContext;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.el.VariableAssignmentCallback;
+import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.el.context.FlowVariableMapContext;
+import org.mule.runtime.core.el.context.MessageContext;
+import org.mule.runtime.core.el.context.MessagePropertyMapContext;
+import org.mule.runtime.core.el.context.SessionVariableMapContext;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;

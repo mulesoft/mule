@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.QueueStore;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.QueueStore;
 
 import java.io.Serializable;
 

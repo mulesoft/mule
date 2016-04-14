@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.config;
 
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
-import static org.mule.util.Preconditions.checkState;
+import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.config.spring.MuleArtifactContext;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.connection.ConnectionProviderModel;

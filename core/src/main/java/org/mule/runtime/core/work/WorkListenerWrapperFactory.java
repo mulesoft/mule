@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.work;
+package org.mule.runtime.core.work;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkListener;

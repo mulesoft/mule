@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.internal.connection;
+package org.mule.runtime.core.internal.connection;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -25,7 +25,7 @@ import static org.mule.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.api.config.PoolingProfile.WHEN_EXHAUSTED_FAIL;
 import static org.mule.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
 import static org.mule.tck.MuleTestUtils.spyInjector;
-import org.mule.api.Injector;
+import org.mule.runtime.core.api.Injector;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionExceptionCode;
@@ -33,7 +33,7 @@ import org.mule.api.connection.ConnectionHandler;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.api.connection.PoolingListener;
-import org.mule.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Arrays;

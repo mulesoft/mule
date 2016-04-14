@@ -5,18 +5,18 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config;
+package org.mule.runtime.core.config;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.QueueStore;
-import org.mule.util.queue.DefaultQueueConfiguration;
-import org.mule.util.queue.DelegateQueueManager;
-import org.mule.util.queue.QueueConfiguration;
-import org.mule.util.queue.QueueManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.QueueStore;
+import org.mule.runtime.core.util.queue.DefaultQueueConfiguration;
+import org.mule.runtime.core.util.queue.DelegateQueueManager;
+import org.mule.runtime.core.util.queue.QueueConfiguration;
+import org.mule.runtime.core.util.queue.QueueManager;
 
 import java.io.Serializable;
 
@@ -101,7 +101,7 @@ public class QueueProfile
         }
         if (DelegateQueueManager.isOldModeEnabled())
         {
-            return new org.mule.util.queue.objectstore.QueueConfiguration(context, maxOutstandingMessages, objectStore);
+            return new org.mule.runtime.core.util.queue.objectstore.QueueConfiguration(context, maxOutstandingMessages, objectStore);
         }
         return new DefaultQueueConfiguration(maxOutstandingMessages, objectStore.isPersistent());
     }

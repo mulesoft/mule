@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.internal.request;
 
-import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
@@ -15,21 +15,21 @@ import static org.mule.module.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.message.NullPayload;
 import org.mule.api.metadata.DataType;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
-import org.mule.transformer.types.MimeTypes;
-import org.mule.util.AttributeEvaluator;
-import org.mule.util.DataTypeUtils;
-import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.transformer.types.MimeTypes;
+import org.mule.runtime.core.util.AttributeEvaluator;
+import org.mule.runtime.core.util.DataTypeUtils;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.net.MediaType;
 

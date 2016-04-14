@@ -10,8 +10,8 @@ package org.mule.module.db.integration.config;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.LocalMuleClient;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 

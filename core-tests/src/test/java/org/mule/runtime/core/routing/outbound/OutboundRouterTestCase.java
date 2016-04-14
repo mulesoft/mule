@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.outbound;
+package org.mule.runtime.core.routing.outbound;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.source.MessageSource;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;

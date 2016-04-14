@@ -11,7 +11,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.junit4.FunctionalTestCase;

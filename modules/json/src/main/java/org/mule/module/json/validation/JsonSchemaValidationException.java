@@ -6,8 +6,8 @@
  */
 package org.mule.module.json.validation;
 
-import org.mule.api.MuleException;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 /**
  * Exception to signal that a given json did not

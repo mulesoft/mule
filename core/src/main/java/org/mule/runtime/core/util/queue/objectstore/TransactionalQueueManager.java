@@ -5,25 +5,25 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.queue.objectstore;
+package org.mule.runtime.core.util.queue.objectstore;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.QueueStore;
-import org.mule.util.UUID;
-import org.mule.util.queue.Queue;
-import org.mule.util.queue.QueueManager;
-import org.mule.util.queue.QueueSession;
-import org.mule.util.queue.objectstore.xa.AbstractTransactionContext;
-import org.mule.util.queue.objectstore.xa.AbstractXAResourceManager;
-import org.mule.util.xa.ResourceManagerException;
-import org.mule.util.xa.ResourceManagerSystemException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.QueueStore;
+import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.util.queue.Queue;
+import org.mule.runtime.core.util.queue.QueueManager;
+import org.mule.runtime.core.util.queue.QueueSession;
+import org.mule.runtime.core.util.queue.objectstore.xa.AbstractTransactionContext;
+import org.mule.runtime.core.util.queue.objectstore.xa.AbstractXAResourceManager;
+import org.mule.runtime.core.util.xa.ResourceManagerException;
+import org.mule.runtime.core.util.xa.ResourceManagerSystemException;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -60,7 +60,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager
     /**
      * {@inheritDoc}
      *
-     * @return an instance of {@link org.mule.util.queue.TransactionalQueueSession}
+     * @return an instance of {@link org.mule.runtime.core.util.queue.TransactionalQueueSession}
      */
     @Override
     public synchronized QueueSession getQueueSession()
@@ -72,7 +72,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager
      * {@inheritDoc}
      */
     @Override
-    public synchronized void setDefaultQueueConfiguration(org.mule.util.queue.QueueConfiguration config)
+    public synchronized void setDefaultQueueConfiguration(org.mule.runtime.core.util.queue.QueueConfiguration config)
     {
         this.defaultQueueConfiguration = (QueueConfiguration)config;
         addStore(((QueueConfiguration)config).objectStore);
@@ -82,7 +82,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager
      * {@inheritDoc}
      */
     @Override
-    public synchronized void setQueueConfiguration(String queueName, org.mule.util.queue.QueueConfiguration config)
+    public synchronized void setQueueConfiguration(String queueName, org.mule.runtime.core.util.queue.QueueConfiguration config)
     {
         getQueue(queueName, (QueueConfiguration) config).setConfig((QueueConfiguration) config);
         addStore(((QueueConfiguration)config).objectStore);

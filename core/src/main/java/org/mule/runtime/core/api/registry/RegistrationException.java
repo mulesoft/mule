@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.registry;
+package org.mule.runtime.core.api.registry;
 
-import org.mule.api.MuleException;
-import org.mule.config.i18n.Message;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.config.i18n.Message;
 
 public class RegistrationException extends MuleException
 {

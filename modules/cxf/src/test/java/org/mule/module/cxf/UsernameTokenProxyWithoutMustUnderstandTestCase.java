@@ -11,13 +11,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.module.cxf.wssec.ClientPasswordCallback;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;

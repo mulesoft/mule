@@ -9,11 +9,11 @@ package org.mule.test.integration.messaging.meps;
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;

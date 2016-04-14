@@ -4,26 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.lifecycle;
+package org.mule.runtime.core.lifecycle;
 
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.LifecycleCallback;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 
 /**
- * This {@link org.mule.api.lifecycle.LifecycleManager} implementation is designed to track the lifecycle of objects
- * that support the {@link org.mule.api.lifecycle.Initialisable#PHASE_NAME}, {@link org.mule.api.lifecycle.Startable#PHASE_NAME},
- * {@link org.mule.api.lifecycle.Stoppable#PHASE_NAME} and {@link org.mule.api.lifecycle.Disposable#PHASE_NAME} phases and
+ * This {@link org.mule.runtime.core.api.lifecycle.LifecycleManager} implementation is designed to track the lifecycle of objects
+ * that support the {@link org.mule.runtime.core.api.lifecycle.Initialisable#PHASE_NAME}, {@link org.mule.runtime.core.api.lifecycle.Startable#PHASE_NAME},
+ * {@link org.mule.runtime.core.api.lifecycle.Stoppable#PHASE_NAME} and {@link org.mule.runtime.core.api.lifecycle.Disposable#PHASE_NAME} phases and
  * adds convenience methods for firing these phases by callbacks.  
  * 
- * This is an internal class used by Mule for managing state for objects such as {@link org.mule.api.service.Service},
- * {@link org.mule.api.transport.Connector} and {@link org.mule.api.agent.Agent}, all of which can be controlled externally via JMX
- * @param <O> the object type being managed by this {@link org.mule.api.lifecycle.LifecycleManager}
+ * This is an internal class used by Mule for managing state for objects such as {@link org.mule.runtime.core.api.service.Service},
+ * {@link org.mule.runtime.core.api.transport.Connector} and {@link org.mule.runtime.core.api.agent.Agent}, all of which can be controlled externally via JMX
+ * @param <O> the object type being managed by this {@link org.mule.runtime.core.api.lifecycle.LifecycleManager}
  */
 public abstract class SimpleLifecycleManager<O> extends AbstractLifecycleManager<O>
 {

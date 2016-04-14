@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.context.notification.MuleContextNotification;
+import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -24,7 +24,7 @@ import org.junit.Test;
 
 /**
  * This tests verifies that the {@link org.mule.module.launcher.application.DefaultMuleApplication}
- * status is set correctly depending on its {@link org.mule.api.MuleContext}'s lifecycle phase
+ * status is set correctly depending on its {@link org.mule.runtime.core.api.MuleContext}'s lifecycle phase
  */
 public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTestCase
 {

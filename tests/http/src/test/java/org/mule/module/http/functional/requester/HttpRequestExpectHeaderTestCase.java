@@ -13,7 +13,7 @@ import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STA
 import static org.mule.module.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.module.http.functional.AbstractHttpExpectHeaderServerTestCase;
 
 import java.io.IOException;

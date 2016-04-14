@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.source.polling;
+package org.mule.runtime.core.source.polling;
 
-import org.mule.RequestContext;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleException;
-import org.mule.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 
 import javax.resource.spi.work.Work;
 

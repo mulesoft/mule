@@ -8,7 +8,7 @@ package org.mule.module.xml.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;

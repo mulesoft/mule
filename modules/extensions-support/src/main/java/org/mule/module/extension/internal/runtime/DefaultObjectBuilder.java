@@ -7,9 +7,9 @@
 package org.mule.module.extension.internal.runtime;
 
 import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
-import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.ClassUtils;
 
 /**
  * Default implementation of {@link ObjectBuilder} which

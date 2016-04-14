@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -12,15 +12,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.UUID;
-import org.mule.util.store.DefaultObjectStoreFactoryBean;
+import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
 
 import java.util.Arrays;
 import java.util.HashSet;

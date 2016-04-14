@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.outbound;
+package org.mule.runtime.core.routing.outbound;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * registered with the router.
  *
  * This class is deprecated since 3.5.0 and will be removed in Mule 4.0. Please use
- * {@link org.mule.routing.ScatterGatherRouter} instead.
+ * {@link org.mule.runtime.core.routing.ScatterGatherRouter} instead.
  */
 
 @Deprecated

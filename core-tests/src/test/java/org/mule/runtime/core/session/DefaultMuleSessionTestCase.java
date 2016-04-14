@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.session;
+package org.mule.runtime.core.session;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -14,19 +14,19 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleSession;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.SecurityContext;
-import org.mule.api.serialization.ObjectSerializer;
-import org.mule.construct.Flow;
-import org.mule.security.DefaultMuleAuthentication;
-import org.mule.security.DefaultSecurityContextFactory;
-import org.mule.security.MuleCredentials;
-import org.mule.serialization.internal.JavaObjectSerializer;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.security.DefaultMuleAuthentication;
+import org.mule.runtime.core.security.DefaultSecurityContextFactory;
+import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 
 import java.util.Collections;
 

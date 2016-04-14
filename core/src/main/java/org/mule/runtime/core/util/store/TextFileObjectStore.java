@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -7,12 +7,12 @@
 
 package org.mule.module.db.internal.processor;
 
-import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
+import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.QUERIES_DEBUG_FIELD;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.QUERY_DEBUG_FIELD;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.createQueryFieldDebugInfo;
-import org.mule.api.MuleEvent;
-import org.mule.api.debug.FieldDebugInfo;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.executor.BulkExecutor;
 import org.mule.module.db.internal.domain.executor.BulkQueryExecutorFactory;
@@ -33,7 +33,7 @@ import java.util.List;
  * * <p/>
  * Accepted queries are any query with no parameters and returning an update count as result.
  * <p/>
- * Both database and bulk query are resolved, if required, using the {@link org.mule.api.MuleEvent}
+ * Both database and bulk query are resolved, if required, using the {@link org.mule.runtime.core.api.MuleEvent}
  * being processed.
  */
 public class BulkExecuteMessageProcessor extends AbstractDbMessageProcessor

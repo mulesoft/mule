@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
@@ -18,16 +18,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.ObjectStoreManager;
-import org.mule.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;

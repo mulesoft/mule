@@ -24,15 +24,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.api.metadata.DataType;
 import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -50,9 +50,9 @@ import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.extension.api.runtime.OperationExecutorFactory;
-import org.mule.internal.connection.ConnectionManagerAdapter;
-import org.mule.internal.connection.ConnectionProviderWrapper;
-import org.mule.internal.connection.DefaultConnectionManager;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
+import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
@@ -274,7 +274,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         messageProcessor.process(event);
 
-        verify(event, never()).setMessage(any(org.mule.api.MuleMessage.class));
+        verify(event, never()).setMessage(any(org.mule.runtime.core.api.MuleMessage.class));
         verify(event.getMessage(), never()).setPayload(any(Object.class));
 
         ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
@@ -358,7 +358,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         messageProcessor.process(event);
 
-        ArgumentCaptor<org.mule.api.MuleMessage> captor = ArgumentCaptor.forClass(org.mule.api.MuleMessage.class);
+        ArgumentCaptor<org.mule.runtime.core.api.MuleMessage> captor = ArgumentCaptor.forClass(org.mule.runtime.core.api.MuleMessage.class);
         verify(event).setMessage(captor.capture());
 
         MuleMessage message = captor.getValue();
@@ -377,7 +377,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         messageProcessor.process(event);
 
-        verify(event, never()).setMessage(any(org.mule.api.MuleMessage.class));
+        verify(event, never()).setMessage(any(org.mule.runtime.core.api.MuleMessage.class));
         verify(event.getMessage(), never()).setPayload(any(Object.class));
 
         ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
@@ -396,7 +396,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(null);
         assertThat(messageProcessor.process(event), is(sameInstance(event)));
-        verify(event, never()).setMessage(any(org.mule.api.MuleMessage.class));
+        verify(event, never()).setMessage(any(org.mule.runtime.core.api.MuleMessage.class));
     }
 
     @Test

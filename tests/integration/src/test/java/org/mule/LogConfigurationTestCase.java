@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.module.launcher.application.Application;
 import org.mule.rule.UseMuleLog4jContextFactory;
 import org.mule.test.infrastructure.deployment.AbstractFakeMuleServerTestCase;

@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 
 import org.junit.Test;
 

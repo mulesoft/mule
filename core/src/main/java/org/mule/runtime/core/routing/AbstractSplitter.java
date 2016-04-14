@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.routing.outbound.AbstractMessageSequenceSplitter;
-import org.mule.routing.outbound.CollectionMessageSequence;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
+import org.mule.runtime.core.routing.outbound.CollectionMessageSequence;
 
 import java.util.List;
 
@@ -33,11 +33,11 @@ public abstract class AbstractSplitter extends AbstractMessageSequenceSplitter
     }
 
     /**
-     * Performs the split of the message payload in the current event, creating a new {@link org.mule.api.MuleMessage}
+     * Performs the split of the message payload in the current event, creating a new {@link org.mule.runtime.core.api.MuleMessage}
      * and in turn a new {@link MuleEvent} for each split part.
      *
-     * @param event the event continaing the {@link org.mule.api.MuleMessage} whose payload is to be split.
-     * @return a list of {@link MuleEvent}s each containing a new {@link org.mule.api.MuleMessage} with a split part.
+     * @param event the event continaing the {@link org.mule.runtime.core.api.MuleMessage} whose payload is to be split.
+     * @return a list of {@link MuleEvent}s each containing a new {@link org.mule.runtime.core.api.MuleMessage} with a split part.
      * @throws MuleException if an error occurs doing spltting.
      */
     protected abstract List<MuleEvent> splitMessage(MuleEvent event) throws MuleException;

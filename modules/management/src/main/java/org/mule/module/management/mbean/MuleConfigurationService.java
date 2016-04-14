@@ -6,9 +6,9 @@
  */
 package org.mule.module.management.mbean;
 
-import org.mule.api.config.MuleConfiguration;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.util.StringUtils;
 
 /**
  * <code>MuleConfigurationService</code> exposes the MuleConfiguration settings as

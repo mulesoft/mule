@@ -7,7 +7,7 @@
 package org.mule.module.json.validation;
 
 import org.mule.module.json.JsonData;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

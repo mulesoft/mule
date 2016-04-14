@@ -6,7 +6,7 @@
  */
 package org.mule.module.management.support;
 
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.io.ObjectStreamException;
 import java.lang.reflect.Method;

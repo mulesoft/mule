@@ -7,7 +7,7 @@
 
 package org.mule.module.launcher.nativelib;
 
-import org.mule.util.FileUtils;
+import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;

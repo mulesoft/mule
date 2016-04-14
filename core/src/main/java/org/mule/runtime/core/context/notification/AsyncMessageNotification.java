@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.notification.BlockingServerEvent;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 
 /**
  * <code>AsyncMessageNotification</code> when async work is scheduled and completed for a given flow

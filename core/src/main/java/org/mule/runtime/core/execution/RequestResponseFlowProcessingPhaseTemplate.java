@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 
 /**
- * Extension of {@link FlowProcessingPhaseTemplate} for those {@link org.mule.api.source.MessageSource}
+ * Extension of {@link FlowProcessingPhaseTemplate} for those {@link org.mule.runtime.core.api.source.MessageSource}
  * that requires sending a response of the message processed.
  */
 public interface RequestResponseFlowProcessingPhaseTemplate extends FlowProcessingPhaseTemplate

@@ -5,15 +5,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.streaming;
+package org.mule.runtime.core.streaming;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * Implementation of {@link org.mule.streaming.Consumer} that obains a {@link List}
+ * Implementation of {@link org.mule.runtime.core.streaming.Consumer} that obains a {@link List}
  * from a {@link Producer} and returns the elements one by one. This implementation
  * is not thread-safe.
  * 

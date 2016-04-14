@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport;
+package org.mule.runtime.core.transport;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -18,14 +18,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.context.WorkManager;
+import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
-import org.mule.work.TrackingWorkManager;
-import org.mule.work.WorkListenerWrapperFactory;
-import org.mule.work.WorkManagerHolder;
-import org.mule.work.WorkTracker;
+import org.mule.runtime.core.work.TrackingWorkManager;
+import org.mule.runtime.core.work.WorkListenerWrapperFactory;
+import org.mule.runtime.core.work.WorkManagerHolder;
+import org.mule.runtime.core.work.WorkTracker;
 
 import java.util.Collections;
 import java.util.List;

@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.config;
 
-import org.mule.time.Time;
+import org.mule.runtime.core.time.Time;
 
 /**
  * Default implementation of {@link ExtensionConfig}

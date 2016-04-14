@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.config;
+package org.mule.runtime.core.api.config;
 
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.MuleContext;
 
 /**
  * A <code>ConfigurationBuilder</code> is used to configure a Mule instance,
@@ -27,10 +27,10 @@ public interface ConfigurationBuilder
 {
     /**
      * Will configure a MuleContext based on the configuration provided.  The configuration will be set on the
-     * {@link org.mule.api.config.ConfigurationBuilder} implementation as bean properties before this method
+     * {@link org.mule.runtime.core.api.config.ConfigurationBuilder} implementation as bean properties before this method
      * has been called.
      *
-     * @param muleContext The current {@link org.mule.api.MuleContext}
+     * @param muleContext The current {@link org.mule.runtime.core.api.MuleContext}
      * @throws ConfigurationException if the configuration fails i.e. an object cannot be created or
      * initialised properly
      */

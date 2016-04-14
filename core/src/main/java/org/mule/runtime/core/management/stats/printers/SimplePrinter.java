@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.stats.printers;
+package org.mule.runtime.core.management.stats.printers;
 
 import java.io.OutputStream;
 import java.io.Writer;

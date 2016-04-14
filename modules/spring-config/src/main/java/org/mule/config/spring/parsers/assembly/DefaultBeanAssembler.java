@@ -6,8 +6,8 @@
  */
 package org.mule.config.spring.parsers.assembly;
 
-import org.mule.api.AnnotatedObject;
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.config.spring.MuleArtifactContext;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
@@ -17,8 +17,8 @@ import org.mule.config.spring.parsers.assembly.configuration.SinglePropertyWrapp
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.util.SpringXMLUtils;
-import org.mule.util.ClassUtils;
-import org.mule.util.MapCombiner;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.MapCombiner;
 
 import java.lang.reflect.Method;
 import java.util.Collection;

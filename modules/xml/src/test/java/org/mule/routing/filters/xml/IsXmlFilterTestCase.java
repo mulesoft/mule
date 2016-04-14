@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.filters.xml;
+package org.mule.runtime.core.routing.filters.xml;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.module.xml.filters.IsXmlFilter;
 import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 import java.util.List;

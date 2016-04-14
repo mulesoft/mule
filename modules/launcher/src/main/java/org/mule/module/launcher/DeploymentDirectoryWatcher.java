@@ -8,8 +8,8 @@ package org.mule.module.launcher;
 
 import static org.mule.module.launcher.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
-import static org.mule.util.SplashScreen.miniSplash;
-import org.mule.config.StartupContext;
+import static org.mule.runtime.core.util.SplashScreen.miniSplash;
+import org.mule.runtime.core.config.StartupContext;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.artifact.Artifact;
 import org.mule.module.launcher.artifact.DeployableArtifact;
@@ -19,9 +19,9 @@ import org.mule.module.launcher.util.DebuggableReentrantLock;
 import org.mule.module.launcher.util.ElementAddedEvent;
 import org.mule.module.launcher.util.ElementRemovedEvent;
 import org.mule.module.launcher.util.ObservableList;
-import org.mule.util.ArrayUtils;
-import org.mule.util.CollectionUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

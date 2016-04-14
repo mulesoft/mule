@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.keygenerator;
+package org.mule.runtime.core.keygenerator;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventKeyGenerator;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventKeyGenerator;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;
@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implements {@link org.mule.api.MuleEventKeyGenerator} applying SHA-256 digest to the event's
+ * Implements {@link org.mule.runtime.core.api.MuleEventKeyGenerator} applying SHA-256 digest to the event's
  * message payload.
  */
 public class SHA256MuleEventKeyGenerator implements MuleEventKeyGenerator

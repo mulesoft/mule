@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import org.mule.api.context.notification.ExceptionNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;

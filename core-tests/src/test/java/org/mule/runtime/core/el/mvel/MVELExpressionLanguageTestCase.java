@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.mvel;
+package org.mule.runtime.core.el.mvel;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -16,29 +16,29 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.el.ExpressionLanguageContext;
-import org.mule.api.el.ExpressionLanguageExtension;
-import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.api.expression.InvalidExpressionException;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.el.ExpressionLanguageContext;
+import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.expression.InvalidExpressionException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DataType;
-import org.mule.api.registry.RegistrationException;
-import org.mule.config.MuleManifest;
-import org.mule.el.context.AppContext;
-import org.mule.el.context.MessageContext;
-import org.mule.el.function.RegexExpressionLanguageFuntion;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.el.context.AppContext;
+import org.mule.runtime.core.el.context.MessageContext;
+import org.mule.runtime.core.el.function.RegexExpressionLanguageFuntion;
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.MimeTypes;
-import org.mule.transformer.types.TypedValue;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.MimeTypes;
+import org.mule.runtime.core.transformer.types.TypedValue;
 
 import java.io.File;
 import java.io.FileReader;

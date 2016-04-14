@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.processor;
+package org.mule.runtime.core.api.processor;
 
-import org.mule.AbstractAnnotatedObject;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +23,7 @@ import org.apache.log4j.Level;
 /**
  * MessageProcessor implementation that logs the current element of a value evaluated from it using
  * an expression evaluator. By default the current messages is logged using the {@link Level#DEBUG}
- * level to the 'org.mule.api.processor.LoggerMessageProcessor' category. The level and
+ * level to the 'org.mule.runtime.core.api.processor.LoggerMessageProcessor' category. The level and
  * category can both be configured to suit your needs.
  */
 public class LoggerMessageProcessor extends AbstractAnnotatedObject implements MessageProcessor, Initialisable, MuleContextAware

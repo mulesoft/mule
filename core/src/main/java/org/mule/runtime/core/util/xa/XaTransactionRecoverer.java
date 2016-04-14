@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.xa;
+package org.mule.runtime.core.util.xa;
 
-import org.mule.util.CollectionUtils;
-import org.mule.util.journal.queue.XaQueueTxJournalEntry;
-import org.mule.util.journal.queue.XaTxQueueTransactionJournal;
-import org.mule.util.queue.PersistentXaTransactionContext;
-import org.mule.util.queue.QueueProvider;
+import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.journal.queue.XaQueueTxJournalEntry;
+import org.mule.runtime.core.util.journal.queue.XaTxQueueTransactionJournal;
+import org.mule.runtime.core.util.queue.PersistentXaTransactionContext;
+import org.mule.runtime.core.util.queue.QueueProvider;
 
 import com.google.common.collect.Multimap;
 

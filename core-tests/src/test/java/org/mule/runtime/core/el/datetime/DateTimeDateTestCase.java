@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.datetime;
+package org.mule.runtime.core.el.datetime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -34,7 +34,7 @@ public class DateTimeDateTestCase extends AbstractMuleTestCase
 
     private Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
-    private org.mule.api.el.datetime.Date now = new DateTime(currentCalendar).withTimeZone("UTC").getDate();
+    private org.mule.runtime.core.api.el.datetime.Date now = new DateTime(currentCalendar).withTimeZone("UTC").getDate();
 
     @Test
     public void isBefore()

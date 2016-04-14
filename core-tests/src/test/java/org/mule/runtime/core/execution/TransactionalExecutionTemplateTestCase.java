@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -18,23 +18,23 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
-import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
-import org.mule.transaction.IllegalTransactionStateException;
-import org.mule.transaction.MuleTransactionConfig;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.TransactionTemplateTestUtils;
+import org.mule.runtime.core.transaction.IllegalTransactionStateException;
+import org.mule.runtime.core.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.transaction.TransactionTemplateTestUtils;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;

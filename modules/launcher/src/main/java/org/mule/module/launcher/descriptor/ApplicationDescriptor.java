@@ -7,9 +7,9 @@
 package org.mule.module.launcher.descriptor;
 
 import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptor;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.net.URL;

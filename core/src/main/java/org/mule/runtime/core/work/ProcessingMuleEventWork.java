@@ -5,16 +5,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.work;
+package org.mule.runtime.core.work;
 
-import static org.mule.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
+import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.ResponseTimeoutException;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.execution.MessageProcessorExecutionTemplate;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.ResponseTimeoutException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;

@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transaction.IllegalTransactionStateException;
-import org.mule.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transaction.IllegalTransactionStateException;
+import org.mule.runtime.core.transaction.TransactionCoordination;
 
 class ValidateTransactionalStateInterceptor<T> implements ExecutionInterceptor<T>
 {

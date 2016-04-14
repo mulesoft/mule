@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml.xstream;
+package org.mule.runtime.core.transformers.xml.xstream;
 
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.module.xml.transformer.XmlToObject;
-import org.mule.transformer.AbstractTransformerTestCase;
-import org.mule.util.ArrayUtils;
+import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
+import org.mule.runtime.core.util.ArrayUtils;
 
 import java.io.UnsupportedEncodingException;
 

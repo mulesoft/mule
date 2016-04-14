@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.agents;
+package org.mule.runtime.core.management.agents;
 
-import org.mule.management.AbstractMuleJmxTestCase;
+import org.mule.runtime.core.management.AbstractMuleJmxTestCase;
 import org.mule.module.management.agent.Mx4jAgent;
 
 import mx4j.tools.adaptor.http.HttpAdaptor;

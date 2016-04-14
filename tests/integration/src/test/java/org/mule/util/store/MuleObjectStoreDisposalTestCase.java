@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.store.ObjectStore;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

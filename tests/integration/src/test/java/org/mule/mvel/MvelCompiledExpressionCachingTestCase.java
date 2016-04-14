@@ -9,7 +9,7 @@ package org.mule.mvel;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

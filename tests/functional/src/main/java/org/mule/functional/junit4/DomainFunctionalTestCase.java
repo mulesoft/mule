@@ -6,12 +6,12 @@
  */
 package org.mule.functional.junit4;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,7 +111,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * Uses {@link org.mule.TransformationService} to get a {@link String} representation of a message.
+     * Uses {@link org.mule.runtime.core.TransformationService} to get a {@link String} representation of a message.
      *
      * @param message message to get payload from
      * @return String representation of the message payload

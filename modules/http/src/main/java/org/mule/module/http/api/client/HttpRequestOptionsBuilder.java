@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.api.client;
 
-import org.mule.api.client.AbstractBaseOptionsBuilder;
+import org.mule.runtime.core.api.client.AbstractBaseOptionsBuilder;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.client.DefaultHttpRequestOptions;

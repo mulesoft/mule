@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.interceptor;
+package org.mule.runtime.core.interceptor;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.interceptor.Interceptor;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.interceptor.Interceptor;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
 

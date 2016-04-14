@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.simple;
+package org.mule.runtime.core.transformers.simple;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transformer.TransformerException;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.util.ArrayList;
 import java.util.Collections;

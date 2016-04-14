@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.work;
+package org.mule.runtime.core.work;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.OptimizedRequestContext;
-import org.mule.RequestContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.ThreadSafeAccess;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;

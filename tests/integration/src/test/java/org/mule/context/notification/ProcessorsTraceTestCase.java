@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
@@ -12,12 +12,12 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mule.api.config.MuleProperties.MULE_FLOW_TRACE;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.context.notification.MessageProcessorNotificationListener;
-import org.mule.api.context.notification.ProcessorsTrace;
-import org.mule.api.processor.MessageProcessor;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_FLOW_TRACE;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
+import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 

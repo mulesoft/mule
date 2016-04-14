@@ -6,11 +6,11 @@
  */
 package org.mule.module.json;
 
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.transformer.TransformerUtils;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.transformer.TransformerUtils;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JsonLoader;

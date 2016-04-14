@@ -6,7 +6,7 @@
  */
 package org.mule.module.json.filters;
 
-import org.mule.DefaultMuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.api.registry.ServiceRegistry;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionDiscoverer;
 import org.mule.extension.api.introspection.ExtensionFactory;

@@ -9,8 +9,8 @@ package org.mule.module.db.integration.executeddl;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 

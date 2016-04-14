@@ -8,12 +8,12 @@ package org.mule.test.transformers;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.Base64;
+import org.mule.runtime.core.util.Base64;
 
 import java.io.IOException;
 

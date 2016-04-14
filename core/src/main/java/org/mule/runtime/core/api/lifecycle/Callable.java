@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.lifecycle;
+package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleEventContext;
 
 /**
  * <code>Callable</code> is used to provide a Service with an interface that supports

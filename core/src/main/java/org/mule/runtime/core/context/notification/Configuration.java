@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServerNotificationListener;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -21,7 +21,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import static org.mule.context.notification.ServerNotificationManager.toClass;
+import static org.mule.runtime.core.context.notification.ServerNotificationManager.toClass;
 
 /**
  * This acts as a synchronized collection. No call blocks and all are synchronized.

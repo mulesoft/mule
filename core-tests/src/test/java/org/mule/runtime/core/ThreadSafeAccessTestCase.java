@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.ThreadSafeAccess;
+import org.mule.runtime.core.api.ThreadSafeAccess;
 
 import java.util.Map;
 

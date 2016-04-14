@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.bootstrap;
+package org.mule.runtime.core.config.bootstrap;
 
-import org.mule.config.i18n.MessageFactory;
-import org.mule.util.ClassUtils;
-import org.mule.util.OrderedProperties;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.OrderedProperties;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  * All found properties resources are collected and loaded during the discovery process.
  * Properties are returned in the same order they were found in the classpath.
  * If while loading some properties resource an exception occurs the whole process is interrupted and a
- * {@link org.mule.config.bootstrap.BootstrapException} exception is raised.
+ * {@link org.mule.runtime.core.config.bootstrap.BootstrapException} exception is raised.
  * </p>
  */
 public class ClassPathRegistryBootstrapDiscoverer implements RegistryBootstrapDiscoverer

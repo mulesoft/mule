@@ -10,9 +10,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.message.NullPayload;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 

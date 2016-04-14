@@ -4,15 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api;
+package org.mule.runtime.core.api;
 
-import org.mule.api.security.tls.TlsConfiguration;
-import org.mule.api.security.tls.TlsPropertiesSocketFactory;
+import static org.junit.Assert.assertTrue;
+import org.mule.runtime.core.api.security.tls.TlsConfiguration;
+import org.mule.runtime.core.api.security.tls.TlsPropertiesSocketFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
 
 public class TlsPropertiesSocketTestCase extends AbstractMuleTestCase
 {

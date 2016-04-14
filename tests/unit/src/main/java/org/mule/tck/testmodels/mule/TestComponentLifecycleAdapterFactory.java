@@ -6,13 +6,13 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.component.JavaComponent;
-import org.mule.api.component.LifecycleAdapter;
-import org.mule.api.component.LifecycleAdapterFactory;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.model.EntryPointResolverSet;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.component.LifecycleAdapter;
+import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.model.EntryPointResolverSet;
 
 public class TestComponentLifecycleAdapterFactory implements LifecycleAdapterFactory
 {

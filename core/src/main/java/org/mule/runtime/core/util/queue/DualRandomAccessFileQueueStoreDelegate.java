@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue;
+package org.mule.runtime.core.util.queue;
 
-import org.mule.api.MuleContext;
-import org.mule.api.serialization.ObjectSerializer;
-import org.mule.util.Preconditions;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.util.Preconditions;
 
 import java.io.File;
 import java.io.Serializable;

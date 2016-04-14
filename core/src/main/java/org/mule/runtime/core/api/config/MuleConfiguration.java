@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.config;
+package org.mule.runtime.core.api.config;
 
-import org.mule.api.MuleContext;
-import org.mule.api.processor.ProcessingStrategy;
-import org.mule.api.serialization.ObjectSerializer;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.construct.Flow;
 
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes

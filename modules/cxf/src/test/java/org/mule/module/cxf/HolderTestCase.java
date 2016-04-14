@@ -8,11 +8,11 @@ package org.mule.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import javax.xml.ws.Holder;
 

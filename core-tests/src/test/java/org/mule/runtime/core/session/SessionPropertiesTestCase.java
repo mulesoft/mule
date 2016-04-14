@@ -4,25 +4,25 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.session;
+package org.mule.runtime.core.session;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.PropertyScope;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.serialization.ObjectSerializer;
-import org.mule.construct.Flow;
-import org.mule.processor.AsyncInterceptingMessageProcessor;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

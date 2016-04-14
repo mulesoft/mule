@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.model;
+package org.mule.runtime.core.api.model;
 
-import org.mule.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleEventContext;
 
 /**
  * <code>EntryPointResolver</code> resolves a method to call on the given
@@ -16,14 +16,14 @@ import org.mule.api.MuleEventContext;
  * exhausted.
  *
  * Note that there is a one-to-one mapping from component to EntryPointResolverSet.  Each component must get a separate set
- * with {@link org.mule.api.model.EntryPointResolver} instances that are not shared. An EntryPointResolver is allowed to cache state
+ * with {@link org.mule.runtime.core.api.model.EntryPointResolver} instances that are not shared. An EntryPointResolver is allowed to cache state
  * and can assume the component will always be of the the same type.
  */
 public interface EntryPointResolverSet
 {
 
     /**
-     * Will attempt to invoke the component by looping through all {@link org.mule.api.model.EntryPointResolver} instances registered on this set until
+     * Will attempt to invoke the component by looping through all {@link org.mule.runtime.core.api.model.EntryPointResolver} instances registered on this set until
      * a match is found
      * @param component the component to invoke
      * @param context the current event context, this is used to figure out which method to call on the component

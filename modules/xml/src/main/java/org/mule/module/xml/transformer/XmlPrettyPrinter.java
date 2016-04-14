@@ -6,11 +6,11 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.dom4j.Document;

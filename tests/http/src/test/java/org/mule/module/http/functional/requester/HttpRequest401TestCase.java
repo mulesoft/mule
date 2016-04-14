@@ -10,7 +10,7 @@ import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 
 import java.io.IOException;
 

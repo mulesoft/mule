@@ -54,7 +54,7 @@
  * @version 2.1
  */
 
-package org.mule.util;
+package org.mule.runtime.core.util;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;

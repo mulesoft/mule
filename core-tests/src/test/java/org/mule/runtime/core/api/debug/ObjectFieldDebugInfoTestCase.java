@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.debug;
+package org.mule.runtime.core.api.debug;
 
 import org.mule.tck.size.SmallTest;
 

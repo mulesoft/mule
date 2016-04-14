@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config;
+package org.mule.runtime.core.config;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.FatalException;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.processor.ProcessingStrategy;
-import org.mule.api.serialization.ObjectSerializer;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.construct.Flow;
-import org.mule.util.FileUtils;
-import org.mule.util.NetworkUtils;
-import org.mule.util.NumberUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.UUID;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.FatalException;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.NetworkUtils;
+import org.mule.runtime.core.util.NumberUtils;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.UUID;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,8 +50,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public static final boolean DEFAULT_TRANSFORMATION_RESOLVE_NON_DIRECT = true;
 
     public static final String[] DEFAULT_STACKTRACE_FILTER = (
-            "org.mule.processor.AbstractInterceptingMessageProcessor," +
-            "org.mule.processor.chain")
+            "org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor," +
+            "org.mule.runtime.core.processor.chain")
             .split(",");
 
     /**
@@ -230,7 +230,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             catch (UnknownHostException e)
             {
                 logger.warn(e);
-                domainId = "org.mule";
+                domainId = "org.mule.runtime.core";
             }
         }
 

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.lifecycle;
+package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,7 +22,7 @@ public final class LifecycleTransitionResult
      *
      * @param iface The lifecycle interface to be called
      * @param objects An iterator over all children that must also be called
-     * @throws org.mule.api.lifecycle.LifecycleException if any fail
+     * @throws org.mule.runtime.core.api.lifecycle.LifecycleException if any fail
      */
     private static void processAllNoRetry(Class<? extends Initialisable> iface, 
         Iterator<? extends Initialisable> objects) throws LifecycleException

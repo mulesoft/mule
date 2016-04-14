@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.processor;
+package org.mule.runtime.core.api.processor;
 
 /**
  * Marker interface that tells that a Message Processor is for internal use only.

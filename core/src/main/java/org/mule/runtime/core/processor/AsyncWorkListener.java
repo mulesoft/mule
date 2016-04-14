@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;

@@ -6,13 +6,13 @@
  */
 package org.mule.test.integration.transformer;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.util.ArrayList;
 import java.util.List;

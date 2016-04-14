@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -17,23 +17,23 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.serialization.SerializationException;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.serialization.SerializationException;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.tck.NonSerializableObject;
-import org.mule.util.FileUtils;
-import org.mule.util.UUID;
-import org.mule.util.queue.objectstore.QueueKey;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.util.queue.objectstore.QueueKey;
 
 import java.io.File;
 import java.io.FileOutputStream;

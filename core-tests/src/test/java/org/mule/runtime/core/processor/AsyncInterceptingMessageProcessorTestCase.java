@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -13,27 +13,27 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.VoidMuleEvent;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.ThreadSafeAccess;
-import org.mule.api.context.WorkManager;
-import org.mule.api.context.WorkManagerSource;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.RollbackSourceCallback;
-import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transaction.Transaction;
-import org.mule.construct.Flow;
-import org.mule.routing.filters.WildcardFilter;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.ThreadSafeAccess;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.context.WorkManagerSource;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.RollbackSourceCallback;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.beans.ExceptionListener;
 import java.util.concurrent.TimeUnit;

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.processor;
+package org.mule.runtime.core.api.processor;
 
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.MuleContext;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public interface ProcessingStrategy
 {
 
     void configureProcessors(List<MessageProcessor> processors,
-                             org.mule.api.processor.StageNameSource nameSource,
+                             org.mule.runtime.core.api.processor.StageNameSource nameSource,
                              MessageProcessorChainBuilder chainBuilder,
                              MuleContext muleContext);
 }

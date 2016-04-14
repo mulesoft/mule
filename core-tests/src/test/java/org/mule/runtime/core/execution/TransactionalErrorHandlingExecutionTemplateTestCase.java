@@ -4,7 +4,37 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.exception.CatchMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.transaction.TransactionTemplateTestUtils;
+import org.mule.tck.size.SmallTest;
+import org.mule.tck.testmodels.mule.TestTransaction;
+import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
@@ -17,36 +47,6 @@ import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transaction.TransactionException;
-import org.mule.api.transaction.TransactionFactory;
-import org.mule.context.notification.ServerNotificationManager;
-import org.mule.exception.CatchMessagingExceptionStrategy;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.tck.size.SmallTest;
-import org.mule.tck.testmodels.mule.TestTransaction;
-import org.mule.tck.testmodels.mule.TestTransactionFactory;
-import org.mule.transaction.MuleTransactionConfig;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.TransactionTemplateTestUtils;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mule.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest

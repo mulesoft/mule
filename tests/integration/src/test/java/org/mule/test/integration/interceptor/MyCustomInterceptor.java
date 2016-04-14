@@ -6,10 +6,10 @@
  */
 package org.mule.test.integration.interceptor;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.interceptor.Interceptor;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.interceptor.Interceptor;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
 public class MyCustomInterceptor extends AbstractInterceptingMessageProcessor implements Interceptor
 {

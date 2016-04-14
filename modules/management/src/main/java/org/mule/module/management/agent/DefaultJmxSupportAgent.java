@@ -6,17 +6,17 @@
  */
 package org.mule.module.management.agent;
 
-import static org.mule.config.bootstrap.ArtifactType.APP;
-import static org.mule.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 
-import org.mule.AbstractAgent;
-import org.mule.api.MuleException;
-import org.mule.api.agent.Agent;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.RegistrationException;
-import org.mule.config.bootstrap.ArtifactType;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.AbstractAgent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.rmi.server.RMIClientSocketFactory;
 import java.text.MessageFormat;
@@ -104,7 +104,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
      * There is no guarantee that by throwing a Recoverable exception that the Mule
      * instance will not shut down.
      *
-     * @throws org.mule.api.lifecycle.InitialisationException if a fatal error occurs
+     * @throws org.mule.runtime.core.api.lifecycle.InitialisationException if a fatal error occurs
      *                                                        causing the Mule instance to shutdown
      */
     @Override

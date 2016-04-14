@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.bootstrap;
+package org.mule.runtime.core.config.bootstrap;
 
 /**
  * A simple factory interface that can be listed in a registry-bootstrap.properties file

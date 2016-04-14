@@ -10,7 +10,7 @@ import static org.mule.config.spring.parsers.specific.NameConstants.MULE_NAMESPA
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
 import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;

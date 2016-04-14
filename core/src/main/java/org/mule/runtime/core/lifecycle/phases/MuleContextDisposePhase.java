@@ -4,26 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.lifecycle.phases;
+package org.mule.runtime.core.lifecycle.phases;
 
-import org.mule.api.MuleContext;
-import org.mule.api.agent.Agent;
-import org.mule.api.component.Component;
-import org.mule.api.config.Config;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecyclePhase;
-import org.mule.api.routing.OutboundRouter;
-import org.mule.api.source.MessageSource;
-import org.mule.api.transformer.Transformer;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.api.component.Component;
+import org.mule.runtime.core.api.config.Config;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
+import org.mule.runtime.core.api.routing.OutboundRouter;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.extension.api.runtime.ConfigurationProvider;
-import org.mule.lifecycle.LifecycleObject;
-import org.mule.lifecycle.NotificationLifecycleObject;
-import org.mule.util.annotation.AnnotationMetaData;
-import org.mule.util.annotation.AnnotationUtils;
+import org.mule.runtime.core.lifecycle.LifecycleObject;
+import org.mule.runtime.core.lifecycle.NotificationLifecycleObject;
+import org.mule.runtime.core.util.annotation.AnnotationMetaData;
+import org.mule.runtime.core.util.annotation.AnnotationUtils;
 
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
@@ -35,20 +35,20 @@ import javax.annotation.PreDestroy;
 /**
  * Objects are disposed of via the Registry since the Registry manages the creation/initialisation of the objects
  * it must also take care of disposing them. However, a user may want to initiate a dispose via the
- * {@link org.mule.DefaultMuleContext} so the dispose Lifecycle phase for the {@link org.mule.DefaultMuleContext}
+ * {@link org.mule.runtime.core.DefaultMuleContext} so the dispose Lifecycle phase for the {@link org.mule.runtime.core.DefaultMuleContext}
  * needs to call dispose on the Registry.
  *
  * The MuleContextDisposePhase defines the lifecycle behaviour when the Mule context is disposed.  The MuleContext is associated
  * with one or more registries that inherit the lifecycle of the MuleContext.
  *
- * This phase is responsible for disposing objects. Any object that implements {@link org.mule.api.lifecycle.Disposable} will
- * have its {@link org.mule.api.lifecycle.Disposable#dispose()} method called.  Objects are initialised in the order based on type:
- * {@link org.mule.api.construct.FlowConstruct}, {@link org.mule.api.agent.Agent} followed
- * by any other object that implements {@link org.mule.api.lifecycle.Disposable}.
+ * This phase is responsible for disposing objects. Any object that implements {@link org.mule.runtime.core.api.lifecycle.Disposable} will
+ * have its {@link org.mule.runtime.core.api.lifecycle.Disposable#dispose()} method called.  Objects are initialised in the order based on type:
+ * {@link org.mule.runtime.core.api.construct.FlowConstruct}, {@link org.mule.runtime.core.api.agent.Agent} followed
+ * by any other object that implements {@link org.mule.runtime.core.api.lifecycle.Disposable}.
  *
- * @see org.mule.api.MuleContext
- * @see org.mule.api.lifecycle.LifecycleManager
- * @see org.mule.api.lifecycle.Disposable
+ * @see org.mule.runtime.core.api.MuleContext
+ * @see org.mule.runtime.core.api.lifecycle.LifecycleManager
+ * @see org.mule.runtime.core.api.lifecycle.Disposable
  *
  * @since 3.0
  */

@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.correlation;
+package org.mule.runtime.core.routing.correlation;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
-import org.mule.routing.AggregationException;
-import org.mule.routing.EventGroup;
-import org.mule.session.DefaultMuleSession;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.routing.AggregationException;
+import org.mule.runtime.core.routing.EventGroup;
+import org.mule.runtime.core.session.DefaultMuleSession;
 
 import java.text.MessageFormat;
 
@@ -44,7 +44,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
      * 
      * @param events the event group for this request
      * @return an aggregated message
-     * @throws org.mule.routing.AggregationException if the aggregation fails. in this scenario the whole
+     * @throws org.mule.runtime.core.routing.AggregationException if the aggregation fails. in this scenario the whole
      *             event group is removed and passed to the exception handler for this componenet
      */
     @Override
@@ -79,7 +79,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
     /**
      * @return <code>true</code> if the correlation size is not set or exactly the expected size of the event
      *         group.
-     * @see org.mule.routing.correlation.EventCorrelatorCallback#shouldAggregateEvents(org.mule.routing.EventGroup)
+     * @see org.mule.runtime.core.routing.correlation.EventCorrelatorCallback#shouldAggregateEvents(org.mule.runtime.core.routing.EventGroup)
      */
     @Override
     public boolean shouldAggregateEvents(EventGroup events)

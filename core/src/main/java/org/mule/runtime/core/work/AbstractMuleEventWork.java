@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.work;
+package org.mule.runtime.core.work;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.OptimizedRequestContext;
-import org.mule.RequestContext;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleEvent;
 
 import javax.resource.spi.work.Work;
 
@@ -35,7 +35,7 @@ public abstract class AbstractMuleEventWork implements Work
 
     /**
      * Constructor allowing event copying to be disabled.  This is used when a copy has already been made previously
-     * e.g.  if the event is queued before being processed asynchronously like with {@link org.mule.processor
+     * e.g.  if the event is queued before being processed asynchronously like with {@link org.mule.runtime.core.processor
      * .SedaStageInterceptingMessageProcessor}
      */
     public AbstractMuleEventWork(MuleEvent event, boolean copyEvent)

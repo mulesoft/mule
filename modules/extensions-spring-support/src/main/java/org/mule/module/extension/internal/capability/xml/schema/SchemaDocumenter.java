@@ -11,8 +11,8 @@ import static org.mule.module.extension.internal.capability.xml.schema.Annotatio
 import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getMethodDocumentation;
 import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getOperationMethods;
 import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
-import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.extension.api.annotation.Configuration;
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.ParameterGroup;
@@ -22,7 +22,7 @@ import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarat
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
-import org.mule.util.CollectionUtils;
+import org.mule.runtime.core.util.CollectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.Collection;

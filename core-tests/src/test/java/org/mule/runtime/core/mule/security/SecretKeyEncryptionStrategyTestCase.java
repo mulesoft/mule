@@ -8,8 +8,8 @@ package org.mule.mule.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
-import org.mule.security.SecretKeyEncryptionStrategy;
-import org.mule.security.SecretKeyFactory;
+import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
+import org.mule.runtime.core.security.SecretKeyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.apache.commons.lang.RandomStringUtils;

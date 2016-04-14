@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.debug;
+package org.mule.runtime.core.api.debug;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 
 import java.util.List;
 

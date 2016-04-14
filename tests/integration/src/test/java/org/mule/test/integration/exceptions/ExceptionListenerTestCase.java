@@ -14,14 +14,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.context.notification.ExceptionStrategyNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.context.notification.ExceptionStrategyNotification;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.context.notification.ExceptionStrategyNotificationListener;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.message.ExceptionMessage;
+import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 

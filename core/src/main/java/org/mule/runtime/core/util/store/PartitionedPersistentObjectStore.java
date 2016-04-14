@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.PartitionableExpirableObjectStore;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.Message;
-import org.mule.util.FileUtils;
-import org.mule.util.UUID;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.PartitionableExpirableObjectStore;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.UUID;
 
 import java.io.File;
 import java.io.FileFilter;

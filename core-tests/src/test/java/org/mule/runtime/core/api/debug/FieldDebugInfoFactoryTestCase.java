@@ -5,18 +5,18 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.debug;
+package org.mule.runtime.core.api.debug;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
-import org.mule.api.MuleEvent;
-import org.mule.api.debug.FieldDebugInfoFactory.FieldEvaluator;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.debug.FieldDebugInfoFactory.FieldEvaluator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.AttributeEvaluator;
+import org.mule.runtime.core.util.AttributeEvaluator;
 
 import java.util.Collections;
 import java.util.List;

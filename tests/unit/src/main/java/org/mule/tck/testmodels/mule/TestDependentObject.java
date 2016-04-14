@@ -6,7 +6,7 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.config.PropertyFactory;
+import org.mule.runtime.core.api.config.PropertyFactory;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import java.util.Map;

@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor.chain;
+package org.mule.runtime.core.processor.chain;
 
-import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.processor.InterceptingMessageProcessor;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 
 import java.util.ArrayList;
 import java.util.Collections;

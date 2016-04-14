@@ -13,17 +13,17 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 

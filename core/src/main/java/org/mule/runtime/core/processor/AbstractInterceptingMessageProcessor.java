@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 
 /**
  * Abstract implementation of {@link InterceptingMessageProcessor} that simply

@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.config;
 
-import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import org.mule.metadata.api.model.MetadataType;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

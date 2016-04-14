@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor.chain;
+package org.mule.runtime.core.processor.chain;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.context.notification.FlowTraceManager;
-import org.mule.api.processor.InterceptingMessageProcessor;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.processor.MessageProcessorPathElement;
-import org.mule.util.NotificationUtils;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.notification.FlowTraceManager;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.util.NotificationUtils;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.schedule;
+package org.mule.runtime.core.api.schedule;
 
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.Predicate;
+import org.mule.runtime.core.util.Predicate;
 
 import org.junit.Test;
 

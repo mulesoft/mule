@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
-import static org.mule.util.ClassUtils.isConsumable;
+import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.connector.DispatchException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.RoutingException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.StringMessageUtils;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.util.Arrays;
 import java.util.List;

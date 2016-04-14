@@ -9,8 +9,8 @@ package org.mule.module.db.integration.delete;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.module.db.integration.model.Planet.VENUS;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;

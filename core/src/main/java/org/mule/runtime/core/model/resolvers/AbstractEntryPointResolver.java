@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.model.resolvers;
+package org.mule.runtime.core.model.resolvers;
 
-import org.mule.VoidResult;
-import org.mule.api.MuleEventContext;
-import org.mule.api.model.EntryPointResolver;
-import org.mule.api.model.InvocationResult;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.VoidResult;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.model.EntryPointResolver;
+import org.mule.runtime.core.api.model.InvocationResult;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.api.message.NullPayload;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringMessageUtils;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -23,7 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A Base class for {@link org.mule.api.model.EntryPointResolver}. It provides parameters for
+ * A Base class for {@link org.mule.runtime.core.api.model.EntryPointResolver}. It provides parameters for
  * detemining if the payload of the message should be transformed first and whether void methods are
  * acceptible. It also provides a method cashe for those resolvers that use reflection to discover methods
  * on the service.

@@ -6,8 +6,8 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.config.MuleConfiguration;
-import org.mule.transaction.lookup.GenericTransactionManagerLookupFactory;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.transaction.lookup.GenericTransactionManagerLookupFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;

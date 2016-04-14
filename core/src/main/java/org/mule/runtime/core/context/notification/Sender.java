@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.routing.filters.WildcardFilter;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.routing.filters.WildcardFilter;
 
 /**
  * This does the work necessary to deliver events to a particular listener.  It is generated for a
  * particular {@link Configuration} and stored in a
- * {@link org.mule.context.notification.Policy}.
+ * {@link org.mule.runtime.core.context.notification.Policy}.
  */
 class Sender
 {

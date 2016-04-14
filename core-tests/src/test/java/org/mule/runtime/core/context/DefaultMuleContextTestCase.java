@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context;
+package org.mule.runtime.core.context;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -16,25 +16,25 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
 
-import org.mule.DataTypeConversionResolver;
-import org.mule.DefaultMuleContext;
-import org.mule.DynamicDataTypeConversionResolver;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextFactory;
-import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.api.registry.ServiceType;
-import org.mule.api.util.StreamCloserService;
-import org.mule.config.ClusterConfiguration;
-import org.mule.config.ExceptionHelper;
-import org.mule.connector.PollingController;
-import org.mule.registry.MuleRegistryHelper;
+import org.mule.runtime.core.DataTypeConversionResolver;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.DynamicDataTypeConversionResolver;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.context.MuleContextFactory;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.api.registry.ServiceType;
+import org.mule.runtime.core.api.util.StreamCloserService;
+import org.mule.runtime.core.config.ClusterConfiguration;
+import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.connector.PollingController;
+import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.SpiUtils;
-import org.mule.util.store.MuleObjectStoreManager;
+import org.mule.runtime.core.util.SpiUtils;
+import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 
 import java.io.File;
 import java.io.FileWriter;

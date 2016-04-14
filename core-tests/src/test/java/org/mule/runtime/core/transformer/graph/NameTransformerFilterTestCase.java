@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.graph;
+package org.mule.runtime.core.transformer.graph;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.registry.ResolverException;
-import org.mule.api.transformer.Converter;
+import org.mule.runtime.core.api.registry.ResolverException;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.api.metadata.DataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.transformer.builder.MockConverterBuilder;
+import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
 
 import java.util.ArrayList;
 import java.util.List;

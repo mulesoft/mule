@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.queue;
+package org.mule.runtime.core.util.queue;
 
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
 
 /**
  * A Queue manager is responsible for managing one or more Queue resources and
@@ -25,19 +25,19 @@ public interface QueueManager extends Startable, Stoppable
     QueueSession getQueueSession();
 
     /**
-     * Sets the default {@link org.mule.util.queue.QueueConfiguration} for any created {@link Queue} for
+     * Sets the default {@link org.mule.runtime.core.util.queue.QueueConfiguration} for any created {@link Queue} for
      * which a custom configuration hasn't been specified
      * 
-     * @param config an instance of {@link org.mule.util.queue.QueueConfiguration}
+     * @param config an instance of {@link org.mule.runtime.core.util.queue.QueueConfiguration}
      */
     void setDefaultQueueConfiguration(QueueConfiguration config);
 
     /**
-     * Specifies a {@link org.mule.util.queue.QueueConfiguration} for the queue which name matches
+     * Specifies a {@link org.mule.runtime.core.util.queue.QueueConfiguration} for the queue which name matches
      * queueName
      * 
      * @param queueName the name of a {@link Queue}
-     * @param config an instance of {@link org.mule.util.queue.QueueConfiguration}
+     * @param config an instance of {@link org.mule.runtime.core.util.queue.QueueConfiguration}
      */
     void setQueueConfiguration(String queueName, QueueConfiguration config);
 }

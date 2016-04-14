@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.streaming;
+package org.mule.runtime.core.streaming;
 
 /**
  * Inmutable pojo to carry pagination parameters

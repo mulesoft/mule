@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.journal;
+package org.mule.runtime.core.util.journal;
 
-import org.mule.util.Preconditions;
+import org.mule.runtime.core.util.Preconditions;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;

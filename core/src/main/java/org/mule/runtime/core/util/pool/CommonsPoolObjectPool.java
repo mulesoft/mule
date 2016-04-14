@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.pool;
+package org.mule.runtime.core.util.pool;
 
-import org.mule.api.MuleContext;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.object.ObjectFactory;
-import org.mule.config.PoolingProfile;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.config.PoolingProfile;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -229,7 +229,7 @@ public class CommonsPoolObjectPool implements ObjectPool
     }
 
     /**
-     * Wraps org.mule.object.ObjectFactory with commons-pool PoolableObjectFactory
+     * Wraps org.mule.runtime.core.object.ObjectFactory with commons-pool PoolableObjectFactory
      */
     class PoolabeObjectFactoryAdapter implements PoolableObjectFactory
     {

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.compression;
+package org.mule.runtime.core.util.compression;
 
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;

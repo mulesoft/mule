@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer;
+package org.mule.runtime.core.transformer;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -16,14 +16,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.TransformationService;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Converter;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.tck.size.SmallTest;
-import org.mule.transformer.types.MimeTypes;
+import org.mule.runtime.core.transformer.types.MimeTypes;
 
 import java.util.Arrays;
 

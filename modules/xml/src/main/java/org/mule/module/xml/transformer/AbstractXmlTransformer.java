@@ -6,16 +6,16 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.message.OutputHandler;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.message.OutputHandler;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.transformer.AbstractMessageTransformer;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.MimeTypes;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.MimeTypes;
 
 import java.io.InputStream;
 import java.io.OutputStream;

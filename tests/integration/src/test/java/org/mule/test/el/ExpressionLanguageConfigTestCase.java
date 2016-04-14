@@ -8,9 +8,9 @@ package org.mule.test.el;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.text.DateFormat;

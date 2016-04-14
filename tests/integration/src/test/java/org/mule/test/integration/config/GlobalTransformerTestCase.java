@@ -7,7 +7,7 @@
 package org.mule.test.integration.config;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

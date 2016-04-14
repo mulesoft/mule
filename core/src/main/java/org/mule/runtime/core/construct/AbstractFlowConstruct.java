@@ -4,34 +4,34 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.construct;
+package org.mule.runtime.core.construct;
 
-import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import org.mule.AbstractAnnotatedObject;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.construct.FlowConstructInvalidException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.api.exception.MessagingExceptionHandlerAware;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.LifecycleCallback;
-import org.mule.api.lifecycle.LifecycleState;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.MessageInfoMapping;
-import org.mule.api.source.MessageSource;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.lifecycle.EmptyLifecycleCallback;
-import org.mule.management.stats.FlowConstructStatistics;
-import org.mule.routing.MuleMessageInfoMapping;
-import org.mule.util.ClassUtils;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.MessageInfoMapping;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.lifecycle.EmptyLifecycleCallback;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.routing.MuleMessageInfoMapping;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.beans.ExceptionListener;
 

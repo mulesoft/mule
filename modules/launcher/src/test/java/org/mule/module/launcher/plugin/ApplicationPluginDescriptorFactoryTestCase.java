@@ -17,14 +17,14 @@ import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXP
 import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
 import static org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory.PLUGIN_PROPERTIES;
 import static org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory.PROPERTY_LOADER_OVERRIDE;
-import static org.mule.util.FileUtils.stringToFile;
+import static org.mule.runtime.core.util.FileUtils.stringToFile;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.module.artifact.classloader.ClassLoaderFilter;
 import org.mule.module.artifact.classloader.ClassLoaderFilterFactory;
 import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.FileUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;

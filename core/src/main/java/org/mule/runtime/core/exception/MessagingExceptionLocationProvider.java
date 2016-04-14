@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.exception;
+package org.mule.runtime.core.exception;
 
-import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
-import static org.mule.api.LocatedMuleException.INFO_SOURCE_XML_KEY;
+import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
+import static org.mule.runtime.core.api.LocatedMuleException.INFO_SOURCE_XML_KEY;
 
-import org.mule.api.AnnotatedObject;
-import org.mule.api.MuleEvent;
-import org.mule.api.construct.MessageProcessorPathResolver;
-import org.mule.api.execution.LocationExecutionContextProvider;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
+import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import java.util.HashMap;
 import java.util.Map;

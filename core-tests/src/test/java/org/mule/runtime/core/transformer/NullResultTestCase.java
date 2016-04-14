@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer;
+package org.mule.runtime.core.transformer;
 
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.message.NullPayload;
 
 import org.junit.Test;

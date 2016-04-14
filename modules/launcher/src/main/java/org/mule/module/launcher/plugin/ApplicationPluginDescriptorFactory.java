@@ -9,7 +9,7 @@ package org.mule.module.launcher.plugin;
 
 import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.module.artifact.classloader.ClassLoaderFilter;
 import org.mule.module.artifact.classloader.ClassLoaderFilterFactory;
 import org.mule.module.artifact.descriptor.ArtifactDescriptorCreateException;

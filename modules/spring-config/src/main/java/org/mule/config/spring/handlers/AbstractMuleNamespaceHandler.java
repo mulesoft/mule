@@ -14,7 +14,7 @@ import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 import java.util.Map;

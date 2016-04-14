@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.types;
+package org.mule.runtime.core.transformer.types;
 
 import org.mule.api.metadata.ImmutableDataType;
 import org.mule.api.metadata.SimpleDataType;
 import org.mule.api.metadata.DataType;
-import org.mule.util.generics.GenericsUtils;
-import org.mule.util.generics.MethodParameter;
+import org.mule.runtime.core.util.generics.GenericsUtils;
+import org.mule.runtime.core.util.generics.MethodParameter;
 
 import java.lang.reflect.Method;
 import java.util.Collection;

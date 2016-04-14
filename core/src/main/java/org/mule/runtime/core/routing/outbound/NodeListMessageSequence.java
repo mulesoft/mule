@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.outbound;
+package org.mule.runtime.core.routing.outbound;
 
-import org.mule.routing.AbstractMessageSequence;
+import org.mule.runtime.core.routing.AbstractMessageSequence;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

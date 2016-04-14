@@ -7,18 +7,18 @@
 package org.mule.module.extension.internal.runtime.connector;
 
 import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionHandler;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.RetryRequest;
 import org.mule.module.extension.internal.ExtensionProperties;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.util.ExceptionUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.util.Optional;
 

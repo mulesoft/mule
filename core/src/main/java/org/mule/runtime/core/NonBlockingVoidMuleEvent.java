@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 /**
- * A {@link NonBlockingVoidMuleEvent} represents a void return, but in contrast to {@link org.mule.VoidMuleEvent}
+ * A {@link NonBlockingVoidMuleEvent} represents a void return, but in contrast to {@link org.mule.runtime.core.VoidMuleEvent}
  * while the return up the stack is void, an asynchronous response is expected.  Because Mule supports both blocking and
  * non-blocking then it is the return of this event instance that signals that a callback is to be expected.
  *

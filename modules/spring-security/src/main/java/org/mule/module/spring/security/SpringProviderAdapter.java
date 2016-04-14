@@ -6,10 +6,10 @@
  */
 package org.mule.module.spring.security;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.SecurityException;
-import org.mule.security.AbstractSecurityProvider;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.core.security.AbstractSecurityProvider;
 
 import java.util.Map;
 

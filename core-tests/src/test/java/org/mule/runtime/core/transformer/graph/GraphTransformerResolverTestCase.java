@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.graph;
+package org.mule.runtime.core.transformer.graph;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -15,16 +15,16 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import org.mule.api.registry.ResolverException;
-import org.mule.api.registry.TransformerResolver;
-import org.mule.api.transformer.Converter;
+import org.mule.runtime.core.api.registry.ResolverException;
+import org.mule.runtime.core.api.registry.TransformerResolver;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.transformer.CompositeConverter;
-import org.mule.transformer.builder.MockConverterBuilder;
-import org.mule.transformer.builder.MockTransformerBuilder;
+import org.mule.runtime.core.transformer.CompositeConverter;
+import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
+import org.mule.runtime.core.transformer.builder.MockTransformerBuilder;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

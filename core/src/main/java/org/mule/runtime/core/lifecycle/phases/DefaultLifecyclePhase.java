@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.lifecycle.phases;
+package org.mule.runtime.core.lifecycle.phases;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecyclePhase;
-import org.mule.api.lifecycle.LifecycleStateEnabled;
-import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.lifecycle.LifecycleObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
+import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
+import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.lifecycle.LifecycleObject;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -30,19 +30,19 @@ import org.apache.commons.logging.LogFactory;
  * Represents a configurable lifecycle phase. This is a default implementation of a
  * 'generic phase' in that is can be configured to represnt any phase. Instances of
  * this phase can then be registered with a
- * {@link org.mule.api.lifecycle.LifecycleManager} and by used to enforce a lifecycle
+ * {@link org.mule.runtime.core.api.lifecycle.LifecycleManager} and by used to enforce a lifecycle
  * phase on an object. Usually, Lifecycle phases have a fixed configuration in which
  * case a specialisation of this class should be created that initialises its
  * configuration internally.
  * <p>
- * Note that this class and {@link org.mule.api.lifecycle.LifecycleTransitionResult}
+ * Note that this class and {@link org.mule.runtime.core.api.lifecycle.LifecycleTransitionResult}
  * both make assumptions about the interfaces used - the return values and
  * exceptions. These are, currently, that the return value is either void or
- * {@link org.mule.api.lifecycle.LifecycleTransitionResult} and either 0 or 1
+ * {@link org.mule.runtime.core.api.lifecycle.LifecycleTransitionResult} and either 0 or 1
  * exceptions can be thrown which are either {@link InstantiationException} or
- * {@link org.mule.api.lifecycle.LifecycleException}.
+ * {@link org.mule.runtime.core.api.lifecycle.LifecycleException}.
  *
- * @see org.mule.api.lifecycle.LifecyclePhase
+ * @see org.mule.runtime.core.api.lifecycle.LifecyclePhase
  */
 public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
 {

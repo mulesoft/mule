@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.context;
+package org.mule.runtime.core.el.context;
 
 import java.util.ArrayList;
 import java.util.Collection;

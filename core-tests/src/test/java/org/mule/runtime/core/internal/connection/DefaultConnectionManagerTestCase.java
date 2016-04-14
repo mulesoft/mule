@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.internal.connection;
+package org.mule.runtime.core.internal.connection;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -16,7 +16,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionHandler;

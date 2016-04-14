@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;

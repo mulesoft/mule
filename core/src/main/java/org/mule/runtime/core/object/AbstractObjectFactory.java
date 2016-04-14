@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.object;
+package org.mule.runtime.core.object;
 
-import org.mule.api.MuleContext;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.lifecycle.InitialisationCallback;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.object.ObjectFactory;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.util.BeanUtils;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.BeanUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,7 +115,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
      * Creates an initialized object instance based on the class and sets any properties.
      * This method handles all injection of properties for the resulting object
      *
-     * @param muleContext the current {@link org.mule.api.MuleContext} instance. This can be used for performing registry lookups
+     * @param muleContext the current {@link org.mule.runtime.core.api.MuleContext} instance. This can be used for performing registry lookups
      *                    applying processors to newly created objects or even firing custom notifications
      * @throws Exception Can throw any type of exception while creating a new object
      */

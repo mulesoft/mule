@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.BeanUtils;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.BeanUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.Map;
 

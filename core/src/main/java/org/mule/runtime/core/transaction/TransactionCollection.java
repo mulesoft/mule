@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transaction;
+package org.mule.runtime.core.transaction;
 
-import org.mule.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.Transaction;
 
 import java.util.List;
 

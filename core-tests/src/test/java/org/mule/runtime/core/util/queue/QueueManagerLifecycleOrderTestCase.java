@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue;
+package org.mule.runtime.core.util.queue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.config.builders.DefaultsConfigurationBuilder;
-import org.mule.construct.Flow;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.security.MuleSecurityManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.security.MuleSecurityManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

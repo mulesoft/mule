@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.MuleContext;
 
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -18,13 +18,13 @@ import java.security.PrivilegedAction;
  * method <code>private void initAfterDeserialization(MuleContext muleContext) throws MuleException</code>
  * to their class (note that it's private). This will get invoked after the object has been
  * deserialized passing in the current mulecontext when using either
- * {@link org.mule.transformer.wire.SerializationWireFormat},
- * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat}, or the
- * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
+ * {@link org.mule.runtime.core.transformer.wire.SerializationWireFormat},
+ * {@link org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat}, or the
+ * {@link org.mule.runtime.core.transformer.simple.ByteArrayToSerializable} transformer.
  *
- * @see org.mule.transformer.simple.ByteArrayToSerializable
- * @see org.mule.transformer.wire.SerializationWireFormat
- * @see org.mule.transformer.wire.SerializedMuleMessageWireFormat
+ * @see org.mule.runtime.core.transformer.simple.ByteArrayToSerializable
+ * @see org.mule.runtime.core.transformer.wire.SerializationWireFormat
+ * @see org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat
  */
 public interface DeserializationPostInitialisable
 {

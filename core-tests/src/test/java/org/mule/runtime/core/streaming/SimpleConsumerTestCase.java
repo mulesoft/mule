@@ -5,14 +5,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.streaming;
+package org.mule.runtime.core.streaming;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;

@@ -6,21 +6,21 @@
  */
 package org.mule.module.management.agent;
 
-import org.mule.AbstractAgent;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.MuleManifest;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.AbstractAgent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.module.management.mbean.MBeanServerFactory;
 import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.module.management.support.JmxSupport;
 import org.mule.module.management.support.JmxSupportFactory;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.util.BeanUtils;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.util.BeanUtils;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.net.URI;
 import java.util.HashMap;

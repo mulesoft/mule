@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 import org.apache.commons.lang.SerializationUtils;
 

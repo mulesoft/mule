@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
-import org.mule.api.registry.Registry;
-import org.mule.util.CaseInsensitiveHashMap;
+import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.util.CaseInsensitiveHashMap;
 
 import java.util.Map;
 

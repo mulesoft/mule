@@ -8,19 +8,19 @@ package org.mule.module.http.api.listener;
 
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.internal.listener.DefaultHttpListener;
 import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.module.http.internal.listener.HttpListenerConfigBuilder;
 import org.mule.module.http.internal.listener.HttpResponseBuilder;
 import org.mule.api.tls.TlsContextFactory;
-import org.mule.util.Preconditions;
+import org.mule.runtime.core.util.Preconditions;
 
 import java.net.MalformedURLException;
 import java.net.URL;

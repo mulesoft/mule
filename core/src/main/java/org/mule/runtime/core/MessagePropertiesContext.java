@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 import org.mule.api.metadata.DataType;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.TypedValue;
-import org.mule.util.CaseInsensitiveHashMap;
-import org.mule.util.CopyOnWriteCaseInsensitiveMap;
-import org.mule.util.MapUtils;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.runtime.core.util.CaseInsensitiveHashMap;
+import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
+import org.mule.runtime.core.util.MapUtils;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

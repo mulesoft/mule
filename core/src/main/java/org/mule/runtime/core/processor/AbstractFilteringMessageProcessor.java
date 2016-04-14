@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.NonBlockingSupported;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.processor.InterceptingMessageProcessor;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.filter.FilterUnacceptedException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
  * Abstract {@link InterceptingMessageProcessor} that can be easily be extended and

@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transaction;
+package org.mule.runtime.core.transaction;
 
 import org.apache.commons.collections.ArrayStack;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.processor.DelegateTransaction;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.processor.DelegateTransaction;
 
 public final class TransactionCoordination
 {

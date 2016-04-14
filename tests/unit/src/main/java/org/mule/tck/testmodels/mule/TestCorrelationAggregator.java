@@ -6,10 +6,10 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleEvent;
-import org.mule.routing.AbstractCorrelationAggregator;
-import org.mule.routing.AggregationException;
-import org.mule.routing.EventGroup;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.routing.AbstractCorrelationAggregator;
+import org.mule.runtime.core.routing.AggregationException;
+import org.mule.runtime.core.routing.EventGroup;
 
 /**
  * <code>TestResponseAggregator</code> is a mock response Agrregator object used for

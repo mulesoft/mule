@@ -11,9 +11,9 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.retry.policies.SimpleRetryPolicyTemplate;
+import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 
 import org.junit.Test;
 

@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.lifecycle;
+package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * <code>InitialisationException</code> is thrown by the initialise method defined
- * in the <code>org.mule.api.lifecycle.Initialisable</code> interface.
+ * in the <code>org.mule.runtime.core.api.lifecycle.Initialisable</code> interface.
  * IinitialisationExceptions are fatal and will cause the current Mule instance to
  * shutdown.
  */

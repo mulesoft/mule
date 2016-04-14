@@ -6,12 +6,12 @@
  */
 package org.mule.module.tls.internal;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.api.tls.TlsContextFactoryBuilder;
 import org.mule.module.tls.api.DefaultTlsContextFactoryBuilder;

@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.security;
+package org.mule.runtime.core.security;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.CryptoFailureException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.Base64;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.Base64;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

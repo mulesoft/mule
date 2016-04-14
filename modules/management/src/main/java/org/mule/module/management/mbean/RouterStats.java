@@ -6,7 +6,7 @@
  */
 package org.mule.module.management.mbean;
 
-import org.mule.management.stats.RouterStatistics;
+import org.mule.runtime.core.management.stats.RouterStatistics;
 
 import java.util.Map;
 

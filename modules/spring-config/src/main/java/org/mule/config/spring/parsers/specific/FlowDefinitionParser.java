@@ -6,10 +6,10 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.util.ProcessingStrategyUtils;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.construct.Flow;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;

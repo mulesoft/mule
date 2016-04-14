@@ -6,10 +6,10 @@
  */
 package org.mule.test.usecases.properties;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Callable;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.HashMap;

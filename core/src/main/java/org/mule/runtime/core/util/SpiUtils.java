@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
-import org.mule.api.registry.ServiceType;
-import org.mule.config.ExceptionHelper;
+import org.mule.runtime.core.api.registry.ServiceType;
+import org.mule.runtime.core.config.ExceptionHelper;
 
 import java.io.IOException;
 import java.io.InputStream;

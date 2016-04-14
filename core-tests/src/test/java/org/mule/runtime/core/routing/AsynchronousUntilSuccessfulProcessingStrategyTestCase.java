@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -21,25 +21,25 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
-import org.mule.DefaultMuleMessage;
-import org.mule.TransformationService;
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.InitialisationException;
+import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DataType;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.retry.RetryPolicyExhaustedException;
-import org.mule.routing.filters.ExpressionFilter;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
+import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.concurrent.Latch;
-import org.mule.util.store.SimpleMemoryObjectStore;
+import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;

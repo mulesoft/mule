@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue;
+package org.mule.runtime.core.util.queue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.Serializable;
 import java.util.Random;

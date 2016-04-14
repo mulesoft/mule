@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
-import org.mule.api.Closeable;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.util.StreamCloser;
-import org.mule.api.util.StreamCloserService;
+import org.mule.runtime.core.api.Closeable;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.util.StreamCloser;
+import org.mule.runtime.core.api.util.StreamCloserService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +25,7 @@ import org.xml.sax.InputSource;
 
 /**
  * Closes streams of different types by looking up available {@link StreamCloser}'s
- * from the Mule registry. {@link org.mule.api.util.StreamCloser} instances are only fetched
+ * from the Mule registry. {@link org.mule.runtime.core.api.util.StreamCloser} instances are only fetched
  * from the registry the first time the {@link #closeStream(Object)} method is called
  * with a steam that cannot be closed by {@lnk CoreStreamTypesCloser}. Any other closers
  * added to the registry after that will be ignored
@@ -76,13 +76,13 @@ public class DefaultStreamCloserService implements StreamCloserService
     }
 
     /**
-     * Lazyly fetches and keeps all the registered {@link org.mule.api.util.StreamCloser}
+     * Lazyly fetches and keeps all the registered {@link org.mule.runtime.core.api.util.StreamCloser}
      * instances from the registry. Because there're not too many of them, this is
      * the most efficient option to avoid accessing the registry continuosly.
      * If we get to a situation in which we have many of them, considering using a
      * {@link java.util.Map} guarded by a {@link java.util.concurrent.locks.ReadWriteLock}
      *
-     * @return all {@link org.mule.api.util.StreamCloser} instances in the registry
+     * @return all {@link org.mule.runtime.core.api.util.StreamCloser} instances in the registry
      * @throws Exception
      */
     private Collection<StreamCloser> getAllStreamClosers() throws Exception

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.stats.printers;
+package org.mule.runtime.core.management.stats.printers;
 
-import org.mule.management.stats.RouterStatistics;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.management.stats.RouterStatistics;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.OutputStream;
 import java.io.Writer;

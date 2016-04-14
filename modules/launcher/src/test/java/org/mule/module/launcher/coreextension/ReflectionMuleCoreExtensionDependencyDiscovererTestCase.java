@@ -8,10 +8,10 @@ package org.mule.module.launcher.coreextension;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.MuleCoreExtension;
-import org.mule.MuleCoreExtensionDependency;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.MuleCoreExtension;
+import org.mule.runtime.core.MuleCoreExtensionDependency;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

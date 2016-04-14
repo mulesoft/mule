@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.component;
+package org.mule.runtime.core.component;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.object.PrototypeObjectFactory;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 

@@ -5,22 +5,22 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
-import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.serialization.ObjectSerializer;
-import org.mule.api.store.ExpirableObjectStore;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectAlreadyExistsException;
-import org.mule.api.store.ObjectDoesNotExistException;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.ObjectStoreNotAvaliableException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.util.FileUtils;
+import static org.mule.runtime.core.api.store.ObjectStoreManager.UNBOUNDED;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.store.ExpirableObjectStore;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -324,7 +324,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
 
     protected File createFileToStoreObject() throws ObjectStoreException
     {
-        String filename = org.mule.util.UUID.getUUID() + OBJECT_FILE_EXTENSION;
+        String filename = org.mule.runtime.core.util.UUID.getUUID() + OBJECT_FILE_EXTENSION;
         try
         {
             return FileUtils.newFile(partitionDirectory, filename);

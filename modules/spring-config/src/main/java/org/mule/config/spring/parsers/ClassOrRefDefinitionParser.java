@@ -6,8 +6,8 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.mule.util.ClassUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.RuntimeBeanReference;

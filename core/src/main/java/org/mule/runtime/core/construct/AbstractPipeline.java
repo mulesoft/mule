@@ -4,49 +4,49 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.construct;
+package org.mule.runtime.core.construct;
 
-import static org.mule.util.NotificationUtils.buildPathResolver;
+import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 
-import org.mule.api.GlobalNameableObject;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstructInvalidException;
-import org.mule.api.construct.Pipeline;
-import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.processor.DefaultMessageProcessorPathElement;
-import org.mule.api.processor.InterceptingMessageProcessor;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.api.processor.MessageProcessorContainer;
-import org.mule.api.processor.MessageProcessorPathElement;
-import org.mule.api.processor.ProcessingStrategy;
-import org.mule.api.processor.StageNameSource;
-import org.mule.api.source.ClusterizableMessageSource;
-import org.mule.api.source.CompositeMessageSource;
-import org.mule.api.source.MessageSource;
-import org.mule.api.source.NonBlockingMessageSource;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.construct.flow.DefaultFlowProcessingStrategy;
-import org.mule.context.notification.PipelineMessageNotification;
-import org.mule.exception.ChoiceMessagingExceptionStrategy;
-import org.mule.exception.RollbackMessagingExceptionStrategy;
-import org.mule.processor.AbstractFilteringMessageProcessor;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.processor.AbstractRequestResponseMessageProcessor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.processor.strategy.SynchronousProcessingStrategy;
-import org.mule.source.ClusterizableMessageSourceWrapper;
-import org.mule.util.NotificationUtils;
-import org.mule.util.NotificationUtils.PathResolver;
+import org.mule.runtime.core.api.GlobalNameableObject;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.api.processor.MessageProcessorContainer;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.StageNameSource;
+import org.mule.runtime.core.api.source.ClusterizableMessageSource;
+import org.mule.runtime.core.api.source.CompositeMessageSource;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.source.NonBlockingMessageSource;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
+import org.mule.runtime.core.context.notification.PipelineMessageNotification;
+import org.mule.runtime.core.exception.ChoiceMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.RollbackMessagingExceptionStrategy;
+import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
+import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
+import org.mule.runtime.core.util.NotificationUtils;
+import org.mule.runtime.core.util.NotificationUtils.PathResolver;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,7 +81,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
      * <p>
      * The default implementation of this methods uses a {@link DefaultMessageProcessorChainBuilder} and
      * allows a chain of {@link MessageProcessor}s to be configured using the
-     * {@link #configureMessageProcessors(org.mule.api.processor.MessageProcessorChainBuilder)} method but if
+     * {@link #configureMessageProcessors(org.mule.runtime.core.api.processor.MessageProcessorChainBuilder)} method but if
      * you wish to use another {@link MessageProcessorBuilder} or just a single {@link MessageProcessor} then
      * this method can be overridden and return a single {@link MessageProcessor} instead.
      */

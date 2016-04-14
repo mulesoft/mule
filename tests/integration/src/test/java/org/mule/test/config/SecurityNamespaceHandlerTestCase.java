@@ -9,10 +9,10 @@ package org.mule.test.config;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.EncryptionStrategy;
-import org.mule.api.security.SecurityManager;
-import org.mule.security.PasswordBasedEncryptionStrategy;
-import org.mule.security.SecretKeyEncryptionStrategy;
+import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.security.SecurityManager;
+import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
+import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.functional.security.MockEncryptionStrategy;
 import org.mule.functional.security.TestSingleUserSecurityProvider;

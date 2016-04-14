@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.graph;
+package org.mule.runtime.core.transformer.graph;
 
-import org.mule.api.registry.ResolverException;
-import org.mule.api.registry.TransformerResolver;
-import org.mule.api.transformer.Converter;
+import org.mule.runtime.core.api.registry.ResolverException;
+import org.mule.runtime.core.api.registry.TransformerResolver;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;

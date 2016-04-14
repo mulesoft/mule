@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.source.polling;
+package org.mule.runtime.core.source.polling;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
@@ -14,18 +14,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.schedule.Scheduler;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.api.message.NullPayload;
-import org.mule.source.polling.MessageProcessorPollingOverride.NullOverride;
-import org.mule.source.polling.schedule.FixedFrequencySchedulerFactory;
+import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride.NullOverride;
+import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
 
 import java.util.Collection;
 

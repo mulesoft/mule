@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -15,23 +15,23 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.transaction.TransactionTemplateTestUtils.getEmptyTransactionCallback;
+import static org.mule.runtime.core.transaction.TransactionTemplateTestUtils.getEmptyTransactionCallback;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.execution.ExecutionTemplate;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.transaction.Transaction;
-import org.mule.context.notification.ServerNotificationManager;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.routing.filters.WildcardFilter;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.TransactionTemplateTestUtils;
+import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.transaction.TransactionTemplateTestUtils;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
@@ -160,7 +160,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
     {
         ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-        configureExceptionListener(null, "org.mule.api.MuleException+");
+        configureExceptionListener(null, "org.mule.runtime.core.api.MuleException+");
         try
         {
             executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));
@@ -177,7 +177,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
     {
         ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-        configureExceptionListener(null, "org.mule.api.MessagingException");
+        configureExceptionListener(null, "org.mule.runtime.core.api.MessagingException");
         try
         {
             executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(new MessagingException(mockEvent, null)));
@@ -194,7 +194,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
     {
         ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-        configureExceptionListener("org.mule.api.MuleException+", "org.mule.api.MessagingException");
+        configureExceptionListener("org.mule.runtime.core.api.MuleException+", "org.mule.runtime.core.api.MessagingException");
         try
         {
             executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));

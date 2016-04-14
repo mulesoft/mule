@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.pool;
+package org.mule.runtime.core.config.pool;
 
-import org.mule.api.config.ThreadingProfile;
-import org.mule.util.StringUtils;
-import org.mule.util.concurrent.NamedThreadFactory;
-import org.mule.util.concurrent.WaitPolicy;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
+import org.mule.runtime.core.util.concurrent.WaitPolicy;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;

@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.serialization.internal;
+package org.mule.runtime.core.serialization.internal;
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.serialization.SerializationException;
-import org.mule.util.SerializationUtils;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.serialization.SerializationException;
+import org.mule.runtime.core.util.SerializationUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 
 /**
- * Implementation of {@link org.mule.api.serialization.ObjectSerializer} that uses Java's default serialization
+ * Implementation of {@link org.mule.runtime.core.api.serialization.ObjectSerializer} that uses Java's default serialization
  * mechanism. This means that exceptions will come from serializing objects that do
  * not implement {@link Serializable}
  *

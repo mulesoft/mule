@@ -4,30 +4,30 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.OptimizedRequestContext;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.NonBlockingSupported;
-import org.mule.api.connector.ReplyToHandler;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 
 /**
- * Base implementation of a {@link org.mule.api.processor.MessageProcessor} that may performs processing during both the
+ * Base implementation of a {@link org.mule.runtime.core.api.processor.MessageProcessor} that may performs processing during both the
  * request and response processing phases while supporting non-blocking execution.
  * <p/>
  *
  * In order to define the process during the request phase you should override the
- * {@link #processRequest(org.mule.api.MuleEvent)} method. Symmetrically, if you need to define a process to be executed
- * during the response phase, then you should override the {@link #processResponse(org.mule.api.MuleEvent)} method.
+ * {@link #processRequest(org.mule.runtime.core.api.MuleEvent)} method. Symmetrically, if you need to define a process to be executed
+ * during the response phase, then you should override the {@link #processResponse(org.mule.runtime.core.api.MuleEvent)} method.
  * <p/>
  *
  * In some cases you'll have some code that should be always executed, even if an error occurs, for those cases you
- * should override the {@link #processFinally(org.mule.api.MuleEvent, org.mule.api.MessagingException)} method.
+ * should override the {@link #processFinally(org.mule.runtime.core.api.MuleEvent, org.mule.runtime.core.api.MessagingException)} method.
  *
  * @since 3.7.0
  */

@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.expression.transformers;
+package org.mule.runtime.core.expression.transformers;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.api.expression.RequiredValueException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.object.ObjectFactory;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.object.PrototypeObjectFactory;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.BeanUtils;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.expression.RequiredValueException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.object.PrototypeObjectFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.BeanUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -56,7 +56,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
      * Template method were deriving classes can do any initialisation after the
      * properties have been set on this transformer
      *
-     * @throws org.mule.api.lifecycle.InitialisationException
+     * @throws org.mule.runtime.core.api.lifecycle.InitialisationException
      */
     @Override
     public void initialise() throws InitialisationException

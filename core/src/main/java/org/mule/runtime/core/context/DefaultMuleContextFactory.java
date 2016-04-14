@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context;
+package org.mule.runtime.core.context;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.api.context.MuleContextFactory;
-import org.mule.api.context.notification.MuleContextListener;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.builders.AutoConfigurationBuilder;
-import org.mule.config.builders.DefaultsConfigurationBuilder;
-import org.mule.config.builders.SimpleConfigurationBuilder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.context.MuleContextFactory;
+import org.mule.runtime.core.api.context.notification.MuleContextListener;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.builders.AutoConfigurationBuilder;
+import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 
 import java.util.LinkedList;
 import java.util.List;

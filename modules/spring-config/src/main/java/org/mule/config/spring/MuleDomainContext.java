@@ -7,8 +7,8 @@
 package org.mule.config.spring;
 
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-import org.mule.api.MuleContext;
-import org.mule.config.ConfigResource;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.config.ConfigResource;
 import org.mule.config.spring.processors.ContextExclusiveInjectorProcessor;
 
 import org.springframework.beans.BeansException;

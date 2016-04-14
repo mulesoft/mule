@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.counters.impl;
+package org.mule.runtime.core.util.counters.impl;
 
-import org.mule.util.counters.Counter;
-import org.mule.util.counters.CounterFactory.Type;
+import org.mule.runtime.core.util.counters.Counter;
+import org.mule.runtime.core.util.counters.CounterFactory.Type;
 
 public class Operator extends AggregateCounter
 {

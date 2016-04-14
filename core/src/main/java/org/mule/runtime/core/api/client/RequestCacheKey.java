@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.client;
+package org.mule.runtime.core.api.client;
 
-import org.mule.MessageExchangePattern;
-import org.mule.util.Preconditions;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.util.Preconditions;
 
 /**
  * Cache key used to locate an object in a map based on an URL and operation options.

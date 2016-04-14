@@ -258,8 +258,8 @@ public abstract class Controller
 
     public File getLog()
     {
-        File logEE = org.mule.util.FileUtils.newFile(muleHome + "/logs/mule_ee.log");
-        File logCE = org.mule.util.FileUtils.newFile(muleHome + "/logs/mule.log");
+        File logEE = org.mule.runtime.core.util.FileUtils.newFile(muleHome + "/logs/mule_ee.log");
+        File logCE = org.mule.runtime.core.util.FileUtils.newFile(muleHome + "/logs/mule.log");
 
         if (logCE.exists() && logCE.isFile())
         {
@@ -275,7 +275,7 @@ public abstract class Controller
 
     public File getLog(String appName)
     {
-        File log = org.mule.util.FileUtils.newFile(String.format("%s/logs/mule-app-%s.log", muleHome, appName));
+        File log = org.mule.runtime.core.util.FileUtils.newFile(String.format("%s/logs/mule-app-%s.log", muleHome, appName));
         if (log.exists() && log.isFile())
         {
             return log;

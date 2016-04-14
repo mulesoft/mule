@@ -5,20 +5,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transformer;
+package org.mule.runtime.core.transformer;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import org.junit.Test;
 

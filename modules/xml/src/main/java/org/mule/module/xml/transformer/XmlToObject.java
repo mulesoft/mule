@@ -6,10 +6,10 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

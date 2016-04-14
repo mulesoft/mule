@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
     public static final String WHITE_SPACE = " ";
     
     /**
-     * Like {@link org.mule.util.StringUtils#split(String, String)}, but additionally
+     * Like {@link org.mule.runtime.core.util.StringUtils#split(String, String)}, but additionally
      * trims whitespace from the result tokens.
      */
     public static String[] splitAndTrim(String string, String delim)

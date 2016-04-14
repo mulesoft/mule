@@ -6,9 +6,9 @@
  */
 package org.mule.module.cxf.feature;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.module.xml.transformer.XmlPrettyPrinter;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.LoggingFeature;

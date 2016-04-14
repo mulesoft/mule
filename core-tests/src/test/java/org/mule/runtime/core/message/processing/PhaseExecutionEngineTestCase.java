@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.message.processing;
+package org.mule.runtime.core.message.processing;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.execution.EndPhaseTemplate;
-import org.mule.execution.EndProcessPhase;
-import org.mule.execution.MessageProcessContext;
-import org.mule.execution.MessageProcessPhase;
-import org.mule.execution.MessageProcessTemplate;
-import org.mule.execution.PhaseExecutionEngine;
-import org.mule.execution.PhaseResultNotifier;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.execution.EndPhaseTemplate;
+import org.mule.runtime.core.execution.EndProcessPhase;
+import org.mule.runtime.core.execution.MessageProcessContext;
+import org.mule.runtime.core.execution.MessageProcessPhase;
+import org.mule.runtime.core.execution.MessageProcessTemplate;
+import org.mule.runtime.core.execution.PhaseExecutionEngine;
+import org.mule.runtime.core.execution.PhaseResultNotifier;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;

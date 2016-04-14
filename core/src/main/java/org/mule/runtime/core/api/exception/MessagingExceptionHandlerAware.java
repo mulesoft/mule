@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.exception;
+package org.mule.runtime.core.api.exception;
 
 /**
  * Objects that need access to the messaging exception handler of the execution context should implement this interface.

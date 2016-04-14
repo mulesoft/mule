@@ -7,12 +7,12 @@
 package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleEvent;
-import org.mule.config.i18n.Message;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.config.i18n.Message;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
-import org.mule.util.ArrayUtils;
+import org.mule.runtime.core.util.ArrayUtils;
 
 import java.util.Collection;
 import java.util.Map;

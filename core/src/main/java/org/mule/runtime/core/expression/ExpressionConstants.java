@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.expression;
+package org.mule.runtime.core.expression;
 
 /**
  * Constnts for Headers and Attachment processing shared by a number of the Expression evaluators

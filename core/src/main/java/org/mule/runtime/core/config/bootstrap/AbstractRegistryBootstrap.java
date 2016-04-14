@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.bootstrap;
+package org.mule.runtime.core.config.bootstrap;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transaction.TransactionFactory;
-import org.mule.api.transformer.Transformer;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.ClassUtils;
-import org.mule.util.ExceptionUtils;
-import org.mule.util.PropertiesUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.runtime.core.util.PropertiesUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -60,16 +60,16 @@ import org.slf4j.LoggerFactory;
  * Loading transformers has a slightly different notation since you can define the 'returnClass' with optional mime type, and 'name'of
  * the transformer as parameters i.e.
  * <pre>
- * transformer.1=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=byte[]
- * transformer.2=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=java.lang.String:text/xml, name=JMSMessageToString
- * transformer.3=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
+ * transformer.1=org.mule.runtime.core.transport.jms.transformers.JMSMessageToObject,returnClass=byte[]
+ * transformer.2=org.mule.runtime.core.transport.jms.transformers.JMSMessageToObject,returnClass=java.lang.String:text/xml, name=JMSMessageToString
+ * transformer.3=org.mule.runtime.core.transport.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
  * </pre>
  * Note that the key used for transformers must be 'transformer.x' where 'x' is a sequential number.  The transformer name will be
  * automatically generated as JMSMessageToXXX where XXX is the return class name i.e. JMSMessageToString unless a 'name'
  * parameter is specified. If no 'returnClass' is specified the default in the transformer will be used.
  * <p/>
  * Note that all objects defined have to have a default constructor. They can implement injection interfaces such as
- * {@link org.mule.api.context.MuleContextAware} and lifecycle interfaces such as {@link org.mule.api.lifecycle.Initialisable}.
+ * {@link org.mule.runtime.core.api.context.MuleContextAware} and lifecycle interfaces such as {@link org.mule.runtime.core.api.lifecycle.Initialisable}.
  *
  * @since 3.7.0
  */

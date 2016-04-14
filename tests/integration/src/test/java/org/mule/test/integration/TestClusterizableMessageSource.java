@@ -6,17 +6,17 @@
  */
 package org.mule.test.integration;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.source.ClusterizableMessageSource;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 
 public class TestClusterizableMessageSource implements ClusterizableMessageSource, Startable, MuleContextAware, FlowConstructAware
 {

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.stats;
+package org.mule.runtime.core.management.stats;
 
 /**
  * TODO MULE-2233 Pooling functionality has been abstracted out of the SedaService. 

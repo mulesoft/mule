@@ -4,22 +4,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config;
+package org.mule.runtime.core.config;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.ExceptionReader;
-import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.api.registry.ServiceType;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.MuleContextNotification;
-import org.mule.context.notification.NotificationException;
-import org.mule.util.ClassUtils;
-import org.mule.util.MapUtils;
-import org.mule.util.PropertiesUtils;
-import org.mule.util.SpiUtils;
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.ExceptionReader;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.registry.ServiceType;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.context.notification.MuleContextNotification;
+import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.MapUtils;
+import org.mule.runtime.core.util.PropertiesUtils;
+import org.mule.runtime.core.util.SpiUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;

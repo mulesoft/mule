@@ -6,9 +6,9 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleException;
-import org.mule.api.object.ObjectFactory;
-import org.mule.component.DefaultJavaComponent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.component.DefaultJavaComponent;
 
 /**
  * Makes the underlying POJO service object available for unit testing.

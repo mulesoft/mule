@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-import org.mule.MessageExchangePattern;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MuleEvent;
-import org.mule.routing.filters.EqualsFilter;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.routing.filters.EqualsFilter;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

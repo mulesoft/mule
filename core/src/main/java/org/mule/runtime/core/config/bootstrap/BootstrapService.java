@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.bootstrap;
+package org.mule.runtime.core.config.bootstrap;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;

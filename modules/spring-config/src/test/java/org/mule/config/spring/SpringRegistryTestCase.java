@@ -10,8 +10,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.registry.Registry;
-import org.mule.registry.AbstractRegistryTestCase;
+import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.registry.AbstractRegistryTestCase;
 
 import java.util.Collection;
 

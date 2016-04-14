@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.expression.transformers;
+package org.mule.runtime.core.expression.transformers;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.expression.ExpressionConfig;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.expression.ExpressionConfig;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 /**
  * TODO

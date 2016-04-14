@@ -6,9 +6,9 @@
  */
 package org.mule.module.extension.internal.introspection.describer;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
-import org.mule.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;

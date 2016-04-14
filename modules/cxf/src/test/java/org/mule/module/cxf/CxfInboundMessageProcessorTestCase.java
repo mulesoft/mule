@@ -6,10 +6,10 @@
  */
 package org.mule.module.cxf;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.message.OutputHandler;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.message.OutputHandler;
 import org.mule.module.cxf.builder.WebServiceMessageProcessorBuilder;
 import org.mule.module.cxf.testmodels.Echo;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

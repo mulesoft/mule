@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.construct.flow;
+package org.mule.runtime.core.construct.flow;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.config.QueueProfile;
-import org.mule.processor.AsyncInterceptingMessageProcessor;
-import org.mule.processor.LaxSedaStageInterceptingMessageProcessor;
-import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.config.QueueProfile;
+import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.LaxSedaStageInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.strategy.QueuedAsynchronousProcessingStrategy;
 
 /**
  * This processing strategy uses the 'queued-asynchronous' strategy where possible, but if an event is
@@ -21,7 +21,7 @@ public class DefaultFlowProcessingStrategy extends QueuedAsynchronousProcessingS
 {
 
     @Override
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(org.mule.api.processor.StageNameSource nameSource,
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(org.mule.runtime.core.api.processor.StageNameSource nameSource,
                                                                             MuleContext muleContext)
     {
         Integer timeout = queueTimeout != null ? queueTimeout : muleContext.getConfiguration()

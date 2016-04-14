@@ -7,19 +7,19 @@
 package org.mule.module.extension.internal.config;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.registry.RegistrationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.module.extension.internal.runtime.processor.OperationMessageProcessor;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.util.ObjectNameHelper;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.ObjectNameHelper;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;

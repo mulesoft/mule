@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml;
+package org.mule.runtime.core.transformers.xml;
 
 import org.mule.module.xml.transformer.XStreamFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import com.thoughtworks.xstream.XStream;
 

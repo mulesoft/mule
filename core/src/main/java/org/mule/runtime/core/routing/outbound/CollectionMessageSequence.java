@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.outbound;
+package org.mule.runtime.core.routing.outbound;
 
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.commons.lang.Validate;
-import org.mule.routing.AbstractMessageSequence;
-import org.mule.routing.MessageSequence;
+import org.mule.runtime.core.routing.AbstractMessageSequence;
+import org.mule.runtime.core.routing.MessageSequence;
 
 /**
  * A {@link MessageSequence} that retrieves elements from a {@link Collection}. Its

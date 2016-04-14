@@ -5,22 +5,22 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel.datatype;
+package org.mule.runtime.core.el.mvel.datatype;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.el.mvel.MessageVariableResolverFactory.MESSAGE_PAYLOAD;
-import static org.mule.el.mvel.MessageVariableResolverFactory.PAYLOAD;
+import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.MESSAGE_PAYLOAD;
+import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.PAYLOAD;
 import static org.mule.mvel2.MVEL.compileExpression;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-import static org.mule.transformer.types.MimeTypes.JSON;
-import org.mule.api.MuleEvent;
+import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.metadata.DataType;
-import org.mule.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import org.junit.Test;
 

@@ -4,22 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.component;
-
-import org.mule.api.component.LifecycleAdapter;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.object.ObjectFactory;
-import org.mule.config.PoolingProfile;
-import org.mule.object.PrototypeObjectFactory;
-import org.mule.tck.services.UniqueComponent;
-import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.tck.testmodels.fruit.WaterMelon;
-import org.mule.util.ExceptionUtils;
-import org.mule.util.pool.AbstractPoolingTestCase;
-
-import java.util.NoSuchElementException;
-
-import org.junit.Test;
+package org.mule.runtime.core.component;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -28,6 +13,20 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.runtime.core.api.component.LifecycleAdapter;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.config.PoolingProfile;
+import org.mule.runtime.core.object.PrototypeObjectFactory;
+import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.runtime.core.util.pool.AbstractPoolingTestCase;
+import org.mule.tck.services.UniqueComponent;
+import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.tck.testmodels.fruit.WaterMelon;
+
+import java.util.NoSuchElementException;
+
+import org.junit.Test;
 
 public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
 {    

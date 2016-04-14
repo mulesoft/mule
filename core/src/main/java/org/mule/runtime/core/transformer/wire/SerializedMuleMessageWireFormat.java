@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.wire;
+package org.mule.runtime.core.transformer.wire;
 
-import org.mule.transformer.simple.ByteArrayToMuleMessage;
-import org.mule.transformer.simple.MuleMessageToByteArray;
+import org.mule.runtime.core.transformer.simple.ByteArrayToMuleMessage;
+import org.mule.runtime.core.transformer.simple.MuleMessageToByteArray;
 
 /**
  * Wire format using Java serialization to serialize MuleMessage objects accross the wire

@@ -6,13 +6,13 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.api.routing.filter.Filter;
+import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.WrappingChildDefinitionParser;
-import org.mule.routing.MessageFilter;
+import org.mule.runtime.core.routing.MessageFilter;
 
 import org.w3c.dom.Element;
 

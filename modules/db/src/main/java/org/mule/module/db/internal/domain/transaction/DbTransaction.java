@@ -7,13 +7,13 @@
 
 package org.mule.module.db.internal.domain.transaction;
 
-import org.mule.api.MuleContext;
-import org.mule.api.transaction.TransactionException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.module.db.internal.i18n.DbMessages;
-import org.mule.transaction.AbstractSingleResourceTransaction;
-import org.mule.transaction.IllegalTransactionStateException;
-import org.mule.transaction.TransactionRollbackException;
+import org.mule.runtime.core.transaction.AbstractSingleResourceTransaction;
+import org.mule.runtime.core.transaction.IllegalTransactionStateException;
+import org.mule.runtime.core.transaction.TransactionRollbackException;
 
 import java.sql.Connection;
 import java.sql.SQLException;

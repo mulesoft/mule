@@ -6,8 +6,8 @@
  */
 package org.mule.functional.exceptions;
 
-import org.mule.api.MuleException;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 public class FunctionalTestException extends MuleException
 {

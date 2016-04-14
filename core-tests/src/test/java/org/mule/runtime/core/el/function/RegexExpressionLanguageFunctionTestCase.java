@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.function;
+package org.mule.runtime.core.el.function;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -13,17 +13,17 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.TransformationService;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.el.ExpressionExecutor;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.el.ExpressionExecutor;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.TransformerException;
-import org.mule.el.context.MessageContext;
-import org.mule.el.mvel.MVELExpressionExecutor;
-import org.mule.el.mvel.MVELExpressionLanguageContext;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.el.context.MessageContext;
+import org.mule.runtime.core.el.mvel.MVELExpressionExecutor;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;

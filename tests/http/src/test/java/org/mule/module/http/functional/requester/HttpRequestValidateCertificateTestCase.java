@@ -12,8 +12,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
 
 import java.security.GeneralSecurityException;
 

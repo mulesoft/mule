@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue.objectstore;
+package org.mule.runtime.core.util.queue.objectstore;
 
-import org.mule.util.queue.QueueStoreDelegate;
+import org.mule.runtime.core.util.queue.QueueStoreDelegate;
 
 /**
  * A marker interface for a QueueStoreDelegate that, along with its store, is transactional

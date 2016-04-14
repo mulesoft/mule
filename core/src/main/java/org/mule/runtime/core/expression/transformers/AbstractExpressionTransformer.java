@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.expression.transformers;
+package org.mule.runtime.core.expression.transformers;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.AbstractMessageTransformer;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -60,7 +60,7 @@ public abstract class AbstractExpressionTransformer extends AbstractMessageTrans
      * Template method were deriving classes can do any initialisation after the
      * properties have been set on this transformer
      *
-     * @throws org.mule.api.lifecycle.InitialisationException
+     * @throws org.mule.runtime.core.api.lifecycle.InitialisationException
      *
      */
     @Override

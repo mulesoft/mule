@@ -4,22 +4,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.outbound;
+package org.mule.runtime.core.routing.outbound;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.CouldNotRouteOutboundMessageException;
-import org.mule.api.routing.RoutePathNotFoundException;
-import org.mule.api.routing.RoutingException;
-import org.mule.api.routing.TransformingMatchable;
-import org.mule.api.routing.filter.Filter;
-import org.mule.api.transformer.Transformer;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.TemplateParser;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
+import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.api.routing.TransformingMatchable;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.TemplateParser;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

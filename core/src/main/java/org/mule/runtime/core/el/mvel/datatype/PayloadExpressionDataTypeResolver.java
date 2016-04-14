@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel.datatype;
+package org.mule.runtime.core.el.mvel.datatype;
 
-import static org.mule.el.mvel.MessageVariableResolverFactory.MESSAGE_PAYLOAD;
-import static org.mule.el.mvel.MessageVariableResolverFactory.PAYLOAD;
-import org.mule.api.MuleEvent;
+import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.MESSAGE_PAYLOAD;
+import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.PAYLOAD;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.mvel2.ast.ASTNode;
 

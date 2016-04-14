@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.work;
+package org.mule.runtime.core.api.work;
 
-import org.mule.work.WorkerContext;
+import org.mule.runtime.core.work.WorkerContext;
 
 import java.util.concurrent.Executor;
 

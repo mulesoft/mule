@@ -8,12 +8,12 @@ package org.mule.module.http.functional;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.api.context.notification.ConnectorMessageNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServerNotificationListener;
-import org.mule.context.notification.ConnectorMessageNotification;
-import org.mule.context.notification.ServerNotificationManager;
-import org.mule.util.CollectionUtils;
+import org.mule.runtime.core.api.context.notification.ConnectorMessageNotificationListener;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;

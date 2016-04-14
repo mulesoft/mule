@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.component;
+package org.mule.runtime.core.component;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.object.ObjectFactory;
-import org.mule.construct.Flow;
-import org.mule.lifecycle.LifecycleTrackerComponent;
-import org.mule.object.PrototypeObjectFactory;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.lifecycle.LifecycleTrackerComponent;
+import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import org.junit.Test;

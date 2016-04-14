@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.internal.metadata;
+package org.mule.runtime.core.internal.metadata;
 
 import org.mule.api.metadata.resolving.MetadataContentResolver;
 import org.mule.api.metadata.resolving.MetadataKeysResolver;

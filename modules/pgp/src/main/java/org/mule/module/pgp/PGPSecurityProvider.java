@@ -6,14 +6,14 @@
  */
 package org.mule.module.pgp;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.SecurityException;
-import org.mule.api.security.UnauthorisedException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.module.pgp.i18n.PGPMessages;
-import org.mule.security.AbstractSecurityProvider;
-import org.mule.util.SecurityUtils;
+import org.mule.runtime.core.security.AbstractSecurityProvider;
+import org.mule.runtime.core.util.SecurityUtils;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPPublicKey;

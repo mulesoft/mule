@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.ThreadSafeAccess;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.ThreadSafeAccess;
 
 /**
  * <code>RequestContext</code> is a thread context where components can get the
@@ -23,8 +23,8 @@ import org.mule.api.ThreadSafeAccess;
  *
  * @deprecated
  *    If access to MuleEvent or MuleMessage is required,
- *    then implement a {@link org.mule.api.processor.MessageProcessor}
- *    or {@link org.mule.api.lifecycle.Callable} instead
+ *    then implement a {@link org.mule.runtime.core.api.processor.MessageProcessor}
+ *    or {@link org.mule.runtime.core.api.lifecycle.Callable} instead
  */
 @Deprecated
 public final class RequestContext

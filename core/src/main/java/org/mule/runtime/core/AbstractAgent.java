@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.agent.Agent;
-import org.mule.api.context.MuleContextAware;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.api.context.MuleContextAware;
 
 /**
  * Implements common methods for all Agents. Importantly, the MuleContext is made available to Agents that

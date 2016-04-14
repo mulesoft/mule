@@ -7,8 +7,8 @@
 
 package org.mule.module.db.internal.domain.connection;
 
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionException;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.module.db.internal.domain.transaction.DbTransactionManager;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
 import org.mule.module.db.internal.domain.type.DbTypeManager;

@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.exception;
+package org.mule.runtime.core.exception;
 
-import org.mule.RequestContext;
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleContext;
-import org.mule.api.exception.RollbackSourceCallback;
-import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.message.DefaultExceptionPayload;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.connector.ConnectException;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.exception.RollbackSourceCallback;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.connector.ConnectException;
 
 /**
  * Fire a notification, log exception, clean up transaction if any, and trigger reconnection strategy 

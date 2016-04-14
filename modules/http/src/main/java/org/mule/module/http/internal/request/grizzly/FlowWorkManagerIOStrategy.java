@@ -6,9 +6,9 @@
  */
 package org.mule.module.http.internal.request.grizzly;
 
-import org.mule.api.MuleException;
-import org.mule.api.context.WorkManager;
-import org.mule.api.context.WorkManagerSource;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.context.WorkManagerSource;
 
 import com.ning.http.client.AsyncHandler;
 import com.ning.http.client.providers.grizzly.HttpTransactionContext;
@@ -26,7 +26,7 @@ import org.glassfish.grizzly.IOEventLifeCycleListener;
 import org.glassfish.grizzly.strategies.AbstractIOStrategy;
 
 /**
- * Grizzly IO Strategy that will handle work using a Mule {@link org.mule.api.context.WorkManager}.
+ * Grizzly IO Strategy that will handle work using a Mule {@link org.mule.runtime.core.api.context.WorkManager}.
  */
 public class FlowWorkManagerIOStrategy extends AbstractIOStrategy
 {

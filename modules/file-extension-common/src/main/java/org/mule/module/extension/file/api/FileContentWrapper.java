@@ -6,14 +6,14 @@
  */
 package org.mule.module.extension.file.api;
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleEvent;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.MessageTransformer;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.message.OutputHandler;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.transformer.MessageTransformer;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
 import java.util.Iterator;

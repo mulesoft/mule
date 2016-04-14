@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.debug;
+package org.mule.runtime.core.api.debug;
 
 /**
  * Specifies that a message processor can debug its internal execution.

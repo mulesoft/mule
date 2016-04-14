@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.security;
+package org.mule.runtime.core.api.security;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 
 /**
  * <code>CredentialsAccessor</code> is a template for obtaining user credentials

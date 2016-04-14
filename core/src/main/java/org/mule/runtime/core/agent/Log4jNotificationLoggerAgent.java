@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.agent;
+package org.mule.runtime.core.agent;
 
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.util.MapUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.util.MapUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;

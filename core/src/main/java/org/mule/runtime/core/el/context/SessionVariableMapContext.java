@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.context;
+package org.mule.runtime.core.el.context;
 
-import org.mule.api.MuleSession;
+import org.mule.runtime.core.api.MuleSession;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Session variables wrapper {@link Map} for exposing Session variables via an {@link org.mule.api.el.ExpressionLanguage}
+ * Session variables wrapper {@link Map} for exposing Session variables via an {@link org.mule.runtime.core.api.el.ExpressionLanguage}
  */
 public class SessionVariableMapContext extends AbstractMapContext<Object>
 {

@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.collection;
+package org.mule.runtime.core.util.collection;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.util.Copiable;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.MessageSequence;
-import org.mule.routing.outbound.ArrayMessageSequence;
-import org.mule.routing.outbound.CollectionMessageSequence;
-import org.mule.routing.outbound.IteratorMessageSequence;
-import org.mule.routing.outbound.NodeListMessageSequence;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.util.Copiable;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.routing.MessageSequence;
+import org.mule.runtime.core.routing.outbound.ArrayMessageSequence;
+import org.mule.runtime.core.routing.outbound.CollectionMessageSequence;
+import org.mule.runtime.core.routing.outbound.IteratorMessageSequence;
+import org.mule.runtime.core.routing.outbound.NodeListMessageSequence;
 
 import java.util.Collection;
 import java.util.Iterator;

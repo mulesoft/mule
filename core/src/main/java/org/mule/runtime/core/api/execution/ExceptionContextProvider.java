@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.execution;
+package org.mule.runtime.core.api.execution;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import java.util.Map;
 

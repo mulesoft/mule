@@ -12,7 +12,7 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBowl;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 

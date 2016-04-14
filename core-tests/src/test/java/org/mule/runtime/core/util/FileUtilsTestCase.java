@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.tck.ZipUtils.compress;
-import static org.mule.util.FileUtils.unzip;
+import static org.mule.runtime.core.util.FileUtils.unzip;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

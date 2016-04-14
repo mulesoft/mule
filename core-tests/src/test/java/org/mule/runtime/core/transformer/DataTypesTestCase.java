@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer;
+package org.mule.runtime.core.transformer;
 
 import org.mule.api.metadata.DataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.transformer.types.CollectionDataType;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.MimeTypes;
+import org.mule.runtime.core.transformer.types.CollectionDataType;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.MimeTypes;
 
 import java.io.IOException;
 import java.util.ArrayList;

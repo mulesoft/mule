@@ -5,7 +5,7 @@
 
     <flow name="service">
         <component class="org.mule.functional.functional.FunctionalTestComponent">
-            <singleton-object class="org.mule.component.simple.StaticComponent"/>
+            <singleton-object class="org.mule.runtime.core.component.simple.StaticComponent"/>
         </component>
     </flow>
     

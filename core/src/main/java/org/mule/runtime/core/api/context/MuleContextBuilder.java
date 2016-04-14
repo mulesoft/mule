@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.context;
+package org.mule.runtime.core.api.context;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
 
 import javax.resource.spi.work.WorkListener;
 

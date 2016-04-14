@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management;
+package org.mule.runtime.core.management;
 
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 
 public class DummyListener implements ServerNotificationListener
 {

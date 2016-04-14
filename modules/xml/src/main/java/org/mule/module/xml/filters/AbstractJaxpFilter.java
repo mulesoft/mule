@@ -6,12 +6,12 @@
  */
 package org.mule.module.xml.filters;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 

@@ -7,11 +7,11 @@
 
 package org.mule.modules.schedulers.cron;
 
-import org.mule.construct.Flow;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

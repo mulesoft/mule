@@ -4,27 +4,27 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.exception.MessageRedeliveredException;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.ObjectStoreManager;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.simple.ByteArrayToHexString;
-import org.mule.transformer.simple.ObjectToByteArray;
-import org.mule.util.lock.LockFactory;
-import org.mule.util.store.ObjectStorePartition;
-import org.mule.util.store.ProvidedObjectStoreWrapper;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.exception.MessageRedeliveredException;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
+import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.core.util.lock.LockFactory;
+import org.mule.runtime.core.util.store.ObjectStorePartition;
+import org.mule.runtime.core.util.store.ProvidedObjectStoreWrapper;
 
 import java.io.InputStream;
 import java.security.MessageDigest;

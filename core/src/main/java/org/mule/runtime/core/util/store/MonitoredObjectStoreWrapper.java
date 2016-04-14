@@ -4,23 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
-import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
+import static org.mule.runtime.core.api.store.ObjectStoreManager.UNBOUNDED;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.UUID;
-import org.mule.util.concurrent.DaemonThreadFactory;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -296,14 +296,14 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
 
         /**
          * Invoked after deserialization. This is called when the marker interface
-         * {@link org.mule.util.store.DeserializationPostInitialisable} is used. This will get invoked after the
+         * {@link org.mule.runtime.core.util.store.DeserializationPostInitialisable} is used. This will get invoked after the
          * object has been deserialized passing in the current MuleContext when using either
-         * {@link org.mule.transformer.wire.SerializationWireFormat},
-         * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat} or the
-         * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
+         * {@link org.mule.runtime.core.transformer.wire.SerializationWireFormat},
+         * {@link org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat} or the
+         * {@link org.mule.runtime.core.transformer.simple.ByteArrayToSerializable} transformer.
          *
          * @param muleContext the current muleContext instance
-         * @throws org.mule.api.MuleException if there is an error initializing
+         * @throws org.mule.runtime.core.api.MuleException if there is an error initializing
          */
         @SuppressWarnings({"unused"})
         private void initAfterDeserialisation(MuleContext muleContext) throws MuleException

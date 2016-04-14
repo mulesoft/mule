@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.codec;
+package org.mule.runtime.core.transformer.codec;
 
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.Base64;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.Base64;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 

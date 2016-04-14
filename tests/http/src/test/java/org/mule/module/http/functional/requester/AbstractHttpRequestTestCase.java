@@ -8,9 +8,9 @@ package org.mule.module.http.functional.requester;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.CaseInsensitiveMapWrapper;
-import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.Multimap;

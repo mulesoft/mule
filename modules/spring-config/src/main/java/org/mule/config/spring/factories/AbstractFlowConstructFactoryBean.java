@@ -6,14 +6,14 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.source.MessageSource;
-import org.mule.construct.AbstractFlowConstruct;
-import org.mule.construct.builder.AbstractFlowConstructBuilder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.construct.AbstractFlowConstruct;
+import org.mule.runtime.core.construct.builder.AbstractFlowConstructBuilder;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;

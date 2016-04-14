@@ -5,26 +5,26 @@
  * LICENSE.txt file.
  */
 
-package org.mule;
+package org.mule.runtime.core;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.transformer.types.MimeTypes.APPLICATION_XML;
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstruct;
+import static org.mule.runtime.core.transformer.types.MimeTypes.APPLICATION_XML;
 import org.mule.api.metadata.DataType;
-import org.mule.construct.Flow;
-import org.mule.construct.flow.DefaultFlowProcessingStrategy;
-import org.mule.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.tck.size.SmallTest;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.MimeTypes;
 
 import java.util.Map;
 

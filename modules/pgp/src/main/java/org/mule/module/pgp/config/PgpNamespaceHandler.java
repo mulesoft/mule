@@ -6,7 +6,7 @@
  */
 package org.mule.module.pgp.config;
 
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
@@ -14,7 +14,7 @@ import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.module.pgp.KeyBasedEncryptionStrategy;
 import org.mule.module.pgp.PGPSecurityProvider;
 import org.mule.module.pgp.filters.PGPSecurityFilter;
-import org.mule.util.SecurityUtils;
+import org.mule.runtime.core.util.SecurityUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;

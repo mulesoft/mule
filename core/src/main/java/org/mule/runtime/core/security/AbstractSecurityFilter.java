@@ -4,25 +4,25 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.security;
+package org.mule.runtime.core.security;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.CryptoFailureException;
-import org.mule.api.security.EncryptionStrategyNotFoundException;
-import org.mule.api.security.SecurityException;
-import org.mule.api.security.SecurityFilter;
-import org.mule.api.security.SecurityManager;
-import org.mule.api.security.SecurityProvider;
-import org.mule.api.security.SecurityProviderNotFoundException;
-import org.mule.api.security.UnknownAuthenticationTypeException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.TransformerTemplate;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
+import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.core.api.security.SecurityFilter;
+import org.mule.runtime.core.api.security.SecurityManager;
+import org.mule.runtime.core.api.security.SecurityProvider;
+import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transformer.TransformerTemplate;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

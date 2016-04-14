@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
@@ -13,10 +13,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.registry.RegistrationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;

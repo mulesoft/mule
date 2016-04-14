@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.runtime.resolver;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 
 /**
  * Provides a value which is dependant on a {@link MuleEvent}

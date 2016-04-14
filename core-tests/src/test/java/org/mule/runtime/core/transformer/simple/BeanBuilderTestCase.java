@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.transformer.Transformer;
-import org.mule.expression.ExpressionConfig;
-import org.mule.expression.transformers.BeanBuilderTransformer;
-import org.mule.expression.transformers.ExpressionArgument;
-import org.mule.object.PrototypeObjectFactory;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.expression.ExpressionConfig;
+import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
+import org.mule.runtime.core.expression.transformers.ExpressionArgument;
+import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 import java.util.HashMap;
 import java.util.Map;

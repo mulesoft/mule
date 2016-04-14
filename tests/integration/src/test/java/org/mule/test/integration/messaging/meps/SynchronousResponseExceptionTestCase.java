@@ -9,9 +9,9 @@ package org.mule.test.integration.messaging.meps;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MessagingException;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.ExceptionHelper;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.functional.junit4.FunctionalTestCase;
 

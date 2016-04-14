@@ -12,7 +12,7 @@ package org.mule.functional.functional;
 public interface Receiveable
 {
     /**
-     * This method is used by some WebServices tests where you don' want to be introducing the {@link org.mule.api.MuleEventContext} as
+     * This method is used by some WebServices tests where you don' want to be introducing the {@link org.mule.runtime.core.api.MuleEventContext} as
      * a complex type.
      *
      * @param data the event data received

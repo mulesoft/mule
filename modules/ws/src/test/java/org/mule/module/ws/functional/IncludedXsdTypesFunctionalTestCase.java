@@ -8,7 +8,7 @@ package org.mule.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;

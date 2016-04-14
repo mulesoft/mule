@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.model.resolvers;
+package org.mule.runtime.core.model.resolvers;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.model.EntryPointResolver;
-import org.mule.api.model.EntryPointResolverSet;
-import org.mule.api.model.InvocationResult;
-import org.mule.util.CollectionUtils;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.model.EntryPointResolver;
+import org.mule.runtime.core.api.model.EntryPointResolverSet;
+import org.mule.runtime.core.api.model.InvocationResult;
+import org.mule.runtime.core.util.CollectionUtils;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Provides the default implementation of an {@link org.mule.api.model.EntryPointResolverSet}
+ * Provides the default implementation of an {@link org.mule.runtime.core.api.model.EntryPointResolverSet}
  * It resolves a method to call on the given service when an event is received.
  * This object maintains a set of Resolvers that will be used in order to resolve
  * an entrypoint on a service object until one is found or until the set is

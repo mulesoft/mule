@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.component;
+package org.mule.runtime.core.component;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.RequestContext;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.component.InterfaceBinding;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.component.InterfaceBinding;
 import org.mule.api.message.NullPayload;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.StringMessageUtils;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

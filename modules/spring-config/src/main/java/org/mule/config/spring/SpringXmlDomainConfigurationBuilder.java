@@ -6,9 +6,9 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationException;
-import org.mule.config.ConfigResource;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.config.ConfigResource;
 
 import org.springframework.context.ApplicationContext;
 

@@ -10,9 +10,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleContext;
-import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Calendar;

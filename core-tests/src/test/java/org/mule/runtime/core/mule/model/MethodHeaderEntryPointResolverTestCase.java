@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.mule.model;
+package org.mule.runtime.core.mule.model;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.model.InvocationResult;
-import org.mule.PropertyScope;
-import org.mule.model.resolvers.MethodHeaderPropertyEntryPointResolver;
+import static org.junit.Assert.assertEquals;
+import org.mule.api.message.NullPayload;
+import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.model.InvocationResult;
+import org.mule.runtime.core.model.MultiplePayloadsTestObject;
+import org.mule.runtime.core.model.resolvers.MethodHeaderPropertyEntryPointResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
-import org.mule.api.message.NullPayload;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextTestCase
 {

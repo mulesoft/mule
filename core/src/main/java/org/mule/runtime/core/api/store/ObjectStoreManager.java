@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.store;
+package org.mule.runtime.core.api.store;
 
 import java.io.Serializable;
 
@@ -18,7 +18,7 @@ public interface ObjectStoreManager
      * if necessary.
      *
      * @param name the name of the object store
-     * @return an {@link org.mule.api.store.ObjectStore}
+     * @return an {@link org.mule.runtime.core.api.store.ObjectStore}
      */
     <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name);
 
@@ -29,7 +29,7 @@ public interface ObjectStoreManager
      * @param name the name of the object store
      * @param isPersistent whether it should be in memory or persistent
      *
-     * @return an {@link org.mule.api.store.ObjectStore}
+     * @return an {@link org.mule.runtime.core.api.store.ObjectStore}
      */
     <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name, boolean isPersistent);
 
@@ -43,7 +43,7 @@ public interface ObjectStoreManager
      * @param entryTTL entry timeout in milliseconds.
      * @param expirationInterval how frequently should the expiration thread run
      *
-     * @return an {@link org.mule.api.store.ObjectStore}
+     * @return an {@link org.mule.runtime.core.api.store.ObjectStore}
      */
     <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name,
         boolean isPersistent, int maxEntries, int entryTTL, int expirationInterval);

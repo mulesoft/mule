@@ -6,11 +6,11 @@
  */
 package org.mule.module.spring.security.config;
 
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.security.MuleSecurityManager;
+import org.mule.runtime.core.security.MuleSecurityManager;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;

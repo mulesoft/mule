@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.debug;
+package org.mule.runtime.core.api.debug;
 
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import java.util.List;
 

@@ -6,8 +6,8 @@
  */
 package org.mule.module.cxf;
 
-import org.mule.api.MuleEvent;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 
 import org.apache.cxf.interceptor.Fault;
 

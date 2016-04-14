@@ -19,12 +19,12 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.expression.DefaultExpressionManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.functional.functional.AssertionMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

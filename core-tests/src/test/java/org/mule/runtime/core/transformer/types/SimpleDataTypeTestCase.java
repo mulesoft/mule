@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transformer.types;
+package org.mule.runtime.core.transformer.types;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mule.transformer.types.MimeTypes.JSON;
+import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
 import org.mule.api.metadata.SimpleDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.context.DefaultMuleContextBuilder.MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE;
+import static org.mule.runtime.core.context.DefaultMuleContextBuilder.MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE;
 
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

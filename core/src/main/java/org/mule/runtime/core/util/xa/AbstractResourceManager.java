@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.xa;
+package org.mule.runtime.core.util.xa;
 
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -8,10 +8,10 @@ package org.mule.module.cxf.payload;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
 
 class CallAndExpectPayloadResult implements CallAndExpect
 {

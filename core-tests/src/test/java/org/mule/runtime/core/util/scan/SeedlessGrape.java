@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.scan;
+package org.mule.runtime.core.util.scan;
 
 /**
  * A grape without seeds

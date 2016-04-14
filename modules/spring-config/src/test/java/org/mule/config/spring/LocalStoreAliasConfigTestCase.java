@@ -9,9 +9,9 @@ package org.mule.config.spring;
 
 import static org.junit.Assert.assertSame;
 
-import org.mule.DefaultMuleContext;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

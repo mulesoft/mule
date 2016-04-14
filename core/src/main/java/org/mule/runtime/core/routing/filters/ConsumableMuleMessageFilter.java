@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.filters;
+package org.mule.runtime.core.routing.filters;
 
-import static org.mule.util.ClassUtils.isConsumable;
+import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.routing.filter.Filter;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.routing.filter.Filter;
 
 /**
  * Filters messages that have a consumable payload.
  * <p/>
  * The filter accepts only {@link DefaultMuleMessage} instances that
  * have a no consumable payload. Check is done using
- * {@link org.mule.DefaultMuleMessage#isConsumable()} method.
+ * {@link org.mule.runtime.core.DefaultMuleMessage#isConsumable()} method.
  */
 public class ConsumableMuleMessageFilter implements Filter
 {

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api;
+package org.mule.runtime.core.api;
 
 import java.io.Serializable;
 

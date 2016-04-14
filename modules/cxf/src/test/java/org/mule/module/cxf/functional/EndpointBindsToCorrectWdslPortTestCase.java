@@ -7,7 +7,7 @@
 package org.mule.module.cxf.functional;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.functional.junit4.FunctionalTestCase;

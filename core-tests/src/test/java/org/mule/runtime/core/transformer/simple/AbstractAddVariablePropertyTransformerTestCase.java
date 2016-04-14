@@ -4,28 +4,28 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.transformer.types.MimeTypes.APPLICATION_XML;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.lifecycle.InitialisationException;
+import static org.mule.runtime.core.transformer.types.MimeTypes.APPLICATION_XML;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.tck.size.SmallTest;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.MimeTypes;
-import org.mule.transformer.types.TypedValue;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.MimeTypes;
+import org.mule.runtime.core.transformer.types.TypedValue;
 
 import javax.activation.MimeTypeParseException;
 

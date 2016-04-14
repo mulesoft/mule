@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.transaction;
+package org.mule.runtime.core.api.transaction;
 
-import org.mule.transaction.constraints.ConstraintFilter;
+import org.mule.runtime.core.transaction.constraints.ConstraintFilter;
 
 /**
  * <code>TransactionConfig</code> defines transaction configuration for a

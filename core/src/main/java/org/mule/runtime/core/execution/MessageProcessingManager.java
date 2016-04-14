@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
 /**
  * In charge of processing messages through mule.
@@ -21,7 +21,7 @@ public interface MessageProcessingManager
      * - {@link EndProcessPhase} which will be executed after all the phases have been executed
      *
      * @param messageProcessTemplate contains template methods that will be executed by each phase in specific parts of the phase so
-     *                               the {@link org.mule.api.source.MessageSource} can apply custom logic during message processing.
+     *                               the {@link org.mule.runtime.core.api.source.MessageSource} can apply custom logic during message processing.
      *                               The message will participate only on those phases were the template defines the required template methods
      * @param messageProcessContext  defines the context of execution of the message
      */

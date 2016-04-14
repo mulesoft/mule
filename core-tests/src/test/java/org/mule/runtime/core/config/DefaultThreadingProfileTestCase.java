@@ -4,15 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config;
-
-import org.mule.api.config.ThreadingProfile;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.Test;
+package org.mule.runtime.core.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 public class DefaultThreadingProfileTestCase extends AbstractMuleContextTestCase
 {

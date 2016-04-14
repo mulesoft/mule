@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.object;
+package org.mule.runtime.core.object;
 
-import org.mule.api.MuleContext;
-import org.mule.api.lifecycle.InitialisationCallback;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.object.ObjectFactory;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.util.Hashtable;
 import java.util.Map;

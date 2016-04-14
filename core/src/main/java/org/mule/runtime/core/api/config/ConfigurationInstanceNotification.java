@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.config;
+package org.mule.runtime.core.api.config;
 
-import org.mule.context.notification.CustomNotification;
+import org.mule.runtime.core.context.notification.CustomNotification;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 
 /**

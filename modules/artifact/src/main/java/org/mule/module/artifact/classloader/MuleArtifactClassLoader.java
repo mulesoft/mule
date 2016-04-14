@@ -6,9 +6,9 @@
  */
 package org.mule.module.artifact.classloader;
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.InputStream;
 import java.net.URL;

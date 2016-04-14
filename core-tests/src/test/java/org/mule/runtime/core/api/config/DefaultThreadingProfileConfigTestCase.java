@@ -5,15 +5,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.config;
+package org.mule.runtime.core.api.config;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Field;
 import java.net.URLClassLoader;

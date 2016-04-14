@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing.correlation;
+package org.mule.runtime.core.routing.correlation;
 
-import org.mule.routing.EventProcessingThread;
+import org.mule.runtime.core.routing.EventProcessingThread;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;

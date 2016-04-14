@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.tcp;
+package org.mule.runtime.core.transport.tcp;
 
 import org.junit.Test;
 import org.mule.functional.junit4.FunctionalTestCase;

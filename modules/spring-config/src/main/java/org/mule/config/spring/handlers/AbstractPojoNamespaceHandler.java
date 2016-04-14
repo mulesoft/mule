@@ -8,7 +8,7 @@ package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.InvokerMessageProcessorDefinitionParser;
-import org.mule.util.ParamReader;
+import org.mule.runtime.core.util.ParamReader;
 
 import java.io.IOException;
 import java.lang.reflect.Method;

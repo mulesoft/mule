@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.internal.connection;
+package org.mule.runtime.core.internal.connection;
 
 import org.mule.api.config.PoolingProfile;
-import org.mule.api.connector.ConnectionManager;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.retry.RetryPolicy;
-import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.retry.RetryPolicy;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 
 /**
  * Interface for {@link ConnectionManager} implementations which expands its contract with non API functionality

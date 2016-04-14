@@ -6,9 +6,9 @@
  */
 package org.mule.module.oauth2.internal.mel;
 
-import org.mule.api.el.ExpressionLanguageContext;
-import org.mule.api.el.ExpressionLanguageFunction;
-import org.mule.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.el.ExpressionLanguageContext;
+import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
+import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
 
 import java.util.Arrays;

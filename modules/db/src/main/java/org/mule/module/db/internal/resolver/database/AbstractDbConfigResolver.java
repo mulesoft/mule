@@ -7,7 +7,7 @@
 
 package org.mule.module.db.internal.resolver.database;
 
-import org.mule.AbstractAnnotatedObject;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.common.Result;
 import org.mule.common.TestResult;
 import org.mule.common.metadata.MetaData;

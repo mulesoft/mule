@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
-import org.mule.api.MuleContext;
-import org.mule.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

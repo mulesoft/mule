@@ -6,9 +6,9 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.store.ObjectStore;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.store.ObjectStore;
 
 import java.io.Serializable;
 

@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.GlobalNameableObject;
+import org.mule.runtime.core.api.GlobalNameableObject;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;

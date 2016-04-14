@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue.objectstore;
+package org.mule.runtime.core.util.queue.objectstore;
 
-import org.mule.api.MuleContext;
-import org.mule.api.store.QueueStore;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.store.QueueStore;
 
 import java.io.Serializable;
 
@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
 @Deprecated
-public class QueueConfiguration implements org.mule.util.queue.QueueConfiguration
+public class QueueConfiguration implements org.mule.runtime.core.util.queue.QueueConfiguration
 {
     public final static int INFINITY_CAPACTY = 0;
     protected final int capacity;

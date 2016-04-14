@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.message.ds;
+package org.mule.runtime.core.message.ds;
 
 
 import java.io.ByteArrayInputStream;

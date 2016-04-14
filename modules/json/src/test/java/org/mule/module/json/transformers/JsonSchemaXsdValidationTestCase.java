@@ -10,10 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

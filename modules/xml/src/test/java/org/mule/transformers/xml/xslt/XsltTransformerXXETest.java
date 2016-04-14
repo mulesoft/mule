@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml.xslt;
+package org.mule.runtime.core.transformers.xml.xslt;
 
 import static junit.framework.Assert.assertTrue;
 
-import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 

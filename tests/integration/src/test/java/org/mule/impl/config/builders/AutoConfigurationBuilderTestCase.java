@@ -8,16 +8,16 @@ package org.mule.impl.config.builders;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.context.MuleContextFactory;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.builders.AutoConfigurationBuilder;
-import org.mule.config.builders.SimpleConfigurationBuilder;
-import org.mule.construct.Flow;
-import org.mule.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.context.MuleContextFactory;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.builders.AutoConfigurationBuilder;
+import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

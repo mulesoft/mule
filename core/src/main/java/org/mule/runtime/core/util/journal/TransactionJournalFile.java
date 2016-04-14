@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.journal;
+package org.mule.runtime.core.util.journal;
 
-import org.mule.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -55,7 +55,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
 
     /**
      * @param journalFile journal file to use. Will be created if it doesn't exists. If exists then transaction entries will get loaded from it.
-     * @param journalEntrySerializer serializer for {@link org.mule.util.journal.JournalEntry}
+     * @param journalEntrySerializer serializer for {@link org.mule.runtime.core.util.journal.JournalEntry}
      */
     public TransactionJournalFile(File journalFile, JournalEntrySerializer journalEntrySerializer)
     {

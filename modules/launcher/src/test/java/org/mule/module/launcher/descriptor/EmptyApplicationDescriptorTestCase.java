@@ -10,8 +10,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.MuleServer;
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.MuleServer;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;

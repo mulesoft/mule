@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel;
+package org.mule.runtime.core.el.mvel;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.el.ExpressionExecutor;
-import org.mule.api.expression.InvalidExpressionException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.el.ExpressionExecutor;
+import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.mvel2.MVEL;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;

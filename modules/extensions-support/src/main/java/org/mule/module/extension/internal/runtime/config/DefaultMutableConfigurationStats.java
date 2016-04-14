@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
-import org.mule.time.TimeSupplier;
+import org.mule.runtime.core.time.TimeSupplier;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

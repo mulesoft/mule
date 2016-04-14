@@ -6,11 +6,11 @@
  */
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
 
 import java.util.HashMap;
 

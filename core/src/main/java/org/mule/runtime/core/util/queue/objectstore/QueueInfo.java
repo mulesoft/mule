@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue.objectstore;
+package org.mule.runtime.core.util.queue.objectstore;
 
-import org.mule.api.MuleContext;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
 
 import java.io.Serializable;
 import java.util.HashMap;

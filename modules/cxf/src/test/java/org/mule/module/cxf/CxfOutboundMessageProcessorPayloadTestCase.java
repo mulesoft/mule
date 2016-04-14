@@ -6,9 +6,9 @@
  */
 package org.mule.module.cxf;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.api.message.NullPayload;
 

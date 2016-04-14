@@ -4,22 +4,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.notification.FlowCallStack;
-import org.mule.api.context.notification.ProcessorsTrace;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.api.metadata.DataType;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.security.Credentials;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.connector.ReplyToHandler;
-import org.mule.management.stats.ProcessingTime;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.security.Credentials;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.management.stats.ProcessingTime;
 
 import java.io.OutputStream;
 import java.net.URI;

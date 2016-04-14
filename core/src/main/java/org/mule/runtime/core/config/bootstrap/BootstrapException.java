@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.bootstrap;
+package org.mule.runtime.core.config.bootstrap;
 
-import org.mule.api.config.ConfigurationException;
-import org.mule.config.i18n.Message;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * Represents exceptions during the bootstrap configuration process

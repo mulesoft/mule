@@ -6,7 +6,7 @@
  */
 package org.mule.extension.ftp.internal.command;
 
-import org.mule.DefaultMuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.ftp.api.FtpConnector;

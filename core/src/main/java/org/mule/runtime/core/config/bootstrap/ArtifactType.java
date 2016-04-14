@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.bootstrap;
+package org.mule.runtime.core.config.bootstrap;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
  * List the possible types of deployable artifacts

@@ -9,15 +9,15 @@ package org.mule.module.pgp;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.ExceptionUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
 
 import org.junit.Test;
 

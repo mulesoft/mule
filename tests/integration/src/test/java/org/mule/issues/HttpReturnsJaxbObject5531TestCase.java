@@ -11,12 +11,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.client.MuleClient;
-import org.mule.api.lifecycle.Callable;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transformer.simple.ObjectToString;
+import org.mule.runtime.core.transformer.simple.ObjectToString;
 
 import org.junit.Ignore;
 import org.junit.Rule;

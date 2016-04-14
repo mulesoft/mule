@@ -6,11 +6,11 @@
  */
 package org.mule.module.extension.file.api;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleRuntimeException;
-import org.mule.message.OutputHandler;
-import org.mule.util.IOUtils;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;

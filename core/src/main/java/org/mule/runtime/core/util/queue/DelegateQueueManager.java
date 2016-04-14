@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue;
+package org.mule.runtime.core.util.queue;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,7 +37,7 @@ public class DelegateQueueManager implements QueueManager, Lifecycle, MuleContex
         if (isOldModeEnabled())
         {
             logger.info("Using old QueueManager implementation");
-            delegate = new org.mule.util.queue.objectstore.TransactionalQueueManager();
+            delegate = new org.mule.runtime.core.util.queue.objectstore.TransactionalQueueManager();
         }
         else
         {

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.internal.metadata;
+package org.mule.runtime.core.internal.metadata;
 
 import org.mule.api.connection.ConnectionException;
-import org.mule.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.api.metadata.MetadataCache;
 import org.mule.api.metadata.MetadataContext;
 import org.mule.extension.api.runtime.ConfigurationInstance;

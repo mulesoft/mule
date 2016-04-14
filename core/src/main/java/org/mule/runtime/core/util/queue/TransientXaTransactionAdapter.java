@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue;
+package org.mule.runtime.core.util.queue;
 
-import org.mule.util.xa.ResourceManagerException;
+import org.mule.runtime.core.util.xa.ResourceManagerException;
 
 import java.io.Serializable;
 
 /**
- * Adapter for {@link TransientQueueTransactionContext} to an {@link org.mule.util.queue.XaQueueTransactionContext}
+ * Adapter for {@link TransientQueueTransactionContext} to an {@link org.mule.runtime.core.util.queue.XaQueueTransactionContext}
  */
 public class TransientXaTransactionAdapter implements XaQueueTransactionContext
 {

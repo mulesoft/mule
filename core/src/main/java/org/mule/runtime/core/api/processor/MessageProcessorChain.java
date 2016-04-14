@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.processor;
+package org.mule.runtime.core.api.processor;
 
-import org.mule.api.NamedObject;
+import org.mule.runtime.core.api.NamedObject;
 
 import java.util.List;
 

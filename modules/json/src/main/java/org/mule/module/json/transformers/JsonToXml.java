@@ -6,9 +6,9 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.IOUtils;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;

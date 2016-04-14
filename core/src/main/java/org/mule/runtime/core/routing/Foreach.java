@@ -4,31 +4,31 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
-import static org.mule.api.LocatedMuleException.INFO_LOCATION_KEY;
+import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.NonBlockingSupported;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorPathElement;
-import org.mule.api.routing.filter.Filter;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.TransformerException;
-import org.mule.expression.ExpressionConfig;
-import org.mule.processor.AbstractMessageProcessorOwner;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.routing.outbound.AbstractMessageSequenceSplitter;
-import org.mule.routing.outbound.CollectionMessageSequence;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.NotificationUtils;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.expression.ExpressionConfig;
+import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
+import org.mule.runtime.core.routing.outbound.CollectionMessageSequence;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.NotificationUtils;
 
 import java.util.LinkedList;
 import java.util.List;

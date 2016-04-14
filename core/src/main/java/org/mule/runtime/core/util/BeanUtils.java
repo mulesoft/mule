@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

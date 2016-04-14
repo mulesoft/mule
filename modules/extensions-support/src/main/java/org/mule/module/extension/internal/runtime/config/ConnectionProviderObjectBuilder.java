@@ -6,15 +6,15 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
-import org.mule.internal.connection.CachedConnectionProviderWrapper;
-import org.mule.internal.connection.ConnectionManagerAdapter;
-import org.mule.internal.connection.PooledConnectionProviderWrapper;
+import org.mule.runtime.core.internal.connection.CachedConnectionProviderWrapper;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.connection.PooledConnectionProviderWrapper;
 import org.mule.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;

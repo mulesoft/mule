@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.client;
+package org.mule.runtime.core.client;
 
-import org.mule.api.client.OperationOptions;
+import org.mule.runtime.core.api.client.OperationOptions;
 
 /**
- * Default implementation for {@link org.mule.api.client.OperationOptions}
+ * Default implementation for {@link org.mule.runtime.core.api.client.OperationOptions}
  */
 public class SimpleOptions implements OperationOptions
 {

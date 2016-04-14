@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.model;
+package org.mule.runtime.core.api.model;
 
-import org.mule.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleEventContext;
 
 /**
  * <code>EntryPointResolver</code> resolves a method to call on the given

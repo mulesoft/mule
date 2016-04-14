@@ -7,11 +7,11 @@
 
 package org.mule.module.launcher.application;
 
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 
 import java.util.HashMap;
 import java.util.Map;

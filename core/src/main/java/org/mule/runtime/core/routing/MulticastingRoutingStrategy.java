@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
-import org.mule.VoidMuleEvent;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.CouldNotRouteOutboundMessageException;
-import org.mule.api.routing.RoutePathNotFoundException;
-import org.mule.api.routing.RouterResultsHandler;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
+import org.mule.runtime.core.api.routing.RouterResultsHandler;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.util.ArrayList;
 import java.util.List;

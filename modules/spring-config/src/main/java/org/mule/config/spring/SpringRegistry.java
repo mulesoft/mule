@@ -7,22 +7,22 @@
 package org.mule.config.spring;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.Injector;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.registry.LifecycleRegistry;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.registry.TransformerResolver;
-import org.mule.api.transformer.Converter;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.registry.LifecycleRegistry;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.registry.TransformerResolver;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
-import org.mule.lifecycle.RegistryLifecycleManager;
-import org.mule.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.registry.AbstractRegistry;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.lifecycle.RegistryLifecycleManager;
+import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.registry.AbstractRegistry;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -278,7 +278,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
      *
      * @param object the object to process
      * @return the same object with lifecycle methods called (if it has any)
-     * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change for the object.
+     * @throws org.mule.runtime.core.api.MuleException if the registry fails to perform the lifecycle change for the object.
      */
     @Override
     public Object applyLifecycle(Object object) throws MuleException

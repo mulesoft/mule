@@ -6,18 +6,18 @@
  */
 package org.mule.module.cxf;
 
-import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.execution.ExecutionCallback;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.api.message.NullPayload;
-import org.mule.component.ComponentException;
-import org.mule.config.ExceptionHelper;
-import org.mule.execution.ErrorHandlingExecutionTemplate;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.component.ComponentException;
+import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

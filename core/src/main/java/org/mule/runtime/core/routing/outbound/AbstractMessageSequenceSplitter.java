@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.outbound;
+package org.mule.runtime.core.routing.outbound;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.RequestContext;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.routing.MessageInfoMapping;
-import org.mule.api.routing.RouterResultsHandler;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.routing.AbstractSplitter;
-import org.mule.routing.CorrelationMode;
-import org.mule.routing.DefaultRouterResultsHandler;
-import org.mule.routing.MessageSequence;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.routing.MessageInfoMapping;
+import org.mule.runtime.core.api.routing.RouterResultsHandler;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.core.routing.AbstractSplitter;
+import org.mule.runtime.core.routing.CorrelationMode;
+import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
+import org.mule.runtime.core.routing.MessageSequence;
 
 import java.util.ArrayList;
 import java.util.List;

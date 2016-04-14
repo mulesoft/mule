@@ -5,23 +5,23 @@
  * LICENSE.txt file.
  */
 
-package org.mule.agent.registry;
+package org.mule.runtime.core.agent.registry;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleContext;
-import org.mule.api.registry.TransformerResolver;
-import org.mule.api.transformer.Converter;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.registry.TransformerResolver;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.registry.DefaultRegistryBroker;
-import org.mule.registry.MuleRegistryHelper;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.registry.DefaultRegistryBroker;
+import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.transformer.builder.MockConverterBuilder;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.construct;
+package org.mule.runtime.core.construct;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleContext;
-import org.mule.api.construct.FlowConstructInvalidException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.source.MessageSource;
-import org.mule.api.source.NonBlockingMessageSource;
-import org.mule.exception.RollbackMessagingExceptionStrategy;
-import org.mule.processor.AbstractRedeliveryPolicy;
-import org.mule.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.processor.strategy.SynchronousProcessingStrategy;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.source.NonBlockingMessageSource;
+import org.mule.runtime.core.exception.RollbackMessagingExceptionStrategy;
+import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;

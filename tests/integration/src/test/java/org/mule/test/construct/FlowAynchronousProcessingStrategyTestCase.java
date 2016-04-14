@@ -6,7 +6,7 @@
  */
 package org.mule.test.construct;
 
-import org.mule.api.MessagingException;
+import org.mule.runtime.core.api.MessagingException;
 
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;

@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.streaming;
+package org.mule.runtime.core.streaming;
 
-import org.mule.api.Closeable;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.Closeable;
+import org.mule.runtime.core.api.MuleException;
 
 import java.util.Iterator;
 

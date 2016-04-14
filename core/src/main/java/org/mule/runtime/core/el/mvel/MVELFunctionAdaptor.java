@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.mvel;
+package org.mule.runtime.core.el.mvel;
 
-import org.mule.api.el.ExpressionLanguageContext;
-import org.mule.api.el.ExpressionLanguageFunction;
+import org.mule.runtime.core.api.el.ExpressionLanguageContext;
+import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
 
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.ast.Function;

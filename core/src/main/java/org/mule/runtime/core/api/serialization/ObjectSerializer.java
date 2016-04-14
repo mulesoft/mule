@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.serialization;
+package org.mule.runtime.core.api.serialization;
 
-import org.mule.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.InputStream;
 import java.io.OutputStream;

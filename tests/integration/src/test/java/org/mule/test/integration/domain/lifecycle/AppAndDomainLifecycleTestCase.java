@@ -10,16 +10,16 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import org.junit.Rule;
 import org.junit.Test;

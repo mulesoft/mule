@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
 public class StopFurtherMessageProcessingMessageProcessor extends AbstractInterceptingMessageProcessor
 {

@@ -10,7 +10,7 @@ import static org.mule.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANN
 
 import org.mule.config.spring.parsers.DefaultXmlMetadataAnnotations;
 import org.mule.config.spring.parsers.XmlMetadataAnnotations;
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api;
+package org.mule.runtime.core.api;
 
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.util.StringUtils;
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

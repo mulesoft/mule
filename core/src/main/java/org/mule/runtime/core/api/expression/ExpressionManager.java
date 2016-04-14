@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.expression;
+package org.mule.runtime.core.api.expression;
 
-import org.mule.api.MuleEvent;
-import org.mule.transformer.types.TypedValue;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.transformer.types.TypedValue;
 
 /**
  * Provides universal access for evaluating expressions embedded in Mule configurations, such as Xml, Java,
@@ -23,7 +23,7 @@ public interface ExpressionManager
      * Evaluates the given expression. The expression should be a single expression definition with or without
      * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For
      * situations where one or more expressions need to be parsed within a single text, the
-     * {@link #parse(String,org.mule.api.MuleEvent,boolean)} method should be used since it will iterate
+     * {@link #parse(String,org.mule.runtime.core.api.MuleEvent,boolean)} method should be used since it will iterate
      * through all expressions in a string.
      * 
      * @param expression a single expression i.e. xpath://foo
@@ -38,7 +38,7 @@ public interface ExpressionManager
      * Evaluates the given expression. The expression should be a single expression definition with or without
      * enclosing braces. i.e. "context:serviceName" and "#[context:serviceName]" are both valid. For
      * situations where one or more expressions need to be parsed within a single text, the
-     * {@link #parse(String,org.mule.api.MuleEvent,boolean)} method should be used since it will iterate
+     * {@link #parse(String,org.mule.runtime.core.api.MuleEvent,boolean)} method should be used since it will iterate
      * through all expressions in a string.
      * 
      * @param expression a single expression i.e. xpath://foo
@@ -100,13 +100,13 @@ public interface ExpressionManager
     /**
      * Evaluates expressions in a given string. This method will iterate through each expression and evaluate
      * it. If a user needs to evaluate a single expression they can use
-     * {@link #evaluate(String,org.mule.api.MuleEvent,boolean)}.
+     * {@link #evaluate(String,org.mule.runtime.core.api.MuleEvent,boolean)}.
      * 
      * @param expression one or more expressions ebedded in a literal string i.e.
      *            "Value is #[xpath://foo] other value is #[header:foo]."
      * @param event The current event being processed
      * @return the result of the evaluation
-     * @throws org.mule.api.expression.ExpressionRuntimeException if the expression is invalid, or a null is
+     * @throws org.mule.runtime.core.api.expression.ExpressionRuntimeException if the expression is invalid, or a null is
      *             found for the expression and 'failIfNull is set to true.
      */
     String parse(String expression, MuleEvent event) throws ExpressionRuntimeException;
@@ -114,7 +114,7 @@ public interface ExpressionManager
     /**
      * Evaluates expressions in a given string. This method will iterate through each expression and evaluate
      * it. If a user needs to evaluate a single expression they can use
-     * {@link #evaluate(String,org.mule.api.MuleEvent,boolean)}.
+     * {@link #evaluate(String,org.mule.runtime.core.api.MuleEvent,boolean)}.
      * 
      * @param expression one or more expressions ebedded in a literal string i.e.
      *            "Value is #[xpath://foo] other value is #[header:foo]."

@@ -12,12 +12,12 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.AnnotatedObject;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.transformer.Transformer;
-import org.mule.component.DefaultJavaComponent;
+import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.util.Collection;
 

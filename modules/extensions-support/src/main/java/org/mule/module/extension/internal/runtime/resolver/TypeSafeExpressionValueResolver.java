@@ -6,18 +6,18 @@
  */
 package org.mule.module.extension.internal.runtime.resolver;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.transformer.MessageTransformer;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.AttributeEvaluator;
-import org.mule.util.ClassUtils;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.transformer.MessageTransformer;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.AttributeEvaluator;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.debug;
+package org.mule.runtime.core.api.debug;
 
 /**
  * Handles the execution of the underlying debugging engine.

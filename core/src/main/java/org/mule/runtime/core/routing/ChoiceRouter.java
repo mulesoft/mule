@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.RoutePathNotFoundException;
-import org.mule.api.routing.filter.Filter;
-import org.mule.processor.NonBlockingMessageProcessor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 
 import java.util.Collection;
 import java.util.Collections;

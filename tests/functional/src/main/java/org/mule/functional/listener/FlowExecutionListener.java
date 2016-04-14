@@ -8,12 +8,12 @@ package org.mule.functional.listener;
 
 import static org.junit.Assert.fail;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.context.notification.PipelineMessageNotificationListener;
-import org.mule.context.notification.NotificationException;
-import org.mule.context.notification.PipelineMessageNotification;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
+import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.runtime.core.context.notification.PipelineMessageNotification;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.ArrayList;
 import java.util.List;

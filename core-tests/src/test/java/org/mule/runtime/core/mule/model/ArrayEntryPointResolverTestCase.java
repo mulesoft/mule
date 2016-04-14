@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.mule.model;
+package org.mule.runtime.core.model;
 
-import org.mule.api.model.InvocationResult;
-import org.mule.model.resolvers.AbstractArgumentEntryPointResolver;
-import org.mule.model.resolvers.ArrayEntryPointResolver;
+import org.mule.runtime.core.api.model.InvocationResult;
+import org.mule.runtime.core.model.resolvers.AbstractArgumentEntryPointResolver;
+import org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;

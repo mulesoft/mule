@@ -6,18 +6,18 @@
  */
 package org.mule.module.scripting.filter;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.api.routing.filter.Filter;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.module.scripting.component.Scriptable;
-import org.mule.processor.AbstractFilteringMessageProcessor;
+import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 
 import javax.script.Bindings;
 

@@ -6,12 +6,12 @@
  */
 package org.mule.tck;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.connector.ReplyToHandler;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 public class SensingNullReplyToHandler implements ReplyToHandler
 {

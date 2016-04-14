@@ -9,7 +9,7 @@ package org.mule.test.integration.management;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.module.management.agent.DefaultJmxSupportAgent;
 import org.mule.functional.junit4.FunctionalTestCase;
 

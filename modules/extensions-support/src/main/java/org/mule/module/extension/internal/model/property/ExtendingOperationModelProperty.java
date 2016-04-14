@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.model.property;
 
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.extension.api.annotation.Extensible;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.introspection.ModelProperty;

@@ -8,7 +8,7 @@ package org.mule.module.scripting;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

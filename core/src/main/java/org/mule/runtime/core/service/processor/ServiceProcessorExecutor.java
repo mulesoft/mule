@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.service.processor;
+package org.mule.runtime.core.service.processor;
 
-import org.mule.VoidMuleEvent;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.execution.MessageProcessorExecutionTemplate;
-import org.mule.processor.BlockingProcessorExecutor;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
+import org.mule.runtime.core.processor.BlockingProcessorExecutor;
 
 import java.util.List;
 
 /**
- * {@link org.mule.processor.BlockingProcessorExecutor} specifically for use with instances of {@link org.mule.api.service.Service}
+ * {@link org.mule.runtime.core.processor.BlockingProcessorExecutor} specifically for use with instances of {@link org.mule.runtime.core.api.service.Service}
  */
 public class ServiceProcessorExecutor extends BlockingProcessorExecutor
 {

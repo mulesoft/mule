@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.api.Closeable;
-import org.mule.api.MuleContext;
-import org.mule.api.util.StreamCloser;
-import org.mule.streaming.Consumer;
+import org.mule.runtime.core.api.Closeable;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.StreamCloser;
+import org.mule.runtime.core.streaming.Consumer;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;

@@ -4,27 +4,27 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.agent;
+package org.mule.runtime.core.agent;
 
-import org.mule.AbstractAgent;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.api.context.notification.ConnectionNotificationListener;
-import org.mule.api.context.notification.CustomNotificationListener;
-import org.mule.api.context.notification.ManagementNotificationListener;
-import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.api.context.notification.SecurityNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServerNotificationListener;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.context.notification.ComponentMessageNotification;
-import org.mule.context.notification.ConnectionNotification;
-import org.mule.context.notification.ConnectorMessageNotification;
-import org.mule.context.notification.ManagementNotification;
-import org.mule.context.notification.MessageProcessorNotification;
-import org.mule.context.notification.MuleContextNotification;
-import org.mule.context.notification.NotificationException;
-import org.mule.context.notification.SecurityNotification;
+import org.mule.runtime.core.AbstractAgent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
+import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
+import org.mule.runtime.core.api.context.notification.ManagementNotificationListener;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.context.notification.ComponentMessageNotification;
+import org.mule.runtime.core.context.notification.ConnectionNotification;
+import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
+import org.mule.runtime.core.context.notification.ManagementNotification;
+import org.mule.runtime.core.context.notification.MessageProcessorNotification;
+import org.mule.runtime.core.context.notification.MuleContextNotification;
+import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.runtime.core.context.notification.SecurityNotification;
 
 import java.util.HashSet;
 import java.util.Set;

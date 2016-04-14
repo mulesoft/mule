@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.datetime;
+package org.mule.runtime.core.el.datetime;
 
-import org.mule.api.el.datetime.Date;
-import org.mule.api.el.datetime.Time;
+import org.mule.runtime.core.api.el.datetime.Date;
+import org.mule.runtime.core.api.el.datetime.Time;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

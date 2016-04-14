@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.construct;
+package org.mule.runtime.core.construct;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -19,17 +19,17 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.processor.ResponseMessageProcessorAdapter;
-import org.mule.processor.chain.DynamicMessageProcessorContainer;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
+import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.transformer.simple.StringAppendTransformer;
-import org.mule.util.NotificationUtils.FlowMap;
+import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 
 import java.util.ArrayList;
 import java.util.Collections;

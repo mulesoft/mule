@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.mule.model;
+package org.mule.runtime.core.model;
 
 /**
  * A test object with multiple signatures matching a payload for the discovery to fail.

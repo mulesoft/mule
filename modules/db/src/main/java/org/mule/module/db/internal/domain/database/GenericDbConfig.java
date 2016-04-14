@@ -10,7 +10,7 @@ package org.mule.module.db.internal.domain.database;
 import static org.mule.common.Result.Status.FAILURE;
 import static org.mule.common.Result.Status.SUCCESS;
 import static org.mule.module.db.internal.domain.transaction.TransactionalAction.NOT_SUPPORTED;
-import org.mule.AbstractAnnotatedObject;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.common.DefaultResult;
 import org.mule.common.DefaultTestResult;
 import org.mule.common.Result;

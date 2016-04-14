@@ -5,21 +5,21 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectAlreadyExistsException;
-import org.mule.api.store.ObjectDoesNotExistException;
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Ignore;

@@ -4,32 +4,32 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.AbstractAnnotatedObject;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.registry.RegistrationException;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.TransformerTemplate;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transformer.TransformerTemplate;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.message.NullPayload;
-import org.mule.util.ClassUtils;
-import org.mule.util.TemplateParser;
-import org.mule.util.TemplateParser.PatternInfo;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.TemplateParser;
+import org.mule.runtime.core.util.TemplateParser.PatternInfo;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

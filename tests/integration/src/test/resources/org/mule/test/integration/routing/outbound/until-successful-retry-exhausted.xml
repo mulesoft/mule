@@ -8,7 +8,7 @@
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
 	<spring:bean id="objectStore"
-		class="org.mule.util.store.SimpleMemoryObjectStore" />
+		class="org.mule.runtime.core.util.store.SimpleMemoryObjectStore" />
 
 	<flow name="retryExhausted">
 		<until-successful objectStore-ref="objectStore" maxRetries="1" secondsBetweenRetries="1">

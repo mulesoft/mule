@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.exception;
+package org.mule.runtime.core.exception;
 
-import org.mule.RequestContext;
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.context.notification.ExceptionStrategyNotification;
-import org.mule.management.stats.FlowConstructStatistics;
-import org.mule.message.DefaultExceptionPayload;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.api.message.NullPayload;
 
 /**

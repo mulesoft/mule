@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.object;
+package org.mule.runtime.core.api.object;
 
-import org.mule.api.MuleContext;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationCallback;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
 
 /**
  * <code>ObjectFactory</code> is a generic Factory interface.
@@ -21,7 +21,7 @@ public interface ObjectFactory extends Initialisable, Disposable
      * an existing instance depending on the implementation. If a new instance is
      * created it will also be initialized by this method
      * (Initilisable.initialise()).
-     * @param muleContext the current {@link org.mule.api.MuleContext} instance. This can be used for performing registry look-ups
+     * @param muleContext the current {@link org.mule.runtime.core.api.MuleContext} instance. This can be used for performing registry look-ups
      * applying processors to newly created objects or even firing custom notifications
      * @throws Exception if there is an exception thrown creating the new instance
      * @return A new instance of an object.  The factory may decide to return the same instance each type or create a new instance each time

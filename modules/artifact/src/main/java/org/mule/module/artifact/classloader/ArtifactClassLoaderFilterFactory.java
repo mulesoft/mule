@@ -7,7 +7,7 @@
 
 package org.mule.module.artifact.classloader;
 
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.HashSet;
 import java.util.Set;

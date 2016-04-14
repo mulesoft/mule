@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.agents;
+package org.mule.runtime.core.management.agents;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.module.management.agent.AbstractJmxAgent;
 import org.mule.module.management.agent.DefaultJmxSupportAgent;
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;

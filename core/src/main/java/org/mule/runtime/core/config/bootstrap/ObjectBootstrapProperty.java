@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.bootstrap;
+package org.mule.runtime.core.config.bootstrap;
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.util.StringUtils;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.util.StringUtils;
 
 /**
  * Defines a bootstrap property for a generic object

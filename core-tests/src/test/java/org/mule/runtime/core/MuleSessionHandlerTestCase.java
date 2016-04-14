@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -12,25 +12,25 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.PropertyScope.OUTBOUND;
+import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.Credentials;
-import org.mule.api.security.SecurityContext;
-import org.mule.api.serialization.SerializationException;
-import org.mule.message.SessionHandler;
-import org.mule.security.DefaultMuleAuthentication;
-import org.mule.security.DefaultSecurityContextFactory;
-import org.mule.security.MuleCredentials;
-import org.mule.session.DefaultMuleSession;
-import org.mule.session.SerializeAndEncodeSessionHandler;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.Credentials;
+import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.serialization.SerializationException;
+import org.mule.runtime.core.message.SessionHandler;
+import org.mule.runtime.core.security.DefaultMuleAuthentication;
+import org.mule.runtime.core.security.DefaultSecurityContextFactory;
+import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.session.SerializeAndEncodeSessionHandler;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

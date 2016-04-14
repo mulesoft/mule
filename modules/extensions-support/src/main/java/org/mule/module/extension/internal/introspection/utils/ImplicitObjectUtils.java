@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.introspection.utils;
 
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
-import org.mule.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.introspection.parameter.ParametrizedModel;

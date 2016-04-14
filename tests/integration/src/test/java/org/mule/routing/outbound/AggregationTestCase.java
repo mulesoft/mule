@@ -4,27 +4,27 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.outbound;
+package org.mule.runtime.core.routing.outbound;
 
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.store.ObjectStoreException;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.routing.AggregationException;
-import org.mule.routing.EventGroup;
-import org.mule.routing.SimpleCollectionAggregator;
-import org.mule.routing.correlation.CollectionCorrelatorCallback;
-import org.mule.routing.correlation.EventCorrelatorCallback;
+import org.mule.runtime.core.routing.AggregationException;
+import org.mule.runtime.core.routing.EventGroup;
+import org.mule.runtime.core.routing.SimpleCollectionAggregator;
+import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
+import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;

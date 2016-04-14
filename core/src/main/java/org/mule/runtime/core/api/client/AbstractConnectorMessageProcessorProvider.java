@@ -5,16 +5,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.client;
+package org.mule.runtime.core.api.client;
 
-import org.mule.MessageExchangePattern;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.connector.ConnectorOperationProvider;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.connector.ConnectorOperationProvider;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

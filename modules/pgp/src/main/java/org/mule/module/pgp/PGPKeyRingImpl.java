@@ -19,12 +19,12 @@ import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.module.pgp.i18n.PGPMessages;
-import org.mule.util.IOUtils;
-import org.mule.util.SecurityUtils;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.SecurityUtils;
 
 public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 {

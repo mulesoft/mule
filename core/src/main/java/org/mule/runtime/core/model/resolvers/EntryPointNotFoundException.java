@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.model.resolvers;
+package org.mule.runtime.core.model.resolvers;
 
-import org.mule.api.MuleException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
- * Tis exception gets thrown by the {@link org.mule.model.resolvers.DefaultEntryPointResolverSet} if after trying
+ * Tis exception gets thrown by the {@link org.mule.runtime.core.model.resolvers.DefaultEntryPointResolverSet} if after trying
  * all entrypointResolvers it cannot fin the entrypoint on the service service
  */
 public class EntryPointNotFoundException extends MuleException

@@ -6,14 +6,14 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;

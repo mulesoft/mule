@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.agent.registry;
+package org.mule.runtime.core.agent.registry;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -13,17 +13,17 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleException;
-import org.mule.api.schedule.Scheduler;
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.schedule.Scheduler;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.BloodOrange;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transformer.builder.MockConverterBuilder;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.metadata.SimpleDataType;
-import org.mule.util.Predicate;
+import org.mule.runtime.core.util.Predicate;
 
 import java.util.List;
 

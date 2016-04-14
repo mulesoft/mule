@@ -6,8 +6,8 @@
  */
 package org.mule.extension.validation.internal;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.extension.validation.api.Validator;
 import org.mule.mvel2.compiler.BlankLiteral;
 

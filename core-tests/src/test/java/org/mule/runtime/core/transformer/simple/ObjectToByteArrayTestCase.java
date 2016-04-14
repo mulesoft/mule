@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.api.transformer.Converter.DEFAULT_PRIORITY_WEIGHTING;
+import static org.mule.runtime.core.api.transformer.Converter.DEFAULT_PRIORITY_WEIGHTING;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
 /**
- * This unit test only tests the default priority of the {@link org.mule.transformer.simple.ObjectToByteArray} transformer.
- * Actual transformation logic is tested in the {@link org.mule.transformer.simple.ObjectByteArrayTransformersWithObjectsTestCase}
+ * This unit test only tests the default priority of the {@link org.mule.runtime.core.transformer.simple.ObjectToByteArray} transformer.
+ * Actual transformation logic is tested in the {@link org.mule.runtime.core.transformer.simple.ObjectByteArrayTransformersWithObjectsTestCase}
  * test and its subclasses.
  */
 @SmallTest

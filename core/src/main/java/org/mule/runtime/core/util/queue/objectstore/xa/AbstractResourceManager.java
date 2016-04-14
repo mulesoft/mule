@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue.objectstore.xa;
+package org.mule.runtime.core.util.queue.objectstore.xa;
 
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.xa.ResourceManagerException;
-import org.mule.util.xa.ResourceManagerSystemException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.xa.ResourceManagerException;
+import org.mule.runtime.core.util.xa.ResourceManagerSystemException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -160,17 +160,17 @@ public abstract class AbstractResourceManager
     /**
      * Starts a new transaction and associates it with the current thread. All
      * subsequent changes in the same thread made to the map are invisible from other
-     * threads until {@link #commitTransaction(org.mule.util.xa.AbstractTransactionContext)} is called. Use
-     * {@link #rollbackTransaction(org.mule.util.xa.AbstractTransactionContext)} to discard your changes. After
+     * threads until {@link #commitTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)} is called. Use
+     * {@link #rollbackTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)} to discard your changes. After
      * calling either method there will be no transaction associated to the current thread any
      * longer. <br>
      * <br>
      * <em>Caution:</em> Be careful to finally call one of those methods, as
      * otherwise the transaction will lurk around for ever.
      *
-     * @see #prepareTransaction(org.mule.util.xa.AbstractTransactionContext)
-     * @see #commitTransaction(org.mule.util.xa.AbstractTransactionContext)
-     * @see #rollbackTransaction(org.mule.util.xa.AbstractTransactionContext)
+     * @see #prepareTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)
+     * @see #commitTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)
+     * @see #rollbackTransaction(org.mule.runtime.core.util.xa.AbstractTransactionContext)
      */
     public AbstractTransactionContext startTransaction(Object session) throws ResourceManagerException
     {

@@ -11,8 +11,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.IOException;
 import java.io.StringReader;

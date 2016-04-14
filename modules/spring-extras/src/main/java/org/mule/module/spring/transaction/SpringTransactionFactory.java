@@ -6,11 +6,11 @@
  */
 package org.mule.module.spring.transaction;
 
-import org.mule.api.MuleContext;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionException;
-import org.mule.api.transaction.TransactionFactory;
-import org.mule.transaction.AbstractSingleResourceTransaction;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.transaction.AbstractSingleResourceTransaction;
 
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.jms.connection.JmsResourceHolder;

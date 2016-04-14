@@ -6,8 +6,8 @@
  */
 package org.mule.module.spring.transaction;
 
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.transaction.TransactionManagerFactory;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 
 import javax.transaction.TransactionManager;
 

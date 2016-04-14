@@ -10,8 +10,8 @@ package org.mule.module.db.integration.vendor.oracle;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;

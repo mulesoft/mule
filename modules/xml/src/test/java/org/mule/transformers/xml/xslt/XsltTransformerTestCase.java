@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml.xslt;
+package org.mule.runtime.core.transformers.xml.xslt;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.module.xml.util.LocalURIResolver;
 import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformers.xml.AbstractXmlTransformerTestCase;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformers.xml.AbstractXmlTransformerTestCase;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 import java.util.HashMap;

@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
-import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
-import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
-import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
+import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
+import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
+import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;

@@ -6,19 +6,19 @@
  */
 package org.mule.tck;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.VoidMuleEvent;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.api.execution.CompletionHandler;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.source.MessageSource;
-import org.mule.processor.AbstractNonBlockingMessageProcessor;
-import org.mule.util.ObjectUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.processor.AbstractNonBlockingMessageProcessor;
+import org.mule.runtime.core.util.ObjectUtils;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.Executors;
 

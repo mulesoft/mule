@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.object;
+package org.mule.runtime.core.object;
 
-import org.mule.api.MuleContext;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 import java.util.Map;
 

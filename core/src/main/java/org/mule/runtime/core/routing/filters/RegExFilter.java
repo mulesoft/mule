@@ -4,26 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.filters;
+package org.mule.runtime.core.routing.filters;
 
-import static org.mule.util.ClassUtils.hash;
-import org.mule.DefaultMuleEvent;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.routing.filter.Filter;
-import org.mule.api.routing.filter.ObjectFilter;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.construct.Flow;
-import org.mule.transformer.simple.ByteArrayToObject;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.AttributeEvaluator;
-import org.mule.util.ClassUtils;
+import static org.mule.runtime.core.util.ClassUtils.hash;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.api.routing.filter.ObjectFilter;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.AttributeEvaluator;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.regex.Pattern;
 

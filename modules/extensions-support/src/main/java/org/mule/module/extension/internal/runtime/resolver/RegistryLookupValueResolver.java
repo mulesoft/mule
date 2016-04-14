@@ -6,10 +6,10 @@
  */
 package org.mule.module.extension.internal.runtime.resolver;
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 
 import org.apache.commons.lang.StringUtils;
 

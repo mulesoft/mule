@@ -6,7 +6,7 @@
  */
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleEventContext;
 
 /**
  * A test object not implementing Callable, but having a matching method accepting

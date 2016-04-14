@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.serialization.internal;
+package org.mule.runtime.core.serialization.internal;
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.serialization.ObjectSerializer;
-import org.mule.api.serialization.SerializationException;
-import org.mule.util.IOUtils;
-import org.mule.util.store.DeserializationPostInitialisable;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.serialization.SerializationException;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Base class for implementations of {@link org.mule.api.serialization.ObjectSerializer}
+ * Base class for implementations of {@link org.mule.runtime.core.api.serialization.ObjectSerializer}
  * This class implements all the base behavioral contract allowing its extensions to
  * only care about the actual serialization/deserialization part.
  *

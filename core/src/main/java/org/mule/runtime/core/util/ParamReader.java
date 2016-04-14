@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.mule.util;
+package org.mule.runtime.core.util;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;

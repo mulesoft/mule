@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.codec;
+package org.mule.runtime.core.transformer.codec;
 
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.is;
@@ -12,10 +12,10 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.api.transformer.Transformer;
-import org.mule.transformer.AbstractTransformerTestCase;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.Base64;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.Base64;
 
 import org.junit.Test;
 

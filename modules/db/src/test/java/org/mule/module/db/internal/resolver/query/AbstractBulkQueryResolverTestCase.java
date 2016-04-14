@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.module.db.internal.domain.param.QueryParam;
 import org.mule.module.db.internal.domain.query.BulkQuery;
 import org.mule.module.db.internal.domain.query.QueryTemplate;

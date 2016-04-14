@@ -37,7 +37,7 @@
         <test:non-blocking-processor/>
     </flow>
 
-    <spring:bean id="objectStore" class="org.mule.util.store.SimpleMemoryObjectStore"/>
+    <spring:bean id="objectStore" class="org.mule.runtime.core.util.store.SimpleMemoryObjectStore"/>
 
     <flow name="untilSuccessful">
         <test:assert-intercepting responseSameThread="true"/>

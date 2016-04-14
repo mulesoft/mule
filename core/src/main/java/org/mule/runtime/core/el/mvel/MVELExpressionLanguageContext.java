@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.mvel;
+package org.mule.runtime.core.el.mvel;
 
-import org.mule.api.MuleContext;
-import org.mule.api.el.ExpressionLanguageContext;
-import org.mule.api.el.ExpressionLanguageFunction;
-import org.mule.api.el.VariableAssignmentCallback;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionLanguageContext;
+import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
+import org.mule.runtime.core.api.el.VariableAssignmentCallback;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
@@ -63,7 +63,7 @@ public class MVELExpressionLanguageContext extends MuleBaseVariableResolverFacto
 
     /*
      * (non-Javadoc)
-     * @see org.mule.el.mvel.MuleVariableResolverFactory#addVariable(java.lang.String, java.lang.Object)
+     * @see org.mule.runtime.core.el.mvel.MuleVariableResolverFactory#addVariable(java.lang.String, java.lang.Object)
      */
     @Override
     public <T> void addVariable(String name, T value)

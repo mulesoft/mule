@@ -6,7 +6,7 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

@@ -6,10 +6,10 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.source.CompositeMessageSource;
-import org.mule.api.source.MessageSource;
-import org.mule.source.StartableCompositeMessageSource;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.source.CompositeMessageSource;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.source.StartableCompositeMessageSource;
 
 import java.util.Collections;
 import java.util.List;

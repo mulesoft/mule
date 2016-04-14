@@ -9,7 +9,7 @@ package org.mule.extension.validation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MessagingException;
+import org.mule.runtime.core.api.MessagingException;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.Test;

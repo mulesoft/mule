@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api;
+package org.mule.runtime.core.api;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.util.concurrent.DaemonThreadFactory;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;
 
 import java.util.List;
 import java.util.concurrent.Callable;

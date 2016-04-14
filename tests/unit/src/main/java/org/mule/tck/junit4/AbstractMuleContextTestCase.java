@@ -6,40 +6,40 @@
  */
 package org.mule.tck.junit4;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.api.context.MuleContextFactory;
-import org.mule.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.context.MuleContextFactory;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.metadata.DataType;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.transformer.Transformer;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.builders.DefaultsConfigurationBuilder;
-import org.mule.config.builders.SimpleConfigurationBuilder;
-import org.mule.construct.Flow;
-import org.mule.context.DefaultMuleContextBuilder;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.context.notification.MuleContextNotification;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.TestingWorkListener;
 import org.mule.tck.TriggerableMessageSource;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.ClassUtils;
-import org.mule.util.FileUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -329,7 +329,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * @return creates a new {@link org.mule.api.MuleMessage} with a test payload
+     * @return creates a new {@link org.mule.runtime.core.api.MuleMessage} with a test payload
      */
     protected MuleMessage getTestMuleMessage()
     {
@@ -338,7 +338,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
 
     /**
      * @param message
-     * @return creates a new {@link org.mule.api.MuleMessage} with message as payload
+     * @return creates a new {@link org.mule.runtime.core.api.MuleMessage} with message as payload
      */
     protected MuleMessage getTestMuleMessage(Object message)
     {
@@ -474,7 +474,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      * lifecycle as the MuleContext
      *
      * @param o the object to register and initialise it
-     * @throws org.mule.api.registry.RegistrationException
+     * @throws org.mule.runtime.core.api.registry.RegistrationException
      */
     protected void initialiseObject(Object o) throws RegistrationException
     {
@@ -514,7 +514,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * Uses {@link org.mule.TransformationService} to get a {@link String} representation of a message.
+     * Uses {@link org.mule.runtime.core.TransformationService} to get a {@link String} representation of a message.
      *
      * @param message message to get payload from
      * @return String representation of the message payload
@@ -526,7 +526,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * Uses {@link org.mule.TransformationService} to get byte[] representation of a message.
+     * Uses {@link org.mule.runtime.core.TransformationService} to get byte[] representation of a message.
      *
      * @param message message to get payload from
      * @return byte[] representation of the message payload
@@ -538,7 +538,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * Uses {@link org.mule.TransformationService} to get representation of a message for a given {@link DataType}
+     * Uses {@link org.mule.runtime.core.TransformationService} to get representation of a message for a given {@link DataType}
      *
      * @param message message to get payload from
      * @param dataType dataType to be transformed to
@@ -551,7 +551,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * Uses {@link org.mule.TransformationService} to get representation of a message for a given {@link Class}
+     * Uses {@link org.mule.runtime.core.TransformationService} to get representation of a message for a given {@link Class}
      *
      * @param message message to get payload from
      * @param clazz type of the payload to be transformed to

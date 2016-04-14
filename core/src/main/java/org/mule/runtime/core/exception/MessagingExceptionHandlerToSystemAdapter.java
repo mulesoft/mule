@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.exception;
+package org.mule.runtime.core.exception;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 
 public class MessagingExceptionHandlerToSystemAdapter implements MessagingExceptionHandler
 {

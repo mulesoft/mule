@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.client;
+package org.mule.runtime.core.api.client;
 
 /**
- * Base options for every operation executed by {@link org.mule.api.client.MuleClient}
+ * Base options for every operation executed by {@link org.mule.runtime.core.api.client.MuleClient}
  *
  * Implementations of this class must redefine {@link Object#hashCode()} and {@link java.lang.Object#equals(Object)} since the may be used as key in a map
  */

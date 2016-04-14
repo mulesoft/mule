@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.model;
+package org.mule.runtime.core.api.model;
 
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.lang.reflect.Method;
 
@@ -43,12 +43,12 @@ public class InvocationResult
 
     /**
      * Will construct an InvocationResult with a given state. The state must be either
-     * {@link org.mule.api.model.InvocationResult.State#NOT_SUPPORTED} if the resolver performing the invocation knows that it cannot
+     * {@link org.mule.runtime.core.api.model.InvocationResult.State#NOT_SUPPORTED} if the resolver performing the invocation knows that it cannot
      * attempt to make the invocation
-     * {@link org.mule.api.model.InvocationResult.State#FAILED} If an invocation attempt is made but fails
-     * {@link org.mule.api.model.InvocationResult.State#SUCCESSFUL} If the invocation was successful
+     * {@link org.mule.runtime.core.api.model.InvocationResult.State#FAILED} If an invocation attempt is made but fails
+     * {@link org.mule.runtime.core.api.model.InvocationResult.State#SUCCESSFUL} If the invocation was successful
      *
-     * Typically, this constructor is used when the state is {@link org.mule.api.model.InvocationResult.State#NOT_SUPPORTED} or {@link org.mule.api.model.InvocationResult.State#FAILED}
+     * Typically, this constructor is used when the state is {@link org.mule.runtime.core.api.model.InvocationResult.State#NOT_SUPPORTED} or {@link org.mule.runtime.core.api.model.InvocationResult.State#FAILED}
      *
      * @param resolver the resolver being used to make the invocation
      * @param state the state of the result
@@ -60,7 +60,7 @@ public class InvocationResult
     }
 
     /**
-     * Creates a result with the result payload set. The state of this result will be {@link org.mule.api.model.InvocationResult.State#SUCCESSFUL}
+     * Creates a result with the result payload set. The state of this result will be {@link org.mule.runtime.core.api.model.InvocationResult.State#SUCCESSFUL}
      * since only in this state will a result be set.
      *
      * @param resolver the resolver being used to make the invocation
@@ -78,7 +78,7 @@ public class InvocationResult
 
     /**
      * Returns the name of the method invoked, this property is only set if the state of the invocation is
-     * {@link org.mule.api.model.InvocationResult.State#SUCCESSFUL}
+     * {@link org.mule.runtime.core.api.model.InvocationResult.State#SUCCESSFUL}
      *
      * @return the name of the method invoked
      */
@@ -91,7 +91,7 @@ public class InvocationResult
      * The result of this invocation
      *
      * @return an object or null if the result did not yield a result or because the state of this invocation result
-     *         is either {@link org.mule.api.model.InvocationResult.State#NOT_SUPPORTED} or {@link org.mule.api.model.InvocationResult.State#FAILED}.
+     *         is either {@link org.mule.runtime.core.api.model.InvocationResult.State#NOT_SUPPORTED} or {@link org.mule.runtime.core.api.model.InvocationResult.State#FAILED}.
      */
     public Object getResult()
     {
@@ -100,10 +100,10 @@ public class InvocationResult
 
     /**
      * @return the state of this invocation. Possible values are:
-     * {@link org.mule.api.model.InvocationResult.State#NOT_SUPPORTED} if the resolver performing the invocation knows that it cannot
+     * {@link org.mule.runtime.core.api.model.InvocationResult.State#NOT_SUPPORTED} if the resolver performing the invocation knows that it cannot
      * attempt to make the invocation
-     * {@link org.mule.api.model.InvocationResult.State#FAILED} If an invocation attempt is made but fails
-     * {@link org.mule.api.model.InvocationResult.State#SUCCESSFUL} If the invocation was successful
+     * {@link org.mule.runtime.core.api.model.InvocationResult.State#FAILED} If an invocation attempt is made but fails
+     * {@link org.mule.runtime.core.api.model.InvocationResult.State#SUCCESSFUL} If the invocation was successful
      */
     public State getState()
     {
@@ -111,7 +111,7 @@ public class InvocationResult
     }
 
     /**
-     * An optional error message can be set if the invocation state is not {@link org.mule.api.model.InvocationResult.State#SUCCESSFUL}
+     * An optional error message can be set if the invocation state is not {@link org.mule.runtime.core.api.model.InvocationResult.State#SUCCESSFUL}
      *
      * @param message the error message
      */

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.mvel;
+package org.mule.runtime.core.el.mvel;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -13,8 +13,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.el.context.AbstractELTestCase;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.el.context.AbstractELTestCase;
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.tck.MuleTestUtils;

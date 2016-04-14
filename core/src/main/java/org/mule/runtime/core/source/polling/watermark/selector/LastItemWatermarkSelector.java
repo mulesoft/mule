@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.source.polling.watermark.selector;
+package org.mule.runtime.core.source.polling.watermark.selector;
 
 /**
  * Implementation of {@link WatermarkSelector} that selects the last value of the

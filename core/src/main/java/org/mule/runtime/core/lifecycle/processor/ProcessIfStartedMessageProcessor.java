@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.lifecycle.processor;
+package org.mule.runtime.core.lifecycle.processor;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.NameableObject;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecycleState;
-import org.mule.api.lifecycle.Startable;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.processor.AbstractFilteringMessageProcessor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 
 public class ProcessIfStartedMessageProcessor extends AbstractFilteringMessageProcessor
 {

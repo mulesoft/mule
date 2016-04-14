@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.lifecycle;
+package org.mule.runtime.core.lifecycle;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.MuleContextNotification;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.context.notification.MuleContextNotification;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.lang.reflect.Constructor;
 

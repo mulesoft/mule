@@ -6,10 +6,10 @@
  */
 package org.mule.module.http.internal;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;

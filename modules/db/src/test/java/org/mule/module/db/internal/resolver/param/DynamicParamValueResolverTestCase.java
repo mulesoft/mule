@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.module.db.internal.domain.query.QueryParamValue;
 import org.mule.tck.size.SmallTest;
 

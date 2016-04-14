@@ -6,7 +6,7 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.routing.SimpleCollectionAggregator;
+import org.mule.runtime.core.routing.SimpleCollectionAggregator;
 
 
 /**

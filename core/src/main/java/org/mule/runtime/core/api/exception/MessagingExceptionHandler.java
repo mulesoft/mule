@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.exception;
+package org.mule.runtime.core.api.exception;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 
 /**
  * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).

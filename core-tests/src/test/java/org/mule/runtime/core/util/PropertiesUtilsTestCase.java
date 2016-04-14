@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
 import org.hamcrest.core.IsNull;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -109,7 +109,7 @@ public class PropertiesUtilsTestCase extends AbstractMuleTestCase
     {
         Properties properties = PropertiesUtils.loadAllProperties("META-INF/services/org/mule/config/mule-exception-codes.properties", this.getClass().getClassLoader());
         assertThat((String) properties.get("java.lang.IllegalArgumentException"), is("104000"));
-        assertThat((String) properties.get("org.mule.api.MuleException"),is("10000"));
+        assertThat((String) properties.get("org.mule.runtime.core.api.MuleException"),is("10000"));
     }
 
     @Test

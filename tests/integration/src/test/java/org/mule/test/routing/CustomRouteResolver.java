@@ -6,13 +6,13 @@
  */
 package org.mule.test.routing;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.DynamicRouteResolver;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.routing.DynamicRouteResolver;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
 import java.util.List;

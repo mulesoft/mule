@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.QueueStore;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.QueueStore;
 
 import java.io.Serializable;
 
@@ -32,12 +32,12 @@ public class DefaultObjectStoreFactoryBean
     /**
      * @deprecated to change object store implementations use the registry.
      * You must replace the object under keys:
-     * - {@link org.mule.api.config.MuleProperties#OBJECT_STORE_DEFAULT_IN_MEMORY_NAME}
-     * - {@link org.mule.api.config.MuleProperties#OBJECT_STORE_DEFAULT_PERSISTENT_NAME}
-     * - {@link org.mule.api.config.MuleProperties#DEFAULT_USER_OBJECT_STORE_NAME}
-     * - {@link org.mule.api.config.MuleProperties#DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME}
-     * - {@link org.mule.api.config.MuleProperties#QUEUE_STORE_DEFAULT_IN_MEMORY_NAME}
-     * - {@link org.mule.api.config.MuleProperties#QUEUE_STORE_DEFAULT_PERSISTENT_NAME}
+     * - {@link org.mule.runtime.core.api.config.MuleProperties#OBJECT_STORE_DEFAULT_IN_MEMORY_NAME}
+     * - {@link org.mule.runtime.core.api.config.MuleProperties#OBJECT_STORE_DEFAULT_PERSISTENT_NAME}
+     * - {@link org.mule.runtime.core.api.config.MuleProperties#DEFAULT_USER_OBJECT_STORE_NAME}
+     * - {@link org.mule.runtime.core.api.config.MuleProperties#DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME}
+     * - {@link org.mule.runtime.core.api.config.MuleProperties#QUEUE_STORE_DEFAULT_IN_MEMORY_NAME}
+     * - {@link org.mule.runtime.core.api.config.MuleProperties#QUEUE_STORE_DEFAULT_PERSISTENT_NAME}
      * @param factory
      */
     public static void setDelegate(DefaultObjectStoreFactory factory)

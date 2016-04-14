@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
-import org.mule.api.Injector;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.LifecycleRegistry;
-import org.mule.api.registry.RegistrationException;
-import org.mule.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.LifecycleRegistry;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 
 import java.lang.reflect.Field;
 
@@ -36,7 +36,7 @@ import javax.inject.Inject;
 public class SimpleRegistry extends TransientRegistry implements LifecycleRegistry, Injector
 {
 
-    private static final String REGISTRY_ID = "org.mule.Registry.Simple";
+    private static final String REGISTRY_ID = "org.mule.runtime.core.Registry.Simple";
 
     public SimpleRegistry(MuleContext muleContext)
     {

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 
 /**
  * Phase for validation of the incoming message.
@@ -29,7 +29,7 @@ public interface ValidationPhaseTemplate extends MessageProcessTemplate
     /**
      * Discards the message because the validation failed
      *
-     * @throws org.mule.api.MuleException
+     * @throws org.mule.runtime.core.api.MuleException
      */
     void discardInvalidMessage() throws MuleException;
 }

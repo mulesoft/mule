@@ -9,7 +9,7 @@ package org.mule.config.spring.parsers.processors;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.util.SpringXMLUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.LinkedList;

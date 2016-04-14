@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml.wire;
+package org.mule.runtime.core.transformers.xml.wire;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.wire.WireFormat;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.wire.WireFormat;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.module.xml.transformer.wire.XStreamWireFormat;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transformer.wire.AbstractMuleMessageWireFormatTestCase;
+import org.mule.runtime.core.transformer.wire.AbstractMuleMessageWireFormatTestCase;
 
 import java.util.Properties;
 

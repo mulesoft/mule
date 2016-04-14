@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.session;
+package org.mule.runtime.core.session;
 
 import static org.junit.Assert.assertEquals;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.FileUtils;
-import org.mule.util.SerializationUtils;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.SerializationUtils;
 
 import java.io.File;
 import java.io.IOException;

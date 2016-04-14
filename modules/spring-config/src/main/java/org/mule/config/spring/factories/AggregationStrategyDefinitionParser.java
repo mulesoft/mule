@@ -7,12 +7,12 @@
 
 package org.mule.config.spring.factories;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.routing.AggregationContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.routing.AggregationContext;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttribute;
-import org.mule.routing.AggregationStrategy;
+import org.mule.runtime.core.routing.AggregationStrategy;
 
 import org.w3c.dom.Element;
 

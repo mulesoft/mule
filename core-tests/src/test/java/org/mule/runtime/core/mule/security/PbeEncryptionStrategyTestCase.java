@@ -6,7 +6,7 @@
  */
 package org.mule.mule.security;
 
-import org.mule.security.PasswordBasedEncryptionStrategy;
+import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

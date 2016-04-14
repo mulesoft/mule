@@ -5,17 +5,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageRouter;
-import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.MessageRouter;
+import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 import java.util.Collections;
 import java.util.Map;

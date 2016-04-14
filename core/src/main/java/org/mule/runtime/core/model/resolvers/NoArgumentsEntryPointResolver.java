@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.model.resolvers;
+package org.mule.runtime.core.model.resolvers;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.transformer.TransformerException;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.util.ClassUtils;
 
 /**
  * Allows for arguments with no parameters to be called. Regardless of the payload of the current
  * event, this resolver will always only look for No-Arg servic methods.
  * <p/>
- * Note that the {@link org.mule.model.resolvers.ReflectionEntryPointResolver} supports the resolution
+ * Note that the {@link org.mule.runtime.core.model.resolvers.ReflectionEntryPointResolver} supports the resolution
  * of no-arg service methods if the event payload received is of type {@link org.mule.api.message.NullPayload}.
  *
- * @see org.mule.model.resolvers.ReflectionEntryPointResolver
+ * @see org.mule.runtime.core.model.resolvers.ReflectionEntryPointResolver
  * @see org.mule.api.message.NullPayload
  */
 public class NoArgumentsEntryPointResolver extends AbstractArgumentEntryPointResolver

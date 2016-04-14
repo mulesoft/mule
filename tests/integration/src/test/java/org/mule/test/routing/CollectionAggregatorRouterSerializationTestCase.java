@@ -11,14 +11,14 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.serialization.SerializationException;
-import org.mule.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.serialization.SerializationException;
+import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.routing.EventGroup;
-import org.mule.util.store.SimpleMemoryObjectStore;
+import org.mule.runtime.core.routing.EventGroup;
+import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
 import java.util.Arrays;

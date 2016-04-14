@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transformer.types;
+package org.mule.runtime.core.transformer.types;
 
 import org.mule.api.metadata.DataType;
 

@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.retry.async;
+package org.mule.runtime.core.retry.async;
 
-import org.mule.api.context.WorkManager;
-import org.mule.api.retry.RetryCallback;
-import org.mule.api.retry.RetryContext;
-import org.mule.api.retry.RetryNotifier;
-import org.mule.api.retry.RetryPolicy;
-import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.retry.RetryPolicyExhaustedException;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.retry.RetryCallback;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.RetryNotifier;
+import org.mule.runtime.core.api.retry.RetryPolicy;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.Map;
 

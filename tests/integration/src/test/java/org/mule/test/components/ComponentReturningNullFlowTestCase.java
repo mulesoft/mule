@@ -9,7 +9,7 @@ package org.mule.test.components;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.api.message.NullPayload;
 

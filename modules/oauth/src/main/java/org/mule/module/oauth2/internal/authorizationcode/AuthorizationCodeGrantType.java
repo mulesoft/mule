@@ -6,12 +6,12 @@
  */
 package org.mule.module.oauth2.internal.authorizationcode;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.module.oauth2.internal.ApplicationCredentials;
 import org.mule.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.api.tls.TlsContextFactory;
-import org.mule.util.AttributeEvaluator;
+import org.mule.runtime.core.util.AttributeEvaluator;
 
 /**
  * Provides access to the general configuration of an authorization code oauth config.

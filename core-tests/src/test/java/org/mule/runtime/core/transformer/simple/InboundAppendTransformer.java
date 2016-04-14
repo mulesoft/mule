@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
-import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 
 public class InboundAppendTransformer  extends StringAppendTransformer
 {

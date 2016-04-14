@@ -6,10 +6,10 @@
  */
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.api.MuleContext;
-import org.mule.api.lifecycle.InitialisationCallback;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.object.ObjectFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.object.ObjectFactory;
 
 /**
  * <code>BananaFactory</code> is a test factory that creates Bananas

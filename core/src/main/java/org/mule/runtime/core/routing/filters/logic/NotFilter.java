@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.filters.logic;
+package org.mule.runtime.core.routing.filters.logic;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
+import static org.mule.runtime.core.util.ClassUtils.equal;
+import static org.mule.runtime.core.util.ClassUtils.hash;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.routing.filter.Filter;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.routing.filter.Filter;
 
 /**
  * <code>NotFilter</code> accepts if the filter does not accept.

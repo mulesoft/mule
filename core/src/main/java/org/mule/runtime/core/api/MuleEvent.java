@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api;
+package org.mule.runtime.core.api;
 
-import org.mule.MessageExchangePattern;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.notification.FlowCallStack;
-import org.mule.api.context.notification.ProcessorsTrace;
-import org.mule.api.security.Credentials;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
+import org.mule.runtime.core.api.security.Credentials;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.connector.ReplyToHandler;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.management.stats.ProcessingTime;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.management.stats.ProcessingTime;
 
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -62,7 +62,7 @@ public interface MuleEvent extends Serializable
      * @param outputType The requested output type.
      * @return the message transformed into it's recognised or expected format.
      * @throws TransformerException if a failure occurs in the transformer
-     * @see org.mule.api.transformer.Transformer if the transform fails or the outputtype is null
+     * @see org.mule.runtime.core.api.transformer.Transformer if the transform fails or the outputtype is null
      */
     <T> T transformMessage(Class<T> outputType) throws TransformerException;
 
@@ -73,7 +73,7 @@ public interface MuleEvent extends Serializable
      * @param outputType The requested output type.
      * @return the message transformed into it's recognised or expected format.
      * @throws TransformerException if a failure occurs in the transformer
-     * @see org.mule.api.transformer.Transformer if the transform fails or the outputtype is null
+     * @see org.mule.runtime.core.api.transformer.Transformer if the transform fails or the outputtype is null
      */
     <T> T transformMessage(DataType<T> outputType) throws TransformerException;
 
@@ -84,7 +84,7 @@ public interface MuleEvent extends Serializable
      * 
      * @return the message transformed into it's recognised or expected format as a Strings.
      * @throws TransformerException if a failure occurs in the transformer
-     * @see org.mule.api.transformer.Transformer
+     * @see org.mule.runtime.core.api.transformer.Transformer
      */
     String transformMessageToString() throws TransformerException;
 
@@ -130,14 +130,14 @@ public interface MuleEvent extends Serializable
      * Determines whether the default processing for this event will be executed. By default, the Mule server
      * will route events according to a components configuration. The user can override this behaviour by
      * obtaining a reference to the MuleEvent context, either by implementing
-     * <code>org.mule.api.lifecycle.Callable</code> or calling <code>RequestContext.getEventContext</code> to
+     * <code>org.mule.runtime.core.api.lifecycle.Callable</code> or calling <code>RequestContext.getEventContext</code> to
      * obtain the MuleEventContext for the current thread. The user can programmatically control how events
      * are dispatched.
      * 
      * @return Returns true is the user has set stopFurtherProcessing.
-     * @see org.mule.api.MuleContext
+     * @see org.mule.runtime.core.api.MuleContext
      * @see MuleEventContext
-     * @see org.mule.api.lifecycle.Callable
+     * @see org.mule.runtime.core.api.lifecycle.Callable
      */
     boolean isStopFurtherProcessing();
 
@@ -145,7 +145,7 @@ public interface MuleEvent extends Serializable
      * Determines whether the default processing for this event will be executed. By default, the Mule server
      * will route events according to a components configuration. The user can override this behaviour by
      * obtaining a reference to the MuleEvent context, either by implementing
-     * <code>org.mule.api.lifecycle.Callable</code> or calling <code>RequestContext.getEventContext</code> to
+     * <code>org.mule.runtime.core.api.lifecycle.Callable</code> or calling <code>RequestContext.getEventContext</code> to
      * obtain the MuleEventContext for the current thread. The user can programmatically control how events
      * are dispached.
      * 

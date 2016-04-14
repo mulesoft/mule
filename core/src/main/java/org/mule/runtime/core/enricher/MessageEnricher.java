@@ -4,30 +4,30 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.enricher;
+package org.mule.runtime.core.enricher;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.OptimizedRequestContext;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.ThreadSafeAccess;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.processor.InternalMessageProcessor;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.processor.MessageProcessorContainer;
-import org.mule.api.processor.MessageProcessorPathElement;
-import org.mule.api.processor.MessageProcessors;
-import org.mule.processor.AbstractMessageProcessorOwner;
-import org.mule.processor.AbstractRequestResponseMessageProcessor;
-import org.mule.processor.NonBlockingMessageProcessor;
-import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
-import org.mule.transformer.types.TypedValue;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.ThreadSafeAccess;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.processor.InternalMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.MessageProcessorContainer;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.api.processor.MessageProcessors;
+import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
+import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
+import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
+import org.mule.runtime.core.processor.chain.InterceptingChainLifecycleWrapper;
+import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;

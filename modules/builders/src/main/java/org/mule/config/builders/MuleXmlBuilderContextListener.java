@@ -6,21 +6,21 @@
  */
 package org.mule.config.builders;
 
-import org.mule.MuleServer;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.api.context.MuleContextFactory;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.PropertiesMuleConfigurationFactory;
+import org.mule.runtime.core.MuleServer;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.context.MuleContextFactory;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.PropertiesMuleConfigurationFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.context.DefaultMuleContextBuilder;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.util.FilenameUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.util.FilenameUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 
@@ -35,7 +35,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 /**
  * <code>MuleXmlBuilderContextListener</code> is a bootstrap listener used to
- * construct a {@link org.mule.api.MuleContext} instance. This listener delegates to the
+ * construct a {@link org.mule.runtime.core.api.MuleContext} instance. This listener delegates to the
  * <i>MuleXmlConfigurationBuilder</i>.
  * <p>
  * The location of the configuration file can be specified in a init parameter called

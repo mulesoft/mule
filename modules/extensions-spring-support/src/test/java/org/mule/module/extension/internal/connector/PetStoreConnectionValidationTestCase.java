@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.connector;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
-import org.mule.api.MessagingException;
+import org.mule.runtime.core.api.MessagingException;
 
 import org.junit.Rule;
 import org.junit.Test;

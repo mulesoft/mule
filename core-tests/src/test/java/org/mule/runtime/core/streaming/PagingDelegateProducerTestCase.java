@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.streaming;
+package org.mule.runtime.core.streaming;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;

@@ -4,35 +4,35 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.mule.PropertyScope.INBOUND;
-import static org.mule.PropertyScope.OUTBOUND;
-import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.ThreadSafeAccess;
-import org.mule.api.config.MuleProperties;
+import static org.mule.runtime.core.PropertyScope.INBOUND;
+import static org.mule.runtime.core.PropertyScope.OUTBOUND;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.ThreadSafeAccess;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.api.message.NullPayload;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.message.ds.ByteArrayDataSource;
-import org.mule.message.ds.StringDataSource;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.TypedValue;
-import org.mule.util.ClassUtils;
-import org.mule.util.ObjectUtils;
-import org.mule.util.StringMessageUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.SystemUtils;
-import org.mule.util.UUID;
-import org.mule.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.message.ds.ByteArrayDataSource;
+import org.mule.runtime.core.message.ds.StringDataSource;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.ObjectUtils;
+import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.SystemUtils;
+import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -1438,11 +1438,11 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
 
     /**
      * Invoked after deserialization. This is called when the marker interface
-     * {@link org.mule.util.store.DeserializationPostInitialisable} is used. This will get invoked
+     * {@link org.mule.runtime.core.util.store.DeserializationPostInitialisable} is used. This will get invoked
      * after the object has been deserialized passing in the current mulecontext when using either
-     * {@link org.mule.transformer.wire.SerializationWireFormat},
-     * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat} or the
-     * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
+     * {@link org.mule.runtime.core.transformer.wire.SerializationWireFormat},
+     * {@link org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat} or the
+     * {@link org.mule.runtime.core.transformer.simple.ByteArrayToSerializable} transformer.
      *
      * @param context the current muleContext instance
      * @throws MuleException if there is an error initializing

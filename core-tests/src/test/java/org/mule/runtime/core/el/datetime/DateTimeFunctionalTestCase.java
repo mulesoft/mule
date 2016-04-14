@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.datetime;
+package org.mule.runtime.core.el.datetime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.el.context.AbstractELTestCase;
+import org.mule.runtime.core.el.context.AbstractELTestCase;
 
 import org.junit.Test;
 

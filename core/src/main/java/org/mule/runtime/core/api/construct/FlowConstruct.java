@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.construct;
+package org.mule.runtime.core.api.construct;
 
-import org.mule.api.MuleContext;
-import org.mule.api.NamedObject;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.lifecycle.LifecycleStateEnabled;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.MessageInfoMapping;
-import org.mule.api.source.MessageSource;
-import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.MessageInfoMapping;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 
 /**
  * A uniquely identified {@link FlowConstruct} that once implemented and configured defines a construct

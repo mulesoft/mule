@@ -8,9 +8,9 @@ package org.mule.extension.ftp.api;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.extension.ftp.internal.command.FtpCopyCommand;
 import org.mule.extension.ftp.internal.command.FtpCreateDirectoryCommand;
 import org.mule.extension.ftp.internal.command.FtpDeleteCommand;

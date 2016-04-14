@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.execution.TransactionalExecutionTemplate;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 
 /**
  * Wraps the invocation of the next {@link MessageProcessor} with a transaction. If

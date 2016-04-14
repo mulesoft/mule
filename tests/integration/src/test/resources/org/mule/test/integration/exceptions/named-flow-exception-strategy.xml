@@ -5,6 +5,6 @@
 
     <flow name="badConfiguredFlow">
         <logger/>
-        <custom-exception-strategy name="someName" class="org.mule.exception.CatchMessagingExceptionStrategy"/>
+        <custom-exception-strategy name="someName" class="org.mule.runtime.core.exception.CatchMessagingExceptionStrategy"/>
     </flow>
 </mule>

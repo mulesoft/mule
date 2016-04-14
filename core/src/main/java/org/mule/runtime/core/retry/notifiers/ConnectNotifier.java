@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.retry.notifiers;
+package org.mule.runtime.core.retry.notifiers;
 
-import org.mule.api.retry.RetryContext;
-import org.mule.api.retry.RetryNotifier;
-import org.mule.config.ExceptionHelper;
-import org.mule.context.notification.ConnectionNotification;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.RetryNotifier;
+import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.context.notification.ConnectionNotification;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

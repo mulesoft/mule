@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.transaction.Transaction;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.OutputStream;
 import java.net.URI;
@@ -76,10 +76,10 @@ public class DefaultMuleEventContext implements MuleEventContext
      *            just provides a convienient way to manage type casting of
      *            transformed objects
      * @return the message transformed into it's recognised or expected format.
-     * @throws org.mule.api.transformer.TransformerException if a failure occurs or
+     * @throws org.mule.runtime.core.api.transformer.TransformerException if a failure occurs or
      *             if the return type is not the same as the expected type in the
      *             transformer
-     * @see org.mule.api.transformer.Transformer
+     * @see org.mule.runtime.core.api.transformer.Transformer
      */
     public Object transformMessage(DataType dataType) throws TransformerException
     {
@@ -95,10 +95,10 @@ public class DefaultMuleEventContext implements MuleEventContext
      *            just provides a convienient way to manage type casting of
      *            transformed objects
      * @return the message transformed into it's recognised or expected format.
-     * @throws org.mule.api.transformer.TransformerException if a failure occurs or
+     * @throws org.mule.runtime.core.api.transformer.TransformerException if a failure occurs or
      *             if the return type is not the same as the expected type in the
      *             transformer
-     * @see org.mule.api.transformer.Transformer
+     * @see org.mule.runtime.core.api.transformer.Transformer
      */
     public Object transformMessage(Class expectedType) throws TransformerException
     {
@@ -109,7 +109,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * Returns the message contents as a string
      *
      * @return the message contents as a string
-     * @throws org.mule.api.MuleException if the message cannot be converted into a
+     * @throws org.mule.runtime.core.api.MuleException if the message cannot be converted into a
      *             string
      */
     public String getMessageAsString(String encoding) throws MuleException
@@ -125,9 +125,9 @@ public class DefaultMuleEventContext implements MuleEventContext
      *
      * @return the message transformed into it's recognised or expected format as a
      *         Strings.
-     * @throws org.mule.api.transformer.TransformerException if a failure occurs in
+     * @throws org.mule.runtime.core.api.transformer.TransformerException if a failure occurs in
      *             the transformer
-     * @see org.mule.api.transformer.Transformer
+     * @see org.mule.runtime.core.api.transformer.Transformer
      */
     public String transformMessageToString() throws TransformerException
     {
@@ -139,7 +139,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * encoding on the event
      *
      * @return the message contents as a string
-     * @throws org.mule.api.MuleException if the message cannot be converted into a
+     * @throws org.mule.runtime.core.api.MuleException if the message cannot be converted into a
      *             string
      */
     public String getMessageAsString() throws MuleException
@@ -168,7 +168,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      *            be looked up first on the service configuration and then on the
      *            mule manager configuration
      * @return the return Message from the call or null if there was no result
-     * @throws org.mule.api.MuleException if the event fails to be processed by the
+     * @throws org.mule.runtime.core.api.MuleException if the event fails to be processed by the
      *             service or the transport for the endpoint
      */
     public MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException
@@ -183,7 +183,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      *            event will be received
      * @param timeout time in milliseconds before the request timesout
      * @return The requested event or null if the request times out
-     * @throws org.mule.api.MuleException if the request operation fails
+     * @throws org.mule.runtime.core.api.MuleException if the request operation fails
      */
     public MuleMessage requestEvent(String endpointName, long timeout) throws MuleException
     {
@@ -203,7 +203,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * default, the Mule server will route events according to a components
      * configuration. The user can override this behaviour by obtaining a reference
      * to the MuleEvent context, either by implementing
-     * <code>org.mule.api.lifecycle.Callable</code> or calling
+     * <code>org.mule.runtime.core.api.lifecycle.Callable</code> or calling
      * <code>RequestContext.getEventContext</code> to obtain the MuleEventContext for
      * the current thread. The user can programmatically control how events are
      * dispached.

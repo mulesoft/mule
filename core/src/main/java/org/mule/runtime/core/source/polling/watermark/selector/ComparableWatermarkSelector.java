@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.source.polling.watermark.selector;
+package org.mule.runtime.core.source.polling.watermark.selector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.debug;
+package org.mule.runtime.core.api.debug;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 /**
  * Identifies an execution breakpoint.

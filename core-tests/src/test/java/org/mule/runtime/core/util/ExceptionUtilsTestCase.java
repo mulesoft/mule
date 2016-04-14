@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
@@ -15,10 +15,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.util.ExceptionUtils.containsType;
-import static org.mule.util.ExceptionUtils.extractRootConnectionException;
-import static org.mule.util.ExceptionUtils.getDeepestOccurenceOfType;
-import static org.mule.util.ExceptionUtils.getFullStackTraceWithoutMessages;
+import static org.mule.runtime.core.util.ExceptionUtils.containsType;
+import static org.mule.runtime.core.util.ExceptionUtils.extractRootConnectionException;
+import static org.mule.runtime.core.util.ExceptionUtils.getDeepestOccurenceOfType;
+import static org.mule.runtime.core.util.ExceptionUtils.getFullStackTraceWithoutMessages;
 
 import org.mule.api.connection.ConnectionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;

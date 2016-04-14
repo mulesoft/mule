@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.routing.RoutingException;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.simple.ByteArrayToHexString;
-import org.mule.transformer.simple.SerializableToByteArray;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
+import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

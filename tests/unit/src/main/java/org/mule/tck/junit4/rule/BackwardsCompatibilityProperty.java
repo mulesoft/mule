@@ -6,7 +6,7 @@
  */
 package org.mule.tck.junit4.rule;
 
-import org.mule.util.BackwardsCompatibilityPropertyChecker;
+import org.mule.runtime.core.util.BackwardsCompatibilityPropertyChecker;
 
 import org.junit.rules.ExternalResource;
 

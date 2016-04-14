@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.schedule;
+package org.mule.runtime.core.api.schedule;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -12,8 +12,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleContext;
-import org.mule.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;

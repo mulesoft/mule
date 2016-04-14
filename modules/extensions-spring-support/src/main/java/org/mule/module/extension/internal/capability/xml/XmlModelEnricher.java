@@ -13,7 +13,7 @@ import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.module.extension.internal.introspection.enricher.AbstractAnnotatedModelEnricher;
 import org.mule.module.extension.internal.util.NameUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.function.Supplier;
 

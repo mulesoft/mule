@@ -10,7 +10,7 @@ package org.mule.module.ws.functional;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.construct.Flow;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;

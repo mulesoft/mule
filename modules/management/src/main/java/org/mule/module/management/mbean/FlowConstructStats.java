@@ -8,7 +8,7 @@ package org.mule.module.management.mbean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;

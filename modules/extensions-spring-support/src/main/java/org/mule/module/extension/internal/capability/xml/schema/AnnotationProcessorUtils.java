@@ -12,7 +12,7 @@ import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.ParameterGroup;
 import org.mule.extension.api.annotation.param.Ignore;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import com.google.common.collect.ImmutableMap;
 import com.sun.tools.javac.code.Attribute;

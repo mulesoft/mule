@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.expression;
+package org.mule.runtime.core.expression;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Date;
@@ -24,7 +24,7 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
     public void testManager() throws Exception
     {
         MuleEvent event = getTestEvent("test");
-        Object o = muleContext.getExpressionManager().evaluate("org.mule.util.UUID.getUUID()", event);
+        Object o = muleContext.getExpressionManager().evaluate("org.mule.runtime.core.util.UUID.getUUID()", event);
         assertNotNull(o);
         o = muleContext.getExpressionManager().evaluate("server.dateTime.toDate()", event);
         assertNotNull(o);

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.stats;
+package org.mule.runtime.core.management.stats;
 
-import org.mule.api.management.stats.Statistics;
-import org.mule.management.stats.printers.SimplePrinter;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.management.stats.Statistics;
+import org.mule.runtime.core.management.stats.printers.SimplePrinter;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.PrintWriter;
 

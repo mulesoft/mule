@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.exception;
+package org.mule.runtime.core.exception;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -18,27 +18,27 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionException;
-import org.mule.api.util.StreamCloserService;
-import org.mule.construct.Flow;
-import org.mule.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.core.api.util.StreamCloserService;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
-import org.mule.transaction.TransactionCoordination;
+import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import java.util.Collections;
 

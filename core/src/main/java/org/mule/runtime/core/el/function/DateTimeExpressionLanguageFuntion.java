@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.function;
+package org.mule.runtime.core.el.function;
 
-import org.mule.api.el.ExpressionLanguageContext;
-import org.mule.api.el.ExpressionLanguageFunction;
-import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.el.datetime.DateTime;
+import org.mule.runtime.core.api.el.ExpressionLanguageContext;
+import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.el.datetime.DateTime;
 
 import java.text.ParseException;
 import java.util.Calendar;

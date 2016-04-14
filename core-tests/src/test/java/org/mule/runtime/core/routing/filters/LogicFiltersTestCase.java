@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.filters;
+package org.mule.runtime.core.routing.filters;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.routing.filters.logic.AndFilter;
-import org.mule.routing.filters.logic.NotFilter;
-import org.mule.routing.filters.logic.OrFilter;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.routing.filters.logic.AndFilter;
+import org.mule.runtime.core.routing.filters.logic.NotFilter;
+import org.mule.runtime.core.routing.filters.logic.OrFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.LinkedList;

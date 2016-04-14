@@ -6,12 +6,12 @@
  */
 package org.mule.module.extension.internal.runtime.executor;
 
-import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;

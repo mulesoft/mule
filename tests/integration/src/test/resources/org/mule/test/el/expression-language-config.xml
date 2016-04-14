@@ -9,7 +9,7 @@
     <configuration>
         <expression-language autoResolveVariables="false">
             <import name="loc" class="java.util.Locale" />
-            <import class="org.mule.util.StringUtils" />
+            <import class="org.mule.runtime.core.util.StringUtils" />
             <import class="java.text.DateFormat" />
             <alias name="appName" expression="app.name" />
             <global-functions file="org/mule/test/el/functions.txt">

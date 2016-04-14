@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.concurrent;
+package org.mule.runtime.core.util.concurrent;
 
 /*
  * Written by Doug Lea with assistance from members of JCP JSR-166 Expert Group and

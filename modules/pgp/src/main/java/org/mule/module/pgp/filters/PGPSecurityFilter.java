@@ -6,27 +6,24 @@
  */
 package org.mule.module.pgp.filters;
 
-import org.mule.api.EncryptionStrategy;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.SecurityContext;
-import org.mule.api.security.SecurityException;
-import org.mule.api.security.UnauthorisedException;
-import org.mule.api.security.UnknownAuthenticationTypeException;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.module.pgp.LiteralMessage;
 import org.mule.module.pgp.Message;
 import org.mule.module.pgp.MessageFactory;
 import org.mule.module.pgp.PGPAuthentication;
-import org.mule.module.pgp.PGPCryptInfo;
 import org.mule.module.pgp.PGPKeyRing;
 import org.mule.module.pgp.SignedMessage;
 import org.mule.module.pgp.i18n.PGPMessages;
-import org.mule.security.AbstractOperationSecurityFilter;
-
-import org.bouncycastle.openpgp.PGPPublicKey;
+import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.security.AbstractOperationSecurityFilter;
 
 public class PGPSecurityFilter extends AbstractOperationSecurityFilter
 {

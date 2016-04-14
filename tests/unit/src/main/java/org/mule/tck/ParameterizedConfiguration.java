@@ -6,7 +6,7 @@
  */
 package org.mule.tck;
 
-import org.mule.api.NamedObject;
+import org.mule.runtime.core.api.NamedObject;
 
 import java.util.Map;
 

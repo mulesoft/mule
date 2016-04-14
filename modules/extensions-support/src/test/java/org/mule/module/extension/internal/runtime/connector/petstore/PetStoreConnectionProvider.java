@@ -6,14 +6,14 @@
  */
 package org.mule.module.extension.internal.runtime.connector.petstore;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.api.connection.ConnectionExceptionCode;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.api.connection.ConnectionValidationResult;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.param.Optional;

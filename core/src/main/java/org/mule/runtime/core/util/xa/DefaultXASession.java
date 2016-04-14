@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.xa;
+package org.mule.runtime.core.util.xa;
 
 import javax.transaction.Status;
 import javax.transaction.xa.XAException;
@@ -17,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Base class for an XAResource implementation.
  *
- * @param <T> type of the {@link org.mule.util.xa.AbstractXaTransactionContext} created for each transaction
+ * @param <T> type of the {@link org.mule.runtime.core.util.xa.AbstractXaTransactionContext} created for each transaction
  */
 public abstract class DefaultXASession<T extends AbstractXaTransactionContext> implements XAResource
 {

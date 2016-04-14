@@ -6,10 +6,10 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
 

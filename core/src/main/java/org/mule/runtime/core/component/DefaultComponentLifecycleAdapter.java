@@ -4,30 +4,30 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.component;
+package org.mule.runtime.core.component;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 
-import org.mule.DefaultMuleEventContext;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleException;
-import org.mule.api.component.JavaComponent;
-import org.mule.api.component.LifecycleAdapter;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.model.EntryPointResolverSet;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.model.resolvers.LegacyEntryPointResolverSet;
-import org.mule.registry.JSR250ValidatorProcessor;
-import org.mule.util.annotation.AnnotationMetaData;
-import org.mule.util.annotation.AnnotationUtils;
+import org.mule.runtime.core.DefaultMuleEventContext;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.component.LifecycleAdapter;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.model.EntryPointResolverSet;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.model.resolvers.LegacyEntryPointResolverSet;
+import org.mule.runtime.core.registry.JSR250ValidatorProcessor;
+import org.mule.runtime.core.util.annotation.AnnotationMetaData;
+import org.mule.runtime.core.util.annotation.AnnotationUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -44,16 +44,16 @@ import org.apache.commons.logging.LogFactory;
  * {@link LifecycleAdapter} for use with {@link JavaComponent} that expects component
  * instances to implement Mule lifecycle interfaces in order to receive lifecycle. Lifecycle interfaces supported are -
  * <ul>
- * <li>{@link org.mule.api.lifecycle.Initialisable}</li>
- * <li>{@link org.mule.api.lifecycle.Startable}</li>
- * <li>{@link org.mule.api.lifecycle.Stoppable}</li>
- * <li>{@link org.mule.api.lifecycle.Disposable}</li>
+ * <li>{@link org.mule.runtime.core.api.lifecycle.Initialisable}</li>
+ * <li>{@link org.mule.runtime.core.api.lifecycle.Startable}</li>
+ * <li>{@link org.mule.runtime.core.api.lifecycle.Stoppable}</li>
+ * <li>{@link org.mule.runtime.core.api.lifecycle.Disposable}</li>
  * </ul>
  *  This implementation also supports JSR-250 lifecycle annotations
  *  {@link javax.annotation.PostConstruct} (for initialisation) and/or {@link javax.annotation.PreDestroy}
  * (for disposal of the object). Only one of each annotation can be used per component object.
  *
- * @see org.mule.registry.JSR250ValidatorProcessor for details about the rules for using JSR-250 lifecycle annotations
+ * @see org.mule.runtime.core.registry.JSR250ValidatorProcessor for details about the rules for using JSR-250 lifecycle annotations
  */
 public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
 {

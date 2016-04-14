@@ -7,24 +7,24 @@
 package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
-import static org.mule.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 
-import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transaction.TransactionFactory;
-import org.mule.api.connector.ReplyToHandler;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.tck.SensingNullReplyToHandler;
-import org.mule.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 import java.util.concurrent.TimeUnit;
 

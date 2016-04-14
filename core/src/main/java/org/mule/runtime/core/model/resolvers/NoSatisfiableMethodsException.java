@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.model.resolvers;
+package org.mule.runtime.core.model.resolvers;
 
-import org.mule.api.MuleException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
  * <code>NoSatisfiableMethodsException</code> is thrown by EntryPointResolvers when
  * the service passed has no methods that meet the criteria of the configured
  * EntryPointResolver.
  *
- * @see org.mule.api.model.EntryPointResolver
+ * @see org.mule.runtime.core.api.model.EntryPointResolver
  */
 public class NoSatisfiableMethodsException extends MuleException
 {

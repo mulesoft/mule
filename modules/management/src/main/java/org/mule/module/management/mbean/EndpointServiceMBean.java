@@ -6,7 +6,7 @@
  */
 package org.mule.module.management.mbean;
 
-import org.mule.MessageExchangePattern;
+import org.mule.runtime.core.MessageExchangePattern;
 
 /**
  * The EndpointServiceMBean allows you to check the confiugration of an endpoint and

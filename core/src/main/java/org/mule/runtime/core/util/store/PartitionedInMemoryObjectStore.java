@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
-import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
-import org.mule.api.store.ObjectAlreadyExistsException;
-import org.mule.api.store.ObjectDoesNotExistException;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.PartitionableExpirableObjectStore;
+import static org.mule.runtime.core.api.store.ObjectStoreManager.UNBOUNDED;
+import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.PartitionableExpirableObjectStore;
 
 import java.io.Serializable;
 import java.util.ArrayList;

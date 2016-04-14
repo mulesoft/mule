@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.internal.metadata;
+package org.mule.runtime.core.internal.metadata;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.ConfigurationInstanceNotification;
-import org.mule.api.context.notification.CustomNotificationListener;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.ConfigurationInstanceNotification;
+import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.ComponentId;
 import org.mule.api.metadata.MetadataAware;
 import org.mule.api.metadata.MetadataCache;
@@ -22,9 +22,9 @@ import org.mule.api.metadata.MetadataManager;
 import org.mule.api.metadata.MetadataResolvingException;
 import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.api.metadata.resolving.MetadataResult;
-import org.mule.api.source.MessageSource;
-import org.mule.construct.Flow;
-import org.mule.context.notification.NotificationException;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.context.notification.NotificationException;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

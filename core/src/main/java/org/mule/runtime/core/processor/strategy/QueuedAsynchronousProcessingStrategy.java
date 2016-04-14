@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor.strategy;
+package org.mule.runtime.core.processor.strategy;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.store.QueueStore;
-import org.mule.config.QueueProfile;
-import org.mule.management.stats.QueueStatistics;
-import org.mule.management.stats.QueueStatisticsAware;
-import org.mule.processor.AsyncInterceptingMessageProcessor;
-import org.mule.processor.SedaStageInterceptingMessageProcessor;
-import org.mule.util.concurrent.ThreadNameHelper;
-import org.mule.util.queue.QueueManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.store.QueueStore;
+import org.mule.runtime.core.config.QueueProfile;
+import org.mule.runtime.core.management.stats.QueueStatistics;
+import org.mule.runtime.core.management.stats.QueueStatisticsAware;
+import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.SedaStageInterceptingMessageProcessor;
+import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
+import org.mule.runtime.core.util.queue.QueueManager;
 
 import java.io.Serializable;
 
@@ -37,7 +37,7 @@ public class QueuedAsynchronousProcessingStrategy extends AsynchronousProcessing
     protected QueueStatistics queueStatistics;
 
     @Override
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(org.mule.api.processor.StageNameSource nameSource,
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(org.mule.runtime.core.api.processor.StageNameSource nameSource,
                                                                             MuleContext muleContext)
     {
         Integer timeout = queueTimeout != null ? queueTimeout : muleContext.getConfiguration()

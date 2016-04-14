@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
-import org.mule.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
 
 interface ExecutionInterceptor<T>
 {

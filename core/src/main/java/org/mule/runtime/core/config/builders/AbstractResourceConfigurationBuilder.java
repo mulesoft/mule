@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.builders;
+package org.mule.runtime.core.config.builders;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.ConfigurationException;
-import org.mule.config.ConfigResource;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.config.ConfigResource;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ import java.io.IOException;
  * Abstract {@link ConfigurationBuilder} implementation used for
  * ConfigurationBuider's that use one of more configuration resources of the same
  * type that are defined using strings or {@link ConfigResource} objects.  It is recommended that
- * {@link org.mule.config.ConfigResource} objects are used over strings since they can be more descriptive, but
+ * {@link org.mule.runtime.core.config.ConfigResource} objects are used over strings since they can be more descriptive, but
  * Strings will be supported for quite some time.
  */
 public abstract class AbstractResourceConfigurationBuilder extends AbstractConfigurationBuilder
@@ -29,7 +29,7 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
     /**
      * @param configResources a comma separated list of configuration files to load,
      *            this should be accessible on the classpath or filesystem
-     * @throws org.mule.api.config.ConfigurationException usually if the config resources cannot be loaded
+     * @throws org.mule.runtime.core.api.config.ConfigurationException usually if the config resources cannot be loaded
      */
     public AbstractResourceConfigurationBuilder(String configResources) throws ConfigurationException
     {
@@ -39,7 +39,7 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
     /**
      * @param configResources an array of configuration files to load, this should be
      *            accessible on the classpath or filesystem
-     * @throws org.mule.api.config.ConfigurationException usually if the config resources cannot be loaded
+     * @throws org.mule.runtime.core.api.config.ConfigurationException usually if the config resources cannot be loaded
      */
     public AbstractResourceConfigurationBuilder(String[] configResources) throws ConfigurationException
     {

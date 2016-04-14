@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.components.script.refreshable;
+package org.mule.runtime.core.components.script.refreshable;
 
 
 import org.junit.Test;
@@ -17,7 +17,7 @@ public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCa
     public static final String NAME_CALLABLE = "groovy-dynamic-script-callable.groovy";
     public static final String NAME_BEAN = "groovy-dynamic-script-bean.groovy";
     public static final String NAME_CHANGE_INTERFACE = "groovy-dynamic-script.groovy";
-    public static final String ON_CALL_RECEIVED = "import org.mule.api.MuleEventContext; import org.mule.api.lifecycle.Callable; public class GroovyDynamicScript implements Callable { public Object onCall(MuleEventContext eventContext) throws Exception{ return eventContext.getMessage().getPayload() + \"" + RECEIVED + "\"; }}";
+    public static final String ON_CALL_RECEIVED = "import org.mule.runtime.core.api.MuleEventContext; import org.mule.runtime.core.api.lifecycle.Callable; public class GroovyDynamicScript implements Callable { public Object onCall(MuleEventContext eventContext) throws Exception{ return eventContext.getMessage().getPayload() + \"" + RECEIVED + "\"; }}";
     public static final String ON_CALL_RECEIVED2 = ON_CALL_RECEIVED.replaceAll(RECEIVED, RECEIVED2);
     public static final String RECEIVE_RECEIVED = "public class GroovyDynamicScript { public String receive(String src) { return src + \"" + RECEIVED + "\"; }}";
     public static final String RECEIVE_RECEIVED2 = RECEIVE_RECEIVED.replaceAll(RECEIVED, RECEIVED2);

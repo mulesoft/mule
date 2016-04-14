@@ -7,7 +7,7 @@
 package org.mule.test.spring;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

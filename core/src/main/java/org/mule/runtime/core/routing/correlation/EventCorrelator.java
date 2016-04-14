@@ -4,36 +4,36 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.correlation;
+package org.mule.runtime.core.routing.correlation;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.MessageInfoMapping;
-import org.mule.api.routing.RoutingException;
-import org.mule.api.store.ObjectAlreadyExistsException;
-import org.mule.api.store.ObjectDoesNotExistException;
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.PartitionableObjectStore;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.RoutingNotification;
-import org.mule.execution.ErrorHandlingExecutionTemplate;
-import org.mule.routing.EventGroup;
-import org.mule.routing.EventProcessingThread;
-import org.mule.util.StringMessageUtils;
-import org.mule.util.concurrent.ThreadNameHelper;
-import org.mule.util.monitor.Expirable;
-import org.mule.util.monitor.ExpiryMonitor;
-import org.mule.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.MessageInfoMapping;
+import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.context.notification.RoutingNotification;
+import org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate;
+import org.mule.runtime.core.routing.EventGroup;
+import org.mule.runtime.core.routing.EventProcessingThread;
+import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
+import org.mule.runtime.core.util.monitor.Expirable;
+import org.mule.runtime.core.util.monitor.ExpiryMonitor;
+import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 import java.text.MessageFormat;

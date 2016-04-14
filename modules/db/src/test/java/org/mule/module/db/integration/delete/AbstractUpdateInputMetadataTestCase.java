@@ -9,13 +9,13 @@ package org.mule.module.db.integration.delete;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.common.Result;
 import org.mule.common.metadata.DefinedMapMetaDataModel;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.MetaDataModel;
 import org.mule.common.metadata.datatype.DataType;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.internal.processor.AbstractSingleQueryDbMessageProcessor;

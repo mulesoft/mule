@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue;
+package org.mule.runtime.core.util.queue;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.api.MuleEvent;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.journal.queue.LocalTxQueueTransactionJournal;
-import org.mule.util.journal.queue.LocalTxQueueTransactionRecoverer;
-import org.mule.util.xa.ResourceManagerException;
+import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionJournal;
+import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionRecoverer;
+import org.mule.runtime.core.util.xa.ResourceManagerException;
 
 import java.io.Serializable;
 

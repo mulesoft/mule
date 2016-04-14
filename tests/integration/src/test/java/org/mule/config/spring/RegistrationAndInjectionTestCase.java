@@ -15,11 +15,11 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.LifecycleState;
-import org.mule.api.lifecycle.LifecycleStateAware;
-import org.mule.api.registry.RegistrationException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.lifecycle.LifecycleStateAware;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import javax.inject.Inject;

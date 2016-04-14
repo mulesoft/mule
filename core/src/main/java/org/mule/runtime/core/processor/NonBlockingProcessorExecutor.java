@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.OptimizedRequestContext;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.NonBlockingSupported;
-import org.mule.api.processor.InterceptingMessageProcessor;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorContainer;
-import org.mule.api.connector.ReplyToHandler;
-import org.mule.execution.MessageProcessorExecutionTemplate;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorContainer;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 
 import java.util.List;
 
@@ -26,11 +26,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Specialized {@link org.mule.processor.BlockingProcessorExecutor} that pauses iteration in the case a {@link org
+ * Specialized {@link org.mule.runtime.core.processor.BlockingProcessorExecutor} that pauses iteration in the case a {@link org
  * .mule.processor.NonBlockingMessageProcessor}
  * is invoked and the flow is executing using non-blocking.  Processor execution is then continued when the {@link
- * org.mule.processor.NonBlockingMessageProcessor}
- * invokes the {@link org.mule.api.connector.ReplyToHandler}.
+ * org.mule.runtime.core.processor.NonBlockingMessageProcessor}
+ * invokes the {@link org.mule.runtime.core.api.connector.ReplyToHandler}.
  */
 public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
 {

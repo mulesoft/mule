@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.model.resolvers;
+package org.mule.runtime.core.model.resolvers;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.model.InvocationResult;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringMessageUtils;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.model.InvocationResult;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -19,8 +19,8 @@ import java.util.Set;
 
 /**
  * A base class that allows implementing resolvers to define what parameters it is expecting.  Currently
- * there are two implementations of this {@link org.mule.model.resolvers.NoArgumentsEntryPointResolver}, that
- * allows methods with no arguments to be invoked and {@link org.mule.model.resolvers.ArrayEntryPointResolver} that
+ * there are two implementations of this {@link org.mule.runtime.core.model.resolvers.NoArgumentsEntryPointResolver}, that
+ * allows methods with no arguments to be invoked and {@link org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver} that
  * allows for methods that accept an array type to be invoked.
  * <p/>
  * Users can set explicit method names on this resolver to control which methods are allowed to be called. Also a set of

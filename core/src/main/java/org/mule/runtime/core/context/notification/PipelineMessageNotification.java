@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.construct.Pipeline;
-import org.mule.api.context.notification.BlockingServerEvent;
-import org.mule.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
 
 /**
  * <code>PipelineMessageNotification</code> is fired at key steps in the processing of {@link Pipeline}

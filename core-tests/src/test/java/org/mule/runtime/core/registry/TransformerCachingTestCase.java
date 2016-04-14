@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
-import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.simple.ObjectToByteArray;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.metadata.SimpleDataType;
 
 import java.io.FilterInputStream;

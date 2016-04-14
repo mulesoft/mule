@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.filters;
+package org.mule.runtime.core.routing.filters;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.routing.filter.Filter;
-import org.mule.PropertyScope;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
+import static org.mule.runtime.core.util.ClassUtils.equal;
+import static org.mule.runtime.core.util.ClassUtils.hash;
 
 /**
  * <code>MessagePropertyFilter</code> can be used to filter against properties on

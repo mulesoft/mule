@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor.strategy;
+package org.mule.runtime.core.processor.strategy;
 
-import org.mule.api.MuleContext;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class SynchronousProcessingStrategy implements ProcessingStrategy
 {
     @Override
     public void configureProcessors(List<MessageProcessor> processors,
-                                    org.mule.api.processor.StageNameSource nameSource,
+                                    org.mule.runtime.core.api.processor.StageNameSource nameSource,
                                     MessageProcessorChainBuilder chainBuilder,
                                     MuleContext muleContext)
     {

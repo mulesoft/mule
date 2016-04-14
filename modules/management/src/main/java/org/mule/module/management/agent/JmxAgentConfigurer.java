@@ -6,9 +6,9 @@
  */
 package org.mule.module.management.agent;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.registry.RegistrationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.registry.RegistrationException;
 
 import java.util.Collections;
 import java.util.HashMap;

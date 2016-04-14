@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api;
+package org.mule.runtime.core.api;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -19,22 +19,22 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.api.MessagingException.PAYLOAD_INFO_KEY;
-import org.mule.DefaultMuleMessage;
-import org.mule.TransformationService;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.MessageProcessorPathResolver;
-import org.mule.api.execution.LocationExecutionContextProvider;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.exception.MessagingExceptionLocationProvider;
+import static org.mule.runtime.core.api.MessagingException.PAYLOAD_INFO_KEY;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
+import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.exception.MessagingExceptionLocationProvider;
 import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

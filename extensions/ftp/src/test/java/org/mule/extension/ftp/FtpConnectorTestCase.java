@@ -7,7 +7,7 @@
 package org.mule.extension.ftp;
 
 import static org.junit.rules.ExpectedException.none;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
@@ -88,7 +88,7 @@ public abstract class FtpConnectorTestCase extends ExtensionFunctionalTestCase
         return getPath(HELLO_PATH);
     }
 
-    protected org.mule.api.MuleMessage readPath(String path) throws Exception
+    protected org.mule.runtime.core.api.MuleMessage readPath(String path) throws Exception
     {
         return getPath(path).getMessage();
     }

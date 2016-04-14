@@ -6,8 +6,8 @@
  */
 package org.mule.module.json.i18n;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 /**
  * Internationalised messages for the Json module

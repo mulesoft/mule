@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -14,18 +14,18 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.api.context.notification.MuleContextListener;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.builders.AbstractConfigurationBuilder;
-import org.mule.config.builders.SimpleConfigurationBuilder;
-import org.mule.context.DefaultMuleContextBuilder;
-import org.mule.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.context.notification.MuleContextListener;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
+import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
+import org.mule.runtime.core.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
 
@@ -128,7 +128,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
             assertEquals(
                     "No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j2-test.xml'}]\" found.  "
                     + "Check you have configuration module on your classpath and are using correct file extension. "
-                    + "(org.mule.api.config.ConfigurationException)", e.getMessage());
+                    + "(org.mule.runtime.core.api.config.ConfigurationException)", e.getMessage());
         }
         assertNull(context);
     }
@@ -150,7 +150,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
             assertEquals(
                     "No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j2-test.xml'}]\" found.  "
                     + "Check you have configuration module on your classpath and are using correct file extension. "
-                    + "(org.mule.api.config.ConfigurationException)", e.getMessage());
+                    + "(org.mule.runtime.core.api.config.ConfigurationException)", e.getMessage());
         }
 
         assertNull(context);

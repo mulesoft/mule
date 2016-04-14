@@ -4,22 +4,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.api.context.notification.ComponentMessageNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.component.DefaultJavaComponent;
-import org.mule.component.simple.EchoComponent;
-import org.mule.construct.Flow;
-import org.mule.object.SingletonObjectFactory;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.component.Component;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.context.notification.ComponentMessageNotificationListener;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.component.DefaultJavaComponent;
+import org.mule.runtime.core.component.simple.EchoComponent;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

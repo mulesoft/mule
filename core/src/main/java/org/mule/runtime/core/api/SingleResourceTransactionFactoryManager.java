@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api;
+package org.mule.runtime.core.api;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mule.api.transaction.TransactionFactory;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
  *

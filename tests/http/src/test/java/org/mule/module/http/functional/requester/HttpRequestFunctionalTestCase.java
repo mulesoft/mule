@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.tck.junit4.rule.DynamicPort;

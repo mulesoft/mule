@@ -6,9 +6,9 @@
  */
 package org.mule.test.integration.resolvers;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.model.EntryPointResolver;
-import org.mule.api.model.InvocationResult;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.model.EntryPointResolver;
+import org.mule.runtime.core.api.model.InvocationResult;
 
 public class CustomEntryPointResolver implements EntryPointResolver
 {

@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.queue;
+package org.mule.runtime.core.util.queue;
 
-import org.mule.api.MuleException;
-import org.mule.api.NamedObject;
-import org.mule.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.core.api.store.ObjectStoreException;
 
 import java.io.Serializable;
 

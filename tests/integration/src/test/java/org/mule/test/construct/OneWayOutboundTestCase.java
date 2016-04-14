@@ -8,8 +8,8 @@ package org.mule.test.construct;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.LocalMuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Before;

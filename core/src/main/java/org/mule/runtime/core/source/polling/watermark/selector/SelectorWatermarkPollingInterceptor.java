@@ -5,22 +5,22 @@
  * LICENSE.txt file.
  */
 
-package org.mule.source.polling.watermark.selector;
+package org.mule.runtime.core.source.polling.watermark.selector;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.streaming.ProvidesTotalHint;
-import org.mule.source.polling.watermark.Watermark;
-import org.mule.source.polling.watermark.WatermarkPollingInterceptor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.streaming.ProvidesTotalHint;
+import org.mule.runtime.core.source.polling.watermark.Watermark;
+import org.mule.runtime.core.source.polling.watermark.WatermarkPollingInterceptor;
 
 import java.io.Serializable;
 import java.util.Iterator;
 
 /**
  * Implementation of
- * {@link org.mule.source.polling.watermark.WatermarkPollingInterceptor} that uses
+ * {@link org.mule.runtime.core.source.polling.watermark.WatermarkPollingInterceptor} that uses
  * a {@link WatermarkSelector} to return the new watermark value.
  * 
  * @since 3.5.0

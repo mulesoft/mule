@@ -6,9 +6,9 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.MuleProperties;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;

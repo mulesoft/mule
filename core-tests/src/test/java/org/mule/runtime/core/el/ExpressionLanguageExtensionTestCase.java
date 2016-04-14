@@ -4,31 +4,31 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el;
+package org.mule.runtime.core.el;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.el.ExpressionLanguageContext;
-import org.mule.api.el.ExpressionLanguageExtension;
-import org.mule.api.el.ExpressionLanguageFunction;
-import org.mule.api.el.VariableAssignmentCallback;
-import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.RegistrationException;
-import org.mule.config.builders.DefaultsConfigurationBuilder;
-import org.mule.el.context.AbstractELTestCase;
-import org.mule.el.context.AppContext;
-import org.mule.el.mvel.MVELExpressionLanguage;
-import org.mule.el.mvel.MVELExpressionLanguageContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionLanguageContext;
+import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
+import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
+import org.mule.runtime.core.api.el.VariableAssignmentCallback;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.el.context.AbstractELTestCase;
+import org.mule.runtime.core.el.context.AppContext;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
 import org.mule.mvel2.compiler.AbstractParser;
 
 import java.text.DateFormat;

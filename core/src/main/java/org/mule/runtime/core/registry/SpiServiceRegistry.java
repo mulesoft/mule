@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
-import org.mule.api.registry.ServiceRegistry;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
 
 import com.google.common.collect.ImmutableList;
 

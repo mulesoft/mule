@@ -4,34 +4,34 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.exception;
+package org.mule.runtime.core.exception;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.GlobalNameableObject;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.security.SecurityException;
-import org.mule.config.ExceptionHelper;
-import org.mule.context.notification.ExceptionNotification;
-import org.mule.context.notification.SecurityNotification;
-import org.mule.management.stats.FlowConstructStatistics;
-import org.mule.management.stats.ServiceStatistics;
-import org.mule.message.ExceptionMessage;
-import org.mule.processor.AbstractMessageProcessorOwner;
-import org.mule.routing.filters.WildcardFilter;
-import org.mule.routing.outbound.MulticastingRouter;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.util.CollectionUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.GlobalNameableObject;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.context.notification.ExceptionNotification;
+import org.mule.runtime.core.context.notification.SecurityNotification;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.management.stats.ServiceStatistics;
+import org.mule.runtime.core.message.ExceptionMessage;
+import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
+import org.mule.runtime.core.routing.filters.WildcardFilter;
+import org.mule.runtime.core.routing.outbound.MulticastingRouter;
+import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.net.URI;
 import java.text.MessageFormat;
@@ -316,7 +316,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
     /**
      * Fires a server notification to all registered
-     * {@link org.mule.api.context.notification.ExceptionNotificationListener}
+     * {@link org.mule.runtime.core.api.context.notification.ExceptionNotificationListener}
      * eventManager.
      *
      * @param notification the notification to fire.

@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.model.resolvers;
+package org.mule.runtime.core.model.resolvers;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.model.InvocationResult;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.model.InvocationResult;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.lang.reflect.Method;
 
 import org.apache.commons.lang.BooleanUtils;
 
 /**
- * This resolver will look for a {@link org.mule.api.config.MuleProperties#MULE_METHOD_PROPERTY} 
+ * This resolver will look for a {@link org.mule.runtime.core.api.config.MuleProperties#MULE_METHOD_PROPERTY}
  * property on the incoming event to determine which method to invoke Users can customise the name 
  * of the property used to look up the method name on the event
  */

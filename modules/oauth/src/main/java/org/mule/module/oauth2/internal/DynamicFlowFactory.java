@@ -6,10 +6,10 @@
  */
 package org.mule.module.oauth2.internal;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.construct.Flow;
 
 import java.util.List;
 

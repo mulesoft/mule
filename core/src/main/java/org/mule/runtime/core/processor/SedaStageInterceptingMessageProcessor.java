@@ -4,37 +4,37 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.OptimizedRequestContext;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.NameableObject;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.context.WorkManager;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.LifecycleCallback;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.service.FailedToQueueEventException;
-import org.mule.config.QueueProfile;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
-import org.mule.lifecycle.EmptyLifecycleCallback;
-import org.mule.management.stats.QueueStatistics;
-import org.mule.service.Pausable;
-import org.mule.service.Resumable;
-import org.mule.util.concurrent.WaitableBoolean;
-import org.mule.util.queue.Queue;
-import org.mule.util.queue.QueueConfiguration;
-import org.mule.util.queue.QueueSession;
-import org.mule.work.MuleWorkManager;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.service.FailedToQueueEventException;
+import org.mule.runtime.core.config.QueueProfile;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
+import org.mule.runtime.core.lifecycle.EmptyLifecycleCallback;
+import org.mule.runtime.core.management.stats.QueueStatistics;
+import org.mule.runtime.core.service.Pausable;
+import org.mule.runtime.core.service.Resumable;
+import org.mule.runtime.core.util.concurrent.WaitableBoolean;
+import org.mule.runtime.core.util.queue.Queue;
+import org.mule.runtime.core.util.queue.QueueConfiguration;
+import org.mule.runtime.core.util.queue.QueueSession;
+import org.mule.runtime.core.work.MuleWorkManager;
 
 import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;

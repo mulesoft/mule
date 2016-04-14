@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.agents;
+package org.mule.runtime.core.management.agents;
 
-import static org.mule.management.agents.DefaultJmxSupportAgentTestCase.doTestHostPropertyEnablesClientSocketFactory;
+import static org.mule.runtime.core.management.agents.DefaultJmxSupportAgentTestCase.doTestHostPropertyEnablesClientSocketFactory;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

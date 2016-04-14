@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.collection;
+package org.mule.runtime.core.util.collection;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -14,9 +14,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import org.mule.api.MuleEvent;
-import org.mule.api.util.Copiable;
-import org.mule.routing.MessageSequence;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.util.Copiable;
+import org.mule.runtime.core.routing.MessageSequence;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

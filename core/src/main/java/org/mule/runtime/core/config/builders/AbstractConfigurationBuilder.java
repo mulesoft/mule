@@ -4,22 +4,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.builders;
+package org.mule.runtime.core.config.builders;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A support class for {@link org.mule.api.config.ConfigurationBuilder} implementations
+ * A support class for {@link org.mule.runtime.core.api.config.ConfigurationBuilder} implementations
  * that handles the logic of creating config arrays and {@link java.util.Properties}
  * arguments
  *
- * @see org.mule.api.config.ConfigurationBuilder
+ * @see org.mule.runtime.core.api.config.ConfigurationBuilder
  */
 public abstract class AbstractConfigurationBuilder implements ConfigurationBuilder
 {
@@ -29,9 +29,9 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
 
     /**
      * Will configure a MuleContext object based on the builders configuration settings.
-     * This method will delegate the actual processing to {@link #doConfigure(org.mule.api.MuleContext)}
+     * This method will delegate the actual processing to {@link #doConfigure(org.mule.runtime.core.api.MuleContext)}
      *
-     * @param muleContext The current {@link org.mule.api.MuleContext}
+     * @param muleContext The current {@link org.mule.runtime.core.api.MuleContext}
      * @throws ConfigurationException if the configuration fails i.e. an object cannot be created or
      * initialised properly
      */
@@ -52,10 +52,10 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
 
     /**
      * Will configure a MuleContext based on the configuration provided.  The configuration will be set on the
-     * {@link org.mule.api.config.ConfigurationBuilder} implementation as bean properties before this method
+     * {@link org.mule.runtime.core.api.config.ConfigurationBuilder} implementation as bean properties before this method
      * has been called.
      *
-     * @param muleContext The current {@link org.mule.api.MuleContext}
+     * @param muleContext The current {@link org.mule.runtime.core.api.MuleContext}
      * @throws ConfigurationException if the configuration fails i.e. an object cannot be created or
      * initialised properly
      */
@@ -86,7 +86,7 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
 
     /**
      * Has this builder been configured already
-     * @return true if the {@link #configure(org.mule.api.MuleContext)} method has been called
+     * @return true if the {@link #configure(org.mule.runtime.core.api.MuleContext)} method has been called
      */
     @Override
     public boolean isConfigured()

@@ -11,7 +11,7 @@
         <property name="factories">
             <map>
                 <entry key="hostname">
-                    <bean class="org.mule.config.factories.HostNameFactory"/>
+                    <bean class="org.mule.runtime.core.config.factories.HostNameFactory"/>
                 </entry>
             </map>
         </property>

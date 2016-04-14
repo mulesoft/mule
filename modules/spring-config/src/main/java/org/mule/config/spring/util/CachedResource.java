@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring.util;
 
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

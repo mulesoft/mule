@@ -4,42 +4,42 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.construct;
+package org.mule.runtime.core.construct;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.OptimizedRequestContext;
-import org.mule.VoidMuleEvent;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.context.WorkManager;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
-import org.mule.api.processor.DynamicPipeline;
-import org.mule.api.processor.DynamicPipelineBuilder;
-import org.mule.api.processor.DynamicPipelineException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.api.processor.NamedStageNameSource;
-import org.mule.api.processor.ProcessingStrategy;
-import org.mule.api.processor.SequentialStageNameSource;
-import org.mule.api.processor.StageNameSource;
-import org.mule.api.processor.StageNameSourceProvider;
-import org.mule.execution.ExceptionHandlingReplyToHandlerDecorator;
-import org.mule.api.connector.ReplyToHandler;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.construct.flow.DefaultFlowProcessingStrategy;
-import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
-import org.mule.execution.ErrorHandlingExecutionTemplate;
-import org.mule.interceptor.ProcessingTimeInterceptor;
-import org.mule.management.stats.FlowConstructStatistics;
-import org.mule.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
-import org.mule.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.processor.DynamicPipeline;
+import org.mule.runtime.core.api.processor.DynamicPipelineBuilder;
+import org.mule.runtime.core.api.processor.DynamicPipelineException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.api.processor.NamedStageNameSource;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.SequentialStageNameSource;
+import org.mule.runtime.core.api.processor.StageNameSource;
+import org.mule.runtime.core.api.processor.StageNameSourceProvider;
+import org.mule.runtime.core.execution.ExceptionHandlingReplyToHandlerDecorator;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
+import org.mule.runtime.core.construct.processor.FlowConstructStatisticsMessageProcessor;
+import org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate;
+import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.QueuedAsynchronousProcessingStrategy;
+import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
 
 /**
  * This implementation of {@link AbstractPipeline} adds the following functionality:

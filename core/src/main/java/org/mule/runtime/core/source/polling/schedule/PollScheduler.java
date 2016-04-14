@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.source.polling.schedule;
+package org.mule.runtime.core.source.polling.schedule;
 
-import org.mule.api.schedule.Scheduler;
+import org.mule.runtime.core.api.schedule.Scheduler;
 
 
 /**
@@ -22,7 +22,7 @@ public abstract class PollScheduler<T extends Runnable> implements Scheduler
     protected T job;
 
     /**
-     * <p>The {@link org.mule.api.schedule.Scheduler} name used as an identifier in the {@link org.mule.api.registry.MuleRegistry}</p>
+     * <p>The {@link org.mule.runtime.core.api.schedule.Scheduler} name used as an identifier in the {@link org.mule.runtime.core.api.registry.MuleRegistry}</p>
      */
     protected String name;
 

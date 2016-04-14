@@ -14,7 +14,7 @@ import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

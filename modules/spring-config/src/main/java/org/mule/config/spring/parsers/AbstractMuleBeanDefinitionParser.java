@@ -6,17 +6,8 @@
  */
 package org.mule.config.spring.parsers;
 
-import static org.mule.api.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
 import static org.mule.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
-
-import org.mule.api.AnnotatedObject;
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.routing.OutboundRouter;
-import org.mule.api.source.MessageSource;
-import org.mule.api.transformer.Transformer;
+import static org.mule.runtime.core.api.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
@@ -24,9 +15,14 @@ import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.XMLUtils;
+import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.XMLUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;

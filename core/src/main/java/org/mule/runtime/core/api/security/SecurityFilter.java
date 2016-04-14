@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.security;
+package org.mule.runtime.core.api.security;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 /**
  * <code>SecurityFilter</code> is a base filter for secure filtering of

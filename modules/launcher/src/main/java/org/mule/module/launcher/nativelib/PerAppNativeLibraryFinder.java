@@ -7,7 +7,7 @@
 
 package org.mule.module.launcher.nativelib;
 
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.File;
 

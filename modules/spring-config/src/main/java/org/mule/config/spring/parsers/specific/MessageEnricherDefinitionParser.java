@@ -7,8 +7,8 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.enricher.MessageEnricher.EnrichExpressionPair;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.GenericBeanDefinition;

@@ -15,7 +15,7 @@ import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.launcher.MuleApplicationClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.nativelib.NativeLibraryFinderFactory;
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;

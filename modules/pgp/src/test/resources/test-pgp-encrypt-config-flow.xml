@@ -21,7 +21,7 @@
     </spring:bean>
 
     <spring:bean id="credentialAccessor"
-        class="org.mule.security.MuleHeaderCredentialsAccessor" />
+        class="org.mule.runtime.core.security.MuleHeaderCredentialsAccessor" />
 
     <pgp:security-manager>
         <pgp:security-provider name="pgpSecurityProvider"

@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.model.resolvers;
+package org.mule.runtime.core.model.resolvers;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.model.EntryPointResolver;
-import org.mule.api.model.InvocationResult;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.model.EntryPointResolver;
+import org.mule.runtime.core.api.model.InvocationResult;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 import java.lang.reflect.Method;
 
@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
  * An entry-point resolver that only allows Service objects that implement the
  * Callable interface
  *
- * @see org.mule.api.lifecycle.Callable
+ * @see org.mule.runtime.core.api.lifecycle.Callable
  */
 public class CallableEntryPointResolver implements EntryPointResolver
 {

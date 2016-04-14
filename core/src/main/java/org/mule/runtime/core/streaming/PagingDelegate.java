@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.streaming;
+package org.mule.runtime.core.streaming;
 
-import org.mule.api.Closeable;
+import org.mule.runtime.core.api.Closeable;
 
 import java.util.List;
 

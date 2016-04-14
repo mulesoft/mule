@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transaction.lookup;
+package org.mule.runtime.core.transaction.lookup;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.transaction.TransactionManagerFactory;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.lang.reflect.Method;
 

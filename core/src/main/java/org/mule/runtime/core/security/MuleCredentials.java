@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.security;
+package org.mule.runtime.core.security;
 
-import org.mule.api.EncryptionStrategy;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.security.Credentials;
-import org.mule.api.security.CryptoFailureException;
-import org.mule.api.security.EncryptionStrategyNotFoundException;
-import org.mule.api.security.SecurityManager;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.ArrayUtils;
+import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.security.Credentials;
+import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
+import org.mule.runtime.core.api.security.SecurityManager;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.ArrayUtils;
 
 import java.io.Serializable;
 import java.util.StringTokenizer;

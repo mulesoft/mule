@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.types;
+package org.mule.runtime.core.transformer.types;
 
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.api.metadata.DataType;
 import org.mule.api.metadata.ImmutableDataType;
 import org.mule.api.metadata.SimpleDataType;
-import org.mule.util.generics.GenericsUtils;
-import org.mule.util.generics.MethodParameter;
+import org.mule.runtime.core.util.generics.GenericsUtils;
+import org.mule.runtime.core.util.generics.MethodParameter;
 
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -101,11 +101,11 @@ public class DataTypeFactory
 
     /**
      * Will create a {@link DataType} object from an object instance. This method will check
-     * if the object value is a {@link org.mule.api.MuleMessage} instance and will take the type from the message payload
+     * if the object value is a {@link org.mule.runtime.core.api.MuleMessage} instance and will take the type from the message payload
      * and check if a mime type is set on the message and used that when constructing the {@link DataType}
      * object.
      *
-     * @param value an object instance.  This can be a {@link org.mule.api.MuleMessage}, a collection, a proxy instance or any other
+     * @param value an object instance.  This can be a {@link org.mule.runtime.core.api.MuleMessage}, a collection, a proxy instance or any other
      *          object
      * @return a data type that represents the object type.
      */

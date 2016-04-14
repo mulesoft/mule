@@ -13,7 +13,7 @@ import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import static org.mule.module.http.api.HttpHeaders.Values.KEEP_ALIVE;
 
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.junit.Test;
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -15,22 +15,22 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.serialization.ObjectSerializer;
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.concurrent.Latch;
-import org.mule.util.lock.MuleLockFactory;
-import org.mule.util.lock.SingleServerLockProvider;
+import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.util.lock.MuleLockFactory;
+import org.mule.runtime.core.util.lock.SingleServerLockProvider;
 
 import java.io.Serializable;
 import java.util.HashMap;

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor.chain;
+package org.mule.runtime.core.processor.chain;
 
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorContainer;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 
 /**
  * Marker interface for MessageProcessors that actually represent a subflow.

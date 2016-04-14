@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.security;
+package org.mule.runtime.core.api.security;
 
-import org.mule.api.MuleException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
  * <code>EncryptionStrategyNotFoundException</code> is thrown by the

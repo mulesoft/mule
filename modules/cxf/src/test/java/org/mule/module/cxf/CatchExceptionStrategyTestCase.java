@@ -17,20 +17,20 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.exception.TemplateMessagingExceptionStrategy;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.TemplateMessagingExceptionStrategy;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.util.Map;
 

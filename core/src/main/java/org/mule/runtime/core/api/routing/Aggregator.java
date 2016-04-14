@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.routing;
+package org.mule.runtime.core.api.routing;
 
-import org.mule.api.MessagingException;
+import org.mule.runtime.core.api.MessagingException;
 
 public interface Aggregator
 {

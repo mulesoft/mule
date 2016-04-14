@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.simple;
+package org.mule.runtime.core.transformers.simple;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 

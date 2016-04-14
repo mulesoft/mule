@@ -14,8 +14,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.listener.ExceptionListener;
 import org.mule.module.ws.consumer.SoapFaultException;
 

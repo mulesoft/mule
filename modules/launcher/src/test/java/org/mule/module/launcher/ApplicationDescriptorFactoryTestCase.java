@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.module.launcher.MuleFoldersUtil.getAppFolder;
 import static org.mule.module.launcher.MuleFoldersUtil.getAppPluginsFolder;
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.module.launcher.builder.ApplicationPluginFileBuilder;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
@@ -24,7 +24,7 @@ import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

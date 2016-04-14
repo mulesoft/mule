@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.agent.Agent;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.InjectProcessor;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.ObjectProcessor;
-import org.mule.api.registry.PreInitProcessor;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.transformer.Transformer;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.util.CollectionUtils;
-import org.mule.util.ExceptionUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.InjectProcessor;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.registry.ObjectProcessor;
+import org.mule.runtime.core.api.registry.PreInitProcessor;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -46,7 +46,7 @@ import org.slf4j.Logger;
 public class TransientRegistry extends AbstractRegistry
 {
 
-    public static final String REGISTRY_ID = "org.mule.Registry.Transient";
+    public static final String REGISTRY_ID = "org.mule.runtime.core.Registry.Transient";
 
     private final RegistryMap registryMap = new RegistryMap(logger);
 
@@ -199,7 +199,7 @@ public class TransientRegistry extends AbstractRegistry
      *
      * @param object the object to process
      * @return the same object with lifecycle methods called (if it has any)
-     * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change for the object.
+     * @throws org.mule.runtime.core.api.MuleException if the registry fails to perform the lifecycle change for the object.
      */
     Object applyLifecycle(Object object) throws MuleException
     {

@@ -6,29 +6,29 @@
  */
 package org.mule.config.spring.factories;
 
-import static org.mule.util.NotificationUtils.buildPathResolver;
+import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 
-import org.mule.AbstractAnnotatedObject;
-import org.mule.api.AnnotatedObject;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.processor.MessageProcessorContainer;
-import org.mule.api.processor.MessageProcessorPathElement;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.processor.NonBlockingMessageProcessor;
-import org.mule.processor.chain.DynamicMessageProcessorContainer;
-import org.mule.util.NotificationUtils.FlowMap;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.MessageProcessorContainer;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
+import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
+import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

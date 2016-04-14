@@ -6,15 +6,15 @@
  */
 package org.mule.module.http.internal;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.module.http.internal.HttpParam;
 import org.mule.module.http.internal.HttpParamType;
 import org.mule.module.http.internal.ParameterMap;
-import org.mule.util.AttributeEvaluator;
+import org.mule.runtime.core.util.AttributeEvaluator;
 
 public class HttpSingleParam extends HttpParam implements Initialisable, MuleContextAware
 {

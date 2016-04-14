@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.expression;
+package org.mule.runtime.core.expression;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;

@@ -12,7 +12,7 @@ import org.mule.module.db.internal.domain.param.QueryParam;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
 import org.mule.module.db.internal.domain.query.QueryType;
 import org.mule.module.db.internal.domain.type.UnknownDbType;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

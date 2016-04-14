@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.pool;
+package org.mule.runtime.core.util.pool;
 
-import org.mule.config.PoolingProfile;
+import org.mule.runtime.core.config.PoolingProfile;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public abstract class AbstractPoolingTestCase extends AbstractMuleContextTestCase

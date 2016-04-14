@@ -6,7 +6,7 @@
  */
 package org.mule.module.management.mbean;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 
 /**
  * <code>RegistryServiceMBean</code> JMX Service interface for the Registry

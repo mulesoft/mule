@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.message.processing;
+package org.mule.runtime.core.message.processing;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -17,30 +17,30 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
-import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
-import org.mule.DefaultMuleEvent;
-import org.mule.RequestContext;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.source.MessageSource;
-import org.mule.context.notification.NotificationHelper;
-import org.mule.context.notification.ServerNotificationManager;
-import org.mule.execution.AsyncResponseFlowProcessingPhase;
-import org.mule.execution.AsyncResponseFlowProcessingPhaseTemplate;
-import org.mule.execution.MessageProcessContext;
-import org.mule.execution.MessageProcessPhase;
-import org.mule.execution.PhaseResultNotifier;
-import org.mule.execution.ResponseCompletionCallback;
-import org.mule.execution.ResponseDispatchException;
-import org.mule.execution.ValidationPhase;
+import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
+import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.context.notification.NotificationHelper;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.execution.AsyncResponseFlowProcessingPhase;
+import org.mule.runtime.core.execution.AsyncResponseFlowProcessingPhaseTemplate;
+import org.mule.runtime.core.execution.MessageProcessContext;
+import org.mule.runtime.core.execution.MessageProcessPhase;
+import org.mule.runtime.core.execution.PhaseResultNotifier;
+import org.mule.runtime.core.execution.ResponseCompletionCallback;
+import org.mule.runtime.core.execution.ResponseDispatchException;
+import org.mule.runtime.core.execution.ValidationPhase;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 

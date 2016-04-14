@@ -10,7 +10,7 @@ import static org.mule.config.spring.parsers.specific.NameConstants.MULE_NAMESPA
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY_TYPE;
 import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
 
-import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.ManagedMap;

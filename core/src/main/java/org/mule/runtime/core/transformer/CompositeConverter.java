@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer;
+package org.mule.runtime.core.transformer;
 
-import org.mule.TransformationService;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.Converter;
+import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 
 import java.util.LinkedList;
 import java.util.List;

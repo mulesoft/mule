@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.transaction;
+package org.mule.runtime.core.api.transaction;
 
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.MuleContext;
 
 /**
  * Create an unbound transaction, to be bound and started by other parts of the transaction framework.

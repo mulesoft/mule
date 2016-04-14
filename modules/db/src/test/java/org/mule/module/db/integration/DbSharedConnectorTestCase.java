@@ -9,8 +9,8 @@ package org.mule.module.db.integration;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.module.db.integration.model.DerbyTestDatabase;

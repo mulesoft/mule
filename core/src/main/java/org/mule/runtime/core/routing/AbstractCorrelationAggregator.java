@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.routing.correlation.CollectionCorrelatorCallback;
-import org.mule.routing.correlation.EventCorrelatorCallback;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
+import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 
 /**
  * <code>AbstractCorrelationAggregatingMessageProcessor</code> uses the CorrelationID
- * and CorrelationGroupSize properties of the {@link org.mule.api.MuleMessage} to
+ * and CorrelationGroupSize properties of the {@link org.mule.runtime.core.api.MuleMessage} to
  * manage message groups.
  */
 public abstract class AbstractCorrelationAggregator extends AbstractAggregator

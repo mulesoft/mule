@@ -6,11 +6,11 @@
  */
 package org.mule.module.http.internal.multipart;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.message.ds.ByteArrayDataSource;
-import org.mule.message.ds.StringDataSource;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.message.ds.ByteArrayDataSource;
+import org.mule.runtime.core.message.ds.StringDataSource;
 import org.mule.module.http.internal.HttpParam;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

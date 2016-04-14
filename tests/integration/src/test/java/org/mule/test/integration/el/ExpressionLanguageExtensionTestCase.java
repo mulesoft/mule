@@ -8,11 +8,11 @@ package org.mule.test.integration.el;
 
 import static org.junit.Assert.assertSame;
 
-import org.mule.api.MuleContext;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.el.ExpressionLanguage;
-import org.mule.el.mvel.MVELExpressionLanguage;
-import org.mule.expression.DefaultExpressionManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

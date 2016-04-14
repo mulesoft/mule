@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue.objectstore.xa;
+package org.mule.runtime.core.util.queue.objectstore.xa;
 
-import org.mule.util.UUID;
-import org.mule.util.xa.ResourceManagerException;
+import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.util.xa.ResourceManagerException;
 
 import javax.transaction.Status;
 

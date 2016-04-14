@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static org.mule.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.descriptor.DomainDescriptor;

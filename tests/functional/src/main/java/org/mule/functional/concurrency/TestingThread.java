@@ -6,7 +6,7 @@
  */
 package org.mule.functional.concurrency;
 
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 

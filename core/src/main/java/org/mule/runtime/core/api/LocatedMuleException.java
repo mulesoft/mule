@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api;
+package org.mule.runtime.core.api;
 
-import org.mule.api.execution.LocationExecutionContextProvider;
-import org.mule.config.i18n.Message;
-import org.mule.util.ObjectUtils;
+import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.util.ObjectUtils;
 
 /**
  * <code>LocatedMuleException</code> is a general exception that adds context location about the Exception (i.e.: where it occurred in the application).

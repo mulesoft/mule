@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.lifecycle;
+package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 
 /**
  * This callback is used to execute lifecycle behaviour for an object being managed by a {@link LifecycleManager}

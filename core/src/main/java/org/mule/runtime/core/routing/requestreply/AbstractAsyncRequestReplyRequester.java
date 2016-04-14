@@ -4,37 +4,37 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.requestreply;
+package org.mule.runtime.core.routing.requestreply;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.OptimizedRequestContext;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
-import org.mule.api.routing.ResponseTimeoutException;
-import org.mule.api.source.MessageSource;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.ObjectStoreManager;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.RoutingNotification;
-import org.mule.processor.AbstractInterceptingMessageProcessorBase;
-import org.mule.routing.EventProcessingThread;
-import org.mule.util.ObjectUtils;
-import org.mule.util.concurrent.Latch;
-import org.mule.util.concurrent.ThreadNameHelper;
-import org.mule.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.RequestReplyRequesterMessageProcessor;
+import org.mule.runtime.core.api.routing.ResponseTimeoutException;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.context.notification.RoutingNotification;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessorBase;
+import org.mule.runtime.core.routing.EventProcessingThread;
+import org.mule.runtime.core.util.ObjectUtils;
+import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
+import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 import java.util.List;
@@ -95,7 +95,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                 {
                     event.getSession().merge(resultEvent.getSession());
                 }
-                resultEvent = org.mule.RequestContext.setEvent(new DefaultMuleEvent(resultEvent.getMessage(),
+                resultEvent = org.mule.runtime.core.RequestContext.setEvent(new DefaultMuleEvent(resultEvent.getMessage(),
                     event));
             }
             return resultEvent;

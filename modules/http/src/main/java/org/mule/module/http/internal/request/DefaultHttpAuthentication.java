@@ -6,15 +6,15 @@
  */
 package org.mule.module.http.internal.request;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
-import org.mule.util.AttributeEvaluator;
+import org.mule.runtime.core.util.AttributeEvaluator;
 
 
 public class DefaultHttpAuthentication implements HttpAuthentication, MuleContextAware, Initialisable

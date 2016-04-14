@@ -4,38 +4,38 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.source.polling;
+package org.mule.runtime.core.source.polling;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.OptimizedRequestContext;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
-import org.mule.api.lifecycle.CreateException;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.schedule.Scheduler;
-import org.mule.api.schedule.SchedulerFactory;
-import org.mule.api.source.MessageSource;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.ConnectorMessageNotification;
-import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.schedule.Scheduler;
+import org.mule.runtime.core.api.schedule.SchedulerFactory;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
+import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.api.message.NullPayload;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Map;
 
@@ -44,11 +44,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * <p>
- * Polling {@link org.mule.api.source.MessageSource}.
+ * Polling {@link org.mule.runtime.core.api.source.MessageSource}.
  * </p>
  * <p>
- * The {@link PollingMessageSource} is responsible of creating a {@link org.mule.api.schedule.Scheduler}
- * at the initialization phase. This {@link org.mule.api.schedule.Scheduler} can be stopped/started and executed by using the {@link org.mule.api.registry.MuleRegistry}
+ * The {@link PollingMessageSource} is responsible of creating a {@link org.mule.runtime.core.api.schedule.Scheduler}
+ * at the initialization phase. This {@link org.mule.runtime.core.api.schedule.Scheduler} can be stopped/started and executed by using the {@link org.mule.runtime.core.api.registry.MuleRegistry}
  * interface, this way users can manipulate poll from outside mule server.
  * </p>
  */
@@ -67,7 +67,7 @@ public class PollingMessageSource implements MessageSource, FlowConstructAware, 
     private final SchedulerFactory<Runnable> schedulerFactory;
 
     /**
-     * The {@link org.mule.api.schedule.Scheduler} instance used to execute the scheduled jobs
+     * The {@link org.mule.runtime.core.api.schedule.Scheduler} instance used to execute the scheduled jobs
      */
     private Scheduler scheduler;
     private MessageProcessor listener;
@@ -194,7 +194,7 @@ public class PollingMessageSource implements MessageSource, FlowConstructAware, 
 
     /**
      * <p>
-     * Helper method to create {@link org.mule.api.schedule.Scheduler} names
+     * Helper method to create {@link org.mule.runtime.core.api.schedule.Scheduler} names
      * </p>
      */
     private String schedulerNameOf(FlowConstruct flowConstruct)

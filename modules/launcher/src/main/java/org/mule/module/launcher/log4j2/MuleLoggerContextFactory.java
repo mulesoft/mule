@@ -6,9 +6,9 @@
  */
 package org.mule.module.launcher.log4j2;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 
-import org.mule.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.module.artifact.classloader.DirectoryResourceLocator;

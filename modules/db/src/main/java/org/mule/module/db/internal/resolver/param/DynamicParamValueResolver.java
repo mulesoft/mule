@@ -7,8 +7,8 @@
 
 package org.mule.module.db.internal.resolver.param;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.expression.ExpressionManager;
 
 import org.mule.module.db.internal.domain.query.QueryParamValue;
 

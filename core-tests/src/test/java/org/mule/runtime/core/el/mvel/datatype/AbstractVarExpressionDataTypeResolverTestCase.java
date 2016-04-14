@@ -5,28 +5,28 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel.datatype;
+package org.mule.runtime.core.el.mvel.datatype;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.mvel2.MVEL.compileExpression;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-import static org.mule.transformer.types.MimeTypes.JSON;
-import org.mule.api.MuleEvent;
+import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.metadata.DataType;
-import org.mule.el.mvel.DelegateVariableResolverFactory;
-import org.mule.el.mvel.GlobalVariableResolverFactory;
-import org.mule.el.mvel.MVELExpressionLanguage;
-import org.mule.el.mvel.MVELExpressionLanguageContext;
-import org.mule.el.mvel.MessageVariableResolverFactory;
-import org.mule.el.mvel.StaticVariableResolverFactory;
-import org.mule.el.mvel.VariableVariableResolverFactory;
+import org.mule.runtime.core.el.mvel.DelegateVariableResolverFactory;
+import org.mule.runtime.core.el.mvel.GlobalVariableResolverFactory;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
+import org.mule.runtime.core.el.mvel.MessageVariableResolverFactory;
+import org.mule.runtime.core.el.mvel.StaticVariableResolverFactory;
+import org.mule.runtime.core.el.mvel.VariableVariableResolverFactory;
 import org.mule.mvel2.MVEL;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;

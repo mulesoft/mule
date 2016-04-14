@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.lifecycle;
+package org.mule.runtime.core.lifecycle;
 
-import org.mule.api.MuleContext;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.LifecycleCallback;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.lifecycle.LifecycleState;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -26,12 +26,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This is a base implementation of the {@link org.mule.api.lifecycle.LifecycleManager} interface
- * and provides almost all the plumbing required to write a {@link org.mule.api.lifecycle.LifecycleManager}
+ * This is a base implementation of the {@link org.mule.runtime.core.api.lifecycle.LifecycleManager} interface
+ * and provides almost all the plumbing required to write a {@link org.mule.runtime.core.api.lifecycle.LifecycleManager}
  * implementation. This class handles the tracking ofg the phases, transition validation and
  * checking state.
  *
- * @param <O> The object type being managed by this {@link org.mule.api.lifecycle.LifecycleManager}
+ * @param <O> The object type being managed by this {@link org.mule.runtime.core.api.lifecycle.LifecycleManager}
  * @since 3.0
  */
 public abstract class AbstractLifecycleManager<O> implements LifecycleManager

@@ -6,11 +6,11 @@
  */
 package org.mule.module.http.internal.listener;
 
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.WorkManager;
-import org.mule.api.source.MessageSource;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.execution.MessageProcessContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.execution.MessageProcessContext;
 
 public class HttpMessageProcessContext implements MessageProcessContext
 {

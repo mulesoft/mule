@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.connector;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
-import org.mule.api.MessagingException;
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionExceptionCode;
 import org.mule.api.connection.ConnectionHandlingStrategy;
@@ -26,7 +26,7 @@ import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreCli
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreOperations;
-import org.mule.retry.RetryPolicyExhaustedException;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 
 import org.junit.Rule;
 import org.junit.Test;

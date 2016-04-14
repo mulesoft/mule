@@ -16,8 +16,8 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 
-import org.mule.api.MuleEvent;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

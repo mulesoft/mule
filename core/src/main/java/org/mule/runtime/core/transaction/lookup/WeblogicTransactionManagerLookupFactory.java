@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transaction.lookup;
+package org.mule.runtime.core.transaction.lookup;
 
 public class WeblogicTransactionManagerLookupFactory extends GenericTransactionManagerLookupFactory
 {

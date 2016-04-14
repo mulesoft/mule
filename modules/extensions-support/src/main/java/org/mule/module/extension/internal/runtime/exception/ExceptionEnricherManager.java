@@ -13,7 +13,7 @@ import org.mule.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.extension.api.introspection.source.RuntimeSourceModel;
-import org.mule.util.ExceptionUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.util.Optional;
 

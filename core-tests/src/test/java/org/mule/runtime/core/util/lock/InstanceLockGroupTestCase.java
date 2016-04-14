@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.lock;
+package org.mule.runtime.core.util.lock;
 
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.api.store.ObjectAlreadyExistsException;
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.Serializable;
 import java.util.ArrayList;

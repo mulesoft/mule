@@ -100,7 +100,7 @@
 
     <flow name="security-filter">
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
-        <custom-processor class="org.mule.processor.SecurityFilterMessageProcessor"/>
+        <custom-processor class="org.mule.runtime.core.processor.SecurityFilterMessageProcessor"/>
         <test:non-blocking-processor/>
     </flow>
 

@@ -7,8 +7,8 @@
 package org.mule.module.extension;
 
 import static org.mule.api.metadata.DataType.STRING_DATA_TYPE;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.api.execution.CompletionHandler;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.Alias;

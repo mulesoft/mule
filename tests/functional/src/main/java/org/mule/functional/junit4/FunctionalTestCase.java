@@ -7,35 +7,32 @@
 package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
-
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.component.Component;
-import org.mule.api.component.JavaComponent;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.schedule.Scheduler;
-import org.mule.api.schedule.Schedulers;
-import org.mule.component.AbstractJavaComponent;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.construct.AbstractPipeline;
-import org.mule.construct.Flow;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.Component;
+import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.schedule.Scheduler;
+import org.mule.runtime.core.api.schedule.Schedulers;
+import org.mule.runtime.core.component.AbstractJavaComponent;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.construct.AbstractPipeline;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.processor.chain.SubflowInterceptingChainLifecycleWrapper;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 
 import org.junit.After;
-
-import junit.framework.Assert;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The

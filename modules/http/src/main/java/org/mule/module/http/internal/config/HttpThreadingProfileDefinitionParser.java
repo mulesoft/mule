@@ -7,7 +7,7 @@
 package org.mule.module.http.internal.config;
 
 import static org.mule.module.http.internal.listener.DefaultHttpListenerConfig.DEFAULT_MAX_THREADS;
-import org.mule.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

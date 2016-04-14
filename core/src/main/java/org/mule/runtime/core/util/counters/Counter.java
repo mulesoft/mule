@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.counters;
+package org.mule.runtime.core.util.counters;
 
-import org.mule.api.NamedObject;
+import org.mule.runtime.core.api.NamedObject;
 
 /**
  * This interface is the interface implemented for all counter types. A Counter can

@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.RequestContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;

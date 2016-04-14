@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
 import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
@@ -13,9 +13,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
-import org.mule.api.MuleContext;
-import org.mule.api.store.ObjectDoesNotExistException;
-import org.mule.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

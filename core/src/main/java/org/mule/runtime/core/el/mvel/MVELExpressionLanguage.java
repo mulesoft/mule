@@ -4,22 +4,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.mvel;
+package org.mule.runtime.core.el.mvel;
 
-import static org.mule.expression.DefaultExpressionManager.OBJECT_FOR_ENRICHMENT;
-import static org.mule.expression.DefaultExpressionManager.removeExpressionMarker;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.api.expression.InvalidExpressionException;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
+import static org.mule.runtime.core.expression.DefaultExpressionManager.OBJECT_FOR_ENRICHMENT;
+import static org.mule.runtime.core.expression.DefaultExpressionManager.removeExpressionMarker;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.expression.InvalidExpressionException;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DataType;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.el.mvel.datatype.MvelDataTypeResolver;
-import org.mule.el.mvel.datatype.MvelEnricherDataTypePropagator;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.el.mvel.datatype.MvelDataTypeResolver;
+import org.mule.runtime.core.el.mvel.datatype.MvelEnricherDataTypePropagator;
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ast.Function;
@@ -27,10 +27,10 @@ import org.mule.mvel2.compiler.ExpressionCompiler;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.mvel2.util.CompilerTools;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.TypedValue;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.TypedValue;
 import org.mule.api.message.NullPayload;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.Serializable;

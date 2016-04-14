@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.message.OutputHandler;
-import org.mule.routing.filters.WildcardFilter;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.routing.filters.WildcardFilter;
 
 import com.google.common.primitives.Primitives;
 

@@ -6,9 +6,9 @@
  */
 package org.mule.test.integration.schedule;
 
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.schedule.Scheduler;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.schedule.Scheduler;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

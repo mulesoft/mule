@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.config;
+package org.mule.runtime.core.api.config;
 
 
 /**
@@ -71,9 +71,9 @@ public class MuleProperties
      */
 
     public static final String LOG_CONTEXT_SELECTOR_PROPERTY = "Log4jContextSelector";
-    public static final String DEFAULT_LOG_CONTEXT_SELECTOR = "org.mule.module.launcher.log4j.ArtifactAwareContextSelector";
+    public static final String DEFAULT_LOG_CONTEXT_SELECTOR = "org.mule.runtime.core.module.launcher.log4j.ArtifactAwareContextSelector";
     public static final String LOG_CONFIGURATION_FACTORY_PROPERTY = "log4j.configurationFactory";
-    public static final String DEFAULT_LOG_CONFIGURATION_FACTORY = "org.mule.module.launcher.log4j.MuleLoggerConfigurationFactory";
+    public static final String DEFAULT_LOG_CONFIGURATION_FACTORY = "org.mule.runtime.core.module.launcher.log4j.MuleLoggerConfigurationFactory";
 
     /**
      * *****************************************************************************

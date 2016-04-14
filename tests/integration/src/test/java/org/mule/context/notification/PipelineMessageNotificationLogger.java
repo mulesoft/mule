@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import org.mule.api.context.notification.PipelineMessageNotificationListener;
+import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
 
 import java.util.List;
 

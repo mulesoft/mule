@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule;
+package org.mule.runtime.core;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.any;
@@ -18,24 +18,24 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.PropertyScope.OUTBOUND;
+import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.api.metadata.DataType.ANY_MIME_TYPE;
 import static org.mule.api.metadata.DataType.STRING_DATA_TYPE;
 import static org.mule.tck.MuleTestUtils.getTestEvent;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-import static org.mule.transformer.types.MimeTypes.ANY;
-import static org.mule.transformer.types.MimeTypes.APPLICATION_XML;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
+import static org.mule.runtime.core.transformer.types.MimeTypes.ANY;
+import static org.mule.runtime.core.transformer.types.MimeTypes.APPLICATION_XML;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.api.message.NullPayload;
 import org.mule.api.metadata.DataType;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
 import java.util.Collections;

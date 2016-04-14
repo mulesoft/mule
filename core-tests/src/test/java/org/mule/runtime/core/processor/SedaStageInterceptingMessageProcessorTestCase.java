@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -21,35 +21,35 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.processor.SedaStageInterceptingMessageProcessor.DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.ThreadSafeAccess;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.context.notification.AsyncMessageNotificationListener;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.LifecycleState;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.service.FailedToQueueEventException;
-import org.mule.config.ChainedThreadingProfile;
-import org.mule.config.QueueProfile;
-import org.mule.construct.Flow;
-import org.mule.context.notification.AsyncMessageNotification;
-import org.mule.management.stats.QueueStatistics;
-import org.mule.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.service.Pausable;
+import static org.mule.runtime.core.processor.SedaStageInterceptingMessageProcessor.DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.ThreadSafeAccess;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.context.notification.AsyncMessageNotificationListener;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.service.FailedToQueueEventException;
+import org.mule.runtime.core.config.ChainedThreadingProfile;
+import org.mule.runtime.core.config.QueueProfile;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.context.notification.AsyncMessageNotification;
+import org.mule.runtime.core.management.stats.QueueStatistics;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.runtime.core.service.Pausable;
 import org.mule.tck.MuleTestUtils;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.beans.ExceptionListener;
 import java.io.Serializable;
@@ -310,7 +310,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         threadingProfile.setThreadWaitTimeout(10);
         threadingProfile.setMuleContext(muleContext);
         // Create queue with capacity of 1, so that for second event queue is already full
-        org.mule.api.store.QueueStore<Serializable> queueStore = (org.mule.api.store.QueueStore<Serializable>)
+        org.mule.runtime.core.api.store.QueueStore<Serializable> queueStore = (org.mule.runtime.core.api.store.QueueStore<Serializable>)
                 muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
         QueueProfile queueProfile = new QueueProfile(1, queueStore);
         SedaStageInterceptingMessageProcessor mp;
@@ -331,7 +331,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
     public void enqueueQueueSizeZero() throws Exception
     {
         // Simple check to ensure a zero queue size doesn't disable queue.
-        org.mule.api.store.QueueStore<Serializable> queueStore = (org.mule.api.store.QueueStore<Serializable>)
+        org.mule.runtime.core.api.store.QueueStore<Serializable> queueStore = (org.mule.runtime.core.api.store.QueueStore<Serializable>)
                 muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
         createMPAndQueueSingleEvent(new QueueProfile(0, queueStore));
     }
@@ -340,7 +340,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
     public void enqueueQueueSizeMinusOne() throws Exception
     {
         // Simple check to ensure a negative queue size doesn't cause an issues.
-        org.mule.api.store.QueueStore<Serializable> queueStore = (org.mule.api.store.QueueStore<Serializable>)
+        org.mule.runtime.core.api.store.QueueStore<Serializable> queueStore = (org.mule.runtime.core.api.store.QueueStore<Serializable>)
                 muleContext.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME);
         createMPAndQueueSingleEvent(new QueueProfile(-1, queueStore));
     }

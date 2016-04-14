@@ -12,7 +12,7 @@ import org.mule.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.routing.MessageFilter;
+import org.mule.runtime.core.routing.MessageFilter;
 
 import java.util.List;
 

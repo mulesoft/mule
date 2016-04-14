@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.pool;
+package org.mule.runtime.core.util.pool;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.component.JavaComponent;
-import org.mule.api.component.LifecycleAdapter;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.object.ObjectFactory;
-import org.mule.component.PooledJavaComponent;
-import org.mule.config.PoolingProfile;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.component.LifecycleAdapter;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.component.PooledJavaComponent;
+import org.mule.runtime.core.config.PoolingProfile;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -46,7 +46,7 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
 
     /**
      * @param objectFactory The object factory that should be used to create new
-     *            {@link org.mule.api.component.LifecycleAdapter} instance for the pool
+     *            {@link org.mule.runtime.core.api.component.LifecycleAdapter} instance for the pool
      * @param poolingProfile The pooling progile ot be used to configure pool
      * @param muleContext
      */
@@ -85,7 +85,7 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
     }
 
     /**
-     * Wraps org.mule.object.ObjectFactory with commons-pool PoolableObjectFactory
+     * Wraps org.mule.runtime.core.object.ObjectFactory with commons-pool PoolableObjectFactory
      */
     class LifecycleEnabledPoolabeObjectFactoryAdapter implements PoolableObjectFactory
     {

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.filters;
+package org.mule.runtime.core.routing.filters;
 
-import org.mule.DefaultMuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

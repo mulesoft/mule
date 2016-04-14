@@ -6,9 +6,9 @@
  */
 package org.mule.module.oauth2.internal.authorizationcode.state;
 
-import org.mule.api.store.ListableObjectStore;
-import org.mule.util.lock.LockFactory;
-import org.mule.util.store.ObjectStoreToMapAdapter;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.util.lock.LockFactory;
+import org.mule.runtime.core.util.store.ObjectStoreToMapAdapter;
 
 import java.util.concurrent.locks.Lock;
 

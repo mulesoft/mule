@@ -6,11 +6,11 @@
  */
 package org.mule.test.components;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 public class PartialStartupRudeMessageProcessor implements MessageProcessor, Startable
 {

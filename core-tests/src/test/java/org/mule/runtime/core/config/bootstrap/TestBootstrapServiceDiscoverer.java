@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.bootstrap;
+package org.mule.runtime.core.config.bootstrap;
 
 import java.util.Collections;
 import java.util.List;

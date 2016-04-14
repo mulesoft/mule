@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.exception;
+package org.mule.runtime.core.exception;
 
-import org.mule.api.MuleContext;
-import org.mule.api.exception.MessageRedeliveredException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.exception.MessageRedeliveredException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import java.util.ArrayList;
 import java.util.List;

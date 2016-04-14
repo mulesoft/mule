@@ -6,7 +6,7 @@
  */
 package org.mule.module.cxf.builder;
 
-import org.mule.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.module.cxf.support.CxfUtils;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;

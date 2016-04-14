@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,8 +24,8 @@ import org.apache.commons.logging.LogFactory;
  *
  * @deprecated
  *    If access to MuleEvent or MuleMessage is required,
- *    then implement a {@link org.mule.api.processor.MessageProcessor}
- *    or {@link org.mule.api.lifecycle.Callable} instead
+ *    then implement a {@link org.mule.runtime.core.api.processor.MessageProcessor}
+ *    or {@link org.mule.runtime.core.api.lifecycle.Callable} instead
  */
 @Deprecated
 public final class OptimizedRequestContext

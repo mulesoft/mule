@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
-import org.mule.api.MuleContext;
-import org.mule.api.agent.Agent;
-import org.mule.config.MuleManifest;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

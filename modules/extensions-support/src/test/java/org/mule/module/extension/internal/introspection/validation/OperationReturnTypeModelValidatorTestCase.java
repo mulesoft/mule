@@ -10,7 +10,7 @@ import static java.util.Arrays.asList;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.operation.OperationModel;
 import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;

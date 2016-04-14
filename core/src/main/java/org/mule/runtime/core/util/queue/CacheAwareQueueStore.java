@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue;
+package org.mule.runtime.core.util.queue;
 
 import java.io.Serializable;
 
 /**
- * Wrapper for QueueStore so the cache in {@link org.mule.util.queue.AbstractQueueManager} gets
+ * Wrapper for QueueStore so the cache in {@link org.mule.runtime.core.util.queue.AbstractQueueManager} gets
  * cleaned up when a queue is not longer used.
  */
 class CacheAwareQueueStore implements QueueStore

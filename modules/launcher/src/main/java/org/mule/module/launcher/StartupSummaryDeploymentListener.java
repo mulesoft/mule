@@ -7,7 +7,7 @@
 package org.mule.module.launcher;
 
 import org.mule.module.launcher.application.Application;
-import org.mule.util.SimpleLoggingTable;
+import org.mule.runtime.core.util.SimpleLoggingTable;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;

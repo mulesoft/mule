@@ -8,8 +8,8 @@ package org.mule.module.json.transformers;
 
 import static org.junit.Assert.fail;
 import org.mule.api.metadata.SimpleDataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.config.i18n.LocaleMessageHandler;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.config.i18n.LocaleMessageHandler;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 

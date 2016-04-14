@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.message.processing;
+package org.mule.runtime.core.message.processing;
 
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleException;
-import org.mule.execution.MessageProcessContext;
-import org.mule.execution.PhaseResultNotifier;
-import org.mule.execution.ValidationPhase;
-import org.mule.execution.ValidationPhaseTemplate;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.execution.MessageProcessContext;
+import org.mule.runtime.core.execution.PhaseResultNotifier;
+import org.mule.runtime.core.execution.ValidationPhase;
+import org.mule.runtime.core.execution.ValidationPhaseTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 

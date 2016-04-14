@@ -8,10 +8,10 @@ package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 
 import java.util.Map;
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context;
+package org.mule.runtime.core.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -13,24 +13,24 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.tck.MuleAssert.assertTrue;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.security.SecurityManager;
-import org.mule.config.builders.DefaultsConfigurationBuilder;
-import org.mule.context.notification.MuleContextNotification;
-import org.mule.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.security.SecurityManager;
+import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.context.notification.MuleContextNotification;
+import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.JdkVersionUtils;
-import org.mule.util.UUID;
-import org.mule.util.queue.QueueManager;
+import org.mule.runtime.core.util.JdkVersionUtils;
+import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.util.queue.QueueManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -8,10 +8,10 @@ package org.mule.config.spring.parsers;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.apache.commons.logging.Log;

@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher.descriptor;
 
-import org.mule.MuleServer;
+import org.mule.runtime.core.MuleServer;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;

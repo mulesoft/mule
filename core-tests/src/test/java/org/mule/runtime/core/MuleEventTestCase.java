@@ -4,26 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.ThreadSafeAccess;
-import org.mule.api.routing.filter.Filter;
-import org.mule.api.security.Credentials;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.construct.Flow;
-import org.mule.routing.filters.PayloadTypeFilter;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.ThreadSafeAccess;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.api.security.Credentials;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.routing.filters.PayloadTypeFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.simple.ByteArrayToObject;
-import org.mule.transformer.simple.SerializableToByteArray;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
+import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.context;
+package org.mule.runtime.core.el.context;
 
-import org.mule.api.MuleEvent;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.util.Set;
 

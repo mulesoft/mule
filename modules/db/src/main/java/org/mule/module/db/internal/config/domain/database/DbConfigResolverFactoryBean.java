@@ -7,11 +7,11 @@
 
 package org.mule.module.db.internal.config.domain.database;
 
-import org.mule.api.AnnotatedObject;
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.config.spring.factories.AnnotatedObjectFactoryBean;
 import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
 import org.mule.module.db.internal.domain.database.ConfigurableDbConfigFactory;
@@ -23,7 +23,7 @@ import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.resolver.database.DbConfigResolver;
 import org.mule.module.db.internal.resolver.database.DynamicDbConfigResolver;
 import org.mule.module.db.internal.resolver.database.StaticDbConfigResolver;
-import org.mule.util.Preconditions;
+import org.mule.runtime.core.util.Preconditions;
 
 import java.util.List;
 import java.util.Map;

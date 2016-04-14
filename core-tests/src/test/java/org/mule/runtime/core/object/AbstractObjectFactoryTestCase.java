@@ -4,16 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.object;
-
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.Test;
+package org.mule.runtime.core.object;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 public abstract class AbstractObjectFactoryTestCase extends AbstractMuleContextTestCase
 {

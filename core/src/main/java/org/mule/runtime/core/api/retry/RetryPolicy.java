@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.retry;
+package org.mule.runtime.core.api.retry;
 
-import org.mule.retry.PolicyStatus;
+import org.mule.runtime.core.retry.PolicyStatus;
 
 /**
  * A RetryPolicy takes some action each time an exception occurs and returns a {@link PolicyStatus}

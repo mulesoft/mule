@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api;
+package org.mule.runtime.core.api;
 
-import org.mule.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * <code>MuleRuntimeException</code> Is the base runtime exception type for the

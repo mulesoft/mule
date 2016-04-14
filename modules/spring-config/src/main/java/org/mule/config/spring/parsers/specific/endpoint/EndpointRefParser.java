@@ -8,7 +8,7 @@ package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.w3c.dom.Element;
 

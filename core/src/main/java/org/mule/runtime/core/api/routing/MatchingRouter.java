@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.routing;
+package org.mule.runtime.core.api.routing;
 
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 
 /**
  * Routes the message to zero or more <code>MatchableMessageProcessor</code>s. Which
  * route(s) are used used is defined by implementations of this interface which use
- * the {@link Matchable#isMatch(org.mule.api.MuleMessage)} method of the routers to
+ * the {@link Matchable#isMatch(org.mule.runtime.core.api.MuleMessage)} method of the routers to
  * determine if a router accept the event or not.
  * <p>
  * Different implementations may route to the first match, or to all matches or you

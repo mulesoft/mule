@@ -5,23 +5,23 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
-import org.mule.AbstractAnnotatedObject;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.api.metadata.DataType;
 import org.mule.api.metadata.SimpleDataType;
-import org.mule.transformer.types.TypedValue;
+import org.mule.runtime.core.transformer.types.TypedValue;
 import org.mule.api.message.NullPayload;
-import org.mule.util.AttributeEvaluator;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.AttributeEvaluator;
+import org.mule.runtime.core.util.StringUtils;
 
 /**
  * Modifies the payload of a {@link MuleMessage} according to the provided value.

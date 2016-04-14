@@ -6,8 +6,8 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
@@ -16,8 +16,8 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * registry that want it. For an object to get an instance of the MuleContext it must
  * implement MuleContextAware.
  * 
- * @see org.mule.api.context.MuleContextAware
- * @see org.mule.api.MuleContext
+ * @see org.mule.runtime.core.api.context.MuleContextAware
+ * @see org.mule.runtime.core.api.MuleContext
  * @deprecated as of 3.7.0 because it's not being used. Will be removed in Mule 4.0
  */
 @Deprecated

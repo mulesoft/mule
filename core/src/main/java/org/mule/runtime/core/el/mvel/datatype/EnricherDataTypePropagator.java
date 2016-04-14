@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel.datatype;
+package org.mule.runtime.core.el.mvel.datatype;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.mvel2.compiler.CompiledExpression;
-import org.mule.transformer.types.TypedValue;
+import org.mule.runtime.core.transformer.types.TypedValue;
 
 /**
  * Propagates {@link org.mule.api.metadata.DataType} from the right to the left side

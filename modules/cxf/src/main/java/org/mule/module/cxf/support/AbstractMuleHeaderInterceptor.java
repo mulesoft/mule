@@ -18,10 +18,10 @@ import static org.mule.module.cxf.MuleSoapHeaders.MULE_10_ACTOR;
 import static org.mule.module.cxf.MuleSoapHeaders.MULE_HEADER;
 import static org.mule.module.cxf.MuleSoapHeaders.MULE_NAMESPACE;
 
-import static org.mule.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
 /**
  *

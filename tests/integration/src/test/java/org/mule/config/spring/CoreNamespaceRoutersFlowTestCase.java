@@ -10,18 +10,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.construct.Flow;
-import org.mule.routing.IdempotentMessageFilter;
-import org.mule.routing.IdempotentSecureHashMessageFilter;
-import org.mule.routing.outbound.AbstractOutboundRouter;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.routing.IdempotentMessageFilter;
+import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
+import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.store.InMemoryObjectStore;
-import org.mule.util.store.TextFileObjectStore;
+import org.mule.runtime.core.util.store.InMemoryObjectStore;
+import org.mule.runtime.core.util.store.TextFileObjectStore;
 
 import java.util.List;
 

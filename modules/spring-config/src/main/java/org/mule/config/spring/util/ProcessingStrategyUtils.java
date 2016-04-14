@@ -6,14 +6,14 @@
  */
 package org.mule.config.spring.util;
 
-import org.mule.api.processor.ProcessingStrategy;
-import org.mule.construct.flow.DefaultFlowProcessingStrategy;
-import org.mule.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
-import org.mule.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
-import org.mule.processor.strategy.SynchronousProcessingStrategy;
-import org.mule.processor.strategy.ThreadPerProcessorProcessingStrategy;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.QueuedAsynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.ThreadPerProcessorProcessingStrategy;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.config.RuntimeBeanReference;

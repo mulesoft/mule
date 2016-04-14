@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.serialization;
+package org.mule.runtime.core.api.serialization;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import org.mule.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

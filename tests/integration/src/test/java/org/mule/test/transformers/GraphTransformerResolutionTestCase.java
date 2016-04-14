@@ -8,12 +8,12 @@ package org.mule.test.transformers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.api.metadata.SimpleDataType;
 
 import org.junit.Test;

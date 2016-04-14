@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.interceptor;
+package org.mule.runtime.core.api.interceptor;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 
 /**
  * <code>Interceptor</code> is based on a similar concept of servlet filters and
@@ -25,7 +25,7 @@ public interface Interceptor extends InterceptingMessageProcessor
      * 
      * @param event the event containing info about the current message and service
      * @return A result message that may have been altered by this invocation
-     * @throws org.mule.api.MuleException if the invocation fails
+     * @throws org.mule.runtime.core.api.MuleException if the invocation fails
      */
     MuleEvent process(MuleEvent event) throws MuleException;
 

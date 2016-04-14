@@ -32,7 +32,7 @@ import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
-import org.mule.util.collection.ImmutableListCollector;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import com.google.common.collect.ImmutableList;
 

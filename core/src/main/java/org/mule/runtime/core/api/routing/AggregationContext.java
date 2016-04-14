@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.routing;
+package org.mule.runtime.core.api.routing;
 
-import org.mule.VoidMuleEvent;
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleEvent;
-import org.mule.util.Preconditions;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.Preconditions;
 
 import java.util.Collections;
 import java.util.List;

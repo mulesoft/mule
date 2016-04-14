@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.config;
+package org.mule.runtime.core.api.config;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.context.WorkManager;
-import org.mule.config.ChainedThreadingProfile;
-import org.mule.config.ImmutableThreadingProfile;
-import org.mule.config.pool.ThreadPoolFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.config.ChainedThreadingProfile;
+import org.mule.runtime.core.config.ImmutableThreadingProfile;
+import org.mule.runtime.core.config.pool.ThreadPoolFactory;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;

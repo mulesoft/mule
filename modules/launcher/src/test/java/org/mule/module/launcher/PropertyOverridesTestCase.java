@@ -14,7 +14,7 @@ import org.mule.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

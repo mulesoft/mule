@@ -8,7 +8,7 @@
  * @since 3.3
  */
 
-package org.mule.api.el;
+package org.mule.runtime.core.api.el;
 
 /**
  * @since 3.3

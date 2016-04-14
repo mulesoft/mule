@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.schedule;
+package org.mule.runtime.core.api.schedule;
 
 
-import static org.mule.source.polling.PollingMessageSource.POLLING_SCHEME;
+import static org.mule.runtime.core.source.polling.PollingMessageSource.POLLING_SCHEME;
 
-import org.mule.util.Predicate;
+import org.mule.runtime.core.util.Predicate;
 
 /**
  * <p>
@@ -19,7 +19,7 @@ import org.mule.util.Predicate;
 public class Schedulers
 {
     /**
-     * @return Predicate used to request the  {@link org.mule.api.registry.MuleRegistry} all the polling {@link org.mule.api.schedule.Scheduler}
+     * @return Predicate used to request the  {@link org.mule.runtime.core.api.registry.MuleRegistry} all the polling {@link org.mule.runtime.core.api.schedule.Scheduler}
      */
     public static Predicate<String> allPollSchedulers()
     {
@@ -34,8 +34,8 @@ public class Schedulers
     }
 
     /**
-     * @return Predicate used to request the  {@link org.mule.api.registry.MuleRegistry} all the polling {@link org.mule.api.schedule.Scheduler}
-     *         for a particular {@link org.mule.api.construct.FlowConstruct}
+     * @return Predicate used to request the  {@link org.mule.runtime.core.api.registry.MuleRegistry} all the polling {@link org.mule.runtime.core.api.schedule.Scheduler}
+     *         for a particular {@link org.mule.runtime.core.api.construct.FlowConstruct}
      */
     public static Predicate<String> flowConstructPollingSchedulers(final String flowConstruct)
     {

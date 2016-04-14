@@ -6,7 +6,7 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;

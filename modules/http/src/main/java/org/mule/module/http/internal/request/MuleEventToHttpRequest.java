@@ -17,11 +17,11 @@ import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.api.metadata.DataType;
 import org.mule.module.http.api.requester.HttpSendBodyMode;
 import org.mule.module.http.api.requester.HttpStreamingType;
@@ -33,11 +33,11 @@ import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
-import org.mule.transformer.types.MimeTypes;
+import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.api.message.NullPayload;
-import org.mule.util.AttributeEvaluator;
-import org.mule.util.DataTypeUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.AttributeEvaluator;
+import org.mule.runtime.core.util.DataTypeUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.collect.Maps;
 

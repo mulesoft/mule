@@ -4,80 +4,80 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
-import static org.mule.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
-import static org.mule.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
-import static org.mule.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
-import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
-import org.mule.api.Injector;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.SingleResourceTransactionFactoryManager;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.context.WorkManager;
-import org.mule.api.context.notification.FlowTraceManager;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServerNotificationListener;
-import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.RollbackSourceCallback;
-import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.api.execution.ExceptionContextProvider;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.registry.Registry;
-import org.mule.api.security.SecurityManager;
-import org.mule.api.serialization.ObjectSerializer;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStoreManager;
-import org.mule.api.util.StreamCloserService;
-import org.mule.client.DefaultLocalMuleClient;
-import org.mule.config.ClusterConfiguration;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.NullClusterConfiguration;
-import org.mule.config.bootstrap.ArtifactType;
-import org.mule.config.bootstrap.BootstrapServiceDiscoverer;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.connector.DefaultPollingController;
-import org.mule.connector.PollingController;
-import org.mule.context.notification.MuleContextNotification;
-import org.mule.context.notification.NotificationException;
-import org.mule.context.notification.ServerNotificationManager;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.exception.DefaultSystemExceptionStrategy;
-import org.mule.expression.DefaultExpressionManager;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
+import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.context.notification.FlowTraceManager;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.RollbackSourceCallback;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.api.security.SecurityManager;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.util.StreamCloserService;
+import org.mule.runtime.core.client.DefaultLocalMuleClient;
+import org.mule.runtime.core.config.ClusterConfiguration;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.NullClusterConfiguration;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.connector.DefaultPollingController;
+import org.mule.runtime.core.connector.PollingController;
+import org.mule.runtime.core.context.notification.MuleContextNotification;
+import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
+import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.extension.api.ExtensionManager;
-import org.mule.lifecycle.MuleContextLifecycleManager;
-import org.mule.management.stats.AllStatistics;
-import org.mule.management.stats.ProcessingTimeWatcher;
-import org.mule.registry.DefaultRegistryBroker;
-import org.mule.registry.MuleRegistryHelper;
-import org.mule.util.ApplicationShutdownSplashScreen;
-import org.mule.util.ApplicationStartupSplashScreen;
-import org.mule.util.JdkVersionUtils;
-import org.mule.util.ServerShutdownSplashScreen;
-import org.mule.util.ServerStartupSplashScreen;
-import org.mule.util.SplashScreen;
-import org.mule.util.SystemUtils;
-import org.mule.util.UUID;
-import org.mule.util.concurrent.Latch;
-import org.mule.util.lock.LockFactory;
-import org.mule.util.queue.QueueManager;
+import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.management.stats.AllStatistics;
+import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
+import org.mule.runtime.core.registry.DefaultRegistryBroker;
+import org.mule.runtime.core.registry.MuleRegistryHelper;
+import org.mule.runtime.core.util.ApplicationShutdownSplashScreen;
+import org.mule.runtime.core.util.ApplicationStartupSplashScreen;
+import org.mule.runtime.core.util.JdkVersionUtils;
+import org.mule.runtime.core.util.ServerShutdownSplashScreen;
+import org.mule.runtime.core.util.ServerStartupSplashScreen;
+import org.mule.runtime.core.util.SplashScreen;
+import org.mule.runtime.core.util.SystemUtils;
+import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.util.lock.LockFactory;
+import org.mule.runtime.core.util.queue.QueueManager;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -511,13 +511,13 @@ public class DefaultMuleContext implements MuleContext
 
     /**
      * Fires a server notification to all registered
-     * {@link org.mule.api.context.notification.CustomNotificationListener} notificationManager.
+     * {@link org.mule.runtime.core.api.context.notification.CustomNotificationListener} notificationManager.
      *
      * @param notification the notification to fire. This must be of type
-     *                     {@link org.mule.context.notification.CustomNotification} otherwise an
+     *                     {@link org.mule.runtime.core.context.notification.CustomNotification} otherwise an
      *                     exception will be thrown.
      * @throws UnsupportedOperationException if the notification fired is not a
-     *                                       {@link org.mule.context.notification.CustomNotification}
+     *                                       {@link org.mule.runtime.core.context.notification.CustomNotification}
      */
     @Override
     public void fireNotification(ServerNotification notification)
@@ -589,7 +589,7 @@ public class DefaultMuleContext implements MuleContext
      * object.
      *
      * @return a workManager instance used by the current MuleManager
-     * @see org.mule.api.config.ThreadingProfile
+     * @see org.mule.runtime.core.api.config.ThreadingProfile
      * @see DefaultMuleConfiguration
      */
     @Override
@@ -644,12 +644,12 @@ public class DefaultMuleContext implements MuleContext
     }
 
     /**
-     * When running in clustered mode, it returns a {@link org.mule.api.store.ObjectStoreManager} that
-     * creates {@link org.mule.api.store.ObjectStore} instances which are only local to the current node.
+     * When running in clustered mode, it returns a {@link org.mule.runtime.core.api.store.ObjectStoreManager} that
+     * creates {@link org.mule.runtime.core.api.store.ObjectStore} instances which are only local to the current node.
      * This is just a workaround until we introduce a solution for durable persistent stores in HA. This is not part of
      * Mule's API and you should not use this in your apps or extensions
      *
-     * @return a {@link org.mule.api.store.ObjectStoreManager}
+     * @return a {@link org.mule.runtime.core.api.store.ObjectStoreManager}
      * @since 3.5.0
      */
     public ObjectStoreManager getLocalObjectStoreManager()
@@ -658,12 +658,12 @@ public class DefaultMuleContext implements MuleContext
     }
 
     /**
-     * When running in clustered mode, it returns a {@link org.mule.util.queue.QueueManager} that
-     * creates {@link org.mule.util.queue.Queue} instances which are only local to the current node.
+     * When running in clustered mode, it returns a {@link org.mule.runtime.core.util.queue.QueueManager} that
+     * creates {@link org.mule.runtime.core.util.queue.Queue} instances which are only local to the current node.
      * This is just a workaround until we introduce a solution for durable persistent queues in HA. This is not part of
      * Mule's API and you should not use this in your apps or extensions
      *
-     * @return a {@link org.mule.util.queue.QueueManager}
+     * @return a {@link org.mule.runtime.core.util.queue.QueueManager}
      * @since 3.5.0
      */
     public QueueManager getLocalQueueManager()
@@ -813,7 +813,7 @@ public class DefaultMuleContext implements MuleContext
      * Returns the Expression Manager configured for this instance of Mule
      *
      * @return the Expression Manager configured for this instance of Mule
-     * @see org.mule.api.expression.ExpressionManager
+     * @see org.mule.runtime.core.api.expression.ExpressionManager
      */
     @Override
     public ExpressionManager getExpressionManager()

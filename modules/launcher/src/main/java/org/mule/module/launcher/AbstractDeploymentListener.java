@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher;
 
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.MuleContext;
 
 /**
  * Convenience implementation of DeploymentListener.  Default 

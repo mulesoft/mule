@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.NonBlockingSupported;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.config.QueueProfile;
-import org.mule.management.stats.QueueStatistics;
-import org.mule.service.Pausable;
-import org.mule.service.Resumable;
-import org.mule.work.MuleWorkManager;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.QueueProfile;
+import org.mule.runtime.core.management.stats.QueueStatistics;
+import org.mule.runtime.core.service.Pausable;
+import org.mule.runtime.core.service.Resumable;
+import org.mule.runtime.core.work.MuleWorkManager;
 
 import javax.resource.spi.work.Work;
 

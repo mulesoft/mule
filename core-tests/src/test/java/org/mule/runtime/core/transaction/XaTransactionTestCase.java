@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transaction;
+package org.mule.runtime.core.transaction;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -14,11 +14,11 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleContext;
-import org.mule.api.transaction.Transaction;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.xa.XaResourceFactoryHolder;
+import org.mule.runtime.core.util.xa.XaResourceFactoryHolder;
 
 import java.util.Random;
 

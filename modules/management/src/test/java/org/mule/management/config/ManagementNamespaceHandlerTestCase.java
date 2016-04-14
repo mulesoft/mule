@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.config;
+package org.mule.runtime.core.management.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.agent.Log4jNotificationLoggerAgent;
-import org.mule.api.agent.Agent;
-import org.mule.api.registry.Registry;
+import org.mule.runtime.core.agent.Log4jNotificationLoggerAgent;
+import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.api.registry.Registry;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;

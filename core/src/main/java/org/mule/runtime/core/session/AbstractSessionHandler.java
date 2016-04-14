@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.session;
+package org.mule.runtime.core.session;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.serialization.DefaultObjectSerializer;
-import org.mule.api.serialization.ObjectSerializer;
-import org.mule.api.serialization.SerializationException;
-import org.mule.message.SessionHandler;
-import org.mule.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.serialization.DefaultObjectSerializer;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.serialization.SerializationException;
+import org.mule.runtime.core.message.SessionHandler;
+import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import javax.inject.Inject;
 

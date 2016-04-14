@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
 import static org.junit.Assert.fail;
-import org.mule.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.work;
+package org.mule.runtime.core.work;
 
-import org.mule.api.MuleException;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.context.WorkManager;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.context.WorkManager;
 
 import javax.resource.spi.work.ExecutionContext;
 import javax.resource.spi.work.Work;

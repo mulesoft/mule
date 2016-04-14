@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.encryption;
+package org.mule.runtime.core.transformer.encryption;
 
-import org.mule.api.EncryptionStrategy;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.api.security.CryptoFailureException;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -82,7 +82,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
      * Template method were deriving classes can do any initialisation after the
      * properties have been set on this transformer
      * 
-     * @throws org.mule.api.lifecycle.InitialisationException
+     * @throws org.mule.runtime.core.api.lifecycle.InitialisationException
      */
     @Override
     public void initialise() throws InitialisationException

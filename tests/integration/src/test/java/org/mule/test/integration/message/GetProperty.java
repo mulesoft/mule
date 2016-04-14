@@ -6,9 +6,9 @@
  */
 package org.mule.test.integration.message;
 
-import org.mule.RequestContext;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 
 public class GetProperty extends AbstractTransformer
 {

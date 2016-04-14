@@ -4,25 +4,25 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.construct;
+package org.mule.runtime.core.construct;
 
-import org.mule.api.NonBlockingSupported;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.processor.DynamicPipeline;
-import org.mule.api.processor.DynamicPipelineBuilder;
-import org.mule.api.processor.DynamicPipelineException;
-import org.mule.api.processor.InterceptingMessageProcessor;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChain;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.processor.chain.AbstractMessageProcessorChain;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.processor.chain.SimpleMessageProcessorChain;
-import org.mule.util.StringUtils;
-import org.mule.util.UUID;
+import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.processor.DynamicPipeline;
+import org.mule.runtime.core.api.processor.DynamicPipelineBuilder;
+import org.mule.runtime.core.api.processor.DynamicPipelineException;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.processor.chain.SimpleMessageProcessorChain;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.UUID;
 
 import java.util.ArrayList;
 import java.util.Collections;

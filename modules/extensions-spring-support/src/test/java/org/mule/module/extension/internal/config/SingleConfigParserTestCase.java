@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.model.Ricin;
 

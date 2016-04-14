@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.retry;
+package org.mule.runtime.core.retry;
 
-import org.mule.api.lifecycle.FatalException;
-import org.mule.config.i18n.Message;
+import org.mule.runtime.core.api.lifecycle.FatalException;
+import org.mule.runtime.core.config.i18n.Message;
 
 /** 
  * This exception is thrown when a Retry policy has made all the retry attempts 

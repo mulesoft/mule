@@ -6,7 +6,7 @@
  */
 package org.mule.module.reboot;
 
-import org.mule.MuleServer;
+import org.mule.runtime.core.MuleServer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -133,12 +133,12 @@ public final class MuleContainerBootstrapUtils
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
-    // The following methods are intentionally duplicated from org.mule.util so that
+    // The following methods are intentionally duplicated from org.mule.runtime.core.util so that
     // mule-module-reboot has no external dependencies at system startup.
     //////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @see org.mule.util.ClassUtils#getResource
+     * @see org.mule.runtime.core.util.ClassUtils#getResource
      */
     public static URL getResource(final String resourceName, final Class<?> callingClass)
     {
@@ -177,7 +177,7 @@ public final class MuleContainerBootstrapUtils
     }
 
     /**
-     * @see org.mule.util.FileUtils#renameFile
+     * @see org.mule.runtime.core.util.FileUtils#renameFile
      */
     public static boolean renameFile(File srcFile, File destFile) throws IOException
     {
@@ -200,7 +200,7 @@ public final class MuleContainerBootstrapUtils
     }
 
     /**
-     * @see org.mule.util.FileUtils#renameFileHard
+     * @see org.mule.runtime.core.util.FileUtils#renameFileHard
      */
     public static boolean renameFileHard(File srcFile, File destFile) throws IOException
     {
@@ -246,7 +246,7 @@ public final class MuleContainerBootstrapUtils
     }
 
     /**
-     * @see org.mule.util.IOUtils#copy
+     * @see org.mule.runtime.core.util.IOUtils#copy
      */
     public static int copy(InputStream input, OutputStream output) throws IOException
     {
@@ -259,7 +259,7 @@ public final class MuleContainerBootstrapUtils
     }
 
     /**
-     * @see org.mule.util.IOUtils#copyLarge
+     * @see org.mule.runtime.core.util.IOUtils#copyLarge
      */
     public static long copyLarge(InputStream input, OutputStream output) throws IOException
     {

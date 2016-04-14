@@ -10,11 +10,11 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.registry.ResolverException;
-import org.mule.component.ComponentException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.registry.ResolverException;
+import org.mule.runtime.core.component.ComponentException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;

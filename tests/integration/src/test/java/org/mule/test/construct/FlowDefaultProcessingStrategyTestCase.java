@@ -10,12 +10,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.PropertyScope;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.PropertyScope;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.functional.junit4.TransactionConfigEnum;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;

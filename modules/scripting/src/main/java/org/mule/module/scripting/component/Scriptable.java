@@ -6,25 +6,25 @@
  */
 package org.mule.module.scripting.component;
 
-import static org.mule.PropertyScope.INBOUND;
-import static org.mule.config.i18n.CoreMessages.cannotLoadFromClasspath;
-import static org.mule.config.i18n.CoreMessages.propertiesNotSet;
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.util.IOUtils.getResourceAsStream;
-import org.mule.DefaultMuleEventContext;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.PropertyScope;
+import static org.mule.runtime.core.PropertyScope.INBOUND;
+import static org.mule.runtime.core.config.i18n.CoreMessages.cannotLoadFromClasspath;
+import static org.mule.runtime.core.config.i18n.CoreMessages.propertiesNotSet;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.IOUtils.getResourceAsStream;
+import org.mule.runtime.core.DefaultMuleEventContext;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.PropertyScope;
 import org.mule.api.message.NullPayload;
-import org.mule.el.context.FlowVariableMapContext;
-import org.mule.el.context.SessionVariableMapContext;
-import org.mule.util.CollectionUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.el.context.FlowVariableMapContext;
+import org.mule.runtime.core.el.context.SessionVariableMapContext;
+import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

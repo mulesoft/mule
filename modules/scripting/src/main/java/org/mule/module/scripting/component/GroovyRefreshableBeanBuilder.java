@@ -6,11 +6,11 @@
  */
 package org.mule.module.scripting.component;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.StringUtils;
 
 import groovy.lang.GroovyObject;
 import groovy.lang.MetaMethod;

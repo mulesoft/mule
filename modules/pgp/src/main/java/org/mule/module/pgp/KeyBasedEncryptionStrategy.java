@@ -6,14 +6,14 @@
  */
 package org.mule.module.pgp;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.CredentialsAccessor;
-import org.mule.api.security.CryptoFailureException;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.CredentialsAccessor;
+import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.module.pgp.i18n.PGPMessages;
-import org.mule.security.AbstractNamedEncryptionStrategy;
-import org.mule.util.SecurityUtils;
+import org.mule.runtime.core.security.AbstractNamedEncryptionStrategy;
+import org.mule.runtime.core.util.SecurityUtils;
 
 import java.io.InputStream;
 import java.security.Provider;

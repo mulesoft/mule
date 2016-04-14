@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
@@ -12,9 +12,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
-import org.mule.api.MuleContext;
-import org.mule.api.store.ObjectAlreadyExistsException;
-import org.mule.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;

@@ -27,8 +27,8 @@ import org.mule.api.metadata.ProcessorId;
 import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.extension.api.introspection.metadata.NullMetadataKey;
-import org.mule.internal.metadata.DefaultMetadataCache;
-import org.mule.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
+import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.util.List;

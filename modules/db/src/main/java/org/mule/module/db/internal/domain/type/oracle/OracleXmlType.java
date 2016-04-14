@@ -7,7 +7,7 @@
 package org.mule.module.db.internal.domain.type.oracle;
 
 import org.mule.module.db.internal.domain.type.StructuredDbType;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;

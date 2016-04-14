@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.transformer;
+package org.mule.runtime.core.api.transformer;
 
 /**
  * A interface to denote that a transformer is discoverable. A Transformer can implement this interface so that

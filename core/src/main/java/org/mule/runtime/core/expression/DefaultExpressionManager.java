@@ -4,23 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.expression;
+package org.mule.runtime.core.expression;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.api.expression.InvalidExpressionException;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.el.mvel.MVELExpressionLanguage;
-import org.mule.transformer.types.TypedValue;
-import org.mule.util.StringUtils;
-import org.mule.util.TemplateParser;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.expression.InvalidExpressionException;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.TemplateParser;
 
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;

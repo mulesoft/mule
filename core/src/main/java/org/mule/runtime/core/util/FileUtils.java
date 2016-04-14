@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;

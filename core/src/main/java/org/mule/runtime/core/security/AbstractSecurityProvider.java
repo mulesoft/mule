@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.security;
+package org.mule.runtime.core.security;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.SecurityContext;
-import org.mule.api.security.SecurityContextFactory;
-import org.mule.api.security.SecurityProvider;
-import org.mule.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.security.SecurityContextFactory;
+import org.mule.runtime.core.api.security.SecurityProvider;
+import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 
 public abstract class AbstractSecurityProvider implements SecurityProvider
 {

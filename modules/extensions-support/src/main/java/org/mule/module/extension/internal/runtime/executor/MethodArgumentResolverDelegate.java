@@ -8,7 +8,7 @@ package org.mule.module.extension.internal.runtime.executor;
 
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.toMap;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.ParameterGroup;
 import org.mule.extension.api.annotation.param.Connection;

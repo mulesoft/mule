@@ -6,21 +6,21 @@
  */
 package org.mule.config.spring;
 
-import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-import org.mule.api.MuleContext;
-import org.mule.config.ConfigResource;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.config.ConfigResource;
 import org.mule.config.spring.editors.MulePropertyEditorRegistrar;
 import org.mule.config.spring.processors.DiscardedOptionalBeanPostProcessor;
 import org.mule.config.spring.processors.LifecycleStatePostProcessor;
 import org.mule.config.spring.processors.MuleInjectorProcessor;
 import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.config.spring.util.LaxInstantiationStrategyWrapper;
-import org.mule.registry.MuleRegistryHelper;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.registry.MuleRegistryHelper;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 

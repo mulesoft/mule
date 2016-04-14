@@ -6,11 +6,11 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.context.notification.ServerNotificationListener;
-import org.mule.context.notification.ListenerSubscriptionPair;
-import org.mule.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
 
 import java.util.Collection;
 import java.util.HashSet;

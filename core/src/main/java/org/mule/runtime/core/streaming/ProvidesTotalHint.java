@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.streaming;
+package org.mule.runtime.core.streaming;
 
 /**
  * Object provides a hint on total amount of elements it has/can process

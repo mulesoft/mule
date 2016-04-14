@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.retry;
+package org.mule.runtime.core.api.retry;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleMessage;
 
 import java.util.Map;
 

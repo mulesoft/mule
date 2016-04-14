@@ -6,11 +6,11 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.message.OutputHandler;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.message.OutputHandler;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;

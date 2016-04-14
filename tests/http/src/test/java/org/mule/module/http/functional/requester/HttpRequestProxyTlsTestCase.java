@@ -12,13 +12,13 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_URI;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

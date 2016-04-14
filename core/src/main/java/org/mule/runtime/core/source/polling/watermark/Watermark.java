@@ -5,14 +5,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.source.polling.watermark;
+package org.mule.runtime.core.source.polling.watermark;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.store.ObjectDoesNotExistException;
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.source.polling.MessageProcessorPollingOverride;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;

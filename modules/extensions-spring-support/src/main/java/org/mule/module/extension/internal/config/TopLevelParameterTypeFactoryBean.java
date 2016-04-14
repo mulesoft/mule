@@ -8,9 +8,9 @@ package org.mule.module.extension.internal.config;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-import org.mule.RequestContext;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.api.introspection.config.ConfigurationModel;
 import org.mule.extension.api.introspection.operation.OperationModel;
 import org.mule.extension.api.introspection.parameter.ParameterModel;

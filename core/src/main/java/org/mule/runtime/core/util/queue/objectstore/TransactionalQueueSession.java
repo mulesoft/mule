@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue.objectstore;
+package org.mule.runtime.core.util.queue.objectstore;
 
-import org.mule.api.MuleException;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.util.queue.Queue;
-import org.mule.util.queue.QueueSession;
-import org.mule.util.queue.objectstore.xa.AbstractXAResourceManager;
-import org.mule.util.queue.objectstore.xa.DefaultXASession;
-import org.mule.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.util.queue.Queue;
+import org.mule.runtime.core.util.queue.QueueSession;
+import org.mule.runtime.core.util.queue.objectstore.xa.AbstractXAResourceManager;
+import org.mule.runtime.core.util.queue.objectstore.xa.DefaultXASession;
+import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 
@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 @Deprecated
 class TransactionalQueueSession extends DefaultXASession implements QueueSession
 {
-    private Log logger = LogFactory.getLog(org.mule.util.queue.TransactionalQueueSession.class);
+    private Log logger = LogFactory.getLog(org.mule.runtime.core.util.queue.TransactionalQueueSession.class);
 
     protected TransactionalQueueManager queueManager;
 

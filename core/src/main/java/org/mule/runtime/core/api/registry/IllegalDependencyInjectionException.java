@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.registry;
+package org.mule.runtime.core.api.registry;
 
 /**
  * Thrown to indicate that an object has an illegal dependency injection reference

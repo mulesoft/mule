@@ -8,7 +8,7 @@
 
     <spring:bean id="beanRouteResolver" class="org.mule.test.routing.CustomRouteResolver"/>
 
-    <spring:bean id="resultsHandler" class="org.mule.routing.DefaultRouterResultsHandler">
+    <spring:bean id="resultsHandler" class="org.mule.runtime.core.routing.DefaultRouterResultsHandler">
         <spring:constructor-arg index="0"><spring:value>true</spring:value></spring:constructor-arg>
     </spring:bean>
 

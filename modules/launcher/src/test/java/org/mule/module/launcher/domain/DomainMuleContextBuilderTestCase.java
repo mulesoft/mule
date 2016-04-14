@@ -9,7 +9,7 @@ package org.mule.module.launcher.domain;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

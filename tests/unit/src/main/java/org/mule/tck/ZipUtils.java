@@ -7,7 +7,7 @@
 
 package org.mule.tck;
 
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.session;
+package org.mule.runtime.core.session;
 
-import org.mule.api.MuleSession;
-import org.mule.api.security.SecurityContext;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.api.metadata.DataType;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.TypedValue;
-import org.mule.util.CaseInsensitiveHashMap;
-import org.mule.util.UUID;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.runtime.core.util.CaseInsensitiveHashMap;
+import org.mule.runtime.core.util.UUID;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

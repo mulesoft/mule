@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
+import static org.mule.runtime.core.api.store.ObjectStoreManager.UNBOUNDED;
 
-import org.mule.api.config.MuleProperties;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStore;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;

@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.correlation.CorrelationSequenceComparator;
-import org.mule.routing.correlation.EventCorrelatorCallback;
-import org.mule.routing.correlation.ResequenceMessagesCorrelatorCallback;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.routing.correlation.CorrelationSequenceComparator;
+import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
+import org.mule.runtime.core.routing.correlation.ResequenceMessagesCorrelatorCallback;
 
 import java.util.Comparator;
 

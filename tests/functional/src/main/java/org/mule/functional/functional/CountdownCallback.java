@@ -6,9 +6,9 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

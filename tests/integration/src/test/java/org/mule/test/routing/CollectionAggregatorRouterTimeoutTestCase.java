@@ -10,10 +10,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.context.notification.RoutingNotificationListener;
-import org.mule.context.notification.RoutingNotification;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.context.notification.RoutingNotificationListener;
+import org.mule.runtime.core.context.notification.RoutingNotification;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;

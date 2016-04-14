@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

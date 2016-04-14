@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -405,8 +405,8 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
     }
 
     /**
-     * @return the configured default encoding {@link org.mule.api.config.MuleConfiguration#getDefaultEncoding()}, or
-     * the value of the system property 'mule.encoding' if {@link org.mule.api.MuleContext} is null.
+     * @return the configured default encoding {@link org.mule.runtime.core.api.config.MuleConfiguration#getDefaultEncoding()}, or
+     * the value of the system property 'mule.encoding' if {@link org.mule.runtime.core.api.MuleContext} is null.
      */
     public static String getDefaultEncoding(MuleContext muleContext)
     {

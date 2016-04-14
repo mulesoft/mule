@@ -6,9 +6,9 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.module.xml.util.XMLUtils;
 
 import javax.xml.stream.XMLStreamReader;

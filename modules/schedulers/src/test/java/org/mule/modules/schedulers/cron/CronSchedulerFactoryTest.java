@@ -10,10 +10,10 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.api.schedule.Scheduler;
-import org.mule.source.polling.PollingTask;
-import org.mule.source.polling.PollingWorker;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.api.schedule.Scheduler;
+import org.mule.runtime.core.source.polling.PollingTask;
+import org.mule.runtime.core.source.polling.PollingWorker;
 
 import org.junit.Test;
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.context.notification;
+package org.mule.runtime.core.api.context.notification;
 
 /**
  * <code>BlockingServerEvent</code> is a marker interface that tells the server

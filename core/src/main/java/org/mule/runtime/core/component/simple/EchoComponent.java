@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.component.simple;
+package org.mule.runtime.core.component.simple;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.component.simple.EchoService;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.component.simple.EchoService;
 
 /**
  * <code>EchoComponent</code> will log the message and return the payload back as

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.service;
+package org.mule.runtime.core.service;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 
 /**
  * Adds a pause lifecycle method to an object.  This should only be used with {@link Resumable}

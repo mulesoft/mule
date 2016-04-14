@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.introspection.describer;
 
-import org.mule.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.introspection.parameter.ExpressionSupport;

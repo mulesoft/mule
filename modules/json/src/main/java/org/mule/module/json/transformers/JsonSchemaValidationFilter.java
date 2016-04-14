@@ -8,9 +8,9 @@ package org.mule.module.json.transformers;
 
 import static org.mule.module.xml.filters.SchemaValidationFilter.DEFAULT_SCHEMA_LANGUAGE;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor;
 
 import java.util.Map;

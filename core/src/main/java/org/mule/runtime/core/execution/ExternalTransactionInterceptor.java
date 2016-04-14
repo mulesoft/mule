@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
-import org.mule.api.MuleContext;
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transaction.TransactionFactory;
-import org.mule.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.transaction.TransactionCoordination;
 
 class ExternalTransactionInterceptor<T> implements ExecutionInterceptor<T>
 {

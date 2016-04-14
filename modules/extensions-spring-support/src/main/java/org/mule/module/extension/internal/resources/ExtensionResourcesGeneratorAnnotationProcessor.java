@@ -18,8 +18,8 @@ import org.mule.module.extension.internal.capability.xml.schema.AnnotationProces
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.introspection.VersionResolver;
 import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
-import org.mule.registry.SpiServiceRegistry;
-import org.mule.util.ExceptionUtils;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.util.ExceptionUtils;
 
 import com.google.common.collect.ImmutableList;
 

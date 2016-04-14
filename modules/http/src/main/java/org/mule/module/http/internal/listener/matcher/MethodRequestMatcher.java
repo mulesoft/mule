@@ -7,7 +7,7 @@
 package org.mule.module.http.internal.listener.matcher;
 
 import org.mule.module.http.internal.domain.request.HttpRequest;
-import org.mule.util.Preconditions;
+import org.mule.runtime.core.util.Preconditions;
 
 import java.util.Arrays;
 import java.util.List;

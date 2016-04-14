@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import org.apache.commons.beanutils.PropertyUtils;
 
@@ -16,7 +16,7 @@ import org.apache.commons.beanutils.PropertyUtils;
  * Looks up a property from a JavaBean using PropertyUtils.getProperty().
  * Nested properties are valid, assuming they follow JavaBean conventions.
  * 
- *   <transformer name="ExtractCustomer" className="org.mule.transformer.simple.GetBeanProperty">
+ *   <transformer name="ExtractCustomer" className="org.mule.runtime.core.transformer.simple.GetBeanProperty">
  *       <properties>
  *           <property name="propertyName" value="customerRequest.customer" />
  *       </properties>

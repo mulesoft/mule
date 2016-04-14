@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServerNotificationHandler;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -94,9 +94,9 @@ public class NotificationHelper
      * using the {@link ServerNotificationHandler} associated to the given {@code event}
      *
      * @param source
-     * @param event         a {@link org.mule.api.MuleEvent}
+     * @param event         a {@link org.mule.runtime.core.api.MuleEvent}
      * @param uri           the uri of the firing endpoint
-     * @param flowConstruct the {@link org.mule.api.construct.FlowConstruct} that generated the notification
+     * @param flowConstruct the {@link org.mule.runtime.core.api.construct.FlowConstruct} that generated the notification
      * @param action        the action code for the notification
      */
     public void fireNotification(Object source, MuleEvent event, String uri, FlowConstruct flowConstruct, int action)

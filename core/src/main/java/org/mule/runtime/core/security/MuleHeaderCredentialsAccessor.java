@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.security;
+package org.mule.runtime.core.security;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.security.CredentialsAccessor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.security.CredentialsAccessor;
 
 /**
  * <code>MuleHeaderCredentialsAccessor</code> obtains and sets the user credentials

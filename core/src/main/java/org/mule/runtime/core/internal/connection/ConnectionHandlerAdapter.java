@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.internal.connection;
+package org.mule.runtime.core.internal.connection;
 
-import org.mule.api.Closeable;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.Closeable;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.api.connection.ConnectionHandler;
 
 /**

@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport;
+package org.mule.runtime.core.transport;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mule.transport.WorkEventMatcher.aRejectedWorkEventFor;
-import static org.mule.transport.WorkEventMatcher.aStartedWorkEventFor;
-import static org.mule.transport.WorkEventMatcher.anAcceptedWorkEventFor;
-import static org.mule.transport.WorkEventMatcher.aCompletedWorkEventFor;
+import static org.mule.runtime.core.transport.WorkEventMatcher.aRejectedWorkEventFor;
+import static org.mule.runtime.core.transport.WorkEventMatcher.aStartedWorkEventFor;
+import static org.mule.runtime.core.transport.WorkEventMatcher.anAcceptedWorkEventFor;
+import static org.mule.runtime.core.transport.WorkEventMatcher.aCompletedWorkEventFor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.work.TrackerWorkListener;
+import org.mule.runtime.core.work.TrackerWorkListener;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;

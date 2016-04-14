@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.registry;
+package org.mule.runtime.core.api.registry;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 
 /**
  * A {@link Registry} which not only registers and fetches objects,
@@ -24,7 +24,7 @@ public interface LifecycleRegistry extends Registry
      *
      * @param object the object to process
      * @return either the same object but with the lifecycle applied or a proxy to it
-     * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change for the object.
+     * @throws org.mule.runtime.core.api.MuleException if the registry fails to perform the lifecycle change for the object.
      */
     Object applyLifecycle(Object object) throws MuleException;
 
@@ -36,7 +36,7 @@ public interface LifecycleRegistry extends Registry
      * @param object the object to process
      * @param phase  the specific lifecycle phase you want to fire
      * @return either the same object but with the lifecycle applied or a proxy to it
-     * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change for the object.
+     * @throws org.mule.runtime.core.api.MuleException if the registry fails to perform the lifecycle change for the object.
      */
     Object applyLifecycle(Object object, String phase) throws MuleException;
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.context;
+package org.mule.runtime.core.el.context;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -16,13 +16,13 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.DefaultMuleMessage;
-import org.mule.TransformationService;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.api.metadata.DataType;
 import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.message.NullPayload;
 
 import org.junit.Before;
@@ -168,7 +168,7 @@ public class MessageContextTestCase extends AbstractELTestCase
         when(transformedMessage.getPayload()).thenReturn(TEST_PAYLOAD);
         muleContext.setTransformationService(transformationService);
         when(transformationService.transform(event.getMessage(), DataTypeFactory.STRING)).thenReturn(transformedMessage);
-        Object result = evaluate("message.payloadAs(org.mule.transformer.types.DataTypeFactory.STRING)", event);
+        Object result = evaluate("message.payloadAs(org.mule.runtime.core.transformer.types.DataTypeFactory.STRING)", event);
         assertSame(TEST_PAYLOAD, result);
     }
 

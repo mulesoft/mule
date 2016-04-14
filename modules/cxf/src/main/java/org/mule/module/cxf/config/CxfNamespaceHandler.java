@@ -6,7 +6,7 @@
  */
 package org.mule.module.cxf.config;
 
-import org.mule.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;

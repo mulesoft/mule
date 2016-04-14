@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor.strategy;
+package org.mule.runtime.core.processor.strategy;
 
-import org.mule.api.MuleContext;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.WorkManager;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.work.MuleWorkManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.work.MuleWorkManager;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class NonBlockingProcessingStrategy extends AbstractThreadingProfileProce
     }
 
     @Override
-    public void configureProcessors(List<MessageProcessor> processors, org.mule.api.processor.StageNameSource
+    public void configureProcessors(List<MessageProcessor> processors, org.mule.runtime.core.api.processor.StageNameSource
             nameSource, MessageProcessorChainBuilder chainBuilder, MuleContext muleContext)
     {
         for (MessageProcessor processor : processors)

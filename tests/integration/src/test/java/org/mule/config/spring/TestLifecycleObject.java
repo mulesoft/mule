@@ -6,11 +6,11 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.store.ObjectStoreManager;
 
 import javax.inject.Inject;
 

@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.config.MuleManifest;
+import org.mule.runtime.core.config.MuleManifest;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.JdkVersionUtils.JdkVersion;
+import org.mule.runtime.core.util.JdkVersionUtils.JdkVersion;
 
 import java.lang.reflect.Field;
 import java.util.jar.Attributes;

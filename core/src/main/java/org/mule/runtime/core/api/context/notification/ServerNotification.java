@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.context.notification;
+package org.mule.runtime.core.api.context.notification;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.context.MuleContextAware;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.EventObject;
 import java.util.Map;

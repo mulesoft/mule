@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transaction;
+package org.mule.runtime.core.transaction;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transaction.TransactionFactory;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transaction.constraints.ConstraintFilter;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transaction.constraints.ConstraintFilter;
+import org.mule.runtime.core.util.ClassUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

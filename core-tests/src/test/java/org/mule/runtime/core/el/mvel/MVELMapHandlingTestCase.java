@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.mvel;
+package org.mule.runtime.core.el.mvel;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
-import org.mule.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;

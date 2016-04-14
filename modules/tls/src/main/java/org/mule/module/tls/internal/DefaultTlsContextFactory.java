@@ -7,17 +7,17 @@
 package org.mule.module.tls.internal;
 
 
-import org.mule.api.lifecycle.CreateException;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.tls.TlsConfiguration;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.tls.TlsConfiguration;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.api.tls.TlsContextTrustStoreConfiguration;
-import org.mule.util.ArrayUtils;
-import org.mule.util.FileUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.base.Joiner;
 

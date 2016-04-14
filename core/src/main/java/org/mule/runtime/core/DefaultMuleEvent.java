@@ -4,39 +4,39 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
-import static org.mule.util.ClassUtils.isConsumable;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
-import org.mule.api.ThreadSafeAccess;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.Pipeline;
-import org.mule.api.context.notification.FlowCallStack;
-import org.mule.api.context.notification.ProcessorsTrace;
+import static org.mule.runtime.core.util.ClassUtils.isConsumable;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.ThreadSafeAccess;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.api.metadata.DataType;
-import org.mule.api.processor.ProcessingDescriptor;
-import org.mule.api.security.Credentials;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.connector.ReplyToHandler;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.DefaultFlowCallStack;
-import org.mule.context.notification.DefaultProcessorsTrace;
-import org.mule.management.stats.ProcessingTime;
-import org.mule.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.security.MuleCredentials;
-import org.mule.session.DefaultMuleSession;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.TypedValue;
-import org.mule.connector.DefaultReplyToHandler;
-import org.mule.util.CopyOnWriteCaseInsensitiveMap;
-import org.mule.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.processor.ProcessingDescriptor;
+import org.mule.runtime.core.api.security.Credentials;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.context.notification.DefaultProcessorsTrace;
+import org.mule.runtime.core.management.stats.ProcessingTime;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.runtime.core.connector.DefaultReplyToHandler;
+import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
+import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -104,7 +104,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     // Constructors
 
     /**
-     * Constructor used to create an event with no message source with minimal arguments and a {@link org.mule.api.MuleSession}
+     * Constructor used to create an event with no message source with minimal arguments and a {@link org.mule.runtime.core.api.MuleSession}
      */
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
@@ -130,7 +130,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     /**
      * Constructor used to create an event with no message source with minimal arguments and a
-     * {@link org.mule.api.connector.ReplyToHandler}
+     * {@link org.mule.runtime.core.api.connector.ReplyToHandler}
      */
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
@@ -238,7 +238,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     /**
      *  Constructor used to create an event with a identifiable message source with all additional arguments except
-     *  a {@link org.mule.api.connector.ReplyToHandler}
+     *  a {@link org.mule.runtime.core.api.connector.ReplyToHandler}
      */
     public DefaultMuleEvent(MuleMessage message,
                             URI messageSourceURI,
@@ -347,7 +347,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     /**
-     * Copy constructor to be used when synchronicity and {@link org.mule.MessageExchangePattern} both need changing.
+     * Copy constructor to be used when synchronicity and {@link org.mule.runtime.core.MessageExchangePattern} both need changing.
      */
     public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus, boolean shareFlowVars,
                             MessageExchangePattern messageExchangePattern)
@@ -613,8 +613,8 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      * transformer used is the one configured on the endpoint through which this event was received.
      *
      * @return the message transformed into it's recognised or expected format as a Strings.
-     * @throws org.mule.api.transformer.TransformerException if a failure occurs in the transformer
-     * @see org.mule.api.transformer.Transformer
+     * @throws org.mule.runtime.core.api.transformer.TransformerException if a failure occurs in the transformer
+     * @see org.mule.runtime.core.api.transformer.Transformer
      */
     @Override
     public String transformMessageToString() throws TransformerException
@@ -633,7 +633,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      *
      * @param encoding the encoding to use when converting bytes to a string, if necessary
      * @return the message contents as a string
-     * @throws org.mule.api.MuleException if the message cannot be converted into a string
+     * @throws org.mule.runtime.core.api.MuleException if the message cannot be converted into a string
      */
     @Override
     public String getMessageAsString(String encoding) throws MuleException
@@ -785,11 +785,11 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     /**
      * Invoked after deserialization. This is called when the marker interface
-     * {@link org.mule.util.store.DeserializationPostInitialisable} is used. This will get invoked after the
+     * {@link org.mule.runtime.core.util.store.DeserializationPostInitialisable} is used. This will get invoked after the
      * object has been deserialized passing in the current MuleContext when using either
-     * {@link org.mule.transformer.wire.SerializationWireFormat},
-     * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat} or the
-     * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
+     * {@link org.mule.runtime.core.transformer.wire.SerializationWireFormat},
+     * {@link org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat} or the
+     * {@link org.mule.runtime.core.transformer.simple.ByteArrayToSerializable} transformer.
      *
      * @param muleContext the current muleContext instance
      * @throws MuleException if there is an error initializing

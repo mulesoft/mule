@@ -8,8 +8,8 @@ package org.mule.module.jaas;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleMessage;
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.util.SystemUtils;
 
 import org.junit.Test;
 

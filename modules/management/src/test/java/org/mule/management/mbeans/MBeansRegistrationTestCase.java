@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.mbeans;
+package org.mule.runtime.core.management.mbeans;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el;
+package org.mule.runtime.core.el;
 
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.construct.Flow;
-import org.mule.el.context.AbstractELTestCase;
-import org.mule.expression.DefaultExpressionManager;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.el.context.AbstractELTestCase;
+import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;

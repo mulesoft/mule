@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.model.resolvers;
+package org.mule.runtime.core.model.resolvers;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.model.InvocationResult;
-import org.mule.routing.filters.WildcardFilter;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringMessageUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.model.InvocationResult;
+import org.mule.runtime.core.routing.filters.WildcardFilter;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

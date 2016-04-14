@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.notification.ExceptionNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.context.notification.ExceptionNotification;
-import org.mule.exception.DefaultSystemExceptionStrategy;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.context.notification.ExceptionNotification;
+import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;

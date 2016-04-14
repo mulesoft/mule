@@ -7,10 +7,10 @@
 package org.mule.test.integration.routing;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 

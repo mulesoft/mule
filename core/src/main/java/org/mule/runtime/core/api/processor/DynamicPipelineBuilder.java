@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.processor;
+package org.mule.runtime.core.api.processor;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 
 import java.util.List;
 
@@ -66,12 +66,12 @@ public interface DynamicPipelineBuilder
     DynamicPipelineBuilder injectAfter(List<MessageProcessor> messageProcessors);
 
     /**
-     * Injects the message processors added with {@link #injectBefore(org.mule.api.processor.MessageProcessor...)}
-     * and {@link #injectAfter(org.mule.api.processor.MessageProcessor...)}
+     * Injects the message processors added with {@link #injectBefore(org.mule.runtime.core.api.processor.MessageProcessor...)}
+     * and {@link #injectAfter(org.mule.runtime.core.api.processor.MessageProcessor...)}
      * If none were added the effect is the same as calling {@link #reset()}
      *
      * @return pipeline ID for future updates
-     * @throws org.mule.api.MuleException if the update fails
+     * @throws org.mule.runtime.core.api.MuleException if the update fails
      */
     String resetAndUpdate() throws MuleException;
 
@@ -79,7 +79,7 @@ public interface DynamicPipelineBuilder
      * Removes and disposes all injected message processors.
      *
      * @return pipeline ID for future updates
-     * @throws org.mule.api.MuleException if the update fails
+     * @throws org.mule.runtime.core.api.MuleException if the update fails
      */
     String reset() throws MuleException;
 

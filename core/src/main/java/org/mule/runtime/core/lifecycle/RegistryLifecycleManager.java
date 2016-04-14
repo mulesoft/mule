@@ -4,28 +4,28 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.lifecycle;
+package org.mule.runtime.core.lifecycle;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.HasLifecycleInterceptor;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.LifecycleCallback;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecycleInterceptor;
-import org.mule.api.lifecycle.LifecyclePhase;
-import org.mule.api.lifecycle.RegistryLifecycleHelpers;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.registry.Registry;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.lifecycle.phases.MuleContextDisposePhase;
-import org.mule.lifecycle.phases.MuleContextInitialisePhase;
-import org.mule.lifecycle.phases.MuleContextStartPhase;
-import org.mule.lifecycle.phases.MuleContextStopPhase;
-import org.mule.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.registry.AbstractRegistryBroker;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.HasLifecycleInterceptor;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
+import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
+import org.mule.runtime.core.api.lifecycle.RegistryLifecycleHelpers;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.lifecycle.phases.MuleContextDisposePhase;
+import org.mule.runtime.core.lifecycle.phases.MuleContextInitialisePhase;
+import org.mule.runtime.core.lifecycle.phases.MuleContextStartPhase;
+import org.mule.runtime.core.lifecycle.phases.MuleContextStopPhase;
+import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.registry.AbstractRegistryBroker;
 
 import java.util.HashMap;
 import java.util.Map;

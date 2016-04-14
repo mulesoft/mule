@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transaction;
+package org.mule.runtime.core.transaction;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.transaction.constraints.ConstraintFilter;
+import org.mule.runtime.core.transaction.constraints.ConstraintFilter;
 
 import org.junit.Test;
 import org.mockito.Mockito;

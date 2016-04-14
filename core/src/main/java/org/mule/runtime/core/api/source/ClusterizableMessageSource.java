@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.source;
+package org.mule.runtime.core.api.source;
 
 /**
  * Defines a message source that runs in only one node of a cluster.

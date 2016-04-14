@@ -4,22 +4,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.NameableObject;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.MessageProcessorPathResolver;
-import org.mule.api.context.notification.BlockingServerEvent;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
+import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.api.message.NullPayload;
-import org.mule.util.ObjectUtils;
+import org.mule.runtime.core.util.ObjectUtils;
 
 public class MessageProcessorNotification extends ServerNotification implements BlockingServerEvent
 {

@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.routing.AggregationContext;
-import org.mule.api.routing.RouterResultsHandler;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.routing.AggregationContext;
+import org.mule.runtime.core.api.routing.RouterResultsHandler;
 
 /**
  * If no routes generated exeption then it returns a new {@link MuleEvent} under the

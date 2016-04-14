@@ -11,11 +11,11 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 
-import org.mule.api.MessagingException;
-import org.mule.api.security.tls.TlsConfiguration;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.security.tls.TlsConfiguration;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.io.File;
 import java.io.IOException;

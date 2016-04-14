@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transaction.lookup;
+package org.mule.runtime.core.transaction.lookup;
 
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transaction.TransactionManagerFactory;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.JndiContextHelper;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.JndiContextHelper;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Map;
 
@@ -83,7 +83,7 @@ public class GenericTransactionManagerLookupFactory implements TransactionManage
         this.context = context;
     }
 
-    /** @see org.mule.api.transaction.TransactionManagerFactory#create(MuleConfiguration)
+    /** @see org.mule.runtime.core.api.transaction.TransactionManagerFactory#create(MuleConfiguration)
      * @param config */
     public TransactionManager create(MuleConfiguration config) throws Exception
     {
@@ -105,7 +105,7 @@ public class GenericTransactionManagerLookupFactory implements TransactionManage
      * There is no guarantee that by throwing a Recoverable exception that the Mule
      * instance will not shut down.
      *
-     * @throws org.mule.api.lifecycle.InitialisationException
+     * @throws org.mule.runtime.core.api.lifecycle.InitialisationException
      *          if a fatal error occurs
      *          causing the Mule instance to shutdown
      */

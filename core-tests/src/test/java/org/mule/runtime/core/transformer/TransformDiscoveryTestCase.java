@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer;
+package org.mule.runtime.core.transformer;
 
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.RedApple;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import org.junit.Test;
 
@@ -60,7 +60,7 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
         assertEquals(StringToRedApple.class, t.getClass());
     }
 
-    protected class StringToApple extends org.mule.transformer.AbstractDiscoverableTransformer
+    protected class StringToApple extends org.mule.runtime.core.transformer.AbstractDiscoverableTransformer
     {
         public StringToApple()
         {
@@ -73,7 +73,7 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
         }
     }
 
-    protected class StringToRedApple extends org.mule.transformer.AbstractDiscoverableTransformer
+    protected class StringToRedApple extends org.mule.runtime.core.transformer.AbstractDiscoverableTransformer
     {
         public StringToRedApple()
         {
@@ -87,7 +87,7 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
         }
     }
 
-    protected class StringToOrange extends org.mule.transformer.AbstractDiscoverableTransformer
+    protected class StringToOrange extends org.mule.runtime.core.transformer.AbstractDiscoverableTransformer
     {
         public StringToOrange()
         {

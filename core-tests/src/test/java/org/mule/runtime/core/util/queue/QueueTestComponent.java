@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.queue;
+package org.mule.runtime.core.util.queue;
 
 import static junit.framework.Assert.assertNotSame;
 import static org.junit.Assert.assertEquals;

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.work;
+package org.mule.runtime.core.work;
 
-import org.mule.RequestContext;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import javax.resource.spi.work.ExecutionContext;
 import javax.resource.spi.work.Work;

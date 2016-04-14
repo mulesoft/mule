@@ -6,9 +6,9 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.processor.chain.AbstractMessageProcessorChainBuilder;
-import org.mule.processor.chain.SubflowMessageProcessorChainBuilder;
+import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChainBuilder;
+import org.mule.runtime.core.processor.chain.SubflowMessageProcessorChainBuilder;
 
 /**
  * Uses a custom message processor chain builder for subflows

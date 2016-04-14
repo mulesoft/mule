@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.security;
+package org.mule.runtime.core.api.security;
 
 /**
  * <code>SecurityContextFactory</code> is responsible for creating a

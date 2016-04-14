@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.WorkManager;
-import org.mule.api.source.MessageSource;
-import org.mule.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
 
 /**
- * Context for processing one message from a {@link org.mule.api.source.MessageSource}.
+ * Context for processing one message from a {@link org.mule.runtime.core.api.source.MessageSource}.
  *
- * Mule {@link org.mule.api.source.MessageSource} implementations should create one instance of MessageProcessContext per message
+ * Mule {@link org.mule.runtime.core.api.source.MessageSource} implementations should create one instance of MessageProcessContext per message
  * that generates.
  *
  * MessageProcessContext is responsible for

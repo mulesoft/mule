@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.bootstrap;
+package org.mule.runtime.core.config.bootstrap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;

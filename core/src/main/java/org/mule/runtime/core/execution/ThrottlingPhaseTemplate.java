@@ -4,32 +4,32 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 
 /**
- * Template that a {@link org.mule.api.source.MessageSource} must implement
+ * Template that a {@link org.mule.runtime.core.api.source.MessageSource} must implement
  * if it wants to participate in the throttling phase when processing a message
  */
 public interface ThrottlingPhaseTemplate extends MessageProcessTemplate
 {
 
     /**
-     * @return a {@link org.mule.api.MuleEvent} created from the original message
+     * @return a {@link org.mule.runtime.core.api.MuleEvent} created from the original message
      */
     MuleEvent getMuleEvent() throws MuleException;
 
     /**
-     * Discards the message due to ThrottlingPolicy configured for the {@link org.mule.api.source.MessageSource} is exceeded
+     * Discards the message due to ThrottlingPolicy configured for the {@link org.mule.runtime.core.api.source.MessageSource} is exceeded
      *
      * @throws MuleException
      */
     void discardMessageOnThrottlingExceeded() throws MuleException;
 
     /**
-     * Set up throttling policy state to be used by the {@link org.mule.api.source.MessageSource} for debugging or
+     * Set up throttling policy state to be used by the {@link org.mule.runtime.core.api.source.MessageSource} for debugging or
      * information purpose.
      *
      * Not all throttling policy supports statistics so this method may not be called

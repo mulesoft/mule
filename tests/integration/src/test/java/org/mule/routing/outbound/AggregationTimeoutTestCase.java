@@ -5,15 +5,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing.outbound;
+package org.mule.runtime.core.routing.outbound;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.LocalMuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;

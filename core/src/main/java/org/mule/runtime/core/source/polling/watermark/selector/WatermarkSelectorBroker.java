@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.source.polling.watermark.selector;
+package org.mule.runtime.core.source.polling.watermark.selector;
 
 /**
  * Broker for the default implementations of {@link WatermarkSelector}

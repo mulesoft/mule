@@ -4,28 +4,28 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor.strategy;
+package org.mule.runtime.core.processor.strategy;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.WorkManager;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.api.processor.ProcessingStrategy;
-import org.mule.api.processor.StageNameSource;
-import org.mule.config.ChainedThreadingProfile;
-import org.mule.processor.AsyncInterceptingMessageProcessor;
-import org.mule.util.concurrent.ThreadNameHelper;
-import org.mule.work.MuleWorkManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.StageNameSource;
+import org.mule.runtime.core.config.ChainedThreadingProfile;
+import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
+import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
+import org.mule.runtime.core.work.MuleWorkManager;
 
 import java.util.List;
 
 /**
- * A abstract {@link org.mule.api.processor.ProcessingStrategy} implementation that provides a
- * {@link org.mule.api.config.ThreadingProfile} for you in extensions configured via setters for each of the threading
+ * A abstract {@link org.mule.runtime.core.api.processor.ProcessingStrategy} implementation that provides a
+ * {@link org.mule.runtime.core.api.config.ThreadingProfile} for you in extensions configured via setters for each of the threading
  * profile attributes.
  */
 public abstract class AbstractThreadingProfileProcessingStrategy implements ProcessingStrategy

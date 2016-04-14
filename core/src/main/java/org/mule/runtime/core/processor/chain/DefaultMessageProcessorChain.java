@@ -4,23 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor.chain;
+package org.mule.runtime.core.processor.chain;
 
-import org.mule.OptimizedRequestContext;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.component.Component;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.processor.RequestReplyReplierMessageProcessor;
-import org.mule.api.transformer.Transformer;
-import org.mule.construct.Flow;
-import org.mule.execution.MessageProcessorExecutionTemplate;
-import org.mule.routing.MessageFilter;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.Component;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.RequestReplyReplierMessageProcessor;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
+import org.mule.runtime.core.routing.MessageFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;

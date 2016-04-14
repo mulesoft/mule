@@ -9,7 +9,7 @@ package org.mule.module.http.functional.requester;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.module.http.api.HttpHeaders;
 
 import java.io.IOException;

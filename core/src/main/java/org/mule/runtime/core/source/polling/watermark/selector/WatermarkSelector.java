@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.source.polling.watermark.selector;
+package org.mule.runtime.core.source.polling.watermark.selector;
 
 /**
  * A watermark selector receives values and selects which one should be the new

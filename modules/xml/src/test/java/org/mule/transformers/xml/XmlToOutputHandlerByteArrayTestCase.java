@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml;
+package org.mule.runtime.core.transformers.xml;
 
 import static org.junit.Assert.fail;
-import org.mule.api.transformer.Transformer;
-import org.mule.message.OutputHandler;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.message.OutputHandler;
 import org.mule.module.xml.transformer.XmlToOutputHandler;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;

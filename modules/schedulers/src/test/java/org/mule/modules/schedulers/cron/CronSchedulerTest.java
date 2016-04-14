@@ -12,13 +12,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.source.polling.PollingTask;
-import org.mule.source.polling.PollingWorker;
+import org.mule.runtime.core.source.polling.PollingTask;
+import org.mule.runtime.core.source.polling.PollingWorker;
 
 import java.util.TimeZone;
 

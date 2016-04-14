@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.config;
+package org.mule.runtime.core.api.config;
 
 public class DefaultThreadingProfileConfig
 {

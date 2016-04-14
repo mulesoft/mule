@@ -10,14 +10,14 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.config.ExceptionHelper;
-import org.mule.execution.AsyncResponseFlowProcessingPhaseTemplate;
-import org.mule.execution.ResponseCompletionCallback;
-import org.mule.execution.ThrottlingPhaseTemplate;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.execution.AsyncResponseFlowProcessingPhaseTemplate;
+import org.mule.runtime.core.execution.ResponseCompletionCallback;
+import org.mule.runtime.core.execution.ThrottlingPhaseTemplate;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;

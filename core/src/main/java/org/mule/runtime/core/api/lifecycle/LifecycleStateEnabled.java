@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.lifecycle;
+package org.mule.runtime.core.api.lifecycle;
 
 /**
- * Objects that have an associated lifecycle manager such as {@link org.mule.api.construct.FlowConstruct}
+ * Objects that have an associated lifecycle manager such as {@link org.mule.runtime.core.api.construct.FlowConstruct}
  * should implement this interface so that the registry lifecycle
  * manager can introspect the lifecycle state of an object. This allows objects to
  * have a different lifecycle state to the registry. Typically objects that have

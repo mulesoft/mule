@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.OptimizedRequestContext;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.ProcessorExecutor;
-import org.mule.execution.MessageProcessorExecutionTemplate;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.ProcessorExecutor;
+import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 
 import java.util.List;
 
 /**
- * This {@link org.mule.api.processor.ProcessorExecutor} implementation executes each {@link org.mule.api.processor.MessageProcessor}
+ * This {@link org.mule.runtime.core.api.processor.ProcessorExecutor} implementation executes each {@link org.mule.runtime.core.api.processor.MessageProcessor}
  * in sucession in the same thread until or processors have been invoked or one of the following is returned by a processor:
- * <li>{@link org.mule.VoidMuleEvent}</li>
+ * <li>{@link org.mule.runtime.core.VoidMuleEvent}</li>
  * <li><code>null</code></li>
  */
 public class BlockingProcessorExecutor implements ProcessorExecutor

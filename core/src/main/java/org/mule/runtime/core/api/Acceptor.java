@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api;
+package org.mule.runtime.core.api;
 
 /**
  *  Provides capability to only accept handling certain MuleEvents.
@@ -13,7 +13,7 @@ public interface Acceptor
 {
     /**
      * @param event {@link MuleEvent} to route through exception handler
-     * @return true if this {@link org.mule.api.exception.MessagingExceptionHandler} should handler exception
+     * @return true if this {@link org.mule.runtime.core.api.exception.MessagingExceptionHandler} should handler exception
      *         false otherwise
      */
     boolean accept(MuleEvent event);

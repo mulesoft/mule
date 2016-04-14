@@ -11,9 +11,9 @@ import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
-import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.module.cxf.CxfConstants;
 
 import java.util.List;

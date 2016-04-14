@@ -17,8 +17,8 @@ import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptio
 import static org.mule.module.http.internal.HttpParser.appendQueryParam;
 import static org.mule.module.http.internal.listener.grizzly.GrizzlyServerManager.MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;

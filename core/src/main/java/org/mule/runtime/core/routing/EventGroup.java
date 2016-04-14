@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
 import static java.util.stream.Collectors.toList;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.PartitionableObjectStore;
-import org.mule.session.DefaultMuleSession;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.ClassUtils;
-import org.mule.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -485,7 +485,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
      * Finds the last stored event key on the event group.
      * <p/>
      * Event group uses {@code lastStoredEventKey} internally to differentiate the last event
-     * added to the group. When the event group is stored in an {@link org.mule.api.store.ObjectStore}
+     * added to the group. When the event group is stored in an {@link org.mule.runtime.core.api.store.ObjectStore}
      * that serializes/deserializes the instances, the eventGroup state is not keep updated.
      * When an instance is deserialized, the events field is restored, but no the lastStoredEventKey
      * field.

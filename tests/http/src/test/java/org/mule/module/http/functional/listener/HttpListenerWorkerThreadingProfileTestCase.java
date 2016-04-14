@@ -13,12 +13,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.internal.listener.DefaultHttpListenerConfig.DEFAULT_MAX_THREADS;
-import org.mule.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.IOException;
 import java.net.SocketException;

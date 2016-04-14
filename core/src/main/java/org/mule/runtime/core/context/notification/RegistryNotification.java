@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.registry.Registry;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.registry.Registry;
 
 /**
  * <code>RegistryNotification</code> is fired when an event such as a Registry
  * being started occurs. The payload of this event will always
  * be a reference to the Registry ID.
  *
- * @see org.mule.api.registry.Registry
- * @see org.mule.api.MuleContext
+ * @see org.mule.runtime.core.api.registry.Registry
+ * @see org.mule.runtime.core.api.MuleContext
  */
 public class RegistryNotification extends ServerNotification
 {

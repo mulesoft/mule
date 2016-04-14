@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.builders;
+package org.mule.runtime.core.config.builders;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
-import org.mule.config.ConfigResource;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.DomainMuleContextAwareConfigurationBuilder;
+import org.mule.runtime.core.config.ConfigResource;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

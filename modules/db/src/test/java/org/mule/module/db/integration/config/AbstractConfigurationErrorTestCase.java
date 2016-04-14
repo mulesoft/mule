@@ -10,7 +10,7 @@ package org.mule.module.db.integration.config;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 public class AbstractConfigurationErrorTestCase extends FunctionalTestCase

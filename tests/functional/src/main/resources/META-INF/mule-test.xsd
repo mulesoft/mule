@@ -21,7 +21,7 @@
     <xsd:element name="web-service-component" type="testComponentType" substitutionGroup="mule:abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                A component that can be used for testing web services. This component has the same properties as {{component}} element, but in addition to implementing {{org.mule.api.lifecycle.Callable}}, it also implements {{org.mule.api.component.simple.EchoService}}, {{org.mule.tck.testmodels.services.DateService}}, and {{org.mule.tck.testmodels.services.PeopleService}}. When using this with WS endpoints such as CXF, be sure to set the {{serviceClass}} property of the endpoint to the type of service you are using.
+                A component that can be used for testing web services. This component has the same properties as {{component}} element, but in addition to implementing {{org.mule.runtime.core.api.lifecycle.Callable}}, it also implements {{org.mule.runtime.core.api.component.simple.EchoService}}, {{org.mule.tck.testmodels.services.DateService}}, and {{org.mule.tck.testmodels.services.PeopleService}}. When using this with WS endpoints such as CXF, be sure to set the {{serviceClass}} property of the endpoint to the type of service you are using.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

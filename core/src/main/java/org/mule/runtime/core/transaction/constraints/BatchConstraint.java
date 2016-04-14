@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transaction.constraints;
+package org.mule.runtime.core.transaction.constraints;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 
 /**
  * <code>BatchConstraint</code> is a filter that counts on every execution and

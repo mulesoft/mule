@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport;
+package org.mule.runtime.core.transport;
 
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.retry.RetryContext;
-import org.mule.api.connector.Connectable;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.connector.Connectable;
 
 public class TestNotSerializableConnectable implements Connectable
 {

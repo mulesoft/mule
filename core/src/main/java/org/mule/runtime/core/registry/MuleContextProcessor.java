@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.registry.InjectProcessor;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.registry.InjectProcessor;
 
 /**
  * Injects the MuleContext object for objects stored in the {@link TransientRegistry} where the object registered
- * implements {@link org.mule.api.context.MuleContextAware}.
+ * implements {@link org.mule.runtime.core.api.context.MuleContextAware}.
  *
- * @deprecated as of 3.7.0 since these are only used by {@link org.mule.registry.TransientRegistry} which is also deprecated. Use post processors
- * for currently supported registries instead (i.e: {@link org.mule.config.spring.SpringRegistry})
+ * @deprecated as of 3.7.0 since these are only used by {@link org.mule.runtime.core.registry.TransientRegistry} which is also deprecated. Use post processors
+ * for currently supported registries instead (i.e: {@link org.mule.runtime.core.config.spring.SpringRegistry})
  */
 @Deprecated
 public class MuleContextProcessor implements InjectProcessor

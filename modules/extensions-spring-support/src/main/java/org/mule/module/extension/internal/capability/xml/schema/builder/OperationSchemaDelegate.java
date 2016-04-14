@@ -22,7 +22,7 @@ import org.mule.module.extension.internal.capability.xml.schema.model.ExtensionT
 import org.mule.module.extension.internal.capability.xml.schema.model.Schema;
 import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
-import org.mule.util.ValueHolder;
+import org.mule.runtime.core.util.ValueHolder;
 
 import javax.xml.namespace.QName;
 

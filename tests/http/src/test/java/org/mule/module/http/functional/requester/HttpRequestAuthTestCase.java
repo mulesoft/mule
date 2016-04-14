@@ -10,8 +10,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleEvent;
-import org.mule.util.FileUtils;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.FileUtils;
 
 import java.io.IOException;
 

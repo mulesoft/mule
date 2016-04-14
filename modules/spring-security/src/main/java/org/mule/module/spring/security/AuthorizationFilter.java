@@ -6,19 +6,19 @@
  */
 package org.mule.module.spring.security;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.CryptoFailureException;
-import org.mule.api.security.EncryptionStrategyNotFoundException;
-import org.mule.api.security.NotPermittedException;
-import org.mule.api.security.SecurityException;
-import org.mule.api.security.SecurityProviderNotFoundException;
-import org.mule.api.security.UnauthorisedException;
-import org.mule.api.security.UnknownAuthenticationTypeException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
+import org.mule.runtime.core.api.security.NotPermittedException;
+import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.module.spring.security.i18n.SpringSecurityMessages;
-import org.mule.security.AbstractSecurityFilter;
+import org.mule.runtime.core.security.AbstractSecurityFilter;
 
 import java.text.MessageFormat;
 import java.util.Arrays;

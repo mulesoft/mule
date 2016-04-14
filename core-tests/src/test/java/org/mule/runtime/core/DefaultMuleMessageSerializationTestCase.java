@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transformer.simple.ObjectToByteArray;
-import org.mule.transformer.types.DataTypeFactory;
 import org.mule.api.metadata.SimpleDataType;
-import org.mule.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

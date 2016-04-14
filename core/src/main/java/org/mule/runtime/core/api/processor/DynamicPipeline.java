@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.processor;
+package org.mule.runtime.core.api.processor;
 
 /**
  * Adds to a pipeline the ability to dynamically inject a sequence

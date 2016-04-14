@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.processor;
+package org.mule.runtime.core.api.processor;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -15,9 +15,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.apache.commons.logging.Log;

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util;
+package org.mule.runtime.core.util;
 
 import static junit.framework.Assert.assertEquals;
 

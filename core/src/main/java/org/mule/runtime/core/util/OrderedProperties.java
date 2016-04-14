@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util;
+package org.mule.runtime.core.util;
 
 import java.util.Enumeration;
 import java.util.LinkedHashSet;

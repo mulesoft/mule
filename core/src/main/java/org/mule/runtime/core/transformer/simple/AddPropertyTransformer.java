@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
 
-import org.mule.PropertyScope;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 
 public class AddPropertyTransformer extends AbstractAddVariablePropertyTransformer

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue;
+package org.mule.runtime.core.util.queue;
 
-import org.mule.util.xa.AbstractXAResourceManager;
-import org.mule.util.xa.DefaultXASession;
-import org.mule.util.xa.XaTransactionRecoverer;
+import org.mule.runtime.core.util.xa.AbstractXAResourceManager;
+import org.mule.runtime.core.util.xa.DefaultXASession;
+import org.mule.runtime.core.util.xa.XaTransactionRecoverer;
 
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;

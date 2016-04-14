@@ -6,16 +6,16 @@
  */
 package org.mule.module.management.agent;
 
-import org.mule.AbstractAgent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.construct.AbstractFlowConstruct;
-import org.mule.context.notification.MuleContextNotification;
-import org.mule.context.notification.NotificationException;
-import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.AbstractAgent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.construct.AbstractFlowConstruct;
+import org.mule.runtime.core.context.notification.MuleContextNotification;
+import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.module.management.i18n.ManagementMessages;
 import org.mule.module.management.mbean.ApplicationService;
 import org.mule.module.management.mbean.FlowConstructService;
@@ -30,7 +30,7 @@ import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.module.management.support.JmxSupport;
 import org.mule.module.management.support.JmxSupportFactory;
 import org.mule.module.management.support.SimplePasswordJmxAuthenticator;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.lang.management.ManagementFactory;
 import java.net.URI;
@@ -324,7 +324,7 @@ public abstract class AbstractJmxAgent extends AbstractAgent
     /**
      * Register a Java Service Wrapper agent.
      *
-     * @throws org.mule.api.MuleException if registration failed
+     * @throws org.mule.runtime.core.api.MuleException if registration failed
      */
     protected void registerWrapperService() throws MuleException
     {

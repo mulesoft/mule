@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue;
+package org.mule.runtime.core.util.queue;
 
-import org.mule.DefaultMuleContext;
-import org.mule.api.config.MuleConfiguration;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.monitor.Expirable;
-import org.mule.util.monitor.ExpiryMonitor;
+import org.mule.runtime.core.util.monitor.Expirable;
+import org.mule.runtime.core.util.monitor.ExpiryMonitor;
 
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;

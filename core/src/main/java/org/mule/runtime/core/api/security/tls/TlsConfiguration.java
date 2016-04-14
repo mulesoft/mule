@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.security.tls;
+package org.mule.runtime.core.api.security.tls;
 
-import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import org.mule.api.lifecycle.CreateException;
-import org.mule.api.security.TlsDirectKeyStore;
-import org.mule.api.security.TlsDirectTrustStore;
-import org.mule.api.security.TlsIndirectKeyStore;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.ArrayUtils;
-import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
-import org.mule.util.SecurityUtils;
-import org.mule.util.StringUtils;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.security.TlsDirectKeyStore;
+import org.mule.runtime.core.api.security.TlsDirectTrustStore;
+import org.mule.runtime.core.api.security.TlsIndirectKeyStore;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.SecurityUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -53,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
  * <h2>Configuration</h2>
  * <p/>
  * The documentation in this class is intended more for programmers than end uses.  If you are
- * configuring a connector the interfaces {@link org.mule.api.security.TlsIndirectTrustStore},
+ * configuring a connector the interfaces {@link org.mule.runtime.core.api.security.TlsIndirectTrustStore},
  * {@link TlsDirectTrustStore},
  * {@link TlsDirectKeyStore} and {@link TlsIndirectKeyStore} should provide guidance to individual
  * properties.  In addition you should check the documentation for the specific protocol / connector
@@ -64,7 +64,7 @@ import org.apache.commons.logging.LogFactory;
  * <p/>
  * This class is intended to be used as a delegate as we typically want to add security to an
  * already existing connector (so we inherit from that connector, implement the appropriate
- * interfaces from {@link org.mule.api.security.TlsIndirectTrustStore}, {@link TlsDirectTrustStore},
+ * interfaces from {@link org.mule.runtime.core.api.security.TlsIndirectTrustStore}, {@link TlsDirectTrustStore},
  * {@link TlsDirectKeyStore} and {@link TlsIndirectKeyStore}, and then forward calls to the
  * interfaces to an instance of this class).
  * <p/>
@@ -88,7 +88,7 @@ import org.apache.commons.logging.LogFactory;
  * </dl>
  * <p/>
  * Historically, many other transports relied on the indirect configurations defined above.
- * So they implemented {@link org.mule.api.security.TlsIndirectTrustStore}
+ * So they implemented {@link org.mule.runtime.core.api.security.TlsIndirectTrustStore}
  * (a superclass of {@link TlsDirectTrustStore})
  * and relied on {@link TlsIndirectKeyStore} from the SSL configuration.  For continuity these
  * interfaces continue to be used, even though

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.context;
+package org.mule.runtime.core.el.context;
 
-import org.mule.api.MuleContext;
-import org.mule.config.MuleManifest;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.config.MuleManifest;
 
 /**
  * Expose information about the Mule instance:

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.outbound;
+package org.mule.runtime.core.routing.outbound;
 
 import static org.junit.Assert.assertTrue;
 import org.mule.functional.junit4.FunctionalTestCase;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.requestreply;
+package org.mule.runtime.core.routing.requestreply;
 
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
@@ -12,21 +12,21 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.WorkManager;
-import org.mule.api.context.WorkManagerSource;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.ResponseTimeoutException;
-import org.mule.api.source.MessageSource;
-import org.mule.processor.LaxAsyncInterceptingMessageProcessor;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.context.WorkManagerSource;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.ResponseTimeoutException;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.concurrent.Latch;
-import org.mule.util.store.MuleObjectStoreManager;
+import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 
 import java.beans.ExceptionListener;
 import java.util.concurrent.CountDownLatch;

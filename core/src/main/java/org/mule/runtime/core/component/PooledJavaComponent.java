@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.component;
+package org.mule.runtime.core.component;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.component.Component;
-import org.mule.api.component.InterfaceBinding;
-import org.mule.api.component.LifecycleAdapter;
-import org.mule.api.lifecycle.InitialisationCallback;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.model.EntryPointResolverSet;
-import org.mule.api.object.ObjectFactory;
-import org.mule.config.PoolingProfile;
-import org.mule.util.pool.DefaultLifecycleEnabledObjectPool;
-import org.mule.util.pool.LifecyleEnabledObjectPool;
-import org.mule.util.pool.ObjectPool;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.Component;
+import org.mule.runtime.core.api.component.InterfaceBinding;
+import org.mule.runtime.core.api.component.LifecycleAdapter;
+import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.model.EntryPointResolverSet;
+import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.config.PoolingProfile;
+import org.mule.runtime.core.util.pool.DefaultLifecycleEnabledObjectPool;
+import org.mule.runtime.core.util.pool.LifecyleEnabledObjectPool;
+import org.mule.runtime.core.util.pool.ObjectPool;
 
 import java.util.List;
 

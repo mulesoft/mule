@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.simple;
+package org.mule.runtime.core.transformers.simple;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.expression.transformers.BeanBuilderTransformer;
-import org.mule.expression.transformers.ExpressionArgument;
-import org.mule.expression.transformers.ExpressionTransformer;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
+import org.mule.runtime.core.expression.transformers.ExpressionArgument;
+import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;

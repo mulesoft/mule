@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.api.requester;
 
-import org.mule.api.client.OperationOptionsConfig;
+import org.mule.runtime.core.api.client.OperationOptionsConfig;
 
 /**
  * Common configuration for an HTTP request operation

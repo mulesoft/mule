@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ExpirationPolicy;
 import org.mule.module.extension.HeisenbergExtension;
@@ -26,7 +26,7 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.collection.ImmutableListCollector;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import com.google.common.collect.ImmutableList;
 

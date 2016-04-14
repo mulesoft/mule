@@ -8,7 +8,7 @@ package org.mule.module.pgp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.FileInputStream;
 import java.net.URL;

@@ -7,7 +7,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.routing.filters.WildcardFilter;
+import org.mule.runtime.core.routing.filters.WildcardFilter;
 
 /**
  * TODO

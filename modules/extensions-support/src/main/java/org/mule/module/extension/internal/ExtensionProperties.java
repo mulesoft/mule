@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal;
 
-import static org.mule.api.config.MuleProperties.PROPERTY_PREFIX;
-import org.mule.api.MuleEvent;
+import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.temporary.MuleMessage;
 
 /**

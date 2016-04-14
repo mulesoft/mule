@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.correlation;
+package org.mule.runtime.core.routing.correlation;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.isA;
@@ -12,26 +12,26 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.api.metadata.SimpleDataType;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.MessageInfoMapping;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.ObjectStoreManager;
-import org.mule.api.store.PartitionableObjectStore;
-import org.mule.routing.EventGroup;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.MessageInfoMapping;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.routing.EventGroup;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.store.PartitionedInMemoryObjectStore;
+import org.mule.runtime.core.util.store.PartitionedInMemoryObjectStore;
 
 import org.junit.Before;
 import org.junit.Ignore;

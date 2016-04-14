@@ -6,30 +6,30 @@
  */
 package org.mule.module.xml.el;
 
-import static org.mule.util.ClassUtils.isConsumable;
-import static org.mule.util.Preconditions.checkArgument;
-import static org.mule.util.Preconditions.checkState;
+import static org.mule.runtime.core.util.ClassUtils.isConsumable;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkState;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.el.ExpressionLanguageContext;
-import org.mule.api.el.ExpressionLanguageFunction;
-import org.mule.api.registry.RegistrationException;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.el.ExpressionLanguageContext;
+import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.api.metadata.DataType;
-import org.mule.message.OutputHandler;
-import org.mule.el.context.MessageContext;
-import org.mule.el.mvel.MVELExpressionLanguageContext;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.el.context.MessageContext;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
 import org.mule.module.xml.transformer.DelayedResult;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.module.xml.xpath.SaxonXpathEvaluator;
 import org.mule.module.xml.xpath.XPathEvaluator;
 import org.mule.module.xml.xpath.XPathReturnType;
-import org.mule.transformer.TransformerUtils;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.TransformerUtils;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Supplier;

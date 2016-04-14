@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.routing;
+package org.mule.runtime.core.api.routing;
 
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.filter.Filter;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.filter.Filter;
 
 /**
  * Routes the event to <code>MessageProcessor</code>s using a {@link Filter} to

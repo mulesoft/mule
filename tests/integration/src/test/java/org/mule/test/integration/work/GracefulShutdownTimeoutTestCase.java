@@ -8,13 +8,13 @@ package org.mule.test.integration.work;
 
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 

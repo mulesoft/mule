@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.journal.queue;
+package org.mule.runtime.core.util.journal.queue;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.queue.DefaultQueueStore;
+import org.mule.runtime.core.util.queue.DefaultQueueStore;
 
 import com.google.common.collect.Multimap;
 

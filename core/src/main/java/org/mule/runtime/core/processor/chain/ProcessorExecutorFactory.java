@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor.chain;
+package org.mule.runtime.core.processor.chain;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.ProcessorExecutor;
-import org.mule.execution.MessageProcessorExecutionTemplate;
-import org.mule.processor.BlockingProcessorExecutor;
-import org.mule.processor.NonBlockingProcessorExecutor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.ProcessorExecutor;
+import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
+import org.mule.runtime.core.processor.BlockingProcessorExecutor;
+import org.mule.runtime.core.processor.NonBlockingProcessorExecutor;
 
 import java.util.List;
 
 /**
- * Creates an appropriate instance of {@link org.mule.processor.BlockingProcessorExecutor} based on the current
- * {@link org.mule.api.MuleEvent} and {@link org.mule.api.construct.FlowConstruct}.
+ * Creates an appropriate instance of {@link org.mule.runtime.core.processor.BlockingProcessorExecutor} based on the current
+ * {@link org.mule.runtime.core.api.MuleEvent} and {@link org.mule.runtime.core.api.construct.FlowConstruct}.
  */
 public class ProcessorExecutorFactory
 {

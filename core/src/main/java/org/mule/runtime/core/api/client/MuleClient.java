@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.client;
+package org.mule.runtime.core.api.client;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 
 import java.util.Map;
 
@@ -19,7 +19,7 @@ public interface MuleClient
 {
 
     /**
-     * @deprecated use {@link #dispatch(String, org.mule.api.MuleMessage)} instead
+     * @deprecated use {@link #dispatch(String, org.mule.runtime.core.api.MuleMessage)} instead
      *
      * Dispatches an event asynchronously to a endpointUri via a Mule server. The URL
      * determines where to dispatch the event to.
@@ -30,7 +30,7 @@ public interface MuleClient
      * @param messageProperties any properties to be associated with the payload. In
      *            the case of JMS you could set the JMSReplyTo property in these
      *            properties.
-     * @throws org.mule.api.MuleException
+     * @throws org.mule.runtime.core.api.MuleException
      */
     @Deprecated
     void dispatch(String url, Object payload, Map<String, Object> messageProperties) throws MuleException;
@@ -42,7 +42,7 @@ public interface MuleClient
      * @param url the Mule URL used to determine the destination and transport of the
      *            message
      * @param message the message to send
-     * @throws org.mule.api.MuleException
+     * @throws org.mule.runtime.core.api.MuleException
      */
     void dispatch(String url, MuleMessage message) throws MuleException;
 
@@ -54,12 +54,12 @@ public interface MuleClient
      *            message
      * @param message the message to send
      * @param operationOptions the options to configure the operation
-     * @throws org.mule.api.MuleException
+     * @throws org.mule.runtime.core.api.MuleException
      */
     void dispatch(String url, MuleMessage message, OperationOptions operationOptions) throws MuleException;
 
     /**
-     * @deprecated use {@link #send(String, org.mule.api.MuleMessage)} instead
+     * @deprecated use {@link #send(String, org.mule.runtime.core.api.MuleMessage)} instead
      *
      * Sends an event synchronously to a endpointUri via a Mule server and a
      * resulting message is returned.
@@ -72,7 +72,7 @@ public interface MuleClient
      *            properties.
      * @return A return message, this could be <code>null</code> if the the
      *         components invoked explicitly sets a return as <code>null</code>.
-     * @throws org.mule.api.MuleException
+     * @throws org.mule.runtime.core.api.MuleException
      */
     @Deprecated
     MuleMessage send(String url, Object payload, Map<String, Object> messageProperties) throws MuleException;
@@ -87,7 +87,7 @@ public interface MuleClient
      * @param message the Message for the event
      * @return A return message, this could be <code>null</code> if the the
      *         components invoked explicitly sets a return as <code>null</code>.
-     * @throws org.mule.api.MuleException
+     * @throws org.mule.runtime.core.api.MuleException
      */
     MuleMessage send(String url, MuleMessage message) throws MuleException;
 
@@ -102,12 +102,12 @@ public interface MuleClient
      * @param operationOptions the options to configure the operation
      * @return A return message, this could be <code>null</code> if the the
      *         components invoked explicitly sets a return as <code>null</code>.
-     * @throws org.mule.api.MuleException
+     * @throws org.mule.runtime.core.api.MuleException
      */
     MuleMessage send(String url, MuleMessage message, OperationOptions operationOptions) throws MuleException;
 
     /**
-     * @deprecated use {@link #send(String, org.mule.api.MuleMessage, OperationOptions)}
+     * @deprecated use {@link #send(String, org.mule.runtime.core.api.MuleMessage, OperationOptions)}
      *
      * Sends an event synchronously to a endpointUri via a mule server and a
      * resulting message is returned.
@@ -122,14 +122,14 @@ public interface MuleClient
      *            a response
      * @return A return message, this could be <code>null</code> if the the
      *         components invoked explicitly sets a return as <code>null</code>.
-     * @throws org.mule.api.MuleException
+     * @throws org.mule.runtime.core.api.MuleException
      */
     @Deprecated
     MuleMessage send(String url, Object payload, Map<String, Object> messageProperties, long timeout)
         throws MuleException;
 
     /**
-     * @deprecated use {@link #send(String, org.mule.api.MuleMessage, OperationOptions)} instead
+     * @deprecated use {@link #send(String, org.mule.runtime.core.api.MuleMessage, OperationOptions)} instead
      *
      * Sends an event synchronously to a endpointUri via a mule server and a
      * resulting message is returned.
@@ -141,7 +141,7 @@ public interface MuleClient
      *            a response
      * @return A return message, this could be <code>null</code> if the the
      *         components invoked explicitly sets a return as <code>null</code>.
-     * @throws org.mule.api.MuleException
+     * @throws org.mule.runtime.core.api.MuleException
      */
     @Deprecated
     MuleMessage send(String url, MuleMessage message, long timeout) throws MuleException;
@@ -155,7 +155,7 @@ public interface MuleClient
      *            receive will not wait at all and if set to -1 the receive will wait
      *            forever
      * @return the message received or <code>null</code> if no message was received
-     * @throws org.mule.api.MuleException
+     * @throws org.mule.runtime.core.api.MuleException
      */
     MuleMessage request(String url, long timeout) throws MuleException;
 

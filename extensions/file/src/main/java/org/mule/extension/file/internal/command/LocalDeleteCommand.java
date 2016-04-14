@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
 import org.mule.module.extension.file.api.command.DeleteCommand;
-import org.mule.util.FileUtils;
+import org.mule.runtime.core.util.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -26,12 +26,12 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.getPara
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
-import org.mule.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.internal.metadata.DefaultMetadataResolverFactory;
-import org.mule.internal.metadata.NullMetadataResolverFactory;
+import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
+import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Configuration;
@@ -90,9 +90,9 @@ import org.mule.module.extension.internal.runtime.exception.DefaultExceptionEnri
 import org.mule.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.module.extension.internal.runtime.source.DefaultSourceFactory;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
-import org.mule.util.ArrayUtils;
-import org.mule.util.CollectionUtils;
-import org.mule.util.collection.ImmutableSetCollector;
+import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.collection.ImmutableSetCollector;
 
 import com.google.common.collect.ImmutableList;
 

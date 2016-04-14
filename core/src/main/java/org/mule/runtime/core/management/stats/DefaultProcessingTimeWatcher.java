@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.stats;
+package org.mule.runtime.core.management.stats;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.util.concurrent.ThreadNameHelper;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;

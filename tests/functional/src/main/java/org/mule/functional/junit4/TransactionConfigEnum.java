@@ -6,7 +6,7 @@
  */
 package org.mule.functional.junit4;
 
-import org.mule.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
 
 /**
  * Helper to access constants from {@link TransactionConfig}.

@@ -10,8 +10,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -42,6 +42,6 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
     public void testError() throws Exception
     {
         MessagingException e = flowRunner("test").withPayload(getErrorMessage()).runExpectingException();
-        assertThat(e.getMessage(), is("Execution of the expression \"payload.childBean.value\" failed. (org.mule.api.expression.ExpressionRuntimeException)."));
+        assertThat(e.getMessage(), is("Execution of the expression \"payload.childBean.value\" failed. (org.mule.runtime.core.api.expression.ExpressionRuntimeException)."));
     }
 }

@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.component;
+package org.mule.runtime.core.component;
 
-import org.mule.api.MuleException;
-import org.mule.api.component.InterfaceBinding;
-import org.mule.api.component.JavaComponent;
-import org.mule.api.component.LifecycleAdapter;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.api.model.EntryPointResolverSet;
-import org.mule.api.object.ObjectFactory;
-import org.mule.api.registry.ServiceException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.InterfaceBinding;
+import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.component.LifecycleAdapter;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.model.EntryPointResolverSet;
+import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.api.registry.ServiceException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 import java.util.List;
 

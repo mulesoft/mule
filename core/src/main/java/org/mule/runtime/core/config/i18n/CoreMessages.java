@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.i18n;
+package org.mule.runtime.core.config.i18n;
 
-import org.mule.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.api.metadata.DataType;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transformer.Transformer;
-import org.mule.config.MuleManifest;
-import org.mule.context.notification.ListenerSubscriptionPair;
-import org.mule.util.ClassUtils;
-import org.mule.util.DateUtils;
-import org.mule.util.StringMessageUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.DateUtils;
+import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.net.URI;

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.lifecycle;
+package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.api.NamedObject;
-import org.mule.lifecycle.LifecycleObject;
+import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.core.lifecycle.LifecycleObject;
 
 import java.util.Set;
 

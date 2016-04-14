@@ -6,9 +6,9 @@
  */
 package org.mule.tck.services;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
-import org.mule.util.UUID;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.util.UUID;
 
 /**
  * Each instance of this service should contain a unique ID.  

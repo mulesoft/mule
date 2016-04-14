@@ -6,13 +6,13 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;

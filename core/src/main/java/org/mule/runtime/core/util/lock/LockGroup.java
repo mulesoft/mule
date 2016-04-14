@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.lock;
+package org.mule.runtime.core.util.lock;
 
-import org.mule.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Disposable;
 
 import java.util.concurrent.TimeUnit;
 

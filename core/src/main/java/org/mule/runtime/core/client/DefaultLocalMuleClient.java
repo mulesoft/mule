@@ -4,32 +4,32 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.client;
+package org.mule.runtime.core.client;
 
-import static org.mule.api.client.SimpleOptionsBuilder.newOptions;
-import static org.mule.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.VoidMuleEvent;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.client.OperationOptions;
-import org.mule.api.connector.ConnectorOperationLocator;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.lifecycle.LifecycleState;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.routing.MessageInfoMapping;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.management.stats.FlowConstructStatistics;
+import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.OperationOptions;
+import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.routing.MessageInfoMapping;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.api.message.NullPayload;
 
 import java.util.Map;

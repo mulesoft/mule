@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
 
 import org.junit.Test;
 

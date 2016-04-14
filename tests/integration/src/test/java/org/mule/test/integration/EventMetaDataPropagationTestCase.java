@@ -10,15 +10,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.io.IOException;
 import java.io.InputStream;

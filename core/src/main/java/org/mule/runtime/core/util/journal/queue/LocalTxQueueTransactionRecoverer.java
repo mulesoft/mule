@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.journal.queue;
+package org.mule.runtime.core.util.journal.queue;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.util.CollectionUtils;
-import org.mule.util.queue.QueueProvider;
-import org.mule.util.queue.RecoverableQueueStore;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.queue.QueueProvider;
+import org.mule.runtime.core.util.queue.RecoverableQueueStore;
 
 import com.google.common.collect.Multimap;
 

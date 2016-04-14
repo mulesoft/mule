@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher;
 
-import org.mule.util.concurrent.LoggingUncaughtExceptionHandler;
+import org.mule.runtime.core.util.concurrent.LoggingUncaughtExceptionHandler;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;

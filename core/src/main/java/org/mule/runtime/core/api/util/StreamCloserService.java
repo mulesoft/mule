@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.util;
+package org.mule.runtime.core.api.util;
 
-import org.mule.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
 
 /**
  * Simple service to close streams of different types.

@@ -7,11 +7,11 @@
 
 package org.mule.module.db.internal.domain.database;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.context.MuleContextAware;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 /**
  * Maintains configuration information about how to build a {@link javax.sql.DataSource}

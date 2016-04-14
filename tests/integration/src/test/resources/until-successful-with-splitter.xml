@@ -5,7 +5,7 @@
       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <spring:bean id="objectStore" class="org.mule.util.store.SimpleMemoryObjectStore" />
+    <spring:bean id="objectStore" class="org.mule.runtime.core.util.store.SimpleMemoryObjectStore" />
 
     <flow name="withSplitter">
         <set-payload value="#[['a','b']]" />

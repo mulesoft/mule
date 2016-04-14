@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.security;
+package org.mule.runtime.core.security;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.SecurityContext;
-import org.mule.api.security.SecurityException;
-import org.mule.api.security.SecurityManager;
-import org.mule.api.security.SecurityProviderNotFoundException;
-import org.mule.api.security.UnauthorisedException;
-import org.mule.api.security.UnknownAuthenticationTypeException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.core.api.security.SecurityManager;
+import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
  * Performs authentication based on a username and password. The username and password are retrieved from the
@@ -38,7 +38,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
      * Authenticates the current message.
      *
      * @param event the current message recieved
-     * @throws org.mule.api.security.SecurityException if authentication fails
+     * @throws org.mule.runtime.core.api.security.SecurityException if authentication fails
      */
     @Override
     public void authenticate(MuleEvent event)

@@ -11,8 +11,8 @@ import static java.lang.Boolean.FALSE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.DerbyTestDatabase;

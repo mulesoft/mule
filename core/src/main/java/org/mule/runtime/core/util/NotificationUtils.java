@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
 import static java.util.Collections.synchronizedSet;
 
-import org.mule.api.processor.InternalMessageProcessor;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorContainer;
-import org.mule.api.processor.MessageProcessorPathElement;
-import org.mule.processor.chain.DynamicMessageProcessorContainer;
+import org.mule.runtime.core.api.processor.InternalMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorContainer;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
 
 import java.util.Collection;
 import java.util.HashSet;

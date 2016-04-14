@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.internal.connection;
+package org.mule.runtime.core.internal.connection;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.api.config.HasPoolingProfile;
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.retry.RetryPolicy;
-import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.retry.RetryPolicy;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 
 import java.util.Optional;
 

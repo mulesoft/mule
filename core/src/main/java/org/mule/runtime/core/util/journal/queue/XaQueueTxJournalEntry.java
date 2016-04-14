@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.journal.queue;
+package org.mule.runtime.core.util.journal.queue;
 
-import org.mule.api.MuleContext;
-import org.mule.util.xa.MuleXid;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.util.xa.MuleXid;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -17,7 +17,7 @@ import java.io.Serializable;
 import javax.transaction.xa.Xid;
 
 /**
- * Queue {@link org.mule.util.journal.JournalEntry} for XA transactions
+ * Queue {@link org.mule.runtime.core.util.journal.JournalEntry} for XA transactions
  */
 public class XaQueueTxJournalEntry extends AbstractQueueTxJournalEntry<Xid>
 {

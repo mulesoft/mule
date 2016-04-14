@@ -7,7 +7,7 @@
 
 package org.mule.module.db.internal.domain.transaction;
 
-import org.mule.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.Transaction;
 
 /**
  * Manages transactions for the connector

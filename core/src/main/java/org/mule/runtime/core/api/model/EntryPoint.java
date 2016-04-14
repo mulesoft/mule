@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.model;
+package org.mule.runtime.core.api.model;
 
-import org.mule.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleEventContext;
 
 /**
  * <code>EntryPoint</code> defines the current entry method on a service. If
- * the invoked method does not have a return value, a {@link org.mule.VoidResult}
+ * the invoked method does not have a return value, a {@link org.mule.runtime.core.VoidResult}
  * is returned.
  */
 public interface EntryPoint

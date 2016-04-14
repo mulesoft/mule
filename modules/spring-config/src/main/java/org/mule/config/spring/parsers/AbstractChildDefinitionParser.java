@@ -9,7 +9,7 @@ package org.mule.config.spring.parsers;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.util.SpringXMLUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

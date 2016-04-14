@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.exception.AbstractExceptionListener;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.exception.AbstractExceptionListener;
+import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;

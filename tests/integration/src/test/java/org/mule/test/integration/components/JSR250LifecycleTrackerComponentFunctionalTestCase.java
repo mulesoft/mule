@@ -8,9 +8,9 @@ package org.mule.test.integration.components;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.lifecycle.JSR250LifecycleTrackerComponent;
+import org.mule.runtime.core.lifecycle.JSR250LifecycleTrackerComponent;
 import org.mule.api.message.NullPayload;
 
 import org.junit.Test;

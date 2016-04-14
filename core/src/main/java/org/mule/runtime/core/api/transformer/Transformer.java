@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.transformer;
+package org.mule.runtime.core.api.transformer;
 
-import org.mule.api.NameableObject;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.api.metadata.DataType;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import java.util.List;
 

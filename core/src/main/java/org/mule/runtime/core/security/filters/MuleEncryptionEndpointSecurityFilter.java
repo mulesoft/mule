@@ -4,26 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.security.filters;
+package org.mule.runtime.core.security.filters;
 
-import org.mule.api.EncryptionStrategy;
-import org.mule.api.MuleEvent;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.Credentials;
-import org.mule.api.security.CredentialsNotSetException;
-import org.mule.api.security.CryptoFailureException;
-import org.mule.api.security.EncryptionStrategyNotFoundException;
-import org.mule.api.security.SecurityContext;
-import org.mule.api.security.SecurityException;
-import org.mule.api.security.SecurityProviderNotFoundException;
-import org.mule.api.security.UnauthorisedException;
-import org.mule.api.security.UnknownAuthenticationTypeException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.security.AbstractOperationSecurityFilter;
-import org.mule.security.DefaultMuleAuthentication;
-import org.mule.security.MuleCredentials;
-import org.mule.security.MuleHeaderCredentialsAccessor;
+import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.Credentials;
+import org.mule.runtime.core.api.security.CredentialsNotSetException;
+import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
+import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.security.AbstractOperationSecurityFilter;
+import org.mule.runtime.core.security.DefaultMuleAuthentication;
+import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.core.security.MuleHeaderCredentialsAccessor;
 
 /**
  * <code>MuleEncryptionEndpointSecurityFilter</code> provides password-based

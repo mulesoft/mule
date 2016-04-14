@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.Injector;
-import org.mule.api.MuleException;
-import org.mule.api.registry.Registry;
-import org.mule.api.registry.RegistryProvider;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.api.registry.RegistryProvider;
 
 /**
  * An implementation of {@link Injector} which uses a

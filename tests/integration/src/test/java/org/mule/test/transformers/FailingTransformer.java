@@ -6,8 +6,8 @@
  */
 package org.mule.test.transformers;
 
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 
 public class FailingTransformer extends AbstractTransformer
 {

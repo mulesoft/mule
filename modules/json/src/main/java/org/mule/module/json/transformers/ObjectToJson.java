@@ -6,11 +6,11 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.module.json.filters.IsJsonFilter;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;

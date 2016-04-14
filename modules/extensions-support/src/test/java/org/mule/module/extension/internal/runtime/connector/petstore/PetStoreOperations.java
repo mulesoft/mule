@@ -6,10 +6,10 @@
  */
 package org.mule.module.extension.internal.runtime.connector.petstore;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.annotation.param.UseConfig;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;

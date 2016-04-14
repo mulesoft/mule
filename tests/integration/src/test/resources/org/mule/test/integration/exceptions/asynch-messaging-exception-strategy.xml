@@ -14,14 +14,14 @@
         <script:script engine="groovy">
             log.info("Throwing exception...");
             throw new
-            org.mule.api.transformer.TransformerException(org.mule.config.i18n.MessageFactory.createStaticMessage("dummyException"));
+            org.mule.runtime.core.api.transformer.TransformerException(org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage("dummyException"));
         </script:script>
     </script:transformer>
 
     <script:script engine="groovy" name="throwException">
         log.info("Throwing exception...");
         throw new
-        org.mule.component.ComponentException(org.mule.config.i18n.MessageFactory.createStaticMessage("dummyException"));
+        org.mule.runtime.core.component.ComponentException(org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage("dummyException"));
     </script:script>
 
     <flow name="TransformerException">

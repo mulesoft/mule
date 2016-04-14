@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.debug;
+package org.mule.runtime.core.api.debug;
 
 /**
  * Determine if the {@link ExecutionManager} supports or not dynamic scripting evaluation.

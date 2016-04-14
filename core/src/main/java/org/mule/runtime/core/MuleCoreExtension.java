@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
-import org.mule.api.NamedObject;
-import org.mule.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
 
 /**
  * Allows Mule modules and transports to extend core functionality in an

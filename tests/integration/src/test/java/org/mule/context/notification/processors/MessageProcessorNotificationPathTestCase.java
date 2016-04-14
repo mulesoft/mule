@@ -9,13 +9,13 @@ package org.mule.context.notification.processors;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.Assert.assertThat;
-import static org.mule.util.NotificationUtils.buildPathResolver;
+import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.Pipeline;
-import org.mule.api.processor.DefaultMessageProcessorPathElement;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.NotificationUtils.FlowMap;
+import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

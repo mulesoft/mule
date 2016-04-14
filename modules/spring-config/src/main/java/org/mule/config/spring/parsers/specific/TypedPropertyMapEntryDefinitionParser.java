@@ -12,7 +12,7 @@ import org.mule.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.api.metadata.SimpleDataType;
-import org.mule.transformer.types.TypedValue;
+import org.mule.runtime.core.transformer.types.TypedValue;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;

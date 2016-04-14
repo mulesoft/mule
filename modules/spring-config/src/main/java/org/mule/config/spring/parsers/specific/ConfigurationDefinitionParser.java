@@ -7,8 +7,8 @@
 package org.mule.config.spring.parsers.specific;
 
 import static org.mule.config.spring.util.ProcessingStrategyUtils.DEFAULT_PROCESSING_STRATEGY;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.util.ProcessingStrategyUtils;
 

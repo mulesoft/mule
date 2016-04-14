@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification.processors;
+package org.mule.runtime.core.context.notification.processors;
 
-import org.mule.context.notification.AbstractNotificationTestCase;
-import org.mule.context.notification.MessageProcessorNotification;
-import org.mule.context.notification.Node;
-import org.mule.context.notification.RestrictedNode;
+import org.mule.runtime.core.context.notification.AbstractNotificationTestCase;
+import org.mule.runtime.core.context.notification.MessageProcessorNotification;
+import org.mule.runtime.core.context.notification.Node;
+import org.mule.runtime.core.context.notification.RestrictedNode;
 
 public abstract class AbstractMessageProcessorNotificationTestCase extends AbstractNotificationTestCase
 {

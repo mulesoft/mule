@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
 import org.mule.module.extension.file.api.FileWriteMode;

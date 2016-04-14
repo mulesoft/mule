@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.exception;
+package org.mule.runtime.core.api.exception;
 
-import org.mule.api.Acceptor;
+import org.mule.runtime.core.api.Acceptor;
 
 /**
  *  MessagingExceptionHandlers that will only be executed if accepts to manage MuleEvent

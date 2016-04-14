@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.security;
+package org.mule.runtime.core.api.security;
 
 import java.io.IOException;
 
@@ -16,12 +16,12 @@ import java.io.IOException;
  * 
  * <p>The information specified in this interface is used to configure a key store indirectly.
  * For more information see the documentation for the connector or protocol in question.
- * The comments in {@link org.mule.api.security.tls.TlsConfiguration} may also be useful.</p>
+ * The comments in {@link org.mule.runtime.core.api.security.tls.TlsConfiguration} may also be useful.</p>
  * 
  * <p><em>Programmers:</em> this information, once stored in and retrieved from properties via
- * {@link org.mule.api.security.tls.TlsPropertiesMapper}, will provide a key manager factory via the {@link TlsDirectKeyStore}
- * interface implemented by {@link org.mule.api.security.tls.TlsConfiguration}.  This can be associated with a socket
- * factory via {@link org.mule.api.security.tls.TlsPropertiesSocketFactory}.</p>
+ * {@link org.mule.runtime.core.api.security.tls.TlsPropertiesMapper}, will provide a key manager factory via the {@link TlsDirectKeyStore}
+ * interface implemented by {@link org.mule.runtime.core.api.security.tls.TlsConfiguration}.  This can be associated with a socket
+ * factory via {@link org.mule.runtime.core.api.security.tls.TlsPropertiesSocketFactory}.</p>
  */
 public interface TlsIndirectKeyStore
 {

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
@@ -13,9 +13,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import org.mule.api.Injector;
-import org.mule.api.registry.Registry;
-import org.mule.api.registry.RegistryProvider;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.api.registry.RegistryProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -77,7 +77,7 @@ public class RegistryDelegatingInjectorTestCase extends AbstractMuleTestCase
         new RegistryDelegatingInjector(null);
     }
 
-    private void assertNoinjection() throws org.mule.api.MuleException
+    private void assertNoinjection() throws org.mule.runtime.core.api.MuleException
     {
         Object target = mock(Object.class);
 

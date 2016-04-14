@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.queue.objectstore.xa;
+package org.mule.runtime.core.util.queue.objectstore.xa;
 
-import org.mule.util.xa.ResourceManagerException;
+import org.mule.runtime.core.util.xa.ResourceManagerException;
 
 import javax.transaction.Status;
 import javax.transaction.xa.XAException;
@@ -104,8 +104,8 @@ public class DefaultXASession implements XAResource
 
     public boolean isSameRM(XAResource xares) throws XAException
     {
-        return xares instanceof org.mule.util.xa.DefaultXASession
-               && ((org.mule.util.xa.DefaultXASession) xares).getResourceManager().equals(resourceManager);
+        return xares instanceof org.mule.runtime.core.util.xa.DefaultXASession
+               && ((org.mule.runtime.core.util.xa.DefaultXASession) xares).getResourceManager().equals(resourceManager);
     }
 
     public Xid[] recover(int flag) throws XAException

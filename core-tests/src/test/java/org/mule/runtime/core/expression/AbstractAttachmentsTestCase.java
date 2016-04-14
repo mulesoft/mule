@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.expression;
+package org.mule.runtime.core.expression;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.StringDataSource;
+import org.mule.runtime.core.util.StringDataSource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

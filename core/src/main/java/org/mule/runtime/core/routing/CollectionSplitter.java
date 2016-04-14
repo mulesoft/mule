@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
-import org.mule.api.MuleEvent;
-import org.mule.routing.outbound.AbstractMessageSequenceSplitter;
-import org.mule.util.collection.EventToMessageSequenceSplittingStrategy;
-import org.mule.util.collection.SplittingStrategy;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
+import org.mule.runtime.core.util.collection.EventToMessageSequenceSplittingStrategy;
+import org.mule.runtime.core.util.collection.SplittingStrategy;
 
 /**
  * Splits a message that has a Collection, Iterable, MessageSequence or Iterator

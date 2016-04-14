@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.schedule;
+package org.mule.runtime.core.api.schedule;
 
-import static org.mule.config.i18n.CoreMessages.couldNotRegisterNewScheduler;
-import static org.mule.config.i18n.CoreMessages.objectIsNull;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
+import static org.mule.runtime.core.config.i18n.CoreMessages.couldNotRegisterNewScheduler;
+import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
 
 import java.util.Map;
 
@@ -53,7 +53,7 @@ public abstract class SchedulerFactory<T extends Runnable> implements MuleContex
      *
      * @param job  The {@link Scheduler} job that has to be executed.
      * @param name The {@link Scheduler} name. This name is the one that is going to be use to register the {@link Scheduler}
-     *             in the {@link org.mule.api.registry.MuleRegistry}
+     *             in the {@link org.mule.runtime.core.api.registry.MuleRegistry}
      * @return A new instance of a {@link Scheduler}. It must never be null.
      * @throws SchedulerCreationException In case after creating and post processing the {@link Scheduler} it is null or
      *                                    in case a {@link SchedulerFactoryPostProcessor} fails.
@@ -79,7 +79,7 @@ public abstract class SchedulerFactory<T extends Runnable> implements MuleContex
      * </p>
      *
      * @param name
-     * @param job  The Job the {@link org.mule.api.schedule.Scheduler} is going to execute
+     * @param job  The Job the {@link org.mule.runtime.core.api.schedule.Scheduler} is going to execute
      * @return The {@link Scheduler} instance
      */
     protected abstract Scheduler doCreate(String name, T job);

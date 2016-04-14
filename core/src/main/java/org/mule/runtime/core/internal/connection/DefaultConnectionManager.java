@@ -4,23 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.internal.connection;
+package org.mule.runtime.core.internal.connection;
 
-import static org.mule.api.lifecycle.LifecycleUtils.assertNotStopping;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionHandler;
 import org.mule.api.connection.ConnectionHandlingStrategy;
 import org.mule.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connector.ConnectionManager;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.retry.policies.NoRetryPolicyTemplate;
+import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 
 import java.util.HashMap;
 import java.util.Map;

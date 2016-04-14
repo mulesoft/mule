@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transformer.simple;
+package org.mule.runtime.core.transformer.simple;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
@@ -16,16 +16,16 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.api.metadata.DataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
-import org.mule.transformer.types.MimeTypes;
-import org.mule.transformer.types.TypedValue;
+import org.mule.runtime.core.transformer.types.MimeTypes;
+import org.mule.runtime.core.transformer.types.TypedValue;
 import org.mule.api.message.NullPayload;
 
 import org.junit.Before;

@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.correlation;
+package org.mule.runtime.core.routing.correlation;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.routing.RoutingException;
-import org.mule.routing.AggregationException;
-import org.mule.routing.EventGroup;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.routing.AggregationException;
+import org.mule.runtime.core.routing.EventGroup;
 
 /**
  * A callback used to allow pluggable behaviour when correlating events

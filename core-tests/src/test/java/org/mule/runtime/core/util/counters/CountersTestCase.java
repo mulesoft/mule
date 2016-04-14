@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.counters;
+package org.mule.runtime.core.util.counters;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.counters.CounterFactory.Type;
+import org.mule.runtime.core.util.counters.CounterFactory.Type;
 
 import java.util.Iterator;
 

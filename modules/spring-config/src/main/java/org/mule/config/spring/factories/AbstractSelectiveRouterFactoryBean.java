@@ -6,10 +6,10 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.AbstractAnnotatedObject;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.routing.AbstractSelectiveRouter;
-import org.mule.routing.MessageProcessorFilterPair;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.routing.AbstractSelectiveRouter;
+import org.mule.runtime.core.routing.MessageProcessorFilterPair;
 
 import java.util.Collection;
 

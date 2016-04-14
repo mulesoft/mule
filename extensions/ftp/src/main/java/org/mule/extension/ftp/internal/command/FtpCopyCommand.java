@@ -7,10 +7,10 @@
 package org.mule.extension.ftp.internal.command;
 
 import static java.lang.String.format;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionHandler;
-import org.mule.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.FtpFileSystem;

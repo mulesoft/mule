@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.concurrent;
+package org.mule.runtime.core.util.concurrent;
 
-import org.mule.api.MuleContext;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.util.StringUtils;
 
 /**
  * Encapsulates thread naming logic for Mule standalone and embedded scenarios.

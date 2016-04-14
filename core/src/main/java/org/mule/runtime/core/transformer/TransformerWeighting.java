@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer;
+package org.mule.runtime.core.transformer;
 
-import org.mule.api.transformer.Converter;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Transformer;
 
 import java.util.List;
 
 import org.apache.commons.beanutils.MethodUtils;
 
 /**
- * Given a {@link org.mule.api.transformer.Transformer} instance, an input class and output class
+ * Given a {@link org.mule.runtime.core.api.transformer.Transformer} instance, an input class and output class
  * this object will create a weighting for a transformer. This weighthing can be used compare one transformer with
  * another, which can be useful for choosing a transformer to use given the input class and required output class.
  */

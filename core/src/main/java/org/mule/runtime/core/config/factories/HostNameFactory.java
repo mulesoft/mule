@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.factories;
+package org.mule.runtime.core.config.factories;
 
-import org.mule.api.config.PropertyFactory;
-import org.mule.util.NetworkUtils;
+import org.mule.runtime.core.api.config.PropertyFactory;
+import org.mule.runtime.core.util.NetworkUtils;
 
 import java.util.Map;
 

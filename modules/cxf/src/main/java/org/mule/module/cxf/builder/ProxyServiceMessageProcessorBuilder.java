@@ -19,7 +19,7 @@ import org.mule.module.cxf.support.ProxyWSDLQueryHandler;
 import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.module.cxf.support.ReversibleValidatingInterceptor;
-import org.mule.transformer.types.MimeTypes;
+import org.mule.runtime.core.transformer.types.MimeTypes;
 
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.interceptor.RPCInInterceptor;

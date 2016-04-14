@@ -11,7 +11,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.ParameterMap;
@@ -20,7 +20,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.api.message.NullPayload;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.base.Charsets;
 

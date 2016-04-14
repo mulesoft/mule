@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.serialization;
+package org.mule.runtime.core.api.serialization;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 /**
  * Exception to signal an error during serialization/deserialization process

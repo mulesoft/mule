@@ -7,8 +7,8 @@
 package org.mule.module.extension.internal.runtime;
 
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
@@ -16,7 +16,7 @@ import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.util.GroupValueSetter;
 import org.mule.module.extension.internal.util.SingleValueSetter;
 import org.mule.module.extension.internal.util.ValueSetter;
-import org.mule.util.collection.ImmutableListCollector;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import java.lang.reflect.Field;
 import java.util.List;

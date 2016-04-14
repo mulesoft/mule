@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.parameter.ParameterModel;

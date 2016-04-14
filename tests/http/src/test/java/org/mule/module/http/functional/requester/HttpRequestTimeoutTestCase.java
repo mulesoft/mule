@@ -11,9 +11,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MessagingException;
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

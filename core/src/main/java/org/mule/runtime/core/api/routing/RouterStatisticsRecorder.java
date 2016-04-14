@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.routing;
+package org.mule.runtime.core.api.routing;
 
-import org.mule.management.stats.RouterStatistics;
+import org.mule.runtime.core.management.stats.RouterStatistics;
 
 public interface RouterStatisticsRecorder
 {

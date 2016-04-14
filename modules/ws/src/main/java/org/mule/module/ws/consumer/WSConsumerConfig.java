@@ -7,23 +7,23 @@
 package org.mule.module.ws.consumer;
 
 
-import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.connector.ConnectorOperationLocator;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.ws.security.WSSecurity;
-import org.mule.util.Preconditions;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.core.util.StringUtils;
 
 public class WSConsumerConfig implements MuleContextAware
 {

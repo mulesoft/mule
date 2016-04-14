@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.config;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.config.ConfigurationModel;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
@@ -19,7 +19,7 @@ import org.mule.module.extension.internal.runtime.config.ConfigurationProviderFa
 import org.mule.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.time.TimeSupplier;
+import org.mule.runtime.core.time.TimeSupplier;
 
 import java.util.concurrent.TimeUnit;
 

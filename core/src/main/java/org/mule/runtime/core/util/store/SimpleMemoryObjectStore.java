@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+package org.mule.runtime.core.util.store;
 
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.io.Serializable;
 import java.util.ArrayList;

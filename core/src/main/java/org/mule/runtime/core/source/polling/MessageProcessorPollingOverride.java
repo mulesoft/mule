@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.source.polling;
+package org.mule.runtime.core.source.polling;
 
 /**
  * Extension point to hook extra functionality to a message processor polling component.

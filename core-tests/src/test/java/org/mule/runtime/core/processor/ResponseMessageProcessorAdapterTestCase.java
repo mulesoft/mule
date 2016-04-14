@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 
 import org.junit.Test;
 

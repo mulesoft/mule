@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.requestreply;
+package org.mule.runtime.core.routing.requestreply;
 
-import org.mule.VoidMuleEvent;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.processor.InternalMessageProcessor;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.RequestReplyReplierMessageProcessor;
-import org.mule.api.connector.ReplyToHandler;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.processor.InternalMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.RequestReplyReplierMessageProcessor;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
 import org.apache.commons.lang.BooleanUtils;
 

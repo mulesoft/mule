@@ -7,14 +7,14 @@
 package org.mule.extension.validation.internal;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
-import org.mule.api.MuleEvent;
-import org.mule.api.NestedProcessor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.extension.api.annotation.RestrictedTo;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationResult;
-import org.mule.util.ExceptionUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.util.ArrayList;
 import java.util.List;

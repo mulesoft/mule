@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.function;
+package org.mule.runtime.core.el.function;
 
-import org.mule.api.el.ExpressionLanguageContext;
-import org.mule.api.el.ExpressionLanguageFunction;
-import org.mule.api.transformer.TransformerException;
-import org.mule.el.context.MessageContext;
+import org.mule.runtime.core.api.el.ExpressionLanguageContext;
+import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.el.context.MessageContext;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 public class WildcardExpressionLanguageFuntion implements ExpressionLanguageFunction
 {

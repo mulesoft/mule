@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer;
+package org.mule.runtime.core.transformer;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.message.NullPayload;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -64,7 +64,7 @@ public class TransformerUtils
      * @param names - a list of transformers separated by commands
      * @param muleContext the current muleContext. This is used to look up transformers in the registry
      * @return a list (possibly empty) of transformers or
-     * @throws org.mule.api.DefaultMuleException if any of the transformers cannot be found
+     * @throws org.mule.runtime.core.api.DefaultMuleException if any of the transformers cannot be found
      */
     public static List<Transformer> getTransformers(String names, MuleContext muleContext) throws DefaultMuleException
     {

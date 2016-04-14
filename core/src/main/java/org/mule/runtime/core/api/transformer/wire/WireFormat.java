@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.transformer.wire;
+package org.mule.runtime.core.api.transformer.wire;
 
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
 
 import java.io.InputStream;
 import java.io.OutputStream;

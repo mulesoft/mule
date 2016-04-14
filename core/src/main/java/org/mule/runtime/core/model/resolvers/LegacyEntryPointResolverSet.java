@@ -4,25 +4,25 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.model.resolvers;
+package org.mule.runtime.core.model.resolvers;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.model.EntryPointResolver;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.model.EntryPointResolver;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.ClassUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * An {@link org.mule.api.model.EntryPointResolverSet} that mimics the behaviour of the Mule 1.x
+ * An {@link org.mule.runtime.core.api.model.EntryPointResolverSet} that mimics the behaviour of the Mule 1.x
  * DynamicEntryPointResolver.
  * <b>NOTE:</b> Since 3.0 this legacy entry point resolver will always invoked after message
  * transformation  and not before.
  */
 public class LegacyEntryPointResolverSet extends DefaultEntryPointResolverSet
 {
-    private static final String ANNOTATED_ENTRYPOINT_RESOLVER_CLASS = "org.mule.impl.model.resolvers.AnnotatedEntryPointResolver";
+    private static final String ANNOTATED_ENTRYPOINT_RESOLVER_CLASS = "org.mule.runtime.core.impl.model.resolvers.AnnotatedEntryPointResolver";
     private static final Log logger = LogFactory.getLog(LegacyEntryPointResolverSet.class);
 
     public LegacyEntryPointResolverSet()

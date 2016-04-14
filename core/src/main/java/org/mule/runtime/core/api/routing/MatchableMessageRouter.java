@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.routing;
+package org.mule.runtime.core.api.routing;
 
-import org.mule.api.processor.MessageRouter;
+import org.mule.runtime.core.api.processor.MessageRouter;
 
 public interface MatchableMessageRouter extends MatchableMessageProcessor, MessageRouter
 {

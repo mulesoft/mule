@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.source.polling.watermark;
+package org.mule.runtime.core.source.polling.watermark;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.expression.ExpressionManager;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;

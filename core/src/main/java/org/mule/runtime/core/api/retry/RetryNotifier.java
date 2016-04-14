@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.retry;
+package org.mule.runtime.core.api.retry;
 
 /**
  * This interface is a callback that allows actions to be performed after each retry attempt, 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.types;
+package org.mule.runtime.core.transformer.types;
 
 /**
  * Common mime types used in Mule

@@ -7,11 +7,11 @@
 package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleRuntimeException;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionHandler;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.module.extension.internal.ExtensionProperties;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;

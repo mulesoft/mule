@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.manager;
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.registry.ServiceRegistry;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.extension.api.introspection.ExtensionDiscoverer;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
@@ -15,8 +15,8 @@ import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer
 import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.registry.SpiServiceRegistry;
-import org.mule.util.collection.ImmutableListCollector;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import com.google.common.collect.ImmutableList;
 

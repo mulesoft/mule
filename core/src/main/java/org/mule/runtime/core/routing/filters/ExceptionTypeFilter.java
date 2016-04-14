@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.filters;
+package org.mule.runtime.core.routing.filters;
 
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleMessage;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.util.ClassUtils;
 
 /**
  * A filter that accepts messages that have an exception payload. An Exception type

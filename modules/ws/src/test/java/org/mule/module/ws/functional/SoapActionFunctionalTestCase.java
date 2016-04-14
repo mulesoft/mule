@@ -10,7 +10,7 @@ package org.mule.module.ws.functional;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 
-import org.mule.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.functional.functional.EventCallback;
 
 import java.util.regex.Matcher;

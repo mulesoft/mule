@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.streaming;
+package org.mule.runtime.core.streaming;
 
 import java.util.NoSuchElementException;
 

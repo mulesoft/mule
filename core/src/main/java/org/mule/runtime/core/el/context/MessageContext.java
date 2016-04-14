@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.context;
+package org.mule.runtime.core.el.context;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.TransformerException;
-import org.mule.PropertyScope;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.message.NullPayload;
 
 import java.io.Serializable;
@@ -29,7 +29,7 @@ import javax.activation.DataHandler;
  * <li> <b>correlationId</b>         <i>The message correlationId.</i>
  * <li> <b>correlationSequence</b>   <i>The message correlation sequence number.</i>
  * <li> <b>correlationGroupSize</b>  <i>The message correlation group size.</i>
- * <li> <b>dataType</b>              <i>The message data type (org.mule.api.transformer.DataType).</i>
+ * <li> <b>dataType</b>              <i>The message data type (org.mule.runtime.core.api.transformer.DataType).</i>
  * <li> <b>replyTo</b>               <i>The message reply to destination. (mutable)</i>
  * <li> <b>payload</b>               <i>The message payload (mutable).  You can also use message.payloadAs(Class clazz).  Note: If the message payload is NullPayload, this method will return null (from 3.4)</i>
  * <li> <b>inboundProperties</b>     <i>Map of inbound message properties (immutable).</i>

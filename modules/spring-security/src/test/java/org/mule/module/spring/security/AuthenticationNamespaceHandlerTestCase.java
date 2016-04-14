@@ -10,9 +10,9 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.security.SecurityProvider;
-import org.mule.security.MuleSecurityManager;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.security.SecurityProvider;
+import org.mule.runtime.core.security.MuleSecurityManager;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Collection;

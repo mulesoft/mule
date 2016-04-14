@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.keygenerator;
+package org.mule.runtime.core.keygenerator;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventKeyGenerator;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventKeyGenerator;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;
@@ -16,7 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Implements {@link org.mule.api.MuleEventKeyGenerator} using the Mule expression language to
+ * Implements {@link org.mule.runtime.core.api.MuleEventKeyGenerator} using the Mule expression language to
  * generate the cache keys.
  */
 public class ExpressionMuleEventKeyGenerator implements MuleEventKeyGenerator

@@ -6,16 +6,16 @@
  */
 package org.mule.module.extension.internal.config;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.ConfigurationException;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.api.config.PoolingProfile;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;

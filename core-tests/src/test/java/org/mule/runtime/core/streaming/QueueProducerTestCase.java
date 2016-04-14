@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.streaming;
+package org.mule.runtime.core.streaming;
 
 import org.mule.tck.size.SmallTest;
-import org.mule.util.queue.Queue;
+import org.mule.runtime.core.util.queue.Queue;
 
 import java.io.Serializable;
 import java.util.HashSet;

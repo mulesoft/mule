@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.el.mvel.datatype;
+package org.mule.runtime.core.el.mvel.datatype;
 
 import org.junit.Test;
 

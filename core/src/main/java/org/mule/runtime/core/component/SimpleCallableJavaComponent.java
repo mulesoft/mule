@@ -4,27 +4,27 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.component;
+package org.mule.runtime.core.component;
 
-import org.mule.DefaultMuleEventContext;
-import org.mule.VoidResult;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.component.JavaComponent;
-import org.mule.api.component.LifecycleAdapter;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.object.ObjectFactory;
-import org.mule.api.registry.ServiceException;
-import org.mule.api.transformer.Transformer;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.object.SingletonObjectFactory;
-import org.mule.transformer.TransformerTemplate;
+import org.mule.runtime.core.DefaultMuleEventContext;
+import org.mule.runtime.core.VoidResult;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.component.LifecycleAdapter;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.api.registry.ServiceException;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.object.SingletonObjectFactory;
+import org.mule.runtime.core.transformer.TransformerTemplate;
 
 import java.util.Collections;
 

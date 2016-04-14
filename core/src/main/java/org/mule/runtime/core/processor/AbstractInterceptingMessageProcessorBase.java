@@ -4,25 +4,25 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor;
+package org.mule.runtime.core.processor;
 
-import org.mule.AbstractAnnotatedObject;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.context.notification.ServerNotificationHandler;
-import org.mule.api.processor.InternalMessageProcessor;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.processor.MessageProcessorContainer;
-import org.mule.api.processor.MessageProcessorPathElement;
-import org.mule.execution.MessageProcessorExecutionTemplate;
-import org.mule.processor.chain.ProcessorExecutorFactory;
-import org.mule.util.NotificationUtils;
-import org.mule.util.ObjectUtils;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
+import org.mule.runtime.core.api.processor.InternalMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.MessageProcessorContainer;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
+import org.mule.runtime.core.processor.chain.ProcessorExecutorFactory;
+import org.mule.runtime.core.util.NotificationUtils;
+import org.mule.runtime.core.util.ObjectUtils;
 
 import java.util.Arrays;
 import java.util.Collections;

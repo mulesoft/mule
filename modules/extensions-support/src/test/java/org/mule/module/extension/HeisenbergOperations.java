@@ -7,9 +7,9 @@
 package org.mule.module.extension;
 
 import static java.util.stream.Collectors.toList;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.NestedProcessor;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.annotation.DataTypeParameters;
@@ -31,7 +31,7 @@ import org.mule.module.extension.model.HealthStatus;
 import org.mule.module.extension.model.KnockeableDoor;
 import org.mule.module.extension.model.PersonalInfo;
 import org.mule.module.extension.model.Weapon;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

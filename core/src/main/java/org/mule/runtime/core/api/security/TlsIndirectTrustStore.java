@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.security;
+package org.mule.runtime.core.api.security;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ import java.io.IOException;
  * It may therefore be specific to a single
  * connector, or global to all connectors made by that protocol, or even (in the case of the SSL transport)
  * become a global default value.  For more information see the documentation for the connector or protocol in
- * question.  The comments in {@link org.mule.api.security.tls.TlsConfiguration} may also be useful.</p>
+ * question.  The comments in {@link org.mule.runtime.core.api.security.tls.TlsConfiguration} may also be useful.</p>
  */
 public interface TlsIndirectTrustStore
 {

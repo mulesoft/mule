@@ -13,16 +13,16 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mule.PropertyScope.OUTBOUND;
+import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.module.http.api.HttpHeaders.Names.AUTHORIZATION;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.SecurityManager;
-import org.mule.api.security.UnauthorisedException;
-import org.mule.PropertyScope;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.SecurityManager;
+import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.core.PropertyScope;
 import org.mule.module.http.internal.filter.HttpBasicAuthenticationFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

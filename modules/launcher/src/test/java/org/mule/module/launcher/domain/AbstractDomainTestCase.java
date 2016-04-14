@@ -10,7 +10,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.module.artifact.classloader.MuleClassLoaderLookupPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;

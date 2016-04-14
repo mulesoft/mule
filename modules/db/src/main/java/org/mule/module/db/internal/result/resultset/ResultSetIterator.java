@@ -7,8 +7,8 @@
 
 package org.mule.module.db.internal.result.resultset;
 
-import org.mule.api.Closeable;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.Closeable;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.result.row.RowHandler;
 

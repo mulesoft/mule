@@ -6,9 +6,9 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.component.DefaultJavaComponent;
-import org.mule.object.AbstractObjectFactory;
-import org.mule.object.SingletonObjectFactory;
+import org.mule.runtime.core.component.DefaultJavaComponent;
+import org.mule.runtime.core.object.AbstractObjectFactory;
+import org.mule.runtime.core.object.SingletonObjectFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,8 +23,8 @@ import org.w3c.dom.Node;
 
 /**
  * Used to parse shortcut elements for simple built-in components such as
- * {@link org.mule.component.simple.EchoComponent} and
- * {@link org.mule.component.simple.LogComponent}. This allows shortcuts like
+ * {@link org.mule.runtime.core.component.simple.EchoComponent} and
+ * {@link org.mule.runtime.core.component.simple.LogComponent}. This allows shortcuts like
  * for example <i>&lt;mule:bridge-service/&gt;</i> to be used instead of having to
  * use the <i>&lt;mule:service/&gt;</i> element and specify the class name (and
  * scope) for built-in components that don't require configuration. <p/> <b>This

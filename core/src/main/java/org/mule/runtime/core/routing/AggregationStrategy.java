@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing;
+package org.mule.runtime.core.routing;
 
-import org.mule.VoidMuleEvent;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.routing.AggregationContext;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.routing.AggregationContext;
 
 /**
  * Strategy pattern for aggregating a list of {@link MuleEvent} passed through a

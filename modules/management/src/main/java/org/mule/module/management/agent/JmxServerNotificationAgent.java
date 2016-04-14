@@ -6,10 +6,10 @@
  */
 package org.mule.module.management.agent;
 
-import org.mule.agent.AbstractNotificationLoggerAgent;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.agent.AbstractNotificationLoggerAgent;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.module.management.support.JmxSupport;
 import org.mule.module.management.support.JmxSupportFactory;

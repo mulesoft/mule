@@ -7,16 +7,16 @@
 package org.mule.module.extension.internal.runtime.executor;
 
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
-import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
 

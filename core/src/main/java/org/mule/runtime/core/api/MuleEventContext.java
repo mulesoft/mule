@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api;
+package org.mule.runtime.core.api;
 
-import org.mule.MessageExchangePattern;
-import org.mule.api.construct.FlowConstruct;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.io.OutputStream;
 import java.net.URI;
@@ -45,10 +45,10 @@ public interface MuleEventContext
      *            just provides a convienient way to manage type casting of
      *            transformed objects
      * @return the message transformed into it's recognised or expected format.
-     * @throws org.mule.api.transformer.TransformerException if a failure occurs or
+     * @throws org.mule.runtime.core.api.transformer.TransformerException if a failure occurs or
      *             if the return type is not the same as the expected type in the
      *             transformer
-     * @see org.mule.api.transformer.Transformer
+     * @see org.mule.runtime.core.api.transformer.Transformer
      */
     Object transformMessage(DataType dataType) throws TransformerException;
 
@@ -61,10 +61,10 @@ public interface MuleEventContext
      *            just provides a convienient way to manage type casting of
      *            transformed objects
      * @return the message transformed into it's recognised or expected format.
-     * @throws org.mule.api.transformer.TransformerException if a failure occurs or
+     * @throws org.mule.runtime.core.api.transformer.TransformerException if a failure occurs or
      *             if the return type is not the same as the expected type in the
      *             transformer
-     * @see org.mule.api.transformer.Transformer
+     * @see org.mule.runtime.core.api.transformer.Transformer
      */
     Object transformMessage(Class expectedType) throws TransformerException;
 
@@ -77,7 +77,7 @@ public interface MuleEventContext
      * @return the message transformed into it's recognised or expected format as a
      *         Strings.
      * @throws TransformerException if a failure occurs in the transformer
-     * @see org.mule.api.transformer.Transformer
+     * @see org.mule.runtime.core.api.transformer.Transformer
      */
     String transformMessageToString() throws TransformerException;
 
@@ -140,7 +140,7 @@ public interface MuleEventContext
      * default, the Mule server will route events according to a components
      * configuration. The user can override this behaviour by obtaining a reference
      * to the MuleEvent context, either by implementing
-     * <code>org.mule.api.lifecycle.Callable</code> or calling
+     * <code>org.mule.runtime.core.api.lifecycle.Callable</code> or calling
      * <code>UMOManager.getEventContext</code> to obtain the MuleEventContext for
      * the current thread. The user can programmatically control how events are
      * dispatched.

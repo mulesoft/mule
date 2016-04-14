@@ -6,8 +6,8 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.api.MuleEvent;
-import org.mule.exception.AbstractMessagingExceptionStrategy;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 
 /**
  * Restrict exceptions to debug log messages

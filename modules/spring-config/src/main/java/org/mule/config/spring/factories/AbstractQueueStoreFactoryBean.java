@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.ObjectStore;
 
 import java.io.Serializable;
 

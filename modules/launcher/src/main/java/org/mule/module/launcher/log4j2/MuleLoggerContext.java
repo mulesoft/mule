@@ -9,7 +9,7 @@ package org.mule.module.launcher.log4j2;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withName;
 
-import org.mule.logging.LogConfigChangeSubject;
+import org.mule.runtime.core.logging.LogConfigChangeSubject;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.application.ApplicationClassLoader;
 

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import org.mule.api.context.notification.ExceptionStrategyNotificationListener;
+import org.mule.runtime.core.api.context.notification.ExceptionStrategyNotificationListener;
 
 public class ExceptionStrategyNotificationLogger extends AbstractNotificationLogger<ExceptionStrategyNotification> implements ExceptionStrategyNotificationListener<ExceptionStrategyNotification>
 {

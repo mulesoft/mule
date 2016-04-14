@@ -8,9 +8,9 @@ package org.mule.config.spring;
 
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.component.JavaComponent;
-import org.mule.api.object.ObjectFactory;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

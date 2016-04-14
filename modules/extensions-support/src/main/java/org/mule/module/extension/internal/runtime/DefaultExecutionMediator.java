@@ -7,11 +7,11 @@
 package org.mule.module.extension.internal.runtime;
 
 import static java.lang.String.format;
-import org.mule.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.retry.RetryCallback;
-import org.mule.api.retry.RetryContext;
-import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.RetryCallback;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.operation.RuntimeOperationModel;
@@ -21,12 +21,12 @@ import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.extension.api.runtime.RetryRequest;
-import org.mule.internal.connection.ConnectionManagerAdapter;
-import org.mule.internal.connection.ConnectionProviderWrapper;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.module.extension.internal.runtime.exception.ExceptionEnricherManager;
-import org.mule.util.ValueHolder;
-import org.mule.work.SerialWorkManager;
+import org.mule.runtime.core.util.ValueHolder;
+import org.mule.runtime.core.work.SerialWorkManager;
 
 import com.google.common.collect.ImmutableList;
 

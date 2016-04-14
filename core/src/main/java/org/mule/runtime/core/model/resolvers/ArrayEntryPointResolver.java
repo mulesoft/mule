@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.model.resolvers;
+package org.mule.runtime.core.model.resolvers;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.transformer.TransformerException;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.util.ClassUtils;
 
 /**
  * Will resolver entry point methods on a service service that accept a single array.

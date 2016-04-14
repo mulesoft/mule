@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.security.tls;
+package org.mule.runtime.core.api.security.tls;
 
-import org.mule.util.ArrayUtils;
+import org.mule.runtime.core.util.ArrayUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;

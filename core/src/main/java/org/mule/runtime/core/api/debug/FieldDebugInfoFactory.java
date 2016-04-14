@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.debug;
+package org.mule.runtime.core.api.debug;
 
-import org.mule.api.MuleEvent;
-import org.mule.util.AttributeEvaluator;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.AttributeEvaluator;
 
 import java.util.HashMap;
 import java.util.List;

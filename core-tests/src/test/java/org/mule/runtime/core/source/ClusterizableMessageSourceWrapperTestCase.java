@@ -4,27 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.source;
+package org.mule.runtime.core.source;
 
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.mule.api.MuleContext;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.source.ClusterizableMessageSource;
-import org.mule.context.notification.ClusterNodeNotification;
-import org.mule.lifecycle.PrimaryNodeLifecycleNotificationListener;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.source.ClusterizableMessageSource;
+import org.mule.runtime.core.context.notification.ClusterNodeNotification;
+import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 @SmallTest
 public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestCase

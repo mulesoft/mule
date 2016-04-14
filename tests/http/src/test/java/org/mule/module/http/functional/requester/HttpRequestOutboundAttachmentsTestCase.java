@@ -14,13 +14,13 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.transformer.types.MimeTypes.HTML;
-import static org.mule.transformer.types.MimeTypes.TEXT;
+import static org.mule.runtime.core.transformer.types.MimeTypes.HTML;
+import static org.mule.runtime.core.transformer.types.MimeTypes.TEXT;
 
-import org.mule.api.MuleEvent;
-import org.mule.message.ds.ByteArrayDataSource;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;

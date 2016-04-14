@@ -26,7 +26,7 @@ import java.util.List;
  * Accepted queries are select queries or stored procedure queries taking input parameters
  * and returning only a resultSet.
  * <p/>
- * Both database and queries are resolved, if required, using the {@link org.mule.api.MuleEvent}
+ * Both database and queries are resolved, if required, using the {@link org.mule.runtime.core.api.MuleEvent}
  * being processed.
  */
 

@@ -11,7 +11,7 @@ import static org.mule.module.db.internal.processor.DbDebugInfoUtils.SQL_TEXT_DE
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.TYPE_DEBUG_FIELD;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
-import org.mule.api.debug.FieldDebugInfo;
+import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.module.db.internal.domain.query.Query;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
 

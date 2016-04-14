@@ -6,10 +6,10 @@
  */
 package org.mule.module.cxf.config;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.util.AttributeEvaluator;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.util.AttributeEvaluator;
 
 import java.util.Collection;
 import java.util.HashMap;

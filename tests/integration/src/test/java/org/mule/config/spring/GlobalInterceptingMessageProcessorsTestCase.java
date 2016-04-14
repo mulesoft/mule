@@ -12,14 +12,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.mule.api.processor.MessageProcessor;
-import org.mule.construct.Flow;
-import org.mule.routing.IdempotentMessageFilter;
-import org.mule.routing.IdempotentSecureHashMessageFilter;
-import org.mule.routing.MessageFilter;
-import org.mule.routing.filters.WildcardFilter;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.routing.IdempotentMessageFilter;
+import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
+import org.mule.runtime.core.routing.MessageFilter;
+import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.transformer.simple.CombineCollectionsTransformer;
+import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
 
 import java.util.List;
 

@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.bootstrap;
+package org.mule.runtime.core.config.bootstrap;
 
-import org.mule.api.MuleException;
-import org.mule.api.registry.ObjectProcessor;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.registry.TransformerResolver;
-import org.mule.api.transformer.Converter;
-import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.util.StreamCloser;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.registry.MuleRegistryHelper;
-import org.mule.registry.SimpleRegistry;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.registry.ObjectProcessor;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.registry.TransformerResolver;
+import org.mule.runtime.core.api.transformer.Converter;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.util.StreamCloser;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.registry.MuleRegistryHelper;
+import org.mule.runtime.core.registry.SimpleRegistry;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.Map;
 
@@ -26,7 +26,7 @@ import java.util.Map;
  * An implementation of {@link AbstractRegistryBootstrap} to populate instances
  * of {@link SimpleRegistry}
  *
- * @deprecated as of 3.7.0. Try to use {@link org.mule.config.spring.SpringRegistryBootstrap} instead.
+ * @deprecated as of 3.7.0. Try to use {@link org.mule.runtime.core.config.spring.SpringRegistryBootstrap} instead.
  */
 @Deprecated
 public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap

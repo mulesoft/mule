@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.exception;
+package org.mule.runtime.core.exception;
 
-import org.mule.api.GlobalNameableObject;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.processor.MessageProcessorContainer;
-import org.mule.api.processor.MessageProcessorPathElement;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.message.DefaultExceptionPayload;
-import org.mule.processor.AbstractMuleObjectOwner;
+import org.mule.runtime.core.api.GlobalNameableObject;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.processor.MessageProcessorContainer;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Selects which exception strategy to execute based on filtering.
  * <p/>
- * Exception listeners must implement {@link org.mule.api.exception.MessagingExceptionHandlerAcceptor} to be part of ChoiceMessagingExceptionStrategy
+ * Exception listeners must implement {@link org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor} to be part of ChoiceMessagingExceptionStrategy
  */
 public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
         implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle, MessageProcessorContainer, GlobalNameableObject

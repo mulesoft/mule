@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.component;
+package org.mule.runtime.core.api.component;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 
 public interface InterfaceBinding extends MessageProcessor
 {
@@ -28,9 +28,9 @@ public interface InterfaceBinding extends MessageProcessor
      *         returned.
      * @throws MessagingException if any errors occur during the sending of messages
      * @throws MuleException
-     * @see org.mule.routing.outbound.FilteringOutboundRouter
-     * @see org.mule.routing.outbound.ExceptionBasedRouter
-     * @see org.mule.routing.outbound.MulticastingRouter
+     * @see org.mule.runtime.core.routing.outbound.FilteringOutboundRouter
+     * @see org.mule.runtime.core.routing.outbound.ExceptionBasedRouter
+     * @see org.mule.runtime.core.routing.outbound.MulticastingRouter
      * @since 2.1 the synchronous argument has been removed. Instead use the
      *        synchronous attribute of the endpoint you are dispatching to.
      */

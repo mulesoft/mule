@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
-import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
-import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
-import static org.mule.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
+import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
+import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.OptimizedRequestContext;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.connector.ReplyToHandler;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.source.MessageSource;
-import org.mule.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -32,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * This phase routes the message through the flow.
  * <p>
- * To participate of this phase, {@link org.mule.execution.MessageProcessTemplate} must implement {@link org.mule.execution.FlowProcessingPhaseTemplate}
+ * To participate of this phase, {@link org.mule.runtime.core.execution.MessageProcessTemplate} must implement {@link org.mule.runtime.core.execution.FlowProcessingPhaseTemplate}
  */
 public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessingPhase<AsyncResponseFlowProcessingPhaseTemplate>
 {

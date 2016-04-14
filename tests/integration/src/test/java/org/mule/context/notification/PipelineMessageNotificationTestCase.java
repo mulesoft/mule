@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.api.MessagingException;
-import org.mule.api.client.MuleClient;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;

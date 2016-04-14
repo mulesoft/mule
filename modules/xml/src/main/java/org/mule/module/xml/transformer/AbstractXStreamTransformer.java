@@ -6,10 +6,10 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;

@@ -6,12 +6,12 @@
  */
 package org.mule.module.extension.internal.config;
 
-import static org.mule.api.config.MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE;
 import static org.mule.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
 import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE_TYPE;
 import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.config.ChainedThreadingProfile;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.config.ChainedThreadingProfile;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.ConstructorReference;
 

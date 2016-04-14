@@ -7,10 +7,10 @@
 
 package org.mule.module.db.internal.domain.transaction;
 
-import org.mule.api.MuleContext;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionException;
-import org.mule.api.transaction.TransactionFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.core.api.transaction.TransactionFactory;
 
 /**
  * Creates database transactions

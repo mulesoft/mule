@@ -9,7 +9,7 @@ package org.mule.module.xml.transformer.wire;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XStreamFactory;
 import org.mule.module.xml.transformer.XmlToObject;
-import org.mule.transformer.wire.TransformerPairWireFormat;
+import org.mule.runtime.core.transformer.wire.TransformerPairWireFormat;
 
 import java.util.Map;
 import java.util.Set;

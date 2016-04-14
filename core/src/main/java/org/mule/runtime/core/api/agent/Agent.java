@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.agent;
+package org.mule.runtime.core.api.agent;
 
-import org.mule.api.NameableObject;
-import org.mule.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
 
 /**
  * <code>Agent</code> is a server plugin that can be initialised, started and

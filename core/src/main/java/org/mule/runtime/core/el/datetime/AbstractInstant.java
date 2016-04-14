@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.datetime;
+package org.mule.runtime.core.el.datetime;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.el.datetime.Instant;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.el.datetime.Instant;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -137,7 +137,7 @@ public abstract class AbstractInstant implements Instant
         else
         {
             throw new MuleRuntimeException(
-                CoreMessages.createStaticMessage("org.mule.el.DateTime.toXMLCalendar() does not support non-gregorian calendars."));
+                CoreMessages.createStaticMessage("org.mule.runtime.core.el.DateTime.toXMLCalendar() does not support non-gregorian calendars."));
         }
     }
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.support;
+package org.mule.runtime.core.management.support;
 
 import org.mule.module.management.support.SimplePasswordJmxAuthenticator;
 import org.mule.tck.junit4.AbstractMuleTestCase;

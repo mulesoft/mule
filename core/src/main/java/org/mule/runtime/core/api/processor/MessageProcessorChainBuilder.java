@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.processor;
+package org.mule.runtime.core.api.processor;
 
 
 /**
- * Builds {@link org.mule.api.processor.MessageProcessorChain} instances.
+ * Builds {@link org.mule.runtime.core.api.processor.MessageProcessorChain} instances.
  *
  * @since 3.1
  */

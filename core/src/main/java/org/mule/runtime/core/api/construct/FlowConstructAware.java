@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.construct;
+package org.mule.runtime.core.api.construct;
 /**
 * Implemented by objects that require the {@link FlowConstruct} to be injected.
 */

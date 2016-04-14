@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
-import org.mule.api.registry.InjectProcessor;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.annotation.AnnotationMetaData;
-import org.mule.util.annotation.AnnotationUtils;
+import org.mule.runtime.core.api.registry.InjectProcessor;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.annotation.AnnotationMetaData;
+import org.mule.runtime.core.util.annotation.AnnotationUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -30,8 +30,8 @@ import javax.annotation.PreDestroy;
  * <li>The method MAY be final or non-final, except in the case of EJBs where it MUST be non-final. Note that Mule is not an EJB container so the EJB case is ignored in Mule.</li>
  * </ol>
  *
- * @deprecated as of 3.7.0 since these are only used by {@link org.mule.registry.TransientRegistry} which is also deprecated. Use post processors
- * for currently supported registries instead (i.e: {@link org.mule.config.spring.SpringRegistry})
+ * @deprecated as of 3.7.0 since these are only used by {@link org.mule.runtime.core.registry.TransientRegistry} which is also deprecated. Use post processors
+ * for currently supported registries instead (i.e: {@link org.mule.runtime.core.config.spring.SpringRegistry})
  */
 @Deprecated
 public class JSR250ValidatorProcessor implements InjectProcessor

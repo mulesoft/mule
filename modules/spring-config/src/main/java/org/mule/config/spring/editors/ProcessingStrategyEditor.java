@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring.editors;
 
-import org.mule.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.config.spring.util.ProcessingStrategyUtils;
 
 import java.beans.PropertyEditor;

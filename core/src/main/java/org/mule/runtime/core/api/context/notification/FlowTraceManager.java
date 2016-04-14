@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.context.notification;
+package org.mule.runtime.core.api.context.notification;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 
 /**
  * Provides callbacks for notifying when a flow call from another flow is started or completed.

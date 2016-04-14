@@ -14,14 +14,14 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.mule.module.http.internal.listener.NoListenerRequestHandler.RESOURCE_NOT_FOUND;
 import static org.mule.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

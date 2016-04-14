@@ -7,19 +7,19 @@
 package org.mule.functional.junit4;
 
 import static org.mockito.Mockito.spy;
-import static org.mule.MessageExchangePattern.ONE_WAY;
-import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.connector.ReplyToHandler;
-import org.mule.session.DefaultMuleSession;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.session.DefaultMuleSession;
 
 import java.net.URI;
 import java.util.HashMap;

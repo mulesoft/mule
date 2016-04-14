@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
-import org.mule.api.context.notification.FlowCallStack;
-import org.mule.api.context.notification.FlowStackElement;
+import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.context.notification.FlowStackElement;
 
 import java.util.ArrayList;
 import java.util.EmptyStackException;

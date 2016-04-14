@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context;
+package org.mule.runtime.core.context;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.hamcrest.CoreMatchers;

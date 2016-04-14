@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.context;
+package org.mule.runtime.core.el.context;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Flow variables wrapper {@link Map} for exposing Flow variables via an {@link org.mule.api.el.ExpressionLanguage}
+ * Flow variables wrapper {@link Map} for exposing Flow variables via an {@link org.mule.runtime.core.api.el.ExpressionLanguage}
  */
 public class FlowVariableMapContext extends AbstractMapContext<Object>
 {

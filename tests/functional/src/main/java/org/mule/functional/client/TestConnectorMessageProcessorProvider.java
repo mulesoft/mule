@@ -7,11 +7,11 @@
 
 package org.mule.functional.client;
 
-import org.mule.api.MuleException;
-import org.mule.api.client.AbstractConnectorMessageProcessorProvider;
-import org.mule.api.client.OperationOptions;
-import org.mule.api.client.RequestCacheKey;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.client.AbstractConnectorMessageProcessorProvider;
+import org.mule.runtime.core.api.client.OperationOptions;
+import org.mule.runtime.core.api.client.RequestCacheKey;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 
 /**
  * Provider for operations of the Test Connector.

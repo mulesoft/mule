@@ -44,9 +44,9 @@ import static org.mule.module.extension.internal.util.IntrospectionUtils.isInsta
 import static org.mule.module.extension.internal.util.IntrospectionUtils.isRequired;
 import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.NestedProcessor;
-import org.mule.api.config.ThreadingProfile;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.NestedProcessor;
+import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Extensible;
 import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
@@ -98,8 +98,8 @@ import org.mule.module.extension.internal.introspection.SubTypesMappingContainer
 import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.module.extension.internal.util.NameUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.ValueHolder;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.ValueHolder;
 
 import java.math.BigInteger;
 import java.util.Collection;

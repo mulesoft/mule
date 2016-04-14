@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transaction;
+package org.mule.runtime.core.transaction;
 
-import org.mule.api.MuleContext;
-import org.mule.api.transaction.TransactionException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.util.Preconditions;
-import org.mule.util.xa.XaResourceFactoryHolder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.core.util.xa.XaResourceFactoryHolder;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -261,9 +261,9 @@ public class XaTransaction extends AbstractTransaction
 
     /**
      * @param key Must be the provider of the resource object. i.e. for JDBC it's the XADataSource, for JMS is the XAConnectionFactory.
-     *            It can be a wrapper in which case should be a {@link org.mule.util.xa.XaResourceFactoryHolder} to be able to determine
+     *            It can be a wrapper in which case should be a {@link org.mule.runtime.core.util.xa.XaResourceFactoryHolder} to be able to determine
      *            correctly if there's already a resource for that {@link javax.transaction.xa.XAResource} provider.
-     * @param resource the resource object. It must be an {@link javax.transaction.xa.XAResource} or a {@link org.mule.transaction.XaTransaction.MuleXaObject}
+     * @param resource the resource object. It must be an {@link javax.transaction.xa.XAResource} or a {@link org.mule.runtime.core.transaction.XaTransaction.MuleXaObject}
      * @throws TransactionException
      */
     public synchronized void bindResource(Object key, Object resource) throws TransactionException

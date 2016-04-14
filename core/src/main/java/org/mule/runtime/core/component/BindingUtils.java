@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.component;
+package org.mule.runtime.core.component;
 
-import org.mule.api.MuleException;
-import org.mule.api.component.InterfaceBinding;
-import org.mule.api.component.JavaComponent;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.model.resolvers.NoSatisfiableMethodsException;
-import org.mule.model.resolvers.TooManySatisfiableMethodsException;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.InterfaceBinding;
+import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.model.resolvers.NoSatisfiableMethodsException;
+import org.mule.runtime.core.model.resolvers.TooManySatisfiableMethodsException;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

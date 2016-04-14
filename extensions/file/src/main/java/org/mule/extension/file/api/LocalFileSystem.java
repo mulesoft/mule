@@ -28,7 +28,7 @@ import org.mule.module.extension.file.api.command.ReadCommand;
 import org.mule.module.extension.file.api.command.RenameCommand;
 import org.mule.module.extension.file.api.command.WriteCommand;
 import org.mule.module.extension.file.api.AbstractFileSystem;
-import org.mule.util.ArrayUtils;
+import org.mule.runtime.core.util.ArrayUtils;
 
 import java.nio.file.OpenOption;
 import java.nio.file.Path;

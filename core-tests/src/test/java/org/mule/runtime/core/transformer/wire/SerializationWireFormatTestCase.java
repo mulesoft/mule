@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.wire;
+package org.mule.runtime.core.transformer.wire;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.api.transformer.wire.WireFormat;
-import org.mule.transformer.simple.ByteArrayToSerializable;
-import org.mule.transformer.simple.SerializableToByteArray;
+import org.mule.runtime.core.api.transformer.wire.WireFormat;
+import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
+import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 
 public class SerializationWireFormatTestCase extends AbstractWireFormatTestCase
 {

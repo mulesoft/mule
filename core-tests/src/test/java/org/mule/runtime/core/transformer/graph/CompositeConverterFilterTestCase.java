@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer.graph;
+package org.mule.runtime.core.transformer.graph;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -13,8 +13,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.registry.ResolverException;
-import org.mule.api.transformer.Converter;
+import org.mule.runtime.core.api.registry.ResolverException;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.api.metadata.DataType;
 import org.mule.tck.size.SmallTest;
 

@@ -6,7 +6,7 @@
  */
 package org.mule.module.xml.xpath;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.module.xml.util.NamespaceManager;
 
 import java.util.Map;

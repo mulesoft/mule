@@ -7,10 +7,10 @@
 package org.mule.functional.security;
 
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.SecurityContext;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.SecurityContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

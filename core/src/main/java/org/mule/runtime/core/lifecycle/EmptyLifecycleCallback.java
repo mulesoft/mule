@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.lifecycle;
+package org.mule.runtime.core.lifecycle;
 
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.LifecycleCallback;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 
 /**
- * A lifecycle callback that does nothing. Can be used to transition a {@link org.mule.api.lifecycle.LifecycleManager} to
+ * A lifecycle callback that does nothing. Can be used to transition a {@link org.mule.runtime.core.api.lifecycle.LifecycleManager} to
  * the next phase without executing logic.
  *
  * USers should never use this object themselves, it provides an internal Mule function.

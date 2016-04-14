@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.streaming;
+package org.mule.runtime.core.streaming;
 
-import org.mule.api.Closeable;
+import org.mule.runtime.core.api.Closeable;
 
 /**
  * A producer implementation that follows the idea of the Producer-Consumer design

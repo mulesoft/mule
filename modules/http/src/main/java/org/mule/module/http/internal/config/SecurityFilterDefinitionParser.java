@@ -6,13 +6,13 @@
  */
 package org.mule.module.http.internal.config;
 
-import org.mule.api.security.SecurityFilter;
+import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.WrappingChildDefinitionParser;
-import org.mule.processor.SecurityFilterMessageProcessor;
+import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 
 import org.w3c.dom.Element;
 

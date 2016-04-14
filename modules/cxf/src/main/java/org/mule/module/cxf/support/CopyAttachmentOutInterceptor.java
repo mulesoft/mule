@@ -6,8 +6,8 @@
  */
 package org.mule.module.cxf.support;
 
-import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.module.cxf.CxfConstants;
 
 import java.util.Collection;

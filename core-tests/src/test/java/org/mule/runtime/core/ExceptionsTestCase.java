@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule;
+package org.mule.runtime.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.RoutingException;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

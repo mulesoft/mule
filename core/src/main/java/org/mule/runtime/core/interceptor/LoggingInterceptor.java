@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.interceptor;
+package org.mule.runtime.core.interceptor;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.management.stats.ProcessingTime;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.management.stats.ProcessingTime;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

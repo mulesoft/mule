@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.internal.metadata;
+package org.mule.runtime.core.internal.metadata;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleRuntimeException;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.api.metadata.resolving.MetadataContentResolver;
 import org.mule.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 
 /**

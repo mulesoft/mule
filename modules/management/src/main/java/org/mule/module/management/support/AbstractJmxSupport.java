@@ -6,8 +6,8 @@
  */
 package org.mule.module.management.support;
 
-import org.mule.api.MuleContext;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Collection;
 import java.util.List;

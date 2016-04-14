@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
-import org.mule.config.MuleManifest;
-import org.mule.util.VersionRange;
+import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.util.VersionRange;
 
 import java.util.ArrayList;
 import java.util.List;

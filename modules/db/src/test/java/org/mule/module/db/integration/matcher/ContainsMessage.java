@@ -7,7 +7,7 @@
 
 package org.mule.module.db.integration.matcher;
 
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 
 import java.util.List;
 import java.util.Map;

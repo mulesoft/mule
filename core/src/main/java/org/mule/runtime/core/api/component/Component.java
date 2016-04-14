@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.component;
+package org.mule.runtime.core.api.component;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.management.stats.ComponentStatistics;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.management.stats.ComponentStatistics;
 
 /**
  * A <code>Component</code> component processes a {@link MuleEvent} by invoking the

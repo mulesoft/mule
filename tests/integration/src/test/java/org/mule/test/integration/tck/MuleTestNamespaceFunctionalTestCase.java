@@ -12,10 +12,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.ExceptionUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.io.FileNotFoundException;
 

@@ -4,22 +4,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.bootstrap;
+package org.mule.runtime.core.config.bootstrap;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.DefaultMuleContext;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.registry.ResolverException;
-import org.mule.api.registry.TransformerResolver;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.registry.ResolverException;
+import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transformer.AbstractDiscoverableTransformer;
+import org.mule.runtime.core.transformer.AbstractDiscoverableTransformer;
 
 import java.util.ArrayList;
 import java.util.List;

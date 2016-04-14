@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.collection;
+package org.mule.runtime.core.util.collection;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;

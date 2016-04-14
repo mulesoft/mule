@@ -4,26 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
-import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.ResolverException;
-import org.mule.api.registry.TransformerResolver;
-import org.mule.api.transformer.Converter;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.ResolverException;
+import org.mule.runtime.core.api.registry.TransformerResolver;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.TransformerChain;
-import org.mule.transformer.TransformerWeighting;
-import org.mule.transformer.graph.GraphTransformerResolver;
-import org.mule.transformer.simple.ObjectToByteArray;
-import org.mule.transformer.simple.ObjectToString;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transformer.TransformerChain;
+import org.mule.runtime.core.transformer.TransformerWeighting;
+import org.mule.runtime.core.transformer.graph.GraphTransformerResolver;
+import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.core.transformer.simple.ObjectToString;
 import org.mule.api.metadata.SimpleDataType;
 
 import java.util.ArrayList;

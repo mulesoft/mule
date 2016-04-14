@@ -6,16 +6,16 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.module.xml.i18n.XmlMessages;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.IOUtils;
 
 import com.saxonica.xqj.SaxonXQDataSource;
 

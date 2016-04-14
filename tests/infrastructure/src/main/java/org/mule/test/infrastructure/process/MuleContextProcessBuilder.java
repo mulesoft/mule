@@ -6,10 +6,10 @@
  */
 package org.mule.test.infrastructure.process;
 
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.junit4.rule.FreePortFinder;
 import org.mule.test.infrastructure.deployment.FakeMuleServer;
-import org.mule.util.UUID;
+import org.mule.runtime.core.util.UUID;
 
 import java.io.File;
 import java.io.IOException;

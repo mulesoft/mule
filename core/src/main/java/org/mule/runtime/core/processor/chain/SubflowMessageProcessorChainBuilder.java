@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.processor.chain;
+package org.mule.runtime.core.processor.chain;
 
-import org.mule.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 
 /**
  * Constructs a custom chain for subflows using the subflow name as the chain name.

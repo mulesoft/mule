@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.el.context;
+package org.mule.runtime.core.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import org.mule.api.MuleEvent;
-import org.mule.api.el.ExpressionLanguage;
-import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.ExceptionUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.util.Arrays;
 import java.util.List;

@@ -8,13 +8,13 @@ package org.mule.module.jaas;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import org.mule.api.EncryptionStrategy;
-import org.mule.api.MessagingException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.security.CryptoFailureException;
-import org.mule.api.security.UnauthorisedException;
+import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.security.MuleCredentials;
+import org.mule.runtime.core.security.MuleCredentials;
 
 public abstract class AbstractJaasFunctionalTestCase extends FunctionalTestCase
 {

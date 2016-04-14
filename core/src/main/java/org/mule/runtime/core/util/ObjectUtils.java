@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util;
+package org.mule.runtime.core.util;
 
-import org.mule.api.NameableObject;
+import org.mule.runtime.core.api.NameableObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

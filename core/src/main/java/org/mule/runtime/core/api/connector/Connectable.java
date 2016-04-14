@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.connector;
+package org.mule.runtime.core.api.connector;
 
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.retry.RetryContext;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.retry.RetryContext;
 
 /**
  * Interface for objects that should connect to a resource.

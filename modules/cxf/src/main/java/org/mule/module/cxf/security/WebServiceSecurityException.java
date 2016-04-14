@@ -6,11 +6,11 @@
  */
 package org.mule.module.cxf.security;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
-public class WebServiceSecurityException extends org.mule.api.security.SecurityException
+public class WebServiceSecurityException extends org.mule.runtime.core.api.security.SecurityException
 {
     public WebServiceSecurityException(MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
     {

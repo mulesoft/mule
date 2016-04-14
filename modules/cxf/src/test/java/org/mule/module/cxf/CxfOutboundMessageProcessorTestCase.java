@@ -6,21 +6,17 @@
  */
 package org.mule.module.cxf;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsInstanceOf;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.component.simple.EchoService;
-import org.mule.api.processor.MessageProcessor;
+import static org.junit.Assert.assertThat;
 import org.mule.module.cxf.builder.SimpleClientMessageProcessorBuilder;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.simple.EchoService;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTestCase
 {

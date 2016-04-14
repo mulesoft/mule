@@ -10,17 +10,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.store.ObjectStore;
-import org.mule.construct.Flow;
-import org.mule.routing.IdempotentMessageFilter;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.routing.IdempotentMessageFilter;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.transformer.simple.StringAppendTransformer;
-import org.mule.util.SystemUtils;
-import org.mule.util.store.InMemoryObjectStore;
-import org.mule.util.store.SimpleMemoryObjectStore;
-import org.mule.util.store.TextFileObjectStore;
+import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.core.util.SystemUtils;
+import org.mule.runtime.core.util.store.InMemoryObjectStore;
+import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
+import org.mule.runtime.core.util.store.TextFileObjectStore;
 
 import java.io.File;
 import java.io.Serializable;

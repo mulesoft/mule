@@ -9,8 +9,8 @@ package org.mule.module.spring.security;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.security.SecurityManager;
-import org.mule.api.security.SecurityProvider;
+import org.mule.runtime.core.api.security.SecurityManager;
+import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Iterator;

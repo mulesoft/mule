@@ -8,7 +8,7 @@ package org.mule.module.xml.util;
 
 import static org.junit.Assert.assertEquals;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.File;
 import java.io.InputStream;

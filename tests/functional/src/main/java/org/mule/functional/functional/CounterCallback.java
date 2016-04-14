@@ -6,7 +6,7 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleEventContext;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

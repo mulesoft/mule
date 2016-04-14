@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.expression.transformers;
+package org.mule.runtime.core.expression.transformers;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.api.expression.RequiredValueException;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.expression.RequiredValueException;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.api.message.NullPayload;
 
 import java.util.Iterator;

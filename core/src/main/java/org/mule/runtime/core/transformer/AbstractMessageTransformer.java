@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformer;
+package org.mule.runtime.core.transformer;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.MessageTransformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
-import org.mule.client.DefaultLocalMuleClient;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.Message;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.transformer.MessageTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.client.DefaultLocalMuleClient;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.message.NullPayload;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringMessageUtils;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringMessageUtils;
 
 /**
  * <code>AbstractMessageTransformer</code> is a transformer that has a reference
@@ -32,8 +32,8 @@ import org.mule.util.StringMessageUtils;
  * DefaultMuleMessage with the src as its payload. Transformers should always work on the
  * src object not the message payload.
  *
- * @see org.mule.api.MuleMessage
- * @see org.mule.DefaultMuleMessage
+ * @see org.mule.runtime.core.api.MuleMessage
+ * @see org.mule.runtime.core.DefaultMuleMessage
  */
 
 public abstract class AbstractMessageTransformer extends AbstractTransformer implements MessageTransformer

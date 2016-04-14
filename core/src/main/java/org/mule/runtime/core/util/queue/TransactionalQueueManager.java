@@ -5,17 +5,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.queue;
+package org.mule.runtime.core.util.queue;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.util.journal.queue.LocalTxQueueTransactionJournal;
-import org.mule.util.journal.queue.LocalTxQueueTransactionRecoverer;
-import org.mule.util.journal.queue.XaTxQueueTransactionJournal;
-import org.mule.util.xa.XaTransactionRecoverer;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionJournal;
+import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionRecoverer;
+import org.mule.runtime.core.util.journal.queue.XaTxQueueTransactionJournal;
+import org.mule.runtime.core.util.xa.XaTransactionRecoverer;
 
 import java.io.File;
 import java.util.HashMap;

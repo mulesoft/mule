@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.context.notification;
+package org.mule.runtime.core.context.notification;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mule.context.notification.ExceptionStrategyNotification.PROCESS_END;
-import static org.mule.context.notification.ExceptionStrategyNotification.PROCESS_START;
+import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
+import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
 
-import org.mule.component.ComponentException;
+import org.mule.runtime.core.component.ComponentException;
 
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;

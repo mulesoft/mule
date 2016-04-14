@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.retry;
+package org.mule.runtime.core.api.retry;
 
 /**
  * This is the main Retry SPI.  The code inside the {@link #doWork} method is what will actually get <u>retried</u> 
@@ -18,7 +18,7 @@ public interface RetryCallback
     public String getWorkDescription();
 
     /**
-     * @return the object for which the retry of the work is being done. Ideally, it should return a {@link org.mule.api.transport.Connector}.
+     * @return the object for which the retry of the work is being done. Ideally, it should return a {@link org.mule.runtime.core.api.transport.Connector}.
      */
     public Object getWorkOwner();
 }

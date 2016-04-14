@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.support;
+package org.mule.runtime.core.management.support;
 
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.management.AbstractMuleJmxTestCase;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.management.AbstractMuleJmxTestCase;
 import org.mule.module.management.mbean.StatisticsService;
 import org.mule.module.management.support.JmxModernSupport;
 

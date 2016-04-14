@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.stats;
+package org.mule.runtime.core.management.stats;
 
-import org.mule.api.processor.ProcessingStrategy;
-import org.mule.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 
 import java.util.concurrent.atomic.AtomicLong;
 

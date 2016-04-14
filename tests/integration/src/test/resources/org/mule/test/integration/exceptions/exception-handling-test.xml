@@ -9,8 +9,8 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <spring:bean id="objectStore" class="org.mule.util.store.PartitionedPersistentObjectStore" />
-    <spring:bean id="objectStore2" class="org.mule.util.store.PartitionedPersistentObjectStore" />
+    <spring:bean id="objectStore" class="org.mule.runtime.core.util.store.PartitionedPersistentObjectStore" />
+    <spring:bean id="objectStore2" class="org.mule.runtime.core.util.store.PartitionedPersistentObjectStore" />
 
     <flow name="customProcessorInFlow">
         <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />

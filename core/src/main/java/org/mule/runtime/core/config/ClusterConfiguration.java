@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config;
+package org.mule.runtime.core.config;
 
 /**
  * Provides the cluster configuration attributes

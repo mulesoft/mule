@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.exception;
+package org.mule.runtime.core.api.exception;
 
 /**
  * This is used to provide a rollback method in order to achieve atomic message delivery without relying on JTA transactions, 

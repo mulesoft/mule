@@ -6,9 +6,9 @@
  */
 package org.mule.module.cxf.component;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.component.AbstractComponent;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.component.AbstractComponent;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

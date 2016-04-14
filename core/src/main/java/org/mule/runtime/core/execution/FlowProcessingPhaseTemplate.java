@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.execution;
+package org.mule.runtime.core.execution;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.source.MessageSource;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.source.MessageSource;
 
 /**
  * Template methods for {@link MessageSource} specific behavior during
@@ -19,7 +19,7 @@ public interface FlowProcessingPhaseTemplate extends MessageProcessTemplate
 {
 
     /**
-     * @return a {@link org.mule.api.MuleEvent} created from the original message
+     * @return a {@link org.mule.runtime.core.api.MuleEvent} created from the original message
      */
     MuleEvent getMuleEvent() throws MuleException;
 

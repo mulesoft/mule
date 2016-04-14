@@ -5,19 +5,19 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api;
+package org.mule.runtime.core.api;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.abbreviate;
-import static org.mule.util.ClassUtils.isConsumable;
-import org.mule.VoidMuleEvent;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.Message;
-import org.mule.routing.filters.RegExFilter;
-import org.mule.routing.filters.WildcardFilter;
-import org.mule.transformer.types.DataTypeFactory;
+import static org.mule.runtime.core.util.ClassUtils.isConsumable;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.routing.filters.RegExFilter;
+import org.mule.runtime.core.routing.filters.WildcardFilter;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.message.NullPayload;
 
 import java.io.IOException;

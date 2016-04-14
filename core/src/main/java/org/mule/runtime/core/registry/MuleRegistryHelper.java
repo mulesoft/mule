@@ -4,33 +4,33 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.registry;
+package org.mule.runtime.core.registry;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.NameableObject;
-import org.mule.api.agent.Agent;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.api.metadata.DataType;
-import org.mule.api.registry.LifecycleRegistry;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.registry.Registry;
-import org.mule.api.registry.RegistryProvider;
-import org.mule.api.registry.ResolverException;
-import org.mule.api.registry.TransformerResolver;
-import org.mule.api.schedule.Scheduler;
-import org.mule.api.transformer.Converter;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.Predicate;
-import org.mule.util.StringUtils;
-import org.mule.util.UUID;
+import org.mule.runtime.core.api.registry.LifecycleRegistry;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.api.registry.RegistryProvider;
+import org.mule.runtime.core.api.registry.ResolverException;
+import org.mule.runtime.core.api.registry.TransformerResolver;
+import org.mule.runtime.core.api.schedule.Scheduler;
+import org.mule.runtime.core.api.transformer.Converter;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.Predicate;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.UUID;
 
 import com.google.common.collect.ImmutableList;
 
@@ -576,8 +576,8 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     }
 
     /**
-     * Returns the name for the object passed in.  If the object implements {@link org.mule.api.NameableObject}, then
-     * {@link org.mule.api.NameableObject#getName()} will be returned, otherwise a name is generated using the class name
+     * Returns the name for the object passed in.  If the object implements {@link org.mule.runtime.core.api.NameableObject}, then
+     * {@link org.mule.runtime.core.api.NameableObject#getName()} will be returned, otherwise a name is generated using the class name
      * and a generated UUID.
      *
      * @param obj the object to inspect

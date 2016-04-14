@@ -4,34 +4,34 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.builders;
+package org.mule.runtime.core.config.builders;
 
-import org.mule.DefaultMuleContext;
-import org.mule.DynamicDataTypeConversionResolver;
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.internal.metadata.MuleMetadataManager;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.store.ObjectStore;
-import org.mule.config.ChainedThreadingProfile;
-import org.mule.config.bootstrap.SimpleRegistryBootstrap;
-import org.mule.connector.MuleConnectorOperationLocator;
-import org.mule.el.mvel.MVELExpressionLanguageWrapper;
-import org.mule.execution.MuleMessageProcessingManager;
-import org.mule.internal.connection.DefaultConnectionManager;
-import org.mule.management.stats.DefaultProcessingTimeWatcher;
-import org.mule.retry.policies.NoRetryPolicyTemplate;
-import org.mule.security.MuleSecurityManager;
-import org.mule.time.TimeSupplier;
-import org.mule.util.DefaultStreamCloserService;
-import org.mule.util.lock.MuleLockFactory;
-import org.mule.util.lock.SingleServerLockProvider;
-import org.mule.util.queue.DelegateQueueManager;
-import org.mule.util.queue.QueueManager;
-import org.mule.util.store.DefaultObjectStoreFactoryBean;
-import org.mule.util.store.MuleObjectStoreManager;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.DynamicDataTypeConversionResolver;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.config.ChainedThreadingProfile;
+import org.mule.runtime.core.config.bootstrap.SimpleRegistryBootstrap;
+import org.mule.runtime.core.connector.MuleConnectorOperationLocator;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguageWrapper;
+import org.mule.runtime.core.execution.MuleMessageProcessingManager;
+import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
+import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
+import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
+import org.mule.runtime.core.security.MuleSecurityManager;
+import org.mule.runtime.core.time.TimeSupplier;
+import org.mule.runtime.core.util.DefaultStreamCloserService;
+import org.mule.runtime.core.util.lock.MuleLockFactory;
+import org.mule.runtime.core.util.lock.SingleServerLockProvider;
+import org.mule.runtime.core.util.queue.DelegateQueueManager;
+import org.mule.runtime.core.util.queue.QueueManager;
+import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
+import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 
 /**
  * Configures defaults required by Mule. This configuration builder is used to

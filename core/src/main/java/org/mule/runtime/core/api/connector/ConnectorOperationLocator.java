@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.connector;
+package org.mule.runtime.core.api.connector;
 
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleException;
-import org.mule.api.client.OperationOptions;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.client.OperationOptions;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 
 /**
  * Locator for a MessageProcessor which is an operation from a Mule connector
