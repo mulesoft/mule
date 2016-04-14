@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.vegan;
 import static org.mule.runtime.module.extension.vegan.VeganExtension.APPLE;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 
@@ -18,5 +19,13 @@ import org.mule.runtime.extension.api.annotation.connector.Providers;
 @Providers(VeganAppleConnectionProvider.class)
 public class AppleConfig
 {
+
+    @Parameter
+    private VeganCookBook cookBook;
+
+    public VeganCookBook getCookBook()
+    {
+        return cookBook;
+    }
 
 }

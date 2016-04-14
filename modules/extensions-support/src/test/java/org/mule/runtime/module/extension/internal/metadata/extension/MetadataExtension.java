@@ -12,18 +12,16 @@ import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
-import org.mule.module.extension.internal.metadata.extension.MetadataInheritedExtensionResolversOperations;
-import org.mule.module.extension.internal.metadata.extension.MetadataInheritedOperationResolversOperations;
 import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 
 @Extension(name = "Metadata")
 @Operations({MetadataOperations.class, MetadataFailureOperations.class, MetadataInheritedExtensionResolversOperations.class, MetadataInheritedOperationResolversOperations.class})
 @Providers(MetadataConnectionProvider.class)
 @Sources(MetadataSource.class)
-@Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/metadata", namespace = "metadata", schemaVersion = "3.7")
 @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
         contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
         outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
+@Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/metadata", namespace = "metadata")
 public class MetadataExtension
 {
 

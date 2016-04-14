@@ -50,7 +50,7 @@ final class ConfigurationSchemaDelegate
         this.schema = schema;
 
         ExtensionType config = registerExtension(configurationModel.getName());
-        config.getAttributeOrAttributeGroup().add(builder.createNameAttribute());
+        config.getAttributeOrAttributeGroup().add(builder.createNameAttribute(true));
 
         final ExplicitGroup choice = new ExplicitGroup();
         choice.setMinOccurs(ZERO);

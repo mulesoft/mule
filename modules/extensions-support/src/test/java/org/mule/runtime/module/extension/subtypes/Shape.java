@@ -4,10 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.connector.subtypes;
+package org.mule.runtime.module.extension.subtypes;
 
-public interface Door
+public abstract class Shape
 {
 
-    void open();
+    private Integer area;
+
+    public Integer getArea()
+    {
+        return area;
+    }
+
+    public void setArea(Integer area)
+    {
+        this.area = area;
+    }
 }

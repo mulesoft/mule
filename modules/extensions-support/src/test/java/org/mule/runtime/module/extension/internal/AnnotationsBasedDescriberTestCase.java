@@ -597,7 +597,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     }
 
     @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
-    @Xml(schemaVersion = SCHEMA_VERSION)
     @Configurations(HeisenbergExtension.class)
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
     @Providers(HeisenbergConnectionProvider.class)
@@ -608,7 +607,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     }
 
     @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
-    @Xml(schemaVersion = SCHEMA_VERSION)
     @Configurations({HeisenbergExtension.class, NamedHeisenbergAlternateConfig.class})
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
     public static class HeisenbergPointerPlusExternalConfig

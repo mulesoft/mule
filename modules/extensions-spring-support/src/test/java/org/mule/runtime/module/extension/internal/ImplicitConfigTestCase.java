@@ -64,7 +64,7 @@ public class ImplicitConfigTestCase extends ExtensionFunctionalTestCase
 
     @Extension(name = "implicit")
     @Operations({ImplicitOperations.class})
-    @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/implicit", namespace = "implicit", schemaVersion = "1.0")
+    @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/implicit", namespace = "implicit")
     public static class ImplicitConfigExtension implements Initialisable, Startable, MuleContextAware
     {
 

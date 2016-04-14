@@ -31,11 +31,12 @@ import org.mule.runtime.module.extension.internal.runtime.connector.basic.ListCo
 import org.mule.runtime.module.extension.internal.runtime.connector.basic.MapConnector;
 import org.mule.runtime.module.extension.internal.runtime.connector.basic.StringListConnector;
 import org.mule.runtime.module.extension.internal.runtime.connector.basic.TestConnector;
-import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.SubTypesMappingConnector;
+import org.mule.runtime.module.extension.subtypes.SubTypesMappingConnector;
 import org.mule.runtime.module.extension.vegan.VeganExtension;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;

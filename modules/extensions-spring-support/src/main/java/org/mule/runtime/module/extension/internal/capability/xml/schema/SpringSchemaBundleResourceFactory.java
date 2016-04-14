@@ -36,7 +36,7 @@ public class SpringSchemaBundleResourceFactory extends AbstractXmlResourceFactor
 
     private String getSpringSchemaBundle(XmlModelProperty xmlProperty, String version)
     {
-        String filename = getXsdFileName(xmlProperty);
-        return escape(String.format(BUNDLE_MASK, xmlProperty.getSchemaLocation(), version, filename, filename));
+        String filename = xmlProperty.getXsdFileName();
+        return escape(String.format(BUNDLE_MASK, xmlProperty.getNamespaceUri(), version, filename, filename));
     }
 }

@@ -4,25 +4,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.connector.subtypes;
+package org.mule.runtime.module.extension.subtypes;
 
-public class HouseDoor implements Door
+public class CarDoor implements Door
 {
 
-    private boolean isLocked;
+    private String color;
 
     @Override
     public void open()
     {
     }
 
-    public boolean isLocked()
+    public void raiseWindow()
     {
-        return isLocked;
     }
 
-    public void setLocked(boolean locked)
+    public String getColor()
     {
-        isLocked = locked;
+        return color;
+    }
+
+    public void setColor(String color)
+    {
+        this.color = color;
     }
 }
