@@ -643,10 +643,10 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         return fields;
     }
 
-    private List<FieldDebugInfo> getQueryParamsDebugInfo(MuleEvent event)
+    private List<FieldDebugInfo<?>> getQueryParamsDebugInfo(MuleEvent event)
     {
         final ParameterMap queryParams = requestBuilder.getQueryParams(event);
-        List<FieldDebugInfo> params = new ArrayList<>();
+        List<FieldDebugInfo<?>> params = new ArrayList<>();
         for (String paramName : queryParams.keySet())
         {
             final List<String> values = queryParams.getAll(paramName);
@@ -673,7 +673,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
 
             if (httpRequestAuthentication != null)
             {
-                final List<FieldDebugInfo> authenticationFields = new ArrayList<>();
+                final List<FieldDebugInfo<?>> authenticationFields = new ArrayList<>();
                 authenticationFields.add(createFieldDebugInfo(USERNAME_DEBUG, String.class, httpRequestAuthentication.getUsername()));
                 authenticationFields.add(createFieldDebugInfo(DOMAIN_DEBUG, String.class, httpRequestAuthentication.getDomain()));
                 authenticationFields.add(createFieldDebugInfo(PASSWORD_DEBUG, String.class, httpRequestAuthentication.getPassword()));

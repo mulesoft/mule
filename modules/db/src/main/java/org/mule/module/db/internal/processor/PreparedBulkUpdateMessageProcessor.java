@@ -107,11 +107,11 @@ public class PreparedBulkUpdateMessageProcessor extends AbstractBulkUpdateMessag
 
         final List<List<QueryParamValue>> paramSets = resolveParamSets(muleEvent, resolvedQuery);
 
-        List<FieldDebugInfo> paramSetInfos = new LinkedList<>();
+        List<FieldDebugInfo<?>> paramSetInfos = new LinkedList<>();
         int setIndex = 1;
         for (List<QueryParamValue> paramSet : paramSets)
         {
-            final List<FieldDebugInfo> paramFields = new ArrayList<>();
+            final List<FieldDebugInfo<?>> paramFields = new ArrayList<>();
             int paramIndex = 1;
             for (QueryParamValue paramValue : paramSet)
             {

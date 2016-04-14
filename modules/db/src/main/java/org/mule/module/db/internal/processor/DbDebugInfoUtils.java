@@ -42,7 +42,7 @@ public class DbDebugInfoUtils
      */
     public static FieldDebugInfo createQueryFieldDebugInfo(String name, QueryTemplate queryTemplate)
     {
-        final List<FieldDebugInfo> query = new ArrayList<>();
+        final List<FieldDebugInfo<?>> query = new ArrayList<>();
         query.add(createFieldDebugInfo(SQL_TEXT_DEBUG_FIELD, String.class, queryTemplate.getSqlText()));
         query.add(createFieldDebugInfo(TYPE_DEBUG_FIELD, String.class, queryTemplate.getType().toString()));
 
