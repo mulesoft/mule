@@ -27,7 +27,7 @@ public class ObjectDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo<?>>
     private final String type;
     private final List<Matcher<FieldDebugInfo<?>>> fieldMatchers;
 
-    public ObjectDebugInfoMatcher(String name, Class type, List<Matcher<FieldDebugInfo<?>>> fieldMatchers)
+    public ObjectDebugInfoMatcher(String name, Class<?> type, List<Matcher<FieldDebugInfo<?>>> fieldMatchers)
     {
         this.name = name;
         this.type = type.getName();
@@ -97,7 +97,7 @@ public class ObjectDebugInfoMatcher extends TypeSafeMatcher<FieldDebugInfo<?>>
     }
 
     @Factory
-    public static Matcher<FieldDebugInfo<?>> objectLike(String name, Class type, List<Matcher<FieldDebugInfo<?>>> fieldMatchers)
+    public static Matcher<FieldDebugInfo<?>> objectLike(String name, Class<?> type, List<Matcher<FieldDebugInfo<?>>> fieldMatchers)
     {
         return new ObjectDebugInfoMatcher(name, type, fieldMatchers);
     }
