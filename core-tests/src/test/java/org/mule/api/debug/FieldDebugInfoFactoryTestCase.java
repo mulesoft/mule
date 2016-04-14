@@ -157,7 +157,7 @@ public class FieldDebugInfoFactoryTestCase extends AbstractMuleTestCase
     public void createsFieldWithObjectDebugInfo() throws Exception
     {
         final SimpleFieldDebugInfo fieldDebugInfo = FieldDebugInfoFactory.createFieldDebugInfo(FIELD_NAME, String.class, STRING_VALUE);
-        final List<FieldDebugInfo> value = Collections.<FieldDebugInfo>singletonList(fieldDebugInfo);
+        final List<FieldDebugInfo<?>> value = Collections.<FieldDebugInfo<?>>singletonList(fieldDebugInfo);
 
         final FieldDebugInfo<?> debugInfo = FieldDebugInfoFactory.createFieldDebugInfo(FIELD_NAME, Map.class, value);
 
