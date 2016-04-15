@@ -19,8 +19,10 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.processor.chain.DefaultMessageProcessorChain;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.util.Preconditions;
@@ -326,7 +328,15 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     @Override
     public MessageProcessor getRoute()
     {
-        return this.routes.get(0);
+        MessageProcessor route = routes.get(0);
+        if (route instanceof MessageProcessorChain)
+        {
+            return route;
+        }
+        else
+        {
+            return DefaultMessageProcessorChain.from(route);
+        }
     }
 
     @Override

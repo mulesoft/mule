@@ -51,6 +51,9 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
         testFlowPaths("all2", "/0", "/0/0", "/0/0/0","/0/0/1", "/0/1", "/0/1/0","/0/1/1", "/1");
         testFlowPaths("choice2", "/0", "/0/0", "/0/0/0","/0/0/1", "/0/1", "/0/1/0", "/0/2", "/0/2/0","/0/2/1");
         testFlowPaths("all", "/0", "/0/0", "/0/0/0", "/0/1", "/0/1/0", "/1");
+        testFlowPaths("scatterGather", "/0", "/0/0", "/0/0/0", "/0/1", "/0/1/0", "/0/1/1");
+        testFlowPaths("scatterGather", "/0", "/0/0", "/0/0/0", "/0/1", "/0/1/0", "/0/1/1");
+        testFlowPaths("until-successful", "/0", "/0/0", "/1");
     }
 
     @Test
