@@ -6,7 +6,7 @@
  */
 package org.mule.module.cxf.builder;
 
-import org.mule.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.support.CopyAttachmentInInterceptor;
@@ -18,7 +18,7 @@ import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.module.cxf.support.StreamClosingInterceptor;
 import org.mule.module.cxf.transport.MuleUniversalConduit;
-import org.mule.transformer.types.MimeTypes;
+import org.mule.runtime.core.transformer.types.MimeTypes;
 
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;

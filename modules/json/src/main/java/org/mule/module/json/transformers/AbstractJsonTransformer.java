@@ -6,9 +6,9 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import org.codehaus.jackson.map.ObjectMapper;
 

@@ -3,9 +3,9 @@
    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
    version="1.0"
    xmlns:java="http://xml.apache.org/xslt/java"
-   xmlns:mulemanifest="xalan://org.mule.config.MuleManifest"
-   xmlns:muleserver="xalan://org.mule.MuleServer"
-   xmlns:mulecontext="xalan://org.mule.api.MuleContext"
+   xmlns:mulemanifest="xalan://org.mule.runtime.core.config.MuleManifest"
+   xmlns:muleserver="xalan://org.mule.runtime.core.MuleServer"
+   xmlns:mulecontext="xalan://org.mule.runtime.core.api.MuleContext"
    xmlns:configuration="xalan://org.mule.config.MuleConfiguration"
    exclude-result-prefixes="java">
 

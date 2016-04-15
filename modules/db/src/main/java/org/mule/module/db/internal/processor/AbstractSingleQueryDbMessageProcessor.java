@@ -7,13 +7,13 @@
 
 package org.mule.module.db.internal.processor;
 
-import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
+import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.INPUT_PARAMS_DEBUG_FIELD;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.PARAM_DEBUG_FIELD_PREFIX;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.SQL_TEXT_DEBUG_FIELD;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.TYPE_DEBUG_FIELD;
-import org.mule.api.MuleEvent;
-import org.mule.api.debug.FieldDebugInfo;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.query.Query;
 import org.mule.module.db.internal.domain.query.QueryParamValue;

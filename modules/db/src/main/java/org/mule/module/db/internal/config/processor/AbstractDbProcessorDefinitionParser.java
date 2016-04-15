@@ -12,7 +12,7 @@ import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.module.db.internal.config.resolver.database.DefaultDbConfigResolverFactoryBean;
 import org.mule.module.db.internal.domain.statement.QueryStatementFactory;
 import org.mule.module.db.internal.resolver.database.ConfiguredDbConfigResolver;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

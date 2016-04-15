@@ -6,7 +6,7 @@
 
     <configuration>
         <expression-language autoResolveVariables="false">
-            <import class="org.mule.util.StringUtils" />
+            <import class="org.mule.runtime.core.util.StringUtils" />
             <global-functions>
                 def reversePayload() { StringUtils.reverse(payload) }
             </global-functions>

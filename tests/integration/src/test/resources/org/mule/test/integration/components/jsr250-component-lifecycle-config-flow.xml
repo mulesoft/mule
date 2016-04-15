@@ -8,7 +8,7 @@
 
     <flow name="MulePrototypeService">
         <component>
-            <prototype-object class="org.mule.lifecycle.JSR250LifecycleTrackerComponent">
+            <prototype-object class="org.mule.runtime.core.lifecycle.JSR250LifecycleTrackerComponent">
                 <property key="property" value="mps"/>
             </prototype-object>
         </component>
@@ -16,7 +16,7 @@
 
     <flow name="MulePooledPrototypeService">
         <pooled-component>
-            <prototype-object class="org.mule.lifecycle.JSR250LifecycleTrackerComponent">
+            <prototype-object class="org.mule.runtime.core.lifecycle.JSR250LifecycleTrackerComponent">
                 <property key="property" value="mpps"/>
             </prototype-object>
             <pooling-profile maxActive="3" initialisationPolicy="INITIALISE_ALL"/>
@@ -25,7 +25,7 @@
 
     <flow name="MulePooledSingletonService">
         <pooled-component>
-            <singleton-object class="org.mule.lifecycle.JSR250LifecycleTrackerComponent">
+            <singleton-object class="org.mule.runtime.core.lifecycle.JSR250LifecycleTrackerComponent">
                 <property key="property" value="mpps"/>
             </singleton-object>
             <pooling-profile maxActive="3" initialisationPolicy="INITIALISE_ALL"/>
@@ -34,7 +34,7 @@
 
     <flow name="MuleSingletonService">
         <component>
-            <singleton-object class="org.mule.lifecycle.JSR250LifecycleTrackerComponent">
+            <singleton-object class="org.mule.runtime.core.lifecycle.JSR250LifecycleTrackerComponent">
                 <property key="property" value="mss"/>
             </singleton-object>
         </component>

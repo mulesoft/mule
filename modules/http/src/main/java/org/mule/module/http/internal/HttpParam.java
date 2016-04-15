@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.internal;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 
 public abstract class HttpParam
 {

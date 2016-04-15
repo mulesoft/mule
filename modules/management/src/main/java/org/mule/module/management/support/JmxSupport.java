@@ -6,7 +6,7 @@
  */
 package org.mule.module.management.support;
 
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.MuleContext;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;

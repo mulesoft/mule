@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.config;
 
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.api.tls.TlsContextFactory;
 
 import org.springframework.beans.factory.config.BeanDefinition;

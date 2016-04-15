@@ -10,10 +10,10 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.component.ComponentException;
-import org.mule.exception.AbstractMessagingExceptionStrategy;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.component.ComponentException;
+import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 

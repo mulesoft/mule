@@ -38,7 +38,7 @@
     <flow name="secure">
         <http:listener path="/services/Echo" config-ref="listenerConfig" allowedMethods="POST" />
         <http:basic-security-filter realm="mule-realm"/>
-        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent"/>
+        <cxf:simple-service serviceClass="org.mule.runtime.core.component.simple.EchoComponent"/>
 
         <echo-component/>
     </flow>

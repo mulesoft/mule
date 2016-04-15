@@ -6,14 +6,14 @@
  */
 package org.mule.module.launcher.log4j2;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.MuleProperties;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.artifact.classloader.ShutdownListener;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
-import org.mule.util.ClassUtils;
-import org.mule.util.FileUtils;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 import java.io.Serializable;

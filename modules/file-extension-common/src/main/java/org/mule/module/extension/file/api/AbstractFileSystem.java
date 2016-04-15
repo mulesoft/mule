@@ -7,7 +7,7 @@
 package org.mule.module.extension.file.api;
 
 import static java.lang.String.format;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.module.extension.file.api.command.CopyCommand;
@@ -19,7 +19,7 @@ import org.mule.module.extension.file.api.command.ReadCommand;
 import org.mule.module.extension.file.api.command.RenameCommand;
 import org.mule.module.extension.file.api.command.WriteCommand;
 import org.mule.module.extension.file.api.lock.PathLock;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
 import java.nio.file.Path;

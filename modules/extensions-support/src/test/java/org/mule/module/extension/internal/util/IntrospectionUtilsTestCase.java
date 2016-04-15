@@ -32,7 +32,7 @@ import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBox;
 import org.mule.tck.testmodels.fruit.Kiwi;
-import org.mule.util.CollectionUtils;
+import org.mule.runtime.core.util.CollectionUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

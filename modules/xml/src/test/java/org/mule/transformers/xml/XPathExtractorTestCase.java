@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml;
+package org.mule.runtime.core.transformers.xml;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XPathExtractor;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.xpath.XPathReturnType;

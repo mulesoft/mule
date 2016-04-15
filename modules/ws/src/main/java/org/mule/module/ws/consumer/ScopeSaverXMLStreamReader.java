@@ -7,7 +7,7 @@
 package org.mule.module.ws.consumer;
 
 import org.mule.module.xml.stax.DelegateXMLStreamReader;
-import org.mule.util.Preconditions;
+import org.mule.runtime.core.util.Preconditions;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -11,7 +11,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.config.WsConfig;
 import org.mule.module.cxf.config.WsSecurity;

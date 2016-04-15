@@ -6,8 +6,8 @@
  */
 package org.mule.test.integration.message;
 
-import org.mule.api.MuleEvent;
-import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 public class RetrievePropertyTransformer extends AbstractMessageTransformer
 {

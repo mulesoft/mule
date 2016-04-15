@@ -11,7 +11,7 @@ import org.mule.config.spring.parsers.assembly.configuration.PropertyConfigurati
 import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.TempWrapperPropertyConfiguration;
 import org.mule.config.spring.util.SpringXMLUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

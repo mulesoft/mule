@@ -6,9 +6,9 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.routing.filter.Filter;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.module.json.validation.JsonSchemaValidator;
 
 import java.util.Map;

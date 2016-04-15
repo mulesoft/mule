@@ -9,7 +9,7 @@ package org.mule.module.artifact.classloader;
 
 import static org.mule.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import java.io.IOException;
 import java.io.InputStream;

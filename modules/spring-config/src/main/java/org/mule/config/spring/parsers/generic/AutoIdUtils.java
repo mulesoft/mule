@@ -7,7 +7,7 @@
 package org.mule.config.spring.parsers.generic;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Executes a DDL query on a database
  * <p/>
- * Both database and bulk query are resolved, if required, using the {@link org.mule.api.MuleEvent}
+ * Both database and bulk query are resolved, if required, using the {@link org.mule.runtime.core.api.MuleEvent}
  * being processed.
  */
 public class ExecuteDdlMessageProcessor extends AbstractSingleQueryDbMessageProcessor

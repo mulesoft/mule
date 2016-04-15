@@ -7,7 +7,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

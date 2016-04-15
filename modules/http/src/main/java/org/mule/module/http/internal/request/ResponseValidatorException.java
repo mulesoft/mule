@@ -6,9 +6,9 @@
  */
 package org.mule.module.http.internal.request;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 
 public class ResponseValidatorException extends MessagingException
 {

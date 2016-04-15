@@ -6,7 +6,7 @@
  */
 package org.mule.module.xml.util;
 
-import org.mule.api.util.StreamCloser;
+import org.mule.runtime.core.api.util.StreamCloser;
 import org.mule.module.xml.stax.StaxSource;
 
 import javax.xml.stream.XMLStreamReader;

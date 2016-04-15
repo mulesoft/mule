@@ -122,7 +122,7 @@
         </scatter-gather>
 
         <catch-exception-strategy>
-            <test:assert expression="#[exception is org.mule.routing.CompositeRoutingException]"/>
+            <test:assert expression="#[exception is org.mule.runtime.core.routing.CompositeRoutingException]"/>
             <test:assert expression="#[exception.getExceptionForRouteIndex(0) == null]"/>
             <test:assert expression="#[exception.getExceptionForRouteIndex(1) != null]"/>
             <test:assert expression="#[exception.getExceptionForRouteIndex(2) != null]"/>

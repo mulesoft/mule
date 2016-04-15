@@ -10,7 +10,7 @@ package org.mule.module.launcher.builder;
 import static com.google.common.base.Preconditions.checkArgument;
 import org.mule.tck.ZipUtils.ZipResource;
 import static org.mule.module.launcher.plugin.ApplicationPluginDescriptor.PLUGIN_PROPERTIES;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.util.LinkedList;

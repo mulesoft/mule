@@ -6,14 +6,14 @@
  */
 package org.mule.module.scripting.component;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.component.InterfaceBinding;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.component.AbstractComponent;
-import org.mule.component.BindingInvocationHandler;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.InterfaceBinding;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.component.AbstractComponent;
+import org.mule.runtime.core.component.BindingInvocationHandler;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;

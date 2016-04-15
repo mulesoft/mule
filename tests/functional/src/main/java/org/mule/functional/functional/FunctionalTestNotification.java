@@ -6,10 +6,10 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleEventContext;
-import org.mule.api.transformer.TransformerException;
-import org.mule.context.notification.CustomNotification;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.context.notification.CustomNotification;
 
 /**
  * A <code>FunctionlTestNotification</code> is fired by the {@link FunctionalTestComponent}
@@ -29,7 +29,7 @@ import org.mule.context.notification.CustomNotification;
  *
  * @see FunctionalTestComponent
  * @see FunctionalTestNotificationListener
- * @see org.mule.api.MuleContext
+ * @see org.mule.runtime.core.api.MuleContext
  */
 public class FunctionalTestNotification extends CustomNotification
 {

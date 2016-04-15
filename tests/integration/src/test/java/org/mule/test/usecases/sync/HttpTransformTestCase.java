@@ -12,14 +12,14 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transformer.compression.GZipUncompressTransformer;
-import org.mule.transformer.simple.ByteArrayToSerializable;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.compression.GZipUncompressTransformer;
+import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;

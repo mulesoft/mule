@@ -9,7 +9,7 @@ package org.mule.config.spring.parsers.specific.endpoint.support;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PostProcessor;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.w3c.dom.Element;
 import org.apache.commons.logging.Log;

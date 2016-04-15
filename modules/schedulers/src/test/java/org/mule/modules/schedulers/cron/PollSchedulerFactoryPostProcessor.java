@@ -6,10 +6,10 @@
  */
 package org.mule.modules.schedulers.cron;
 
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.schedule.Scheduler;
-import org.mule.api.schedule.SchedulerFactoryPostProcessor;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.schedule.Scheduler;
+import org.mule.runtime.core.api.schedule.SchedulerFactoryPostProcessor;
 
 public class PollSchedulerFactoryPostProcessor implements SchedulerFactoryPostProcessor
 {

@@ -6,13 +6,13 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor;
 import org.mule.module.xml.filters.SchemaValidationFilter;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.StringWriter;
 import java.io.Writer;

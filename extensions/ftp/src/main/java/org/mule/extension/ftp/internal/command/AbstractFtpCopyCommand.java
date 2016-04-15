@@ -7,7 +7,7 @@
 package org.mule.extension.ftp.internal.command;
 
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileSystem;
 import org.mule.module.extension.file.api.FileAttributes;

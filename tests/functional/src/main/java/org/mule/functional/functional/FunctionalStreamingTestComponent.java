@@ -6,11 +6,11 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringMessageUtils;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

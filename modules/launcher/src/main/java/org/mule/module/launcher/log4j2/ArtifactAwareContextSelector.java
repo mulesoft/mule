@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher.log4j2;
 
-import org.mule.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.artifact.classloader.ShutdownListener;
 

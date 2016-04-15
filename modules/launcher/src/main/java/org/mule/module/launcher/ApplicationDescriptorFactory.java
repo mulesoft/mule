@@ -8,7 +8,7 @@ package org.mule.module.launcher;
 
 import static java.lang.String.format;
 import static org.mule.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
@@ -17,9 +17,9 @@ import org.mule.module.launcher.descriptor.PropertiesDescriptorParser;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptor;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
-import org.mule.util.FileUtils;
-import org.mule.util.PropertiesUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.PropertiesUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;

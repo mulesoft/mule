@@ -6,12 +6,12 @@
  */
 package org.mule.module.management.mbean;
 
-import org.mule.api.MuleContext;
-import org.mule.management.stats.AllStatistics;
-import org.mule.management.stats.FlowConstructStatistics;
-import org.mule.management.stats.printers.CSVPrinter;
-import org.mule.management.stats.printers.HtmlTablePrinter;
-import org.mule.management.stats.printers.XMLPrinter;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.management.stats.AllStatistics;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.management.stats.printers.CSVPrinter;
+import org.mule.runtime.core.management.stats.printers.HtmlTablePrinter;
+import org.mule.runtime.core.management.stats.printers.XMLPrinter;
 
 import java.io.StringWriter;
 import java.util.Collection;

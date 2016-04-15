@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.runtime.source;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.extension.api.runtime.source.SourceFactory;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 public final class DefaultSourceFactory implements SourceFactory
 {

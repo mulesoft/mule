@@ -6,17 +6,17 @@
  */
 package org.mule.functional.config;
 
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.component.DefaultJavaComponent;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
-import org.mule.object.AbstractObjectFactory;
-import org.mule.object.SingletonObjectFactory;
+import org.mule.runtime.core.object.AbstractObjectFactory;
+import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.util.ClassUtils;
-import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
 import java.util.HashMap;

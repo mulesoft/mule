@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.resources;
 
-import org.mule.api.registry.ServiceRegistry;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.resources.GeneratedResource;
 import org.mule.extension.api.resources.ResourcesGenerator;

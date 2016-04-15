@@ -6,8 +6,8 @@
  */
 package org.mule.module.xml.functional;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

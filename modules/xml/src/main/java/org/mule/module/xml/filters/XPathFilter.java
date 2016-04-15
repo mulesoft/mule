@@ -6,23 +6,23 @@
  */
 package org.mule.module.xml.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-import org.mule.RequestContext;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.routing.filter.Filter;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
+import static org.mule.runtime.core.util.ClassUtils.equal;
+import static org.mule.runtime.core.util.ClassUtils.hash;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.xpath.SaxonXpathEvaluator;
 import org.mule.module.xml.xpath.XPathEvaluator;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.text.MessageFormat;
 import java.util.Map;

@@ -8,7 +8,7 @@
 package org.mule.module.db.integration.select;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Ignore;

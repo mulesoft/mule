@@ -6,11 +6,11 @@
  */
 package org.mule.module.extension.file.api;
 
-import org.mule.DefaultMuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.api.message.NullPayload;
-import org.mule.util.collection.ImmutableListCollector;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import java.io.InputStream;
 import java.io.Serializable;

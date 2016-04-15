@@ -6,10 +6,10 @@
  */
 package org.mule.module.extension.internal.introspection.describer;
 
-import org.mule.config.MuleManifest;
+import org.mule.runtime.core.config.MuleManifest;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.module.extension.internal.introspection.VersionResolver;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of {@link VersionResolver} that infers an extension's version based on the MANIFEST.MF file contained
  * on it's JAR. If that attempt fails, it fallbacks to searching for the file under target/test-classes. If the file can
- * not be found, it uses the version from {@link org.mule.config.MuleManifest}.
+ * not be found, it uses the version from {@link org.mule.runtime.core.config.MuleManifest}.
  *
  * @since 4.0
  */

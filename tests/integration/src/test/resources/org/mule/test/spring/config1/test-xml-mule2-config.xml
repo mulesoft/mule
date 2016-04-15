@@ -58,7 +58,7 @@
     <interceptor-stack name="testInterceptorStack">
         <logging-interceptor/>
         <timer-interceptor/>
-        <custom-interceptor class="org.mule.interceptor.LoggingInterceptor"/>
+        <custom-interceptor class="org.mule.runtime.core.interceptor.LoggingInterceptor"/>
     </interceptor-stack>
 
     <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">

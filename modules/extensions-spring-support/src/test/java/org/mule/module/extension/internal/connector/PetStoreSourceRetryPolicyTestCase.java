@@ -9,10 +9,10 @@ package org.mule.module.extension.internal.connector;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
-import org.mule.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.api.connection.ConnectionException;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.Parameter;

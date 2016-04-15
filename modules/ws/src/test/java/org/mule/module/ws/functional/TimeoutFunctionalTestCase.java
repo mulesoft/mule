@@ -9,13 +9,13 @@ package org.mule.module.ws.functional;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import org.junit.Rule;
 import org.junit.Test;

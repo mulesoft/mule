@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher;
 
-import org.mule.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.Message;
 
 /**
  *

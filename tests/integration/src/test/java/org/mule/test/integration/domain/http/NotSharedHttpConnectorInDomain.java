@@ -9,8 +9,8 @@ package org.mule.test.integration.domain.http;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 

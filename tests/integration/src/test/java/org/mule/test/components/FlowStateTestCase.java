@@ -9,11 +9,11 @@ package org.mule.test.components;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.source.MessageSource;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

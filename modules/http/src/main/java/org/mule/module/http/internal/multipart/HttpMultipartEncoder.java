@@ -10,7 +10,7 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -15,15 +15,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.registry.ResolverException;
-import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.registry.ResolverException;
+import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -116,7 +116,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
         catch (Exception e)
         {
             assertThat(ExceptionHelper.getExceptionStack(e), StringByLineMatcher.matchesLineByLine(
-                    "foo (org.mule.api.DefaultMuleException)",
+                    "foo (org.mule.runtime.core.api.DefaultMuleException)",
                     "  org.mule.test.config.ExceptionHelperTestCase$1$1.execute:",
                     "  org.apache.commons.collections.CollectionUtils.forAllDo:",
                     "  org.mule.test.config.ExceptionHelperTestCase$1.execute:",
@@ -151,7 +151,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
     	catch (Exception e)
     	{
     		assertThat(ExceptionHelper.getExceptionStack(e), StringByLineMatcher.matchesLineByLine(
-    				"foo (org.mule.api.DefaultMuleException)",
+    				"foo (org.mule.runtime.core.api.DefaultMuleException)",
     				"  org.mule.test.config.ExceptionHelperTestCase$2$1.compareTo:",
     				"  org.apache.commons.collections.comparators.ComparableComparator.compare:",
     				"  java.util", // Collections.sort
@@ -184,7 +184,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
         catch (Exception e)
         {
             assertThat(ExceptionHelper.getExceptionStack(e), StringByLineMatcher.matchesLineByLine(
-                    "foo (org.mule.api.DefaultMuleException)",
+                    "foo (org.mule.runtime.core.api.DefaultMuleException)",
                     "  org.mule.test.config.ExceptionHelperTestCase$3.execute:",
                     "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries:",
                     "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries:",

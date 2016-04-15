@@ -6,8 +6,8 @@
  */
 package org.mule.module.pgp;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.security.Authentication;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.security.Authentication;
 
 import java.util.Map;
 

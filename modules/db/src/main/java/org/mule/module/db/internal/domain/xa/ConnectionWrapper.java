@@ -8,12 +8,12 @@
 package org.mule.module.db.internal.domain.xa;
 
 
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transaction.IllegalTransactionStateException;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.XaTransaction;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transaction.IllegalTransactionStateException;
+import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.transaction.XaTransaction;
 
 import java.lang.reflect.Proxy;
 import java.sql.Array;

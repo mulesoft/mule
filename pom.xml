@@ -1837,11 +1837,11 @@
                                     </group>
                                     <group>
                                         <title>Modules (not part of the Mule core)</title>
-                                        <packages>org.mule.module.*:org.mule.components.*</packages>
+                                        <packages>org.mule.module.*:org.mule.runtime.core.components.*</packages>
                                     </group>
                                     <group>
                                         <title>Transports</title>
-                                        <packages>org.mule.transport.*</packages>
+                                        <packages>org.mule.runtime.core.transport.*</packages>
                                     </group>
                                     <group>
                                         <title>Testing Framework</title>

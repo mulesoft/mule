@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.runtime;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.lang.reflect.Field;

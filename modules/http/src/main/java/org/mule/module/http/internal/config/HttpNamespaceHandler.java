@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.internal.config;
 
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.delegate.RootOrNestedElementBeanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;

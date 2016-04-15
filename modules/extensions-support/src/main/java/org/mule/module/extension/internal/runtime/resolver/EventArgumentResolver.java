@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.runtime.resolver;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 

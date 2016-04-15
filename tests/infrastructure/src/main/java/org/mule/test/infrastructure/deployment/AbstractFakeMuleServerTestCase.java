@@ -6,7 +6,7 @@
  */
 package org.mule.test.infrastructure.deployment;
 
-import org.mule.MuleCoreExtension;
+import org.mule.runtime.core.MuleCoreExtension;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.LinkedList;

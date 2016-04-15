@@ -12,8 +12,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import org.mule.api.MuleEvent;
-import org.mule.util.NetworkUtils;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.NetworkUtils;
 
 import com.ning.http.client.ntlm.NTLMEngine;
 

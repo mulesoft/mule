@@ -7,8 +7,8 @@
 package org.mule.module.launcher.descriptor;
 
 import static org.mule.module.reboot.MuleContainerBootstrapUtils.getMuleAppDir;
-import org.mule.util.PropertiesUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.PropertiesUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;

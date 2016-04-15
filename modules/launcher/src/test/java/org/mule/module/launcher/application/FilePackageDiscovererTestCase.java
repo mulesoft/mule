@@ -13,7 +13,7 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import org.mule.tck.ZipUtils;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.FileUtils;
+import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 import java.util.Set;

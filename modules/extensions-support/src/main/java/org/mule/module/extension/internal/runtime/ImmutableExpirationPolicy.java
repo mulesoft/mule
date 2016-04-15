@@ -7,7 +7,7 @@
 package org.mule.module.extension.internal.runtime;
 
 import org.mule.extension.api.runtime.ExpirationPolicy;
-import org.mule.time.TimeSupplier;
+import org.mule.runtime.core.time.TimeSupplier;
 
 import java.util.concurrent.TimeUnit;
 

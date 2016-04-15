@@ -6,9 +6,9 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.model.EntryPointResolver;
-import org.mule.api.model.EntryPointResolverSet;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.model.EntryPointResolver;
+import org.mule.runtime.core.api.model.EntryPointResolverSet;
 
 /**
  * <code>TestEntryPointResolver</code> is a test EntryPointResolver that doesn't provide

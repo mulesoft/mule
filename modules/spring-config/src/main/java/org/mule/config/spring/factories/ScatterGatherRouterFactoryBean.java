@@ -7,11 +7,11 @@
 
 package org.mule.config.spring.factories;
 
-import org.mule.AbstractAnnotatedObject;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.routing.AggregationStrategy;
-import org.mule.routing.ScatterGatherRouter;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.routing.AggregationStrategy;
+import org.mule.runtime.core.routing.ScatterGatherRouter;
 
 import java.util.List;
 

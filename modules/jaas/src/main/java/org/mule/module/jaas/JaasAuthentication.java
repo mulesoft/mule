@@ -6,9 +6,9 @@
  */
 package org.mule.module.jaas;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.Credentials;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.Credentials;
 
 import java.util.Map;
 

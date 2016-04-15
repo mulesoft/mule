@@ -6,12 +6,12 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

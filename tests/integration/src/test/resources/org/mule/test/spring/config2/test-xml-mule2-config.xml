@@ -66,7 +66,7 @@
         <mule:interceptor-stack name="testInterceptorStack">
             <mule:logging-interceptor/>
             <mule:timer-interceptor/>
-            <mule:custom-interceptor class="org.mule.interceptor.LoggingInterceptor"/>
+            <mule:custom-interceptor class="org.mule.runtime.core.interceptor.LoggingInterceptor"/>
         </mule:interceptor-stack>
 
         <mule:flow name="orangeComponent">

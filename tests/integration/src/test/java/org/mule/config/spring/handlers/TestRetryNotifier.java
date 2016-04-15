@@ -6,8 +6,8 @@
  */
 package org.mule.config.spring.handlers;
 
-import org.mule.api.retry.RetryContext;
-import org.mule.api.retry.RetryNotifier;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.RetryNotifier;
 
 public class TestRetryNotifier implements RetryNotifier
 {

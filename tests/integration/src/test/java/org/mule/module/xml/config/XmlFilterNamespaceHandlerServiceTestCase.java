@@ -7,12 +7,12 @@
 package org.mule.module.xml.config;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.xml.filters.IsXmlFilter;
-import org.mule.routing.MessageFilter;
-import org.mule.routing.filters.logic.NotFilter;
+import org.mule.runtime.core.routing.MessageFilter;
+import org.mule.runtime.core.routing.filters.logic.NotFilter;
 
 import java.util.List;
 

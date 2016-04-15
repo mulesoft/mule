@@ -14,11 +14,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.WorkManagerSource;
-import org.mule.construct.Flow;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.execution.MessageProcessingManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.WorkManagerSource;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.module.http.api.listener.HttpListener;
 import org.mule.module.http.api.listener.HttpListenerBuilder;
 import org.mule.module.http.api.listener.HttpListenerConfig;

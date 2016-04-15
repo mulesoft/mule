@@ -6,14 +6,14 @@
  */
 package org.mule.module.launcher;
 
-import org.mule.api.MuleContext;
-import org.mule.api.agent.Agent;
-import org.mule.config.MuleManifest;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.NetworkUtils;
-import org.mule.util.SecurityUtils;
-import org.mule.util.SplashScreen;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.NetworkUtils;
+import org.mule.runtime.core.util.SecurityUtils;
+import org.mule.runtime.core.util.SplashScreen;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

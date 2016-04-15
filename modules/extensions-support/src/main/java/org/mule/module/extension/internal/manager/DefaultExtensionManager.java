@@ -6,20 +6,20 @@
  */
 package org.mule.module.extension.internal.manager;
 
-import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.ServiceRegistry;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.extension.api.introspection.ExtensionDiscoverer;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
@@ -30,8 +30,8 @@ import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.runtime.config.DefaultImplicitConfigurationFactory;
 import org.mule.module.extension.internal.runtime.config.ImplicitConfigurationFactory;
 import org.mule.module.extension.internal.runtime.config.StaticConfigurationProvider;
-import org.mule.registry.SpiServiceRegistry;
-import org.mule.time.Time;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.time.Time;
 
 import com.google.common.collect.ImmutableList;
 

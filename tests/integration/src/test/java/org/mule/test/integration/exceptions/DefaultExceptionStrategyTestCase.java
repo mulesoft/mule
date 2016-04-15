@@ -9,10 +9,10 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleEvent;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.exception.CatchMessagingExceptionStrategy;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.exception.CatchMessagingExceptionStrategy;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.HashSet;

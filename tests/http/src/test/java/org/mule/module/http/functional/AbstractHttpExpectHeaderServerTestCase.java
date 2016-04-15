@@ -8,8 +8,8 @@ package org.mule.module.http.functional;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

@@ -6,12 +6,12 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.component.JavaComponent;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.model.EntryPointResolverSet;
-import org.mule.component.DefaultComponentLifecycleAdapter;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.model.EntryPointResolverSet;
+import org.mule.runtime.core.component.DefaultComponentLifecycleAdapter;
 
 /** <code>TestComponentLifecycleAdapter</code> TODO document */
 public class TestComponentLifecycleAdapter extends DefaultComponentLifecycleAdapter

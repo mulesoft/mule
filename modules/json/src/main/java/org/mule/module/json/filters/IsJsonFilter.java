@@ -6,10 +6,10 @@
  */
 package org.mule.module.json.filters;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.routing.filter.Filter;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
 

@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml.xslt;
+package org.mule.runtime.core.transformers.xml.xslt;
 
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.module.xml.transformer.XsltTransformer;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformers.xml.AbstractXmlTransformerTestCase;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformers.xml.AbstractXmlTransformerTestCase;
+import org.mule.runtime.core.util.IOUtils;
 
 public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
 {

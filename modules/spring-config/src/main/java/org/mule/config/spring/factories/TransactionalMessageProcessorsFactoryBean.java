@@ -6,15 +6,15 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.MessagingExceptionHandlerAware;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.api.transaction.TransactionFactory;
-import org.mule.processor.DelegateTransactionFactory;
-import org.mule.processor.TransactionalInterceptingMessageProcessor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.processor.DelegateTransactionFactory;
+import org.mule.runtime.core.processor.TransactionalInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 import java.util.List;
 

@@ -8,7 +8,7 @@
 package org.mule.module.db.internal.config.domain.database;
 
 import org.mule.module.db.internal.domain.database.ConfigurableDbConfigFactory;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;

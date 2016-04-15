@@ -6,27 +6,23 @@
  */
 package org.mule.module.cxf;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsInstanceOf;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.component.simple.EchoService;
-import org.mule.api.processor.MessageProcessor;
+import static org.junit.Assert.assertThat;
 import org.mule.module.cxf.builder.SimpleClientMessageProcessorBuilder;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.simple.EchoService;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
     String msg = 
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
-            "<ns1:echo xmlns:ns1=\"http://simple.component.api.mule.org/\">" +
+            "<ns1:echo xmlns:ns1=\"http://simple.component.api.core.runtime.mule.org/\">" +
                 "<ns1:return>hello</ns1:return>" +
             "</ns1:echo>" +
         "</soap:Body></soap:Envelope>";

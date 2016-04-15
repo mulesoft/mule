@@ -13,8 +13,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.validation.api.ExceptionFactory;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationResult;

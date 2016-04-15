@@ -7,16 +7,16 @@
 
 package org.mule.module.db.internal.processor;
 
-import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
+import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.INPUT_PARAMS_DEBUG_FIELD;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.PARAM_DEBUG_FIELD_PREFIX;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.PARAM_SET_DEBUG_FIELD_PREFIX;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.QUERY_DEBUG_FIELD;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.debug.FieldDebugInfo;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.executor.BulkExecutor;
 import org.mule.module.db.internal.domain.executor.BulkQueryExecutorFactory;
@@ -41,7 +41,7 @@ import java.util.List;
  * An update query can be parametrized update, insert or delete query or a stored procedure
  * taking input parameters only and returning an update count.
  * <p/>
- * Both database and queries are resolved, if required, using the {@link org.mule.api.MuleEvent}
+ * Both database and queries are resolved, if required, using the {@link org.mule.runtime.core.api.MuleEvent}
  * being processed.
  */
 public class PreparedBulkUpdateMessageProcessor extends AbstractBulkUpdateMessageProcessor

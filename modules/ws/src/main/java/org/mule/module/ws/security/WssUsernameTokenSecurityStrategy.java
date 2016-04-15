@@ -15,7 +15,7 @@ import static org.apache.ws.security.handler.WSHandlerConstants.USER;
 import static org.apache.ws.security.handler.WSHandlerConstants.USERNAME_TOKEN;
 import static org.mule.module.ws.security.PasswordType.DIGEST;
 import static org.mule.module.ws.security.PasswordType.TEXT;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

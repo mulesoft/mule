@@ -50,8 +50,8 @@
         <response>
             <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
         </response>
-        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent"/>
-        <component class="org.mule.component.simple.EchoComponent"/>
+        <cxf:simple-service serviceClass="org.mule.runtime.core.component.simple.EchoComponent"/>
+        <component class="org.mule.runtime.core.component.simple.EchoComponent"/>
         <component class="org.mule.module.cxf.functional.CxfDataTypeTestCase$EnsureAnyDataType" />
     </flow>
 

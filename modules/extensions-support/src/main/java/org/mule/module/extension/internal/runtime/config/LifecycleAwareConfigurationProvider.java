@@ -6,23 +6,23 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
-import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
-import org.mule.lifecycle.DefaultLifecycleManager;
-import org.mule.lifecycle.SimpleLifecycleManager;
+import org.mule.runtime.core.lifecycle.DefaultLifecycleManager;
+import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
 
 import java.util.LinkedList;
 import java.util.List;

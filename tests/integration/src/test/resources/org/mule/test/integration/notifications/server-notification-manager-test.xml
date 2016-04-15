@@ -9,7 +9,7 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                ">
 
-    <spring:bean name="notificationLogger" class="org.mule.context.notification.ServerNotificationLogger"/>
+    <spring:bean name="notificationLogger" class="org.mule.runtime.core.context.notification.ServerNotificationLogger"/>
 
     <flow name="customException">
         <expression-transformer>

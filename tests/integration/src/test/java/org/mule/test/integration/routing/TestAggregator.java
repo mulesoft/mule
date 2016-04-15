@@ -6,17 +6,17 @@
  */
 package org.mule.test.integration.routing;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.transformer.TransformerException;
-import org.mule.routing.AbstractAggregator;
-import org.mule.routing.AggregationException;
-import org.mule.routing.EventGroup;
-import org.mule.routing.correlation.CollectionCorrelatorCallback;
-import org.mule.routing.correlation.EventCorrelatorCallback;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.routing.AbstractAggregator;
+import org.mule.runtime.core.routing.AggregationException;
+import org.mule.runtime.core.routing.EventGroup;
+import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
+import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 
 import java.util.Iterator;
 

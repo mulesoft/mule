@@ -6,10 +6,10 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.lifecycle.LifecycleObject;
-import org.mule.lifecycle.RegistryLifecycleCallback;
-import org.mule.lifecycle.RegistryLifecycleManager;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.lifecycle.LifecycleObject;
+import org.mule.runtime.core.lifecycle.RegistryLifecycleCallback;
+import org.mule.runtime.core.lifecycle.RegistryLifecycleManager;
 
 import com.google.common.collect.TreeTraverser;
 

@@ -6,15 +6,15 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.AbstractAnnotatedObject;
-import org.mule.api.MuleContext;
-import org.mule.api.NameableObject;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.api.processor.ProcessingStrategy;
-import org.mule.processor.AsyncDelegateMessageProcessor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
 

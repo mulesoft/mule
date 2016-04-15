@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring.processors;
 
-import org.mule.registry.MuleRegistryHelper;
+import org.mule.runtime.core.registry.MuleRegistryHelper;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;

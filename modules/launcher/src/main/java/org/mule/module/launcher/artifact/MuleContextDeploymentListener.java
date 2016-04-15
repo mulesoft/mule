@@ -6,8 +6,8 @@
  */
 package org.mule.module.launcher.artifact;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.notification.MuleContextListener;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.module.launcher.DeploymentListener;
 
 /**

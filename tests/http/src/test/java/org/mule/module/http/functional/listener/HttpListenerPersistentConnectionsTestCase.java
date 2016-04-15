@@ -13,7 +13,7 @@ import static org.mule.module.http.api.HttpHeaders.Values.KEEP_ALIVE;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

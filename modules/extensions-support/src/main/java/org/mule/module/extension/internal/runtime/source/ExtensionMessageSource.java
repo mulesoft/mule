@@ -6,34 +6,34 @@
  */
 package org.mule.module.extension.internal.runtime.source;
 
-import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.util.concurrent.ThreadNameHelper.getPrefix;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.ThreadingProfile;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.api.connection.ConnectionException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.WorkManager;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.api.execution.CompletionHandler;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.retry.RetryCallback;
-import org.mule.api.retry.RetryContext;
-import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.api.source.MessageSource;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.retry.RetryCallback;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.api.temporary.MuleMessage;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.execution.MessageProcessContext;
-import org.mule.execution.MessageProcessingManager;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.execution.MessageProcessContext;
+import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.source.RuntimeSourceModel;
@@ -48,7 +48,7 @@ import org.mule.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.module.extension.internal.runtime.exception.ExceptionEnricherManager;
 import org.mule.module.extension.internal.runtime.processor.IllegalOperationException;
 import org.mule.module.extension.internal.runtime.processor.IllegalSourceException;
-import org.mule.util.ExceptionUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -109,14 +109,14 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     @Override
     public void handle(MuleMessage<Object, Serializable> message, CompletionHandler<MuleMessage<Object, Serializable>, Exception> completionHandler)
     {
-        MuleEvent event = new DefaultMuleEvent((org.mule.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
+        MuleEvent event = new DefaultMuleEvent((org.mule.runtime.core.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
         messageProcessingManager.processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, completionHandler), createProcessingContext());
     }
 
     @Override
     public void handle(MuleMessage<Object, Serializable> message)
     {
-        MuleEvent event = new DefaultMuleEvent((org.mule.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
+        MuleEvent event = new DefaultMuleEvent((org.mule.runtime.core.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
         messageProcessingManager.processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, new NullCompletionHandler()), createProcessingContext());
     }
 

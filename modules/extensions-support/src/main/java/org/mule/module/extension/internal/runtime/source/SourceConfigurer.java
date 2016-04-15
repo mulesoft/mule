@@ -6,10 +6,10 @@
  */
 package org.mule.module.extension.internal.runtime.source;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.introspection.source.SourceModel;
 import org.mule.extension.api.runtime.source.Source;

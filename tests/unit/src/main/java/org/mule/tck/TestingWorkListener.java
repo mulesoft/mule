@@ -6,7 +6,7 @@
  */
 package org.mule.tck;
 
-import org.mule.work.DefaultWorkListener;
+import org.mule.runtime.core.work.DefaultWorkListener;
 
 import javax.resource.spi.work.WorkEvent;
 

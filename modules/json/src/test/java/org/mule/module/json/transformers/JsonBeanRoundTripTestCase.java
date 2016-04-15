@@ -8,11 +8,11 @@ package org.mule.module.json.transformers;
 
 import static org.junit.Assert.fail;
 
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transformer.AbstractTransformerTestCase;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 /**
  * For this test I picked difficult beans in that they are not real beans, so I could test how to use

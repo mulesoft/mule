@@ -8,12 +8,12 @@ package org.mule.test.integration.interceptor;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.interceptor.Interceptor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
 import org.junit.Test;
 

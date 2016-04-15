@@ -17,7 +17,7 @@
     </mule-xml:namespace-manager>
 
     <flow name="echoService">
-        <cxf:simple-service serviceClass="org.mule.component.simple.EchoComponent"/>
+        <cxf:simple-service serviceClass="org.mule.runtime.core.component.simple.EchoComponent"/>
         <echo-component/>
     </flow>
 

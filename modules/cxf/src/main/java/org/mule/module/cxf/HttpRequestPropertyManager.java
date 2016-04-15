@@ -6,10 +6,10 @@
  */
 package org.mule.module.cxf;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.module.http.api.HttpConstants;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 public class HttpRequestPropertyManager
 {

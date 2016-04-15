@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.file.api.command;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.module.extension.file.api.FileSystem;
 import org.mule.module.extension.file.api.FileWriteMode;
 

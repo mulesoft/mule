@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.api.registry.ServiceRegistry;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
@@ -21,7 +21,7 @@ import org.mule.module.extension.HeisenbergExtension;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.enricher.StudioModelEnricher;
-import org.mule.registry.SpiServiceRegistry;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

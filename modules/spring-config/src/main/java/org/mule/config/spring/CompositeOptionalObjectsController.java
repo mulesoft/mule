@@ -6,8 +6,8 @@
  */
 package org.mule.config.spring;
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.util.ArrayUtils;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.util.ArrayUtils;
 
 import com.google.common.collect.ImmutableList;
 

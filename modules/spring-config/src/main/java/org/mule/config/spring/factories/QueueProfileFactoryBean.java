@@ -6,11 +6,11 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.store.QueueStore;
-import org.mule.config.QueueProfile;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.store.QueueStore;
+import org.mule.runtime.core.config.QueueProfile;
 
 import java.io.Serializable;
 

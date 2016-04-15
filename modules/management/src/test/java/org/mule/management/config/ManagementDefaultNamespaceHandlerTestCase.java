@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.config;
+package org.mule.runtime.core.management.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.agent.Agent;
+import org.mule.runtime.core.api.agent.Agent;
 import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;
 import org.mule.module.management.agent.Mx4jAgent;

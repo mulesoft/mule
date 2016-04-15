@@ -6,9 +6,9 @@
  */
 package org.mule.config.spring.processors;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.notification.ServerNotificationListener;
-import org.mule.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;

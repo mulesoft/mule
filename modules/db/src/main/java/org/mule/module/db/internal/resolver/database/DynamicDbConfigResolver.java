@@ -8,8 +8,8 @@
 package org.mule.module.db.internal.resolver.database;
 
 import static org.mule.common.Result.Status.FAILURE;
-import org.mule.AbstractAnnotatedObject;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.common.DefaultResult;
 import org.mule.common.DefaultTestResult;
 import org.mule.common.Result;

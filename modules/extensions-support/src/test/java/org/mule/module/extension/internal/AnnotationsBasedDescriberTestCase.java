@@ -37,10 +37,10 @@ import static org.mule.module.extension.internal.util.ExtensionsTestUtils.TYPE_B
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.api.tls.TlsContextFactory;
-import org.mule.config.MuleManifest;
+import org.mule.runtime.core.config.MuleManifest;
 import org.mule.extension.api.annotation.Configuration;
 import org.mule.extension.api.annotation.Configurations;
 import org.mule.extension.api.annotation.Extension;
@@ -86,7 +86,7 @@ import org.mule.module.extension.model.KnockeableDoor;
 import org.mule.module.extension.model.Ricin;
 import org.mule.module.extension.model.Weapon;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.CollectionUtils;
+import org.mule.runtime.core.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.Calendar;

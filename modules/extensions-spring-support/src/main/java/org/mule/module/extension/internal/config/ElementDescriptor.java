@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.config;
 
-import org.mule.util.CollectionUtils;
+import org.mule.runtime.core.util.CollectionUtils;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;

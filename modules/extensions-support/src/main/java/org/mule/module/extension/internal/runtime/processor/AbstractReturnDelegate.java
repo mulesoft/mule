@@ -8,12 +8,12 @@ package org.mule.module.extension.internal.runtime.processor;
 
 import static org.mule.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.message.NullPayload;
 
 import java.io.Serializable;

@@ -6,7 +6,7 @@
  */
 package org.mule.module.spring.security;
 
-import org.mule.api.security.Authentication;
+import org.mule.runtime.core.api.security.Authentication;
 
 /**
  * A provider for spring authentication

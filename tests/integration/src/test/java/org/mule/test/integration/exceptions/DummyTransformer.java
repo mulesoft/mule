@@ -6,9 +6,9 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 public class DummyTransformer extends AbstractMessageTransformer
 {

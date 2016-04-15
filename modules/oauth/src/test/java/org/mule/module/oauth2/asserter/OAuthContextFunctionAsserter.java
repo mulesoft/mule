@@ -8,7 +8,7 @@ package org.mule.module.oauth2.asserter;
 
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 
 import org.hamcrest.core.Is;
 

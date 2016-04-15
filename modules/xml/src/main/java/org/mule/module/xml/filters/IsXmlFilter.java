@@ -6,8 +6,8 @@
  */
 package org.mule.module.xml.filters;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.routing.filter.Filter;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.module.xml.util.XMLUtils;
 
 import javax.xml.stream.XMLInputFactory;

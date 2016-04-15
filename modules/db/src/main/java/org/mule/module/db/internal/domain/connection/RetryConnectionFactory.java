@@ -7,9 +7,9 @@
 
 package org.mule.module.db.internal.domain.connection;
 
-import org.mule.api.retry.RetryCallback;
-import org.mule.api.retry.RetryContext;
-import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.RetryCallback;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 
 import java.sql.Connection;
 import java.util.concurrent.atomic.AtomicReference;

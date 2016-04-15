@@ -7,7 +7,7 @@
 package org.mule.module.ws.functional;
 
 
-import org.mule.DefaultMuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
 
 import java.util.HashMap;
 import java.util.Map;

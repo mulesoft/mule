@@ -14,7 +14,7 @@ import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.config.WsConfig;
 import org.mule.module.cxf.config.WsSecurity;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 
 import java.util.HashMap;
 import java.util.List;

@@ -9,12 +9,12 @@ package org.mule.test.config;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
 import static org.mule.config.spring.util.ProcessingStrategyUtils.QUEUED_THREAD_PER_PROCESSOR_PROCESSING_STRATEGY;
-import org.mule.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.config.spring.util.ProcessingStrategyUtils;
-import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
-import org.mule.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.QueuedAsynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 

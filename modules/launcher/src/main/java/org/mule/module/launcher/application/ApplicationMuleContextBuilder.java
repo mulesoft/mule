@@ -6,16 +6,16 @@
  */
 package org.mule.module.launcher.application;
 
-import static org.mule.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 
-import org.mule.DefaultMuleContext;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.PropertiesMuleConfigurationFactory;
-import org.mule.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.PropertiesMuleConfigurationFactory;
+import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.util.StringUtils;
-import org.mule.work.MuleWorkManager;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.work.MuleWorkManager;
 
 /**
  * Takes Mule application descriptor into account when building the context.

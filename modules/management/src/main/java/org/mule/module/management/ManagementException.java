@@ -6,8 +6,8 @@
  */
 package org.mule.module.management;
 
-import org.mule.api.MuleException;
-import org.mule.config.i18n.Message;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * <code>ManagementException</code> is a general exception thrown by management

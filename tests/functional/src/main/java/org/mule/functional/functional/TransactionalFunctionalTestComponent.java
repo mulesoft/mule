@@ -6,10 +6,10 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionException;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 /**
  * This service is useful for unit tests involving transactionality because it

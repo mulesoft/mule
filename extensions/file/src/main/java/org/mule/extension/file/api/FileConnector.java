@@ -7,9 +7,9 @@
 package org.mule.extension.file.api;
 
 import static java.lang.String.format;
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.Operations;
 import org.mule.extension.api.annotation.Parameter;

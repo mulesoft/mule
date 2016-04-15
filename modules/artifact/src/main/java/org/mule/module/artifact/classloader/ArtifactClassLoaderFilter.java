@@ -7,9 +7,9 @@
 
 package org.mule.module.artifact.classloader;
 
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.module.artifact.descriptor.ArtifactDescriptor;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Collections;
 import java.util.Set;

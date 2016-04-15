@@ -6,9 +6,9 @@
  */
 package org.mule.module.launcher;
 
-import org.mule.config.i18n.MessageFactory;
-import org.mule.util.FileUtils;
-import org.mule.util.FilenameUtils;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.FilenameUtils;
 
 import java.beans.Introspector;
 import java.io.File;

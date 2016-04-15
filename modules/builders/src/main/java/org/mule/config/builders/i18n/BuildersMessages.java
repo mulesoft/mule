@@ -6,8 +6,8 @@
  */
 package org.mule.config.builders.i18n;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 
 public class BuildersMessages extends MessageFactory
 {

@@ -15,8 +15,8 @@ import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.api.requester.HttpSendBodyMode.ALWAYS;
 import static org.mule.module.http.api.requester.HttpStreamingType.AUTO;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;

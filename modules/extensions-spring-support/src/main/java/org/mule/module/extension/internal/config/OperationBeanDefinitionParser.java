@@ -6,14 +6,14 @@
  */
 package org.mule.module.extension.internal.config;
 
-import static org.mule.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_SINGLETON;
-import org.mule.api.NestedProcessor;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.NestedProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.config.spring.util.SpringXMLUtils;
-import org.mule.enricher.MessageEnricher;
+import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.operation.OperationModel;
 import org.mule.extension.api.introspection.parameter.ParameterModel;

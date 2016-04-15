@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
-import org.mule.util.FileUtils;
+import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;

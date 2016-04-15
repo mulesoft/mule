@@ -17,10 +17,10 @@ import static org.mule.module.db.internal.debug.DbDebugInfoTestUtils.createQuery
 import static org.mule.module.db.internal.domain.query.QueryType.UPDATE;
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.QUERIES_DEBUG_FIELD;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
-import org.mule.api.MuleEvent;
-import org.mule.api.debug.FieldDebugInfo;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.debug.FieldDebugInfo;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;

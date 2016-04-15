@@ -11,11 +11,11 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.PropertyScope;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.PropertyScope;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.model.resolvers.EntryPointNotFoundException;
+import org.mule.runtime.core.model.resolvers.EntryPointNotFoundException;
 
 import java.util.HashMap;
 import java.util.Map;

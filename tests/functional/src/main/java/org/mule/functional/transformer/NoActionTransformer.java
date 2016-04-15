@@ -6,9 +6,9 @@
  */
 package org.mule.functional.transformer;
 
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 /**
  * <code>NoActionTransformer</code> doesn't do any transformation on the source

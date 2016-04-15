@@ -17,7 +17,7 @@ import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.registry.SpiServiceRegistry;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

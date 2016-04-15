@@ -7,8 +7,8 @@
 
 package org.mule.module.db.internal.result.statement;
 
-import org.mule.api.Closeable;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.Closeable;
+import org.mule.runtime.core.api.MuleException;
 
 import java.util.Collection;
 import java.util.HashMap;

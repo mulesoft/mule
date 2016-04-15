@@ -12,8 +12,8 @@ import static org.mule.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_
 import static org.mule.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import org.mule.tck.ZipUtils.ZipResource;
-import org.mule.util.FilenameUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.FilenameUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.List;

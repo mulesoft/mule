@@ -226,7 +226,7 @@
             </a>
         </xsl:variable>
         <xsl:variable name="maven">
-            <xsl:value-of select="concat('org.mule.transport:mule-transport-', $scheme)"/>
+            <xsl:value-of select="concat('org.mule.runtime.core.transport:mule-transport-', $scheme)"/>
         </xsl:variable>
 
 

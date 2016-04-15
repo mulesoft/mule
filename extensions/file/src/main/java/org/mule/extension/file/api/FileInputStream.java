@@ -6,7 +6,7 @@
  */
 package org.mule.extension.file.api;
 
-import org.mule.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.module.extension.file.api.lock.PathLock;
 import org.mule.module.extension.file.api.stream.AbstractFileInputStream;
 import org.mule.module.extension.file.api.stream.LazyStreamSupplier;

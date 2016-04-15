@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.util;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 /**

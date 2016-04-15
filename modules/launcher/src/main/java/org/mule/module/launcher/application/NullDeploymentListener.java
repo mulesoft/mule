@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher.application;
 
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.module.launcher.DeploymentListener;
 
 /**

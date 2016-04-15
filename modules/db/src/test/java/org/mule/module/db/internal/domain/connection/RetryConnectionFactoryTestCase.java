@@ -11,9 +11,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.api.context.WorkManager;
-import org.mule.api.retry.RetryCallback;
-import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.retry.RetryCallback;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

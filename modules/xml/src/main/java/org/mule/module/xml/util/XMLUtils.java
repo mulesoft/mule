@@ -6,16 +6,16 @@
  */
 package org.mule.module.xml.util;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.message.OutputHandler;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.message.OutputHandler;
 import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.transformer.DelayedResult;
 import org.mule.module.xml.transformer.XmlToDomDocument;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -63,7 +63,7 @@ import org.xml.sax.InputSource;
 /**
  * General utility methods for working with XML.
  */
-public class XMLUtils extends org.mule.util.XMLUtils
+public class XMLUtils extends org.mule.runtime.core.util.XMLUtils
 {
     public static final String TRANSFORMER_FACTORY_JDK5 = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
 
@@ -273,7 +273,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
      * Returns an XMLStreamReader for an object of unknown type if possible.
      * @return null if no XMLStreamReader can be created for the object type
      * @throws XMLStreamException
-     * @deprecated As of 3.7.0, use {@link #toXMLStreamReader(javax.xml.stream.XMLInputFactory, org.mule.api.MuleEvent, Object)} instead.
+     * @deprecated As of 3.7.0, use {@link #toXMLStreamReader(javax.xml.stream.XMLInputFactory, org.mule.runtime.core.api.MuleEvent, Object)} instead.
      */
     @Deprecated
     public static javax.xml.stream.XMLStreamReader toXMLStreamReader(javax.xml.stream.XMLInputFactory factory, Object obj) throws XMLStreamException

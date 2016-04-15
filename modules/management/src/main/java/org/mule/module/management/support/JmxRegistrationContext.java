@@ -6,10 +6,10 @@
  */
 package org.mule.module.management.support;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.context.notification.MuleContextNotification;
-import org.mule.context.notification.NotificationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.context.notification.MuleContextNotification;
+import org.mule.runtime.core.context.notification.NotificationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

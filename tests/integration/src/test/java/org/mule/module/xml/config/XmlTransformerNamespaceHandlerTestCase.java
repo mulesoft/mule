@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.xml.transformer.AbstractXmlTransformer;
 import org.mule.module.xml.transformer.DomDocumentToXml;
@@ -19,7 +19,7 @@ import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.module.xml.transformer.XsltTransformer;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import org.junit.Test;
 

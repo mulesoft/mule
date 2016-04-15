@@ -15,12 +15,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.CoreExtensionsAware;
-import org.mule.MuleCoreExtension;
-import org.mule.MuleCoreExtensionDependency;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.IllegalDependencyInjectionException;
+import org.mule.runtime.core.CoreExtensionsAware;
+import org.mule.runtime.core.MuleCoreExtension;
+import org.mule.runtime.core.MuleCoreExtensionDependency;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

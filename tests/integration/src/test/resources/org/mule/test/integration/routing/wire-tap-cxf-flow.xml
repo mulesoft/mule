@@ -13,7 +13,7 @@
 
     <flow name="Echo">
         <http:listener path="/services/EchoUMO" config-ref="listenerConfig"/>
-        <cxf:simple-service serviceClass="org.mule.api.component.simple.EchoService" />
+        <cxf:simple-service serviceClass="org.mule.runtime.core.api.component.simple.EchoService" />
         <wire-tap>
             <flow-ref name="WireTapper"/>
         </wire-tap>

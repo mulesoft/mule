@@ -14,7 +14,7 @@ import org.mule.module.db.internal.parser.SimpleQueryTemplateParser;
 import org.mule.module.db.internal.processor.BulkExecuteMessageProcessor;
 import org.mule.module.db.internal.resolver.query.FileBulkQueryResolver;
 import org.mule.module.db.internal.util.DefaultFileReader;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;

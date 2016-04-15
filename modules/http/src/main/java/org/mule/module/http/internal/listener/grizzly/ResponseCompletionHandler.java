@@ -8,8 +8,8 @@ package org.mule.module.http.internal.listener.grizzly;
 
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
@@ -18,7 +18,7 @@ import org.mule.module.http.internal.domain.HttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
-import org.mule.util.Preconditions;
+import org.mule.runtime.core.util.Preconditions;
 
 import java.io.IOException;
 

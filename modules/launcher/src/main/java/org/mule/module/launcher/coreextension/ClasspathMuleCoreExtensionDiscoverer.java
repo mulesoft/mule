@@ -6,9 +6,9 @@
  */
 package org.mule.module.launcher.coreextension;
 
-import org.mule.MuleCoreExtension;
-import org.mule.api.DefaultMuleException;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.MuleCoreExtension;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.net.URL;
 import java.util.Enumeration;

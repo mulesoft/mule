@@ -6,7 +6,7 @@
  */
 package org.mule.extension.ftp.api;
 
-import org.mule.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.Operations;
 import org.mule.extension.api.annotation.Parameter;

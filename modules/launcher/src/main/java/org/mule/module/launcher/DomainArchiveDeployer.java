@@ -10,7 +10,7 @@ import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.artifact.ArtifactFactory;
 import org.mule.module.launcher.domain.Domain;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
-import org.mule.util.Preconditions;
+import org.mule.runtime.core.util.Preconditions;
 
 import java.io.File;
 import java.io.FilenameFilter;

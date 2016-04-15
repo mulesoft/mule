@@ -12,7 +12,7 @@ import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarat
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.CollectionUtils;
+import org.mule.runtime.core.util.CollectionUtils;
 
 public abstract class AbstractAnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
 {

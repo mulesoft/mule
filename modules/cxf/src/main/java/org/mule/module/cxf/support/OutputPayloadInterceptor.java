@@ -6,10 +6,10 @@
  */
 package org.mule.module.cxf.support;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.DelayedResult;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.message.NullPayload;
 
 import java.util.ArrayList;

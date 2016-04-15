@@ -8,8 +8,8 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.processor.InvokerMessageProcessor;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.processor.InvokerMessageProcessor;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -8,12 +8,12 @@ package org.mule.module.http.internal.listener;
 
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.module.http.api.listener.HttpListenerConfig;
 import org.mule.api.tls.TlsContextFactory;
-import org.mule.util.ObjectNameHelper;
+import org.mule.runtime.core.util.ObjectNameHelper;
 
 public class HttpListenerConfigBuilder
 {

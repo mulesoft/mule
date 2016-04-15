@@ -6,13 +6,13 @@
  */
 package org.mule.module.http.api.client;
 
-import org.mule.api.client.OperationOptions;
+import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.api.tls.TlsContextFactory;
 
 /**
- * Options that can be configured for making an HTTP request using {@link org.mule.api.client.MuleClient}
+ * Options that can be configured for making an HTTP request using {@link org.mule.runtime.core.api.client.MuleClient}
  *
  * Implementations of this class must redefine {@link Object#hashCode()} and {@link java.lang.Object#equals(Object)} since the may be used as key in a map
  */

@@ -6,8 +6,8 @@
  */
 package org.mule.tck.util;
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.time.TimeSupplier;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.time.TimeSupplier;
 
 import java.util.concurrent.TimeUnit;
 

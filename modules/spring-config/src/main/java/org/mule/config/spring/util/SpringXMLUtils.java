@@ -7,8 +7,8 @@
 package org.mule.config.spring.util;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.util.StringUtils;
-import org.mule.util.XMLUtils;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.XMLUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

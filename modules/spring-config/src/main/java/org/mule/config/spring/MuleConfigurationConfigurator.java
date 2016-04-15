@@ -6,22 +6,22 @@
  */
 package org.mule.config.spring;
 
-import org.mule.DefaultMuleContext;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.api.processor.ProcessingStrategy;
-import org.mule.api.serialization.ObjectSerializer;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.config.spring.util.ProcessingStrategyUtils;
-import org.mule.serialization.internal.JavaObjectSerializer;
+import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 
 import java.util.List;
 

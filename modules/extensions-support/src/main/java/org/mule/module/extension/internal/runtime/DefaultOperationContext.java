@@ -6,8 +6,8 @@
  */
 package org.mule.module.extension.internal.runtime;
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleEvent;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;

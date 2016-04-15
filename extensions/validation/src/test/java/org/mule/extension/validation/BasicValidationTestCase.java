@@ -14,14 +14,14 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
 import static org.mule.extension.validation.internal.ValidationExtension.DEFAULT_LOCALE;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.mvel2.compiler.BlankLiteral;
-import org.mule.util.ExceptionUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;

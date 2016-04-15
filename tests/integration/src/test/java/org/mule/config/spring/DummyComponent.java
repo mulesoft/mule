@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
 
 public class DummyComponent
 {

@@ -6,10 +6,10 @@
  */
 package org.mule.module.http.internal.listener;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpHeaders;
-import org.mule.util.CaseInsensitiveMapWrapper;
+import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.Multimap;

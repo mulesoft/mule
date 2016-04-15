@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml.xslt;
+package org.mule.runtime.core.transformers.xml.xslt;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
-import org.mule.util.UUID;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.UUID;
 
 import java.io.File;
 

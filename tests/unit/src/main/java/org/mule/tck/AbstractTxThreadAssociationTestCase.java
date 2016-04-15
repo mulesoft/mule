@@ -13,15 +13,15 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.mule.api.execution.ExecutionCallback;
-import org.mule.api.execution.ExecutionTemplate;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transaction.TransactionManagerFactory;
-import org.mule.execution.TransactionalExecutionTemplate;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
+import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transaction.MuleTransactionConfig;
-import org.mule.transaction.XaTransaction;
-import org.mule.transaction.XaTransactionFactory;
+import org.mule.runtime.core.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.transaction.XaTransaction;
+import org.mule.runtime.core.transaction.XaTransactionFactory;
 
 import javax.transaction.Status;
 import javax.transaction.Transaction;

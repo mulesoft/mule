@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.internal.request;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.module.http.internal.HttpMessageBuilder;
 import org.mule.module.http.internal.HttpParamType;
 import org.mule.module.http.internal.ParameterMap;

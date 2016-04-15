@@ -20,8 +20,8 @@ import static org.mule.module.db.internal.domain.transaction.TransactionalAction
 import static org.mule.module.db.internal.processor.DbDebugInfoUtils.QUERIES_DEBUG_FIELD;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
-import org.mule.api.MuleEvent;
-import org.mule.api.debug.FieldDebugInfo;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
 import org.mule.module.db.internal.domain.database.DbConfig;

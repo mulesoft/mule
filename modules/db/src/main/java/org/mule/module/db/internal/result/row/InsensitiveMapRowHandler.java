@@ -7,7 +7,7 @@
 
 package org.mule.module.db.internal.result.row;
 
-import org.mule.util.CaseInsensitiveHashMap;
+import org.mule.runtime.core.util.CaseInsensitiveHashMap;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;

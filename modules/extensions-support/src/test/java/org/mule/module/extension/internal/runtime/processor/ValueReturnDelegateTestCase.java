@@ -31,7 +31,7 @@ public class ValueReturnDelegateTestCase extends ValueReturnDelegateContractTest
     @Override
     protected MuleMessage getOutputMessage()
     {
-        ArgumentCaptor<org.mule.api.MuleMessage> captor = ArgumentCaptor.forClass(org.mule.api.MuleMessage.class);
+        ArgumentCaptor<org.mule.runtime.core.api.MuleMessage> captor = ArgumentCaptor.forClass(org.mule.runtime.core.api.MuleMessage.class);
         verify(event).setMessage(captor.capture());
         MuleMessage message = captor.getValue();
 

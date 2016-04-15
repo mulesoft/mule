@@ -6,9 +6,9 @@
  */
 package org.mule.module.jboss.transaction;
 
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.transaction.TransactionManagerFactory;
-import org.mule.util.NetworkUtils;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
+import org.mule.runtime.core.util.NetworkUtils;
 
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import com.arjuna.common.util.propertyservice.PropertiesFactory;

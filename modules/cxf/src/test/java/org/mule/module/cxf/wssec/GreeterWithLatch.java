@@ -6,9 +6,9 @@
  */
 package org.mule.module.cxf.wssec;
 
-import org.mule.RequestContext;
-import org.mule.api.security.SecurityContext;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import org.apache.hello_world_soap_http.GreeterImpl;
 

@@ -13,8 +13,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
-import org.mule.DefaultMuleContext;
-import org.mule.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
 

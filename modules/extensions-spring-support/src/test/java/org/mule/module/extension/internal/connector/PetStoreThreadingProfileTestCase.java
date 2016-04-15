@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
-import org.mule.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreClient;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnector;

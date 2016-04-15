@@ -6,16 +6,16 @@
  */
 package org.mule.module.launcher.domain;
 
-import static org.mule.util.SplashScreen.miniSplash;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.builders.AutoConfigurationBuilder;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.context.DefaultMuleContextFactory;
+import static org.mule.runtime.core.util.SplashScreen.miniSplash;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.DomainMuleContextAwareConfigurationBuilder;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.builders.AutoConfigurationBuilder;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
@@ -27,8 +27,8 @@ import org.mule.module.launcher.application.NullDeploymentListener;
 import org.mule.module.launcher.artifact.MuleContextDeploymentListener;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.descriptor.DomainDescriptor;
-import org.mule.util.ClassUtils;
-import org.mule.util.ExceptionUtils;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -6,7 +6,7 @@
  */
 package org.mule.functional.security;
 
-import org.mule.security.SecretKeyFactory;
+import org.mule.runtime.core.security.SecretKeyFactory;
 
 /**
  * Empty mock for tests

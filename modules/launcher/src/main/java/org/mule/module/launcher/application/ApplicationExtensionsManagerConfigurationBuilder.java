@@ -6,10 +6,10 @@
  */
 package org.mule.module.launcher.application;
 
-import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import org.mule.DefaultMuleContext;
-import org.mule.api.MuleContext;
-import org.mule.config.builders.AbstractConfigurationBuilder;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
@@ -17,7 +17,7 @@ import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.module.extension.internal.DefaultDescribingContext;
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.manager.DefaultExtensionManager;
-import org.mule.registry.SpiServiceRegistry;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 
 import java.io.IOException;
 import java.net.URL;
@@ -29,7 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Implementation of {@link org.mule.api.config.ConfigurationBuilder}
+ * Implementation of {@link org.mule.runtime.core.api.config.ConfigurationBuilder}
  * that register a {@link ExtensionManager} if it's present in the classpath
  *
  * @since 4.0

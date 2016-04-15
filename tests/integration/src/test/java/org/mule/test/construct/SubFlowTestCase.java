@@ -7,9 +7,9 @@
 package org.mule.test.construct;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.lifecycle.LifecycleTrackerProcessor;
+import org.mule.runtime.core.lifecycle.LifecycleTrackerProcessor;
 
 import org.junit.Test;
 

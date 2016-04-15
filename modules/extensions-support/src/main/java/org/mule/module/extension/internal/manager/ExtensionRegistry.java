@@ -7,19 +7,19 @@
 package org.mule.module.extension.internal.manager;
 
 import static java.lang.String.format;
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.RegistrationException;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.extension.api.introspection.config.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ExpirableConfigurationProvider;
-import org.mule.util.collection.ImmutableListCollector;
-import org.mule.util.collection.ImmutableSetCollector;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.core.util.collection.ImmutableSetCollector;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

@@ -180,8 +180,8 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
 
     protected String dropRef(String name)
     {
-        return org.mule.util.StringUtils.chomp(
-                org.mule.util.StringUtils.chomp(name, AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF_SUFFIX),
+        return org.mule.runtime.core.util.StringUtils.chomp(
+                org.mule.runtime.core.util.StringUtils.chomp(name, AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF_SUFFIX),
                 AbstractMuleBeanDefinitionParser.ATTRIBUTE_REFS_SUFFIX);
     }
 

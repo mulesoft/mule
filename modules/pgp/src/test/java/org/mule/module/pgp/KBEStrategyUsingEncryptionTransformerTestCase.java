@@ -6,11 +6,11 @@
  */
 package org.mule.module.pgp;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transformer.encryption.EncryptionTransformer;
-import org.mule.transformer.simple.ByteArrayToObject;
+import org.mule.runtime.core.transformer.encryption.EncryptionTransformer;
+import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 
 import java.io.InputStream;
 

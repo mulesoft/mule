@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 
 public class DefaultMemoryQueueStoreFactoryBean extends ObjectStoreFromRegistryFactoryBean
 {

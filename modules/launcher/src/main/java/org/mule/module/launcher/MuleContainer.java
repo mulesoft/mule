@@ -6,20 +6,20 @@
  */
 package org.mule.module.launcher;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.MuleProperties;
-import org.mule.config.ExceptionHelper;
-import org.mule.config.StartupContext;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.Message;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.config.StartupContext;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.Message;
 import org.mule.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.module.launcher.log4j2.MuleLog4jContextFactory;
-import org.mule.util.MuleUrlStreamHandlerFactory;
-import org.mule.util.StringMessageUtils;
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
+import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -290,7 +290,7 @@ public class MuleContainer
     /**
      * This class is installed only for MuleContainer running as commandline app. A
      * clean Mule shutdown can be achieved by disposing the
-     * {@link org.mule.DefaultMuleContext}.
+     * {@link org.mule.runtime.core.DefaultMuleContext}.
      */
     private class MuleShutdownHook extends Thread
     {

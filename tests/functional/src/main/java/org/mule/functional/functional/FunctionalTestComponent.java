@@ -6,23 +6,23 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.util.ClassUtils;
-import org.mule.util.NumberUtils;
-import org.mule.util.StringMessageUtils;
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.NumberUtils;
+import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,7 +155,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     }
 
     /**
-     * This method is used by some WebServices tests where you don' want to be introducing the {@link org.mule.api.MuleEventContext} as
+     * This method is used by some WebServices tests where you don' want to be introducing the {@link org.mule.runtime.core.api.MuleEventContext} as
      * a complex type.
      *
      * @param data the event data received
@@ -225,10 +225,10 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
 
     /**
      * The service method that implements the test component logic.  This method can be called publically through
-     * either {@link #onCall(org.mule.api.MuleEventContext)} or {@link #onReceive(Object)}
+     * either {@link #onCall(org.mule.runtime.core.api.MuleEventContext)} or {@link #onReceive(Object)}
      *
      * @param data    The message payload
-     * @param context the current {@link org.mule.api.MuleEventContext}
+     * @param context the current {@link org.mule.runtime.core.api.MuleEventContext}
      * @return a new message payload according to the configuration of the component
      * @throws Exception if there is a general failure or if {@link #isThrowException()} is true.
      */

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management;
+package org.mule.runtime.core.management;
 
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
 import org.mule.functional.junit4.FunctionalTestCase;

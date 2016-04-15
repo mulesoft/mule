@@ -6,22 +6,22 @@
  */
 package org.mule.config.spring;
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.Registry;
-import org.mule.api.registry.RegistryProvider;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.api.registry.RegistryProvider;
 import org.mule.api.metadata.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.config.bootstrap.AbstractRegistryBootstrap;
-import org.mule.config.bootstrap.BootstrapObjectFactory;
-import org.mule.config.bootstrap.ObjectBootstrapProperty;
-import org.mule.config.bootstrap.SimpleRegistryBootstrap;
-import org.mule.config.bootstrap.TransformerBootstrapProperty;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.config.bootstrap.AbstractRegistryBootstrap;
+import org.mule.runtime.core.config.bootstrap.BootstrapObjectFactory;
+import org.mule.runtime.core.config.bootstrap.ObjectBootstrapProperty;
+import org.mule.runtime.core.config.bootstrap.SimpleRegistryBootstrap;
+import org.mule.runtime.core.config.bootstrap.TransformerBootstrapProperty;
 import org.mule.config.spring.factories.BootstrapObjectFactoryBean;
 import org.mule.config.spring.factories.ConstantFactoryBean;
-import org.mule.transformer.TransformerUtils;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.TransformerUtils;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.util.Map.Entry;
 

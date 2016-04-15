@@ -6,8 +6,8 @@
  */
 package org.mule.module.oauth2.api;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.config.i18n.Message;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * Exception throw when it's not possible to create the authentication request for a given request.

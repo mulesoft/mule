@@ -6,12 +6,12 @@
  */
 package org.mule.module.extension.internal.runtime.resolver;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
-import org.mule.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.ParameterGroup;
 import org.mule.extension.api.runtime.OperationContext;

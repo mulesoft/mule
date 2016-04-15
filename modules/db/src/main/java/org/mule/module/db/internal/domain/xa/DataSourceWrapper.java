@@ -8,7 +8,7 @@
 package org.mule.module.db.internal.domain.xa;
 
 
-import org.mule.util.xa.XaResourceFactoryHolder;
+import org.mule.runtime.core.util.xa.XaResourceFactoryHolder;
 
 import java.io.PrintWriter;
 import java.sql.Connection;

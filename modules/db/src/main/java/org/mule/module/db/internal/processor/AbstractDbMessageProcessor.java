@@ -7,20 +7,20 @@
 
 package org.mule.module.db.internal.processor;
 
-import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
+import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.module.db.internal.domain.transaction.TransactionalAction.NOT_SUPPORTED;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.debug.DebugInfoProvider;
-import org.mule.api.debug.FieldDebugInfo;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.debug.DebugInfoProvider;
+import org.mule.runtime.core.api.debug.FieldDebugInfo;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.common.Result;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.OperationMetaDataEnabled;
@@ -34,8 +34,8 @@ import org.mule.module.db.internal.metadata.QueryMetadataProvider;
 import org.mule.module.db.internal.resolver.database.DbConfigResolver;
 import org.mule.module.db.internal.resolver.database.UnresolvableDbConfigException;
 import org.mule.module.db.internal.result.statement.StatementStreamingResultSetCloser;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

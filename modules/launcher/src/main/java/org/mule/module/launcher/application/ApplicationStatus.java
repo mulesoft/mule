@@ -9,7 +9,7 @@ package org.mule.module.launcher.application;
 
 /**
  * Indicates the status of a Mule application that corresponds to the last executed lifecycle phase
- * on the application's {@link org.mule.api.MuleContext}.
+ * on the application's {@link org.mule.runtime.core.api.MuleContext}.
  */
 public enum ApplicationStatus
 {

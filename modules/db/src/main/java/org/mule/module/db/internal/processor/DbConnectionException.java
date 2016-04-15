@@ -7,7 +7,7 @@
 
 package org.mule.module.db.internal.processor;
 
-import org.mule.api.LocatedMuleException;
+import org.mule.runtime.core.api.LocatedMuleException;
 import org.mule.module.db.internal.domain.database.DbConfig;
 
 import java.sql.SQLException;

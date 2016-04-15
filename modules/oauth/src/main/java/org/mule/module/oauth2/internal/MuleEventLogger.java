@@ -8,7 +8,7 @@ package org.mule.module.oauth2.internal;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 
 import org.slf4j.Logger;
 

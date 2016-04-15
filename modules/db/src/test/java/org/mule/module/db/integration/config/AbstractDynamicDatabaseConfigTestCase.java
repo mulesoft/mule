@@ -7,7 +7,7 @@
 
 package org.mule.module.db.integration.config;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.internal.domain.database.DbConfig;
 import org.mule.module.db.internal.resolver.database.DbConfigResolver;

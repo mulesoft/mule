@@ -7,14 +7,14 @@
 package org.mule.module.json.validation;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.mule.util.Preconditions.checkArgument;
-import static org.mule.util.Preconditions.checkState;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.MessageFactory;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkState;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.module.json.DefaultJsonParser;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.load.Dereferencing;

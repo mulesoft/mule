@@ -7,7 +7,7 @@
 
 package org.mule.module.db.internal.domain.database;
 
-import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.module.db.internal.domain.type.DbType;
 
 import java.util.List;

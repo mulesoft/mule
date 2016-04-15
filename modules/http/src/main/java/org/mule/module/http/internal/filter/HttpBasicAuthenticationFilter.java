@@ -9,27 +9,25 @@ package org.mule.module.http.internal.filter;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.WWW_AUTHENTICATE;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
-import static org.apache.commons.codec.binary.Base64.encodeBase64;
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.CryptoFailureException;
-import org.mule.api.security.EncryptionStrategyNotFoundException;
-import org.mule.api.security.SecurityContext;
-import org.mule.api.security.SecurityException;
-import org.mule.api.security.SecurityProviderNotFoundException;
-import org.mule.api.security.UnauthorisedException;
-import org.mule.api.security.UnknownAuthenticationTypeException;
-import org.mule.api.security.UnsupportedAuthenticationSchemeException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.security.AbstractAuthenticationFilter;
-import org.mule.security.AbstractOperationSecurityFilter;
-import org.mule.security.DefaultMuleAuthentication;
-import org.mule.security.MuleCredentials;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
+import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.api.security.UnsupportedAuthenticationSchemeException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.security.AbstractAuthenticationFilter;
+import org.mule.runtime.core.security.DefaultMuleAuthentication;
+import org.mule.runtime.core.security.MuleCredentials;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -112,7 +110,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter
      * will always populate the secure context in the session
      *
      * @param event the current message recieved
-     * @throws org.mule.api.security.SecurityException if authentication fails
+     * @throws org.mule.runtime.core.api.security.SecurityException if authentication fails
      */
     @Override
     public void authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException

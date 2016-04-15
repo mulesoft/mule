@@ -6,11 +6,11 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.config.ConfigurationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;

@@ -23,7 +23,7 @@ public class JmxLegacySupport extends AbstractJmxSupport
 
     /**
      * Uses simpler rules for escaping non-JMX compliant chars.
-     * Much of the work has already been performed in {@link org.mule.util.ObjectNameHelper}.
+     * Much of the work has already been performed in {@link org.mule.runtime.core.util.ObjectNameHelper}.
      *
      * @param name value to escape for JMX compliance
      * @return value valid for JMX

@@ -6,8 +6,8 @@
  */
 package org.mule.module.db.integration.config;
 
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

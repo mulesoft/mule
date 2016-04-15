@@ -6,7 +6,7 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleEventContext;
 
 /**
  * A test callback that writes the results of a service invocation to the response output stream

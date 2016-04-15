@@ -7,9 +7,9 @@
 package org.mule.module.http.internal.request;
 
 import org.mule.api.execution.CompletionHandler;
-import org.mule.api.context.WorkManager;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.module.http.internal.domain.response.HttpResponse;

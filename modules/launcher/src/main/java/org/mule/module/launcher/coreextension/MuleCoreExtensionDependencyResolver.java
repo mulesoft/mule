@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher.coreextension;
 
-import org.mule.MuleCoreExtension;
+import org.mule.runtime.core.MuleCoreExtension;
 
 import java.util.Collection;
 import java.util.List;

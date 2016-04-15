@@ -21,13 +21,13 @@ import static org.mule.module.json.validation.JsonSchemaTestUtils.getGoodFstabAs
 import static org.mule.module.json.validation.JsonSchemaTestUtils.getGoodFstabInline;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.getGoodFstabInlineAsJsonData;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.toStream;
-import org.mule.api.MuleEvent;
-import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.transformer.AbstractMessageTransformer;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
 import java.util.Arrays;

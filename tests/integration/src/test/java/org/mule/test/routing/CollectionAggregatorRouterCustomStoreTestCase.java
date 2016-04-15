@@ -12,11 +12,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.store.PartitionedInMemoryObjectStore;
+import org.mule.runtime.core.util.store.PartitionedInMemoryObjectStore;
 
 import java.io.Serializable;
 import java.util.Arrays;

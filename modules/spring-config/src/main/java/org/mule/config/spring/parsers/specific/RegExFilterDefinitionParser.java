@@ -7,8 +7,8 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
-import org.mule.routing.filters.RegExFilter;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.routing.filters.RegExFilter;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;

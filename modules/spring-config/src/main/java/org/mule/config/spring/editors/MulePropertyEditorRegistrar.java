@@ -6,12 +6,12 @@
  */
 package org.mule.config.spring.editors;
 
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.processor.ProcessingStrategy;
-import org.mule.util.ClassUtils;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.beans.PropertyEditor;
 import java.io.InputStream;

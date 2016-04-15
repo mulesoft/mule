@@ -6,9 +6,9 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleContext;
-import org.mule.api.transaction.TransactionException;
-import org.mule.transaction.AbstractSingleResourceTransaction;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.core.transaction.AbstractSingleResourceTransaction;
 
 import javax.transaction.Transaction;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -51,7 +51,7 @@ public class TestTransaction extends AbstractSingleResourceTransaction
     /**
      * Really begin the transaction. Note that resources are enlisted yet.
      *
-     * @throws org.mule.api.transaction.TransactionException
+     * @throws org.mule.runtime.core.api.transaction.TransactionException
      *
      */
     protected void doBegin() throws TransactionException
@@ -62,7 +62,7 @@ public class TestTransaction extends AbstractSingleResourceTransaction
     /**
      * Commit the transaction on the underlying resource
      *
-     * @throws org.mule.api.transaction.TransactionException
+     * @throws org.mule.runtime.core.api.transaction.TransactionException
      *
      */
     protected void doCommit() throws TransactionException
@@ -73,7 +73,7 @@ public class TestTransaction extends AbstractSingleResourceTransaction
     /**
      * Rollback the transaction on the underlying resource
      *
-     * @throws org.mule.api.transaction.TransactionException
+     * @throws org.mule.runtime.core.api.transaction.TransactionException
      *
      */
     protected void doRollback() throws TransactionException

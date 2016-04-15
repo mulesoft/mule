@@ -6,7 +6,7 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 
 public class StringAppendTestTransformer extends StringAppendTransformer
 {

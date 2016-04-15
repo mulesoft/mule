@@ -7,9 +7,9 @@
 
 package org.mule.module.launcher.nativelib;
 
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.module.launcher.MuleFoldersUtil;
-import org.mule.util.BackwardsCompatibilityPropertyChecker;
+import org.mule.runtime.core.util.BackwardsCompatibilityPropertyChecker;
 
 import java.io.File;
 

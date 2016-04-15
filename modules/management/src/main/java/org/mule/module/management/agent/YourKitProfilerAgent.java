@@ -6,18 +6,18 @@
  */
 package org.mule.module.management.agent;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.agent.Agent;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.module.management.i18n.ManagementMessages;
 import org.mule.module.management.mbean.YourKitProfilerService;
 import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.module.management.support.JmxSupport;
 import org.mule.module.management.support.JmxSupportFactory;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.Collections;
 import java.util.List;

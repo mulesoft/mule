@@ -6,16 +6,16 @@
  */
 package org.mule.module.xml.filters;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.routing.filter.Filter;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.module.xml.transformer.DelayedResult;
 import org.mule.module.xml.util.MuleResourceResolver;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

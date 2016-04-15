@@ -6,10 +6,10 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.component.DefaultJavaComponent;
-import org.mule.component.simple.StaticComponent;
-import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.component.DefaultJavaComponent;
+import org.mule.runtime.core.component.simple.StaticComponent;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
 import java.util.HashMap;

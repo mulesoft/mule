@@ -6,12 +6,12 @@
  */
 package org.mule.module.oauth2.internal;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -105,6 +105,6 @@ public class TokenResponseProcessor
     private boolean isEmpty(String value)
     {
         //TODO remove "null" check when MULE-8281 gets fixed.
-        return value == null || org.mule.util.StringUtils.isEmpty(value) || "null".equals(value);
+        return value == null || org.mule.runtime.core.util.StringUtils.isEmpty(value) || "null".equals(value);
     }
 }

@@ -6,15 +6,15 @@
  */
 package org.mule.module.oauth2.internal.tokenmanager;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
-import org.mule.util.store.MuleObjectStoreManager;
+import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

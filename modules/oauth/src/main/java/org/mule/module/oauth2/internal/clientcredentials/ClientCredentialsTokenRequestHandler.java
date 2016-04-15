@@ -6,14 +6,14 @@
  */
 package org.mule.module.oauth2.internal.clientcredentials;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.oauth2.internal.AbstractTokenRequestHandler;
 import org.mule.module.oauth2.internal.ApplicationCredentials;

@@ -12,13 +12,13 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.api.MessagingException;
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.api.connection.ConnectionException;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -6,11 +6,11 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.exception.RollbackSourceCallback;
-import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.exception.AbstractExceptionListener;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.RollbackSourceCallback;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.exception.AbstractExceptionListener;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>TestExceptionStrategy</code> is used by the Mule test cases as a direct
- * replacement of the {@link org.mule.exception.AbstractMessagingExceptionStrategy}.
+ * replacement of the {@link org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy}.
  * This is used to test that overriding the default Exception strategy works.
  */
 public class TestExceptionStrategy extends AbstractExceptionListener implements MessagingExceptionHandler, SystemExceptionHandler

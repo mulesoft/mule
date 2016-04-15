@@ -8,8 +8,8 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;

@@ -6,10 +6,10 @@
  */
 package org.mule.module.http.internal;
 
-import static org.mule.util.StringUtils.WHITE_SPACE;
-import org.mule.api.MuleRuntimeException;
+import static org.mule.runtime.core.util.StringUtils.WHITE_SPACE;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.module.http.internal.multipart.HttpPart;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;

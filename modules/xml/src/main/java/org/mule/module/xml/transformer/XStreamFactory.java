@@ -6,7 +6,7 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;

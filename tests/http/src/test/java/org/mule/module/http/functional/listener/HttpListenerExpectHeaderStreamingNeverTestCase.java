@@ -18,7 +18,7 @@ import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

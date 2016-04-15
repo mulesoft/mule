@@ -18,20 +18,20 @@
 
     <http:request-config name="requestConfig" host="localhost" />
 
-    <spring:bean name="notificationLogger" class="org.mule.context.notification.processors.MessageProcessorNotificationLogger"/>
+    <spring:bean name="notificationLogger" class="org.mule.runtime.core.context.notification.processors.MessageProcessorNotificationLogger"/>
 
     <notifications>
         <notification-listener ref="notificationLogger"/>
     </notifications>
 
-    <spring:bean id="objectStore" class="org.mule.util.store.SimpleMemoryObjectStore"/>
+    <spring:bean id="objectStore" class="org.mule.runtime.core.util.store.SimpleMemoryObjectStore"/>
 
     <flow name="singleMP">
         <logger message="check"/>
     </flow>
 
     <flow name="cxfMP">
-        <cxf:jaxws-service port="80" serviceClass="org.mule.context.notification.CxfSimpleService"
+        <cxf:jaxws-service port="80" serviceClass="org.mule.runtime.core.context.notification.CxfSimpleService"
                            enableMuleSoapHeaders="false"/>
         <logger message="check1"/>
         <logger message="check2"/>
@@ -288,8 +288,8 @@
 
     <flow name="composite-source">
         <composite-source>
-            <custom-source class="org.mule.context.notification.processors.MessageProcessorNotificationTestCase$TestMessageSource"/>
-            <custom-source class="org.mule.context.notification.processors.MessageProcessorNotificationTestCase$TestMessageSource"/>
+            <custom-source class="org.mule.runtime.core.context.notification.processors.MessageProcessorNotificationTestCase$TestMessageSource"/>
+            <custom-source class="org.mule.runtime.core.context.notification.processors.MessageProcessorNotificationTestCase$TestMessageSource"/>
         </composite-source>
         <logger level="INFO"/>
     </flow>
@@ -321,7 +321,7 @@
 
     <flow name="customAggregator">
         <collection-splitter/>
-        <custom-aggregator class="org.mule.routing.outbound.AggregationTestCase$Aggregator" timeout="2000"
+        <custom-aggregator class="org.mule.runtime.core.routing.outbound.AggregationTestCase$Aggregator" timeout="2000"
                            failOnTimeout="false"/>
         <logger level="INFO"/>
     </flow>

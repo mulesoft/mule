@@ -6,11 +6,11 @@
  */
 package org.mule.module.jaas;
 
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.UnauthorisedException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.security.AbstractSecurityProvider;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.security.AbstractSecurityProvider;
 
 import java.io.IOException;
 import java.security.Security;
@@ -130,7 +130,7 @@ public class JaasSimpleAuthenticationProvider extends AbstractSecurityProvider
     {
 
         String loginConfigUrl = "file://"
-                + org.mule.util.FileUtils.getResourcePath(loginConfig,
+                + org.mule.runtime.core.util.FileUtils.getResourcePath(loginConfig,
                 JaasSimpleAuthenticationProvider.class);
 
         boolean alreadySet = false;
@@ -163,11 +163,11 @@ public class JaasSimpleAuthenticationProvider extends AbstractSecurityProvider
      * Login Context is successfully created, it will then attempt to login.
      *
      * @return Authentication
-     * @throws org.mule.api.security.SecurityException
+     * @throws org.mule.runtime.core.api.security.SecurityException
      *
      */
     public final Authentication authenticate(Authentication authentication)
-            throws org.mule.api.security.SecurityException
+            throws org.mule.runtime.core.api.security.SecurityException
     {
         LoginContext loginContext;
         JaasAuthentication auth = (JaasAuthentication)authentication;
@@ -189,7 +189,7 @@ public class JaasSimpleAuthenticationProvider extends AbstractSecurityProvider
         }
         catch (LoginException e)
         {
-            throw new org.mule.api.security.UnauthorisedException(
+            throw new org.mule.runtime.core.api.security.UnauthorisedException(
                     CoreMessages.cannotLoadFromClasspath(loginContextName));
         }
 

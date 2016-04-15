@@ -12,8 +12,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import org.mule.api.Closeable;
-import org.mule.api.DefaultMuleException;
+import org.mule.runtime.core.api.Closeable;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

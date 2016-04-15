@@ -6,7 +6,7 @@
  */
 package org.mule.module.scripting.component;
 
-import org.mule.api.registry.Registry;
+import org.mule.runtime.core.api.registry.Registry;
 
 import java.util.Collection;
 import java.util.Map;

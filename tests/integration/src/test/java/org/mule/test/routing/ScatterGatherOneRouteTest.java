@@ -6,13 +6,13 @@
  */
 package org.mule.test.routing;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.routing.ScatterGatherRouter;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.yourkit.util.Asserts;

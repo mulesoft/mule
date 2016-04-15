@@ -14,13 +14,13 @@ import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.source.polling.PollingWorker;
-import org.mule.source.polling.schedule.PollScheduler;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.source.polling.PollingWorker;
+import org.mule.runtime.core.source.polling.schedule.PollScheduler;
 
 import java.util.Properties;
 import java.util.TimeZone;
@@ -39,7 +39,7 @@ import org.quartz.impl.StdSchedulerFactory;
 
 /**
  * <p>
- * Cron {@link org.mule.api.schedule.Scheduler} implemented with Quartz.
+ * Cron {@link org.mule.runtime.core.api.schedule.Scheduler} implemented with Quartz.
  * </p>
  *
  * @since 3.5.0

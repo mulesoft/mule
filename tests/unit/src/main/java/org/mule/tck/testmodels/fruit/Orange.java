@@ -6,9 +6,9 @@
  */
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Callable;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.Callable;
 
 import java.util.HashMap;
 import java.util.List;

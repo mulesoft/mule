@@ -8,12 +8,12 @@ package org.mule.module.extension.internal;
 
 import static org.mockito.Mockito.verify;
 import static org.mule.tck.MuleTestUtils.spyInjector;
-import org.mule.api.Injector;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.module.extension.internal.introspection.AbstractInterceptable;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

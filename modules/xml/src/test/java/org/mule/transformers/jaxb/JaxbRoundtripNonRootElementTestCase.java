@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.jaxb;
+package org.mule.runtime.core.transformers.jaxb;
 
-import org.mule.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.jaxb.model.Person;
 import org.mule.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import org.w3c.dom.Document;
 

@@ -6,8 +6,8 @@
  */
 package org.mule.config.spring.processors;
 
-import org.mule.api.lifecycle.LifecycleState;
-import org.mule.api.lifecycle.LifecycleStateAware;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.lifecycle.LifecycleStateAware;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;

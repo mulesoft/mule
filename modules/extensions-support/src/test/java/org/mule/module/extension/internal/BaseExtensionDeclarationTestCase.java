@@ -16,7 +16,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
-import org.mule.api.registry.ServiceRegistry;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;

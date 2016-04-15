@@ -10,13 +10,13 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.FileUtils;
+import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;

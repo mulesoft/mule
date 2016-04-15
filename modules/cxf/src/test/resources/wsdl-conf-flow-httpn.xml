@@ -12,7 +12,7 @@
 
     <flow name="cxfService">
         <http:listener config-ref="httpConfig" path="cxfService"/>
-        <cxf:simple-service serviceClass="org.mule.api.lifecycle.Callable" />
+        <cxf:simple-service serviceClass="org.mule.runtime.core.api.lifecycle.Callable" />
 
         <test:component />
     </flow>

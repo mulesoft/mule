@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher.application;
 
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.module.launcher.DeploymentException;
 import org.mule.module.launcher.DeploymentStopException;
 

@@ -8,9 +8,9 @@ package org.mule.module.extension.internal.introspection.describer;
 
 import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
-import static org.mule.util.Preconditions.checkState;
+import static org.mule.runtime.core.util.Preconditions.checkState;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Extension;
@@ -37,8 +37,8 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
-import org.mule.util.ClassUtils;
-import org.mule.util.CollectionUtils;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.CollectionUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;

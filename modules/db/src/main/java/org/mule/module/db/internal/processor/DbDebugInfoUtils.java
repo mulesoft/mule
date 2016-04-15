@@ -7,8 +7,8 @@
 
 package org.mule.module.db.internal.processor;
 
-import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
-import org.mule.api.debug.FieldDebugInfo;
+import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
+import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.module.db.internal.domain.query.Query;
 import org.mule.module.db.internal.domain.query.QueryTemplate;
 

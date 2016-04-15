@@ -6,7 +6,7 @@
  */
 package org.mule.functional.junit4;
 
-import org.mule.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.ConfigurationException;
 
 import org.junit.Assert;
 import org.junit.Rule;

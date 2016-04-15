@@ -6,10 +6,10 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.processor.AbstractFilteringMessageProcessor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 
 public class FailingRouter extends AbstractFilteringMessageProcessor
 {

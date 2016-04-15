@@ -12,7 +12,7 @@
         <notification event="CONNECTOR-MESSAGE"/>
     </notifications>
 
-    <spring:bean name="notificationLogger" class="org.mule.context.notification.ConnectorMessageNotificationLogger"/>
+    <spring:bean name="notificationLogger" class="org.mule.runtime.core.context.notification.ConnectorMessageNotificationLogger"/>
 
     <notifications>
         <notification-listener ref="notificationLogger"/>

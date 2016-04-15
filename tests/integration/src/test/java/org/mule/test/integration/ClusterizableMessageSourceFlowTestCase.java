@@ -9,14 +9,14 @@ package org.mule.test.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.DefaultMuleContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.construct.Flow;
-import org.mule.context.notification.ClusterNodeNotification;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.context.notification.ClusterNodeNotification;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.source.ClusterizableMessageSourceWrapper;
-import org.mule.connector.PollingController;
+import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
+import org.mule.runtime.core.connector.PollingController;
 
 import org.junit.Test;
 

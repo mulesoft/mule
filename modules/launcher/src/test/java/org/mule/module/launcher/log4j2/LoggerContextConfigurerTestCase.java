@@ -23,10 +23,10 @@ import static org.mockito.Mockito.when;
 import static org.mule.module.launcher.log4j2.LoggerContextConfigurer.FORCED_CONSOLE_APPENDER_NAME;
 import static org.mule.module.launcher.log4j2.LoggerContextConfigurer.PER_APP_FILE_APPENDER_NAME;
 
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.io.File;
 import java.util.ArrayList;

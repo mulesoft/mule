@@ -32,6 +32,6 @@
     <flow name="authenticate">
         <http:listener path="authenticate" config-ref="listenerConfig"/>
         <http:basic-security-filter realm="mule-realm"/>
-        <component class="org.mule.component.simple.EchoComponent"/>
+        <component class="org.mule.runtime.core.component.simple.EchoComponent"/>
     </flow>
 </mule>

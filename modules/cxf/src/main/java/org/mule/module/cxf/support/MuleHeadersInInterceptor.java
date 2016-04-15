@@ -6,9 +6,9 @@
  */
 package org.mule.module.cxf.support;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.module.cxf.CxfConstants;
 
 import java.util.Set;

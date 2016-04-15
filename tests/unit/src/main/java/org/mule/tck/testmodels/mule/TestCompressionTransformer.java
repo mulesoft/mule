@@ -6,9 +6,9 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.compression.AbstractCompressionTransformer;
-import org.mule.util.compression.GZipCompression;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.compression.AbstractCompressionTransformer;
+import org.mule.runtime.core.util.compression.GZipCompression;
 
 public class TestCompressionTransformer extends AbstractCompressionTransformer
 {

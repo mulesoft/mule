@@ -10,8 +10,8 @@ package org.mule.tck.junit4.matcher;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import org.mule.api.debug.FieldDebugInfo;
-import org.mule.api.debug.ObjectFieldDebugInfo;
+import org.mule.runtime.core.api.debug.FieldDebugInfo;
+import org.mule.runtime.core.api.debug.ObjectFieldDebugInfo;
 
 import java.util.List;
 

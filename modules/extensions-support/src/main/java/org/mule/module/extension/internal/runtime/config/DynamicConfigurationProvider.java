@@ -6,14 +6,14 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
-import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
@@ -23,7 +23,7 @@ import org.mule.extension.api.runtime.ExpirationPolicy;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.util.collection.ImmutableListCollector;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import java.util.List;
 import java.util.Map;

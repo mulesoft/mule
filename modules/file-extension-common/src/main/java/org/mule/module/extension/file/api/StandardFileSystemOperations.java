@@ -6,14 +6,14 @@
  */
 package org.mule.module.extension.file.api;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.message.NullPayload;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.DataTypeParameters;
 import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.annotation.param.Optional;
-import org.mule.message.OutputHandler;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.Iterator;

@@ -10,7 +10,7 @@
 
     <custom-transformer name="global-transformer" class="org.mule.test.integration.transformer.LifecycleTrackerTransformer"/>
     <custom-filter name="global-filter" class="org.mule.test.integration.filter.LifecycleTrackerFilter"/>
-    <custom-processor name="global-processor" class="org.mule.processor.NullMessageProcessor"/>
+    <custom-processor name="global-processor" class="org.mule.runtime.core.processor.NullMessageProcessor"/>
     <processor-chain name="global-composite-processor">
         <filter ref="global-filter"/>    
         <transformer ref="global-transformer"/>  

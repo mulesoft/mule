@@ -9,21 +9,21 @@ package org.mule.test.integration.watermark;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.schedule.Scheduler;
-import org.mule.api.schedule.SchedulerFactoryPostProcessor;
-import org.mule.api.schedule.Schedulers;
-import org.mule.api.store.ObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.schedule.Scheduler;
+import org.mule.runtime.core.api.schedule.SchedulerFactoryPostProcessor;
+import org.mule.runtime.core.api.schedule.Schedulers;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.config.spring.factories.WatermarkFactoryBean;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.util.store.ObjectStorePartition;
+import org.mule.runtime.core.util.store.ObjectStorePartition;
 
 import java.io.Serializable;
 import java.util.ArrayList;

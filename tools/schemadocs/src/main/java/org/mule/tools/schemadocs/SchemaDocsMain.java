@@ -6,7 +6,7 @@
  */
 package org.mule.tools.schemadocs;
 
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

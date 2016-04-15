@@ -6,9 +6,9 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.context.WorkManagerSource;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.module.http.internal.listener.ServerAddressMap;
 import org.mule.module.http.internal.listener.ServerAddress;
 
@@ -17,7 +17,7 @@ import java.util.concurrent.Executor;
 
 /**
  * {@link org.mule.module.http.internal.listener.grizzly.ExecutorProvider} implementation
- * that retrieves an {@link java.util.concurrent.Executor} from a {@link org.mule.api.context.WorkManagerSource}
+ * that retrieves an {@link java.util.concurrent.Executor} from a {@link org.mule.runtime.core.api.context.WorkManagerSource}
  */
 public class WorkManagerSourceExecutorProvider implements ExecutorProvider
 {

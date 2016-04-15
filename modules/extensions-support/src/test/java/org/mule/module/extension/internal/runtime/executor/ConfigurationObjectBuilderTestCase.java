@@ -12,7 +12,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getResolver;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;

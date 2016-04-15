@@ -6,18 +6,18 @@
  */
 package org.mule.module.extension.internal.runtime.config;
 
-import static org.mule.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.api.config.ConfigurationInstanceNotification.CONFIGURATION_STOPPED;
-import static org.mule.util.Preconditions.checkState;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.config.ConfigurationInstanceNotification;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.config.ConfigurationInstanceNotification.CONFIGURATION_STOPPED;
+import static org.mule.runtime.core.util.Preconditions.checkState;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.ConfigurationInstanceNotification;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connector.ConnectionManager;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.extension.api.introspection.config.ConfigurationModel;
 import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
@@ -25,7 +25,7 @@ import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationStats;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.module.extension.internal.introspection.AbstractInterceptable;
-import org.mule.time.TimeSupplier;
+import org.mule.runtime.core.time.TimeSupplier;
 
 import java.util.List;
 import java.util.Optional;

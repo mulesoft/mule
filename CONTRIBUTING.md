@@ -146,7 +146,7 @@ You can debug following these steps. There is also a more in-depth guide availab
 5. Click **Select All**, then click **OK**, then **Finish**.
 6. In the Package Explorer, right click your launcher project's name, then select **Debug As > Debug Configurations...**
 7. In the **Debug Configurations** wizard, double-click **Java Application**.
-8. In the **Main class** field, enter the following content: `org.mule.MuleServer`
+8. In the **Main class** field, enter the following content: `org.mule.runtime.core.MuleServer`
 9. Click the **Arguments** tab. In the **Program Arguments** field, enter the following content: `-config <path to a Mule config>`
 10. Click **Apply**, then click **Debug**.
 11. Eclipse requests permission to switch to the **Debug Perspective**; click **Yes** to accept and open.

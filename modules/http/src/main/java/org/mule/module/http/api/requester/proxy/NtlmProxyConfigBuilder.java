@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.api.requester.proxy;
 
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import org.mule.module.http.internal.request.DefaultProxyConfig;
 import org.mule.module.http.internal.request.NtlmProxyConfig;

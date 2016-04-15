@@ -20,9 +20,9 @@ import static org.mule.module.extension.exception.HeisenbergConnectionExceptionE
 import static org.mule.module.extension.model.HealthStatus.DEAD;
 import static org.mule.module.extension.model.KnockeableDoor.knock;
 import static org.mule.module.extension.model.Ricin.RICIN_KILL_MESSAGE;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.api.connection.ConnectionException;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;

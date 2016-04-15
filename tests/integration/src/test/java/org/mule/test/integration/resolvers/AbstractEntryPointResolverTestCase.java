@@ -7,8 +7,8 @@
 package org.mule.test.integration.resolvers;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Map;

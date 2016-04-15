@@ -6,14 +6,14 @@
  */
 package org.mule.module.extension.internal.runtime.source;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.api.execution.CompletionHandler;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.api.temporary.MuleMessage;
-import org.mule.execution.AsyncResponseFlowProcessingPhaseTemplate;
-import org.mule.execution.ResponseCompletionCallback;
+import org.mule.runtime.core.execution.AsyncResponseFlowProcessingPhaseTemplate;
+import org.mule.runtime.core.execution.ResponseCompletionCallback;
 
 import java.io.Serializable;
 

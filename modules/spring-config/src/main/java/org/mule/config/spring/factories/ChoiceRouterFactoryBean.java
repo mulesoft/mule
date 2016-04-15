@@ -6,8 +6,8 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.routing.AbstractSelectiveRouter;
-import org.mule.routing.ChoiceRouter;
+import org.mule.runtime.core.routing.AbstractSelectiveRouter;
+import org.mule.runtime.core.routing.ChoiceRouter;
 
 public class ChoiceRouterFactoryBean extends AbstractSelectiveRouterFactoryBean
 {

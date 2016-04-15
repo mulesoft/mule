@@ -6,15 +6,15 @@
  */
 package org.mule.module.cxf.builder;
 
-import org.mule.AbstractAnnotatedObject;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.MuleInvoker;
@@ -24,9 +24,9 @@ import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.module.cxf.support.MuleServiceConfiguration;
 import org.mule.module.cxf.support.WSDLQueryHandler;
-import org.mule.transformer.types.MimeTypes;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.transformer.types.MimeTypes;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;

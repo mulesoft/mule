@@ -6,7 +6,7 @@
  */
 package org.mule.module.artifact.classloader;
 
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;

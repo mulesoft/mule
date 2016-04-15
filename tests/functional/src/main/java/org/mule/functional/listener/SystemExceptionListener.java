@@ -8,13 +8,13 @@ package org.mule.functional.listener;
 
 import static org.junit.Assert.fail;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.notification.ExceptionNotificationListener;
-import org.mule.api.exception.RollbackSourceCallback;
-import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.context.notification.ExceptionNotification;
-import org.mule.context.notification.NotificationException;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
+import org.mule.runtime.core.api.exception.RollbackSourceCallback;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.context.notification.ExceptionNotification;
+import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Listener for exceptions managed by the {@link org.mule.api.exception.SystemExceptionHandler}.
+ * Listener for exceptions managed by the {@link org.mule.runtime.core.api.exception.SystemExceptionHandler}.
  */
 public class SystemExceptionListener
 {

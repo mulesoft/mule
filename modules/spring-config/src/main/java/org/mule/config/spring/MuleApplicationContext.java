@@ -6,8 +6,8 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.MuleContext;
-import org.mule.config.ConfigResource;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.config.ConfigResource;
 
 import org.springframework.beans.BeansException;
 import org.springframework.core.io.Resource;

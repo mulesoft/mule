@@ -6,10 +6,10 @@
  */
 package org.mule.functional.testmodels.services;
 
-import org.mule.api.component.simple.EchoService;
-import org.mule.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.component.simple.EchoService;
+import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Collections;
 import java.util.Date;

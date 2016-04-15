@@ -27,7 +27,7 @@ import org.mule.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
 import org.mule.module.launcher.util.DebuggableReentrantLock;
 import org.mule.module.launcher.util.ObservableList;
-import org.mule.util.Preconditions;
+import org.mule.runtime.core.util.Preconditions;
 
 import com.google.common.collect.ImmutableSet;
 

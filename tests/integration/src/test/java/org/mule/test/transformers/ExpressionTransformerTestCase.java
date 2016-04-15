@@ -10,12 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.expression.ExpressionConfig;
-import org.mule.expression.transformers.ExpressionArgument;
-import org.mule.expression.transformers.ExpressionTransformer;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.expression.ExpressionConfig;
+import org.mule.runtime.core.expression.transformers.ExpressionArgument;
+import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import groovyjarjarasm.asm.ClassWriter;

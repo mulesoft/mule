@@ -6,8 +6,8 @@
  */
 package org.mule.module.http.internal;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 
 import java.util.Iterator;
 import java.util.Map;

@@ -7,10 +7,10 @@
 package org.mule.module.extension.internal.runtime.resolver;
 
 import static org.mule.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Lifecycle;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.collect.ImmutableList;

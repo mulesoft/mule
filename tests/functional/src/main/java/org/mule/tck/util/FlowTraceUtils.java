@@ -9,11 +9,11 @@ package org.mule.tck.util;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.context.notification.FlowCallStack;
-import org.mule.api.context.notification.FlowStackElement;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.context.notification.FlowStackElement;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import java.util.concurrent.CountDownLatch;
 

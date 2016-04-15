@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.time.Time;
+import org.mule.runtime.core.time.Time;
 
 import java.util.concurrent.TimeUnit;
 

@@ -7,7 +7,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.routing.AbstractSplitter;
+import org.mule.runtime.core.routing.AbstractSplitter;
 
 /**
  * Generic router definition parser for parsing all Router elements.

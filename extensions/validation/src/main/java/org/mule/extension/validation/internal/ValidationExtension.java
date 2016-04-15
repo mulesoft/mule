@@ -6,17 +6,17 @@
  */
 package org.mule.extension.validation.internal;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.AbstractAnnotatedObject;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.NamedObject;
-import org.mule.api.config.Config;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.RegistrationException;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.core.api.config.Config;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Extensible;
 import org.mule.extension.api.annotation.Extension;
@@ -29,7 +29,7 @@ import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.operation.OperationModel;
 import org.mule.extension.validation.api.ExceptionFactory;
 import org.mule.extension.validation.api.Validator;
-import org.mule.util.ObjectNameHelper;
+import org.mule.runtime.core.util.ObjectNameHelper;
 
 import java.util.Locale;
 

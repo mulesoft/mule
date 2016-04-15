@@ -47,7 +47,7 @@
 		            </script:script>
 		        </script:component>
             </catch-exception-strategy>
-            <catch-exception-strategy when="#[exception.causeMatches('*') &amp;&amp; !exception.causedBy(java.lang.ArithmeticException) &amp;&amp; !exception.causedBy(org.mule.api.registry.ResolverException)]">
+            <catch-exception-strategy when="#[exception.causeMatches('*') &amp;&amp; !exception.causedBy(java.lang.ArithmeticException) &amp;&amp; !exception.causedBy(org.mule.runtime.core.api.registry.ResolverException)]">
                 <append-string-transformer message=" catch-9"/>
             </catch-exception-strategy>
             <exception-strategy ref="global-catch"/>

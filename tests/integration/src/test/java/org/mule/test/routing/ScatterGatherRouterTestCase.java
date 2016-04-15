@@ -17,20 +17,20 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.connector.DispatchException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.AggregationContext;
-import org.mule.api.routing.ResponseTimeoutException;
-import org.mule.api.routing.RoutingException;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.AggregationContext;
+import org.mule.runtime.core.api.routing.ResponseTimeoutException;
+import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.routing.AggregationStrategy;
-import org.mule.routing.CompositeRoutingException;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.routing.AggregationStrategy;
+import org.mule.runtime.core.routing.CompositeRoutingException;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
@@ -116,7 +116,7 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
     public void routeWithMelException() throws Exception
     {
         assertRouteException("routeWithMelException",
-                             EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: Execution of the expression \"invalidExpr\" failed. (org.mule.api.expression.ExpressionRuntimeException).",
+                             EXCEPTION_MESSAGE_TITLE_PREFIX + "\t1: Execution of the expression \"invalidExpr\" failed. (org.mule.runtime.core.api.expression.ExpressionRuntimeException).",
                              ").");
     }
 

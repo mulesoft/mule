@@ -16,7 +16,7 @@ public interface Callback<T>
 {
 
     /**
-     * @param source is the source value of the {@link org.mule.api.context.notification.ServerNotification} received by the notification listener that executes this callback
+     * @param source is the source value of the {@link org.mule.runtime.core.api.context.notification.ServerNotification} received by the notification listener that executes this callback
      */
     public void execute(final T source);
 }

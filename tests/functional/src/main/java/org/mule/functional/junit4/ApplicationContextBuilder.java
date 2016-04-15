@@ -6,15 +6,15 @@
  */
 package org.mule.functional.junit4;
 
-import static org.mule.config.bootstrap.ArtifactType.APP;
-import org.mule.DefaultMuleContext;
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.api.context.MuleContextFactory;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.context.DefaultMuleContextBuilder;
-import org.mule.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.TestingWorkListener;
 
 import java.util.ArrayList;

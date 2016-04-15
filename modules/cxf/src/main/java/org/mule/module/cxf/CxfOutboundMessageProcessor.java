@@ -6,27 +6,27 @@
  */
 package org.mule.module.cxf;
 
-import static org.mule.PropertyScope.OUTBOUND;
+import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import org.mule.DefaultMuleMessage;
-import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.NonBlockingSupported;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.connector.DispatchException;
-import org.mule.api.processor.CloneableMessageProcessor;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.processor.CloneableMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.module.cxf.i18n.CxfMessages;
 import org.mule.module.cxf.security.WebServiceSecurityException;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

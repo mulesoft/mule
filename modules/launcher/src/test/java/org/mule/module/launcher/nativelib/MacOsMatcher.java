@@ -8,7 +8,7 @@
 package org.mule.module.launcher.nativelib;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;

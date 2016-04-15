@@ -6,11 +6,11 @@
  */
 package org.mule.module.launcher.coreextension;
 
-import org.mule.CoreExtensionsAware;
-import org.mule.MuleCoreExtension;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.CoreExtensionsAware;
+import org.mule.runtime.core.MuleCoreExtension;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.DeploymentServiceAware;

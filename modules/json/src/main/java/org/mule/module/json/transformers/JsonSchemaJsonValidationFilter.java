@@ -6,14 +6,14 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.module.json.JsonData;
 import org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JsonLoader;

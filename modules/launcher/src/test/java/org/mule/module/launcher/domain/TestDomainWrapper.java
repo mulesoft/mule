@@ -6,8 +6,8 @@
  */
 package org.mule.module.launcher.domain;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.application.Application;

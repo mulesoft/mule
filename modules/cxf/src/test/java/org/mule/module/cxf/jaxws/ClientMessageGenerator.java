@@ -6,8 +6,8 @@
  */
 package org.mule.module.cxf.jaxws;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.lifecycle.Callable;
 
 
 public class ClientMessageGenerator implements Callable 

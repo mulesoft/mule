@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.support;
+package org.mule.runtime.core.management.support;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.context.DefaultMuleContextBuilder;
-import org.mule.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.module.management.agent.JmxApplicationAgent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

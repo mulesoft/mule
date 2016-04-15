@@ -9,7 +9,7 @@ package org.mule.test.infrastructure.process.rules;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.infrastructure.server.ftp.EmbeddedFtpServer;
-import org.mule.util.FileUtils;
+import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 

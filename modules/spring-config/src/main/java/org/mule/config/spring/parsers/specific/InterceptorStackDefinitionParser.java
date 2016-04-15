@@ -11,7 +11,7 @@ import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.interceptor.InterceptorStack;
+import org.mule.runtime.core.interceptor.InterceptorStack;
 
 /**
  * This allows a interceptor-stack to be defined globally, or configured on a

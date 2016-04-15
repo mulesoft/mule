@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.mule.util.SystemUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.util.Map;
 import java.util.Map.Entry;

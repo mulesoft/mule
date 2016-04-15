@@ -7,8 +7,8 @@
 package org.mule.module.extension.internal.util;
 
 import static org.springframework.util.ReflectionUtils.setField;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.module.extension.internal.introspection.ParameterGroup;
 import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
@@ -16,7 +16,7 @@ import org.mule.module.extension.internal.runtime.DefaultObjectBuilder;
 import org.mule.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
-import org.mule.util.collection.ImmutableListCollector;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import com.google.common.collect.ImmutableList;
 

@@ -9,8 +9,8 @@ package org.mule.module.http.internal.request.client;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.internal.request.SuccessStatusCodeValidator.NULL_VALIDATOR;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.requester.HttpRequestOperationConfig;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
@@ -18,7 +18,7 @@ import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.api.tls.TlsContextFactory;
-import org.mule.util.ObjectNameHelper;
+import org.mule.runtime.core.util.ObjectNameHelper;
 
 public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequesterBuilder>
 {

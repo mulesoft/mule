@@ -6,16 +6,16 @@
  */
 package org.mule.config.spring.factories;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.api.routing.filter.Filter;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.routing.MessageProcessorFilterPair;
-import org.mule.routing.filters.AcceptAllFilter;
-import org.mule.routing.filters.ExpressionFilter;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.routing.MessageProcessorFilterPair;
+import org.mule.runtime.core.routing.filters.AcceptAllFilter;
+import org.mule.runtime.core.routing.filters.ExpressionFilter;
 
 import java.util.List;
 

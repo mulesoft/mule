@@ -6,11 +6,11 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.routing.RoutingException;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.routing.outbound.FilteringOutboundRouter;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.routing.outbound.FilteringOutboundRouter;
 
 public class ExceptionThrowingOutboundRouter extends FilteringOutboundRouter
 {

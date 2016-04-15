@@ -6,8 +6,8 @@
  */
 package org.mule.test.transformers;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLAssert;

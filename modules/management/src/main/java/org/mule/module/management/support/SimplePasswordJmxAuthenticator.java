@@ -8,7 +8,7 @@ package org.mule.module.management.support;
 
 import org.mule.module.management.agent.ConfigurableJMXAuthenticator;
 import org.mule.module.management.agent.JmxApplicationAgent;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.security.Principal;
 import java.util.Collections;

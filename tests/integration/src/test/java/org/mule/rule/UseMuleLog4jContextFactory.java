@@ -6,7 +6,7 @@
  */
 package org.mule.rule;
 
-import org.mule.api.MuleContext;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.module.launcher.log4j2.MuleLog4jContextFactory;
 
 import org.apache.logging.log4j.LogManager;

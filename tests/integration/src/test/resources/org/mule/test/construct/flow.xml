@@ -335,7 +335,7 @@
 
     <spring:bean name="pojo" class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$Pojo"/>
 
-    <spring:bean name="appender" class="org.mule.transformer.simple.StringAppendTransformer">
+    <spring:bean name="appender" class="org.mule.runtime.core.transformer.simple.StringAppendTransformer">
         <spring:constructor-arg value="recieved"/>
     </spring:bean>
 
@@ -379,7 +379,7 @@
     </sub-flow>
 
     <flow name="customRouter">
-        <custom-router class="org.mule.routing.outbound.MulticastingRouter">
+        <custom-router class="org.mule.runtime.core.routing.outbound.MulticastingRouter">
             <append-string-transformer message="a" />
             <append-string-transformer message="b" />
             <append-string-transformer message="c" />

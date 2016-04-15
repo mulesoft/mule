@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import com.google.common.io.ByteSource;
 import com.google.testing.compile.JavaFileObjects;

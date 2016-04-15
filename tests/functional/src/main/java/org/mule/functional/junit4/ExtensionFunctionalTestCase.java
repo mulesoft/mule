@@ -6,15 +6,15 @@
  */
 package org.mule.functional.junit4;
 
-import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.util.IOUtils.getResourceAsUrl;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.util.IOUtils.getResourceAsUrl;
 import static org.springframework.util.ReflectionUtils.findMethod;
-import org.mule.DefaultMuleContext;
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.registry.ServiceRegistry;
-import org.mule.config.MuleManifest;
-import org.mule.config.builders.AbstractConfigurationBuilder;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
@@ -27,8 +27,8 @@ import org.mule.module.extension.internal.introspection.describer.AnnotationsBas
 import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.module.extension.internal.resources.AbstractResourcesGenerator;
-import org.mule.registry.SpiServiceRegistry;
-import org.mule.util.ArrayUtils;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.util.ArrayUtils;
 
 import com.google.common.collect.ImmutableList;
 

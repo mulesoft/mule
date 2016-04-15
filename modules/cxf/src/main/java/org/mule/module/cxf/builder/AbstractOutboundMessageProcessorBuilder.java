@@ -6,19 +6,19 @@
  */
 package org.mule.module.cxf.builder;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.CreateException;
-import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.CxfPayloadToArguments;
 import org.mule.module.cxf.config.WsSecurity;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
-import org.mule.transformer.types.MimeTypes;
+import org.mule.runtime.core.transformer.types.MimeTypes;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

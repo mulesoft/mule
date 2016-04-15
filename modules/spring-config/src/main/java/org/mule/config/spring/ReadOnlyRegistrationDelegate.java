@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.registry.RegistrationException;
+import org.mule.runtime.core.api.registry.RegistrationException;
 
 import java.util.Map;
 

@@ -8,18 +8,18 @@ package org.mule.config.spring.flow;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.api.MuleContext;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.api.processor.ProcessingStrategy;
-import org.mule.construct.Flow;
-import org.mule.construct.flow.DefaultFlowProcessingStrategy;
-import org.mule.processor.AsyncDelegateMessageProcessor;
-import org.mule.processor.strategy.AbstractThreadingProfileProcessingStrategy;
-import org.mule.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
-import org.mule.processor.strategy.SynchronousProcessingStrategy;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
+import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
+import org.mule.runtime.core.processor.strategy.AbstractThreadingProfileProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.QueuedAsynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.List;
@@ -199,7 +199,7 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
 
         @Override
         public void configureProcessors(List<MessageProcessor> processors,
-                                        org.mule.api.processor.StageNameSource nameSource,
+                                        org.mule.runtime.core.api.processor.StageNameSource nameSource,
                                         MessageProcessorChainBuilder chainBuilder,
                                         MuleContext muleContext)
         {

@@ -6,12 +6,12 @@
  */
 package org.mule.module.scripting.transformer;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.api.transformer.TransformerException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.module.scripting.component.Scriptable;
-import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import javax.script.Bindings;
 import javax.script.ScriptException;

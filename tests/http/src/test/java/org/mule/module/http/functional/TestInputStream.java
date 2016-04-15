@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.functional;
 
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.IOException;
 import java.io.InputStream;

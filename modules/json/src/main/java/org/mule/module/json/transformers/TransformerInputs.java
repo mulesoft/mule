@@ -6,10 +6,10 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.ClassUtils;
 
 import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.SchemaFactory;

@@ -14,7 +14,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.module.oauth2.internal.OAuthConstants;

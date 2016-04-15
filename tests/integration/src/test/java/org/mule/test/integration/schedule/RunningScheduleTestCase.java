@@ -10,9 +10,9 @@ package org.mule.test.integration.schedule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleException;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.Predicate;
+import org.mule.runtime.core.util.Predicate;
 
 import org.junit.Test;
 

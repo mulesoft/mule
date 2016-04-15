@@ -6,9 +6,9 @@
  */
 package org.mule.module.pgp;
 
-import org.mule.api.security.Authentication;
-import org.mule.api.security.SecurityContext;
-import org.mule.api.security.SecurityContextFactory;
+import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.security.SecurityContextFactory;
 
 public class PGPSecurityContextFactory implements SecurityContextFactory
 {

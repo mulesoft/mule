@@ -6,9 +6,9 @@
  */
 package org.mule.module.xml.xpath;
 
-import static org.mule.util.Preconditions.checkArgument;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleRuntimeException;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.NamespaceManager;
 

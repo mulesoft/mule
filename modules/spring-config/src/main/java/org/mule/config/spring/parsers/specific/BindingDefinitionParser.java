@@ -7,7 +7,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.routing.AbstractAggregator;
+import org.mule.runtime.core.routing.AbstractAggregator;
 
 /**
  * Binding definition parser for parsing all binding elements configured as part of the service.

@@ -11,13 +11,13 @@ import static org.junit.Assert.assertThat;
 import static org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase.JSON_REQUEST;
 import static org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase.JSON_RESPONSE;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transaction.Transaction;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.transaction.TransactionCoordination;
+import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;

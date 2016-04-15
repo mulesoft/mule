@@ -37,13 +37,13 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase
     @After
     public void after()
     {
-        verify(event, never()).setMessage(any(org.mule.api.MuleMessage.class));
+        verify(event, never()).setMessage(any(org.mule.runtime.core.api.MuleMessage.class));
     }
 
     @Override
     protected MuleMessage getOutputMessage()
     {
-        ArgumentCaptor<org.mule.api.MuleMessage> captor = ArgumentCaptor.forClass(org.mule.api.MuleMessage.class);
+        ArgumentCaptor<org.mule.runtime.core.api.MuleMessage> captor = ArgumentCaptor.forClass(org.mule.runtime.core.api.MuleMessage.class);
         verify(event).setFlowVariable(same(TARGET), captor.capture());
         MuleMessage message = captor.getValue();
 

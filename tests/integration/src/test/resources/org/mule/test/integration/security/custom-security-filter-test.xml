@@ -30,9 +30,9 @@
     </spring:beans>
 
     <flow name="test">
-        <custom-security-filter class="org.mule.security.UsernamePasswordAuthenticationFilter">
+        <custom-security-filter class="org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter">
             <spring:property name="password" value="#[message.inboundProperties.pass]"/>
         </custom-security-filter>
-        <component class="org.mule.component.simple.EchoComponent"/>
+        <component class="org.mule.runtime.core.component.simple.EchoComponent"/>
     </flow>
 </mule>

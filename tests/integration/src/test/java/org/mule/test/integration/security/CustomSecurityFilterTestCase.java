@@ -10,9 +10,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleMessage;
-import org.mule.config.ExceptionHelper;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.HashMap;

@@ -7,8 +7,8 @@
 
 package org.mule.module.db.internal.config.resolver.query;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.module.db.internal.domain.query.Query;
 import org.mule.module.db.internal.parser.SimpleQueryTemplateParser;
 import org.mule.module.db.internal.resolver.database.DbConfigResolver;

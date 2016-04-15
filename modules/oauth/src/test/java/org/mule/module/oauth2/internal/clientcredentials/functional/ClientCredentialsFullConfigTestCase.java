@@ -22,7 +22,7 @@ import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.module.oauth2.asserter.OAuthContextFunctionAsserter;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.store.SimpleMemoryObjectStore;
+import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 
 import com.google.common.collect.ImmutableMap;
 

@@ -6,14 +6,14 @@
  */
 package org.mule.module.extension.internal.introspection;
 
-import static org.mule.api.lifecycle.LifecycleUtils.disposeAllIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.safeStopIfNeeded;
-import static org.mule.api.lifecycle.LifecycleUtils.startIfNeeded;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeAllIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.safeStopIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.extension.api.introspection.Interceptable;
 import org.mule.extension.api.runtime.Interceptor;
 

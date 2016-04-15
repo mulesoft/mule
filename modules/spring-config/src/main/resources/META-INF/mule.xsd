@@ -797,7 +797,7 @@
         <xsd:annotation>
     <xsd:documentation>
         Performs logging using an expression that determines what should be logged. By default the current messages is
-        logged using the DEBUG level to the 'org.mule.api.processor.LoggerMessageProcessor' category but the level and
+        logged using the DEBUG level to the 'org.mule.runtime.core.api.processor.LoggerMessageProcessor' category but the level and
         category can both be configured to suit your needs.
             </xsd:documentation>
         </xsd:annotation>
@@ -2201,7 +2201,7 @@
     <xsd:element name="custom-processing-strategy" type="customProcessingStrategy" substitutionGroup="abstract-processing-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                Allows for the configuration of a custom processing strategy that implements 'org.mule.api.construct.PipelineProcessingStrategy'.
+                Allows for the configuration of a custom processing strategy that implements 'org.mule.runtime.core.api.construct.PipelineProcessingStrategy'.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3703,7 +3703,7 @@
                     <xsd:attribute name="beanFactory-ref" type="xsd:string">
                         <xsd:annotation>
                             <xsd:documentation>
-                                A Bean factory to use when creating the bean object.  The factory must implement {{org.mule.api.object.ObjectFactory}}.
+                                A Bean factory to use when creating the bean object.  The factory must implement {{org.mule.runtime.core.api.object.ObjectFactory}}.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
@@ -5155,7 +5155,7 @@
                     <xsd:attribute name="objectStore-ref" type="xsd:string" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Reference to the org.mule.api.store.ListableObjectStore that will be used to store events pending (re)processing.
+                                Reference to the org.mule.runtime.core.api.store.ListableObjectStore that will be used to store events pending (re)processing.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
@@ -5262,7 +5262,7 @@
                 <xsd:attribute name="class" type="substitutableClass" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The canonical name of a class that implements org.mule.routing.AggregationStrategy.
+                            The canonical name of a class that implements org.mule.runtime.core.routing.AggregationStrategy.
                             Such a class is required to have a default constructor.
                             This property cannot be set at the same time as 'ref'
                         </xsd:documentation>
@@ -5271,7 +5271,7 @@
                 <xsd:attribute name="ref" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A reference to a registered bean that implements org.mule.routing.AggregationStrategy.
+                            A reference to a registered bean that implements org.mule.runtime.core.routing.AggregationStrategy.
                             This property cannot be set at the same time as 'class'
                         </xsd:documentation>
                     </xsd:annotation>

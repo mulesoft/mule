@@ -6,7 +6,7 @@
  */
 package org.mule.extension.file;
 
-import org.mule.util.FileUtils;
+import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 

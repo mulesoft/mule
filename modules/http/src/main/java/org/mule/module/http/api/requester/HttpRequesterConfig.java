@@ -6,10 +6,10 @@
  */
 package org.mule.module.http.api.requester;
 
-import org.mule.api.AnnotatedObject;
-import org.mule.api.NamedObject;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.api.tls.TlsContextFactory;

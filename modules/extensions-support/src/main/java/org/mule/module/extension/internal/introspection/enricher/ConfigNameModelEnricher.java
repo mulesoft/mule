@@ -16,7 +16,7 @@ import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.module.extension.internal.model.property.RequireNameField;
-import org.mule.util.CollectionUtils;
+import org.mule.runtime.core.util.CollectionUtils;
 
 import com.google.common.base.Joiner;
 

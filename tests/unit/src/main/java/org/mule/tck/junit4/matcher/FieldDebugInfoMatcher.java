@@ -9,8 +9,8 @@ package org.mule.tck.junit4.matcher;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.equalTo;
-import org.mule.api.debug.FieldDebugInfo;
-import org.mule.api.debug.SimpleFieldDebugInfo;
+import org.mule.runtime.core.api.debug.FieldDebugInfo;
+import org.mule.runtime.core.api.debug.SimpleFieldDebugInfo;
 
 import org.hamcrest.Description;
 import org.hamcrest.Factory;

@@ -13,9 +13,9 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mule.tck.ZipUtils.compress;
 import org.mule.tck.ZipUtils.ZipResource;
-import org.mule.util.FileUtils;
-import org.mule.util.FilenameUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.FilenameUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

@@ -13,7 +13,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.runtime.ExpirationPolicy;

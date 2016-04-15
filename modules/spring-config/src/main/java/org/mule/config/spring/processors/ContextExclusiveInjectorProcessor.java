@@ -6,7 +6,7 @@
  */
 package org.mule.config.spring.processors;
 
-import org.mule.api.Injector;
+import org.mule.runtime.core.api.Injector;
 
 import java.beans.PropertyDescriptor;
 

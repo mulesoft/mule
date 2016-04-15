@@ -6,9 +6,9 @@
  */
 package org.mule.extension.validation.internal.el;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.el.ExpressionLanguageContext;
-import org.mule.api.el.ExpressionLanguageExtension;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.el.ExpressionLanguageContext;
+import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 
 /**
  * A {@link ExpressionLanguageExtension} which adds a

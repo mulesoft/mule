@@ -16,9 +16,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import org.mule.DefaultMuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.expression.DefaultExpressionManager;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

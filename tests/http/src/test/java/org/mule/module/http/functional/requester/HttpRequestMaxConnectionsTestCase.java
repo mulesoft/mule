@@ -9,11 +9,11 @@ package org.mule.module.http.functional.requester;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.IOException;
 

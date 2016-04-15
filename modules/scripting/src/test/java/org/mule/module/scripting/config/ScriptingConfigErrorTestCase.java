@@ -6,9 +6,9 @@
  */
 package org.mule.module.scripting.config;
 
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

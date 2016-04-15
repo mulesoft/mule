@@ -6,7 +6,7 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleEventContext;
 
 /**
  * The scope of the MuleEvent Callback is to be able to get a the message currently

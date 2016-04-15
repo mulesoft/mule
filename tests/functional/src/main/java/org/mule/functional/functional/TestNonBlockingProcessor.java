@@ -6,20 +6,20 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.ThreadSafeAccess;
-import org.mule.processor.NonBlockingMessageProcessor;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.ThreadSafeAccess;
+import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
- *  Test implementation of {@link org.mule.processor.NonBlockingMessageProcessor} that simply uses a @{link Executor} to
- *  invoke the {@link org.mule.api.connector.ReplyToHandler} in another thread.
+ *  Test implementation of {@link org.mule.runtime.core.processor.NonBlockingMessageProcessor} that simply uses a @{link Executor} to
+ *  invoke the {@link org.mule.runtime.core.api.connector.ReplyToHandler} in another thread.
  */
 public class TestNonBlockingProcessor implements NonBlockingMessageProcessor
 {

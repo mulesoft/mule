@@ -7,8 +7,8 @@
 package org.mule.module.extension.internal.capability.xml.schema;
 
 import static org.mule.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
-import static org.mule.util.Preconditions.checkArgument;
-import static org.mule.util.Preconditions.checkState;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.property.XmlModelProperty;

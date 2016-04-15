@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.module.db.internal.domain.query.BulkQuery;
 import org.mule.module.db.internal.parser.QueryTemplateParser;
 import org.mule.tck.size.SmallTest;

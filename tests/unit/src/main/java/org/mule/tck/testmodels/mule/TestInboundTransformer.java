@@ -6,8 +6,8 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 
 public class TestInboundTransformer extends AbstractTransformer
 {

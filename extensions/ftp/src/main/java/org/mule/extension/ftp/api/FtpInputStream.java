@@ -6,11 +6,11 @@
  */
 package org.mule.extension.ftp.api;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.MuleRuntimeException;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.connection.ConnectionHandler;
-import org.mule.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.module.extension.file.api.FileAttributes;
 import org.mule.module.extension.file.api.lock.PathLock;
 import org.mule.module.extension.file.api.stream.AbstractFileInputStream;

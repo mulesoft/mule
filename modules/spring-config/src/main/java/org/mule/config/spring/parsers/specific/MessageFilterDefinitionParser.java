@@ -9,7 +9,7 @@ package org.mule.config.spring.parsers.specific;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.routing.MessageFilter;
+import org.mule.runtime.core.routing.MessageFilter;
 
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;

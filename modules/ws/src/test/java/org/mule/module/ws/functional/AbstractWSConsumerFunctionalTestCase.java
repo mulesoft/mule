@@ -9,8 +9,8 @@ package org.mule.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.mule.module.ws.functional.SoapFaultCodeMatcher.hasFaultCode;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.module.ws.consumer.SoapFaultException;
 import org.mule.tck.junit4.rule.DynamicPort;

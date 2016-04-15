@@ -6,9 +6,9 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 
 public class AlwaysRaiseExceptionTransformer extends AbstractTransformer
 {

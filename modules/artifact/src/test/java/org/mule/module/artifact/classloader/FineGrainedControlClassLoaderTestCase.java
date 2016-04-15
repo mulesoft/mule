@@ -14,7 +14,7 @@ import static org.mule.module.artifact.classloader.ClassLoaderLookupStrategy.PAR
 import static org.mule.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.net.URL;

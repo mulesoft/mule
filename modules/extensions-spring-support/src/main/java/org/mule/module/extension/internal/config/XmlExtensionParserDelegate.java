@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.config;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getGenericTypeAt;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
@@ -18,12 +18,12 @@ import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.module.extension.internal.util.NameUtils.pluralize;
 import static org.mule.module.extension.internal.util.NameUtils.singularize;
 import static org.springframework.util.xml.DomUtils.getChildElements;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.NestedProcessor;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.NestedProcessor;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.extension.api.introspection.parameter.ExpressionSupport;
@@ -55,9 +55,9 @@ import org.mule.module.extension.internal.runtime.resolver.TypeSafeExpressionVal
 import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.module.extension.internal.util.IntrospectionUtils;
 import org.mule.module.extension.internal.util.NameUtils;
-import org.mule.util.ClassUtils;
-import org.mule.util.TemplateParser;
-import org.mule.util.ValueHolder;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.TemplateParser;
+import org.mule.runtime.core.util.ValueHolder;
 
 import com.google.common.collect.ImmutableMap;
 

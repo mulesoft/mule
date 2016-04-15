@@ -10,12 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.IOUtils;
-import org.mule.util.compression.GZipCompression;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.compression.GZipCompression;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

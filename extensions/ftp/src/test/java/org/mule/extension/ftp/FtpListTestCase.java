@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import org.mule.module.extension.file.api.FileAttributes;
 import org.mule.module.extension.file.api.TreeNode;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.nio.file.Paths;
 import java.util.List;

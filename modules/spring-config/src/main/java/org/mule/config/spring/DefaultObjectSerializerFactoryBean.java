@@ -6,9 +6,9 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.MuleContext;
-import org.mule.api.serialization.DefaultObjectSerializer;
-import org.mule.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.serialization.DefaultObjectSerializer;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
 
 import org.springframework.beans.factory.SmartFactoryBean;
 

@@ -24,7 +24,7 @@
         <!-- Note: auto formating this file might break the test if the script's indentation is not preserved. -->
         <script:component>
             <script:script engine="groovy">
-                if (message.getProperty("foo", org.mule.PropertyScope.INBOUND))
+                if (message.getProperty("foo", org.mule.runtime.core.PropertyScope.INBOUND))
                 return "foo header received"
                 else
                 return "foo header not received"

@@ -6,12 +6,12 @@
  */
 package org.mule.module.extension.internal.manager;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.util.Preconditions.checkArgument;
-import static org.mule.util.concurrent.ThreadNameHelper.getPrefix;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 
 import com.google.common.collect.Multimap;

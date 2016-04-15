@@ -7,7 +7,7 @@
 package org.mule.config.spring;
 
 import org.mule.config.spring.util.SpringXMLUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.collect.ImmutableList;
 

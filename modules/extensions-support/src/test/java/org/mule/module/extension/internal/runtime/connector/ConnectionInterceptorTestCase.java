@@ -21,7 +21,7 @@ import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_
 import static org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider.PASSWORD;
 import static org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider.USER;
 import org.mule.api.connection.ConnectionHandler;
-import org.mule.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreClient;
 import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider;

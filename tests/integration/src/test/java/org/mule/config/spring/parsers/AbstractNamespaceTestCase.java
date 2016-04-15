@@ -8,7 +8,7 @@ package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.beans.AbstractBean;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.ClassUtils;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.List;
 import java.util.Map;

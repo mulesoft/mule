@@ -6,19 +6,19 @@
  */
 package org.mule.module.http.internal.listener;
 
-import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.ALL_INTERFACES_IP;
 import static org.mule.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.construct.FlowConstruct;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
@@ -27,9 +27,9 @@ import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.session.DefaultMuleSession;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.api.message.NullPayload;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import com.google.common.net.MediaType;
 

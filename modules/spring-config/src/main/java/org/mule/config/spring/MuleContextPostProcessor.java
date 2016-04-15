@@ -6,8 +6,8 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -18,7 +18,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * it must implement MuleContextAware.
  * 
  * @see MuleContextAware
- * @see org.mule.api.MuleContext
+ * @see org.mule.runtime.core.api.MuleContext
  */
 public class MuleContextPostProcessor implements BeanPostProcessor
 {

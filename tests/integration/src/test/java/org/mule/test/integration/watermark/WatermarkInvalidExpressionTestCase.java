@@ -7,7 +7,7 @@
 
 package org.mule.test.integration.watermark;
 
-import org.mule.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.functional.junit4.ApplicationContextBuilder;
 
 import org.junit.Test;

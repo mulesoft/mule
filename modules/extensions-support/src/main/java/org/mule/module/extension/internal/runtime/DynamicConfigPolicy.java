@@ -6,9 +6,9 @@
  */
 package org.mule.module.extension.internal.runtime;
 
-import static org.mule.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.extension.api.runtime.ExpirationPolicy;
-import org.mule.time.TimeSupplier;
+import org.mule.runtime.core.time.TimeSupplier;
 
 /**
  * A policy for how the platform should handle dynamic configuration instances

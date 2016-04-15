@@ -6,23 +6,23 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.RegistrationException;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.module.xml.xpath.SaxonXpathEvaluator;
 import org.mule.module.xml.xpath.XPathEvaluator;
 import org.mule.module.xml.xpath.XPathReturnType;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.util.Map;
 

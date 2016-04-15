@@ -7,14 +7,14 @@
 package org.mule.module.extension.internal.introspection;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.api.expression.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
-import static org.mule.api.expression.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.api.expression.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.expression.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
 import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 
-import org.mule.api.registry.ServiceRegistry;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
 import org.mule.extension.api.introspection.config.ConfigurationModel;
 import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
@@ -54,9 +54,9 @@ import org.mule.module.extension.internal.introspection.validation.OperationRetu
 import org.mule.module.extension.internal.introspection.validation.ParameterModelValidator;
 import org.mule.module.extension.internal.introspection.validation.TargetParameterModelValidator;
 import org.mule.module.extension.internal.runtime.executor.OperationExecutorFactoryWrapper;
-import org.mule.util.CollectionUtils;
-import org.mule.util.ValueHolder;
-import org.mule.util.collection.ImmutableListCollector;
+import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.ValueHolder;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import com.google.common.collect.ImmutableList;
 

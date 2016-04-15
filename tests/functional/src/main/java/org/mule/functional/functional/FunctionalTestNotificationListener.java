@@ -6,9 +6,9 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.notification.CustomNotificationListener;
-import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 
 /**
  * By implementing this listener interface and registering the object with the

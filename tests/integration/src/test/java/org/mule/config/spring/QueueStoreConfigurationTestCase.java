@@ -8,15 +8,15 @@ package org.mule.config.spring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.processor.ProcessingStrategy;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.QueueStore;
-import org.mule.construct.Flow;
-import org.mule.construct.flow.DefaultFlowProcessingStrategy;
-import org.mule.processor.strategy.QueuedAsynchronousProcessingStrategy;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.QueueStore;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.store.SimpleMemoryObjectStore;
+import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
 

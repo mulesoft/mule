@@ -7,14 +7,14 @@
 package org.mule.test.integration.schedule;
 
 
-import org.mule.api.context.notification.ConnectorMessageNotificationListener;
-import org.mule.construct.Flow;
-import org.mule.context.notification.ConnectorMessageNotification;
+import org.mule.runtime.core.api.context.notification.ConnectorMessageNotificationListener;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.source.polling.PollingMessageSource;
+import org.mule.runtime.core.source.polling.PollingMessageSource;
 
 import java.util.ArrayList;
 import java.util.List;

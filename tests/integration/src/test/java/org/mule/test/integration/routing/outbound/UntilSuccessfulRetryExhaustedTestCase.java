@@ -8,10 +8,10 @@ package org.mule.test.integration.routing.outbound;
 
 import static org.junit.Assert.fail;
 
-import org.mule.api.context.notification.ExceptionNotificationListener;
-import org.mule.context.notification.ExceptionNotification;
+import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
+import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 

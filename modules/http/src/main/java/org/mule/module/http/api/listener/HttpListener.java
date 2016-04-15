@@ -6,10 +6,10 @@
  */
 package org.mule.module.http.api.listener;
 
-import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.source.MessageSource;
-import org.mule.api.source.NonBlockingMessageSource;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 
 /**
  * Represents an listener for HTTP requests.

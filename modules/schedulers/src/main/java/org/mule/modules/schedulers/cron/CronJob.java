@@ -6,7 +6,7 @@
  */
 package org.mule.modules.schedulers.cron;
 
-import org.mule.source.polling.PollingWorker;
+import org.mule.runtime.core.source.polling.PollingWorker;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;

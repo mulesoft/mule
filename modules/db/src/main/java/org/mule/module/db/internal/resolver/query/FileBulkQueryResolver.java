@@ -7,7 +7,7 @@
 
 package org.mule.module.db.internal.resolver.query;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.module.db.internal.parser.QueryTemplateParser;
 import org.mule.module.db.internal.util.FileReader;
 

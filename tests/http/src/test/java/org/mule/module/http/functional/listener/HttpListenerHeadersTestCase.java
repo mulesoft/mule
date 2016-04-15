@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;

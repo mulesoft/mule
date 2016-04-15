@@ -9,7 +9,7 @@ package org.mule.module.extension.internal.resources;
 
 import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import org.mule.api.registry.ServiceRegistry;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.extension.api.resources.GeneratedResource;
 import org.mule.extension.api.resources.ResourcesGenerator;
 

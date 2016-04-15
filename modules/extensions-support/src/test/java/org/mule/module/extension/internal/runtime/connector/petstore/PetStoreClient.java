@@ -6,10 +6,10 @@
  */
 package org.mule.module.extension.internal.runtime.connector.petstore;
 
-import static org.mule.util.Preconditions.checkArgument;
-import static org.mule.util.Preconditions.checkState;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkState;
 
-import org.mule.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.api.tls.TlsContextFactory;
 
 import java.util.List;

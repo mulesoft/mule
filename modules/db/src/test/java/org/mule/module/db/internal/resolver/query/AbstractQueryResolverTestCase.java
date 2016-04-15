@@ -8,7 +8,7 @@
 package org.mule.module.db.internal.resolver.query;
 
 import static org.mockito.Mockito.mock;
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.module.db.internal.domain.param.DefaultInputQueryParam;
 import org.mule.module.db.internal.domain.param.InputQueryParam;
 import org.mule.module.db.internal.domain.param.QueryParam;

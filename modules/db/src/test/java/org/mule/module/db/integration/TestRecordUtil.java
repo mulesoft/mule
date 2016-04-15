@@ -14,7 +14,7 @@ import static org.mule.module.db.integration.matcher.FieldMatcher.containsField;
 import static org.mule.module.db.integration.model.Planet.EARTH;
 import static org.mule.module.db.integration.model.Planet.MARS;
 import static org.mule.module.db.integration.model.Planet.VENUS;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.module.db.integration.model.Alien;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.Record;

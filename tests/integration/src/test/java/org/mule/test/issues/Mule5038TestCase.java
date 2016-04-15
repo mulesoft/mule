@@ -8,11 +8,11 @@ package org.mule.test.issues;
 
 import static org.junit.Assert.assertNotSame;
 
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.filter.Filter;
-import org.mule.api.transformer.Transformer;
-import org.mule.construct.Flow;
-import org.mule.routing.MessageFilter;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

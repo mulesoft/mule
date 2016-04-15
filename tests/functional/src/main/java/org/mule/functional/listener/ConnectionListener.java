@@ -10,12 +10,12 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.notification.ConnectionNotificationListener;
-import org.mule.context.notification.ConnectionNotification;
-import org.mule.context.notification.NotificationException;
-import org.mule.util.Preconditions;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
+import org.mule.runtime.core.context.notification.ConnectionNotification;
+import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;

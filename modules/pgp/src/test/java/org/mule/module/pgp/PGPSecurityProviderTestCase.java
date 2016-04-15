@@ -6,7 +6,7 @@
  */
 package org.mule.module.pgp;
 
-import org.mule.api.security.Authentication;
+import org.mule.runtime.core.api.security.Authentication;
 
 import java.io.FileInputStream;
 import java.net.URL;

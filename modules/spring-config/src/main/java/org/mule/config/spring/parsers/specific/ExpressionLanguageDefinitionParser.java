@@ -6,9 +6,9 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
-import org.mule.el.mvel.MVELExpressionLanguageWrapper;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguageWrapper;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;

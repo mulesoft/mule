@@ -6,11 +6,11 @@
  */
 package org.mule.extension.validation.api;
 
-import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.config.i18n.Message;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * The exception to be thrown by default when a validation

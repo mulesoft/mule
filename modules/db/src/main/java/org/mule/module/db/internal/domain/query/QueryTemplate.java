@@ -10,7 +10,7 @@ package org.mule.module.db.internal.domain.query;
 import org.mule.module.db.internal.domain.param.InputQueryParam;
 import org.mule.module.db.internal.domain.param.OutputQueryParam;
 import org.mule.module.db.internal.domain.param.QueryParam;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Collections;
 import java.util.LinkedList;

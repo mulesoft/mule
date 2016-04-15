@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml;
+package org.mule.runtime.core.transformers.xml;
 
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.TransformerFactoryConfigurationError;

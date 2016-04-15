@@ -6,8 +6,8 @@
  */
 package org.mule.functional.testmodels.services;
 
-import org.mule.RequestContext;
-import org.mule.util.StringMessageUtils;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

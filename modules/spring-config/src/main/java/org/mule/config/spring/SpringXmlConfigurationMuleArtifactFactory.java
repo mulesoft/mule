@@ -6,18 +6,18 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.construct.Pipeline;
-import org.mule.api.context.MuleContextFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.common.MuleArtifact;
 import org.mule.common.MuleArtifactFactoryException;
 import org.mule.common.config.XmlConfigurationCallback;
 import org.mule.common.config.XmlConfigurationMuleArtifactFactory;
-import org.mule.config.ConfigResource;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.config.ConfigResource;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.HashMap;

@@ -6,7 +6,7 @@
  */
 package org.mule.module.oauth2.internal;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 
 /**
  * It was not possible to retrieve the access token or the refresh token from the token URL response
