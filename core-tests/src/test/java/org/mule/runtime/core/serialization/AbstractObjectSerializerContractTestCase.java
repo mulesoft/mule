@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.serialization;
+package org.mule.runtime.core.serialization;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;

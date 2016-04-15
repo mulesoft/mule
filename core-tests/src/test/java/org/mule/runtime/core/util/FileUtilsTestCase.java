@@ -183,7 +183,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         {
             outputDir.mkdirs();
         }
-        String res = "org/mule/util/FileUtils.class";
+        String res = "org/mule/runtime/core/util/FileUtils.class";
         FileUtils.extractResources(res, FileUtils.class, outputDir, true);
         File result = FileUtils.newFile(testDir, res);
         assertNotNull(result);
@@ -203,7 +203,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         {
             outputDir.mkdirs();
         }
-        String res = "org/mule/util/";
+        String res = "org/mule/runtime/core/util/";
         FileUtils.extractResources(res, FileUtils.class, outputDir, true);
         File result = FileUtils.newFile(testDir, res);
         assertNotNull(result);
@@ -244,7 +244,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             outputDir.mkdirs();
         }
         String fileName = "util/FileUtilsTestCase.class";
-        String res = "org/mule/";
+        String res = "org/mule/runtime/core";
         FileUtils.extractResources(res, FileUtilsTestCase.class, outputDir, false);
         File result = FileUtils.newFile(testDir, fileName);
         assertNotNull(result);
@@ -265,7 +265,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             outputDir.mkdirs();
         }
         String fileName = "FileUtils.class";
-        String res = "org/mule/util/" + fileName;
+        String res = "org/mule/runtime/core/util/" + fileName;
         FileUtils.extractResources(res, FileUtils.class, outputDir, false);
         File result = FileUtils.newFile(testDir, fileName);
         assertNotNull(result);
@@ -286,7 +286,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
             outputDir.mkdirs();
         }
         String fileName = "util/FileUtilsTestCase.class";
-        String res = "org/mule/";
+        String res = "org/mule/runtime/core/";
         FileUtils.extractResources(res, FileUtilsTestCase.class, outputDir, false);
         File result = FileUtils.newFile(testDir, fileName);
         assertNotNull(result);

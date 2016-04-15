@@ -143,7 +143,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
     {
         ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
         TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-        configureExceptionListener(null, "org.mule.ap*");
+        configureExceptionListener(null, "org.mule.runtime.core.ap*");
         try
         {
             executionTemplate.execute(TransactionTemplateTestUtils.getFailureTransactionCallback(mockMessagingException));

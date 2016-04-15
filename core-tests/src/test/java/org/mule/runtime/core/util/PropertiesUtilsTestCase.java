@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.core.util;
 
-import org.hamcrest.core.IsNull;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -16,14 +21,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
+import org.hamcrest.core.IsNull;
 import org.junit.Test;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 @SmallTest
 public class PropertiesUtilsTestCase extends AbstractMuleTestCase
@@ -107,7 +106,7 @@ public class PropertiesUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testLoadAllProperties()
     {
-        Properties properties = PropertiesUtils.loadAllProperties("META-INF/services/org/mule/config/mule-exception-codes.properties", this.getClass().getClassLoader());
+        Properties properties = PropertiesUtils.loadAllProperties("META-INF/services/org/mule/runtime/core/config/mule-exception-codes.properties", this.getClass().getClassLoader());
         assertThat((String) properties.get("java.lang.IllegalArgumentException"), is("104000"));
         assertThat((String) properties.get("org.mule.runtime.core.api.MuleException"),is("10000"));
     }
@@ -123,7 +122,7 @@ public class PropertiesUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testLoadAllPropertiesEmptyFile()
     {
-        Properties properties = PropertiesUtils.loadAllProperties("META-INF/services/org/mule/config/mule-empty.properties",this.getClass().getClassLoader());
+        Properties properties = PropertiesUtils.loadAllProperties("META-INF/services/org/mule/runtime/core/config/mule-empty.properties", this.getClass().getClassLoader());
         assertThat(properties, IsNull.notNullValue());
         assertThat(properties.isEmpty(), is(true));
     }

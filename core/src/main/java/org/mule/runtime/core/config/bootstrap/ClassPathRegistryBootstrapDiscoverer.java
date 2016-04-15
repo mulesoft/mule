@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
 public class ClassPathRegistryBootstrapDiscoverer implements RegistryBootstrapDiscoverer
 {
 
-    private static final String BOOTSTRAP_PROPERTIES = "META-INF/services/org/mule/config/registry-bootstrap.properties";
+    private static final String BOOTSTRAP_PROPERTIES = "META-INF/services/org/mule/runtime/core/config/registry-bootstrap.properties";
 
     private final transient Log logger = LogFactory.getLog(getClass());
 

@@ -28,7 +28,7 @@
 
         <spring:bean name="_muleProcessingTimeWatcher" class="org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher"/>
 
-        <spring:bean name="_muleConnectorMessageProcessorLocator" class="org.mule.connector.MuleConnectorOperationLocator"/>
+        <spring:bean name="_muleConnectorMessageProcessorLocator" class="org.mule.runtime.core.connector.MuleConnectorOperationLocator"/>
 
         <spring:bean name="_muleExceptionLocationProvider" class="org.mule.runtime.core.exception.MessagingExceptionLocationProvider"/>
 
