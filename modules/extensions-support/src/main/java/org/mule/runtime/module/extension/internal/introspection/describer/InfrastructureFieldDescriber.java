@@ -13,6 +13,7 @@ import org.mule.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 
 import java.lang.reflect.Field;
 
@@ -69,6 +70,7 @@ public class InfrastructureFieldDescriber implements FieldDescriber
 
         return descriptor.ofType(clazz)
                 .withExpressionSupport(ExpressionSupport.NOT_SUPPORTED)
-                .withModelProperty(new DeclaringMemberModelProperty(field));
+                .withModelProperty(new DeclaringMemberModelProperty(field))
+                .withModelProperty(new InfrastructureParameterModelProperty());
     }
 }

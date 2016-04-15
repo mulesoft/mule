@@ -10,12 +10,14 @@ import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.extension.HeisenbergExtension;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaGenerator;
@@ -29,10 +31,8 @@ import org.mule.runtime.module.extension.internal.runtime.connector.basic.String
 import org.mule.runtime.module.extension.internal.runtime.connector.basic.TestConnector;
 import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.SubTypesMappingConnector;
 import org.mule.runtime.module.extension.vegan.VeganExtension;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,6 +51,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class SchemaGeneratorTestCase extends AbstractMuleTestCase
 {
+
     private SchemaGenerator generator;
     private ExtensionFactory extensionFactory;
 

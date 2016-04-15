@@ -16,21 +16,54 @@
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="next-door">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.KnockeableDoor"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="ricin-packs">
+                        <xs:element minOccurs="0" maxOccurs="1" name="enemies">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="ricin-pack">
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="enemy">
                                         <xs:complexType>
-                                            <xs:complexContent>
-                                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.Ricin"></xs:extension>
-                                            </xs:complexContent>
+                                            <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="monthly-incomes">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="monthly-income">
+                                        <xs:complexType>
+                                            <xs:attribute type="mule:expressionLong" use="required" name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="recipes">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="recipe">
+                                        <xs:complexType>
+                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                                            <xs:attribute type="mule:expressionLong" use="required" name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="deaths-by-seasons">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="deaths-by-season">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element minOccurs="0" maxOccurs="unbounded" name="deaths-by-season-item">
+                                                    <xs:complexType>
+                                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                            </xs:sequence>
+                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                                            <xs:attribute type="mule:expressionList" use="optional" name="value"></xs:attribute>
                                         </xs:complexType>
                                     </xs:element>
                                 </xs:sequence>
@@ -57,54 +90,21 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="recipes">
+                        <xs:element minOccurs="0" maxOccurs="1" name="next-door">
                             <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="recipe">
-                                        <xs:complexType>
-                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute type="mule:expressionLong" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
+                                <xs:complexContent>
+                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.KnockeableDoor"></xs:extension>
+                                </xs:complexContent>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="enemies">
+                        <xs:element minOccurs="0" maxOccurs="1" name="ricin-packs">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="enemy">
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="ricin-pack">
                                         <xs:complexType>
-                                            <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="deaths-by-seasons">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="deaths-by-season">
-                                        <xs:complexType>
-                                            <xs:sequence>
-                                                <xs:element minOccurs="0" maxOccurs="unbounded" name="deaths-by-season-item">
-                                                    <xs:complexType>
-                                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                                    </xs:complexType>
-                                                </xs:element>
-                                            </xs:sequence>
-                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute type="mule:expressionList" use="optional" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="monthly-incomes">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="monthly-income">
-                                        <xs:complexType>
-                                            <xs:attribute type="mule:expressionLong" use="required" name="value"></xs:attribute>
+                                            <xs:complexContent>
+                                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.Ricin"></xs:extension>
+                                            </xs:complexContent>
                                         </xs:complexType>
                                     </xs:element>
                                 </xs:sequence>
@@ -133,27 +133,27 @@
                         </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="wildCardWeapons"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="required" name="monthlyIncomes"></xs:attribute>
+                    <xs:attribute type="mule:expressionBoolean" use="required" name="cancer"></xs:attribute>
+                    <xs:attribute type="mule:expressionMap" use="optional" name="recipe"></xs:attribute>
+                    <xs:attribute type="mule:expressionMap" use="optional" name="deathsBySeasons"></xs:attribute>
+                    <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="nextDoor"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
-                    <xs:attribute type="mule:expressionBoolean" use="required" name="cancer"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
-                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.runtime.module.extension.model.HealthStatusEnumType" use="required" name="finalHealth"></xs:attribute>
                     <xs:attribute type="mule:expressionDecimal" use="required" name="money"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="weapon"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="moneyFunction"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="wildCardWeapons"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="wildCardList"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="recipe"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
-                    <xs:attribute type="mule:expressionString" use="optional" name="labAddress"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="deathsBySeasons"></xs:attribute>
-                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.runtime.module.extension.model.HealthStatusEnumType" use="optional" default="CANCER" name="initialHealth"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="wildCardWeaponMap"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" default="#[payload]" name="literalExpressionWithDefault"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="required" name="monthlyIncomes"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="literalExpressionWithoutDefault"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="candidateDoors"></xs:attribute>
+                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.runtime.module.extension.model.HealthStatusEnumType" use="optional" default="CANCER" name="initialHealth"></xs:attribute>
+                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.runtime.module.extension.model.HealthStatusEnumType" use="required" name="finalHealth"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="labAddress"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="firstEndevour"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" default="#[payload]" name="literalExpressionWithDefault"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="literalExpressionWithoutDefault"></xs:attribute>
                     <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
                     <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
                     <xs:attribute type="mule:expressionDateTime" use="required" name="dateOfDeath"></xs:attribute>
@@ -174,8 +174,8 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionString" use="required" name="victim"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="victim"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -698,8 +698,8 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
                 <xs:attribute type="mule:expressionInt" use="required" name="initialBatchNumber"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

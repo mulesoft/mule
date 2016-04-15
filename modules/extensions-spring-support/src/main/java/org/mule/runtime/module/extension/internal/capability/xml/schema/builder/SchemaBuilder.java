@@ -9,13 +9,14 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_NAMESPACE;
-import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
 import static org.mule.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
+import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_NAMESPACE;
+import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_KEY;
@@ -44,22 +45,19 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isRequired;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Extensible;
-import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.operation.OperationModel;
-import org.mule.extension.api.introspection.parameter.ParameterModel;
-import org.mule.extension.api.introspection.parameter.ParametrizedModel;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.extension.api.introspection.source.SourceModel;
-import org.mule.extension.api.introspection.property.SubTypesModelProperty;
+import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.extension.api.introspection.declaration.type.TypeUtils;
+import org.mule.extension.api.introspection.operation.OperationModel;
+import org.mule.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.extension.api.introspection.parameter.ParameterModel;
+import org.mule.extension.api.introspection.parameter.ParametrizedModel;
+import org.mule.extension.api.introspection.property.SubTypesModelProperty;
+import org.mule.extension.api.introspection.source.SourceModel;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -70,6 +68,10 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.utils.MetadataTypeUtils;
+import org.mule.runtime.core.api.NestedProcessor;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
@@ -95,13 +97,13 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Union;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
+import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.NameUtils;
-import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.util.ValueHolder;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -259,7 +261,7 @@ public final class SchemaBuilder
 
     void registerParameters(ExtensionType type, ExplicitGroup choice, Collection<ParameterModel> parameterModels)
     {
-        for (final ParameterModel parameterModel : parameterModels)
+        for (final ParameterModel parameterModel : getSortedParameterModels(parameterModels))
         {
             parameterModel.getType().accept(getParameterDeclarationVisitor(type, choice, parameterModel));
         }
@@ -268,6 +270,44 @@ public final class SchemaBuilder
         {
             type.setSequence(choice);
         }
+    }
+
+    /**
+     * Sorts the given {@code parameterModels} so that infrastructure ones are firsts and the
+     * rest maintain their relative order. If more than one infrastructure parameter
+     * is found, the subgroup is sorted alphabetically.
+     * <p>
+     * The {@link InfrastructureParameterModelProperty} is used to identify those
+     * parameters which are infrastructure
+     *
+     * @param parameterModels a {@link Collection} of {@link ParameterModel parameter models}
+     * @return a sorted {@link List}
+     */
+    private List<ParameterModel> getSortedParameterModels(Collection<ParameterModel> parameterModels)
+    {
+        List<ParameterModel> sortedParameters = new ArrayList<>(parameterModels);
+        sortedParameters.sort((left, right) -> {
+            boolean isLeftInfrastructure = left.getModelProperty(InfrastructureParameterModelProperty.class).isPresent();
+            boolean isRightInfrastructure = right.getModelProperty(InfrastructureParameterModelProperty.class).isPresent();
+
+            if (!isLeftInfrastructure && !isRightInfrastructure)
+            {
+                return 0;
+            }
+
+            if (!isLeftInfrastructure && isRightInfrastructure)
+            {
+                return 1;
+            }
+
+            if (isLeftInfrastructure && !isRightInfrastructure)
+            {
+                return -1;
+            }
+
+            return left.getName().compareTo(right.getName());
+        });
+        return sortedParameters;
     }
 
     /**
@@ -889,23 +929,23 @@ public final class SchemaBuilder
             private boolean shouldForceOptional(Class<?> type)
             {
                 return !parameterModel.isRequired() ||
-                       !subTypesMapping.getSubTypes(parameterModel.getType()).isEmpty()||
+                       !subTypesMapping.getSubTypes(parameterModel.getType()).isEmpty() ||
                        (IntrospectionUtils.isInstantiable(type) && ExpressionSupport.REQUIRED != parameterModel.getExpressionSupport());
             }
         };
     }
 
-    private void registerPojoSubtypes(List<MetadataType> subTypes , ExplicitGroup all)
+    private void registerPojoSubtypes(List<MetadataType> subTypes, ExplicitGroup all)
     {
         ExplicitGroup choice = new ExplicitGroup();
         choice.setMinOccurs(ZERO);
         choice.setMaxOccurs("1");
 
         subTypes.forEach(subtype -> {
-                    TopLevelElement subtypeElement = createTopLevelElement(hyphenize(IntrospectionUtils.getAliasName(subtype)), ZERO, "1");
-                    subtypeElement.setComplexType(newLocalComplexTypeWithBase((ObjectType) subtype, EMPTY));
-                    choice.getParticle().add(objectFactory.createElement(subtypeElement));
-                });
+            TopLevelElement subtypeElement = createTopLevelElement(hyphenize(IntrospectionUtils.getAliasName(subtype)), ZERO, "1");
+            subtypeElement.setComplexType(newLocalComplexTypeWithBase((ObjectType) subtype, EMPTY));
+            choice.getParticle().add(objectFactory.createElement(subtypeElement));
+        });
 
         all.getParticle().add(objectFactory.createChoice(choice));
     }

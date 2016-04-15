@@ -12,15 +12,14 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.metadata.java.JavaTypeLoader.JAVA;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
-
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Expression;
@@ -30,9 +29,9 @@ import org.mule.extension.api.annotation.param.Ignore;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ComponentModel;
+import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.extension.api.introspection.parameter.ParameterModel;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.extension.api.introspection.property.MetadataModelProperty;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -44,8 +43,10 @@ import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableList;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -338,17 +339,38 @@ public final class IntrospectionUtils
 
     public static Collection<Field> getParameterFields(Class<?> extensionType)
     {
-        return getAllFields(extensionType, withAnnotation(Parameter.class));
+
+        return getAnnotatedFields(extensionType, Parameter.class);
     }
 
     public static Collection<Field> getParameterGroupFields(Class<?> extensionType)
     {
-        return getAllFields(extensionType, withAnnotation(ParameterGroup.class));
+        return getAnnotatedFields(extensionType, ParameterGroup.class);
     }
 
     public static Collection<Method> getOperationMethods(Class<?> declaringClass)
     {
         return getAllMethods(declaringClass, withModifier(Modifier.PUBLIC), Predicates.not(withAnnotation(Ignore.class)));
+    }
+
+    private static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation> annotationType)
+    {
+        return getDescendingHierarchy(clazz).stream()
+                .flatMap(type -> Arrays.stream(type.getDeclaredFields()))
+                .filter(field -> field.getAnnotation(annotationType) != null)
+                .collect(new ImmutableListCollector<>());
+    }
+
+    private static List<Class<?>> getDescendingHierarchy(Class<?> type)
+    {
+        List<Class<?>> types = new LinkedList<>();
+        types.add(type);
+        for (type = type.getSuperclass(); type != null && !Object.class.equals(type); type = type.getSuperclass())
+        {
+            types.add(0, type);
+        }
+
+        return ImmutableList.copyOf(types);
     }
 
     public static Collection<Field> getExposedFields(Class<?> extensionType)
