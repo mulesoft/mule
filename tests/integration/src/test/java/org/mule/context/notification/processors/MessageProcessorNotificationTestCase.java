@@ -7,7 +7,6 @@
 package org.mule.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.api.client.MuleClient;
 import org.mule.context.notification.Node;
 import org.mule.context.notification.RestrictedNode;
@@ -66,6 +65,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
         assertNotNull(client.send("vm://custom-agg", testList, null));
         assertNotNull(client.send("vm://chunk-agg", "test", null));
         assertNotNull(client.send("vm://wire-tap", "test", null));
+        assertNotNull(client.send("vm://in-untils", "test", null));
     }
 
     @Override
@@ -217,6 +217,11 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
                 .serial(prePost())
                 .serial(prePost())
 
+                // until successful
+                .serial(pre())
+                .serial(new Node()
+                    .parallel(prePost())
+                    .parallel(post().serial(prePost())))
                 ;
     }
 
