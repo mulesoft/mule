@@ -13,8 +13,8 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.module.xml.filters.IsXmlFilter;
-import org.mule.module.xml.util.XMLTestUtils;
+import org.mule.runtime.module.xml.filters.IsXmlFilter;
+import org.mule.runtime.module.xml.util.XMLTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.IOUtils;
 

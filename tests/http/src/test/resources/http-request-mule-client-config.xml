@@ -42,7 +42,7 @@
 
     <flow name="timeoutFlow">
         <http:listener path="timeoutPath" config-ref="listenerConfig"/>
-        <custom-processor class="org.mule.module.http.functional.requester.HttpRequestWithMuleClientTestCase$LatchMessageProcessor"/>
+        <custom-processor class="org.mule.runtime.module.http.functional.requester.HttpRequestWithMuleClientTestCase$LatchMessageProcessor"/>
     </flow>
 
     <flow name="failureStatusCodeFlow">

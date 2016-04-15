@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transformers.xml;
 
-import org.mule.module.xml.transformer.XStreamFactory;
+import org.mule.runtime.module.xml.transformer.XStreamFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.StringUtils;
 

@@ -11,7 +11,7 @@ import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.IOUtils;

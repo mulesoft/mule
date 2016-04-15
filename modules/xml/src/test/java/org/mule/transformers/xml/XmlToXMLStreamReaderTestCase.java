@@ -10,9 +10,9 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.module.xml.transformer.XmlToDomDocument;
-import org.mule.module.xml.transformer.XmlToXMLStreamReader;
-import org.mule.module.xml.util.XMLUtils;
+import org.mule.runtime.module.xml.transformer.XmlToDomDocument;
+import org.mule.runtime.module.xml.transformer.XmlToXMLStreamReader;
+import org.mule.runtime.module.xml.util.XMLUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;

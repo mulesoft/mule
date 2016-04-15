@@ -12,7 +12,7 @@ import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.config.spring.SpringXmlDomainConfigurationBuilder;
+import org.mule.runtime.config.spring.SpringXmlDomainConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 

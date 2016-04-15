@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
+import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.functional.junit4.DomainContextBuilder;

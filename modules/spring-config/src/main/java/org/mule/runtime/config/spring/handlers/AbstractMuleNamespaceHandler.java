@@ -1,0 +1,190 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.config.spring.handlers;
+
+import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.runtime.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.DeprecatedBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler;
+import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.runtime.core.util.IOUtils;
+
+import java.io.InputStream;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.xml.namespace.QName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.xml.BeanDefinitionParser;
+import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+
+/**
+ * This Namespace handler extends the default Spring {@link org.springframework.beans.factory.xml.NamespaceHandlerSupport}
+ * to allow certain elements in document to be ignored by the handler.
+ */
+public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSupport
+{
+    protected transient final Log logger = LogFactory.getLog(getClass());
+
+    protected AbstractMuleNamespaceHandler()
+    {
+        registerBeanDefinitionParser("annotations", new AnnotationsBeanDefintionParser());
+    }
+
+    /**
+     * @param name The name of the element to be ignored.
+     */
+    protected final void registerIgnoredElement(String name)
+    {
+        registerBeanDefinitionParser(name, new IgnoredDefinitionParser());
+    }
+
+    protected MuleDefinitionParserConfiguration registerMuleBeanDefinitionParser(String name, MuleDefinitionParser parser)
+    {
+        registerBeanDefinitionParser(name, parser);
+        return parser;
+    }
+
+    public static class IgnoredDefinitionParser implements BeanDefinitionParser
+    {
+        public IgnoredDefinitionParser()
+        {
+            super();
+        }
+
+        @Override
+        public BeanDefinition parse(Element element, ParserContext parserContext)
+        {
+            return null;
+        }
+    }
+
+    static class AnnotationsBeanDefintionParser extends AbstractChildDefinitionParser
+    {
+        AnnotationsBeanDefintionParser()
+        {
+            super();
+        }
+
+        @Override
+        protected AbstractBeanDefinition parseInternal(Element element, ParserContext context)
+        {
+            AbstractBeanDefinition beanDef = super.parseInternal(element, context);
+            beanDef.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE, true);
+            beanDef.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION, true);
+            return beanDef;
+        }
+
+        @Override
+        public String getPropertyName(Element element)
+        {
+            return "annotation";
+        }
+
+        @Override
+        protected Class<?> getBeanClass(Element element)
+        {
+            return Map.class;
+        }
+
+        @Override
+        protected void postProcess(ParserContext context, BeanAssembler beanAssembler, Element element)
+        {
+            if (beanAssembler instanceof DefaultBeanAssembler)
+            {
+                DefaultBeanAssembler assembler = (DefaultBeanAssembler) beanAssembler;
+
+                if (assembler.isAnnotationsPropertyAvailable(assembler.getTarget().getBeanClassName()))
+                {
+                    for (Node node = element.getFirstChild(); node != null; node = node.getNextSibling())
+                    {
+                        if (node.getNodeType() == Node.ELEMENT_NODE)
+                        {
+                            StringBuilder builder = new StringBuilder();
+                            for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling())
+                            {
+                                switch (child.getNodeType())
+                                {
+                                    case Node.TEXT_NODE:
+                                    case Node.CDATA_SECTION_NODE:
+                                        builder.append(child.getNodeValue());
+                                }
+                            }
+                            assembler.addAnnotationValue(context.getContainingBeanDefinition().getPropertyValues(),
+                                                         new QName(node.getNamespaceURI(), node.getLocalName()),
+                                                         builder.toString());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * See if there's a preferred connector class
+     */
+    protected Class findConnectorClass(Class basicConnector, String transportName)
+    {
+        String preferredPropertiesURL = "META-INF/services/org/mule/transport/preferred-" +transportName + ".properties";
+        InputStream stream = AbstractMuleNamespaceHandler.class.getClassLoader().getResourceAsStream(preferredPropertiesURL);
+        if (stream != null)
+        {
+            try
+            {
+                Properties preferredProperties = new Properties();
+                preferredProperties.load(stream);
+                String preferredConnectorName = preferredProperties.getProperty("connector");
+                if (preferredConnectorName != null)
+                {
+                    logger.debug("Found preferred connector class " + preferredConnectorName);
+                    return Class.forName(preferredConnectorName);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.debug("Error processing preferred properties", e);
+            }
+            finally
+            {
+                IOUtils.closeQuietly(stream);
+            }
+        }
+        return basicConnector;
+    }
+
+    protected void registerDeprecatedBeanDefinitionParser(String elementName, BeanDefinitionParser parser, String message)
+    {
+        registerBeanDefinitionParser(elementName, new DeprecatedBeanDefinitionParser(
+                parser,
+                String.format("Schema warning: Use of element <%s> is deprecated.  %s.", elementName, message)));
+    }
+
+    protected MuleDefinitionParserConfiguration registerDeprecatedMuleBeanDefinitionParser(String name, MuleDefinitionParser parser, String message)
+    {
+        registerDeprecatedBeanDefinitionParser(name, parser, message);
+        return parser;
+    }
+
+    protected MuleDefinitionParserConfiguration registerDeprecatedConnectorDefinitionParser(Class connectorClass, String message)
+    {
+        MuleOrphanDefinitionParser parser = new MuleOrphanDefinitionParser(connectorClass, true);
+        registerDeprecatedBeanDefinitionParser("connector", parser, message);
+        return parser;
+    }
+
+}

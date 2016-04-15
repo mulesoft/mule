@@ -15,7 +15,7 @@
                 <db:parameterized-query>delete from PLANET where id = #[payload.id]</db:parameterized-query>
             </db:delete>
 
-            <component class="org.mule.module.db.integration.config.AbstractDatasourcePoolingTestCase$JoinRequests"/>
+            <component class="org.mule.runtime.module.db.integration.config.AbstractDatasourcePoolingTestCase$JoinRequests"/>
         </transactional>
 
         <test:queue name="testOut"/>

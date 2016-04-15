@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.proxy;
+package org.mule.runtime.module.http.functional.proxy;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -12,8 +12,8 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.config.spring.util.ProcessingStrategyUtils;
-import org.mule.module.http.functional.requester.AbstractHttpRequestTestCase;
+import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
+import org.mule.runtime.module.http.functional.requester.AbstractHttpRequestTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;

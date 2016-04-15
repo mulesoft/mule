@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.proxy;
+package org.mule.runtime.module.http.functional.proxy;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -12,12 +12,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.config.spring.util.ProcessingStrategyUtils;
-import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.functional.TestInputStream;
-import org.mule.module.http.functional.requester.AbstractHttpRequestTestCase;
+import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
+import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.http.functional.TestInputStream;
+import org.mule.runtime.module.http.functional.requester.AbstractHttpRequestTestCase;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;

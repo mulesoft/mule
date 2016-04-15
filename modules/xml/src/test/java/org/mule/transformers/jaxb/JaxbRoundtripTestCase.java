@@ -9,8 +9,8 @@ package org.mule.runtime.core.transformers.jaxb;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.jaxb.model.EmailAddress;
 import org.mule.jaxb.model.Person;
-import org.mule.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
-import org.mule.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
+import org.mule.runtime.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
+import org.mule.runtime.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 

@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.config.spring.util.ProcessingStrategyUtils;
+import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.QueuedAsynchronousProcessingStrategy;

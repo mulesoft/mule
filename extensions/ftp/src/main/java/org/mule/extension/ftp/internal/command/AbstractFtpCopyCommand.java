@@ -10,8 +10,8 @@ package org.mule.extension.ftp.internal.command;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileSystem;
-import org.mule.module.extension.file.api.FileAttributes;
-import org.mule.module.extension.file.api.FileSystem;
+import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileSystem;
 
 import java.nio.file.Path;
 

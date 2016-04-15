@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.ClassUtils;
 

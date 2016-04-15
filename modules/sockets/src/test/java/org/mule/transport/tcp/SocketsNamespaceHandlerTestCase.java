@@ -8,8 +8,8 @@ package org.mule.runtime.core.transport.tcp;
 
 import org.junit.Test;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.module.socket.api.TcpClientSocketProperties;
-import org.mule.module.socket.api.TcpServerSocketProperties;
+import org.mule.runtime.module.socket.api.TcpClientSocketProperties;
+import org.mule.runtime.module.socket.api.TcpServerSocketProperties;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;

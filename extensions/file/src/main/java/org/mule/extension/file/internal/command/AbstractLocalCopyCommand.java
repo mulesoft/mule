@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
-import org.mule.module.extension.file.api.FileSystem;
+import org.mule.runtime.module.extension.file.api.FileSystem;
 
 import java.nio.file.CopyOption;
 import java.nio.file.Files;

@@ -8,10 +8,10 @@ package org.mule.test.integration.domain.http;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;

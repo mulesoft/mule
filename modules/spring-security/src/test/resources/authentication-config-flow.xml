@@ -21,7 +21,7 @@
     <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
     
     <spring:beans>
-        <spring:bean class="org.mule.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
+        <spring:bean class="org.mule.runtime.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
 
         <ss:authentication-manager alias="authenticationManager">
             <ss:authentication-provider>

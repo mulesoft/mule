@@ -1,1 +1,1 @@
-http\://www.mulesoft.org/schema/mule/ws=org.mule.module.ws.config.WSNamespaceHandler
+http\://www.mulesoft.org/schema/mule/ws=org.mule.runtime.module.ws.config.WSNamespaceHandler

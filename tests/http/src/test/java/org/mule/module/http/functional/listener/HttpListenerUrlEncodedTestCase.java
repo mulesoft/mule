@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.listener;
+package org.mule.runtime.module.http.functional.listener;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.internal.HttpParser;
-import org.mule.module.http.internal.ParameterMap;
-import org.mule.module.http.functional.matcher.ParamMapMatcher;
+import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.runtime.module.http.internal.ParameterMap;
+import org.mule.runtime.module.http.functional.matcher.ParamMapMatcher;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;

@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mule.module.xml.util.MuleResourceResolver;
+import org.mule.runtime.module.xml.util.MuleResourceResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.w3c.dom.ls.LSInput;

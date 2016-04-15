@@ -9,7 +9,7 @@ package org.mule.functional.config;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.component.DefaultJavaComponent;
-import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.runtime.core.object.AbstractObjectFactory;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.functional.functional.EventCallback;

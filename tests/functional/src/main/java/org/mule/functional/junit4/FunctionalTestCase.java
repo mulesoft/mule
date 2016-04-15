@@ -7,7 +7,7 @@
 package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.core.api.MuleEvent;

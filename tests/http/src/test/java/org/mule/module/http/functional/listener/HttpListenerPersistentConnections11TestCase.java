@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.listener;
+package org.mule.runtime.module.http.functional.listener;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
+import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
 
 import java.io.IOException;
 

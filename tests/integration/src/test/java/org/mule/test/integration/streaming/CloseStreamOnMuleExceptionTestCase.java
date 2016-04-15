@@ -9,9 +9,9 @@ package org.mule.test.integration.streaming;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.module.xml.stax.DelegateXMLStreamReader;
-import org.mule.module.xml.stax.StaxSource;
-import org.mule.module.xml.util.XMLUtils;
+import org.mule.runtime.module.xml.stax.DelegateXMLStreamReader;
+import org.mule.runtime.module.xml.stax.StaxSource;
+import org.mule.runtime.module.xml.util.XMLUtils;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.runtime.core.util.concurrent.Latch;

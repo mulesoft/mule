@@ -9,7 +9,7 @@ package org.mule.extension.file;
 import static org.mockito.Mockito.when;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.internal.LocalFilePredicateBuilder;
-import org.mule.module.extension.file.FilePredicateBuilderTestCase;
+import org.mule.runtime.module.extension.file.FilePredicateBuilderTestCase;
 
 import java.time.LocalDateTime;
 

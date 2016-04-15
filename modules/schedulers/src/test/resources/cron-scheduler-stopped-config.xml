@@ -12,7 +12,7 @@
 
 
     <spring:beans>
-        <spring:bean class="org.mule.modules.schedulers.cron.PollSchedulerFactoryPostProcessor"/>
+        <spring:bean class="org.mule.runtime.modules.schedulers.cron.PollSchedulerFactoryPostProcessor"/>
     </spring:beans>
 
     <flow name="pollfoo" processingStrategy="synchronous">
@@ -20,7 +20,7 @@
             <schedulers:cron-scheduler expression="0/1 * * * * ?"/>
             <logger message="Logger started"/>
         </poll>
-        <component class="org.mule.modules.schedulers.cron.StoppedCronSchedulerTestCase$FooComponent"/>
+        <component class="org.mule.runtime.modules.schedulers.cron.StoppedCronSchedulerTestCase$FooComponent"/>
     </flow>
 
 

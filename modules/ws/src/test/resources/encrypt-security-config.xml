@@ -52,13 +52,13 @@
 
     <flow name="server">
         <http:listener path="/services/Test" config-ref="listenerConfig"/>
-        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.ws.consumer.TestService">
             <cxf:inInterceptors>
                 <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
                     <spring:constructor-arg>
                         <spring:map>
                             <spring:entry key="action" value="Encrypt" />
-                            <spring:entry key="passwordCallbackClass" value="org.mule.module.ws.functional.EncryptSecurityFunctionalTestCase$ServerPasswordCallback" />
+                            <spring:entry key="passwordCallbackClass" value="org.mule.runtime.module.ws.functional.EncryptSecurityFunctionalTestCase$ServerPasswordCallback" />
                             <spring:entry key="decryptionPropRefId" value="securityProperties" />
                             <spring:entry key="securityProperties">
                                 <spring:props>
@@ -75,7 +75,7 @@
                 </spring:bean>
             </cxf:inInterceptors>
         </cxf:jaxws-service>
-        <component class="org.mule.module.ws.consumer.TestService"/>
+        <component class="org.mule.runtime.module.ws.consumer.TestService"/>
     </flow>
 
 </mule>

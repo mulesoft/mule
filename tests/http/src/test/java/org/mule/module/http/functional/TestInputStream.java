@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional;
+package org.mule.runtime.module.http.functional;
 
 import org.mule.runtime.core.util.concurrent.Latch;
 

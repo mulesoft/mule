@@ -97,7 +97,7 @@
                         <configuration>
                             <outputDirectory>target/classes/META-INF</outputDirectory>
                             <processors>
-                                <processor>org.mule.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor</processor>
+                                <processor>org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor</processor>
                             </processors>
                             <options>
                                 <extension.version>${project.version}</extension.version>

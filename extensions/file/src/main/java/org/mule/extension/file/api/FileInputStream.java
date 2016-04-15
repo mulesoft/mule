@@ -7,9 +7,9 @@
 package org.mule.extension.file.api;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.module.extension.file.api.lock.PathLock;
-import org.mule.module.extension.file.api.stream.AbstractFileInputStream;
-import org.mule.module.extension.file.api.stream.LazyStreamSupplier;
+import org.mule.runtime.module.extension.file.api.lock.PathLock;
+import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
+import org.mule.runtime.module.extension.file.api.stream.LazyStreamSupplier;
 
 import java.io.Reader;
 import java.nio.file.Files;

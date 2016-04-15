@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.runtime.config.spring.parsers;
 
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
-import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
-import org.mule.config.spring.parsers.beans.ThirdPartyContainer;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.processors.NamedSetterChildElementIterator;
+import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.beans.ThirdPartyContainer;
+import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.processors.NamedSetterChildElementIterator;
 
 public class ThirdPartyContainerDefinitionParser extends OrphanDefinitionParser
 {

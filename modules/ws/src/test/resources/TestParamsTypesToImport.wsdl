@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-                  xmlns:tns="http://consumer.ws.module.mule.org/"
-                  targetNamespace="http://consumer.ws.module.mule.org/">
+                  xmlns:tns="http://consumer.ws.module.runtime.mule.org/"
+                  targetNamespace="http://consumer.ws.module.runtime.mule.org/">
 
     <wsdl:types>
-        <xsd:schema targetNamespace="http://consumer.ws.module.mule.org/">
+        <xsd:schema targetNamespace="http://consumer.ws.module.runtime.mule.org/">
             <xsd:element name="noParams" type="tns:noParams"/>
             <xsd:complexType name="noParams">
                 <xsd:sequence/>

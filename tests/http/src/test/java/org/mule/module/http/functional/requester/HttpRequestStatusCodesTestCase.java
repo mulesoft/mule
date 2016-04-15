@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.requester;
+package org.mule.runtime.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.http.internal.request.ResponseValidatorException;
+import org.mule.runtime.module.http.internal.request.ResponseValidatorException;
 
 import java.io.IOException;
 

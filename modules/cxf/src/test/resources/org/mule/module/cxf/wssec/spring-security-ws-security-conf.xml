@@ -34,7 +34,7 @@
             <cxf:property key="action" value="UsernameToken"/>
             <cxf:property key="user" value="joe"/>
             <cxf:property key="passwordType" value="PasswordText"/>
-            <cxf:property key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ClientPasswordCallback"/>
+            <cxf:property key="passwordCallbackClass" value="org.mule.runtime.module.cxf.wssec.ClientPasswordCallback"/>
         </cxf:ws-config>
     </cxf:ws-security>
 

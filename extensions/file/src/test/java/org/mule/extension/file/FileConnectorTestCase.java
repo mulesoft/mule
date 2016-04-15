@@ -14,8 +14,8 @@ import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.module.extension.file.api.FileWriteMode;
-import org.mule.module.extension.file.api.stream.AbstractFileInputStream;
+import org.mule.runtime.module.extension.file.api.FileWriteMode;
+import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.runtime.core.util.IOUtils;
 

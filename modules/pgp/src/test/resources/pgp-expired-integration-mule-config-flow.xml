@@ -10,7 +10,7 @@
         http://www.mulesoft.org/schema/mule/pgp http://www.mulesoft.org/schema/mule/pgp/current/mule-pgp.xsd
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <spring:bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl"
+    <spring:bean id="pgpKeyManager" class="org.mule.runtime.module.pgp.PGPKeyRingImpl"
         init-method="initialise">
         <spring:property name="publicKeyRingFileName"
             value="./expiredPublic.gpg" />
@@ -21,7 +21,7 @@
     </spring:bean>
 
     <spring:bean id="fakeCredentialAccessor"
-        class="org.mule.module.pgp.FakeCredentialAccessor">
+        class="org.mule.runtime.module.pgp.FakeCredentialAccessor">
         <spring:property name="credentials"
             value="Mulesoft &lt;mulesoft@mulesoft.com&gt;" />
     </spring:bean>
@@ -40,7 +40,7 @@
         <decrypt-transformer name="pgpDecrypt" strategy-ref="keyBasedEncryptionStrategy" />
         <test:queue name="out"/>
         <catch-exception-strategy>
-            <custom-processor class="org.mule.module.pgp.PGPExpiredIntegrationTestCase$ExceptionSaver"/>
+            <custom-processor class="org.mule.runtime.module.pgp.PGPExpiredIntegrationTestCase$ExceptionSaver"/>
         </catch-exception-strategy>
     </flow>
 

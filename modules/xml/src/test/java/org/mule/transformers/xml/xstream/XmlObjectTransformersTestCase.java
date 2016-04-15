@@ -7,8 +7,8 @@
 package org.mule.runtime.core.transformers.xml.xstream;
 
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.module.xml.transformer.ObjectToXml;
-import org.mule.module.xml.transformer.XmlToObject;
+import org.mule.runtime.module.xml.transformer.ObjectToXml;
+import org.mule.runtime.module.xml.transformer.XmlToObject;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.runtime.core.transformers.xml.AbstractXmlTransformerTestCase;
 

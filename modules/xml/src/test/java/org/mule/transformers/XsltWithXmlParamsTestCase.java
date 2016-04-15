@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.module.xml.util.XMLTestUtils;
+import org.mule.runtime.module.xml.util.XMLTestUtils;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;

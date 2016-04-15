@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.requester;
+package org.mule.runtime.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
+import org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

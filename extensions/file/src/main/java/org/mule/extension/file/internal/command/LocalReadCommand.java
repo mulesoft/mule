@@ -12,10 +12,10 @@ import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.FileInputStream;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.api.LocalFileSystem;
-import org.mule.module.extension.file.api.FileAttributes;
-import org.mule.module.extension.file.api.command.ReadCommand;
-import org.mule.module.extension.file.api.lock.NullPathLock;
-import org.mule.module.extension.file.api.lock.PathLock;
+import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.command.ReadCommand;
+import org.mule.runtime.module.extension.file.api.lock.NullPathLock;
+import org.mule.runtime.module.extension.file.api.lock.PathLock;
 
 import java.io.InputStream;
 import java.nio.file.Files;

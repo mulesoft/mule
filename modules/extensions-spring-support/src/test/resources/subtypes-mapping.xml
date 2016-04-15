@@ -11,10 +11,10 @@
             <subtypes:house-door locked="true"/>
         </subtypes:connection>
 
-        <subtypes:explicit-square side="2" area="4"/>
-        <subtypes:car-door color="red"/>
-        <subtypes:final-pojo someString="message"/>
         <subtypes:square side="1" area="1"/>
+        <subtypes:car-door color="red"/>
+        <subtypes:explicit-square side="2" area="4"/>
+        <subtypes:final-pojo someString="message"/>
     </subtypes:config>
 
     <flow name="shapeRetriever">

@@ -1,1 +1,1 @@
-http\://www.mulesoft.org/schema/mule/extension=org.mule.module.extension.internal.config.ExtensionConfigNamespaceHandler
+http\://www.mulesoft.org/schema/mule/extension=org.mule.runtime.module.extension.internal.config.ExtensionConfigNamespaceHandler

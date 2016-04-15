@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transformers.xml;
 
-import org.mule.module.xml.util.XMLUtils;
+import org.mule.runtime.module.xml.util.XMLUtils;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 import javax.xml.stream.XMLStreamReader;

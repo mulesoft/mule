@@ -7,7 +7,7 @@
 package org.mule.extension.validation.internal;
 
 import org.mule.extension.api.introspection.declaration.spi.Describer;
-import org.mule.module.extension.DescriberSupport;
+import org.mule.runtime.module.extension.DescriberSupport;
 
 /**
  * A {@link Describer} wich publishes the {@link ValidationExtension}

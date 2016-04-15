@@ -9,18 +9,18 @@ package org.mule.test.integration.http;
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.core.util.ClassUtils.getClassPathRoot;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 
 import java.io.IOException;
 

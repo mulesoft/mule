@@ -22,11 +22,11 @@ import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.extension.api.resources.GeneratedResource;
 import org.mule.extension.api.resources.ResourcesGenerator;
 import org.mule.extension.api.resources.spi.GenerableResourceContributor;
-import org.mule.module.extension.internal.DefaultDescribingContext;
-import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
-import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.module.extension.internal.manager.DefaultExtensionManager;
-import org.mule.module.extension.internal.resources.AbstractResourcesGenerator;
+import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
+import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
+import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
+import org.mule.runtime.module.extension.internal.resources.AbstractResourcesGenerator;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.ArrayUtils;
 

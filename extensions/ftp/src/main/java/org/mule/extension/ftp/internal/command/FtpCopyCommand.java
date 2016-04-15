@@ -14,9 +14,9 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.FtpFileSystem;
-import org.mule.module.extension.file.api.FileAttributes;
-import org.mule.module.extension.file.api.FileWriteMode;
-import org.mule.module.extension.file.api.command.CopyCommand;
+import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileWriteMode;
+import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 
 import java.io.IOException;
 import java.io.InputStream;

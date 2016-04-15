@@ -14,13 +14,13 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.module.xml.functional.AbstractXmlFunctionalTestCase;
+import org.mule.runtime.module.xml.functional.AbstractXmlFunctionalTestCase;
 
 import org.junit.Test;
 
 /**
  * This is a simplified version of
- * {@link org.mule.module.xml.functional.XmlTransformerFunctionalTestCase} The
+ * {@link org.mule.runtime.module.xml.functional.XmlTransformerFunctionalTestCase} The
  * {@link #testObjectXmlOut()} method hangs intermittently.
  */
 public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCase

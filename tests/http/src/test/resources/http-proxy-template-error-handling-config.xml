@@ -25,7 +25,7 @@
         <http:request config-ref="requestConfig" method="#[message.inboundProperties['http.method']]" path="#[message.inboundProperties['http.request.path']]" parseResponse="false" />
         <catch-exception-strategy>
             <processor ref="catchSensingMessageProcessor"/>
-            <set-payload value="#[org.mule.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE]"/>
+            <set-payload value="#[org.mule.runtime.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE]"/>
         </catch-exception-strategy>
     </flow>
 
@@ -34,7 +34,7 @@
         <http:request config-ref="requestConfig" method="#[message.inboundProperties['http.method']]" path="#[message.inboundProperties['http.request.path']]" parseResponse="false" />
         <rollback-exception-strategy>
             <processor ref="rollbackSensingMessageProcessor"/>
-            <set-payload value="#[org.mule.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE]"/>
+            <set-payload value="#[org.mule.runtime.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE]"/>
         </rollback-exception-strategy>
     </flow>
 </mule>

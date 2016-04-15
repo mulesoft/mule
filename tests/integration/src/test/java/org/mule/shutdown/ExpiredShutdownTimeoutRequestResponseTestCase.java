@@ -7,7 +7,7 @@
 package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleException;
@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.HashMap;

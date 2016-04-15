@@ -14,7 +14,7 @@ import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.file.api.LocalFileAttributes;
-import org.mule.module.extension.file.api.stream.AbstractFileInputStream;
+import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.nio.file.Files;

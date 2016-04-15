@@ -11,9 +11,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
-import org.mule.module.xml.transformer.ObjectToXml;
-import org.mule.module.xml.transformer.XmlToObject;
-import org.mule.module.xml.transformer.wire.XStreamWireFormat;
+import org.mule.runtime.module.xml.transformer.ObjectToXml;
+import org.mule.runtime.module.xml.transformer.XmlToObject;
+import org.mule.runtime.module.xml.transformer.wire.XStreamWireFormat;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.runtime.core.transformer.wire.AbstractMuleMessageWireFormatTestCase;
 

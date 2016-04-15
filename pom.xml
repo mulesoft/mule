@@ -1837,7 +1837,7 @@
                                     </group>
                                     <group>
                                         <title>Modules (not part of the Mule core)</title>
-                                        <packages>org.mule.module.*:org.mule.runtime.core.components.*</packages>
+                                        <packages>org.mule.runtime.module.*:org.mule.runtime.core.components.*</packages>
                                     </group>
                                     <group>
                                         <title>Transports</title>

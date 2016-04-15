@@ -6,8 +6,8 @@
  */
 package org.mule.test.spring;
 
-import org.mule.config.spring.handlers.MuleNamespaceHandler;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.runtime.config.spring.handlers.MuleNamespaceHandler;
+import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
 
 public class DummyNamespaceHandler extends MuleNamespaceHandler
 {

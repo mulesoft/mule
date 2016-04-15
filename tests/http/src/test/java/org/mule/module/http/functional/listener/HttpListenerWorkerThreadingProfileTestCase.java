@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.listener;
+package org.mule.runtime.module.http.functional.listener;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.module.http.internal.listener.DefaultHttpListenerConfig.DEFAULT_MAX_THREADS;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig.DEFAULT_MAX_THREADS;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.junit4.FunctionalTestCase;

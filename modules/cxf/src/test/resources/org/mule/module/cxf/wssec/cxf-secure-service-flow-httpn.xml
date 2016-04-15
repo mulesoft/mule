@@ -16,7 +16,7 @@
             <set-payload value="TEST"/>
         </poll>
         <component>
-            <singleton-object class="org.mule.module.cxf.jaxws.ClientMessageGenerator"/>
+            <singleton-object class="org.mule.runtime.module.cxf.jaxws.ClientMessageGenerator"/>
         </component>
         <cxf:jaxws-client clientClass="org.apache.hello_world_soap_http.SOAPService" port="SoapPort"
                           wsdlLocation="classpath:/wsdl/hello_world.wsdl" operation="greetMe">
@@ -27,11 +27,11 @@
 
     <flow name="greeterService">
         <http:listener path="/services/greeter" config-ref="listenerConfig" allowedMethods="POST" />
-        <cxf:jaxws-service serviceClass="org.mule.module.cxf.wssec.GreeterWithLatch">
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.wssec.GreeterWithLatch">
             <cxf:ws-security ref="inboundConfig"/>
         </cxf:jaxws-service>
         <component>
-            <singleton-object class="org.mule.module.cxf.wssec.GreeterWithLatch"/>
+            <singleton-object class="org.mule.runtime.module.cxf.wssec.GreeterWithLatch"/>
         </component>
     </flow>
 

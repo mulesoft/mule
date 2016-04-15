@@ -1,1 +1,1 @@
-org.mule.module.extension.internal.manager.DefaultExtensionDiscoverer
+org.mule.runtime.module.extension.internal.manager.DefaultExtensionDiscoverer
