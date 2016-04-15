@@ -102,4 +102,16 @@
     <flow name="flowWithoutSource">
         <logger/>
     </flow>
+
+    <flow name="shouldInheritOperationResolvers">
+        <metadata:should-inherit-operation-resolvers config-ref="config" type="Person"/>
+    </flow>
+
+    <flow name="shouldInheritExtensionResolvers">
+        <metadata:should-inherit-extension-resolvers config-ref="config" type="Person"/>
+    </flow>
+
+    <flow name="shouldInheritOperationParentResolvers">
+        <metadata:should-inherit-operation-parent-resolvers config-ref="config" type="Person"/>
+    </flow>
 </mule>

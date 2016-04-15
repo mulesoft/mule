@@ -50,6 +50,7 @@ import com.google.common.base.Predicates;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -81,7 +82,7 @@ public final class IntrospectionUtils
     /**
      * Returns a {@link MetadataType} representing the given {@link Class} type.
      *
-     * @param type     the {@link Class} being introspected
+     * @param type       the {@link Class} being introspected
      * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
      * @return a {@link MetadataType}
      */
@@ -425,5 +426,21 @@ public final class IntrospectionUtils
                 .filter(p -> p.getModelProperty(MetadataModelProperty.class).isPresent() &&
                              p.getModelProperty(MetadataModelProperty.class).get().isMetadataKeyParam())
                 .findFirst();
+    }
+
+    /**
+     * Looks for the annotation in the given class. If the annotation is not found, it keeps looking recursively
+     * for it in the superClass until it finds it or there is no superClass to analyze.
+     */
+    public static <T extends Annotation> T getAnnotation(Class<?> annotatedClass, Class<T> annotationClass)
+    {
+        T annotation = annotatedClass.getAnnotation(annotationClass);
+        Class<?> superClass = annotatedClass.getSuperclass();
+        while (annotation == null && superClass != null && !superClass.equals(Object.class))
+        {
+            annotation = superClass.getAnnotation(annotationClass);
+            superClass = superClass.getSuperclass();
+        }
+        return annotation;
     }
 }
