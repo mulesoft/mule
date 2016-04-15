@@ -82,7 +82,7 @@ public final class IntrospectionUtils
     /**
      * Returns a {@link MetadataType} representing the given {@link Class} type.
      *
-     * @param type     the {@link Class} being introspected
+     * @param type       the {@link Class} being introspected
      * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
      * @return a {@link MetadataType}
      */
@@ -432,13 +432,15 @@ public final class IntrospectionUtils
      * Looks for the annotation in the given class. If the annotation is not found, it keeps looking recursively
      * for it in the superClass until it finds it or there is no superClass to analyze.
      */
-    public static <T extends Annotation> T getAnnotationFromClassHierarchy(Class<?> annotatedClass, Class<T> annotationClass){
+    public static <T extends Annotation> T getAnnotation(Class<?> annotatedClass, Class<T> annotationClass)
+    {
         T annotation = annotatedClass.getAnnotation(annotationClass);
-        if (annotation != null){
-            return annotation;
+        Class<?> superClass = annotatedClass.getSuperclass();
+        while (annotation == null && superClass != null && !superClass.equals(Object.class))
+        {
+            annotation = superClass.getAnnotation(annotationClass);
+            superClass = superClass.getSuperclass();
         }
-
-        return annotatedClass.getSuperclass() != null && !annotatedClass.getSuperclass().isAssignableFrom(Object.class) ?
-               getAnnotationFromClassHierarchy(annotatedClass.getSuperclass(), annotationClass) : null;
+        return annotation;
     }
 }

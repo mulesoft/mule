@@ -482,7 +482,8 @@ public final class AnnotationsBasedDescriber implements Describer
      * operation class containing the method is annotated or not. And lastly, if no annotation
      * was found so far, checks if the extension class is annotated.
      */
-    private MetadataResolverFactory getMetadataResolverFactoryFromMethod(Class<?> extensionType, Class<?> declaringClass, Method method){
+    private MetadataResolverFactory getMetadataResolverFactoryFromMethod(Class<?> extensionType, Class<?> declaringClass, Method method)
+    {
         MetadataScope scopeAnnotation = method.getAnnotation(MetadataScope.class);
         return scopeAnnotation != null ? getMetadataResolverFactory(scopeAnnotation) : getMetadataResolverFactoryFromClass(extensionType, declaringClass);
     }
@@ -493,9 +494,9 @@ public final class AnnotationsBasedDescriber implements Describer
      */
     private MetadataResolverFactory getMetadataResolverFactoryFromClass(Class<?> extensionType, Class<?> declaringClass)
     {
-        MetadataScope scopeAnnotation = IntrospectionUtils.getAnnotationFromClassHierarchy(declaringClass, MetadataScope.class);
+        MetadataScope scopeAnnotation = IntrospectionUtils.getAnnotation(declaringClass, MetadataScope.class);
         scopeAnnotation = scopeAnnotation != null ? scopeAnnotation :
-               IntrospectionUtils.getAnnotationFromClassHierarchy(extensionType, MetadataScope.class);
+                          IntrospectionUtils.getAnnotation(extensionType, MetadataScope.class);
         return getMetadataResolverFactory(scopeAnnotation);
     }
 

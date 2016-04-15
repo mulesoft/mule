@@ -15,9 +15,7 @@ import org.mule.extension.api.annotation.metadata.MetadataScope;
 import org.mule.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 
 @Extension(name = "Metadata")
-@Operations({MetadataOperations.class, MetadataFailureOperations.class,
-        MetadataInheritedExtensionResolversOperations.class,
-        MetadataInheritedOperationResolversOperations.class})
+@Operations({MetadataOperations.class, MetadataFailureOperations.class, MetadataInheritedExtensionResolversOperations.class, MetadataInheritedOperationResolversOperations.class})
 @Providers(MetadataConnectionProvider.class)
 @Sources(MetadataSource.class)
 @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/metadata", namespace = "metadata", schemaVersion = "3.7")
