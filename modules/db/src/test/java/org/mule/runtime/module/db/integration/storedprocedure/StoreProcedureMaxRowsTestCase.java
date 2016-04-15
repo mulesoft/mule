@@ -5,20 +5,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.storedprocedure;
+package org.mule.runtime.module.db.integration.storedprocedure;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
-import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
-import static org.mule.module.db.integration.TestRecordUtil.getVenusRecord;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecords;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.getVenusRecord;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.matcher.SupportsStoredFunctionsUsingCallSyntax;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.integration.model.MySqlTestDatabase;
+import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.matcher.SupportsStoredFunctionsUsingCallSyntax;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.model.MySqlTestDatabase;
 
 import java.util.List;
 import java.util.Map;

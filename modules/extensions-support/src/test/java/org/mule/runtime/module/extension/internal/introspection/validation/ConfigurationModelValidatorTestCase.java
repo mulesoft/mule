@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.validation;
+package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import org.mule.extension.api.annotation.Configuration;
 import org.mule.extension.api.annotation.Configurations;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.Operations;
 import org.mule.extension.api.annotation.param.UseConfig;
-import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.extension.api.introspection.ExtensionFactory;
 import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.module.extension.internal.DefaultDescribingContext;
-import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
-import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
+import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
+import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

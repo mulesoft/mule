@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.specific.properties;
+package org.mule.runtime.config.spring.parsers.specific.properties;
 
-import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.runtime.config.spring.parsers.assembly.MapEntryCombiner;
+import org.mule.runtime.config.spring.parsers.generic.ParentDefinitionParser;
 
 import org.w3c.dom.Element;
 
 /**
  * This allows a child element to extends a list of values, via an attribute, on a parent setter.
  * Typically it is used with
- * {@link org.mule.config.spring.parsers.specific.properties.ElementInNestedMapDefinitionParser}
- * whose setter is {@link org.mule.config.spring.parsers.assembly.MapEntryCombiner#VALUE}.
+ * {@link org.mule.runtime.config.spring.parsers.specific.properties.ElementInNestedMapDefinitionParser}
+ * whose setter is {@link org.mule.runtime.config.spring.parsers.assembly.MapEntryCombiner#VALUE}.
  */
 public class ListPropertyDefinitionParser extends ParentDefinitionParser
 {

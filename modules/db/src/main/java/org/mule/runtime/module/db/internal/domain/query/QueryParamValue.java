@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.query;
+package org.mule.runtime.module.db.internal.domain.query;
 
 /**
  * Contains the value for a query parameter

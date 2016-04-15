@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.select;
+package org.mule.runtime.module.db.integration.select;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -13,20 +13,20 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mule.module.db.internal.processor.DbDebugInfoUtils.INPUT_PARAMS_DEBUG_FIELD;
-import static org.mule.module.db.internal.processor.DbDebugInfoUtils.SQL_TEXT_DEBUG_FIELD;
-import static org.mule.module.db.internal.processor.DbDebugInfoUtils.TYPE_DEBUG_FIELD;
+import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.INPUT_PARAMS_DEBUG_FIELD;
+import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.SQL_TEXT_DEBUG_FIELD;
+import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.TYPE_DEBUG_FIELD;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.internal.processor.AbstractSingleQueryDbMessageProcessor;
-import org.mule.module.db.internal.processor.DbDebugInfoUtils;
+import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.internal.processor.AbstractSingleQueryDbMessageProcessor;
+import org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.domain;
+package org.mule.runtime.module.launcher.domain;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.artifact.DeployableArtifact;
-import org.mule.module.launcher.descriptor.DomainDescriptor;
+import org.mule.runtime.module.launcher.application.Application;
+import org.mule.runtime.module.launcher.artifact.DeployableArtifact;
+import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
 
 /**
- * A domain is a deployable Artifact that contains shared resources for {@link org.mule.module.launcher.application.Application}
+ * A domain is a deployable Artifact that contains shared resources for {@link org.mule.runtime.module.launcher.application.Application}
  * <p/>
  * A domain can just consist of a set of jar libraries to share between the domain applications or it can also contain shared
  * resources such as connectors or other mule components.

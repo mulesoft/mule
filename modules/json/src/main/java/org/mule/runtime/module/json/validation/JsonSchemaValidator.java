@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.json.validation;
+package org.mule.runtime.module.json.validation;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.module.json.DefaultJsonParser;
+import org.mule.runtime.module.json.DefaultJsonParser;
 import org.mule.runtime.core.util.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;

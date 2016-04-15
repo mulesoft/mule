@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.application;
+package org.mule.runtime.module.launcher.application;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.core.DefaultMuleContext;
@@ -14,9 +14,9 @@ import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
-import org.mule.module.extension.internal.DefaultDescribingContext;
-import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.module.extension.internal.manager.DefaultExtensionManager;
+import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
+import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 
 import java.io.IOException;

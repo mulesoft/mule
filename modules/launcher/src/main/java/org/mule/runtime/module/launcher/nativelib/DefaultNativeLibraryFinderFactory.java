@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.nativelib;
+package org.mule.runtime.module.launcher.nativelib;
 
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.module.launcher.MuleFoldersUtil;
+import org.mule.runtime.module.launcher.MuleFoldersUtil;
 import org.mule.runtime.core.util.BackwardsCompatibilityPropertyChecker;
 
 import java.io.File;

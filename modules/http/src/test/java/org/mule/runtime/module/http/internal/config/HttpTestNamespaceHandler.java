@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.config;
+package org.mule.runtime.module.http.internal.config;
 
-import org.mule.module.http.internal.HttpParamType;
-import org.mule.module.http.internal.HttpSingleParam;
+import org.mule.runtime.module.http.internal.HttpParamType;
+import org.mule.runtime.module.http.internal.HttpSingleParam;
 
 /**
  * Namespace handler for functional tests of this module. It adds the bean definition parser for the header element

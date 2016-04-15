@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.domain.param;
+package org.mule.runtime.module.db.internal.config.domain.param;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
-import org.mule.module.db.internal.resolver.param.DynamicParamValueResolver;
-import org.mule.module.db.internal.resolver.param.ParamValueResolver;
+import org.mule.runtime.module.db.internal.resolver.param.DynamicParamValueResolver;
+import org.mule.runtime.module.db.internal.resolver.param.ParamValueResolver;
 
 import org.springframework.beans.factory.FactoryBean;
 

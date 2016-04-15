@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.authorizationcode;
+package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
-import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
-import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_URI;
-import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import static org.mule.module.http.api.HttpHeaders.Names.LOCATION;
-import static org.mule.module.oauth2.internal.OAuthConstants.CLIENT_ID_PARAMETER;
-import static org.mule.module.oauth2.internal.OAuthConstants.CLIENT_SECRET_PARAMETER;
-import static org.mule.module.oauth2.internal.OAuthConstants.CODE_PARAMETER;
-import static org.mule.module.oauth2.internal.OAuthConstants.GRANT_TYPE_AUTHENTICATION_CODE;
-import static org.mule.module.oauth2.internal.OAuthConstants.GRANT_TYPE_PARAMETER;
-import static org.mule.module.oauth2.internal.OAuthConstants.REDIRECT_URI_PARAMETER;
-import static org.mule.module.oauth2.internal.OAuthConstants.STATE_PARAMETER;
-import static org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_URI;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
+import static org.mule.runtime.module.oauth2.internal.OAuthConstants.CLIENT_ID_PARAMETER;
+import static org.mule.runtime.module.oauth2.internal.OAuthConstants.CLIENT_SECRET_PARAMETER;
+import static org.mule.runtime.module.oauth2.internal.OAuthConstants.CODE_PARAMETER;
+import static org.mule.runtime.module.oauth2.internal.OAuthConstants.GRANT_TYPE_AUTHENTICATION_CODE;
+import static org.mule.runtime.module.oauth2.internal.OAuthConstants.GRANT_TYPE_PARAMETER;
+import static org.mule.runtime.module.oauth2.internal.OAuthConstants.REDIRECT_URI_PARAMETER;
+import static org.mule.runtime.module.oauth2.internal.OAuthConstants.STATE_PARAMETER;
+import static org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.springframework.util.StringUtils.isEmpty;
 
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -33,13 +33,13 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.module.http.internal.HttpParser;
-import org.mule.module.oauth2.internal.MuleEventLogger;
-import org.mule.module.oauth2.internal.OAuthConstants;
-import org.mule.module.oauth2.internal.StateDecoder;
-import org.mule.module.oauth2.internal.TokenNotFoundException;
-import org.mule.module.oauth2.internal.TokenResponseProcessor;
-import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.runtime.module.oauth2.internal.MuleEventLogger;
+import org.mule.runtime.module.oauth2.internal.OAuthConstants;
+import org.mule.runtime.module.oauth2.internal.StateDecoder;
+import org.mule.runtime.module.oauth2.internal.TokenNotFoundException;
+import org.mule.runtime.module.oauth2.internal.TokenResponseProcessor;
+import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 
 import java.util.HashMap;
 import java.util.Map;

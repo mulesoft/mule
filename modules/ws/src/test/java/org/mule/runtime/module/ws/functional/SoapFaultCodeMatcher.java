@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.functional;
+package org.mule.runtime.module.ws.functional;
 
-import org.mule.module.ws.consumer.SoapFaultException;
+import org.mule.runtime.module.ws.consumer.SoapFaultException;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;

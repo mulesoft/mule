@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.nativelib;
+package org.mule.runtime.module.launcher.nativelib;
 
 /**
  * Finds native libraries in a particular class loading context

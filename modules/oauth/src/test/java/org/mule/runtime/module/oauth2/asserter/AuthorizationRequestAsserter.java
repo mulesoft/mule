@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.asserter;
+package org.mule.runtime.module.oauth2.asserter;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.module.http.internal.HttpParser;
-import org.mule.module.http.internal.ParameterMap;
-import org.mule.module.oauth2.internal.OAuthConstants;
+import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.runtime.module.http.internal.ParameterMap;
+import org.mule.runtime.module.oauth2.internal.OAuthConstants;
 
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 

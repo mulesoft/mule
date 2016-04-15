@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.filters;
+package org.mule.runtime.module.xml.filters;
 
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.module.xml.util.XMLUtils;
+import org.mule.runtime.module.xml.util.XMLUtils;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;

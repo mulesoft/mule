@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.processors;
+package org.mule.runtime.config.spring.parsers.processors;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.PreProcessor;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 
 import org.junit.Test;
 import org.w3c.dom.Element;

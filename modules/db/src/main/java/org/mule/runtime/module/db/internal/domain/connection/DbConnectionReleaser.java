@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.connection;
+package org.mule.runtime.module.db.internal.domain.connection;
 
 /**
  * Notifies that a connection can be released

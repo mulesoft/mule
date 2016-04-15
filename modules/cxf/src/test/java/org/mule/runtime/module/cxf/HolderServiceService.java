@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -22,13 +22,13 @@ import javax.xml.ws.Service;
  */
 @WebServiceClient(name = "HolderServiceService", 
                   wsdlLocation = "echoHolder.wsdl",
-                  targetNamespace = "http://cxf.module.mule.org/") 
+                  targetNamespace = "http://cxf.module.runtime.mule.org/")
 public class HolderServiceService extends Service {
 
     public final static URL WSDL_LOCATION;
 
-    public final static QName SERVICE = new QName("http://cxf.module.mule.org/", "HolderServiceService");
-    public final static QName HolderServicePort = new QName("http://cxf.module.mule.org/", "HolderServicePort");
+    public final static QName SERVICE = new QName("http://cxf.module.runtime.mule.org/", "HolderServiceService");
+    public final static QName HolderServicePort = new QName("http://cxf.module.runtime.mule.org/", "HolderServicePort");
     static {
         URL url = null;
         try {

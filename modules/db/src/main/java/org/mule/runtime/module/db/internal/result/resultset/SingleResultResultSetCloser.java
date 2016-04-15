@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.result.resultset;
+package org.mule.runtime.module.db.internal.result.resultset;
 
-import org.mule.module.db.internal.domain.connection.DbConnection;
-import org.mule.module.db.internal.result.statement.AbstractStreamingResultSetCloser;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
+import org.mule.runtime.module.db.internal.result.statement.AbstractStreamingResultSetCloser;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

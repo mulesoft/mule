@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.config;
+package org.mule.runtime.module.extension.internal.config;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -23,10 +23,10 @@ import org.mule.extension.api.introspection.source.SourceModel;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.module.extension.internal.runtime.source.ExtensionMessageSource;
-import org.mule.module.extension.internal.runtime.source.SourceConfigurer;
+import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
+import org.mule.runtime.module.extension.internal.runtime.source.SourceConfigurer;
 
 import com.google.common.base.Joiner;
 

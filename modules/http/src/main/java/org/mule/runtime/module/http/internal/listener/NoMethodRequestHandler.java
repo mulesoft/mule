@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener;
+package org.mule.runtime.module.http.internal.listener;
 
-import static org.mule.module.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
 
 public class NoMethodRequestHandler extends ErrorRequestHandler
 {

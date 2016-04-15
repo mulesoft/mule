@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.model.property;
+package org.mule.runtime.module.extension.internal.model.property;
 
 import org.mule.extension.api.annotation.param.ConfigName;
 import org.mule.extension.api.introspection.config.ConfigurationModel;

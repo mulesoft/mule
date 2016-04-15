@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher;
+package org.mule.runtime.module.launcher;
 
-import org.mule.module.launcher.application.Application;
+import org.mule.runtime.module.launcher.application.Application;
 import org.mule.runtime.core.util.SimpleLoggingTable;
 
 import com.google.common.collect.LinkedListMultimap;

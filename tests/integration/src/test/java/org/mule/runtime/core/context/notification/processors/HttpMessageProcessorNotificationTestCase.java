@@ -9,7 +9,7 @@ package org.mule.runtime.core.context.notification.processors;
 import static org.junit.Assert.assertNotNull;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.config.spring.util.ProcessingStrategyUtils;
+import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 import org.mule.runtime.core.context.notification.Node;
 import org.mule.runtime.core.context.notification.RestrictedNode;
 import org.mule.tck.junit4.rule.DynamicPort;

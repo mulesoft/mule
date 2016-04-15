@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.config;
+package org.mule.runtime.module.cxf.config;
 
-import org.mule.module.cxf.builder.ProxyServiceMessageProcessorBuilder;
+import org.mule.runtime.module.cxf.builder.ProxyServiceMessageProcessorBuilder;
 
 import org.springframework.beans.factory.FactoryBean;
 

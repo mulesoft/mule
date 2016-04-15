@@ -129,8 +129,8 @@
                        cancer="#[true]"
                        initialHealth="#[initialHealth]"
                        finalHealth="#[finalHealth]"
-                       dateOfBirth="#[org.mule.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfBirth().getTime()]"
-                       dateOfDeath="#[org.mule.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfDeath()]"
+                       dateOfBirth="#[org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfBirth().getTime()]"
+                       dateOfDeath="#[org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfDeath()]"
                        money="#[money]"
                        recipe="#[app.registry.recipes]"
                        candidateDoors="#[app.registry.candidateDoors]"
@@ -161,8 +161,8 @@
                        cancer="#[true]"
                        initialHealth="#[initialHealth]"
                        finalHealth="#[finalHealth]"
-                       dateOfBirth="#[org.mule.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfBirth().getTime()]"
-                       dateOfDeath="#[org.mule.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfDeath()]"
+                       dateOfBirth="#[org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfBirth().getTime()]"
+                       dateOfDeath="#[org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfDeath()]"
                        money="#[money]"
                        recipe="#[app.registry.recipes]"
                        candidateDoors="#[app.registry.candidateDoors]"
@@ -200,7 +200,7 @@
             </spring:entry>
         </util:map>
 
-        <util:map id="labeledRicins" value-type="org.mule.module.extension.model.Ricin">
+        <util:map id="labeledRicins" value-type="org.mule.runtime.module.extension.model.Ricin">
             <spring:entry key="pojo" value-ref="ricin"/>
         </util:map>
 

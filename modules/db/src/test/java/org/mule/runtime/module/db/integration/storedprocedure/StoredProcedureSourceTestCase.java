@@ -5,24 +5,24 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.storedprocedure;
+package org.mule.runtime.module.db.integration.storedprocedure;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
-import static org.mule.module.db.integration.DbTestUtil.selectData;
-import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
+import static org.mule.runtime.module.db.integration.DbTestUtil.selectData;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecords;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.integration.model.DerbyTestDatabase;
-import org.mule.module.db.integration.model.Field;
-import org.mule.module.db.integration.model.Record;
+import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.model.DerbyTestDatabase;
+import org.mule.runtime.module.db.integration.model.Field;
+import org.mule.runtime.module.db.integration.model.Record;
 
 import java.util.List;
 import java.util.Map;

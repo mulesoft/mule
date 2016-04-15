@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime;
+package org.mule.runtime.module.extension.internal.runtime;
 
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.extension.api.introspection.EnrichableModel;
-import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.module.extension.internal.util.GroupValueSetter;
-import org.mule.module.extension.internal.util.SingleValueSetter;
-import org.mule.module.extension.internal.util.ValueSetter;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.util.GroupValueSetter;
+import org.mule.runtime.module.extension.internal.util.SingleValueSetter;
+import org.mule.runtime.module.extension.internal.util.ValueSetter;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import java.lang.reflect.Field;

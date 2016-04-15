@@ -60,7 +60,7 @@
 
     <flow name="serverWithEncryption">
         <http:listener path="/services/TestWithEncryption" config-ref="listenerConfig"/>
-        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.ws.consumer.TestService">
             <cxf:outInterceptors>
                 <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                     <spring:constructor-arg>
@@ -80,13 +80,13 @@
                 </spring:bean>
             </cxf:outInterceptors>
         </cxf:jaxws-service>
-        <component class="org.mule.module.ws.consumer.TestService"/>
+        <component class="org.mule.runtime.module.ws.consumer.TestService"/>
     </flow>
 
     <flow name="serverWithoutEncryption">
         <http:listener path="/services/TestWithoutEncryption" config-ref="listenerConfig"/>
-        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService" />
-        <component class="org.mule.module.ws.consumer.TestService"/>
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.ws.consumer.TestService" />
+        <component class="org.mule.runtime.module.ws.consumer.TestService"/>
     </flow>
 
 </mule>

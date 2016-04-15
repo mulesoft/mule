@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api.listener;
+package org.mule.runtime.module.http.api.listener;
 
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
@@ -23,7 +23,7 @@ public interface HttpListener extends NonBlockingMessageSource, Lifecycle
     public HttpListenerConfig getConfig();
 
     /**
-     * Stops this listener. Any subsequent call made to the listener will return {@link org.mule.module.http.internal.listener.ServiceTemporarilyUnavailableListenerRequestHandler#SERVICE_TEMPORARILY_UNAVAILABLE_STATUS_CODE}.
+     * Stops this listener. Any subsequent call made to the listener will return {@link org.mule.runtime.module.http.internal.listener.ServiceTemporarilyUnavailableListenerRequestHandler#SERVICE_TEMPORARILY_UNAVAILABLE_STATUS_CODE}.
      *
      * @throws MuleException if there's was a problem stopping the listener
      */
@@ -37,7 +37,7 @@ public interface HttpListener extends NonBlockingMessageSource, Lifecycle
     public void start() throws MuleException;
 
     /**
-     * Get rid of this listener. Subsequent call made to the listener will return {@link org.mule.module.http.internal.listener.NoListenerRequestHandler#RESOURCE_NOT_FOUND_STATUS_CODE} unless
+     * Get rid of this listener. Subsequent call made to the listener will return {@link org.mule.runtime.module.http.internal.listener.NoListenerRequestHandler#RESOURCE_NOT_FOUND_STATUS_CODE} unless
      * there's another listener which path matches the request criteria.
      */
     public void dispose();

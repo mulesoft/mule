@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.util;
+package org.mule.runtime.module.xml.util;
 
 import org.mule.runtime.core.api.util.StreamCloser;
-import org.mule.module.xml.stax.StaxSource;
+import org.mule.runtime.module.xml.stax.StaxSource;
 
 import javax.xml.stream.XMLStreamReader;
 

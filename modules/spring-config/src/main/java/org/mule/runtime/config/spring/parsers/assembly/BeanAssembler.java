@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.assembly;
+package org.mule.runtime.config.spring.parsers.assembly;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -33,7 +33,7 @@ public interface BeanAssembler
      * by explicit annotation or by the "-ref" at the end of an attribute name.  We do not
      * check the Spring repo to see if a name already exists since that could lead to
      * unpredictable behaviour.
-     * (see {@link org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration})
+     * (see {@link org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration})
      * @param attribute The attribute to add
      */
     void extendBean(Attr attribute);
@@ -88,7 +88,7 @@ public interface BeanAssembler
 
     /**
      * Set a flag on the bean - this is used to communicate with
-     * {@link org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate}
+     * {@link org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate}
      *
      * @param flag The flag to set
      */

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api;
+package org.mule.runtime.module.http.api;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
 
 /**
  * An object that authenticates an HTTP request.

@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -25,7 +25,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
     private static final String REQUEST_PAYLOAD =
             "<soap:Envelope \n" +
             "           xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-            "           xmlns:svc=\"http://example.cxf.module.mule.org/\">\n" +
+            "           xmlns:svc=\"http://example.cxf.module.runtime.mule.org/\">\n" +
             "<soap:Body>\n" +
             "<svc:##method##>\n" +
             "    <arg0>Test</arg0>\n" +
@@ -50,8 +50,8 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
             "<faultcode>soap:Server</faultcode>" +
             "<faultstring>Cxf Exception Message</faultstring>" +
             "<detail>" +
-            "<ns1:CustomFault xmlns:ns1=\"http://testmodels.cxf.module.mule.org/\">" +
-            "<ns2:description xmlns:ns2=\"http://testmodels.cxf.module.mule.org\">%s</ns2:description>" +
+            "<ns1:CustomFault xmlns:ns1=\"http://testmodels.cxf.module.runtime.mule.org/\">" +
+            "<ns2:description xmlns:ns2=\"http://testmodels.cxf.module.runtime.mule.org\">%s</ns2:description>" +
             "</ns1:CustomFault>" +
             "</detail>" +
             "</soap:Fault>" +

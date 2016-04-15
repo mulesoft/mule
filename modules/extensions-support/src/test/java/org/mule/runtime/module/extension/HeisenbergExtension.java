@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension;
+package org.mule.runtime.module.extension;
 
 import static org.mule.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
 import static org.mule.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
@@ -31,12 +31,12 @@ import org.mule.extension.api.annotation.param.ConfigName;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.display.DisplayName;
 import org.mule.extension.api.annotation.param.display.Placement;
-import org.mule.module.extension.exception.HeisenbergConnectionExceptionEnricher;
-import org.mule.module.extension.model.ExtendedPersonalInfo;
-import org.mule.module.extension.model.HealthStatus;
-import org.mule.module.extension.model.KnockeableDoor;
-import org.mule.module.extension.model.Ricin;
-import org.mule.module.extension.model.Weapon;
+import org.mule.runtime.module.extension.exception.HeisenbergConnectionExceptionEnricher;
+import org.mule.runtime.module.extension.model.ExtendedPersonalInfo;
+import org.mule.runtime.module.extension.model.HealthStatus;
+import org.mule.runtime.module.extension.model.KnockeableDoor;
+import org.mule.runtime.module.extension.model.Ricin;
+import org.mule.runtime.module.extension.model.Weapon;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;

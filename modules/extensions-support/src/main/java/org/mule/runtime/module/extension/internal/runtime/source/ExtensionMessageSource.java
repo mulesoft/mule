@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.source;
+package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -43,11 +43,11 @@ import org.mule.extension.api.runtime.MessageHandler;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.extension.api.runtime.source.SourceContext;
 import org.mule.extension.api.runtime.source.SourceFactory;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.module.extension.internal.runtime.ExtensionComponent;
-import org.mule.module.extension.internal.runtime.exception.ExceptionEnricherManager;
-import org.mule.module.extension.internal.runtime.processor.IllegalOperationException;
-import org.mule.module.extension.internal.runtime.processor.IllegalSourceException;
+import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
+import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
+import org.mule.runtime.module.extension.internal.runtime.processor.IllegalOperationException;
+import org.mule.runtime.module.extension.internal.runtime.processor.IllegalSourceException;
 import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.io.Serializable;

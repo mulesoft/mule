@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring;
+package org.mule.runtime.config.spring;
 
-import org.mule.config.spring.util.SpringXMLUtils;
+import org.mule.runtime.config.spring.util.SpringXMLUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -39,20 +39,20 @@ import org.w3c.dom.NodeList;
 /**
  * This parser enables Mule to parse heirarchical bean structures using spring Namespace handling
  * There are 4 base DefinitionParsers supplied in Mule that most Parsers will extend from, these are
- * {@link org.mule.config.spring.parsers.AbstractChildDefinitionParser}
- * {@link org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser}
- * {@link org.mule.config.spring.parsers.generic.ChildDefinitionParser}
- * {@link org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser}
+ * {@link org.mule.runtime.config.spring.parsers.AbstractChildDefinitionParser}
+ * {@link org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser}
+ * {@link org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser}
+ * {@link org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser}
  */
 public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinitionParserDelegate
 {
 
     public static final String BEANS = "beans"; // cannot find this in Spring api!
-    public static final String MULE_REPEAT_PARSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE";
-    public static final String MULE_NO_RECURSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE";
-    public static final String MULE_FORCE_RECURSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_FORCE_RECURSE";
-    public static final String MULE_NO_REGISTRATION = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION";
-    public static final String MULE_POST_CHILDREN = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_POST_CHILDREN";
+    public static final String MULE_REPEAT_PARSE = "org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE";
+    public static final String MULE_NO_RECURSE = "org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE";
+    public static final String MULE_FORCE_RECURSE = "org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_FORCE_RECURSE";
+    public static final String MULE_NO_REGISTRATION = "org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION";
+    public static final String MULE_POST_CHILDREN = "org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_POST_CHILDREN";
     private DefaultBeanDefinitionDocumentReader spring;
     private final List<ElementValidator> elementValidators;
 

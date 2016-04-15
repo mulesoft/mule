@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.artifact.classloader;
+package org.mule.runtime.module.artifact.classloader;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;

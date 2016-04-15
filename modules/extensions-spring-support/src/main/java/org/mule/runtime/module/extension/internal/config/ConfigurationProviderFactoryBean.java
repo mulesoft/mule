@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.config;
+package org.mule.runtime.module.extension.internal.config;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -13,12 +13,12 @@ import org.mule.extension.api.introspection.config.ConfigurationModel;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ExpirationPolicy;
-import org.mule.module.extension.internal.runtime.DynamicConfigPolicy;
-import org.mule.module.extension.internal.runtime.ImmutableExpirationPolicy;
-import org.mule.module.extension.internal.runtime.config.ConfigurationProviderFactory;
-import org.mule.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
+import org.mule.runtime.module.extension.internal.runtime.ImmutableExpirationPolicy;
+import org.mule.runtime.module.extension.internal.runtime.config.ConfigurationProviderFactory;
+import org.mule.runtime.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.core.time.TimeSupplier;
 
 import java.util.concurrent.TimeUnit;

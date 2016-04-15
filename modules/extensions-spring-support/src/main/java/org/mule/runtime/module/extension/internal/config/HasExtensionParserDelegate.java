@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.config;
+package org.mule.runtime.module.extension.internal.config;
 
 /**
  * Contract interface for an object capable of receiving a {@link XmlExtensionParserDelegate}

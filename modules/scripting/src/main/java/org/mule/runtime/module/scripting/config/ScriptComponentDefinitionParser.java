@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.scripting.config;
+package org.mule.runtime.module.scripting.config;
 
-import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
-import org.mule.module.scripting.component.ScriptComponent;
+import org.mule.runtime.config.spring.parsers.specific.ComponentDefinitionParser;
+import org.mule.runtime.module.scripting.component.ScriptComponent;
 
 public class ScriptComponentDefinitionParser extends ComponentDefinitionParser
 {

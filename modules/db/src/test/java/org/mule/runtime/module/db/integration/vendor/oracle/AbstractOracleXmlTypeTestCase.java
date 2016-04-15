@@ -5,17 +5,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.vendor.oracle;
+package org.mule.runtime.module.db.integration.vendor.oracle;
 
 import static org.junit.Assume.assumeThat;
-import static org.mule.module.db.integration.DbTestUtil.selectData;
-import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.integration.model.Alien;
-import org.mule.module.db.integration.model.Field;
-import org.mule.module.db.integration.model.Record;
-import org.mule.module.db.internal.domain.type.oracle.OracleXmlType;
+import static org.mule.runtime.module.db.integration.DbTestUtil.selectData;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecords;
+import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.model.Alien;
+import org.mule.runtime.module.db.integration.model.Field;
+import org.mule.runtime.module.db.integration.model.Record;
+import org.mule.runtime.module.db.internal.domain.type.oracle.OracleXmlType;
 
 import java.sql.SQLException;
 import java.util.List;

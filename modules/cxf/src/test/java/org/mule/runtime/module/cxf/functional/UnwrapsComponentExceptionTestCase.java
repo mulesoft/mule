@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.functional;
+package org.mule.runtime.module.cxf.functional;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.cxf.example.HelloWorld;
+import org.mule.runtime.module.cxf.example.HelloWorld;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -28,7 +28,7 @@ public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
 
     private static final String requestPayload =
             "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-            "           xmlns:hi=\"http://example.cxf.module.mule.org/\">\n" +
+            "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" +
             "<soap:Body>\n" +
             "<hi:sayHi>\n" +
             "    <arg0>Hello</arg0>\n" +
@@ -55,7 +55,7 @@ public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
         assertTrue("Component exception was not managed", getPayloadAsString(received).contains(ERROR_MESSAGE));
     }
 
-    @WebService(endpointInterface = "org.mule.module.cxf.example.HelloWorld", serviceName = "HelloWorld")
+    @WebService(endpointInterface = "org.mule.runtime.module.cxf.example.HelloWorld", serviceName = "HelloWorld")
     public static class HelloWorldImpl implements HelloWorld
     {
 

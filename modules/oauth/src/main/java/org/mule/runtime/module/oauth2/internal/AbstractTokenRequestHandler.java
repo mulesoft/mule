@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal;
+package org.mule.runtime.module.oauth2.internal;
 
-import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.api.tls.TlsContextFactory;
 
 import org.slf4j.Logger;

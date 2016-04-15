@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.template;
+package org.mule.runtime.module.db.integration.template;
 
-import org.mule.module.db.integration.config.AbstractConfigurationErrorTestCase;
+import org.mule.runtime.module.db.integration.config.AbstractConfigurationErrorTestCase;
 
 import org.junit.Test;
 

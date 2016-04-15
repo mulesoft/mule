@@ -14,8 +14,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import org.mule.module.extension.file.api.FileAttributes;
-import org.mule.module.extension.file.api.TreeNode;
+import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.TreeNode;
 
 import java.io.File;
 import java.nio.file.Paths;

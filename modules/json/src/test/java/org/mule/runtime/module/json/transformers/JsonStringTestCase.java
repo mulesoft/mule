@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.json.transformers;
+package org.mule.runtime.module.json.transformers;
 
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

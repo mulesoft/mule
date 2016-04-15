@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.transaction;
+package org.mule.runtime.module.db.internal.domain.transaction;
 
 /**
  * Indicates how a connector should behave about transactions

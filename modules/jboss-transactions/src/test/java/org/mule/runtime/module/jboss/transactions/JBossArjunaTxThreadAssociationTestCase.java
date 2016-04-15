@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.jboss.transactions;
+package org.mule.runtime.module.jboss.transactions;
 
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
-import org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory;
+import org.mule.runtime.module.jboss.transaction.JBossArjunaTransactionManagerFactory;
 import org.mule.tck.AbstractTxThreadAssociationTestCase;
 
 public class JBossArjunaTxThreadAssociationTestCase extends AbstractTxThreadAssociationTestCase

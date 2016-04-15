@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
 import javax.jws.WebService;
 import javax.xml.ws.Holder;
 
-@WebService(endpointInterface = "org.mule.module.cxf.HolderService")
+@WebService(endpointInterface = "org.mule.runtime.module.cxf.HolderService")
 public class HolderServiceImplForNonBlocking implements HolderService
 {
     public String echo(String s1, Holder<String> outS1, Holder<String> outS2)

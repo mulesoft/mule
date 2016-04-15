@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.util;
+package org.mule.runtime.module.extension.internal.util;
 
 import org.mule.extension.api.introspection.parameter.ParameterModel;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 import java.lang.reflect.Field;
 

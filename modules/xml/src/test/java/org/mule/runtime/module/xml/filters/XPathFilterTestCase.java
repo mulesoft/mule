@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.filters;
+package org.mule.runtime.module.xml.filters;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,8 +15,8 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.module.xml.util.NamespaceManager;
-import org.mule.module.xml.xpath.SaxonXpathEvaluator;
+import org.mule.runtime.module.xml.util.NamespaceManager;
+import org.mule.runtime.module.xml.xpath.SaxonXpathEvaluator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

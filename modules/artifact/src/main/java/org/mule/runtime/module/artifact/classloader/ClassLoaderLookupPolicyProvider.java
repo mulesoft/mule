@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.artifact.classloader;
+package org.mule.runtime.module.artifact.classloader;
 
 /**
  * Enables access {@link ClassLoaderLookupPolicy} used on a given classLoader.

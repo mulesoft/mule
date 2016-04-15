@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.tls.internal.config;
+package org.mule.runtime.module.tls.internal.config;
 
-import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
+import org.mule.runtime.config.spring.parsers.delegate.ParentContextDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
 
 
 public class KeyStoreParentContextDefinitionParser extends ParentContextDefinitionParser

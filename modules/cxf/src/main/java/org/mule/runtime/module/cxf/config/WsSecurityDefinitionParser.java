@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.config;
+package org.mule.runtime.module.cxf.config;
 
-import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.delegate.ParentContextDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.config.spring.parsers.processors.CheckRequiredAttributesWhenNoChildren;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
+import org.mule.runtime.config.spring.parsers.PreProcessor;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.processors.CheckRequiredAttributesWhenNoChildren;
+import org.mule.runtime.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
 
 import org.w3c.dom.Element;
 

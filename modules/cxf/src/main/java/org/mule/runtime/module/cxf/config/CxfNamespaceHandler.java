@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.config;
+package org.mule.runtime.module.cxf.config;
 
 import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.processors.AddAttribute;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.module.cxf.CxfConfiguration;
-import org.mule.module.cxf.CxfConstants;
-import org.mule.module.cxf.support.MuleSecurityManagerValidator;
-import org.mule.module.cxf.support.StaxFeature;
+import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.parsers.collection.ChildListDefinitionParser;
+import org.mule.runtime.config.spring.parsers.collection.ChildMapDefinitionParser;
+import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.processors.AddAttribute;
+import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.runtime.module.cxf.CxfConfiguration;
+import org.mule.runtime.module.cxf.CxfConstants;
+import org.mule.runtime.module.cxf.support.MuleSecurityManagerValidator;
+import org.mule.runtime.module.cxf.support.StaxFeature;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.configuration.spring.SimpleBeanDefinitionParser;

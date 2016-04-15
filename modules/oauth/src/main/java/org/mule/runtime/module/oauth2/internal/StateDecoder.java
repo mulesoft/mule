@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal;
+package org.mule.runtime.module.oauth2.internal;
 
 /**
  * Decoder for the oauth state. Allows to retrieve the parameters encoded in an state and to retrieve the original state.
@@ -23,7 +23,7 @@ public class StateDecoder
     }
 
     /**
-     * Decodes the original state from an encoded state using {@link org.mule.module.oauth2.internal.StateEncoder#encodeResourceOwnerIdInState}
+     * Decodes the original state from an encoded state using {@link org.mule.runtime.module.oauth2.internal.StateEncoder#encodeResourceOwnerIdInState}
      *
      * @return the original state, null if the original state was empty.
      */
@@ -57,7 +57,7 @@ public class StateDecoder
     }
 
     /**
-     * Decodes the resource owner id from an encoded state using {@link org.mule.module.oauth2.internal.StateEncoder#encodeResourceOwnerIdInState}
+     * Decodes the resource owner id from an encoded state using {@link org.mule.runtime.module.oauth2.internal.StateEncoder#encodeResourceOwnerIdInState}
      *
      * @return the resource owner id, null if there's no oauth state id encoded in it.
      */

@@ -5,24 +5,24 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.domain.database;
+package org.mule.runtime.module.db.internal.config.domain.database;
 
 import org.mule.runtime.core.api.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.config.spring.factories.AnnotatedObjectFactoryBean;
-import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
-import org.mule.module.db.internal.domain.database.ConfigurableDbConfigFactory;
-import org.mule.module.db.internal.domain.database.DataSourceConfig;
-import org.mule.module.db.internal.domain.database.DataSourceFactory;
-import org.mule.module.db.internal.domain.database.DbConfig;
-import org.mule.module.db.internal.domain.database.GenericDbConfigFactory;
-import org.mule.module.db.internal.domain.type.DbType;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
-import org.mule.module.db.internal.resolver.database.DynamicDbConfigResolver;
-import org.mule.module.db.internal.resolver.database.StaticDbConfigResolver;
+import org.mule.runtime.config.spring.factories.AnnotatedObjectFactoryBean;
+import org.mule.runtime.module.db.internal.domain.connection.DbPoolingProfile;
+import org.mule.runtime.module.db.internal.domain.database.ConfigurableDbConfigFactory;
+import org.mule.runtime.module.db.internal.domain.database.DataSourceConfig;
+import org.mule.runtime.module.db.internal.domain.database.DataSourceFactory;
+import org.mule.runtime.module.db.internal.domain.database.DbConfig;
+import org.mule.runtime.module.db.internal.domain.database.GenericDbConfigFactory;
+import org.mule.runtime.module.db.internal.domain.type.DbType;
+import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.runtime.module.db.internal.resolver.database.DynamicDbConfigResolver;
+import org.mule.runtime.module.db.internal.resolver.database.StaticDbConfigResolver;
 import org.mule.runtime.core.util.Preconditions;
 
 import java.util.List;

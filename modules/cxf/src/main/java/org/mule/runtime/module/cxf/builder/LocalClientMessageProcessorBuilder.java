@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.builder;
+package org.mule.runtime.module.cxf.builder;
 
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.module.cxf.CxfOutboundMessageProcessor;
+import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;

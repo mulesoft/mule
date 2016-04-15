@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api.requester;
+package org.mule.runtime.module.http.api.requester;
 
 import org.mule.runtime.core.api.AnnotatedObject;
 import org.mule.runtime.core.api.NamedObject;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.module.http.api.HttpAuthentication;
-import org.mule.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.runtime.module.http.api.HttpAuthentication;
+import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.api.tls.TlsContextFactory;
 
 /**
@@ -24,7 +24,7 @@ import org.mule.api.tls.TlsContextFactory;
  * This object represents the XML request-config elements in the configuration.
  *
  * If a new HttpRequesterConfig needs to be created programmatically then use
- * {@link org.mule.module.http.api.requester.HttpRequesterConfigBuilder}
+ * {@link org.mule.runtime.module.http.api.requester.HttpRequesterConfigBuilder}
  */
 public interface HttpRequesterConfig extends NamedObject, AnnotatedObject, Startable, Stoppable
 {

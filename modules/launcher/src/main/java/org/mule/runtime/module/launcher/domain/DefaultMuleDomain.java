@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.domain;
+package org.mule.runtime.module.launcher.domain;
 
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import org.mule.runtime.core.api.MuleContext;
@@ -16,17 +16,17 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.builders.AutoConfigurationBuilder;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.launcher.DeploymentInitException;
-import org.mule.module.launcher.DeploymentListener;
-import org.mule.module.launcher.DeploymentStartException;
-import org.mule.module.launcher.DeploymentStopException;
-import org.mule.module.launcher.MuleDeploymentService;
-import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.application.NullDeploymentListener;
-import org.mule.module.launcher.artifact.MuleContextDeploymentListener;
-import org.mule.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.module.launcher.descriptor.DomainDescriptor;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.launcher.DeploymentInitException;
+import org.mule.runtime.module.launcher.DeploymentListener;
+import org.mule.runtime.module.launcher.DeploymentStartException;
+import org.mule.runtime.module.launcher.DeploymentStopException;
+import org.mule.runtime.module.launcher.MuleDeploymentService;
+import org.mule.runtime.module.launcher.application.Application;
+import org.mule.runtime.module.launcher.application.NullDeploymentListener;
+import org.mule.runtime.module.launcher.artifact.MuleContextDeploymentListener;
+import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ExceptionUtils;
 
@@ -214,7 +214,7 @@ public class DefaultMuleDomain implements Domain
     {
         try
         {
-            return (ConfigurationBuilder) ClassUtils.instanciateClass("org.mule.config.spring.SpringXmlDomainConfigurationBuilder",
+            return (ConfigurationBuilder) ClassUtils.instanciateClass("org.mule.runtime.config.spring.SpringXmlDomainConfigurationBuilder",
                                                                       new Object[] {getResourceFiles()[0].getName()}, deploymentClassLoader.getClassLoader());
         }
         catch (Exception e)

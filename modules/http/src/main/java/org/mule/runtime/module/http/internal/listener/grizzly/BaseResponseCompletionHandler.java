@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener.grizzly;
+package org.mule.runtime.module.http.internal.listener.grizzly;
 
-import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
 
-import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 
 import java.util.Collection;
 

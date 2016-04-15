@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.domain.database;
+package org.mule.runtime.module.db.internal.config.domain.database;
 
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
-import org.mule.module.db.internal.domain.type.DbType;
-import org.mule.module.db.internal.domain.type.ResolvedDbType;
+import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.processors.CheckExclusiveAttributes;
+import org.mule.runtime.module.db.internal.domain.type.DbType;
+import org.mule.runtime.module.db.internal.domain.type.ResolvedDbType;
 
 import java.sql.Connection;
 import java.util.ArrayList;

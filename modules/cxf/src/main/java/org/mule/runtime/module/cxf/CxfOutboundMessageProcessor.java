@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
 import static org.mule.runtime.core.PropertyScope.OUTBOUND;
-import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -23,8 +23,8 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.module.cxf.i18n.CxfMessages;
-import org.mule.module.cxf.security.WebServiceSecurityException;
+import org.mule.runtime.module.cxf.i18n.CxfMessages;
+import org.mule.runtime.module.cxf.security.WebServiceSecurityException;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 

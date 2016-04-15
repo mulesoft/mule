@@ -14,7 +14,7 @@ import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.module.extension.file.api.stream.AbstractFileInputStream;
+import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
 
 import java.io.InputStream;
 import java.nio.file.Paths;

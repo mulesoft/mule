@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.config;
+package org.mule.runtime.module.oauth2.internal.config;
 
 
-import org.mule.config.spring.handlers.MuleNamespaceHandler;
-import org.mule.config.spring.parsers.collection.GenericChildMapDefinitionParser;
-import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.module.oauth2.internal.ParameterExtractor;
-import org.mule.module.oauth2.internal.authorizationcode.AuthorizationRequestHandler;
-import org.mule.module.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler;
-import org.mule.module.oauth2.internal.authorizationcode.DefaultAuthorizationCodeGrantType;
-import org.mule.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
-import org.mule.module.oauth2.internal.clientcredentials.ClientCredentialsGrantType;
-import org.mule.module.oauth2.internal.clientcredentials.ClientCredentialsTokenRequestHandler;
-import org.mule.module.oauth2.internal.tokenmanager.InvalidateOauthContextMessageProcessor;
-import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
+import org.mule.runtime.config.spring.handlers.MuleNamespaceHandler;
+import org.mule.runtime.config.spring.parsers.collection.GenericChildMapDefinitionParser;
+import org.mule.runtime.config.spring.parsers.delegate.ParentContextDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.runtime.module.oauth2.internal.ParameterExtractor;
+import org.mule.runtime.module.oauth2.internal.authorizationcode.AuthorizationRequestHandler;
+import org.mule.runtime.module.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler;
+import org.mule.runtime.module.oauth2.internal.authorizationcode.DefaultAuthorizationCodeGrantType;
+import org.mule.runtime.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
+import org.mule.runtime.module.oauth2.internal.clientcredentials.ClientCredentialsGrantType;
+import org.mule.runtime.module.oauth2.internal.clientcredentials.ClientCredentialsTokenRequestHandler;
+import org.mule.runtime.module.oauth2.internal.tokenmanager.InvalidateOauthContextMessageProcessor;
+import org.mule.runtime.module.oauth2.internal.tokenmanager.TokenManagerConfig;
 
 public class OAuth2NamespaceHandler extends MuleNamespaceHandler
 {

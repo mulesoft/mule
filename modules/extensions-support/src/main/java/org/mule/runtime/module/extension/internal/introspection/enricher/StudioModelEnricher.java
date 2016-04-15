@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.enricher;
+package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import org.mule.extension.api.annotation.capability.CustomStudioEditor;
 import org.mule.extension.api.annotation.capability.StudioProvidedEditor;

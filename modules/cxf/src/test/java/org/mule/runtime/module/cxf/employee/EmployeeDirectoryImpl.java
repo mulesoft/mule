@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.employee;
+package org.mule.runtime.module.cxf.employee;
 
 import org.mule.example.employee.Employee;
 import org.mule.example.employee.EmployeeDirectory;

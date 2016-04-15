@@ -5,16 +5,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.processor;
+package org.mule.runtime.module.db.internal.processor;
 
-import org.mule.module.db.internal.resolver.query.QueryResolver;
-import org.mule.module.db.internal.domain.executor.QueryExecutor;
-import org.mule.module.db.internal.domain.query.Query;
-import org.mule.module.db.internal.domain.query.QueryType;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
-import org.mule.module.db.internal.domain.connection.DbConnection;
-import org.mule.module.db.internal.domain.executor.QueryExecutorFactory;
-import org.mule.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.runtime.module.db.internal.resolver.query.QueryResolver;
+import org.mule.runtime.module.db.internal.domain.executor.QueryExecutor;
+import org.mule.runtime.module.db.internal.domain.query.Query;
+import org.mule.runtime.module.db.internal.domain.query.QueryType;
+import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
+import org.mule.runtime.module.db.internal.domain.executor.QueryExecutorFactory;
+import org.mule.runtime.module.db.internal.domain.transaction.TransactionalAction;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

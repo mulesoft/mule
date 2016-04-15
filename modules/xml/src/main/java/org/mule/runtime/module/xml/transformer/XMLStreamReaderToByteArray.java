@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.transformer;
+package org.mule.runtime.module.xml.transformer;
 
 import org.mule.api.metadata.DataType;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
@@ -13,7 +13,7 @@ import javax.xml.stream.XMLStreamReader;
 
 /**
  * Transforms an {@link javax.xml.stream.XMLStreamReader} to a byte array. Provides the same behavior of the
- * {@link org.mule.module.xml.transformer.XmlToDomDocument} transformer, but narrowing down the source types to only
+ * {@link org.mule.runtime.module.xml.transformer.XmlToDomDocument} transformer, but narrowing down the source types to only
  * support XMLStreamReader.
  */
 public class XMLStreamReaderToByteArray extends XmlToDomDocument

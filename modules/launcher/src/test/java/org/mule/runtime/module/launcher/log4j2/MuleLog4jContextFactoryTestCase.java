@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.log4j2;
+package org.mule.runtime.module.launcher.log4j2;
 
 import static java.lang.System.getProperty;
 import static org.hamcrest.CoreMatchers.equalTo;

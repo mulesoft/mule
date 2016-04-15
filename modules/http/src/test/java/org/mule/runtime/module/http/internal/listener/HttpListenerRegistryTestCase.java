@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener;
+package org.mule.runtime.module.http.internal.listener;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
@@ -12,11 +12,11 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.module.http.internal.domain.request.HttpRequest;
-import org.mule.module.http.internal.listener.async.RequestHandler;
-import org.mule.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
-import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.module.http.internal.listener.matcher.MethodRequestMatcher;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
+import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
+import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
+import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.runtime.module.http.internal.listener.matcher.MethodRequestMatcher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.util.StringUtils;

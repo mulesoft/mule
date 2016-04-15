@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.config;
+package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.sameInstance;
@@ -15,7 +15,7 @@ import static org.mule.tck.MuleTestUtils.spyInjector;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.module.extension.internal.runtime.DefaultOperationContext;
+import org.mule.runtime.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;

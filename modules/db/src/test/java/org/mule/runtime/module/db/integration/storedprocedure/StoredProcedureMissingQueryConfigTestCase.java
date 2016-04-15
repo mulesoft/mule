@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.storedprocedure;
+package org.mule.runtime.module.db.integration.storedprocedure;
 
-import org.mule.module.db.integration.config.AbstractMissingQueryConfigTestCase;
+import org.mule.runtime.module.db.integration.config.AbstractMissingQueryConfigTestCase;
 
 public class StoredProcedureMissingQueryConfigTestCase extends AbstractMissingQueryConfigTestCase
 {

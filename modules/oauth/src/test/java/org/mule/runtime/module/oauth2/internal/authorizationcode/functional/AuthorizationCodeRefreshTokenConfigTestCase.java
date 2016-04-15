@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.authorizationcode.functional;
+package org.mule.runtime.module.oauth2.internal.authorizationcode.functional;
 
-import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 
 import org.junit.Test;
 

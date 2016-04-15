@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.result.statement;
+package org.mule.runtime.module.db.internal.result.statement;
 
 /**
  * Represents a single result from a {@link java.sql.Statement} execution

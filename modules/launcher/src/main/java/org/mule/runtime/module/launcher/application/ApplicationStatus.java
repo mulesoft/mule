@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.application;
+package org.mule.runtime.module.launcher.application;
 
 /**
  * Indicates the status of a Mule application that corresponds to the last executed lifecycle phase

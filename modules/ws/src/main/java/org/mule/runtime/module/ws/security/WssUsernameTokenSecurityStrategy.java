@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.ws.security;
+package org.mule.runtime.module.ws.security;
 
 import static org.apache.ws.security.WSConstants.CREATED_LN;
 import static org.apache.ws.security.WSConstants.NONCE_LN;
@@ -13,8 +13,8 @@ import static org.apache.ws.security.handler.WSHandlerConstants.ADD_UT_ELEMENTS;
 import static org.apache.ws.security.handler.WSHandlerConstants.PASSWORD_TYPE;
 import static org.apache.ws.security.handler.WSHandlerConstants.USER;
 import static org.apache.ws.security.handler.WSHandlerConstants.USERNAME_TOKEN;
-import static org.mule.module.ws.security.PasswordType.DIGEST;
-import static org.mule.module.ws.security.PasswordType.TEXT;
+import static org.mule.runtime.module.ws.security.PasswordType.DIGEST;
+import static org.mule.runtime.module.ws.security.PasswordType.TEXT;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;

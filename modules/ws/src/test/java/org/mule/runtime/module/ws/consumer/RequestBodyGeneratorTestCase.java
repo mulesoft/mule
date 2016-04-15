@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.consumer;
+package org.mule.runtime.module.ws.consumer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -33,7 +33,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class RequestBodyGeneratorTestCase extends AbstractMuleTestCase
 {
-    private static final String EXPECTED_BODY_PATTERN = "<ns:%s xmlns:ns=\"http://consumer.ws.module.mule.org/\" />";
+    private static final String EXPECTED_BODY_PATTERN = "<ns:%s xmlns:ns=\"http://consumer.ws.module.runtime.mule.org/\" />";
 
     private static final String SERVICE_NAME = "TestParamsService";
     private static final String VALID_WSDL_FILE = "TestParams.wsdl";

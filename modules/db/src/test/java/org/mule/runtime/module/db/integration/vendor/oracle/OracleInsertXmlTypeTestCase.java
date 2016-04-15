@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.db.integration.vendor.oracle;
+package org.mule.runtime.module.db.integration.vendor.oracle;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.db.integration.DbTestUtil.selectData;
-import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
+import static org.mule.runtime.module.db.integration.DbTestUtil.selectData;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecords;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.integration.model.Alien;
-import org.mule.module.db.integration.model.Field;
-import org.mule.module.db.integration.model.Record;
-import org.mule.module.db.internal.domain.type.oracle.OracleXmlType;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.model.Alien;
+import org.mule.runtime.module.db.integration.model.Field;
+import org.mule.runtime.module.db.integration.model.Record;
+import org.mule.runtime.module.db.internal.domain.type.oracle.OracleXmlType;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.sql.Connection;

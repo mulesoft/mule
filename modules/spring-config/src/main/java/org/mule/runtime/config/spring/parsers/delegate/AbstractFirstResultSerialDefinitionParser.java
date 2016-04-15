@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.delegate;
+package org.mule.runtime.config.spring.parsers.delegate;
 
-import org.mule.config.spring.parsers.MuleDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Extend {@link org.mule.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser}
+ * Extend {@link org.mule.runtime.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser}
  * to return the first definition as the final result
  */
 public class AbstractFirstResultSerialDefinitionParser extends AbstractSerialDelegatingDefinitionParser

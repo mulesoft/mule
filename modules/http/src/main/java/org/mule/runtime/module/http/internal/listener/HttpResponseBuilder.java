@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener;
+package org.mule.runtime.module.http.internal.listener;
 
-import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
-import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
-import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY;
-import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
-import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.module.http.api.requester.HttpStreamingType.ALWAYS;
-import static org.mule.module.http.api.requester.HttpStreamingType.AUTO;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.runtime.module.http.api.requester.HttpStreamingType.ALWAYS;
+import static org.mule.runtime.module.http.api.requester.HttpStreamingType.AUTO;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -24,21 +24,21 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.api.metadata.DataType;
-import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.api.requester.HttpStreamingType;
-import org.mule.module.http.internal.HttpMessageBuilder;
-import org.mule.module.http.internal.HttpParamType;
-import org.mule.module.http.internal.HttpParser;
-import org.mule.module.http.internal.ParameterMap;
-import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
-import org.mule.module.http.internal.domain.EmptyHttpEntity;
-import org.mule.module.http.internal.domain.HttpEntity;
-import org.mule.module.http.internal.domain.HttpProtocol;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.MultipartHttpEntity;
-import org.mule.module.http.internal.domain.response.HttpResponse;
-import org.mule.module.http.internal.multipart.HttpMultipartEncoder;
-import org.mule.module.http.internal.multipart.HttpPartDataSource;
+import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.http.api.requester.HttpStreamingType;
+import org.mule.runtime.module.http.internal.HttpMessageBuilder;
+import org.mule.runtime.module.http.internal.HttpParamType;
+import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.runtime.module.http.internal.ParameterMap;
+import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
+import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
+import org.mule.runtime.module.http.internal.domain.HttpEntity;
+import org.mule.runtime.module.http.internal.domain.HttpProtocol;
+import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
+import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
+import org.mule.runtime.module.http.internal.multipart.HttpMultipartEncoder;
+import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.api.message.NullPayload;
 import org.mule.runtime.core.util.AttributeEvaluator;
@@ -85,7 +85,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         reasonPhraseEvaluator = new AttributeEvaluator(reasonPhrase).initialize(muleContext.getExpressionManager());
     }
 
-    public HttpResponse build(org.mule.module.http.internal.domain.response.HttpResponseBuilder httpResponseBuilder, MuleEvent event) throws MessagingException
+    public HttpResponse build(org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder httpResponseBuilder, MuleEvent event) throws MessagingException
     {
         final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
         final Set<String> outboundProperties = event.getMessage().getOutboundPropertyNames();

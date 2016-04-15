@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.transport;
+package org.mule.runtime.module.cxf.transport;
 
-import org.mule.module.cxf.CxfConfiguration;
+import org.mule.runtime.module.cxf.CxfConfiguration;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -13,12 +13,12 @@ import static java.nio.file.StandardOpenOption.WRITE;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
-import org.mule.module.extension.file.api.FileWriteMode;
-import org.mule.module.extension.file.api.lock.PathLock;
-import org.mule.module.extension.file.api.command.WriteCommand;
-import org.mule.module.extension.file.api.FileContentWrapper;
-import org.mule.module.extension.file.api.FileWriterVisitor;
-import org.mule.module.extension.file.api.lock.NullPathLock;
+import org.mule.runtime.module.extension.file.api.FileWriteMode;
+import org.mule.runtime.module.extension.file.api.lock.PathLock;
+import org.mule.runtime.module.extension.file.api.command.WriteCommand;
+import org.mule.runtime.module.extension.file.api.FileContentWrapper;
+import org.mule.runtime.module.extension.file.api.FileWriterVisitor;
+import org.mule.runtime.module.extension.file.api.lock.NullPathLock;
 
 import java.io.File;
 import java.io.IOException;

@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.capability.xml.schema;
+package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
-import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getFieldsAnnotatedWith;
-import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getJavaDocSummary;
-import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getMethodDocumentation;
-import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getOperationMethods;
-import static org.mule.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getFieldsAnnotatedWith;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getJavaDocSummary;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getMethodDocumentation;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getOperationMethods;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.extension.api.annotation.Configuration;
@@ -21,7 +21,7 @@ import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDecl
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 
 import java.lang.reflect.Field;

@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.executor;
+package org.mule.runtime.module.extension.internal.runtime.executor;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getResolver;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getParameter;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getResolver;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

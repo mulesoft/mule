@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.manager;
+package org.mule.runtime.module.extension.internal.manager;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
+import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -25,11 +25,11 @@ import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
-import org.mule.module.extension.internal.config.ExtensionConfig;
-import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.module.extension.internal.runtime.config.DefaultImplicitConfigurationFactory;
-import org.mule.module.extension.internal.runtime.config.ImplicitConfigurationFactory;
-import org.mule.module.extension.internal.runtime.config.StaticConfigurationProvider;
+import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
+import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConfigurationFactory;
+import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationFactory;
+import org.mule.runtime.module.extension.internal.runtime.config.StaticConfigurationProvider;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.time.Time;
 

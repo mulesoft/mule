@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal;
+package org.mule.runtime.module.extension.internal;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -12,13 +12,13 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.module.extension.internal.runtime.connector.subtypes.CarDoor;
-import org.mule.module.extension.internal.runtime.connector.subtypes.FinalPojo;
-import org.mule.module.extension.internal.runtime.connector.subtypes.HouseDoor;
-import org.mule.module.extension.internal.runtime.connector.subtypes.Square;
-import org.mule.module.extension.internal.runtime.connector.subtypes.SubTypesMappingConnector;
-import org.mule.module.extension.internal.runtime.connector.subtypes.SubTypesConnectorConnection;
-import org.mule.module.extension.internal.runtime.connector.subtypes.Triangle;
+import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.CarDoor;
+import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.FinalPojo;
+import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.HouseDoor;
+import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.Square;
+import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.SubTypesMappingConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.SubTypesConnectorConnection;
+import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.Triangle;
 
 import java.util.List;
 

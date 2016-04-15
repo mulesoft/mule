@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.type;
+package org.mule.runtime.module.db.internal.domain.type;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

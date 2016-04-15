@@ -8,8 +8,8 @@ package org.mule.extension.file.api;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.module.extension.file.api.AbstractFileAttributes;
-import org.mule.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.AbstractFileAttributes;
+import org.mule.runtime.module.extension.file.api.FileAttributes;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

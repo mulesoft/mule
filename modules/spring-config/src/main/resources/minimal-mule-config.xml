@@ -8,15 +8,15 @@
 
     <spring:beans>
 
-        <spring:bean name="_muleNotificationManager" class="org.mule.config.spring.ServerNotificationManagerConfigurator"/>
+        <spring:bean name="_muleNotificationManager" class="org.mule.runtime.config.spring.ServerNotificationManagerConfigurator"/>
 
-        <spring:bean name="_muleConfiguration" class="org.mule.config.spring.MuleConfigurationConfigurator"/>
+        <spring:bean name="_muleConfiguration" class="org.mule.runtime.config.spring.MuleConfigurationConfigurator"/>
 
-        <spring:bean name="_muleDefaultObjectSerializer" class="org.mule.config.spring.DefaultObjectSerializerFactoryBean" depends-on="_muleConfiguration">
+        <spring:bean name="_muleDefaultObjectSerializer" class="org.mule.runtime.config.spring.DefaultObjectSerializerFactoryBean" depends-on="_muleConfiguration">
             <spring:constructor-arg ref="_muleContext" />
         </spring:bean>
 
-        <spring:bean name="_muleTransactionManager" class="org.mule.config.spring.factories.TransactionManagerFactoryBean"/>
+        <spring:bean name="_muleTransactionManager" class="org.mule.runtime.config.spring.factories.TransactionManagerFactoryBean"/>
 
         <spring:bean name="_defaultInMemoryQueueStore,_simpleMemoryQueueStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryQueueStore"/>
 
@@ -33,31 +33,31 @@
         <!--while keeping the local version intact. When the cluster core extension is not active, both-->
         <!--the default and local beans resolve to the same instance-->
 
-        <spring:bean name="_defaultInMemoryObjectStore" class="org.mule.config.spring.factories.ConstantFactoryBean">
+        <spring:bean name="_defaultInMemoryObjectStore" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
             <spring:constructor-arg ref="_localInMemoryObjectStore"/>
         </spring:bean>
 
         <spring:bean name="_localInMemoryObjectStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryObjectStore"/>
 
-        <spring:bean name="_defaultPersistentObjectStore" class="org.mule.config.spring.factories.ConstantFactoryBean">
+        <spring:bean name="_defaultPersistentObjectStore" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
             <spring:constructor-arg ref="_localPersistentObjectStore"/>
         </spring:bean>
 
         <spring:bean name="_localPersistentObjectStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentObjectStore"/>
 
-        <spring:bean name="_defaultUserObjectStore" class="org.mule.config.spring.factories.ConstantFactoryBean">
+        <spring:bean name="_defaultUserObjectStore" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
             <spring:constructor-arg ref="_localUserObjectStore"/>
         </spring:bean>
 
         <spring:bean name="_localUserObjectStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserObjectStore"/>
 
-        <spring:bean name="_defaultTransientUserObjectStore" class="org.mule.config.spring.factories.ConstantFactoryBean">
+        <spring:bean name="_defaultTransientUserObjectStore" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
             <spring:constructor-arg ref="_localTransientUserObjectStore"/>
         </spring:bean>
 
         <spring:bean name="_localTransientUserObjectStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserTransientObjectStore"/>
 
-        <spring:bean name="_muleQueueManager" class="org.mule.config.spring.factories.ConstantFactoryBean">
+        <spring:bean name="_muleQueueManager" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
             <spring:constructor-arg ref="_localQueueManager"/>
         </spring:bean>
 
@@ -97,7 +97,7 @@
             <spring:constructor-arg  ref="_muleContext"/>
         </spring:bean>
 
-        <spring:bean name="_muleExtensionManager" class="org.mule.config.spring.factories.ExtensionManagerFactoryBean">
+        <spring:bean name="_muleExtensionManager" class="org.mule.runtime.config.spring.factories.ExtensionManagerFactoryBean">
             <spring:constructor-arg  ref="_muleContext"/>
         </spring:bean>
 

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.select;
+package org.mule.runtime.module.db.integration.select;
 
 import static java.lang.Boolean.FALSE;
 import static org.hamcrest.CoreMatchers.is;
@@ -13,11 +13,11 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.integration.model.DerbyTestDatabase;
-import org.mule.module.db.internal.domain.database.DbConfig;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.model.DerbyTestDatabase;
+import org.mule.runtime.module.db.internal.domain.database.DbConfig;
+import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
 
 import java.util.Collections;
 import java.util.List;

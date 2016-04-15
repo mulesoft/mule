@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.storedprocedure;
+package org.mule.runtime.module.db.integration.storedprocedure;
 
 import static org.junit.Assume.assumeThat;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 

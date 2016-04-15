@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.update;
+package org.mule.runtime.module.db.integration.update;
 
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.integration.AbstractQueryTimeoutTestCase;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.AbstractQueryTimeoutTestCase;
 
 public class UpdateTimeoutTestCase  extends AbstractQueryTimeoutTestCase
 {

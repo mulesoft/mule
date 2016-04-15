@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.assembly;
+package org.mule.runtime.config.spring.parsers.assembly;
 
 import org.mule.runtime.core.api.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.config.spring.MuleArtifactContext;
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.config.spring.parsers.assembly.configuration.SingleProperty;
-import org.mule.config.spring.parsers.assembly.configuration.SinglePropertyLiteral;
-import org.mule.config.spring.parsers.assembly.configuration.SinglePropertyWrapper;
-import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.util.SpringXMLUtils;
+import org.mule.runtime.config.spring.MuleArtifactContext;
+import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.SingleProperty;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.SinglePropertyLiteral;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.SinglePropertyWrapper;
+import org.mule.runtime.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.runtime.config.spring.util.SpringXMLUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.MapCombiner;
 
@@ -96,7 +96,7 @@ public class DefaultBeanAssembler implements BeanAssembler
      * by explicit annotation or by the "-ref" at the end of an attribute name.  We do not
      * check the Spring repo to see if a name already exists since that could lead to
      * unpredictable behaviour.
-     * (see {@link org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration})
+     * (see {@link org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration})
      * @param attribute The attribute to add
      */
     public void extendBean(Attr attribute)

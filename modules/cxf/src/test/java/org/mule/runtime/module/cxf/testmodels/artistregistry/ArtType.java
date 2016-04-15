@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.cxf.testmodels.artistregistry;
+package org.mule.runtime.module.cxf.testmodels.artistregistry;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;

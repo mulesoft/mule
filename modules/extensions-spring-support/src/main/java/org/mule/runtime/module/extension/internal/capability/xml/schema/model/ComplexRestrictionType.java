@@ -12,7 +12,7 @@
 // Generated on: 2011.06.14 at 03:58:12 PM GMT-03:00 
 //
 
-package org.mule.module.extension.internal.capability.xml.schema.model;
+package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

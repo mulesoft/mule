@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.config;
+package org.mule.runtime.module.xml.config;
 
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.module.xml.util.NamespaceManager;
+import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.runtime.module.xml.util.NamespaceManager;
 
 import java.util.HashMap;
 import java.util.Map;

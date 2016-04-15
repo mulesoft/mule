@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.log4j2;
+package org.mule.runtime.module.launcher.log4j2;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -20,11 +20,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
-import static org.mule.module.launcher.log4j2.LoggerContextReaperThreadFactory.THREAD_NAME;
+import static org.mule.runtime.module.launcher.log4j2.LoggerContextReaperThreadFactory.THREAD_NAME;
 import static org.mule.tck.MuleTestUtils.getRunningThreadByName;
-import org.mule.module.launcher.application.CompositeApplicationClassLoader;
-import org.mule.module.artifact.classloader.ShutdownListener;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.launcher.application.CompositeApplicationClassLoader;
+import org.mule.runtime.module.artifact.classloader.ShutdownListener;
+import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;

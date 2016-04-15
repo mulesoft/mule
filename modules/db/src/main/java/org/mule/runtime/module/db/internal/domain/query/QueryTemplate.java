@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.query;
+package org.mule.runtime.module.db.internal.domain.query;
 
-import org.mule.module.db.internal.domain.param.InputQueryParam;
-import org.mule.module.db.internal.domain.param.OutputQueryParam;
-import org.mule.module.db.internal.domain.param.QueryParam;
+import org.mule.runtime.module.db.internal.domain.param.InputQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.OutputQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.QueryParam;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Collections;

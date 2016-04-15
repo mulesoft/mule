@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.transformer;
+package org.mule.runtime.module.xml.transformer;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.module.xml.util.XMLUtils;
+import org.mule.runtime.module.xml.util.XMLUtils;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;

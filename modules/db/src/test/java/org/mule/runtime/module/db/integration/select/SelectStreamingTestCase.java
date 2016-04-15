@@ -5,19 +5,19 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.select;
+package org.mule.runtime.module.db.integration.select;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
-import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecords;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.getAllPlanetRecords;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.internal.result.resultset.ResultSetIterator;
+import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.internal.result.resultset.ResultSetIterator;
 
 import java.util.List;
 

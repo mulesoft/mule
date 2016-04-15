@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.result.resultset;
+package org.mule.runtime.module.db.internal.result.resultset;
 
 /**
  * Thrown to indicate an error during the processing of a {@link java.sql.ResultSet}

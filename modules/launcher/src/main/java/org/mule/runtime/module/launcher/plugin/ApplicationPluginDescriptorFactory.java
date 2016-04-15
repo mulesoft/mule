@@ -5,15 +5,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.plugin;
+package org.mule.runtime.module.launcher.plugin;
 
-import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
+import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.module.artifact.classloader.ClassLoaderFilter;
-import org.mule.module.artifact.classloader.ClassLoaderFilterFactory;
-import org.mule.module.artifact.descriptor.ArtifactDescriptorCreateException;
-import org.mule.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 
 import java.io.File;
 import java.io.FileReader;

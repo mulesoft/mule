@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.model;
+package org.mule.runtime.module.extension.model;
 
-import static org.mule.module.extension.HeisenbergExtension.AGE;
-import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
+import static org.mule.runtime.module.extension.HeisenbergExtension.AGE;
+import static org.mule.runtime.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.param.Optional;

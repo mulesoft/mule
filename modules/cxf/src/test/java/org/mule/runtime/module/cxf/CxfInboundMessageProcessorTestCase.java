@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.module.cxf.builder.WebServiceMessageProcessorBuilder;
-import org.mule.module.cxf.testmodels.Echo;
+import org.mule.runtime.module.cxf.builder.WebServiceMessageProcessorBuilder;
+import org.mule.runtime.module.cxf.testmodels.Echo;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
 {
     String msg = 
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
-            "<ns1:echo xmlns:ns1=\"http://testmodels.cxf.module.mule.org/\">" +
+            "<ns1:echo xmlns:ns1=\"http://testmodels.cxf.module.runtime.mule.org/\">" +
                 "<text>echo</text>" +
             "</ns1:echo>" +
         "</soap:Body></soap:Envelope>";

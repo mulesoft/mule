@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.processors;
+package org.mule.runtime.config.spring.parsers.processors;
 
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssemblerFactory;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 
 import org.w3c.dom.Element;
 
@@ -17,10 +17,10 @@ import org.w3c.dom.Element;
  * setter given.  So presumably there's either a single child or the destination is a collection.
  *
  * <p>Since this handles the iteration over children explicitly you need to set the flag
- * {@link org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate#MULE_NO_RECURSE}
+ * {@link org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate#MULE_NO_RECURSE}
  * on the parser.
  *
- * @see org.mule.config.spring.parsers.processors.AbstractChildElementIterator - please read the
+ * @see org.mule.runtime.config.spring.parsers.processors.AbstractChildElementIterator - please read the
  * documentation for that processor
  */
 public class NamedSetterChildElementIterator extends AbstractChildElementIterator

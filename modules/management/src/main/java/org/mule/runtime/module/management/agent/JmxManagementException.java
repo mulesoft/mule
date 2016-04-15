@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.management.agent;
+package org.mule.runtime.module.management.agent;
 
 import org.mule.runtime.core.config.i18n.Message;
-import org.mule.module.management.ManagementException;
+import org.mule.runtime.module.management.ManagementException;
 
 import javax.management.ObjectName;
 

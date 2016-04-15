@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.tls.internal;
+package org.mule.runtime.module.tls.internal;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.MuleContext;
@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.api.tls.TlsContextFactoryBuilder;
-import org.mule.module.tls.api.DefaultTlsContextFactoryBuilder;
+import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
 
 @DefaultTlsContextFactoryBuilder
 public class MuleTlsContextFactoryBuilder implements TlsContextFactoryBuilder, Initialisable, MuleContextAware

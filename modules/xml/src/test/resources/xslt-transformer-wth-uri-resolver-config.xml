@@ -8,7 +8,7 @@
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd ">
 
-    <spring:bean name="testResolver" class="org.mule.module.xml.util.LocalURIResolver"/>
+    <spring:bean name="testResolver" class="org.mule.runtime.module.xml.util.LocalURIResolver"/>
 
     <mulexml:xslt-transformer name="testTransformer" xsl-file="cdcatalog.xsl" uriResolver-ref="testResolver"/>
 </mule>

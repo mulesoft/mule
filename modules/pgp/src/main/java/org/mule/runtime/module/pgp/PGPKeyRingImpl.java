@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.pgp;
+package org.mule.runtime.module.pgp;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.module.pgp.i18n.PGPMessages;
+import org.mule.runtime.module.pgp.i18n.PGPMessages;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.SecurityUtils;
 

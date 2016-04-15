@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.parser;
+package org.mule.runtime.module.db.internal.parser;
 
 /**
  * Thrown to indicate an error parsing a SQL query

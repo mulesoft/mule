@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.descriptor;
+package org.mule.runtime.module.launcher.descriptor;
 
 import org.mule.runtime.core.MuleServer;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 

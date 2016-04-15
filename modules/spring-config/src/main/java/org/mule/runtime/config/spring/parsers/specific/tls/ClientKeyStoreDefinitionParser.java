@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.specific.tls;
+package org.mule.runtime.config.spring.parsers.specific.tls;
 
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
+import org.mule.runtime.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.processors.CheckExclusiveAttributes;
 
 public class ClientKeyStoreDefinitionParser extends ParentDefinitionParser
 {

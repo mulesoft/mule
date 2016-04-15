@@ -5,16 +5,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.select;
+package org.mule.runtime.module.db.integration.select;
 
-import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
-import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
-import static org.mule.module.db.integration.TestRecordUtil.getVenusRecord;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.assertMessageContains;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.getVenusRecord;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.List;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.util;
+package org.mule.runtime.module.extension.internal.util;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -15,15 +15,15 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
-import org.mule.module.extension.model.LifetimeInfo;
+import org.mule.runtime.module.extension.model.LifetimeInfo;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;

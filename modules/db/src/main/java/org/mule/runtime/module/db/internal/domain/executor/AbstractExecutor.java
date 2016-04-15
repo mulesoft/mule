@@ -5,18 +5,18 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.executor;
+package org.mule.runtime.module.db.internal.domain.executor;
 
-import org.mule.module.db.internal.domain.logger.DefaultQueryLoggerFactory;
-import org.mule.module.db.internal.domain.logger.QueryLoggerFactory;
-import org.mule.module.db.internal.domain.logger.SingleQueryLogger;
-import org.mule.module.db.internal.domain.param.InputQueryParam;
-import org.mule.module.db.internal.domain.param.OutputQueryParam;
-import org.mule.module.db.internal.domain.param.QueryParam;
-import org.mule.module.db.internal.domain.query.QueryParamValue;
-import org.mule.module.db.internal.domain.query.QueryTemplate;
-import org.mule.module.db.internal.domain.statement.StatementFactory;
-import org.mule.module.db.internal.domain.type.DbType;
+import org.mule.runtime.module.db.internal.domain.logger.DefaultQueryLoggerFactory;
+import org.mule.runtime.module.db.internal.domain.logger.QueryLoggerFactory;
+import org.mule.runtime.module.db.internal.domain.logger.SingleQueryLogger;
+import org.mule.runtime.module.db.internal.domain.param.InputQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.OutputQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.QueryParam;
+import org.mule.runtime.module.db.internal.domain.query.QueryParamValue;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
+import org.mule.runtime.module.db.internal.domain.statement.StatementFactory;
+import org.mule.runtime.module.db.internal.domain.type.DbType;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

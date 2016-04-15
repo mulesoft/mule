@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.config;
+package org.mule.runtime.module.extension.internal.config;
 
-import static org.mule.module.extension.internal.util.NameUtils.getTopLevelTypeName;
-import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
+import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
+import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-import org.mule.config.spring.MuleArtifactContext;
+import org.mule.runtime.config.spring.MuleArtifactContext;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
@@ -24,7 +24,7 @@ import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
+import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;

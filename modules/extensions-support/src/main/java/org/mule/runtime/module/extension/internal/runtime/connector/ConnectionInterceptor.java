@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.connector;
+package org.mule.runtime.module.extension.internal.runtime.connector;
 
-import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import org.mule.api.connection.ConnectionException;
@@ -16,8 +16,8 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.RetryRequest;
-import org.mule.module.extension.internal.ExtensionProperties;
-import org.mule.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.ExtensionProperties;
+import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.util.Optional;

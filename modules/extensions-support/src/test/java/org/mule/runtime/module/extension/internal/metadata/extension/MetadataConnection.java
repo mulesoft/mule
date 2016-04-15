@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.metadata.extension;
+package org.mule.runtime.module.extension.internal.metadata.extension;
 
 import java.util.Arrays;
 import java.util.List;

@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
-import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.module.cxf.testmodels.AsyncService;
+import org.mule.runtime.module.cxf.testmodels.AsyncService;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.api.message.NullPayload;
 
@@ -45,7 +45,7 @@ public class OneWayOutboundTestCase extends FunctionalTestCase
     @Test
     public void proxyClientSupportsOneWayCall() throws Exception
     {
-        String message = "<ns:send xmlns:ns=\"http://testmodels.cxf.module.mule.org/\"><text>hello</text></ns:send>";
+        String message = "<ns:send xmlns:ns=\"http://testmodels.cxf.module.runtime.mule.org/\"><text>hello</text></ns:send>";
         MuleEvent event = flowRunner("proxyClient").withPayload(message).run();
         assertOneWayResponse(event);
     }

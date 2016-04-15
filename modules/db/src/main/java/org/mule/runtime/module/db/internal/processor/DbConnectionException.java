@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.processor;
+package org.mule.runtime.module.db.internal.processor;
 
 import org.mule.runtime.core.api.LocatedMuleException;
-import org.mule.module.db.internal.domain.database.DbConfig;
+import org.mule.runtime.module.db.internal.domain.database.DbConfig;
 
 import java.sql.SQLException;
 

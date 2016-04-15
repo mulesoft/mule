@@ -5,17 +5,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.application;
+package org.mule.runtime.module.launcher.application;
 
 import static java.util.stream.Collectors.toCollection;
-import org.mule.module.artifact.Artifact;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.module.artifact.classloader.CompositeClassLoader;
-import org.mule.module.artifact.classloader.DisposableClassLoader;
-import org.mule.module.artifact.classloader.EnumerationAdapter;
-import org.mule.module.artifact.classloader.ShutdownListener;
-import org.mule.module.launcher.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.Artifact;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.classloader.CompositeClassLoader;
+import org.mule.runtime.module.artifact.classloader.DisposableClassLoader;
+import org.mule.runtime.module.artifact.classloader.EnumerationAdapter;
+import org.mule.runtime.module.artifact.classloader.ShutdownListener;
+import org.mule.runtime.module.launcher.MuleApplicationClassLoader;
 
 import java.io.IOException;
 import java.net.URL;

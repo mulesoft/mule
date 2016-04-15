@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.pgp.filters;
+package org.mule.runtime.module.pgp.filters;
 
-import org.mule.module.pgp.LiteralMessage;
-import org.mule.module.pgp.Message;
-import org.mule.module.pgp.MessageFactory;
-import org.mule.module.pgp.PGPAuthentication;
-import org.mule.module.pgp.PGPKeyRing;
-import org.mule.module.pgp.SignedMessage;
-import org.mule.module.pgp.i18n.PGPMessages;
+import org.mule.runtime.module.pgp.LiteralMessage;
+import org.mule.runtime.module.pgp.Message;
+import org.mule.runtime.module.pgp.MessageFactory;
+import org.mule.runtime.module.pgp.PGPAuthentication;
+import org.mule.runtime.module.pgp.PGPKeyRing;
+import org.mule.runtime.module.pgp.SignedMessage;
+import org.mule.runtime.module.pgp.i18n.PGPMessages;
 import org.mule.runtime.core.api.EncryptionStrategy;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;

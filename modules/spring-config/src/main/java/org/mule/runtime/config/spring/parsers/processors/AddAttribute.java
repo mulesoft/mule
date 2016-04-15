@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.processors;
+package org.mule.runtime.config.spring.parsers.processors;
 
-import org.mule.config.spring.parsers.PostProcessor;
-import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.PostProcessor;
+import org.mule.runtime.config.spring.parsers.PreProcessor;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 
 import org.w3c.dom.Element;
 import org.springframework.beans.factory.xml.ParserContext;

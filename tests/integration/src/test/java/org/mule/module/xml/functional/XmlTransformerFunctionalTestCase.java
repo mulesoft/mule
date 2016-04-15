@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.functional;
+package org.mule.runtime.module.xml.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -24,9 +24,9 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
 {
 	public static final String SIMPLE_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<parent><child name=\"poot\"/></parent>";
     public static final String CHILDLESS_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<parent/>";
-    public static final String SERIALIZED = "<org.mule.module.xml.functional.XmlTransformerFunctionalTestCase_-Parent>\n" +
+    public static final String SERIALIZED = "<org.mule.runtime.module.xml.functional.XmlTransformerFunctionalTestCase_-Parent>\n" +
             "  <child/>\n" +
-            "</org.mule.module.xml.functional.XmlTransformerFunctionalTestCase_-Parent>";
+            "</org.mule.runtime.module.xml.functional.XmlTransformerFunctionalTestCase_-Parent>";
 
     @Override
     protected String getConfigFile()

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.transformer;
+package org.mule.runtime.module.xml.transformer;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -13,9 +13,9 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.module.xml.i18n.XmlMessages;
-import org.mule.module.xml.util.LocalURIResolver;
-import org.mule.module.xml.util.XMLUtils;
+import org.mule.runtime.module.xml.i18n.XmlMessages;
+import org.mule.runtime.module.xml.util.LocalURIResolver;
+import org.mule.runtime.module.xml.util.XMLUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;

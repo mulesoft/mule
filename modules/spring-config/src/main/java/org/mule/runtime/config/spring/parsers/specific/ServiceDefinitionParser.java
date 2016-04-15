@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.specific;
+package org.mule.runtime.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.processors.ProvideDefaultName;
+import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.processors.ProvideDefaultName;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.reboot;
+package org.mule.runtime.module.reboot;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -15,7 +15,7 @@ import org.tanukisoftware.wrapper.WrapperManager;
 
 public class MuleContainerWrapper implements WrapperListener
 {
-    protected static final String CLASSNAME_MULE_CONTAINER = "org.mule.module.launcher.MuleContainer";
+    protected static final String CLASSNAME_MULE_CONTAINER = "org.mule.runtime.module.launcher.MuleContainer";
 
     /**
      * We can't reference MuleContainer class literal here, as it will fail to resolve at runtime.

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.processor;
+package org.mule.runtime.module.db.internal.processor;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -13,26 +13,26 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.module.db.internal.debug.DbDebugInfoTestUtils.createQueryFieldDebugInfoMatcher;
-import static org.mule.module.db.internal.domain.query.QueryType.DELETE;
-import static org.mule.module.db.internal.domain.query.QueryType.INSERT;
-import static org.mule.module.db.internal.domain.transaction.TransactionalAction.NOT_SUPPORTED;
-import static org.mule.module.db.internal.processor.DbDebugInfoUtils.QUERIES_DEBUG_FIELD;
+import static org.mule.runtime.module.db.internal.debug.DbDebugInfoTestUtils.createQueryFieldDebugInfoMatcher;
+import static org.mule.runtime.module.db.internal.domain.query.QueryType.DELETE;
+import static org.mule.runtime.module.db.internal.domain.query.QueryType.INSERT;
+import static org.mule.runtime.module.db.internal.domain.transaction.TransactionalAction.NOT_SUPPORTED;
+import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.QUERIES_DEBUG_FIELD;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
-import org.mule.module.db.internal.domain.connection.DbConnection;
-import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
-import org.mule.module.db.internal.domain.database.DbConfig;
-import org.mule.module.db.internal.domain.param.QueryParam;
-import org.mule.module.db.internal.domain.query.BulkQuery;
-import org.mule.module.db.internal.domain.query.QueryTemplate;
-import org.mule.module.db.internal.domain.query.QueryType;
-import org.mule.module.db.internal.domain.transaction.TransactionalAction;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
-import org.mule.module.db.internal.resolver.query.BulkQueryResolver;
-import org.mule.module.db.internal.resolver.query.QueryResolutionException;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnectionFactory;
+import org.mule.runtime.module.db.internal.domain.database.DbConfig;
+import org.mule.runtime.module.db.internal.domain.param.QueryParam;
+import org.mule.runtime.module.db.internal.domain.query.BulkQuery;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
+import org.mule.runtime.module.db.internal.domain.query.QueryType;
+import org.mule.runtime.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.runtime.module.db.internal.resolver.query.BulkQueryResolver;
+import org.mule.runtime.module.db.internal.resolver.query.QueryResolutionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

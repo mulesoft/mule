@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.metadata.extension.resolver;
+package org.mule.runtime.module.extension.internal.metadata.extension.resolver;
 
-import static org.mule.module.extension.internal.metadata.TestMetadataUtils.APPLICATION_JAVA_MIME_TYPE;
-import static org.mule.module.extension.internal.metadata.TestMetadataUtils.BRAND;
+import static org.mule.runtime.module.extension.internal.metadata.TestMetadataUtils.APPLICATION_JAVA_MIME_TYPE;
+import static org.mule.runtime.module.extension.internal.metadata.TestMetadataUtils.BRAND;
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.metadata.MetadataCache;
 import org.mule.api.metadata.MetadataContext;
@@ -20,7 +20,7 @@ import org.mule.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.module.extension.internal.metadata.TestMetadataUtils;
+import org.mule.runtime.module.extension.internal.metadata.TestMetadataUtils;
 
 import java.io.Serializable;
 import java.util.List;

@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.capability.xml.schema.builder;
+package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
 import static org.apache.commons.lang.StringUtils.capitalize;
-import static org.mule.config.spring.parsers.specific.NameConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.TYPE_SUFFIX;
-import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
+import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.TYPE_SUFFIX;
+import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 
 import org.mule.extension.api.introspection.source.SourceModel;
-import org.mule.module.extension.internal.capability.xml.schema.model.Element;
-import org.mule.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
-import org.mule.module.extension.internal.capability.xml.schema.model.ExtensionType;
-import org.mule.module.extension.internal.capability.xml.schema.model.Schema;
-import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelElement;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 import javax.xml.namespace.QName;
 

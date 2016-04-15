@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.db.integration.update;
+package org.mule.runtime.module.db.integration.update;
 
 import static junit.framework.Assert.assertTrue;
-import static org.mule.module.db.integration.DbTestUtil.selectData;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
+import static org.mule.runtime.module.db.integration.DbTestUtil.selectData;
+import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 import java.util.Map;

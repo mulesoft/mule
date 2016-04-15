@@ -73,14 +73,14 @@
 
     <flow name="serverWithSignature">
         <http:listener path="/services/TestWithSignature" config-ref="listenerConfig"/>
-        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.ws.consumer.TestService">
             <cxf:outInterceptors>
                 <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                     <spring:constructor-arg>
                         <spring:map>
                             <spring:entry key="action" value="Signature" />
                             <spring:entry key="signatureUser" value="muleserver" />
-                            <spring:entry key="passwordCallbackClass" value="org.mule.module.ws.functional.VerifySignatureSecurityFunctionalTestCase$ServerPasswordCallback" />
+                            <spring:entry key="passwordCallbackClass" value="org.mule.runtime.module.ws.functional.VerifySignatureSecurityFunctionalTestCase$ServerPasswordCallback" />
                             <spring:entry key="signaturePropRefId" value="serverOutSecurityProperties" />
                             <spring:entry key="serverOutSecurityProperties">
                                 <spring:props>
@@ -98,13 +98,13 @@
             </cxf:outInterceptors>
 
         </cxf:jaxws-service>
-        <component class="org.mule.module.ws.consumer.TestService"/>
+        <component class="org.mule.runtime.module.ws.consumer.TestService"/>
     </flow>
 
     <flow name="serverWithoutSignature">
         <http:listener path="/services/TestWithoutSignature" config-ref="listenerConfig"/>
-        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService" />
-        <component class="org.mule.module.ws.consumer.TestService"/>
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.ws.consumer.TestService" />
+        <component class="org.mule.runtime.module.ws.consumer.TestService"/>
     </flow>
 
 </mule>

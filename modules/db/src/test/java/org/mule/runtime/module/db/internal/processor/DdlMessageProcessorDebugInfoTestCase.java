@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.processor;
+package org.mule.runtime.module.db.internal.processor;
 
-import org.mule.module.db.internal.domain.query.QueryType;
+import org.mule.runtime.module.db.internal.domain.query.QueryType;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest

@@ -17,7 +17,7 @@
     </mule-ss:security-manager>
 
     <spring:beans>
-        <spring:bean class="org.mule.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
+        <spring:bean class="org.mule.runtime.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
 
         <ss:authentication-manager alias="authenticationManager">
             <ss:authentication-provider>

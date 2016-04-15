@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.management.support;
 
-import org.mule.module.management.support.SimplePasswordJmxAuthenticator;
+import org.mule.runtime.module.management.support.SimplePasswordJmxAuthenticator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.multipart;
+package org.mule.runtime.module.http.internal.multipart;
 
 import javax.mail.internet.MimeMultipart;
 

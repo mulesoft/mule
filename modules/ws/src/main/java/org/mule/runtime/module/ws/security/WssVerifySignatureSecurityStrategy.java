@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.security;
+package org.mule.runtime.module.ws.security;
 
 import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIG_PROP_REF_ID;
-import static org.mule.module.ws.security.WSCryptoUtils.createDefaultTrustStoreProperties;
-import static org.mule.module.ws.security.WSCryptoUtils.createTrustStoreProperties;
+import static org.mule.runtime.module.ws.security.WSCryptoUtils.createDefaultTrustStoreProperties;
+import static org.mule.runtime.module.ws.security.WSCryptoUtils.createTrustStoreProperties;
 import org.mule.api.tls.TlsContextFactory;
 
 import java.util.Map;

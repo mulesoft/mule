@@ -5,15 +5,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.template;
+package org.mule.runtime.module.db.integration.template;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.mule.module.db.internal.domain.param.InputQueryParam;
-import org.mule.module.db.internal.domain.query.QueryTemplate;
-import org.mule.module.db.internal.domain.query.QueryType;
-import org.mule.module.db.internal.domain.type.UnknownDbType;
+import org.mule.runtime.module.db.internal.domain.param.InputQueryParam;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
+import org.mule.runtime.module.db.internal.domain.query.QueryType;
+import org.mule.runtime.module.db.internal.domain.type.UnknownDbType;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 

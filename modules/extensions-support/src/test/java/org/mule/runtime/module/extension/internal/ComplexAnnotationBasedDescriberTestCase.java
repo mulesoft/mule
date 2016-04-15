@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal;
+package org.mule.runtime.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.extension.vegan.VeganExtension.APPLE;
-import static org.mule.module.extension.vegan.VeganExtension.BANANA;
-import static org.mule.module.extension.vegan.VeganExtension.KIWI;
-import static org.mule.module.extension.vegan.VeganExtension.VEGAN;
+import static org.mule.runtime.module.extension.vegan.VeganExtension.APPLE;
+import static org.mule.runtime.module.extension.vegan.VeganExtension.BANANA;
+import static org.mule.runtime.module.extension.vegan.VeganExtension.KIWI;
+import static org.mule.runtime.module.extension.vegan.VeganExtension.VEGAN;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.module.extension.vegan.VeganExtension;
+import org.mule.runtime.module.extension.vegan.VeganExtension;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;

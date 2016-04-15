@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.domain.request;
+package org.mule.runtime.module.http.internal.domain.request;
 
-import org.mule.module.http.internal.HttpParser;
-import org.mule.module.http.internal.ParameterMap;
-import org.mule.module.http.internal.domain.HttpEntity;
+import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.runtime.module.http.internal.ParameterMap;
+import org.mule.runtime.module.http.internal.domain.HttpEntity;
 
 public class HttpRequestBuilder
 {

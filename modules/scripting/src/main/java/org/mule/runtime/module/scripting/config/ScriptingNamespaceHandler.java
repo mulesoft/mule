@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.scripting.config;
+package org.mule.runtime.module.scripting.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.generic.TextDefinitionParser;
-import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.module.scripting.component.ScriptComponent;
-import org.mule.module.scripting.filter.ScriptFilter;
-import org.mule.module.scripting.transformer.ScriptTransformer;
+import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.parsers.generic.TextDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.ComponentDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.runtime.module.scripting.component.ScriptComponent;
+import org.mule.runtime.module.scripting.filter.ScriptFilter;
+import org.mule.runtime.module.scripting.transformer.ScriptTransformer;
 
 
 public class ScriptingNamespaceHandler extends AbstractMuleNamespaceHandler

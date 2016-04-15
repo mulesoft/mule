@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.metadata;
+package org.mule.runtime.module.extension.internal.metadata;
 
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.metadata.MetadataContext;
@@ -14,7 +14,7 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.module.extension.internal.metadata.extension.MetadataConnection;
+import org.mule.runtime.module.extension.internal.metadata.extension.MetadataConnection;
 
 import java.util.List;
 import java.util.stream.Collectors;

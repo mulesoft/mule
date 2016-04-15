@@ -16,8 +16,8 @@ import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.connector.Providers;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.file.internal.FileListOperation;
-import org.mule.module.extension.file.api.FileConnectorConfig;
-import org.mule.module.extension.file.api.StandardFileSystemOperations;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
+import org.mule.runtime.module.extension.file.api.StandardFileSystemOperations;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

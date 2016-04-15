@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.executor;
+package org.mule.runtime.module.extension.internal.runtime.executor;
 
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
@@ -17,8 +17,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
-import static org.mule.module.extension.model.HealthStatus.DEAD;
+import static org.mule.runtime.module.extension.HeisenbergExtension.HEISENBERG;
+import static org.mule.runtime.module.extension.model.HealthStatus.DEAD;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
@@ -28,13 +28,13 @@ import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
-import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.HeisenbergOperations;
-import org.mule.module.extension.internal.runtime.DefaultOperationContext;
-import org.mule.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.runtime.module.extension.HeisenbergExtension;
+import org.mule.runtime.module.extension.HeisenbergOperations;
+import org.mule.runtime.module.extension.internal.runtime.DefaultOperationContext;
+import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;

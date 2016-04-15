@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.config;
+package org.mule.runtime.module.xml.config;
 
-import org.mule.module.xml.util.XMLUtils;
+import org.mule.runtime.module.xml.util.XMLUtils;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;

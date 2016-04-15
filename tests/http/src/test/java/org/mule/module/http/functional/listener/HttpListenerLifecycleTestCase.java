@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.listener;
+package org.mule.runtime.module.http.functional.listener;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.construct.Flow;
-import org.mule.module.http.api.listener.HttpListener;
-import org.mule.module.http.api.listener.HttpListenerConfig;
+import org.mule.runtime.module.http.api.listener.HttpListener;
+import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.IOUtils;

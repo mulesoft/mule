@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.transformer.wire;
+package org.mule.runtime.module.xml.transformer.wire;
 
-import org.mule.module.xml.transformer.ObjectToXml;
-import org.mule.module.xml.transformer.XStreamFactory;
-import org.mule.module.xml.transformer.XmlToObject;
+import org.mule.runtime.module.xml.transformer.ObjectToXml;
+import org.mule.runtime.module.xml.transformer.XStreamFactory;
+import org.mule.runtime.module.xml.transformer.XmlToObject;
 import org.mule.runtime.core.transformer.wire.TransformerPairWireFormat;
 
 import java.util.Map;

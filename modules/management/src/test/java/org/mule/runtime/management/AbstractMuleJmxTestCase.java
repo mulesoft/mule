@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.management;
 
-import org.mule.module.management.agent.RmiRegistryAgent;
-import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
-import org.mule.module.management.support.JmxSupport;
-import org.mule.module.management.support.JmxSupportFactory;
+import org.mule.runtime.module.management.agent.RmiRegistryAgent;
+import org.mule.runtime.module.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.runtime.module.management.support.JmxSupport;
+import org.mule.runtime.module.management.support.JmxSupportFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.lang.management.ManagementFactory;

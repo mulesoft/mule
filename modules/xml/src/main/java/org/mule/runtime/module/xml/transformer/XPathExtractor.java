@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.transformer;
+package org.mule.runtime.module.xml.transformer;
 
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -16,11 +16,11 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.module.xml.util.NamespaceManager;
-import org.mule.module.xml.util.XMLUtils;
-import org.mule.module.xml.xpath.SaxonXpathEvaluator;
-import org.mule.module.xml.xpath.XPathEvaluator;
-import org.mule.module.xml.xpath.XPathReturnType;
+import org.mule.runtime.module.xml.util.NamespaceManager;
+import org.mule.runtime.module.xml.util.XMLUtils;
+import org.mule.runtime.module.xml.xpath.SaxonXpathEvaluator;
+import org.mule.runtime.module.xml.xpath.XPathEvaluator;
+import org.mule.runtime.module.xml.xpath.XPathReturnType;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 

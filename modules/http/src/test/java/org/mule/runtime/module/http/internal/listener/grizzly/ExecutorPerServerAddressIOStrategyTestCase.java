@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener.grizzly;
+package org.mule.runtime.module.http.internal.listener.grizzly;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
-import org.mule.module.http.internal.listener.ServerAddress;
+import org.mule.runtime.module.http.internal.listener.ServerAddress;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.net.InetAddress;

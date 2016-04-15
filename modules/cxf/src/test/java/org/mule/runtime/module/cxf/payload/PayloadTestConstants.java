@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.payload;
+package org.mule.runtime.module.cxf.payload;
 
 import org.mule.api.message.NullPayload;
 

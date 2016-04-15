@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.consumer;
+package org.mule.runtime.module.ws.consumer;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.module.cxf.CxfConstants;
+import org.mule.runtime.module.cxf.CxfConstants;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.metadata.SimpleDataType;
 

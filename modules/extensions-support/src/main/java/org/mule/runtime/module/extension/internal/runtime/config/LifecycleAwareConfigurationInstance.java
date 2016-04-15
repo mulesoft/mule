@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.config;
+package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -24,7 +24,7 @@ import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationStats;
 import org.mule.extension.api.runtime.Interceptor;
-import org.mule.module.extension.internal.introspection.AbstractInterceptable;
+import org.mule.runtime.module.extension.internal.introspection.AbstractInterceptable;
 import org.mule.runtime.core.time.TimeSupplier;
 
 import java.util.List;

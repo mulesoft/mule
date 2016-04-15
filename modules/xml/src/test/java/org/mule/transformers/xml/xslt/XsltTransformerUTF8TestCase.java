@@ -7,7 +7,7 @@
 package org.mule.runtime.core.transformers.xml.xslt;
 
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.module.xml.transformer.XsltTransformer;
+import org.mule.runtime.module.xml.transformer.XsltTransformer;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.transformers.xml.AbstractXmlTransformerTestCase;
 import org.mule.runtime.core.util.IOUtils;

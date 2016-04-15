@@ -14,7 +14,7 @@
 //
 
 
-package org.mule.module.extension.internal.capability.xml.schema.model;
+package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
 
 import java.util.HashMap;
 import java.util.Map;

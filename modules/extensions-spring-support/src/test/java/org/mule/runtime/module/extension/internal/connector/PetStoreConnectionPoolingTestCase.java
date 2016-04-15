@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.connector;
+package org.mule.runtime.module.extension.internal.connector;
 
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.api.connection.ConnectionException;
-import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreClient;
+import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;

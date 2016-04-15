@@ -5,14 +5,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.extension.internal.capability.xml.schema.model;
+package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
 
-import static org.mule.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_NAMESPACE;
-import static org.mule.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_PREFIX;
-import static org.mule.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
-import static org.mule.config.spring.parsers.specific.NameConstants.MULE_PREFIX;
+import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_NAMESPACE;
+import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_PREFIX;
+import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
+import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_PREFIX;
 
-import org.mule.module.extension.internal.ExtensionProperties;
+import org.mule.runtime.module.extension.internal.ExtensionProperties;
 
 import javax.xml.namespace.QName;
 

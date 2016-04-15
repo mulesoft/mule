@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.result.statement;
+package org.mule.runtime.module.db.internal.result.statement;
 
 import org.mule.runtime.core.api.Closeable;
 import org.mule.runtime.core.api.MuleException;

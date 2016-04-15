@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime;
+package org.mule.runtime.module.extension.internal.runtime;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.extension.model.ExtendedPersonalInfo;
-import org.mule.module.extension.model.LifetimeInfo;
-import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.runtime.module.extension.model.ExtendedPersonalInfo;
+import org.mule.runtime.module.extension.model.LifetimeInfo;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

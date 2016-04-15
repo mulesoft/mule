@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.api;
+package org.mule.runtime.module.oauth2.api;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.config.i18n.Message;

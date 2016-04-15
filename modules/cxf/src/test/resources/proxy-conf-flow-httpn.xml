@@ -19,7 +19,7 @@
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
     <mule-xml:xslt-transformer xsl-file="proxy.xsl"
-        name="TestXslt" returnClass="org.mule.module.xml.transformer.DelayedResult" />
+        name="TestXslt" returnClass="org.mule.runtime.module.xml.transformer.DelayedResult" />
 
 
     <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
@@ -281,21 +281,21 @@
 
     <flow name="asyncService">
         <http:listener path="/services/oneway" config-ref="listenerConfig" allowedMethods="POST" />
-        <cxf:jaxws-service serviceClass="org.mule.module.cxf.testmodels.AsyncService"/>
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.testmodels.AsyncService"/>
 
         <component>
             <singleton-object
-                class="org.mule.module.cxf.testmodels.AsyncService" />
+                class="org.mule.runtime.module.cxf.testmodels.AsyncService" />
         </component>
     </flow>
 
     <flow name="asyncServiceWithSoapAction">
         <http:listener path="/services/onewayWithSoapAction" config-ref="listenerConfig" allowedMethods="POST" />
-        <cxf:jaxws-service serviceClass="org.mule.module.cxf.testmodels.AsyncServiceWithSoapAction"/>
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.testmodels.AsyncServiceWithSoapAction"/>
 
         <component>
             <singleton-object
-                class="org.mule.module.cxf.testmodels.AsyncServiceWithSoapAction" />
+                class="org.mule.runtime.module.cxf.testmodels.AsyncServiceWithSoapAction" />
         </component>
     </flow>
 

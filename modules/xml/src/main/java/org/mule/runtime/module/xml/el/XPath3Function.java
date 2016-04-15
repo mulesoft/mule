@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.el;
+package org.mule.runtime.module.xml.el;
 
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
@@ -22,12 +22,12 @@ import org.mule.api.metadata.DataType;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
-import org.mule.module.xml.transformer.DelayedResult;
-import org.mule.module.xml.util.NamespaceManager;
-import org.mule.module.xml.util.XMLUtils;
-import org.mule.module.xml.xpath.SaxonXpathEvaluator;
-import org.mule.module.xml.xpath.XPathEvaluator;
-import org.mule.module.xml.xpath.XPathReturnType;
+import org.mule.runtime.module.xml.transformer.DelayedResult;
+import org.mule.runtime.module.xml.util.NamespaceManager;
+import org.mule.runtime.module.xml.util.XMLUtils;
+import org.mule.runtime.module.xml.xpath.SaxonXpathEvaluator;
+import org.mule.runtime.module.xml.xpath.XPathEvaluator;
+import org.mule.runtime.module.xml.xpath.XPathReturnType;
 import org.mule.runtime.core.transformer.TransformerUtils;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 

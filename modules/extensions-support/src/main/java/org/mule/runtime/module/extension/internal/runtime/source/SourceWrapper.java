@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.source;
+package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -27,8 +27,8 @@ import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.extension.api.runtime.source.SourceContext;
-import org.mule.module.extension.internal.util.FieldSetter;
-import org.mule.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.util.FieldSetter;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

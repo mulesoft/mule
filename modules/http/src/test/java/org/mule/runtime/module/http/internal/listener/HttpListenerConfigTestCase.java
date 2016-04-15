@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener;
+package org.mule.runtime.module.http.internal.listener;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;

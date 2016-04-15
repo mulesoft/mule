@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.feature;
+package org.mule.runtime.module.cxf.feature;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.module.xml.transformer.XmlPrettyPrinter;
+import org.mule.runtime.module.xml.transformer.XmlPrettyPrinter;
 import org.mule.runtime.core.util.StringUtils;
 
 import org.apache.cxf.Bus;

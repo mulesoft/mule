@@ -8,7 +8,7 @@
     <!-- Uses an invalid URL to avoid connecting until the URL is fixed using the reconnect notifier-->
     <db:derby-config name = "badDbConfig" url="jdbc:derby:garbage">
         <reconnect>
-            <reconnect-custom-notifier class="org.mule.module.db.integration.reconnect.ReconnectStandardTestCase$EnableDatabaseConnection"/>
+            <reconnect-custom-notifier class="org.mule.runtime.module.db.integration.reconnect.ReconnectStandardTestCase$EnableDatabaseConnection"/>
         </reconnect>
     </db:derby-config>
 

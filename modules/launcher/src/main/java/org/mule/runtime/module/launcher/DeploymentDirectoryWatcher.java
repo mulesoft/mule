@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher;
+package org.mule.runtime.module.launcher;
 
-import static org.mule.module.launcher.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
-import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+import static org.mule.runtime.module.launcher.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
+import static org.mule.runtime.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import org.mule.runtime.core.config.StartupContext;
-import org.mule.module.launcher.application.Application;
-import org.mule.module.artifact.Artifact;
-import org.mule.module.launcher.artifact.DeployableArtifact;
-import org.mule.module.launcher.descriptor.DeployableArtifactDescriptor;
-import org.mule.module.launcher.domain.Domain;
-import org.mule.module.launcher.util.DebuggableReentrantLock;
-import org.mule.module.launcher.util.ElementAddedEvent;
-import org.mule.module.launcher.util.ElementRemovedEvent;
-import org.mule.module.launcher.util.ObservableList;
+import org.mule.runtime.module.launcher.application.Application;
+import org.mule.runtime.module.artifact.Artifact;
+import org.mule.runtime.module.launcher.artifact.DeployableArtifact;
+import org.mule.runtime.module.launcher.descriptor.DeployableArtifactDescriptor;
+import org.mule.runtime.module.launcher.domain.Domain;
+import org.mule.runtime.module.launcher.util.DebuggableReentrantLock;
+import org.mule.runtime.module.launcher.util.ElementAddedEvent;
+import org.mule.runtime.module.launcher.util.ElementRemovedEvent;
+import org.mule.runtime.module.launcher.util.ObservableList;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.StringUtils;

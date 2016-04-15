@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.domain.param;
+package org.mule.runtime.module.db.internal.config.domain.param;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 
-import org.mule.module.db.internal.domain.query.QueryParamValue;
+import org.mule.runtime.module.db.internal.domain.query.QueryParamValue;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;

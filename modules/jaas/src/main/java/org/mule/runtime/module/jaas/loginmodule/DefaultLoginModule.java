@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.jaas.loginmodule;
+package org.mule.runtime.module.jaas.loginmodule;
 
-import org.mule.module.jaas.MuleJaasPrincipal;
+import org.mule.runtime.module.jaas.MuleJaasPrincipal;
 
 import java.io.IOException;
 import java.util.List;

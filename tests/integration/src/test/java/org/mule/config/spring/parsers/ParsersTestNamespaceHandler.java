@@ -4,22 +4,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.runtime.config.spring.parsers;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.beans.ChildBean;
-import org.mule.config.spring.parsers.beans.OrphanBean;
-import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
-import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
-import org.mule.config.spring.parsers.delegate.MapDefinitionParserMutator;
-import org.mule.config.spring.parsers.delegate.SingleParentFamilyDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.parsers.beans.ChildBean;
+import org.mule.runtime.config.spring.parsers.beans.OrphanBean;
+import org.mule.runtime.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.runtime.config.spring.parsers.collection.ChildMapDefinitionParser;
+import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.runtime.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
+import org.mule.runtime.config.spring.parsers.delegate.InheritDefinitionParser;
+import org.mule.runtime.config.spring.parsers.delegate.MapDefinitionParserMutator;
+import org.mule.runtime.config.spring.parsers.delegate.SingleParentFamilyDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.NamedDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.ParentDefinitionParser;
 
 /**
  * Registers a Bean Definition Parser for handling <code><parsers-test:...></code> elements.

@@ -4,29 +4,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.capability.xml.schema.builder;
+package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.mule.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_POOLING_PROFILE_TYPE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.UNBOUNDED;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_POOLING_PROFILE_TYPE;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.UNBOUNDED;
 import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.connection.PoolingSupport;
 import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.module.extension.internal.capability.xml.schema.model.ComplexContent;
-import org.mule.module.extension.internal.capability.xml.schema.model.Element;
-import org.mule.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
-import org.mule.module.extension.internal.capability.xml.schema.model.ExtensionType;
-import org.mule.module.extension.internal.capability.xml.schema.model.LocalComplexType;
-import org.mule.module.extension.internal.capability.xml.schema.model.ObjectFactory;
-import org.mule.module.extension.internal.capability.xml.schema.model.Schema;
-import org.mule.module.extension.internal.capability.xml.schema.model.TopLevelElement;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 /**
  * Builder delegation class to generate a XSD schema that describes a

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.builder;
+package org.mule.runtime.module.launcher.builder;
 
 import java.io.File;
 

@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.database;
+package org.mule.runtime.module.db.internal.resolver.database;
 
-import org.mule.module.db.internal.domain.database.DbConfig;
+import org.mule.runtime.module.db.internal.domain.database.DbConfig;
 
 /**
  * Thrown to indicate that is not possible to resolve a {@link DbConfig}

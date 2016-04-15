@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener;
+package org.mule.runtime.module.http.internal.listener;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.module.http.internal.HttpParser.decodeQueryString;
-import static org.mule.module.http.internal.HttpParser.decodeUriParams;
-import static org.mule.module.http.internal.HttpParser.extractPath;
-import static org.mule.module.http.internal.HttpParser.extractQueryParams;
+import static org.mule.runtime.module.http.internal.HttpParser.decodeQueryString;
+import static org.mule.runtime.module.http.internal.HttpParser.decodeUriParams;
+import static org.mule.runtime.module.http.internal.HttpParser.extractPath;
+import static org.mule.runtime.module.http.internal.HttpParser.extractQueryParams;
 
-import org.mule.module.http.api.HttpConstants;
-import org.mule.module.http.internal.ParameterMap;
+import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.runtime.module.http.internal.ParameterMap;
 
 import java.security.cert.Certificate;
 import java.util.Map;

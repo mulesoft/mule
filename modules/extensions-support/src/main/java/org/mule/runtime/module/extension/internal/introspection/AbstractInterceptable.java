@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection;
+package org.mule.runtime.module.extension.internal.introspection;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeAllIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;

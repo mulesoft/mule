@@ -4,23 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.json.validation;
+package org.mule.runtime.module.json.validation;
 
 import static com.github.fge.jackson.JsonLoader.fromString;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
-import static org.mule.module.json.validation.JsonSchemaTestUtils.FAKE_SCHEMA_URI;
-import static org.mule.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_INLINE;
-import static org.mule.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_JSON;
-import static org.mule.module.json.validation.JsonSchemaTestUtils.getBadFstab;
-import static org.mule.module.json.validation.JsonSchemaTestUtils.getBadFstab2;
-import static org.mule.module.json.validation.JsonSchemaTestUtils.getBadFstab2AsJsonData;
-import static org.mule.module.json.validation.JsonSchemaTestUtils.getBadFstabAsJsonData;
-import static org.mule.module.json.validation.JsonSchemaTestUtils.getGoodFstab;
-import static org.mule.module.json.validation.JsonSchemaTestUtils.getGoodFstabAsJsonData;
-import static org.mule.module.json.validation.JsonSchemaTestUtils.getGoodFstabInline;
-import static org.mule.module.json.validation.JsonSchemaTestUtils.getGoodFstabInlineAsJsonData;
-import static org.mule.module.json.validation.JsonSchemaTestUtils.toStream;
+import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.FAKE_SCHEMA_URI;
+import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_INLINE;
+import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_JSON;
+import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getBadFstab;
+import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getBadFstab2;
+import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getBadFstab2AsJsonData;
+import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getBadFstabAsJsonData;
+import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getGoodFstab;
+import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getGoodFstabAsJsonData;
+import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getGoodFstabInline;
+import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getGoodFstabInlineAsJsonData;
+import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.toStream;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;

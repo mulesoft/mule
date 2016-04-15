@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.assembly;
+package org.mule.runtime.config.spring.parsers.assembly;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -13,13 +13,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This is used internally by {@link org.mule.config.spring.parsers.assembly.DefaultBeanAssembler}
- * along with {@link org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser}.
+ * This is used internally by {@link org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler}
+ * along with {@link org.mule.runtime.config.spring.parsers.collection.ChildSingletonMapDefinitionParser}.
  * It creates a map with a single key/value pair.  This may seem odd, but the result is not
  * manipulated within the assembler - that means that, unlike
- * {@link org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser}, this element
+ * {@link org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser}, this element
  * can contain nested values.  Note that most uses will set
- * {@link org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration#isCollection(String)}
+ * {@link org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration#isCollection(String)}
  * so that several entries can be combined.
  */
 public class MapEntryCombiner implements Map, Serializable

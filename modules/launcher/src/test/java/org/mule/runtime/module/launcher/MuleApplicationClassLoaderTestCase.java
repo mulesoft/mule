@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher;
+package org.mule.runtime.module.launcher;
 
 import static java.util.Collections.emptyList;
 import static org.hamcrest.core.Is.is;
@@ -14,10 +14,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mule.module.launcher.MuleFoldersUtil.getAppClassesFolder;
-import static org.mule.module.launcher.MuleFoldersUtil.getAppLibFolder;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getAppClassesFolder;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getAppLibFolder;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.util.FileUtils;

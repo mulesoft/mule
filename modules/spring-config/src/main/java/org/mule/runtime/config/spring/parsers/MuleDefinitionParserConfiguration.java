@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.runtime.config.spring.parsers;
 
-import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.ValueMap;
 
 import java.util.Map;
 
 /**
- * @see org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration
+ * @see org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration
  */
 public interface MuleDefinitionParserConfiguration
 {

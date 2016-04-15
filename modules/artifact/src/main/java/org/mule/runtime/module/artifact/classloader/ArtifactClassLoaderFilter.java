@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.artifact.classloader;
+package org.mule.runtime.module.artifact.classloader;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Collections;

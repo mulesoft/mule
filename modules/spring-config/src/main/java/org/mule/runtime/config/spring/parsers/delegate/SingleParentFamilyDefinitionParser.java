@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.delegate;
+package org.mule.runtime.config.spring.parsers.delegate;
 
-import org.mule.config.spring.parsers.MuleChildDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.runtime.config.spring.parsers.MuleChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
 
 public class SingleParentFamilyDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
 {

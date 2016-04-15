@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.insert;
+package org.mule.runtime.module.db.integration.insert;
 
-import org.mule.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 public class InsertNamedParamBulkTestCase extends InsertBulkTestCase
 {

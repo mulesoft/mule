@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.capability.xml;
+package org.mule.runtime.module.extension.internal.capability.xml;
 
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.extension.api.resources.ResourcesGenerator;
 import org.mule.extension.api.resources.spi.GenerableResourceContributor;
-import org.mule.module.extension.internal.capability.xml.schema.SchemaGenerator;
-import org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants;
-import org.mule.module.extension.internal.config.ExtensionNamespaceHandler;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaGenerator;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants;
+import org.mule.runtime.module.extension.internal.config.ExtensionNamespaceHandler;
 
 import java.util.Properties;
 

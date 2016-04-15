@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.connector;
+package org.mule.runtime.module.extension.internal.runtime.connector;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -17,16 +17,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
-import static org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider.PASSWORD;
-import static org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider.USER;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import org.mule.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreClient;
-import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider;
-import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
-import org.mule.module.extension.internal.runtime.connector.petstore.SimplePetStoreConnectionProvider;
+import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreClient;
+import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.petstore.SimplePetStoreConnectionProvider;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Optional;

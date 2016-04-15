@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.executor;
+package org.mule.runtime.module.extension.internal.runtime.executor;
 
 import static org.mockito.Mockito.verify;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
-import org.mule.module.extension.internal.AbstractInterceptableContractTestCase;
+import org.mule.runtime.module.extension.internal.AbstractInterceptableContractTestCase;
 
 import org.junit.Test;
 import org.mockito.Mock;

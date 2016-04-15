@@ -14,7 +14,7 @@ import org.mule.api.connection.ConnectionValidationResult;
 import org.mule.api.connection.PoolingListener;
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.param.display.Password;
-import org.mule.module.extension.file.api.FileSystem;
+import org.mule.runtime.module.extension.file.api.FileSystem;
 
 import java.io.IOException;
 

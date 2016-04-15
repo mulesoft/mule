@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.management.agents;
 
-import org.mule.module.management.agent.JmxApplicationAgent;
-import org.mule.module.management.agent.Mx4jAgent;
+import org.mule.runtime.module.management.agent.JmxApplicationAgent;
+import org.mule.runtime.module.management.agent.Mx4jAgent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.validation;
+package org.mule.runtime.module.extension.internal.introspection.validation;
 
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.getOperationsConnectionType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationsConnectionType;
 
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.config.ConfigurationModel;
@@ -15,8 +15,8 @@ import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.operation.OperationModel;
 import org.mule.extension.api.introspection.connection.RuntimeConnectionProviderModel;
-import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
-import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 
 import com.sun.org.apache.xpath.internal.ExtensionsProvider;
 

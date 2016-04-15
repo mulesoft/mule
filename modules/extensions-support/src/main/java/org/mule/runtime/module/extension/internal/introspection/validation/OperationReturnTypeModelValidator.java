@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.validation;
+package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.operation.OperationModel;
-import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 
 import java.util.List;
 

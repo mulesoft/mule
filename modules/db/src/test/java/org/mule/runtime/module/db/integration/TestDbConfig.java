@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration;
+package org.mule.runtime.module.db.integration;
 
-import org.mule.module.db.integration.model.DerbyTestDatabase;
-import org.mule.module.db.integration.model.MySqlTestDatabase;
-import org.mule.module.db.integration.model.OracleTestDatabase;
+import org.mule.runtime.module.db.integration.model.DerbyTestDatabase;
+import org.mule.runtime.module.db.integration.model.MySqlTestDatabase;
+import org.mule.runtime.module.db.integration.model.OracleTestDatabase;
 
 import java.util.ArrayList;
 import java.util.Collections;

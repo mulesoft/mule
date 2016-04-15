@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api.requester.authentication;
+package org.mule.runtime.module.http.api.requester.authentication;
 
-import static org.mule.module.http.internal.request.HttpAuthenticationType.BASIC;
+import static org.mule.runtime.module.http.internal.request.HttpAuthenticationType.BASIC;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.module.http.api.HttpAuthentication;
-import org.mule.module.http.internal.request.DefaultHttpAuthentication;
+import org.mule.runtime.module.http.api.HttpAuthentication;
+import org.mule.runtime.module.http.internal.request.DefaultHttpAuthentication;
 
 /**
  * Builder for HTTP basic authentication credentials

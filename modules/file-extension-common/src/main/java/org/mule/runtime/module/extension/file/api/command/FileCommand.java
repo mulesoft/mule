@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.file.api.command;
+package org.mule.runtime.module.extension.file.api.command;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.api.temporary.MuleMessage;
-import org.mule.module.extension.file.api.FileConnectorConfig;
-import org.mule.module.extension.file.api.FileSystem;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
+import org.mule.runtime.module.extension.file.api.FileSystem;
 
 import java.nio.file.Path;
 import java.util.function.Predicate;

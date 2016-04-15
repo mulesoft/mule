@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.query;
+package org.mule.runtime.module.db.internal.resolver.query;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.module.db.internal.parser.QueryTemplateParser;
-import org.mule.module.db.internal.util.FileReader;
+import org.mule.runtime.module.db.internal.parser.QueryTemplateParser;
+import org.mule.runtime.module.db.internal.util.FileReader;
 
 import java.io.IOException;
 

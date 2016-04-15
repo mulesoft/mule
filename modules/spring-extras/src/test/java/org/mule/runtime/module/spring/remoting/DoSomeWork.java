@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.spring.remoting;
+package org.mule.runtime.module.spring.remoting;
 
 /**
  * A server-side service to receive and process ComplexData.

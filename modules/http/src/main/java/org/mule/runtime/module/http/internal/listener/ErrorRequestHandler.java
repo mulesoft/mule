@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener;
+package org.mule.runtime.module.http.internal.listener;
 
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.module.http.internal.listener.async.RequestHandler;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
+import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
+import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCallback;
+import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
+import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
 
 import java.io.ByteArrayInputStream;
 
@@ -35,7 +35,7 @@ public class ErrorRequestHandler implements RequestHandler
     @Override
     public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback)
     {
-        responseCallback.responseReady(new org.mule.module.http.internal.domain.response.HttpResponseBuilder()
+        responseCallback.responseReady(new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder()
                                                .setStatusCode(statusCode)
                                                .setReasonPhrase(String.format(reasonPhraseFormat, requestContext.getRequest().getUri()))
                                                .setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(entity.getBytes())))

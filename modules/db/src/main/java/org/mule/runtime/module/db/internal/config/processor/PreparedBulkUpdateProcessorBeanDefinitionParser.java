@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.processor;
+package org.mule.runtime.module.db.internal.config.processor;
 
-import org.mule.module.db.internal.config.domain.param.StaticQueryParamResolverFactoryBean;
-import org.mule.module.db.internal.domain.executor.BulkUpdateExecutorFactory;
-import org.mule.module.db.internal.domain.query.QueryType;
-import org.mule.module.db.internal.metadata.PreparedBulkUpdateMetadataProvider;
+import org.mule.runtime.module.db.internal.config.domain.param.StaticQueryParamResolverFactoryBean;
+import org.mule.runtime.module.db.internal.domain.executor.BulkUpdateExecutorFactory;
+import org.mule.runtime.module.db.internal.domain.query.QueryType;
+import org.mule.runtime.module.db.internal.metadata.PreparedBulkUpdateMetadataProvider;
 
 import java.util.List;
 

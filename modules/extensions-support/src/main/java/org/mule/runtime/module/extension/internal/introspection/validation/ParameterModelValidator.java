@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.validation;
+package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static org.mule.extension.api.introspection.parameter.ParameterModel.RESERVED_NAMES;
-import static org.mule.module.extension.internal.util.NameUtils.hyphenize;
+import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.config.ConfigurationModel;
 import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
@@ -19,9 +19,9 @@ import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
-import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
-import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
-import org.mule.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.util.List;
 import java.util.Optional;

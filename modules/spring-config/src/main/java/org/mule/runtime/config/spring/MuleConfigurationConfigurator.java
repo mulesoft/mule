@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring;
+package org.mule.runtime.config.spring;
 
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.config.spring.util.ProcessingStrategyUtils;
+import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 
 import java.util.List;

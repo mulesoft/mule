@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.application;
+package org.mule.runtime.module.launcher.application;
 
 import static org.apache.commons.io.FileUtils.listFiles;
-import static org.mule.module.launcher.MuleFoldersUtil.getAppClassesFolder;
-import static org.mule.module.launcher.MuleFoldersUtil.getAppLibFolder;
-import static org.mule.module.launcher.MuleFoldersUtil.getMulePerAppLibFolder;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.module.launcher.MuleApplicationClassLoader;
-import org.mule.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.module.launcher.nativelib.NativeLibraryFinderFactory;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getAppClassesFolder;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getAppLibFolder;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getMulePerAppLibFolder;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.launcher.MuleApplicationClassLoader;
+import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.launcher.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.File;

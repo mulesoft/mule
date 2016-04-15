@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.database;
+package org.mule.runtime.module.db.internal.resolver.database;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.module.db.internal.domain.database.DbConfig;
+import org.mule.runtime.module.db.internal.domain.database.DbConfig;
 
 import java.util.Collection;
 

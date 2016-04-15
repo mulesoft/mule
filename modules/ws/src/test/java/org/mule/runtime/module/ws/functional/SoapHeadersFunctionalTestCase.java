@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.functional;
+package org.mule.runtime.module.ws.functional;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -31,20 +31,20 @@ public class SoapHeadersFunctionalTestCase extends AbstractWSConsumerFunctionalT
     private static final String SOAP_HEADER_INOUT = "soap.headerInOut";
     private static final String HTTP_HEADER = "testHttpHeader";
 
-    private static final String ECHO_HEADERS_REQUEST = "<tns:echoWithHeaders xmlns:tns=\"http://consumer.ws.module.mule.org/\">" +
+    private static final String ECHO_HEADERS_REQUEST = "<tns:echoWithHeaders xmlns:tns=\"http://consumer.ws.module.runtime.mule.org/\">" +
                                                        "<text>Hello</text></tns:echoWithHeaders>";
 
-    private static final String REQUEST_HEADER_IN = "<headerIn xmlns=\"http://consumer.ws.module.mule.org/\">TEST_HEADER_1</headerIn>";
+    private static final String REQUEST_HEADER_IN = "<headerIn xmlns=\"http://consumer.ws.module.runtime.mule.org/\">TEST_HEADER_1</headerIn>";
 
-    private static final String REQUEST_HEADER_INOUT = "<headerInOut xmlns=\"http://consumer.ws.module.mule.org/\">TEST_HEADER_2</headerInOut>";
+    private static final String REQUEST_HEADER_INOUT = "<headerInOut xmlns=\"http://consumer.ws.module.runtime.mule.org/\">TEST_HEADER_2</headerInOut>";
 
     private static final String RESPONSE_HEADER_OUT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                                                      "<ns2:headerOut xmlns:ns2=\"http://consumer.ws.module.mule.org/\" " +
+                                                      "<ns2:headerOut xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\" " +
                                                       "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
                                                       "TEST_HEADER_1 OUT</ns2:headerOut>";
 
     private static final String RESPONSE_HEADER_INOUT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                                                        "<ns2:headerInOut xmlns:ns2=\"http://consumer.ws.module.mule.org/\" " +
+                                                        "<ns2:headerInOut xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\" " +
                                                         "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
                                                         "TEST_HEADER_2 INOUT</ns2:headerInOut>";
 

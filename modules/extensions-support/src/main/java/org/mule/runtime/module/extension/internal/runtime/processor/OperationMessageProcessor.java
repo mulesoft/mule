@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.processor;
+package org.mule.runtime.module.extension.internal.runtime.processor;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.isVoid;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -26,13 +26,13 @@ import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.OperationContext;
 import org.mule.extension.api.runtime.OperationExecutor;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.module.extension.internal.runtime.DefaultExecutionMediator;
-import org.mule.module.extension.internal.runtime.DefaultOperationContext;
-import org.mule.module.extension.internal.runtime.ExecutionMediator;
-import org.mule.module.extension.internal.runtime.ExtensionComponent;
-import org.mule.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionMediator;
+import org.mule.runtime.module.extension.internal.runtime.DefaultOperationContext;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionMediator;
+import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
+import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.core.util.StringUtils;
 
 import org.slf4j.Logger;

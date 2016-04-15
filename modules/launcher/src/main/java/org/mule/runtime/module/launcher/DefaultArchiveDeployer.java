@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher;
+package org.mule.runtime.module.launcher;
 
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.module.launcher.application.NullDeploymentListener;
-import org.mule.module.artifact.Artifact;
-import org.mule.module.launcher.artifact.ArtifactFactory;
-import org.mule.module.launcher.artifact.DeployableArtifact;
-import org.mule.module.launcher.util.ObservableList;
+import org.mule.runtime.module.launcher.application.NullDeploymentListener;
+import org.mule.runtime.module.artifact.Artifact;
+import org.mule.runtime.module.launcher.artifact.ArtifactFactory;
+import org.mule.runtime.module.launcher.artifact.DeployableArtifact;
+import org.mule.runtime.module.launcher.util.ObservableList;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.StringUtils;
 

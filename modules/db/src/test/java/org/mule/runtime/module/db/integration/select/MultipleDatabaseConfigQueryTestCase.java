@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.select;
+package org.mule.runtime.module.db.integration.select;
 
-import org.mule.module.db.integration.config.AbstractMultipleDatabaseConfigErrorTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.config.AbstractMultipleDatabaseConfigErrorTestCase;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 public class MultipleDatabaseConfigQueryTestCase extends AbstractMultipleDatabaseConfigErrorTestCase
 {

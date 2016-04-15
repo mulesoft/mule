@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.tls;
+package org.mule.runtime.module.tls;
 
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -14,7 +14,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.api.tls.TlsContextTrustStoreConfiguration;
-import org.mule.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 
 import org.junit.Test;
 

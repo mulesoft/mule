@@ -1,1 +1,1 @@
-http\://www.mulesoft.org/schema/mule/json=org.mule.module.json.config.JsonNamespaceHandler
+http\://www.mulesoft.org/schema/mule/json=org.mule.runtime.module.json.config.JsonNamespaceHandler

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api.requester.proxy;
+package org.mule.runtime.module.http.api.requester.proxy;
 
-import org.mule.module.http.internal.request.DefaultProxyConfig;
+import org.mule.runtime.module.http.internal.request.DefaultProxyConfig;
 import org.mule.runtime.core.util.Preconditions;
 
 /**

@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.processor;
+package org.mule.runtime.module.db.internal.config.processor;
 
-import org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.module.db.internal.config.resolver.database.DefaultDbConfigResolverFactoryBean;
-import org.mule.module.db.internal.domain.statement.QueryStatementFactory;
-import org.mule.module.db.internal.resolver.database.ConfiguredDbConfigResolver;
+import org.mule.runtime.config.spring.parsers.AbstractHierarchicalDefinitionParser;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.runtime.module.db.internal.config.resolver.database.DefaultDbConfigResolverFactoryBean;
+import org.mule.runtime.module.db.internal.domain.statement.QueryStatementFactory;
+import org.mule.runtime.module.db.internal.resolver.database.ConfiguredDbConfigResolver;
 import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;

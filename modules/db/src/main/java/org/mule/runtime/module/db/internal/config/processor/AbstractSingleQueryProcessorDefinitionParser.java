@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.processor;
+package org.mule.runtime.module.db.internal.config.processor;
 
-import org.mule.module.db.internal.config.domain.param.DefaultSqlParamResolverFactoryBean;
-import org.mule.module.db.internal.config.resolver.query.QueryResolverFactoryBean;
+import org.mule.runtime.module.db.internal.config.domain.param.DefaultSqlParamResolverFactoryBean;
+import org.mule.runtime.module.db.internal.config.resolver.query.QueryResolverFactoryBean;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

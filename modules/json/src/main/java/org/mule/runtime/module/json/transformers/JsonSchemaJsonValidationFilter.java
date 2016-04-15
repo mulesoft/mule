@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.json.transformers;
+package org.mule.runtime.module.json.transformers;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.module.json.JsonData;
-import org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor;
+import org.mule.runtime.module.json.JsonData;
+import org.mule.runtime.module.json.validation.ValidateJsonSchemaMessageProcessor;
 import org.mule.runtime.core.util.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;

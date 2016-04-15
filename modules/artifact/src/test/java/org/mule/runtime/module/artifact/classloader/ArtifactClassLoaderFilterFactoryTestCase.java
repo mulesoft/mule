@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.artifact.classloader;
+package org.mule.runtime.module.artifact.classloader;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.module.artifact.classloader.ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
+import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.lang.annotation.Annotation;

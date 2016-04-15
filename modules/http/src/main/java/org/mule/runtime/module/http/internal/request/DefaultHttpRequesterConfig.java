@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request;
+package org.mule.runtime.module.http.internal.request;
 
 import static java.lang.String.format;
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
@@ -22,16 +22,16 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.module.http.api.HttpAuthentication;
-import org.mule.module.http.api.HttpConstants;
-import org.mule.module.http.api.requester.HttpRequesterConfig;
-import org.mule.module.http.api.requester.HttpSendBodyMode;
-import org.mule.module.http.api.requester.HttpStreamingType;
-import org.mule.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClient;
-import org.mule.module.socket.api.TcpClientSocketProperties;
-import org.mule.module.socket.internal.DefaultTcpClientSocketProperties;
-import org.mule.module.tls.api.DefaultTlsContextFactoryBuilder;
+import org.mule.runtime.module.http.api.HttpAuthentication;
+import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
+import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
+import org.mule.runtime.module.http.api.requester.HttpStreamingType;
+import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.runtime.module.http.internal.request.grizzly.GrizzlyHttpClient;
+import org.mule.runtime.module.socket.api.TcpClientSocketProperties;
+import org.mule.runtime.module.socket.internal.DefaultTcpClientSocketProperties;
+import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
 import java.net.CookieManager;

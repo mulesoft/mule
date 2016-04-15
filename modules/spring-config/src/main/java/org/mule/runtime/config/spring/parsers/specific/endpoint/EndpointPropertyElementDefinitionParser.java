@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.specific.endpoint;
+package org.mule.runtime.config.spring.parsers.specific.endpoint;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
-import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
-import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.processors.AddAttribute;
+import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.assembly.MapEntryCombiner;
+import org.mule.runtime.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
+import org.mule.runtime.config.spring.parsers.delegate.AbstractSingleParentFamilyChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.processors.AddAttribute;
 
 /**
  * This parser parses nested endpoint elements adding the resulting beans to the map

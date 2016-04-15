@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.test.util;
+package org.mule.runtime.module.db.test.util;
 
-import org.mule.module.db.internal.domain.type.JdbcTypes;
+import org.mule.runtime.module.db.internal.domain.type.JdbcTypes;
 
 /**
  * Type definitions for testing purposes

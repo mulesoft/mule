@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.type;
+package org.mule.runtime.module.db.internal.domain.type;
 
 /**
  * Thrown to indicate that a data type ID can not be mapped to a database type

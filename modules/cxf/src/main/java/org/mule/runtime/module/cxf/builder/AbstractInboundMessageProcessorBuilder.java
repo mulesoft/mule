@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.builder;
+package org.mule.runtime.module.cxf.builder;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -15,15 +15,15 @@ import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
-import org.mule.module.cxf.CxfConfiguration;
-import org.mule.module.cxf.CxfInboundMessageProcessor;
-import org.mule.module.cxf.MuleInvoker;
-import org.mule.module.cxf.config.WsSecurity;
-import org.mule.module.cxf.support.CxfUtils;
-import org.mule.module.cxf.support.MuleHeadersInInterceptor;
-import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
-import org.mule.module.cxf.support.MuleServiceConfiguration;
-import org.mule.module.cxf.support.WSDLQueryHandler;
+import org.mule.runtime.module.cxf.CxfConfiguration;
+import org.mule.runtime.module.cxf.CxfInboundMessageProcessor;
+import org.mule.runtime.module.cxf.MuleInvoker;
+import org.mule.runtime.module.cxf.config.WsSecurity;
+import org.mule.runtime.module.cxf.support.CxfUtils;
+import org.mule.runtime.module.cxf.support.MuleHeadersInInterceptor;
+import org.mule.runtime.module.cxf.support.MuleHeadersOutInterceptor;
+import org.mule.runtime.module.cxf.support.MuleServiceConfiguration;
+import org.mule.runtime.module.cxf.support.WSDLQueryHandler;
 import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;

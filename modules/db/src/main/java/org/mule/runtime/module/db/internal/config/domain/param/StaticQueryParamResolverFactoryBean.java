@@ -6,10 +6,10 @@
  */
 
 
-package org.mule.module.db.internal.config.domain.param;
+package org.mule.runtime.module.db.internal.config.domain.param;
 
-import org.mule.module.db.internal.resolver.param.ParamValueResolver;
-import org.mule.module.db.internal.resolver.param.StaticParamValueResolver;
+import org.mule.runtime.module.db.internal.resolver.param.ParamValueResolver;
+import org.mule.runtime.module.db.internal.resolver.param.StaticParamValueResolver;
 
 import org.springframework.beans.factory.FactoryBean;
 

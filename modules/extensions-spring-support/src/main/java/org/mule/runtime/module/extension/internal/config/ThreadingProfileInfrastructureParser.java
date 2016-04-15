@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.config;
+package org.mule.runtime.module.extension.internal.config;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE;
-import static org.mule.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE_TYPE;
+import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE_TYPE;
 import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.config.ChainedThreadingProfile;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.processors.ConstructorReference;
+import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.processors.ConstructorReference;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.ManagedMap;

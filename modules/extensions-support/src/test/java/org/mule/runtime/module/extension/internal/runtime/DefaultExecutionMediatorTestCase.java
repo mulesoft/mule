@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime;
+package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -39,8 +39,8 @@ import org.mule.extension.api.runtime.RetryRequest;
 import org.mule.runtime.core.internal.connection.CachedConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
-import org.mule.module.extension.exception.HeisenbergException;
-import org.mule.module.extension.internal.runtime.config.MutableConfigurationStats;
+import org.mule.runtime.module.extension.exception.HeisenbergException;
+import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

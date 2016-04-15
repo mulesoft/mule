@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal;
+package org.mule.runtime.module.extension.internal;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.is;
@@ -13,13 +13,13 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mule.module.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
-import static org.mule.module.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
-import static org.mule.module.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
-import static org.mule.module.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
-import static org.mule.module.extension.model.HealthStatus.DEAD;
-import static org.mule.module.extension.model.KnockeableDoor.knock;
-import static org.mule.module.extension.model.Ricin.RICIN_KILL_MESSAGE;
+import static org.mule.runtime.module.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
+import static org.mule.runtime.module.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
+import static org.mule.runtime.module.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
+import static org.mule.runtime.module.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+import static org.mule.runtime.module.extension.model.HealthStatus.DEAD;
+import static org.mule.runtime.module.extension.model.KnockeableDoor.knock;
+import static org.mule.runtime.module.extension.model.Ricin.RICIN_KILL_MESSAGE;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -27,12 +27,12 @@ import org.mule.api.connection.ConnectionException;
 import org.mule.extension.api.ExtensionManager;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.exception.HeisenbergException;
-import org.mule.module.extension.internal.util.ExtensionsTestUtils;
-import org.mule.module.extension.model.KnockeableDoor;
-import org.mule.module.extension.model.Ricin;
-import org.mule.module.extension.model.Weapon;
+import org.mule.runtime.module.extension.HeisenbergExtension;
+import org.mule.runtime.module.extension.exception.HeisenbergException;
+import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.runtime.module.extension.model.KnockeableDoor;
+import org.mule.runtime.module.extension.model.Ricin;
+import org.mule.runtime.module.extension.model.Weapon;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request;
+package org.mule.runtime.module.http.internal.request;
 
 import org.mule.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.module.http.internal.domain.request.HttpRequest;
-import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
-import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
+import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;

@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.management.config;
+package org.mule.runtime.module.management.config;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.processors.ProvideDefaultNameFromElement;
-import org.mule.module.management.agent.JmxAgentConfigurer;
+import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.runtime.config.spring.parsers.processors.ProvideDefaultNameFromElement;
+import org.mule.runtime.module.management.agent.JmxAgentConfigurer;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.HashMap;

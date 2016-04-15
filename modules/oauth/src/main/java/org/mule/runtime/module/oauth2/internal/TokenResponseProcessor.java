@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal;
+package org.mule.runtime.module.oauth2.internal;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
+import org.mule.runtime.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.ClassUtils;
 

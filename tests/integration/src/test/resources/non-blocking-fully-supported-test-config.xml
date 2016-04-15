@@ -173,7 +173,7 @@
     </flow>
 
     <flow name="enricherFlowVar">
-        <enricher target="flowVars[org.mule.NonBlockingFullySupportedFunctionalTestCase.FOO]">
+        <enricher target="flowVars[org.mule.runtime.core.NonBlockingFullySupportedFunctionalTestCase.FOO]">
             <test:non-blocking-processor/>
         </enricher>
     </flow>

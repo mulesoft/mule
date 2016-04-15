@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.file.api.stream;
+package org.mule.runtime.module.extension.file.api.stream;
 
 import org.mule.api.temporary.MuleMessage;
-import org.mule.module.extension.file.api.FileSystem;
-import org.mule.module.extension.file.api.lock.PathLock;
+import org.mule.runtime.module.extension.file.api.FileSystem;
+import org.mule.runtime.module.extension.file.api.lock.PathLock;
 
 import java.io.IOException;
 import java.io.InputStream;

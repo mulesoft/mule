@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher;
+package org.mule.runtime.module.launcher;
 
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
-import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.module.artifact.classloader.FineGrainedControlClassLoader;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.classloader.FineGrainedControlClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.MediumTest;
 

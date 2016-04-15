@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.vegan;
+package org.mule.runtime.module.extension.vegan;
 
-import static org.mule.module.extension.vegan.VeganExtension.KIWI;
+import static org.mule.runtime.module.extension.vegan.VeganExtension.KIWI;
 import org.mule.extension.api.annotation.Configuration;
 import org.mule.extension.api.annotation.Operations;
 import org.mule.extension.api.annotation.connector.Providers;

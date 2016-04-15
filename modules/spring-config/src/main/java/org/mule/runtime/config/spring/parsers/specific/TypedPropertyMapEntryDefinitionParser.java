@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.specific;
+package org.mule.runtime.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
-import org.mule.config.spring.parsers.assembly.DefaultBeanAssembler;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssemblerFactory;
+import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.api.metadata.SimpleDataType;
 import org.mule.runtime.core.transformer.types.TypedValue;
 

@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.database;
+package org.mule.runtime.module.db.internal.domain.database;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
-import org.mule.module.db.internal.domain.xa.CompositeDataSourceDecorator;
+import org.mule.runtime.module.db.internal.domain.connection.DbPoolingProfile;
+import org.mule.runtime.module.db.internal.domain.xa.CompositeDataSourceDecorator;
 import org.mule.runtime.core.util.concurrent.ConcurrentHashSet;
 
 import com.mchange.v2.c3p0.DataSources;

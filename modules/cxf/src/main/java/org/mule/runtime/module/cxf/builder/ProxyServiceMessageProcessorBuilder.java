@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.builder;
+package org.mule.runtime.module.cxf.builder;
 
-import org.mule.module.cxf.CxfConstants;
-import org.mule.module.cxf.support.CopyAttachmentInInterceptor;
-import org.mule.module.cxf.support.CopyAttachmentOutInterceptor;
-import org.mule.module.cxf.support.CxfUtils;
-import org.mule.module.cxf.support.OutputPayloadInterceptor;
-import org.mule.module.cxf.support.ProxyRPCInInterceptor;
-import org.mule.module.cxf.support.ProxySchemaValidationInInterceptor;
-import org.mule.module.cxf.support.ProxyService;
-import org.mule.module.cxf.support.ProxyServiceFactoryBean;
-import org.mule.module.cxf.support.ProxyWSDLQueryHandler;
-import org.mule.module.cxf.support.ResetStaxInterceptor;
-import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
-import org.mule.module.cxf.support.ReversibleValidatingInterceptor;
+import org.mule.runtime.module.cxf.CxfConstants;
+import org.mule.runtime.module.cxf.support.CopyAttachmentInInterceptor;
+import org.mule.runtime.module.cxf.support.CopyAttachmentOutInterceptor;
+import org.mule.runtime.module.cxf.support.CxfUtils;
+import org.mule.runtime.module.cxf.support.OutputPayloadInterceptor;
+import org.mule.runtime.module.cxf.support.ProxyRPCInInterceptor;
+import org.mule.runtime.module.cxf.support.ProxySchemaValidationInInterceptor;
+import org.mule.runtime.module.cxf.support.ProxyService;
+import org.mule.runtime.module.cxf.support.ProxyServiceFactoryBean;
+import org.mule.runtime.module.cxf.support.ProxyWSDLQueryHandler;
+import org.mule.runtime.module.cxf.support.ResetStaxInterceptor;
+import org.mule.runtime.module.cxf.support.ReversibleStaxInInterceptor;
+import org.mule.runtime.module.cxf.support.ReversibleValidatingInterceptor;
 import org.mule.runtime.core.transformer.types.MimeTypes;
 
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;

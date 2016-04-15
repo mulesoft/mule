@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.manager;
+package org.mule.runtime.module.extension.internal.manager;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -39,10 +39,10 @@ import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.extension.api.runtime.OperationExecutorFactory;
-import org.mule.module.extension.internal.config.ExtensionConfig;
-import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

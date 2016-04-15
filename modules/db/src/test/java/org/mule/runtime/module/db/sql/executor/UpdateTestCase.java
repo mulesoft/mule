@@ -5,18 +5,18 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.sql.executor;
+package org.mule.runtime.module.db.sql.executor;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.module.db.internal.domain.connection.DbConnection;
-import org.mule.module.db.internal.domain.executor.UpdateExecutor;
-import org.mule.module.db.internal.domain.param.QueryParam;
-import org.mule.module.db.internal.domain.query.Query;
-import org.mule.module.db.internal.domain.query.QueryTemplate;
-import org.mule.module.db.internal.domain.query.QueryType;
-import org.mule.module.db.internal.domain.statement.StatementFactory;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
+import org.mule.runtime.module.db.internal.domain.executor.UpdateExecutor;
+import org.mule.runtime.module.db.internal.domain.param.QueryParam;
+import org.mule.runtime.module.db.internal.domain.query.Query;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
+import org.mule.runtime.module.db.internal.domain.query.QueryType;
+import org.mule.runtime.module.db.internal.domain.statement.StatementFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

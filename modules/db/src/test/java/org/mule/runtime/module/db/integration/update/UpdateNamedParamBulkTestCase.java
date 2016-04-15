@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.update;
+package org.mule.runtime.module.db.integration.update;
 
-import org.mule.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 public class UpdateNamedParamBulkTestCase extends UpdateBulkTestCase
 {

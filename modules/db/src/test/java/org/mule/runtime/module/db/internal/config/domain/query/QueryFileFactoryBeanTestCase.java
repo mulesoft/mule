@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.domain.query;
+package org.mule.runtime.module.db.internal.config.domain.query;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.module.db.internal.util.FileReader;
+import org.mule.runtime.module.db.internal.util.FileReader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.coreextension;
+package org.mule.runtime.module.launcher.coreextension;
 
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -12,11 +12,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.CoreExtensionsAware;
 import org.mule.runtime.core.MuleCoreExtension;
-import org.mule.module.launcher.DeploymentListener;
-import org.mule.module.launcher.DeploymentService;
-import org.mule.module.launcher.DeploymentServiceAware;
-import org.mule.module.launcher.ServerPluginClassLoaderManager;
-import org.mule.module.launcher.ServerPluginClassLoaderManagerAware;
+import org.mule.runtime.module.launcher.DeploymentListener;
+import org.mule.runtime.module.launcher.DeploymentService;
+import org.mule.runtime.module.launcher.DeploymentServiceAware;
+import org.mule.runtime.module.launcher.ServerPluginClassLoaderManager;
+import org.mule.runtime.module.launcher.ServerPluginClassLoaderManagerAware;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

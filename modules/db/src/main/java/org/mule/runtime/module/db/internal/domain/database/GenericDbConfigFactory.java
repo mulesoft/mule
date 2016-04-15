@@ -5,24 +5,24 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.database;
+package org.mule.runtime.module.db.internal.domain.database;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.NamedObject;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.module.db.internal.domain.connection.ConnectionCreationException;
-import org.mule.module.db.internal.domain.connection.ConnectionFactory;
-import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
-import org.mule.module.db.internal.domain.connection.RetryConnectionFactory;
-import org.mule.module.db.internal.domain.connection.SimpleConnectionFactory;
-import org.mule.module.db.internal.domain.connection.TransactionalDbConnectionFactory;
-import org.mule.module.db.internal.domain.transaction.TransactionCoordinationDbTransactionManager;
-import org.mule.module.db.internal.domain.type.CompositeDbTypeManager;
-import org.mule.module.db.internal.domain.type.DbType;
-import org.mule.module.db.internal.domain.type.DbTypeManager;
-import org.mule.module.db.internal.domain.type.JdbcTypes;
-import org.mule.module.db.internal.domain.type.MetadataDbTypeManager;
-import org.mule.module.db.internal.domain.type.StaticDbTypeManager;
+import org.mule.runtime.module.db.internal.domain.connection.ConnectionCreationException;
+import org.mule.runtime.module.db.internal.domain.connection.ConnectionFactory;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnectionFactory;
+import org.mule.runtime.module.db.internal.domain.connection.RetryConnectionFactory;
+import org.mule.runtime.module.db.internal.domain.connection.SimpleConnectionFactory;
+import org.mule.runtime.module.db.internal.domain.connection.TransactionalDbConnectionFactory;
+import org.mule.runtime.module.db.internal.domain.transaction.TransactionCoordinationDbTransactionManager;
+import org.mule.runtime.module.db.internal.domain.type.CompositeDbTypeManager;
+import org.mule.runtime.module.db.internal.domain.type.DbType;
+import org.mule.runtime.module.db.internal.domain.type.DbTypeManager;
+import org.mule.runtime.module.db.internal.domain.type.JdbcTypes;
+import org.mule.runtime.module.db.internal.domain.type.MetadataDbTypeManager;
+import org.mule.runtime.module.db.internal.domain.type.StaticDbTypeManager;
 
 import java.sql.Connection;
 import java.util.ArrayList;

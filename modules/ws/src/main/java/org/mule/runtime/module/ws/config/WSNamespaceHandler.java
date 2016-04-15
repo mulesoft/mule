@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.config;
+package org.mule.runtime.module.ws.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.module.ws.consumer.WSConsumer;
-import org.mule.module.ws.consumer.WSConsumerConfig;
-import org.mule.module.ws.security.WSSecurity;
-import org.mule.module.ws.security.WssDecryptSecurityStrategy;
-import org.mule.module.ws.security.WssEncryptSecurityStrategy;
-import org.mule.module.ws.security.WssSignSecurityStrategy;
-import org.mule.module.ws.security.WssTimestampSecurityStrategy;
-import org.mule.module.ws.security.WssUsernameTokenSecurityStrategy;
-import org.mule.module.ws.security.WssVerifySignatureSecurityStrategy;
+import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.runtime.module.ws.consumer.WSConsumer;
+import org.mule.runtime.module.ws.consumer.WSConsumerConfig;
+import org.mule.runtime.module.ws.security.WSSecurity;
+import org.mule.runtime.module.ws.security.WssDecryptSecurityStrategy;
+import org.mule.runtime.module.ws.security.WssEncryptSecurityStrategy;
+import org.mule.runtime.module.ws.security.WssSignSecurityStrategy;
+import org.mule.runtime.module.ws.security.WssTimestampSecurityStrategy;
+import org.mule.runtime.module.ws.security.WssUsernameTokenSecurityStrategy;
+import org.mule.runtime.module.ws.security.WssVerifySignatureSecurityStrategy;
 
 /**
  * Registers a Bean Definition Parser for handling <code><ws:*></code> elements.

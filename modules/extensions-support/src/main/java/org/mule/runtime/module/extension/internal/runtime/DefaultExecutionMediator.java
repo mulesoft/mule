@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime;
+package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.String.format;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -23,8 +23,8 @@ import org.mule.extension.api.runtime.OperationExecutor;
 import org.mule.extension.api.runtime.RetryRequest;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
-import org.mule.module.extension.internal.runtime.config.MutableConfigurationStats;
-import org.mule.module.extension.internal.runtime.exception.ExceptionEnricherManager;
+import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
+import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.core.work.SerialWorkManager;
 

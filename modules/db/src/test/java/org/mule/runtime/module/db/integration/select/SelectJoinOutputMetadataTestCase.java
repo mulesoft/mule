@@ -5,24 +5,24 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.select;
+package org.mule.runtime.module.db.integration.select;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.isNull;
-import static org.mule.module.db.internal.metadata.SelectMetadataProvider.DUPLICATE_COLUMN_LABEL_ERROR;
+import static org.mule.runtime.module.db.internal.metadata.SelectMetadataProvider.DUPLICATE_COLUMN_LABEL_ERROR;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.common.Result;
 import org.mule.common.metadata.DefaultListMetaDataModel;
 import org.mule.common.metadata.DefinedMapMetaDataModel;
 import org.mule.common.metadata.MetaData;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.internal.processor.AbstractSingleQueryDbMessageProcessor;
+import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.internal.processor.AbstractSingleQueryDbMessageProcessor;
 
 import java.util.ArrayList;
 import java.util.List;

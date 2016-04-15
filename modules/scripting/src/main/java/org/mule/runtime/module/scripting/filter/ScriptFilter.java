@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.scripting.filter;
+package org.mule.runtime.module.scripting.filter;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.module.scripting.component.Scriptable;
+import org.mule.runtime.module.scripting.component.Scriptable;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 
 import javax.script.Bindings;

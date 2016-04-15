@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.factories;
+package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.routing.AggregationContext;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttribute;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.processors.CheckExclusiveAttribute;
 import org.mule.runtime.core.routing.AggregationStrategy;
 
 import org.w3c.dom.Element;

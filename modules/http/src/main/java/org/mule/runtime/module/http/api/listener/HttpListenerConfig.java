@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api.listener;
+package org.mule.runtime.module.http.api.listener;
 
 import org.mule.runtime.core.api.AnnotatedObject;
 import org.mule.runtime.core.api.MuleException;

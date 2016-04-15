@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.reboot;
+package org.mule.runtime.module.reboot;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -33,7 +33,7 @@ public class MuleContainerBootstrapUtilsTestCase
     }
 
     /**
-     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#isStandalone()}.
+     * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#isStandalone()}.
      */
     @Test
     public void testIsStandaloneTrue()
@@ -42,7 +42,7 @@ public class MuleContainerBootstrapUtilsTestCase
     }
 
     /**
-     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#getMuleHome()}.
+     * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#getMuleHome()}.
      */
     @Test
     public void testGetMuleHomeFile()
@@ -52,7 +52,7 @@ public class MuleContainerBootstrapUtilsTestCase
     }
 
     /**
-     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#getMuleAppsDir()}.
+     * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#getMuleAppsDir()}.
      */
     @Test
     public void testGetMuleAppsFile()
@@ -62,7 +62,7 @@ public class MuleContainerBootstrapUtilsTestCase
     }
 
     /**
-     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#getMuleLibDir()}.
+     * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#getMuleLibDir()}.
      */
     @Test
     public void testGetMuleLibDir()
@@ -71,7 +71,7 @@ public class MuleContainerBootstrapUtilsTestCase
     }
 
     /**
-     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#getMuleLocalJarFile()}.
+     * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#getMuleLocalJarFile()}.
      */
     @Test
     public void testGetMuleLocalJarFile()
@@ -80,7 +80,7 @@ public class MuleContainerBootstrapUtilsTestCase
     }
 
     /**
-     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#getResource(java.lang.String, java.lang.Class)}.
+     * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#getResource(java.lang.String, java.lang.Class)}.
      * @throws IOException 
      */
     @Test
@@ -95,7 +95,7 @@ public class MuleContainerBootstrapUtilsTestCase
     }
 
     /**
-     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#renameFile(java.io.File, java.io.File)}.
+     * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#renameFile(java.io.File, java.io.File)}.
      * @throws IOException 
      */
     @Test
@@ -112,7 +112,7 @@ public class MuleContainerBootstrapUtilsTestCase
     }
 
     /**
-     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#renameFileHard(java.io.File, java.io.File)}.
+     * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#renameFileHard(java.io.File, java.io.File)}.
      * @throws IOException 
      */
     @Test
@@ -129,7 +129,7 @@ public class MuleContainerBootstrapUtilsTestCase
     }
 
     /**
-     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#copy(java.io.InputStream, java.io.OutputStream)}.
+     * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#copy(java.io.InputStream, java.io.OutputStream)}.
      * @throws IOException 
      */
     @Test
@@ -143,7 +143,7 @@ public class MuleContainerBootstrapUtilsTestCase
     }
 
     /**
-     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#copyLarge(java.io.InputStream, java.io.OutputStream)}.
+     * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#copyLarge(java.io.InputStream, java.io.OutputStream)}.
      * @throws IOException 
      */
     @Test

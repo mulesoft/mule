@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.test.util;
+package org.mule.runtime.module.db.test.util;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;

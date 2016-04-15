@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.filters;
+package org.mule.runtime.module.xml.filters;
 
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.module.xml.transformer.XmlToDomDocument;
-import org.mule.module.xml.util.XMLUtils;
+import org.mule.runtime.module.xml.transformer.XmlToDomDocument;
+import org.mule.runtime.module.xml.util.XMLUtils;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import javax.xml.parsers.DocumentBuilderFactory;

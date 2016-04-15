@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.specific;
+package org.mule.runtime.config.spring.parsers.specific;
 
 public class XaTransactionDefinitionParser extends TransactionDefinitionParser
 {

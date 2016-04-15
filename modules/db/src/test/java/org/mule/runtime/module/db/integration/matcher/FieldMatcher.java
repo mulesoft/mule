@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.matcher;
+package org.mule.runtime.module.db.integration.matcher;
 
-import org.mule.module.db.integration.model.Field;
-import org.mule.module.db.integration.model.Record;
+import org.mule.runtime.module.db.integration.model.Field;
+import org.mule.runtime.module.db.integration.model.Record;
 
 import org.hamcrest.Description;
 import org.hamcrest.Factory;

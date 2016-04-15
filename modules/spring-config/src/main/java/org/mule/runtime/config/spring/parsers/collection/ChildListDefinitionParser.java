@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.collection;
+package org.mule.runtime.config.spring.parsers.collection;
 
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 
 import java.util.ArrayList;
 import java.util.List;

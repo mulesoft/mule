@@ -11,7 +11,7 @@
             <cxf:property key="action" value="Signature" />
             <cxf:property key="user" value="joe" />
             <cxf:property key="signaturePropFile" value="org/mule/module/cxf/wssec/wssecurity.properties" />
-            <cxf:property key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ClientPasswordCallback" />
+            <cxf:property key="passwordCallbackClass" value="org.mule.runtime.module.cxf.wssec.ClientPasswordCallback" />
         </cxf:ws-config>
     </cxf:ws-security>
 
@@ -19,7 +19,7 @@
         <cxf:ws-config>
             <cxf:property key="action" value="Signature" />
             <cxf:property key="signaturePropFile" value="org/mule/module/cxf/wssec/wssecurity.properties" />
-            <cxf:property key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ServerPasswordCallback" />
+            <cxf:property key="passwordCallbackClass" value="org.mule.runtime.module.cxf.wssec.ServerPasswordCallback" />
         </cxf:ws-config>
     </cxf:ws-security>
 

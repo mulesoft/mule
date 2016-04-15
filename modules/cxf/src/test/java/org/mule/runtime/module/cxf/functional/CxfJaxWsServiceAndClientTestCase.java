@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.functional;
+package org.mule.runtime.module.cxf.functional;
 
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.module.http.api.HttpConstants;
-import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -29,7 +29,7 @@ public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase
     private static final String REQUEST_PAYLOAD =
             "<soap:Envelope \n" +
             "           xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-            "           xmlns:svc=\"http://example.cxf.module.mule.org/\">\n" +
+            "           xmlns:svc=\"http://example.cxf.module.runtime.mule.org/\">\n" +
             "<soap:Body>\n" +
             "<svc:sayHi>\n" +
             "    <arg0>Test Message</arg0>\n" +
@@ -41,7 +41,7 @@ public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase
             "<soap:Envelope " +
                 "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
                 "<soap:Body>" +
-                    "<ns2:sayHiResponse xmlns:ns2=\"http://example.cxf.module.mule.org/\">" +
+                    "<ns2:sayHiResponse xmlns:ns2=\"http://example.cxf.module.runtime.mule.org/\">" +
                         "<return>" +
                             "Hello\u2297 Test Message" +
                         "</return>" +

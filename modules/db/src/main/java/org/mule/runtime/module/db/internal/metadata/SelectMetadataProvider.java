@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.metadata;
+package org.mule.runtime.module.db.internal.metadata;
 
 import org.mule.common.DefaultResult;
 import org.mule.common.FailureType;
@@ -15,9 +15,9 @@ import org.mule.common.metadata.DefaultListMetaDataModel;
 import org.mule.common.metadata.DefaultMetaData;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.MetaDataModel;
-import org.mule.module.db.internal.domain.query.Query;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
-import org.mule.module.db.internal.result.resultset.ResultSetIterator;
+import org.mule.runtime.module.db.internal.domain.query.Query;
+import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.runtime.module.db.internal.result.resultset.ResultSetIterator;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSetMetaData;

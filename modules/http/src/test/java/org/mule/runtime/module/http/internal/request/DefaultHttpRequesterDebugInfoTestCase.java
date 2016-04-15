@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.http.internal.request;
+package org.mule.runtime.module.http.internal.request;
 
 import static java.lang.Boolean.TRUE;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,22 +14,22 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
-import static org.mule.module.http.api.requester.HttpSendBodyMode.ALWAYS;
-import static org.mule.module.http.internal.HttpParamType.QUERY_PARAM;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.AUTHENTICATION_TYPE_DEBUG;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.DOMAIN_DEBUG;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.FOLLOW_REDIRECTS_DEBUG;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.METHOD_DEBUG;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.PARSE_RESPONSE_DEBUG;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.PASSWORD_DEBUG;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.QUERY_PARAMS_DEBUG;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.RESPONSE_TIMEOUT_DEBUG;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.SECURITY_DEBUG;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.SEND_BODY_DEBUG;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.STREAMING_MODE_DEBUG;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.URI_DEBUG;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.USERNAME_DEBUG;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.WORKSTATION_DEBUG;
+import static org.mule.runtime.module.http.api.requester.HttpSendBodyMode.ALWAYS;
+import static org.mule.runtime.module.http.internal.HttpParamType.QUERY_PARAM;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.AUTHENTICATION_TYPE_DEBUG;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DOMAIN_DEBUG;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.FOLLOW_REDIRECTS_DEBUG;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.METHOD_DEBUG;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.PARSE_RESPONSE_DEBUG;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.PASSWORD_DEBUG;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.QUERY_PARAMS_DEBUG;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.RESPONSE_TIMEOUT_DEBUG;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.SECURITY_DEBUG;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.SEND_BODY_DEBUG;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.STREAMING_MODE_DEBUG;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.URI_DEBUG;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.USERNAME_DEBUG;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.WORKSTATION_DEBUG;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -39,10 +39,10 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.module.http.api.requester.HttpSendBodyMode;
-import org.mule.module.http.internal.HttpParam;
-import org.mule.module.http.internal.HttpSingleParam;
-import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
+import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
+import org.mule.runtime.module.http.internal.HttpParam;
+import org.mule.runtime.module.http.internal.HttpSingleParam;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;

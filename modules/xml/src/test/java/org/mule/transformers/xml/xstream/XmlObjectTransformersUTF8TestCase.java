@@ -7,7 +7,7 @@
 package org.mule.runtime.core.transformers.xml.xstream;
 
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.module.xml.transformer.XmlToObject;
+import org.mule.runtime.module.xml.transformer.XmlToObject;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 import org.mule.runtime.core.util.ArrayUtils;
 

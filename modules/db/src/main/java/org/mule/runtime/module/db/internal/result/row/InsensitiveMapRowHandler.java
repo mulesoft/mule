@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.result.row;
+package org.mule.runtime.module.db.internal.result.row;
 
 import org.mule.runtime.core.util.CaseInsensitiveHashMap;
 

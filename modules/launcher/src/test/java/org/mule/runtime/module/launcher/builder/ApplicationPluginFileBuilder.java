@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.builder;
+package org.mule.runtime.module.launcher.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import org.mule.tck.ZipUtils.ZipResource;
-import static org.mule.module.launcher.plugin.ApplicationPluginDescriptor.PLUGIN_PROPERTIES;
+import static org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor.PLUGIN_PROPERTIES;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;

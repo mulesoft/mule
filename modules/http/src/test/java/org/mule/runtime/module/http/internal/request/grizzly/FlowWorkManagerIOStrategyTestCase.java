@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request.grizzly;
+package org.mule.runtime.module.http.internal.request.grizzly;
 
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;

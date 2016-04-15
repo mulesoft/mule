@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.artifact.classloader;
+package org.mule.runtime.module.artifact.classloader;
 
 /**
  * Implementations of this class should take care about resources that may leak memory after application undeployment.

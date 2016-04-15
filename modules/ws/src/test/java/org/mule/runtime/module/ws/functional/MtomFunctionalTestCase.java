@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.functional;
+package org.mule.runtime.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.assertEquals;
@@ -41,7 +41,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
     @Test
     public void uploadAttachmentTest() throws Exception
     {
-        String request = String.format("<ns:uploadAttachment xmlns:ns=\"http://consumer.ws.module.mule.org/\">" +
+        String request = String.format("<ns:uploadAttachment xmlns:ns=\"http://consumer.ws.module.runtime.mule.org/\">" +
                                        "<fileName>%s</fileName><attachment>" +
                                        "<xop:Include xmlns:xop=\"http://www.w3.org/2004/08/xop/include\" href=\"cid:testAttachmentId\"/>" +
                                        "</attachment></ns:uploadAttachment>", TEST_FILE_ATTACHMENT);
@@ -50,7 +50,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
                                                               .withOutboundAttachment("testAttachmentId", buildDataHandler(TEST_FILE_ATTACHMENT))
                                                               .run();
 
-        String expected = "<ns2:uploadAttachmentResponse xmlns:ns2=\"http://consumer.ws.module.mule.org/\">" +
+        String expected = "<ns2:uploadAttachmentResponse xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\">" +
                           "<result>OK</result></ns2:uploadAttachmentResponse>";
 
         assertXMLEqual(expected, getPayloadAsString(event.getMessage()));
@@ -59,7 +59,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
     @Test
     public void downloadAttachmentTest() throws Exception
     {
-        String request = String.format("<ns:downloadAttachment xmlns:ns=\"http://consumer.ws.module.mule.org/\">" +
+        String request = String.format("<ns:downloadAttachment xmlns:ns=\"http://consumer.ws.module.runtime.mule.org/\">" +
                                        "<fileName>%s</fileName></ns:downloadAttachment>", TEST_FILE_ATTACHMENT);
 
         MuleEvent event = flowRunner("clientDownloadAttachment").withPayload(request).run();
@@ -69,7 +69,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
     @Test
     public void echoAttachment() throws Exception
     {
-        String request = "<ns:echoAttachment xmlns:ns=\"http://consumer.ws.module.mule.org/\"><attachment>" +
+        String request = "<ns:echoAttachment xmlns:ns=\"http://consumer.ws.module.runtime.mule.org/\"><attachment>" +
                          "<xop:Include xmlns:xop=\"http://www.w3.org/2004/08/xop/include\" href=\"cid:testAttachmentId\"/>" +
                          "</attachment></ns:echoAttachment>";
 

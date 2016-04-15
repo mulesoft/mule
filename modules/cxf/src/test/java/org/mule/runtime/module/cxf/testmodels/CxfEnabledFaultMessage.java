@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.testmodels;
+package org.mule.runtime.module.cxf.testmodels;
 
 import javax.xml.namespace.QName;
 
@@ -33,7 +33,7 @@ public class CxfEnabledFaultMessage extends FaultInfoException
 
     public static QName getFaultName()
     {
-        return new QName("http://org.mule.module.cxf.testmodels/CxfTestService/",
+        return new QName("http://org.mule.runtime.module.cxf.testmodels/CxfTestService/",
             "CxfEnabledFaultMessage");
     }
 

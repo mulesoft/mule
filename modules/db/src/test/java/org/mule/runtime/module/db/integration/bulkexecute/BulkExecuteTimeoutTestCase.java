@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.bulkexecute;
+package org.mule.runtime.module.db.integration.bulkexecute;
 
-import org.mule.module.db.integration.AbstractQueryTimeoutTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.AbstractQueryTimeoutTestCase;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 public class BulkExecuteTimeoutTestCase extends AbstractQueryTimeoutTestCase
 {

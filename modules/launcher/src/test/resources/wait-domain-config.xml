@@ -6,6 +6,6 @@
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/domain http://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd">
 
-    <spring:bean id="waitComponent" class="org.mule.module.launcher.DeploymentServiceTestCase$WaitComponent" init-method="initialise" />
+    <spring:bean id="waitComponent" class="org.mule.runtime.module.launcher.DeploymentServiceTestCase$WaitComponent" init-method="initialise" />
 
 </mule-domain>

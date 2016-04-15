@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.artifact.classloader;
+package org.mule.runtime.module.artifact.classloader;
 
 /**
  * Indicates how to resolve class loading lookup related to parent/child relationships

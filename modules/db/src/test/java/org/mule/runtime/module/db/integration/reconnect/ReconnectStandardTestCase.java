@@ -5,21 +5,21 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.reconnect;
+package org.mule.runtime.module.db.integration.reconnect;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
-import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.assertMessageContains;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.getAllPlanetRecords;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.internal.domain.database.DbConfig;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.internal.domain.database.DbConfig;
+import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
 
 import java.util.List;
 

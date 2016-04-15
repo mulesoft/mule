@@ -13,9 +13,9 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.module.xml.transformer.XPathExtractor;
-import org.mule.module.xml.util.NamespaceManager;
-import org.mule.module.xml.xpath.XPathReturnType;
+import org.mule.runtime.module.xml.transformer.XPathExtractor;
+import org.mule.runtime.module.xml.util.NamespaceManager;
+import org.mule.runtime.module.xml.xpath.XPathReturnType;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;

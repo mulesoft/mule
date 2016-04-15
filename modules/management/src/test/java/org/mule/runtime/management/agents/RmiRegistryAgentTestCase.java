@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.management.agents;
 
-import org.mule.module.management.agent.RmiRegistryAgent;
+import org.mule.runtime.module.management.agent.RmiRegistryAgent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.template;
+package org.mule.runtime.module.db.integration.template;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.module.db.internal.domain.query.QueryTemplate;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

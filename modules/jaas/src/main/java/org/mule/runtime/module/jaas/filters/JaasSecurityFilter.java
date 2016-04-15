@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.jaas.filters;
+package org.mule.runtime.module.jaas.filters;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.module.jaas.JaasAuthentication;
+import org.mule.runtime.module.jaas.JaasAuthentication;
 import org.mule.runtime.core.security.AbstractOperationSecurityFilter;
 import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.runtime.core.security.MuleHeaderCredentialsAccessor;

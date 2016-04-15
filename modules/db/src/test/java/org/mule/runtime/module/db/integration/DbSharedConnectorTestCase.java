@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.db.integration;
+package org.mule.runtime.module.db.integration;
 
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -13,9 +13,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.module.db.integration.model.DerbyTestDatabase;
-import org.mule.module.db.internal.domain.database.DbConfig;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.runtime.module.db.integration.model.DerbyTestDatabase;
+import org.mule.runtime.module.db.internal.domain.database.DbConfig;
+import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
 
 import java.sql.SQLException;
 import java.util.Arrays;

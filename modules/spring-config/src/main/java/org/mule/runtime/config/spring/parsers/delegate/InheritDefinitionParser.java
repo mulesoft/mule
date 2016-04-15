@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.delegate;
+package org.mule.runtime.config.spring.parsers.delegate;
 
-import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.NamedDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
 
 /**
  * This encapsulates two definition parsers - orphan and named - and returns the
  * named definition parser if the "inherit" attribute is set.  This allows a named
  * orphan to be defined (inherit="false") and then extended (inherit="true").
  * The two sub-parsers must be consistent, as described in
- * {@link org.mule.config.spring.parsers.delegate.AbstractParallelDelegatingDefinitionParser}
+ * {@link org.mule.runtime.config.spring.parsers.delegate.AbstractParallelDelegatingDefinitionParser}
  */
 public class InheritDefinitionParser extends BooleanAttributeSelectionDefinitionParser
 {

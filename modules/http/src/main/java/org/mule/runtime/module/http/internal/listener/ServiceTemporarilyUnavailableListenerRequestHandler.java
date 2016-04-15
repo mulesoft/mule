@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener;
+package org.mule.runtime.module.http.internal.listener;
 
-import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.module.http.internal.domain.response.HttpResponseBuilder;
-import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.module.http.internal.listener.async.RequestHandler;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
+import org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder;
+import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCallback;
+import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
+import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

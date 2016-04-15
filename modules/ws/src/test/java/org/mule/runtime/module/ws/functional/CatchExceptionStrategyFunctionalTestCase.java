@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.functional;
+package org.mule.runtime.module.ws.functional;
 
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
@@ -17,18 +17,18 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.listener.ExceptionListener;
-import org.mule.module.ws.consumer.SoapFaultException;
+import org.mule.runtime.module.ws.consumer.SoapFaultException;
 
 import org.junit.Test;
 
 public class CatchExceptionStrategyFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 {
 
-    private static final String FAIL_REQUEST = "<tns:fail xmlns:tns=\"http://consumer.ws.module.mule.org/\">" +
+    private static final String FAIL_REQUEST = "<tns:fail xmlns:tns=\"http://consumer.ws.module.runtime.mule.org/\">" +
                                                "<text>Hello</text></tns:fail>";
 
     private static final String EXPECTED_SOAP_FAULT_DETAIL = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><detail>" +
-                                                             "<ns2:EchoException xmlns:ns2=\"http://consumer.ws.module.mule.org/\">" +
+                                                             "<ns2:EchoException xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\">" +
                                                              "<text>Hello</text></ns2:EchoException></detail>";
 
     @Override

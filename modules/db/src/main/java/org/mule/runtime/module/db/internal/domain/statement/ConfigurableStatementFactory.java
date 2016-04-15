@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.statement;
+package org.mule.runtime.module.db.internal.domain.statement;
 
 /**
  * Provides extra customization to a {@link StatementFactory}

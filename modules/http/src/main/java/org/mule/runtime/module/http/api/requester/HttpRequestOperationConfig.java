@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api.requester;
+package org.mule.runtime.module.http.api.requester;
 
 import org.mule.runtime.core.api.client.OperationOptionsConfig;
 

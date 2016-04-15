@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.validation;
+package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.config.ConfigurationFactory;
@@ -12,8 +12,8 @@ import org.mule.extension.api.introspection.config.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.operation.OperationModel;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
-import org.mule.module.extension.internal.model.property.ConfigTypeModelProperty;
+import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;

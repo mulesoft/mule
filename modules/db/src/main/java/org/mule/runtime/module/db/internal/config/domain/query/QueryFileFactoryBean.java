@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.domain.query;
+package org.mule.runtime.module.db.internal.config.domain.query;
 
-import org.mule.module.db.internal.util.FileReader;
+import org.mule.runtime.module.db.internal.util.FileReader;
 
 import java.io.IOException;
 

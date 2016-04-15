@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.application;
+package org.mule.runtime.module.launcher.application;
 
-import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
-import org.mule.module.launcher.ApplicationDescriptorFactory;
-import org.mule.module.launcher.domain.DomainManager;
-import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.launcher.ApplicationDescriptorFactory;
+import org.mule.runtime.module.launcher.domain.DomainManager;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory;
 
 import java.io.IOException;
 

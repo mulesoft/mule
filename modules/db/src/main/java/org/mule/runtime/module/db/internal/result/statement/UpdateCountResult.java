@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.result.statement;
+package org.mule.runtime.module.db.internal.result.statement;
 
 /**
  * Represents an update count after a {@link java.sql.Statement} execution

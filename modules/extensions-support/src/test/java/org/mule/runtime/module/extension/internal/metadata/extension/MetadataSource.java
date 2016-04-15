@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.metadata.extension;
+package org.mule.runtime.module.extension.internal.metadata.extension;
 
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.metadata.MetadataKeyParam;
 import org.mule.extension.api.annotation.metadata.MetadataScope;
 import org.mule.extension.api.runtime.source.Source;
-import org.mule.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
+import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 
 import java.util.Map;
 

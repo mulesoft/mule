@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener;
+package org.mule.runtime.module.http.internal.listener;
 
 
 import org.mule.runtime.core.api.MuleContext;
@@ -15,10 +15,10 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.module.http.internal.listener.grizzly.GrizzlyServerManager;
-import org.mule.module.socket.internal.DefaultTcpServerSocketProperties;
+import org.mule.runtime.module.http.internal.listener.grizzly.GrizzlyServerManager;
+import org.mule.runtime.module.socket.internal.DefaultTcpServerSocketProperties;
 import org.mule.api.tls.TlsContextFactory;
-import org.mule.module.socket.api.TcpServerSocketProperties;
+import org.mule.runtime.module.socket.api.TcpServerSocketProperties;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
 import com.google.common.collect.Iterables;

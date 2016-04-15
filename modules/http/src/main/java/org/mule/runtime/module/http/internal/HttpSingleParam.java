@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal;
+package org.mule.runtime.module.http.internal;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.module.http.internal.HttpParam;
-import org.mule.module.http.internal.HttpParamType;
-import org.mule.module.http.internal.ParameterMap;
+import org.mule.runtime.module.http.internal.HttpParam;
+import org.mule.runtime.module.http.internal.HttpParamType;
+import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 public class HttpSingleParam extends HttpParam implements Initialisable, MuleContextAware

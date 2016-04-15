@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.consumer;
+package org.mule.runtime.module.ws.consumer;
 
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.testmodels;
+package org.mule.runtime.module.cxf.testmodels;
 
 import java.util.concurrent.CountDownLatch;
 

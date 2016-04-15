@@ -5,24 +5,24 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.query;
+package org.mule.runtime.module.db.internal.resolver.query;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.module.db.internal.domain.connection.DbConnection;
-import org.mule.module.db.internal.domain.param.DefaultInOutQueryParam;
-import org.mule.module.db.internal.domain.param.DefaultInputQueryParam;
-import org.mule.module.db.internal.domain.param.DefaultOutputQueryParam;
-import org.mule.module.db.internal.domain.param.InOutQueryParam;
-import org.mule.module.db.internal.domain.param.InputQueryParam;
-import org.mule.module.db.internal.domain.param.OutputQueryParam;
-import org.mule.module.db.internal.domain.param.QueryParam;
-import org.mule.module.db.internal.domain.query.Query;
-import org.mule.module.db.internal.domain.query.QueryParamValue;
-import org.mule.module.db.internal.domain.query.QueryTemplate;
-import org.mule.module.db.internal.domain.type.DbType;
-import org.mule.module.db.internal.domain.type.DynamicDbType;
-import org.mule.module.db.internal.domain.type.UnknownDbType;
-import org.mule.module.db.internal.resolver.param.ParamValueResolver;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
+import org.mule.runtime.module.db.internal.domain.param.DefaultInOutQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.DefaultInputQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.DefaultOutputQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.InOutQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.InputQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.OutputQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.QueryParam;
+import org.mule.runtime.module.db.internal.domain.query.Query;
+import org.mule.runtime.module.db.internal.domain.query.QueryParamValue;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
+import org.mule.runtime.module.db.internal.domain.type.DbType;
+import org.mule.runtime.module.db.internal.domain.type.DynamicDbType;
+import org.mule.runtime.module.db.internal.domain.type.UnknownDbType;
+import org.mule.runtime.module.db.internal.resolver.param.ParamValueResolver;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

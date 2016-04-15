@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.nativelib;
+package org.mule.runtime.module.launcher.nativelib;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.SystemUtils;

@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.result.statement;
+package org.mule.runtime.module.db.internal.result.statement;
 
-import org.mule.module.db.internal.result.resultset.ResultSetHandler;
+import org.mule.runtime.module.db.internal.result.resultset.ResultSetHandler;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest

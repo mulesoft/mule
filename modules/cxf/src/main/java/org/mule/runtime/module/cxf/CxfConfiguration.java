@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -12,11 +12,11 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.config.spring.SpringRegistry;
-import org.mule.module.cxf.support.MuleHeadersInInterceptor;
-import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
-import org.mule.module.cxf.support.MuleProtocolHeadersOutInterceptor;
-import org.mule.module.cxf.transport.MuleUniversalTransport;
+import org.mule.runtime.config.spring.SpringRegistry;
+import org.mule.runtime.module.cxf.support.MuleHeadersInInterceptor;
+import org.mule.runtime.module.cxf.support.MuleHeadersOutInterceptor;
+import org.mule.runtime.module.cxf.support.MuleProtocolHeadersOutInterceptor;
+import org.mule.runtime.module.cxf.transport.MuleUniversalTransport;
 
 import java.lang.reflect.Field;
 import java.util.Map;

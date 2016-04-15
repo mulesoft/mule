@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.support;
+package org.mule.runtime.module.cxf.support;
 
-import org.mule.module.cxf.CxfConstants;
-import org.mule.module.cxf.i18n.CxfMessages;
+import org.mule.runtime.module.cxf.CxfConstants;
+import org.mule.runtime.module.cxf.i18n.CxfMessages;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

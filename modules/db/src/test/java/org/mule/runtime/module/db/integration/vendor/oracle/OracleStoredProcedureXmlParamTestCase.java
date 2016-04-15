@@ -5,22 +5,22 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.vendor.oracle;
+package org.mule.runtime.module.db.integration.vendor.oracle;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.db.integration.TestRecordUtil.assertRecord;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecord;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.integration.model.Alien;
-import org.mule.module.db.integration.model.Record;
-import org.mule.module.db.integration.model.XmlField;
-import org.mule.module.db.internal.domain.type.oracle.OracleXmlType;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.model.Alien;
+import org.mule.runtime.module.db.integration.model.Record;
+import org.mule.runtime.module.db.integration.model.XmlField;
+import org.mule.runtime.module.db.internal.domain.type.oracle.OracleXmlType;
 
 import java.sql.Connection;
 import java.util.List;

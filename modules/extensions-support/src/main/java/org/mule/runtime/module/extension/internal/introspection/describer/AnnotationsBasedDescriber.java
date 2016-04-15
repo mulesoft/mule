@@ -4,34 +4,30 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.describer;
+package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
-import static org.mule.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
-import static org.mule.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
-import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
-import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
-import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
-import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseMetadataAnnotations;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getExposedFields;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getField;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getMetadataType;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterFields;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getSourceName;
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-
-import org.mule.runtime.core.api.config.ThreadingProfile;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseMetadataAnnotations;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterFields;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
 import org.mule.api.connection.ConnectionProvider;
-import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
-import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Configuration;
@@ -50,8 +46,6 @@ import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclarer;
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclarer;
@@ -67,32 +61,36 @@ import org.mule.extension.api.introspection.declaration.fluent.ParameterizedDecl
 import org.mule.extension.api.introspection.declaration.fluent.SourceDeclarer;
 import org.mule.extension.api.introspection.declaration.spi.Describer;
 import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.extension.api.introspection.property.DisplayModelPropertyBuilder;
+import org.mule.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
-import org.mule.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
-import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
-import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
-import org.mule.module.extension.internal.introspection.ParameterGroup;
-import org.mule.module.extension.internal.introspection.VersionResolver;
-import org.mule.module.extension.internal.model.property.ConfigTypeModelProperty;
-import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
-import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
-import org.mule.module.extension.internal.model.property.ImplementingMethodModelProperty;
-import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
-import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.module.extension.internal.model.property.TypeRestrictionModelProperty;
-import org.mule.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
-import org.mule.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
-import org.mule.module.extension.internal.runtime.source.DefaultSourceFactory;
-import org.mule.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
+import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.CollectionUtils;
-import org.mule.runtime.core.util.collection.ImmutableSetCollector;
+import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
+import org.mule.runtime.module.extension.internal.introspection.VersionResolver;
+import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
+import org.mule.runtime.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
+import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFactory;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -102,10 +100,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -187,11 +188,15 @@ public final class AnnotationsBasedDescriber implements Describer
 
         if (typesMapping != null)
         {
-            Map<MetadataType, List<MetadataType>> subTypesMap = stream(typesMapping.value()).collect(toMap(
-                    mapping -> getMetadataType(mapping.baseType(), typeLoader),
-                    mapping -> stream(mapping.subTypes())
-                            .map(subType -> getMetadataType(subType, typeLoader))
-                            .collect(toList())));
+            Map<MetadataType, List<MetadataType>> subTypesMap = stream(typesMapping.value()).collect(
+                    toMap(
+                            mapping -> getMetadataType(mapping.baseType(), typeLoader),
+                            mapping ->
+                                    stream(mapping.subTypes())
+                                            .map(subType -> getMetadataType(subType, typeLoader))
+                                            .collect(toList())
+                            , (k1, k2) -> k1,
+                            LinkedHashMap::new));
 
             declaration.withModelProperty(new SubTypesModelProperty(subTypesMap));
         }
@@ -416,7 +421,7 @@ public final class AnnotationsBasedDescriber implements Describer
                     Arrays.stream(contributors).forEach(contributor -> contributor.contribute(field, describe));
                     return describe;
                 })
-                .collect(new ImmutableSetCollector<>());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private FieldDescriber getFieldDescriber(Field field)

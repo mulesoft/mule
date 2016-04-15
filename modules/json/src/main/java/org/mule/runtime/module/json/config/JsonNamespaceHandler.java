@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.json.config;
+package org.mule.runtime.module.json.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
-import org.mule.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
-import org.mule.module.json.filters.IsJsonFilter;
-import org.mule.module.json.transformers.JsonSchemaValidationFilter;
-import org.mule.module.json.transformers.JsonToObject;
-import org.mule.module.json.transformers.JsonToXml;
-import org.mule.module.json.transformers.JsonXsltTransformer;
-import org.mule.module.json.transformers.ObjectToJson;
-import org.mule.module.json.transformers.XmlToJson;
+import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.FilterDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
+import org.mule.runtime.module.json.filters.IsJsonFilter;
+import org.mule.runtime.module.json.transformers.JsonSchemaValidationFilter;
+import org.mule.runtime.module.json.transformers.JsonToObject;
+import org.mule.runtime.module.json.transformers.JsonToXml;
+import org.mule.runtime.module.json.transformers.JsonXsltTransformer;
+import org.mule.runtime.module.json.transformers.ObjectToJson;
+import org.mule.runtime.module.json.transformers.XmlToJson;
 
 /**
  * Registers a Bean Definition Parser for handling elements defined in META-INF/mule-json.xsd

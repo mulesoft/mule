@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.pgp;
+package org.mule.runtime.module.pgp;
 
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
 import org.mule.runtime.core.api.security.CryptoFailureException;
-import org.mule.module.pgp.i18n.PGPMessages;
+import org.mule.runtime.module.pgp.i18n.PGPMessages;
 import org.mule.runtime.core.security.AbstractNamedEncryptionStrategy;
 import org.mule.runtime.core.util.SecurityUtils;
 

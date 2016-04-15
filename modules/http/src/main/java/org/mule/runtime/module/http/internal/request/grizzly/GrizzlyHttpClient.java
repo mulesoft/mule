@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request.grizzly;
+package org.mule.runtime.module.http.internal.request.grizzly;
 
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
-import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
@@ -16,21 +16,21 @@ import org.mule.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.MultipartHttpEntity;
-import org.mule.module.http.internal.domain.request.DefaultHttpRequest;
-import org.mule.module.http.internal.domain.request.HttpRequest;
-import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
-import org.mule.module.http.internal.domain.response.HttpResponse;
-import org.mule.module.http.internal.domain.response.HttpResponseBuilder;
-import org.mule.module.http.internal.multipart.HttpPart;
-import org.mule.module.http.internal.request.HttpAuthenticationType;
-import org.mule.module.http.internal.request.HttpClient;
-import org.mule.module.http.internal.request.HttpClientConfiguration;
-import org.mule.module.http.internal.request.NtlmProxyConfig;
-import org.mule.module.socket.api.TcpClientSocketProperties;
+import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
+import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
+import org.mule.runtime.module.http.internal.domain.request.DefaultHttpRequest;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
+import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
+import org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder;
+import org.mule.runtime.module.http.internal.multipart.HttpPart;
+import org.mule.runtime.module.http.internal.request.HttpAuthenticationType;
+import org.mule.runtime.module.http.internal.request.HttpClient;
+import org.mule.runtime.module.http.internal.request.HttpClientConfiguration;
+import org.mule.runtime.module.http.internal.request.NtlmProxyConfig;
+import org.mule.runtime.module.socket.api.TcpClientSocketProperties;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.runtime.core.util.IOUtils;

@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.domain;
+package org.mule.runtime.module.launcher.domain;
 
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.launcher.MuleFoldersUtil.getDomainsFolder;
-import static org.mule.module.launcher.MuleFoldersUtil.getMuleLibFolder;
-import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
-import static org.mule.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.launcher.DeploymentException;
-import org.mule.module.launcher.MuleSharedDomainClassLoader;
-import org.mule.module.launcher.descriptor.DomainDescriptor;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainsFolder;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getMuleLibFolder;
+import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.launcher.DeploymentException;
+import org.mule.runtime.module.launcher.MuleSharedDomainClassLoader;
+import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
 
 import java.io.File;
 import java.io.IOException;

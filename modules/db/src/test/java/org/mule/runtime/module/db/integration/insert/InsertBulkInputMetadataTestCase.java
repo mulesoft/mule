@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.insert;
+package org.mule.runtime.module.db.integration.insert;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -13,10 +13,10 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.common.Result;
 import org.mule.common.metadata.MetaData;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.delete.AbstractBulkUpdateInputMetadataTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.internal.processor.AbstractDbMessageProcessor;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.delete.AbstractBulkUpdateInputMetadataTestCase;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.internal.processor.AbstractDbMessageProcessor;
 
 import java.util.List;
 

@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.delegate;
+package org.mule.runtime.config.spring.parsers.delegate;
 
-import org.mule.config.spring.parsers.MuleChildDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.assembly.TwoStageMapBeanAssemblerFactory;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.runtime.config.spring.parsers.assembly.TwoStageMapBeanAssemblerFactory;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * This changes a {@link org.mule.config.spring.parsers.generic.ChildDefinitionParser}
+ * This changes a {@link org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser}
  * so that it generates a map instead of a bean definition.  This is useful for converting
  * parsers to work with the object factory (which requires a map).
  */

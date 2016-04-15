@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.processor;
+package org.mule.runtime.module.db.internal.config.processor;
 
-import org.mule.module.db.internal.domain.executor.StoredProcedureExecutorFactory;
-import org.mule.module.db.internal.metadata.NullMetadataProvider;
-import org.mule.module.db.internal.processor.StoredProcedureMessageProcessor;
-import org.mule.module.db.internal.result.statement.EagerStatementResultHandler;
-import org.mule.module.db.internal.result.statement.StreamingStatementResultHandler;
+import org.mule.runtime.module.db.internal.domain.executor.StoredProcedureExecutorFactory;
+import org.mule.runtime.module.db.internal.metadata.NullMetadataProvider;
+import org.mule.runtime.module.db.internal.processor.StoredProcedureMessageProcessor;
+import org.mule.runtime.module.db.internal.result.statement.EagerStatementResultHandler;
+import org.mule.runtime.module.db.internal.result.statement.StreamingStatementResultHandler;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;

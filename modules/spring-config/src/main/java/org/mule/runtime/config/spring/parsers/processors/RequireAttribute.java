@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.processors;
+package org.mule.runtime.config.spring.parsers.processors;
 
-import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.config.spring.util.SpringXMLUtils;
+import org.mule.runtime.config.spring.parsers.PreProcessor;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.util.SpringXMLUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,7 +22,7 @@ import org.w3c.dom.NamedNodeMap;
 /**
  * Throws an exception if any of the required attributes (after translation) are missing.
  * Designed to cooperates with
- * {@link org.mule.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser#addHandledException(Class)}
+ * {@link org.mule.runtime.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser#addHandledException(Class)}
  */
 public class RequireAttribute implements PreProcessor
 {

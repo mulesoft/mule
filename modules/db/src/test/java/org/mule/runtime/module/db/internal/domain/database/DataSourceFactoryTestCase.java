@@ -5,14 +5,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.database;
+package org.mule.runtime.module.db.internal.domain.database;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
+import org.mule.runtime.module.db.internal.domain.connection.DbPoolingProfile;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

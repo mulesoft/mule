@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener;
+package org.mule.runtime.module.http.internal.listener;
 
-import org.mule.module.http.api.HttpConstants;
+import org.mule.runtime.module.http.api.HttpConstants;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This is a wrapper for a map whose keys are {@link org.mule.module.http.internal.listener.ServerAddress}s.
+ * This is a wrapper for a map whose keys are {@link org.mule.runtime.module.http.internal.listener.ServerAddress}s.
  * It makes sure that if an entry is not found we instead search for an entry with that same port but host 0.0.0.0.
  */
 public class ServerAddressMap<T>

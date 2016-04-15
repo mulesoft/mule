@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension;
+package org.mule.runtime.module.extension;
 
 import static java.util.stream.Collectors.toList;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -24,13 +24,13 @@ import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.annotation.param.display.DisplayName;
 import org.mule.extension.api.annotation.param.display.Placement;
 import org.mule.extension.api.introspection.parameter.ExpressionSupport;
-import org.mule.module.extension.exception.CureCancerExceptionEnricher;
-import org.mule.module.extension.exception.HealthException;
-import org.mule.module.extension.exception.HeisenbergException;
-import org.mule.module.extension.model.HealthStatus;
-import org.mule.module.extension.model.KnockeableDoor;
-import org.mule.module.extension.model.PersonalInfo;
-import org.mule.module.extension.model.Weapon;
+import org.mule.runtime.module.extension.exception.CureCancerExceptionEnricher;
+import org.mule.runtime.module.extension.exception.HealthException;
+import org.mule.runtime.module.extension.exception.HeisenbergException;
+import org.mule.runtime.module.extension.model.HealthStatus;
+import org.mule.runtime.module.extension.model.KnockeableDoor;
+import org.mule.runtime.module.extension.model.PersonalInfo;
+import org.mule.runtime.module.extension.model.Weapon;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.Serializable;

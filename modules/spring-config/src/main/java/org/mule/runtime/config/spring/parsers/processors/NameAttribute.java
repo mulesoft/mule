@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.processors;
+package org.mule.runtime.config.spring.parsers.processors;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
 public class NameAttribute extends AddAttribute
 {

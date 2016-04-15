@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.param;
+package org.mule.runtime.module.db.internal.resolver.param;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.module.db.internal.domain.query.QueryParamValue;
+import org.mule.runtime.module.db.internal.domain.query.QueryParamValue;
 import org.mule.tck.size.SmallTest;
 
 import java.util.List;

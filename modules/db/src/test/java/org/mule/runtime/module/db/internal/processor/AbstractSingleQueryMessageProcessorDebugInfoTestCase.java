@@ -5,26 +5,26 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.processor;
+package org.mule.runtime.module.db.internal.processor;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.module.db.internal.processor.DbDebugInfoUtils.SQL_TEXT_DEBUG_FIELD;
+import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.SQL_TEXT_DEBUG_FIELD;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
-import org.mule.module.db.internal.domain.connection.DbConnection;
-import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
-import org.mule.module.db.internal.domain.database.DbConfig;
-import org.mule.module.db.internal.domain.query.QueryType;
-import org.mule.module.db.internal.domain.transaction.TransactionalAction;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
-import org.mule.module.db.internal.resolver.database.UnresolvableDbConfigException;
-import org.mule.module.db.internal.resolver.query.QueryResolutionException;
-import org.mule.module.db.internal.resolver.query.QueryResolver;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnectionFactory;
+import org.mule.runtime.module.db.internal.domain.database.DbConfig;
+import org.mule.runtime.module.db.internal.domain.query.QueryType;
+import org.mule.runtime.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.runtime.module.db.internal.resolver.database.UnresolvableDbConfigException;
+import org.mule.runtime.module.db.internal.resolver.query.QueryResolutionException;
+import org.mule.runtime.module.db.internal.resolver.query.QueryResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.sql.SQLException;

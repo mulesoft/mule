@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.management.mbean;
+package org.mule.runtime.module.management.mbean;
 
 import javax.management.ObjectName;
 
@@ -18,7 +18,7 @@ public interface FlowConstructServiceMBean  extends FlowConstructStatsMBean
      * The statistics for this flow construct
      *
      * @return statistics for this flow construct
-     * @see org.mule.module.management.mbean.FlowConstructStats
+     * @see org.mule.runtime.module.management.mbean.FlowConstructStats
      */
     ObjectName getStatistics();
 

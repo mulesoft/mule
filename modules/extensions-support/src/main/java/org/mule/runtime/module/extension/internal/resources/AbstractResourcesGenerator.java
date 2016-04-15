@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.resources;
+package org.mule.runtime.module.extension.internal.resources;
 
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.extension.api.introspection.ExtensionModel;

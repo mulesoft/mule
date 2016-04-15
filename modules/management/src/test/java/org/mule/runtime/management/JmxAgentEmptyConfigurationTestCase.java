@@ -7,7 +7,7 @@
 package org.mule.runtime.core.management;
 
 import org.junit.Rule;
-import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
+import org.mule.runtime.module.management.agent.FixedHostRmiClientSocketFactory;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.net.ConnectException;

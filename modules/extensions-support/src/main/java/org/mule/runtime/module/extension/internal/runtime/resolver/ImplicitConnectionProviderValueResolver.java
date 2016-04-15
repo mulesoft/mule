@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.resolver;
+package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.module.extension.internal.runtime.config.DefaultImplicitConnectionProviderFactory;
-import org.mule.module.extension.internal.runtime.config.ImplicitConnectionProviderFactory;
+import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConnectionProviderFactory;
+import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConnectionProviderFactory;
 
 import java.util.function.Function;
 

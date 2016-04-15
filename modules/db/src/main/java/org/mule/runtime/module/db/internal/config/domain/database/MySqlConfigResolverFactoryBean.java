@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.domain.database;
+package org.mule.runtime.module.db.internal.config.domain.database;
 
-import org.mule.module.db.internal.domain.database.GenericDbConfigFactory;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.runtime.module.db.internal.domain.database.GenericDbConfigFactory;
+import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
 
 /**
  * Creates {@link DbConfigResolver} for MySql databases

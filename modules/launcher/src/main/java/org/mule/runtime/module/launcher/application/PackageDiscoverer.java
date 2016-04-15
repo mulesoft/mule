@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.application;
+package org.mule.runtime.module.launcher.application;
 
 import java.net.URL;
 import java.util.Set;

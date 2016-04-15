@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.capability.xml;
+package org.mule.runtime.module.extension.internal.capability.xml;
 
 import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertEquals;
@@ -16,19 +16,19 @@ import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
-import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.internal.DefaultDescribingContext;
-import org.mule.module.extension.internal.capability.xml.schema.SchemaGenerator;
-import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
-import org.mule.module.extension.internal.runtime.connector.basic.GlobalInnerPojoConnector;
-import org.mule.module.extension.internal.runtime.connector.basic.GlobalPojoConnector;
-import org.mule.module.extension.internal.runtime.connector.basic.ListConnector;
-import org.mule.module.extension.internal.runtime.connector.basic.MapConnector;
-import org.mule.module.extension.internal.runtime.connector.basic.StringListConnector;
-import org.mule.module.extension.internal.runtime.connector.basic.TestConnector;
-import org.mule.module.extension.internal.runtime.connector.subtypes.SubTypesMappingConnector;
-import org.mule.module.extension.vegan.VeganExtension;
+import org.mule.runtime.module.extension.HeisenbergExtension;
+import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaGenerator;
+import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
+import org.mule.runtime.module.extension.internal.runtime.connector.basic.GlobalInnerPojoConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.basic.GlobalPojoConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.basic.ListConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.basic.MapConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.basic.StringListConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.basic.TestConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.SubTypesMappingConnector;
+import org.mule.runtime.module.extension.vegan.VeganExtension;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

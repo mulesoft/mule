@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.executeddl;
+package org.mule.runtime.module.db.integration.executeddl;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.module.db.integration.DbTestUtil.selectData;
-import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
+import static org.mule.runtime.module.db.integration.DbTestUtil.selectData;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecords;
+import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 import java.sql.Connection;
 import java.sql.SQLException;

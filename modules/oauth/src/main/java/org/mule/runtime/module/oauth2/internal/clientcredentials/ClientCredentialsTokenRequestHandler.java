@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.clientcredentials;
+package org.mule.runtime.module.oauth2.internal.clientcredentials;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -14,16 +14,16 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.oauth2.internal.AbstractTokenRequestHandler;
-import org.mule.module.oauth2.internal.ApplicationCredentials;
-import org.mule.module.oauth2.internal.MuleEventLogger;
-import org.mule.module.oauth2.internal.OAuthConstants;
-import org.mule.module.oauth2.internal.TokenNotFoundException;
-import org.mule.module.oauth2.internal.TokenResponseProcessor;
-import org.mule.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
-import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
-import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
+import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.oauth2.internal.AbstractTokenRequestHandler;
+import org.mule.runtime.module.oauth2.internal.ApplicationCredentials;
+import org.mule.runtime.module.oauth2.internal.MuleEventLogger;
+import org.mule.runtime.module.oauth2.internal.OAuthConstants;
+import org.mule.runtime.module.oauth2.internal.TokenNotFoundException;
+import org.mule.runtime.module.oauth2.internal.TokenResponseProcessor;
+import org.mule.runtime.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
+import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.module.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.api.message.NullPayload;
 
 import java.util.HashMap;

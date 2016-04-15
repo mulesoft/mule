@@ -5,15 +5,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.config;
+package org.mule.runtime.module.db.integration.config;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.LocalMuleClient;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 

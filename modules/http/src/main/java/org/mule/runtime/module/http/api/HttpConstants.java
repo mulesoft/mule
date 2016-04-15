@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api;
+package org.mule.runtime.module.http.api;
 
-import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 
 /**
  * General purpose HTTP constants

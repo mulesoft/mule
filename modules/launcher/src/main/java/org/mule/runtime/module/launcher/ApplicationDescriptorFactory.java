@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher;
+package org.mule.runtime.module.launcher;
 
 import static java.lang.String.format;
-import static org.mule.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
+import static org.mule.runtime.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.module.artifact.descriptor.ArtifactDescriptorCreateException;
-import org.mule.module.artifact.descriptor.ArtifactDescriptorFactory;
-import org.mule.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.module.launcher.descriptor.EmptyApplicationDescriptor;
-import org.mule.module.launcher.descriptor.PropertiesDescriptorParser;
-import org.mule.module.launcher.plugin.ApplicationPluginDescriptor;
-import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.launcher.descriptor.EmptyApplicationDescriptor;
+import org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory;
+import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.core.util.StringUtils;

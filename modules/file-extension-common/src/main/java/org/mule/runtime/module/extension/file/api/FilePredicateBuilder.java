@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.file.api;
+package org.mule.runtime.module.extension.file.api;
 
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.param.Optional;
-import org.mule.module.extension.file.api.matcher.PathMatcherPredicate;
-import org.mule.module.extension.file.api.matcher.TimeSinceFunction;
-import org.mule.module.extension.file.api.matcher.TimeUntilFunction;
+import org.mule.runtime.module.extension.file.api.matcher.PathMatcherPredicate;
+import org.mule.runtime.module.extension.file.api.matcher.TimeSinceFunction;
+import org.mule.runtime.module.extension.file.api.matcher.TimeUntilFunction;
 
 import java.util.function.Predicate;
 

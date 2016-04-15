@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
-import static org.mule.module.cxf.HttpRequestPropertyManager.getBasePath;
-import static org.mule.module.cxf.HttpRequestPropertyManager.getRequestPath;
-import static org.mule.module.cxf.HttpRequestPropertyManager.getScheme;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
-import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
-import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.cxf.HttpRequestPropertyManager.getBasePath;
+import static org.mule.runtime.module.cxf.HttpRequestPropertyManager.getRequestPath;
+import static org.mule.runtime.module.cxf.HttpRequestPropertyManager.getScheme;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
@@ -31,9 +31,9 @@ import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
-import org.mule.module.cxf.support.DelegatingOutputStream;
-import org.mule.module.cxf.transport.MuleUniversalDestination;
-import org.mule.module.xml.stax.StaxSource;
+import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
+import org.mule.runtime.module.cxf.transport.MuleUniversalDestination;
+import org.mule.runtime.module.xml.stax.StaxSource;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.message.NullPayload;
@@ -481,7 +481,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     {
         // Only add soap headers if we can validate the bindings. if not, cxf will throw a fault in SoapActionInInterceptor
         // we cannot validate the bindings if we're using mule's pass-through invoke proxy service 
-        boolean isGenericProxy = "http://support.cxf.module.mule.org/"
+        boolean isGenericProxy = "http://support.cxf.module.runtime.mule.org/"
                 .equals(getServer().getEndpoint().getService().getName().getNamespaceURI()) && 
                 "ProxyService".equals(getServer().getEndpoint().getService().getName().getLocalPart());
         return !isGenericProxy;

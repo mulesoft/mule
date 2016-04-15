@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.pgp.config;
+package org.mule.runtime.module.pgp.config;
 
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
-import org.mule.module.pgp.KeyBasedEncryptionStrategy;
-import org.mule.module.pgp.PGPSecurityProvider;
-import org.mule.module.pgp.filters.PGPSecurityFilter;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.NamedDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
+import org.mule.runtime.module.pgp.KeyBasedEncryptionStrategy;
+import org.mule.runtime.module.pgp.PGPSecurityProvider;
+import org.mule.runtime.module.pgp.filters.PGPSecurityFilter;
 import org.mule.runtime.core.util.SecurityUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;

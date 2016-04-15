@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal;
+package org.mule.runtime.module.extension.internal;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
-import org.mule.module.extension.HeisenbergExtension;
+import org.mule.runtime.module.extension.HeisenbergExtension;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
 import org.junit.Test;

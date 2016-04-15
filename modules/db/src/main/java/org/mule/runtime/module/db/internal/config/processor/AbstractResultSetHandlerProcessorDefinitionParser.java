@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.processor;
+package org.mule.runtime.module.db.internal.config.processor;
 
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
-import org.mule.module.db.internal.result.resultset.IteratorResultSetHandler;
-import org.mule.module.db.internal.result.resultset.ListResultSetHandler;
-import org.mule.module.db.internal.result.row.InsensitiveMapRowHandler;
+import org.mule.runtime.module.db.internal.result.resultset.IteratorResultSetHandler;
+import org.mule.runtime.module.db.internal.result.resultset.ListResultSetHandler;
+import org.mule.runtime.module.db.internal.result.row.InsensitiveMapRowHandler;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

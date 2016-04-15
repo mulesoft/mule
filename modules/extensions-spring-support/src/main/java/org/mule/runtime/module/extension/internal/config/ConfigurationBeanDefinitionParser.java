@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.config;
+package org.mule.runtime.module.extension.internal.config;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
-import static org.mule.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_NAMESPACE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
+import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_NAMESPACE;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
 import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
-import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
-import org.mule.module.extension.internal.util.MuleExtensionUtils;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime;
+package org.mule.runtime.module.extension.internal.runtime;
 
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -28,11 +28,11 @@ import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.module.extension.internal.metadata.MetadataMediator;
-import org.mule.module.extension.internal.runtime.config.DynamicConfigurationProvider;
-import org.mule.module.extension.internal.runtime.processor.OperationMessageProcessor;
-import org.mule.module.extension.internal.runtime.source.ExtensionMessageSource;
+import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
+import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
+import org.mule.runtime.module.extension.internal.runtime.processor.OperationMessageProcessor;
+import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.List;

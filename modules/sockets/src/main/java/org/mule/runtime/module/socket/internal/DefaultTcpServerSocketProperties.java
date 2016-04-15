@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.socket.internal;
+package org.mule.runtime.module.socket.internal;
 
-import org.mule.module.socket.api.TcpServerSocketProperties;
+import org.mule.runtime.module.socket.api.TcpServerSocketProperties;
 
 /**
  * Default mutable implementation of the {@code TcpServerSocketProperties} interface.

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.db.integration.config;
+package org.mule.runtime.module.db.integration.config;
 
-import org.mule.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;

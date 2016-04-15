@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.config;
+package org.mule.runtime.module.cxf.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.module.cxf.wssec.ClientPasswordCallback;
+import org.mule.runtime.module.cxf.wssec.ClientPasswordCallback;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Map;
@@ -42,7 +42,7 @@ public class WsSecurityDefinitionParserTestCase extends FunctionalTestCase
         assertEquals(WSHandlerConstants.USERNAME_TOKEN, wsProperties.get(WSHandlerConstants.ACTION));
         assertEquals("joe", wsProperties.get(WSHandlerConstants.USER));
         assertEquals("PasswordText", wsProperties.get(WSHandlerConstants.PASSWORD_TYPE));
-        assertEquals("org.mule.module.cxf.wssec.ClientPasswordCallback", wsProperties.get(WSHandlerConstants.PW_CALLBACK_CLASS));
+        assertEquals("org.mule.runtime.module.cxf.wssec.ClientPasswordCallback", wsProperties.get(WSHandlerConstants.PW_CALLBACK_CLASS));
 
         assertNotNull(wsSecurity.getCustomValidator());
         assertFalse(wsSecurity.getCustomValidator().isEmpty());

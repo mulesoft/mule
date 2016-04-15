@@ -13,10 +13,10 @@ import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.FtpFileSystem;
 import org.mule.extension.ftp.api.FtpInputStream;
-import org.mule.module.extension.file.api.FileAttributes;
-import org.mule.module.extension.file.api.command.ReadCommand;
-import org.mule.module.extension.file.api.lock.NullPathLock;
-import org.mule.module.extension.file.api.lock.PathLock;
+import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.command.ReadCommand;
+import org.mule.runtime.module.extension.file.api.lock.NullPathLock;
+import org.mule.runtime.module.extension.file.api.lock.PathLock;
 
 import java.io.InputStream;
 import java.nio.file.Path;

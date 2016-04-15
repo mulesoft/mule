@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.artifact.classloader;
+package org.mule.runtime.module.artifact.classloader;
 
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
@@ -28,7 +28,7 @@ import org.junit.Test;
 public class ResourceReleaserTestCase extends AbstractMuleTestCase
 {
 
-    public static final String TEST_RESOURCE_RELEASER_CLASS_LOCATION = "/org/mule/module/artifact/classloader/TestResourceReleaser.class";
+    public static final String TEST_RESOURCE_RELEASER_CLASS_LOCATION = "/org/mule/runtime/module/artifact/classloader/TestResourceReleaser.class";
 
     @Test
     public void createdByCorrectArtifactClassLoader() throws Exception

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.builder;
+package org.mule.runtime.module.cxf.builder;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -12,10 +12,10 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.module.cxf.CxfConstants;
-import org.mule.module.cxf.CxfInboundMessageProcessor;
-import org.mule.module.cxf.MuleJAXWSInvoker;
-import org.mule.module.cxf.i18n.CxfMessages;
+import org.mule.runtime.module.cxf.CxfConstants;
+import org.mule.runtime.module.cxf.CxfInboundMessageProcessor;
+import org.mule.runtime.module.cxf.MuleJAXWSInvoker;
+import org.mule.runtime.module.cxf.i18n.CxfMessages;
 
 import javax.xml.namespace.QName;
 

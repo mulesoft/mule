@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.executor;
+package org.mule.runtime.module.db.internal.domain.executor;
 
 /**
  * Creates {@link BulkExecutor} instances

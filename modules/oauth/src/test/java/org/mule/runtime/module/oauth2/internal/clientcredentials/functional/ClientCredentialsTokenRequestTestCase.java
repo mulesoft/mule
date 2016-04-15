@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.clientcredentials.functional;
+package org.mule.runtime.module.oauth2.internal.clientcredentials.functional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 
-import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
+import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;

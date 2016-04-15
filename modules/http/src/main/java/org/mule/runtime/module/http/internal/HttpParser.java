@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal;
+package org.mule.runtime.module.http.internal;
 
 import static org.mule.runtime.core.util.StringUtils.WHITE_SPACE;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.module.http.internal.multipart.HttpPart;
+import org.mule.runtime.module.http.internal.multipart.HttpPart;
 import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.base.Charsets;

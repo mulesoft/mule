@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.enricher;
+package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static java.util.stream.Collectors.toList;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -13,9 +13,9 @@ import org.mule.extension.api.annotation.param.ConfigName;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
-import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
-import org.mule.module.extension.internal.model.property.RequireNameField;
+import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.RequireNameField;
 import org.mule.runtime.core.util.CollectionUtils;
 
 import com.google.common.base.Joiner;

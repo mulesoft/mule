@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.factories;
+package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;

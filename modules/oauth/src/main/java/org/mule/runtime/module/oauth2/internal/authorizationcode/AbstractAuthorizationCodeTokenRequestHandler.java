@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.authorizationcode;
+package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.module.http.api.listener.HttpListener;
-import org.mule.module.http.api.listener.HttpListenerBuilder;
-import org.mule.module.oauth2.internal.AbstractTokenRequestHandler;
-import org.mule.module.oauth2.internal.DynamicFlowFactory;
-import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.module.http.api.listener.HttpListener;
+import org.mule.runtime.module.http.api.listener.HttpListenerBuilder;
+import org.mule.runtime.module.oauth2.internal.AbstractTokenRequestHandler;
+import org.mule.runtime.module.oauth2.internal.DynamicFlowFactory;
+import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 
 import java.net.MalformedURLException;
 import java.net.URL;

@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.capability.xml.schema;
+package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
-import static org.mule.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
+import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
-import org.mule.module.extension.internal.capability.xml.schema.builder.SchemaBuilder;
-import org.mule.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
-import org.mule.module.extension.internal.capability.xml.schema.model.Schema;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.builder.SchemaBuilder;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
 
 import java.io.StringWriter;
 

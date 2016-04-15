@@ -5,15 +5,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.param;
+package org.mule.runtime.module.db.internal.resolver.param;
 
-import org.mule.module.db.internal.domain.connection.DbConnection;
-import org.mule.module.db.internal.domain.param.QueryParam;
-import org.mule.module.db.internal.domain.query.QueryTemplate;
-import org.mule.module.db.internal.domain.type.DbType;
-import org.mule.module.db.internal.domain.type.DbTypeManager;
-import org.mule.module.db.internal.domain.type.DynamicDbType;
-import org.mule.module.db.internal.domain.type.UnknownDbType;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
+import org.mule.runtime.module.db.internal.domain.param.QueryParam;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
+import org.mule.runtime.module.db.internal.domain.type.DbType;
+import org.mule.runtime.module.db.internal.domain.type.DbTypeManager;
+import org.mule.runtime.module.db.internal.domain.type.DynamicDbType;
+import org.mule.runtime.module.db.internal.domain.type.UnknownDbType;
 
 import java.sql.SQLException;
 import java.util.HashMap;

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.config;
+package org.mule.runtime.module.http.internal.config;
 
-import static org.mule.module.http.internal.listener.DefaultHttpListenerConfig.DEFAULT_MAX_THREADS;
+import static org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig.DEFAULT_MAX_THREADS;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;

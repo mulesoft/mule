@@ -1,6 +1,6 @@
-<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://consumer.ws.module.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="TestAttachmentsService" targetNamespace="http://consumer.ws.module.mule.org/">
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://consumer.ws.module.runtime.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="TestAttachmentsService" targetNamespace="http://consumer.ws.module.runtime.mule.org/">
   <wsdl:types>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://consumer.ws.module.mule.org/" elementFormDefault="unqualified" targetNamespace="http://consumer.ws.module.mule.org/" version="1.0">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://consumer.ws.module.runtime.mule.org/" elementFormDefault="unqualified" targetNamespace="http://consumer.ws.module.runtime.mule.org/" version="1.0">
    <xs:element name="downloadAttachment" type="tns:downloadAttachment"/>
    <xs:element name="downloadAttachmentResponse" type="tns:downloadAttachmentResponse"/>
    <xs:element name="echoAttachment" type="tns:echoAttachment"/>

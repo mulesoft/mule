@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.database;
+package org.mule.runtime.module.db.internal.domain.database;
 
 import java.util.Map;
 

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher;
+package org.mule.runtime.module.launcher;
 
 /**
- * Manages which {@link org.mule.module.launcher.DeploymentListener} are listening for domain deployment
+ * Manages which {@link org.mule.runtime.module.launcher.DeploymentListener} are listening for domain deployment
  * notifications.
  */
 public interface DomainDeploymentListenerManager

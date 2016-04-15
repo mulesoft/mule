@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.config;
+package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
@@ -20,9 +20,9 @@ import org.mule.extension.api.runtime.ConfigurationProvider;
 import org.mule.extension.api.runtime.ConfigurationStats;
 import org.mule.extension.api.runtime.ExpirableConfigurationProvider;
 import org.mule.extension.api.runtime.ExpirationPolicy;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import java.util.List;

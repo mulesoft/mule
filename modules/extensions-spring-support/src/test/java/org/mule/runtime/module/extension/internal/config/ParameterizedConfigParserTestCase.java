@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.config;
+package org.mule.runtime.module.extension.internal.config;
 
 import static java.util.Calendar.YEAR;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -19,13 +19,13 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
-import static org.mule.module.extension.HeisenbergExtension.AGE;
-import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
+import static org.mule.runtime.module.extension.HeisenbergExtension.AGE;
+import static org.mule.runtime.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.model.HealthStatus;
-import org.mule.module.extension.model.KnockeableDoor;
-import org.mule.module.extension.model.Ricin;
+import org.mule.runtime.module.extension.HeisenbergExtension;
+import org.mule.runtime.module.extension.model.HealthStatus;
+import org.mule.runtime.module.extension.model.KnockeableDoor;
+import org.mule.runtime.module.extension.model.Ricin;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

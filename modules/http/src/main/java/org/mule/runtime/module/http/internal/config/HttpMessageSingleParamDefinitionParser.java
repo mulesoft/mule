@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.config;
+package org.mule.runtime.module.http.internal.config;
 
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.module.http.internal.HttpParam;
-import org.mule.module.http.internal.HttpParamType;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.module.http.internal.HttpParam;
+import org.mule.runtime.module.http.internal.HttpParamType;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;

@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api.requester;
+package org.mule.runtime.module.http.api.requester;
 
 import static java.lang.String.valueOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-import static org.mule.module.http.api.requester.HttpSendBodyMode.ALWAYS;
-import static org.mule.module.http.api.requester.HttpStreamingType.AUTO;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.runtime.module.http.api.requester.HttpSendBodyMode.ALWAYS;
+import static org.mule.runtime.module.http.api.requester.HttpStreamingType.AUTO;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.module.http.api.HttpAuthentication;
-import org.mule.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.runtime.module.http.api.HttpAuthentication;
+import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.api.tls.TlsContextFactory;

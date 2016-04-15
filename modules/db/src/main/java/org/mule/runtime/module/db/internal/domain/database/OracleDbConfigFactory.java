@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.database;
+package org.mule.runtime.module.db.internal.domain.database;
 
-import org.mule.module.db.internal.domain.type.DbType;
-import org.mule.module.db.internal.domain.type.ResolvedDbType;
-import org.mule.module.db.internal.domain.type.oracle.OracleXmlType;
+import org.mule.runtime.module.db.internal.domain.type.DbType;
+import org.mule.runtime.module.db.internal.domain.type.ResolvedDbType;
+import org.mule.runtime.module.db.internal.domain.type.oracle.OracleXmlType;
 
 import java.util.ArrayList;
 import java.util.List;

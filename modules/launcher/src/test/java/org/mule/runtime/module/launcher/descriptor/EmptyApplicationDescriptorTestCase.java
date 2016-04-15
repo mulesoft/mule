@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.descriptor;
+package org.mule.runtime.module.launcher.descriptor;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.MuleServer;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;

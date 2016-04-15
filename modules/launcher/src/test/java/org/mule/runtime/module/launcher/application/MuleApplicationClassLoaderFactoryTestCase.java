@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.application;
+package org.mule.runtime.module.launcher.application;
 
 import static java.lang.System.setProperty;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -15,15 +15,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.module.launcher.MuleFoldersUtil.getAppClassesFolder;
-import static org.mule.module.launcher.MuleFoldersUtil.getAppLibFolder;
-import static org.mule.module.launcher.MuleFoldersUtil.getMulePerAppLibFolder;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getAppClassesFolder;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getAppLibFolder;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getMulePerAppLibFolder;
 import static org.mule.runtime.core.util.FileUtils.stringToFile;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.module.launcher.MuleApplicationClassLoader;
-import org.mule.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.module.launcher.nativelib.NativeLibraryFinderFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.launcher.MuleApplicationClassLoader;
+import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.launcher.nativelib.NativeLibraryFinderFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.FileUtils;
 

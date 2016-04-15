@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.db.internal.config.domain.database;
+package org.mule.runtime.module.db.internal.config.domain.database;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.mock;

@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.scripting.transformer;
+package org.mule.runtime.module.scripting.transformer;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.module.scripting.component.Scriptable;
+import org.mule.runtime.module.scripting.component.Scriptable;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import javax.script.Bindings;

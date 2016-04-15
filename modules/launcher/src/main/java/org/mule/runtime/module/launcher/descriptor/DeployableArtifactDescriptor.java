@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.descriptor;
+package org.mule.runtime.module.launcher.descriptor;
 
-import org.mule.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 /**
  * Describes an artifact that is deployable on the container

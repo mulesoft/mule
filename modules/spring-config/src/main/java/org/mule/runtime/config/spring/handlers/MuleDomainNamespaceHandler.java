@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.handlers;
+package org.mule.runtime.config.spring.handlers;
 
 /**
  * This is the domain namespace handler for Mule domains and configures all domains configuration elements under the

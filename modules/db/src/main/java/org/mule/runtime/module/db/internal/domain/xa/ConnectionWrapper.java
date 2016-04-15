@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.xa;
+package org.mule.runtime.module.db.internal.domain.xa;
 
 
 import org.mule.runtime.core.api.transaction.Transaction;

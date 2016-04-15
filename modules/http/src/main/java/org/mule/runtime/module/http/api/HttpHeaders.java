@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api;
+package org.mule.runtime.module.http.api;
 
 /**
  * Provides the constants for the standard HTTP header names and values

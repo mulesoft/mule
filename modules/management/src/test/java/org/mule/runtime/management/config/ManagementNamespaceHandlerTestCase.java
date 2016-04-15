@@ -14,10 +14,10 @@ import org.mule.runtime.core.agent.Log4jNotificationLoggerAgent;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.module.management.agent.JmxApplicationAgent;
-import org.mule.module.management.agent.JmxServerNotificationAgent;
-import org.mule.module.management.agent.Log4jAgent;
-import org.mule.module.management.agent.Mx4jAgent;
+import org.mule.runtime.module.management.agent.JmxApplicationAgent;
+import org.mule.runtime.module.management.agent.JmxServerNotificationAgent;
+import org.mule.runtime.module.management.agent.Log4jAgent;
+import org.mule.runtime.module.management.agent.Mx4jAgent;
 import org.mule.tck.testmodels.mule.TestAgent;
 
 import java.util.Collection;

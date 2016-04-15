@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api.requester;
+package org.mule.runtime.module.http.api.requester;
 
 import static java.lang.String.valueOf;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -13,16 +13,16 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.api.tls.TlsContextFactoryBuilder;
-import org.mule.module.http.api.HttpAuthentication;
-import org.mule.module.http.api.HttpConstants;
-import org.mule.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
+import org.mule.runtime.module.http.api.HttpAuthentication;
+import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.runtime.core.util.ObjectNameHelper;
 
 /**
  * Builder for creating http request configs pragmatically.
  *
- * {@link org.mule.module.http.api.requester.HttpRequesterConfig} created by the builder
+ * {@link org.mule.runtime.module.http.api.requester.HttpRequesterConfig} created by the builder
  * will be initialized. The lifecycle of the created object must be managed by the client of this class.
  */
 public class HttpRequesterConfigBuilder
@@ -38,8 +38,8 @@ public class HttpRequesterConfigBuilder
     }
 
     /**
-     * To create instances of {@link org.mule.module.http.api.HttpAuthentication} use
-     * {@link org.mule.module.http.api.requester.authentication.BasicAuthenticationBuilder}
+     * To create instances of {@link org.mule.runtime.module.http.api.HttpAuthentication} use
+     * {@link org.mule.runtime.module.http.api.requester.authentication.BasicAuthenticationBuilder}
      *
      * @param authentication authentication configuration to use for requests.
      * @return the builder
@@ -64,9 +64,9 @@ public class HttpRequesterConfigBuilder
     }
 
     /**
-     * To create instances of {@link org.mule.module.http.api.requester.proxy.ProxyConfig}
-     * use {@link org.mule.module.http.api.requester.proxy.NtlmProxyConfigBuilder} or
-     * {@link org.mule.module.http.api.requester.proxy.ProxyConfigBuilder}
+     * To create instances of {@link org.mule.runtime.module.http.api.requester.proxy.ProxyConfig}
+     * use {@link org.mule.runtime.module.http.api.requester.proxy.NtlmProxyConfigBuilder} or
+     * {@link org.mule.runtime.module.http.api.requester.proxy.ProxyConfigBuilder}
      *
      * @param proxyConfig proxy configuration for outgoing HTTP request
      * @return the builder
@@ -192,11 +192,11 @@ public class HttpRequesterConfigBuilder
 
     /**
      * @param sendBodyMode
-     *  {@link org.mule.module.http.api.requester.HttpSendBodyMode#ALWAYS} if not matter the HTTP method
+     *  {@link org.mule.runtime.module.http.api.requester.HttpSendBodyMode#ALWAYS} if not matter the HTTP method
      *  the payload should be sent as the request body
-     *  {@link org.mule.module.http.api.requester.HttpSendBodyMode#NEVER} if not matter the HTTP method
+     *  {@link org.mule.runtime.module.http.api.requester.HttpSendBodyMode#NEVER} if not matter the HTTP method
      *  the payload never should be sent as the request body
-     *  {@link org.mule.module.http.api.requester.HttpSendBodyMode#AUTO} if the payload will be sent
+     *  {@link org.mule.runtime.module.http.api.requester.HttpSendBodyMode#AUTO} if the payload will be sent
      *   as the request body based on the HTTP request method.
      * @return the builder
      */
@@ -207,11 +207,11 @@ public class HttpRequesterConfigBuilder
 
     /**
      * @param sendBodyMode an expression that resolves:
-     *  {@link org.mule.module.http.api.requester.HttpSendBodyMode#ALWAYS} if not matter the HTTP method
+     *  {@link org.mule.runtime.module.http.api.requester.HttpSendBodyMode#ALWAYS} if not matter the HTTP method
      *  the payload should be sent as the request body
-     *  {@link org.mule.module.http.api.requester.HttpSendBodyMode#NEVER} if not matter the HTTP method
+     *  {@link org.mule.runtime.module.http.api.requester.HttpSendBodyMode#NEVER} if not matter the HTTP method
      *  the payload never should be sent as the request body
-     *  {@link org.mule.module.http.api.requester.HttpSendBodyMode#AUTO} if the payload will be sent
+     *  {@link org.mule.runtime.module.http.api.requester.HttpSendBodyMode#AUTO} if the payload will be sent
      *   as the request body based on the HTTP request method.
      * @return the builder
      */
@@ -223,11 +223,11 @@ public class HttpRequesterConfigBuilder
 
     /**
      * @param requestStreamingMode
-     *  {@link org.mule.module.http.api.requester.HttpStreamingType#ALWAYS} if the request always
+     *  {@link org.mule.runtime.module.http.api.requester.HttpStreamingType#ALWAYS} if the request always
      *  will be sent using Transfer-Encoding: chunked
-     *  {@link org.mule.module.http.api.requester.HttpStreamingType#NEVER} if the request never
+     *  {@link org.mule.runtime.module.http.api.requester.HttpStreamingType#NEVER} if the request never
      *  will be sent using Transfer-Encoding: chunked
-     *  {@link org.mule.module.http.api.requester.HttpStreamingType#AUTO} if the request
+     *  {@link org.mule.runtime.module.http.api.requester.HttpStreamingType#AUTO} if the request
      *  will be sent using Transfer-Encoding: chunked based on the payload content. If the payload is an stream then
      *  it will be sent using Transfer-Encoding: chunked
      * @return
@@ -239,11 +239,11 @@ public class HttpRequesterConfigBuilder
 
     /**
      * @param requestStreamingMode an expression that resovles to:
-     *  {@link org.mule.module.http.api.requester.HttpStreamingType#ALWAYS} if the request always
+     *  {@link org.mule.runtime.module.http.api.requester.HttpStreamingType#ALWAYS} if the request always
      *  will be sent using Transfer-Encoding: chunked
-     *  {@link org.mule.module.http.api.requester.HttpStreamingType#NEVER} if the request never
+     *  {@link org.mule.runtime.module.http.api.requester.HttpStreamingType#NEVER} if the request never
      *  will be sent using Transfer-Encoding: chunked
-     *  {@link org.mule.module.http.api.requester.HttpStreamingType#AUTO} if the request
+     *  {@link org.mule.runtime.module.http.api.requester.HttpStreamingType#AUTO} if the request
      *  will be sent using Transfer-Encoding: chunked based on the payload content. If the payload is an stream then
      *  it will be sent using Transfer-Encoding: chunked
      * @return
@@ -257,7 +257,7 @@ public class HttpRequesterConfigBuilder
     /**
      * Builder the request config and initializes it.
      *
-     * @return an {@link org.mule.module.http.api.requester.HttpRequesterConfig} created with the
+     * @return an {@link org.mule.runtime.module.http.api.requester.HttpRequesterConfig} created with the
      *  provided configuration.
      * @throws MuleException
      */

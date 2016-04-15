@@ -5,16 +5,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.result.statement;
+package org.mule.runtime.module.db.internal.result.statement;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.module.db.internal.domain.query.QueryType.STORE_PROCEDURE_CALL;
-import org.mule.module.db.internal.domain.connection.DbConnection;
-import org.mule.module.db.internal.domain.param.QueryParam;
-import org.mule.module.db.internal.domain.query.QueryTemplate;
+import static org.mule.runtime.module.db.internal.domain.query.QueryType.STORE_PROCEDURE_CALL;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
+import org.mule.runtime.module.db.internal.domain.param.QueryParam;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

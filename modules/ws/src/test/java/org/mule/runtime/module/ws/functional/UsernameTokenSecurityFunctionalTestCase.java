@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.ws.functional;
+package org.mule.runtime.module.ws.functional;
 
 import org.mule.tck.junit4.rule.SystemProperty;
 

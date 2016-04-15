@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.application;
+package org.mule.runtime.module.launcher.application;
 
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.lang.ClassUtils.getPackageName;
-import static org.mule.module.launcher.application.MuleApplicationClassLoaderFactory.CLASS_EXTENSION;
+import static org.mule.runtime.module.launcher.application.MuleApplicationClassLoaderFactory.CLASS_EXTENSION;
 
 import java.io.File;
 import java.io.FileInputStream;

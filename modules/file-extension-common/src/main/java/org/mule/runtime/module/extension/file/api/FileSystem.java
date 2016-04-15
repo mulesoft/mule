@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.file.api;
+package org.mule.runtime.module.extension.file.api;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.module.extension.file.api.lock.PathLock;
+import org.mule.runtime.module.extension.file.api.lock.PathLock;
 import org.mule.api.message.NullPayload;
 
 import java.io.InputStream;

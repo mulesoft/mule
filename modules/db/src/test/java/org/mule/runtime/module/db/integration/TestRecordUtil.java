@@ -5,20 +5,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration;
+package org.mule.runtime.module.db.integration;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.module.db.integration.matcher.FieldMatcher.containsField;
-import static org.mule.module.db.integration.model.Planet.EARTH;
-import static org.mule.module.db.integration.model.Planet.MARS;
-import static org.mule.module.db.integration.model.Planet.VENUS;
+import static org.mule.runtime.module.db.integration.matcher.FieldMatcher.containsField;
+import static org.mule.runtime.module.db.integration.model.Planet.EARTH;
+import static org.mule.runtime.module.db.integration.model.Planet.MARS;
+import static org.mule.runtime.module.db.integration.model.Planet.VENUS;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.db.integration.model.Alien;
-import org.mule.module.db.integration.model.Field;
-import org.mule.module.db.integration.model.Record;
-import org.mule.module.db.integration.model.XmlField;
+import org.mule.runtime.module.db.integration.model.Alien;
+import org.mule.runtime.module.db.integration.model.Field;
+import org.mule.runtime.module.db.integration.model.Record;
+import org.mule.runtime.module.db.integration.model.XmlField;
 
 import java.util.List;
 import java.util.Map;

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.log4j2;
+package org.mule.runtime.module.launcher.log4j2;
 
 import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.artifact.classloader.ShutdownListener;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ShutdownListener;
 
 import java.net.URI;
 import java.util.List;

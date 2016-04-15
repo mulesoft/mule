@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal;
+package org.mule.runtime.module.oauth2.internal;
 
 /**
  * Configuration of a custom parameter to extract from the token response.

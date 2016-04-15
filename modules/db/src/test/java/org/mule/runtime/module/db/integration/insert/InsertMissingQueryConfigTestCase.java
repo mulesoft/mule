@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.insert;
+package org.mule.runtime.module.db.integration.insert;
 
-import org.mule.module.db.integration.config.AbstractMissingQueryConfigTestCase;
+import org.mule.runtime.module.db.integration.config.AbstractMissingQueryConfigTestCase;
 
 public class InsertMissingQueryConfigTestCase extends AbstractMissingQueryConfigTestCase
 {

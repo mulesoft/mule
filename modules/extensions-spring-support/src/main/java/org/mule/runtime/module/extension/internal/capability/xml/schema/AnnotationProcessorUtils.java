@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.capability.xml.schema;
+package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.Operations;
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.annotation.ParameterGroup;
 import org.mule.extension.api.annotation.param.Ignore;
-import org.mule.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.core.util.ClassUtils;
 
 import com.google.common.collect.ImmutableMap;

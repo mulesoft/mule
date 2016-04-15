@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.application;
+package org.mule.runtime.module.launcher.application;
 
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -14,8 +14,8 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -23,7 +23,7 @@ import org.mule.tck.probe.PollingProber;
 import org.junit.Test;
 
 /**
- * This tests verifies that the {@link org.mule.module.launcher.application.DefaultMuleApplication}
+ * This tests verifies that the {@link org.mule.runtime.module.launcher.application.DefaultMuleApplication}
  * status is set correctly depending on its {@link org.mule.runtime.core.api.MuleContext}'s lifecycle phase
  */
 public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTestCase

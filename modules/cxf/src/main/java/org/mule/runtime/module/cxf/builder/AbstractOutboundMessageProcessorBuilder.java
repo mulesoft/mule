@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.builder;
+package org.mule.runtime.module.cxf.builder;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -12,12 +12,12 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
-import org.mule.module.cxf.CxfConfiguration;
-import org.mule.module.cxf.CxfOutboundMessageProcessor;
-import org.mule.module.cxf.CxfPayloadToArguments;
-import org.mule.module.cxf.config.WsSecurity;
-import org.mule.module.cxf.support.MuleHeadersInInterceptor;
-import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
+import org.mule.runtime.module.cxf.CxfConfiguration;
+import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
+import org.mule.runtime.module.cxf.CxfPayloadToArguments;
+import org.mule.runtime.module.cxf.config.WsSecurity;
+import org.mule.runtime.module.cxf.support.MuleHeadersInInterceptor;
+import org.mule.runtime.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.runtime.core.transformer.types.MimeTypes;
 
 import java.lang.reflect.Method;

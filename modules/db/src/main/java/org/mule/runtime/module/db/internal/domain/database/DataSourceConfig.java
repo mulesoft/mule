@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.database;
+package org.mule.runtime.module.db.internal.domain.database;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
+import org.mule.runtime.module.db.internal.domain.connection.DbPoolingProfile;
 import org.mule.runtime.core.util.StringUtils;
 
 /**

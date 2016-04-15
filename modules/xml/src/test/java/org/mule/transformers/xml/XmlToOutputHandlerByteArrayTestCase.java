@@ -9,7 +9,7 @@ package org.mule.runtime.core.transformers.xml;
 import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.module.xml.transformer.XmlToOutputHandler;
+import org.mule.runtime.module.xml.transformer.XmlToOutputHandler;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 

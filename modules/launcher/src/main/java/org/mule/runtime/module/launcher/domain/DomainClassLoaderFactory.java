@@ -4,28 +4,28 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.domain;
+package org.mule.runtime.module.launcher.domain;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.io.FileUtils.listFiles;
-import static org.mule.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
-import static org.mule.module.launcher.MuleFoldersUtil.getDomainLibFolder;
-import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainLibFolder;
+import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.module.artifact.classloader.ClassLoaderLookupStrategy;
-import org.mule.module.artifact.classloader.ShutdownListener;
-import org.mule.module.launcher.DeploymentException;
-import org.mule.module.launcher.MuleFoldersUtil;
-import org.mule.module.launcher.MuleSharedDomainClassLoader;
-import org.mule.module.launcher.application.FilePackageDiscoverer;
-import org.mule.module.launcher.application.PackageDiscoverer;
-import org.mule.module.launcher.descriptor.DomainDescriptor;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
+import org.mule.runtime.module.artifact.classloader.ShutdownListener;
+import org.mule.runtime.module.launcher.DeploymentException;
+import org.mule.runtime.module.launcher.MuleFoldersUtil;
+import org.mule.runtime.module.launcher.MuleSharedDomainClassLoader;
+import org.mule.runtime.module.launcher.application.FilePackageDiscoverer;
+import org.mule.runtime.module.launcher.application.PackageDiscoverer;
+import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
+import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.core.util.SystemUtils;
 

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.describer;
+package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.extension.api.annotation.Extension;
-import org.mule.module.extension.internal.introspection.VersionResolver;
+import org.mule.runtime.module.extension.internal.introspection.VersionResolver;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.io.IOException;

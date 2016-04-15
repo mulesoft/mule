@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.management.agent;
+package org.mule.runtime.module.management.agent;
 
 import org.mule.runtime.core.AbstractAgent;
 import org.mule.runtime.core.api.MuleException;
@@ -16,20 +16,20 @@ import org.mule.runtime.core.construct.AbstractFlowConstruct;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-import org.mule.module.management.i18n.ManagementMessages;
-import org.mule.module.management.mbean.ApplicationService;
-import org.mule.module.management.mbean.FlowConstructService;
-import org.mule.module.management.mbean.FlowConstructServiceMBean;
-import org.mule.module.management.mbean.MuleConfigurationService;
-import org.mule.module.management.mbean.MuleConfigurationServiceMBean;
-import org.mule.module.management.mbean.MuleService;
-import org.mule.module.management.mbean.MuleServiceMBean;
-import org.mule.module.management.mbean.StatisticsService;
-import org.mule.module.management.mbean.StatisticsServiceMBean;
-import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
-import org.mule.module.management.support.JmxSupport;
-import org.mule.module.management.support.JmxSupportFactory;
-import org.mule.module.management.support.SimplePasswordJmxAuthenticator;
+import org.mule.runtime.module.management.i18n.ManagementMessages;
+import org.mule.runtime.module.management.mbean.ApplicationService;
+import org.mule.runtime.module.management.mbean.FlowConstructService;
+import org.mule.runtime.module.management.mbean.FlowConstructServiceMBean;
+import org.mule.runtime.module.management.mbean.MuleConfigurationService;
+import org.mule.runtime.module.management.mbean.MuleConfigurationServiceMBean;
+import org.mule.runtime.module.management.mbean.MuleService;
+import org.mule.runtime.module.management.mbean.MuleServiceMBean;
+import org.mule.runtime.module.management.mbean.StatisticsService;
+import org.mule.runtime.module.management.mbean.StatisticsServiceMBean;
+import org.mule.runtime.module.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.runtime.module.management.support.JmxSupport;
+import org.mule.runtime.module.management.support.JmxSupportFactory;
+import org.mule.runtime.module.management.support.SimplePasswordJmxAuthenticator;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.lang.management.ManagementFactory;

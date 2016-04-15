@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api.client;
+package org.mule.runtime.module.http.api.client;
 
 import org.mule.runtime.core.api.client.AbstractBaseOptionsBuilder;
-import org.mule.module.http.api.requester.HttpRequesterConfig;
-import org.mule.module.http.api.requester.HttpStreamingType;
-import org.mule.module.http.internal.request.client.DefaultHttpRequestOptions;
+import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
+import org.mule.runtime.module.http.api.requester.HttpStreamingType;
+import org.mule.runtime.module.http.internal.request.client.DefaultHttpRequestOptions;
 import org.mule.api.tls.TlsContextFactory;
 
 /**
- * Builder object for {@link org.mule.module.http.api.client.HttpRequestOptions}
+ * Builder object for {@link org.mule.runtime.module.http.api.client.HttpRequestOptions}
  */
 public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRequestOptionsBuilder, HttpRequestOptions>
 {
@@ -107,7 +107,7 @@ public class HttpRequestOptionsBuilder extends AbstractBaseOptionsBuilder<HttpRe
     }
 
     /**
-     * @return a {@link org.mule.module.http.api.client.HttpRequestOptions} instance
+     * @return a {@link org.mule.runtime.module.http.api.client.HttpRequestOptions} instance
      */
     @Override
     public HttpRequestOptions build()

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.config;
+package org.mule.runtime.module.xml.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -14,10 +14,10 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.jaxb.model.Person;
-import org.mule.module.xml.filters.SchemaValidationFilter;
-import org.mule.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
-import org.mule.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
-import org.mule.module.xml.util.NamespaceManager;
+import org.mule.runtime.module.xml.filters.SchemaValidationFilter;
+import org.mule.runtime.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
+import org.mule.runtime.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
+import org.mule.runtime.module.xml.util.NamespaceManager;
 
 import org.junit.Test;
 import org.w3c.dom.ls.LSInput;

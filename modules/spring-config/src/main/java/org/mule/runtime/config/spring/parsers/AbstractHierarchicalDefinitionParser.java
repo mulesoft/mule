@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.runtime.config.spring.parsers;
 
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
-import org.mule.config.spring.parsers.assembly.configuration.TempWrapperPropertyConfiguration;
-import org.mule.config.spring.util.SpringXMLUtils;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.TempWrapperPropertyConfiguration;
+import org.mule.runtime.config.spring.util.SpringXMLUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -25,9 +25,9 @@ import org.w3c.dom.Element;
  * <p>
  * Calling classes must set the registry at the start of processing.
  *
- * @see org.mule.config.spring.parsers.generic.ChildDefinitionParser
- * @see org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser.KeyValuePair
- * @see org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser
+ * @see org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser
+ * @see org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser.KeyValuePair
+ * @see org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser
  */
 public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleBeanDefinitionParser
 {

@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.util;
+package org.mule.runtime.module.xml.util;
 
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.module.xml.stax.DelegateXMLStreamReader;
-import org.mule.module.xml.stax.StaxSource;
-import org.mule.module.xml.transformer.DelayedResult;
-import org.mule.module.xml.transformer.XmlToDomDocument;
+import org.mule.runtime.module.xml.stax.DelegateXMLStreamReader;
+import org.mule.runtime.module.xml.stax.StaxSource;
+import org.mule.runtime.module.xml.transformer.DelayedResult;
+import org.mule.runtime.module.xml.transformer.XmlToDomDocument;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -198,7 +198,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils
 
     /**
      * Converts a payload to a {@link org.w3c.dom.Document} representation.
-     * <p> Reproduces the behavior from {@link org.mule.module.xml.util.XMLUtils#toDocument(Object, MuleContext)}
+     * <p> Reproduces the behavior from {@link org.mule.runtime.module.xml.util.XMLUtils#toDocument(Object, MuleContext)}
      * which works converting to {@link org.dom4j.Document}.
      *
      * @param payload the payload to convert.
@@ -292,9 +292,9 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils
         {
             return (javax.xml.stream.XMLStreamReader) obj;
         }
-        else if (obj instanceof org.mule.module.xml.stax.StaxSource)
+        else if (obj instanceof org.mule.runtime.module.xml.stax.StaxSource)
         {
-            return ((org.mule.module.xml.stax.StaxSource) obj).getXMLStreamReader();
+            return ((org.mule.runtime.module.xml.stax.StaxSource) obj).getXMLStreamReader();
         }
         else if (obj instanceof javax.xml.transform.Source)
         {
@@ -447,7 +447,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils
     {
         if (useStaxSource)
         {
-            return new org.mule.module.xml.stax.StaxSource(xmlInputFactory.createXMLStreamReader(stream));
+            return new org.mule.runtime.module.xml.stax.StaxSource(xmlInputFactory.createXMLStreamReader(stream));
         }
         else 
         {

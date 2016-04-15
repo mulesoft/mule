@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.log4j2;
+package org.mule.runtime.module.launcher.log4j2;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -15,9 +15,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.launcher.application.CompositeApplicationClassLoader;
-import org.mule.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.launcher.application.CompositeApplicationClassLoader;
+import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;

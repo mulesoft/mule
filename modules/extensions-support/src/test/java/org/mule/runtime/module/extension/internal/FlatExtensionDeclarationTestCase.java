@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal;
+package org.mule.runtime.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -62,10 +62,10 @@ import static org.mule.extension.api.introspection.declaration.tck.TestWebServic
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarer.WS_CONSUMER;
 import static org.mule.extension.api.introspection.declaration.tck.TestWebServiceConsumerDeclarer.WS_CONSUMER_DESCRIPTION;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
-import static org.mule.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.extension.api.introspection.config.ConfigurationFactory;
 import org.mule.extension.api.introspection.config.ConfigurationModel;
@@ -88,9 +88,9 @@ import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
-import org.mule.module.extension.internal.exception.IllegalOperationModelDefinitionException;
-import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
-import org.mule.module.extension.internal.introspection.DefaultExtensionFactory;
+import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.tck.size.SmallTest;
 
 import java.io.InputStream;

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.logger;
+package org.mule.runtime.module.db.internal.domain.logger;
 
 /**
  * Base class for query loggers that logs nothing

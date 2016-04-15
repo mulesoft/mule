@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.authorizationcode;
+package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.module.oauth2.internal.StateDecoder;
-import org.mule.module.oauth2.internal.StateEncoder;
+import org.mule.runtime.module.oauth2.internal.StateDecoder;
+import org.mule.runtime.module.oauth2.internal.StateEncoder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

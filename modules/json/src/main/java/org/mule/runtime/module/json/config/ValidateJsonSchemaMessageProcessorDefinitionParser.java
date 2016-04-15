@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.json.config;
+package org.mule.runtime.module.json.config;
 
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.module.json.validation.ValidateJsonSchemaMessageProcessor;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.functional;
+package org.mule.runtime.module.ws.functional;
 
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
@@ -26,7 +26,7 @@ public class NoParamsFunctionalTestCase extends AbstractWSConsumerFunctionalTest
     public void payloadIsIgnoredOperationNoParams() throws Exception
     {
         MuleEvent event = flowRunner("noParams").withPayload(TEST_MESSAGE).run();
-        String expectedResponse = "<ns:noParamsResponse xmlns:ns=\"http://consumer.ws.module.mule.org/\">" +
+        String expectedResponse = "<ns:noParamsResponse xmlns:ns=\"http://consumer.ws.module.runtime.mule.org/\">" +
                                   "<text>TEST</text></ns:noParamsResponse>";
         assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
     }
@@ -34,12 +34,12 @@ public class NoParamsFunctionalTestCase extends AbstractWSConsumerFunctionalTest
     @Test
     public void payloadIsIgnoredOperationNoParamsWithHeaders() throws Exception
     {
-        String header = "<header xmlns=\"http://consumer.ws.module.mule.org/\">HEADER_VALUE</header>";
+        String header = "<header xmlns=\"http://consumer.ws.module.runtime.mule.org/\">HEADER_VALUE</header>";
         MuleEvent event = flowRunner("noParamsWithHeader").withPayload(TEST_MESSAGE)
                                                           .withOutboundProperty("soap.header", header)
                                                           .run();
 
-        String expectedResponse = "<ns2:noParamsWithHeaderResponse xmlns:ns2=\"http://consumer.ws.module.mule.org/\">" +
+        String expectedResponse = "<ns2:noParamsWithHeaderResponse xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\">" +
                                   "<text>HEADER_VALUE</text></ns2:noParamsWithHeaderResponse>";
         assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
     }

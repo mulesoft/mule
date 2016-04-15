@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.file.api.matcher;
+package org.mule.runtime.module.extension.file.api.matcher;
 
 import java.time.LocalDateTime;
 import java.util.function.BiFunction;

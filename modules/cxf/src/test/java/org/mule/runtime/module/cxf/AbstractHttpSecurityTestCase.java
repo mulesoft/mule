@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener;
+package org.mule.runtime.module.http.internal.listener;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -16,13 +16,13 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
-import static org.mule.module.http.api.HttpHeaders.Names.HOST;
-import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_0;
-import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_1;
-import static org.mule.module.http.internal.listener.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
+import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0;
+import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_1;
+import static org.mule.runtime.module.http.internal.listener.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
 
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -33,16 +33,16 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
-import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
-import org.mule.module.http.internal.domain.HttpProtocol;
-import org.mule.module.http.internal.domain.request.ClientConnection;
-import org.mule.module.http.internal.domain.request.HttpRequest;
-import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.module.http.internal.domain.response.HttpResponse;
-import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.module.http.internal.listener.async.RequestHandler;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
-import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
+import org.mule.runtime.module.http.internal.domain.HttpProtocol;
+import org.mule.runtime.module.http.internal.domain.request.ClientConnection;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
+import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
+import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCallback;
+import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
+import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
+import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

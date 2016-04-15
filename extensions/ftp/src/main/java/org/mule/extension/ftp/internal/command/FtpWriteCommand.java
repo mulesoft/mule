@@ -10,11 +10,11 @@ import static java.lang.String.format;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileSystem;
-import org.mule.module.extension.file.api.FileAttributes;
-import org.mule.module.extension.file.api.FileWriteMode;
-import org.mule.module.extension.file.api.command.WriteCommand;
-import org.mule.module.extension.file.api.FileContentWrapper;
-import org.mule.module.extension.file.api.FileWriterVisitor;
+import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileWriteMode;
+import org.mule.runtime.module.extension.file.api.command.WriteCommand;
+import org.mule.runtime.module.extension.file.api.FileContentWrapper;
+import org.mule.runtime.module.extension.file.api.FileWriterVisitor;
 
 import java.io.OutputStream;
 import java.nio.file.Path;

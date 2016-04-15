@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.connection;
+package org.mule.runtime.module.db.internal.domain.connection;
 
-import org.mule.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.runtime.module.db.internal.domain.transaction.TransactionalAction;
 
 import java.sql.SQLException;
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.authorizationcode.functional;
+package org.mule.runtime.module.oauth2.internal.authorizationcode.functional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.findAll;
@@ -15,18 +15,18 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.internal.HttpParser;
-import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
-import org.mule.module.oauth2.asserter.AuthorizationRequestAsserter;
-import org.mule.module.oauth2.asserter.OAuthContextFunctionAsserter;
-import org.mule.module.oauth2.internal.OAuthConstants;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.runtime.module.oauth2.AbstractOAuthAuthorizationTestCase;
+import org.mule.runtime.module.oauth2.asserter.AuthorizationRequestAsserter;
+import org.mule.runtime.module.oauth2.asserter.OAuthContextFunctionAsserter;
+import org.mule.runtime.module.oauth2.internal.OAuthConstants;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.api.message.NullPayload;
-import org.mule.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.api.tls.TlsContextFactory;
 
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;

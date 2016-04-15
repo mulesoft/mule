@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.domain.request;
+package org.mule.runtime.module.http.internal.domain.request;
 
-import org.mule.module.http.internal.domain.HttpMessage;
-import org.mule.module.http.internal.domain.HttpProtocol;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.runtime.module.http.internal.domain.HttpMessage;
+import org.mule.runtime.module.http.internal.domain.HttpProtocol;
+import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 
 public interface HttpRequest extends HttpMessage
 {

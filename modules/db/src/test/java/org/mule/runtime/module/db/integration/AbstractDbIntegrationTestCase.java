@@ -5,17 +5,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration;
+package org.mule.runtime.module.db.integration;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.db.integration.DbTestUtil.selectData;
-import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.integration.model.Field;
-import org.mule.module.db.integration.model.Record;
-import org.mule.module.db.internal.domain.database.DbConfig;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
+import static org.mule.runtime.module.db.integration.DbTestUtil.selectData;
+import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecords;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.model.Field;
+import org.mule.runtime.module.db.integration.model.Record;
+import org.mule.runtime.module.db.internal.domain.database.DbConfig;
+import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.sql.SQLException;

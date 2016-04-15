@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.validation;
+package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
@@ -18,7 +18,7 @@ import org.mule.extension.api.introspection.operation.OperationModel;
 import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.module.extension.internal.util.MuleExtensionUtils;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedListMultimap;

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request;
+package org.mule.runtime.module.http.internal.request;
 
 import org.mule.api.tls.TlsContextFactory;
-import org.mule.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.module.socket.api.TcpClientSocketProperties;
+import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.runtime.module.socket.api.TcpClientSocketProperties;
 
 
 public class HttpClientConfiguration

@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.security;
+package org.mule.runtime.module.ws.security;
 
 import static org.apache.ws.security.WSPasswordCallback.DECRYPT;
 import static org.apache.ws.security.handler.WSHandlerConstants.DEC_PROP_REF_ID;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPT;
-import static org.mule.module.ws.security.WSCryptoUtils.createKeyStoreProperties;
+import static org.mule.runtime.module.ws.security.WSCryptoUtils.createKeyStoreProperties;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.api.tls.TlsContextKeyStoreConfiguration;
 

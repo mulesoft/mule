@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.specific.properties;
+package org.mule.runtime.config.spring.parsers.specific.properties;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
-import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
-import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
-import org.mule.config.spring.parsers.processors.AddAttribute;
+import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.assembly.MapEntryCombiner;
+import org.mule.runtime.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
+import org.mule.runtime.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
+import org.mule.runtime.config.spring.parsers.processors.AddAttribute;
 
 /**
  * This extends a map that is itself a property (with key mapKey).  It does not have any

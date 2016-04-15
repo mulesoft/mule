@@ -7,7 +7,7 @@
 package org.mule.runtime.core.transformers.xml;
 
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.module.xml.transformer.XmlToDomDocument;
+import org.mule.runtime.module.xml.transformer.XmlToDomDocument;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 

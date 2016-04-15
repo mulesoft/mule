@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring;
+package org.mule.runtime.config.spring;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
@@ -13,12 +13,12 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.CONFI
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.config.ConfigResource;
-import org.mule.config.spring.editors.MulePropertyEditorRegistrar;
-import org.mule.config.spring.processors.DiscardedOptionalBeanPostProcessor;
-import org.mule.config.spring.processors.LifecycleStatePostProcessor;
-import org.mule.config.spring.processors.MuleInjectorProcessor;
-import org.mule.config.spring.processors.PostRegistrationActionsPostProcessor;
-import org.mule.config.spring.util.LaxInstantiationStrategyWrapper;
+import org.mule.runtime.config.spring.editors.MulePropertyEditorRegistrar;
+import org.mule.runtime.config.spring.processors.DiscardedOptionalBeanPostProcessor;
+import org.mule.runtime.config.spring.processors.LifecycleStatePostProcessor;
+import org.mule.runtime.config.spring.processors.MuleInjectorProcessor;
+import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProcessor;
+import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -62,7 +62,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
      *
      * @param muleContext     the {@link MuleContext} that own this context
      * @param configResources the configuration resources to use
-     * @see org.mule.config.spring.SpringRegistry
+     * @see org.mule.runtime.config.spring.SpringRegistry
      */
     public MuleArtifactContext(MuleContext muleContext, ConfigResource[] configResources)
             throws BeansException
@@ -78,7 +78,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
      * @param muleContext               the {@link MuleContext} that own this context
      * @param configResources           the configuration resources to use
      * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null}
-     * @see org.mule.config.spring.SpringRegistry
+     * @see org.mule.runtime.config.spring.SpringRegistry
      * @since 3.7.0
      */
     public MuleArtifactContext(MuleContext muleContext, ConfigResource[] configResources, OptionalObjectsController optionalObjectsController)
@@ -100,7 +100,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
      * @param muleContext               the {@link MuleContext} that own this context
      * @param springResources           the configuration resources to use
      * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null}
-     * @see org.mule.config.spring.SpringRegistry
+     * @see org.mule.runtime.config.spring.SpringRegistry
      * @since 3.7.0
      */
     public MuleArtifactContext(MuleContext muleContext, Resource[] springResources, OptionalObjectsController optionalObjectsController) throws BeansException

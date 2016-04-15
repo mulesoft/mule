@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.xpath;
+package org.mule.runtime.module.xml.xpath;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.module.xml.util.NamespaceManager;
+import org.mule.runtime.module.xml.util.NamespaceManager;
 
 import java.util.Map;
 

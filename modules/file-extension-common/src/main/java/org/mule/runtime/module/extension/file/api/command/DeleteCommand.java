@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.file.api.command;
+package org.mule.runtime.module.extension.file.api.command;
 
-import org.mule.module.extension.file.api.FileSystem;
+import org.mule.runtime.module.extension.file.api.FileSystem;
 
 /**
  * Command design pattern for deleting files

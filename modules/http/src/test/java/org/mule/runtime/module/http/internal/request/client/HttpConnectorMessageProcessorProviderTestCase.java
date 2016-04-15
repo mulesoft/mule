@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request.client;
+package org.mule.runtime.module.http.internal.request.client;
 
 
 import static org.hamcrest.core.Is.is;
@@ -15,15 +15,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import static org.mule.module.http.api.requester.HttpStreamingType.ALWAYS;
+import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.runtime.module.http.api.requester.HttpStreamingType.ALWAYS;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.client.SimpleOptionsBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.api.tls.TlsContextFactory;

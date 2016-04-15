@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.metadata;
+package org.mule.runtime.module.extension.internal.metadata;
 
-import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.MISSING_ELEMENT_ERROR_MESSAGE;
+import static org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.MISSING_ELEMENT_ERROR_MESSAGE;
 
 import org.mule.runtime.core.internal.metadata.InvalidComponentIdException;
 import org.mule.api.metadata.MetadataKey;

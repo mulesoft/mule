@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api;
+package org.mule.runtime.module.http.api;
 
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -19,12 +19,12 @@ import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.execution.MessageProcessingManager;
-import org.mule.module.http.api.listener.HttpListener;
-import org.mule.module.http.api.listener.HttpListenerBuilder;
-import org.mule.module.http.api.listener.HttpListenerConfig;
-import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
-import org.mule.module.http.internal.listener.HttpListenerConnectionManager;
-import org.mule.module.http.internal.listener.ServerAddress;
+import org.mule.runtime.module.http.api.listener.HttpListener;
+import org.mule.runtime.module.http.api.listener.HttpListenerBuilder;
+import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
+import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
+import org.mule.runtime.module.http.internal.listener.HttpListenerConnectionManager;
+import org.mule.runtime.module.http.internal.listener.ServerAddress;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.api.tls.TlsContextFactory;

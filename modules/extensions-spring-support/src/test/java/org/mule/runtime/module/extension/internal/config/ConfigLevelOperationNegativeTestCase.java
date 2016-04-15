@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.config;
+package org.mule.runtime.module.extension.internal.config;
 
 import org.mule.functional.junit4.InvalidExtensionConfigTestCase;
-import org.mule.module.extension.vegan.VeganExtension;
+import org.mule.runtime.module.extension.vegan.VeganExtension;
 
 public class ConfigLevelOperationNegativeTestCase extends InvalidExtensionConfigTestCase
 {

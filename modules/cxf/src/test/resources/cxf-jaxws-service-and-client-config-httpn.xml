@@ -14,11 +14,11 @@
     <flow name="client">
         <http:listener path="hello" config-ref="listenerConfig"/>
         <logger level="WARN" message="#[payload]" />
-        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorld" />
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorld" />
 
         <!-- The MULE_METHOD_PROPERTY invocation property set by the jaxws-service should override the "invalidOperation"
             value of the operation attribute in jaxws-client -->
-        <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorld" operation="invalidOperation"/>
+        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorld" operation="invalidOperation"/>
         <logger level="WARN" message="#[payload]" />
         <http:request path="hello2" method="POST" config-ref="requestConfig"/>
     </flow>
@@ -26,8 +26,8 @@
 
     <flow name="server">
         <http:listener path="hello2" config-ref="listenerConfig"/>
-        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorld"/>
-        <component class="org.mule.module.cxf.example.HelloWorldImpl"/>
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorld"/>
+        <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl"/>
     </flow>
 
 </mule>

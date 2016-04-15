@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher;
+package org.mule.runtime.module.launcher;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
@@ -14,9 +14,9 @@ import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
-import org.mule.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
-import org.mule.module.launcher.coreextension.MuleCoreExtensionManagerServer;
-import org.mule.module.launcher.log4j2.MuleLog4jContextFactory;
+import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
+import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
+import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.SystemUtils;

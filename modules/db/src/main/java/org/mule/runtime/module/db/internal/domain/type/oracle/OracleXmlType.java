@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.db.internal.domain.type.oracle;
+package org.mule.runtime.module.db.internal.domain.type.oracle;
 
-import org.mule.module.db.internal.domain.type.StructuredDbType;
+import org.mule.runtime.module.db.internal.domain.type.StructuredDbType;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.io.InputStream;

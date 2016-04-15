@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.matcher;
+package org.mule.runtime.module.db.integration.matcher;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

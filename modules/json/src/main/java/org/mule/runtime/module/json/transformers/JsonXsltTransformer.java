@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.json.transformers;
+package org.mule.runtime.module.json.transformers;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.module.xml.transformer.XsltTransformer;
+import org.mule.runtime.module.xml.transformer.XsltTransformer;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 

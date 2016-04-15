@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.assembly;
+package org.mule.runtime.config.spring.parsers.assembly;
 
-import org.mule.config.spring.parsers.assembly.configuration.PrefixValueMap;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PrefixValueMap;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;

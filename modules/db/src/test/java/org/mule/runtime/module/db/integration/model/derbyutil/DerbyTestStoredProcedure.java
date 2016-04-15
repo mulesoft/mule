@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.model.derbyutil;
+package org.mule.runtime.module.db.integration.model.derbyutil;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Defines stored procedures for testing purposes. Used by reflection from {@link org.mule.module.db.integration.model.DerbyTestDatabase}
+ * Defines stored procedures for testing purposes. Used by reflection from {@link org.mule.runtime.module.db.integration.model.DerbyTestDatabase}
  */
 @SuppressWarnings("UnusedDeclaration")
 public class DerbyTestStoredProcedure

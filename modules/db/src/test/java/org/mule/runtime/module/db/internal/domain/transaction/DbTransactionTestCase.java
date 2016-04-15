@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.db.internal.domain.transaction;
+package org.mule.runtime.module.db.internal.domain.transaction;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;

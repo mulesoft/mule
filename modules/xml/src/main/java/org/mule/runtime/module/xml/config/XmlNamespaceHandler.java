@@ -4,29 +4,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.config;
+package org.mule.runtime.module.xml.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.generic.TextDefinitionParser;
-import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
-import org.mule.module.xml.filters.IsXmlFilter;
-import org.mule.module.xml.filters.SchemaValidationFilter;
-import org.mule.module.xml.filters.XPathFilter;
-import org.mule.module.xml.transformer.DomDocumentToXml;
-import org.mule.module.xml.transformer.ObjectToXml;
-import org.mule.module.xml.transformer.XPathExtractor;
-import org.mule.module.xml.transformer.XQueryTransformer;
-import org.mule.module.xml.transformer.XmlPrettyPrinter;
-import org.mule.module.xml.transformer.XmlToDomDocument;
-import org.mule.module.xml.transformer.XmlToObject;
-import org.mule.module.xml.transformer.XmlToOutputHandler;
-import org.mule.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
-import org.mule.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
+import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.TextDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.FilterDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
+import org.mule.runtime.module.xml.filters.IsXmlFilter;
+import org.mule.runtime.module.xml.filters.SchemaValidationFilter;
+import org.mule.runtime.module.xml.filters.XPathFilter;
+import org.mule.runtime.module.xml.transformer.DomDocumentToXml;
+import org.mule.runtime.module.xml.transformer.ObjectToXml;
+import org.mule.runtime.module.xml.transformer.XPathExtractor;
+import org.mule.runtime.module.xml.transformer.XQueryTransformer;
+import org.mule.runtime.module.xml.transformer.XmlPrettyPrinter;
+import org.mule.runtime.module.xml.transformer.XmlToDomDocument;
+import org.mule.runtime.module.xml.transformer.XmlToObject;
+import org.mule.runtime.module.xml.transformer.XmlToOutputHandler;
+import org.mule.runtime.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
+import org.mule.runtime.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
 
 public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
 {

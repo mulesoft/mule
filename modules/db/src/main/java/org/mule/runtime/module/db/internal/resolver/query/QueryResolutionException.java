@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.query;
+package org.mule.runtime.module.db.internal.resolver.query;
 
 /**
  * Thrown to indicate an error during query resolution

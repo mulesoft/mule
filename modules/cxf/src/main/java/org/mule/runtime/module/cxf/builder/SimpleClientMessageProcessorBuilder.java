@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.builder;
+package org.mule.runtime.module.cxf.builder;
 
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.module.cxf.support.CxfUtils;
+import org.mule.runtime.module.cxf.support.CxfUtils;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.endpoint.Client;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal;
+package org.mule.runtime.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -12,8 +12,8 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.runtime.module.extension.HeisenbergExtension;
+import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.math.BigDecimal;
 

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.model;
+package org.mule.runtime.module.db.integration.model;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,7 +23,7 @@ public class DerbyTestDatabase extends AbstractTestDatabase
             "LANGUAGE JAVA\n" +
             "MODIFIES SQL DATA\n" +
             "DYNAMIC RESULT SETS 0\n" +
-            "EXTERNAL NAME 'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.updateTestType1'";
+            "EXTERNAL NAME 'org.mule.runtime.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.updateTestType1'";
 
     public static String SQL_CREATE_SP_PARAM_UPDATE_TEST_TYPE_1 =
             "CREATE PROCEDURE updateParamTestType1(name VARCHAR(40))\n" +
@@ -31,7 +31,7 @@ public class DerbyTestDatabase extends AbstractTestDatabase
             "LANGUAGE JAVA\n" +
             "MODIFIES SQL DATA\n" +
             "DYNAMIC RESULT SETS 0\n" +
-            "EXTERNAL NAME 'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.updateParameterizedTestType1'";
+            "EXTERNAL NAME 'org.mule.runtime.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.updateParameterizedTestType1'";
 
     public static String SQL_CREATE_SP_COUNT_RECORDS =
             "CREATE PROCEDURE countTestRecords(OUT COUNT INTEGER)\n" +
@@ -39,7 +39,7 @@ public class DerbyTestDatabase extends AbstractTestDatabase
             "LANGUAGE JAVA\n" +
             "READS SQL DATA\n" +
             "DYNAMIC RESULT SETS 0\n" +
-            "EXTERNAL NAME 'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.countTestRecords'";
+            "EXTERNAL NAME 'org.mule.runtime.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.countTestRecords'";
 
     public static String SQL_CREATE_SP_GET_RECORDS =
             "CREATE PROCEDURE getTestRecords()\n" +
@@ -47,7 +47,7 @@ public class DerbyTestDatabase extends AbstractTestDatabase
             "LANGUAGE JAVA\n" +
             "READS SQL DATA\n" +
             "DYNAMIC RESULT SETS 1\n" +
-            "EXTERNAL NAME 'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.getTestRecords'";
+            "EXTERNAL NAME 'org.mule.runtime.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.getTestRecords'";
 
     public static String SQL_CREATE_SP_GET_SPLIT_RECORDS =
             "CREATE PROCEDURE getSplitTestRecords()\n" +
@@ -55,32 +55,32 @@ public class DerbyTestDatabase extends AbstractTestDatabase
             "LANGUAGE JAVA\n" +
             "READS SQL DATA\n" +
             "DYNAMIC RESULT SETS 2\n" +
-            "EXTERNAL NAME 'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.getSplitTestRecords'";
+            "EXTERNAL NAME 'org.mule.runtime.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.getSplitTestRecords'";
 
     public static String SQL_CREATE_SP_DOUBLE_MY_INT =
             "CREATE PROCEDURE doubleMyInt(INOUT MYINT INTEGER)\n" +
             "PARAMETER STYLE JAVA\n" +
             "LANGUAGE JAVA\n" +
             "DYNAMIC RESULT SETS 0\n" +
-            "EXTERNAL NAME 'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.doubleMyInt'";
+            "EXTERNAL NAME 'org.mule.runtime.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.doubleMyInt'";
 
     public static String SQL_CREATE_SP_MULTIPLY_INTS =
             "CREATE PROCEDURE multiplyInts(IN INT1 INTEGER, IN INT2 INTEGER, OUT RESULT1 INTEGER, IN INT3 INTEGER, OUT RESULT2 INTEGER)\n" +
             "PARAMETER STYLE JAVA\n" +
             "LANGUAGE JAVA\n" +
             "DYNAMIC RESULT SETS 0\n" +
-            "EXTERNAL NAME 'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.multiplyInts'";
+            "EXTERNAL NAME 'org.mule.runtime.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.multiplyInts'";
 
     public static String SQL_CREATE_SP_CONCATENATE_STRINGS =
             "CREATE PROCEDURE concatenateStrings(IN INT1 VARCHAR(100), IN INT2 VARCHAR(100), OUT RESULT VARCHAR(200))\n" +
             "PARAMETER STYLE JAVA\n" +
             "LANGUAGE JAVA\n" +
             "DYNAMIC RESULT SETS 0\n" +
-            "EXTERNAL NAME 'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.concatenateStrings'";
+            "EXTERNAL NAME 'org.mule.runtime.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.concatenateStrings'";
 
     public static final String SQL_CREATE_DELAY_FUNCTION = "create function delay(SECONDS INTEGER) " +
                                                            "returns INTEGER language java parameter style java external name " +
-                                                           "'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.timeDelay'";
+                                                           "'org.mule.runtime.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.timeDelay'";
 
     @Override
     public void createPlanetTable(Connection connection) throws SQLException

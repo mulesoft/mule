@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection;
+package org.mule.runtime.module.extension.internal.introspection;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.extension.api.introspection.EnrichableModel;
 import org.mule.extension.api.introspection.ModelProperty;
 import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
-import org.mule.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;

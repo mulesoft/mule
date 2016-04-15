@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.query;
+package org.mule.runtime.module.db.internal.resolver.query;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.expression.ExpressionManager;
-import org.mule.module.db.internal.parser.QueryTemplateParser;
+import org.mule.runtime.module.db.internal.parser.QueryTemplateParser;
 
 /**
  * Resolves a bulk query evaluating expression using a given event

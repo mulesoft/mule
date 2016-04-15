@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.spring.transaction;
+package org.mule.runtime.module.spring.transaction;
 
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;

@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.metadata.extension;
+package org.mule.runtime.module.extension.internal.metadata.extension;
 
 import org.mule.extension.api.annotation.metadata.MetadataScope;
 import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.annotation.metadata.Content;
 import org.mule.extension.api.annotation.metadata.MetadataKeyParam;
-import org.mule.module.extension.internal.metadata.extension.resolver.TestContentResolverWithoutKeyResolver;
-import org.mule.module.extension.internal.metadata.extension.resolver.TestMetadataResolverMetadataResolvingFailure;
-import org.mule.module.extension.internal.metadata.extension.resolver.TestMetadataResolverRuntimeExceptionFailure;
+import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentResolverWithoutKeyResolver;
+import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestMetadataResolverMetadataResolvingFailure;
+import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestMetadataResolverRuntimeExceptionFailure;
 
 public class MetadataFailureOperations extends MetadataOperationsParent
 {

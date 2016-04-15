@@ -4,29 +4,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.config;
+package org.mule.runtime.module.http.internal.config;
 
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.delegate.RootOrNestedElementBeanDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.module.http.internal.HttpMapParam;
-import org.mule.module.http.internal.HttpMessageBuilderRef;
-import org.mule.module.http.internal.HttpParamType;
-import org.mule.module.http.internal.HttpSingleParam;
-import org.mule.module.http.internal.component.StaticResourceMessageProcessor;
-import org.mule.module.http.internal.filter.HttpBasicAuthenticationFilter;
-import org.mule.module.http.internal.listener.DefaultHttpListener;
-import org.mule.module.http.internal.listener.DefaultHttpListenerConfig;
-import org.mule.module.http.internal.request.DefaultHttpRequester;
-import org.mule.module.http.internal.request.DefaultProxyConfig;
-import org.mule.module.http.internal.request.FailureStatusCodeValidator;
-import org.mule.module.http.internal.request.HttpAuthenticationType;
-import org.mule.module.http.internal.request.NtlmProxyConfig;
-import org.mule.module.http.internal.request.RamlApiConfiguration;
-import org.mule.module.http.internal.request.SuccessStatusCodeValidator;
+import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.parsers.delegate.RootOrNestedElementBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.runtime.module.http.internal.HttpMapParam;
+import org.mule.runtime.module.http.internal.HttpMessageBuilderRef;
+import org.mule.runtime.module.http.internal.HttpParamType;
+import org.mule.runtime.module.http.internal.HttpSingleParam;
+import org.mule.runtime.module.http.internal.component.StaticResourceMessageProcessor;
+import org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter;
+import org.mule.runtime.module.http.internal.listener.DefaultHttpListener;
+import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
+import org.mule.runtime.module.http.internal.request.DefaultHttpRequester;
+import org.mule.runtime.module.http.internal.request.DefaultProxyConfig;
+import org.mule.runtime.module.http.internal.request.FailureStatusCodeValidator;
+import org.mule.runtime.module.http.internal.request.HttpAuthenticationType;
+import org.mule.runtime.module.http.internal.request.NtlmProxyConfig;
+import org.mule.runtime.module.http.internal.request.RamlApiConfiguration;
+import org.mule.runtime.module.http.internal.request.SuccessStatusCodeValidator;
 
 public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
 {

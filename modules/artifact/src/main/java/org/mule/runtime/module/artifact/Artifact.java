@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.artifact;
+package org.mule.runtime.module.artifact;
 
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import java.io.File;
 

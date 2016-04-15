@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.builder;
+package org.mule.runtime.module.cxf.builder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.module.cxf.CxfOutboundMessageProcessor;
-import org.mule.module.cxf.config.WsConfig;
-import org.mule.module.cxf.config.WsSecurity;
+import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
+import org.mule.runtime.module.cxf.config.WsConfig;
+import org.mule.runtime.module.cxf.config.WsSecurity;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.api.MuleException;
 
@@ -30,7 +30,7 @@ import org.junit.Test;
 public class SimpleClientMessageProcessorBuilderTestCase extends AbstractMuleContextTestCase
 {
     private SimpleClientMessageProcessorBuilder simpleClientMessageProcessorBuilder;
-    private static final String SERVICE_CLASS = "org.mule.module.cxf.testmodels.Echo";
+    private static final String SERVICE_CLASS = "org.mule.runtime.module.cxf.testmodels.Echo";
 
 
     @Before

@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.describer;
+package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.createManifestFileIfNecessary;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getMetaInfDirectory;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.createManifestFileIfNecessary;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getMetaInfDirectory;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsStream;
 import org.mule.extension.api.annotation.Extension;
-import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.internal.introspection.VersionResolver;
+import org.mule.runtime.module.extension.HeisenbergExtension;
+import org.mule.runtime.module.extension.internal.introspection.VersionResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;

@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.param;
+package org.mule.runtime.module.db.internal.resolver.param;
 
-import org.mule.module.db.internal.domain.query.QueryTemplate;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
 
 /**
  * Creates {@link ParamTypeResolver} instances

@@ -5,18 +5,18 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.resolver.query;
+package org.mule.runtime.module.db.internal.config.resolver.query;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.module.db.internal.domain.query.Query;
-import org.mule.module.db.internal.parser.SimpleQueryTemplateParser;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
-import org.mule.module.db.internal.resolver.param.ParamValueResolver;
-import org.mule.module.db.internal.resolver.query.DynamicQueryResolver;
-import org.mule.module.db.internal.resolver.query.ParametrizedQueryResolver;
-import org.mule.module.db.internal.resolver.query.QueryResolver;
-import org.mule.module.db.internal.resolver.query.StaticQueryResolver;
+import org.mule.runtime.module.db.internal.domain.query.Query;
+import org.mule.runtime.module.db.internal.parser.SimpleQueryTemplateParser;
+import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.runtime.module.db.internal.resolver.param.ParamValueResolver;
+import org.mule.runtime.module.db.internal.resolver.query.DynamicQueryResolver;
+import org.mule.runtime.module.db.internal.resolver.query.ParametrizedQueryResolver;
+import org.mule.runtime.module.db.internal.resolver.query.QueryResolver;
+import org.mule.runtime.module.db.internal.resolver.query.StaticQueryResolver;
 
 import org.springframework.beans.factory.FactoryBean;
 

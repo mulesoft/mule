@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request;
+package org.mule.runtime.module.http.internal.request;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.module.http.internal.HttpMessageBuilder;
-import org.mule.module.http.internal.HttpParamType;
-import org.mule.module.http.internal.ParameterMap;
+import org.mule.runtime.module.http.internal.HttpMessageBuilder;
+import org.mule.runtime.module.http.internal.HttpParamType;
+import org.mule.runtime.module.http.internal.ParameterMap;
 
 import java.util.List;
 

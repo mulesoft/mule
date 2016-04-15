@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.config;
+package org.mule.runtime.module.extension.internal.runtime.config;
 
 import org.mule.runtime.core.api.MuleException;
 import org.mule.api.config.PoolingProfile;
@@ -15,9 +15,9 @@ import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModel
 import org.mule.runtime.core.internal.connection.CachedConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.PooledConnectionProviderWrapper;
-import org.mule.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 /**
  * Implementation of {@link ParameterGroupAwareObjectBuilder} which produces instances

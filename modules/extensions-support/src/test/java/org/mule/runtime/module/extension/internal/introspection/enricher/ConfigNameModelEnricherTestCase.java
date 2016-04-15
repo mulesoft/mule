@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.enricher;
+package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -19,9 +19,9 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import org.mule.extension.api.annotation.param.ConfigName;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
-import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
-import org.mule.module.extension.internal.model.property.RequireNameField;
+import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.RequireNameField;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;

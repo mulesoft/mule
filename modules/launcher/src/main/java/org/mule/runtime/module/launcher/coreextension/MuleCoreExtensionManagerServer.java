@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.coreextension;
+package org.mule.runtime.module.launcher.coreextension;
 
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.module.launcher.DeploymentServiceAware;
-import org.mule.module.launcher.ServerPluginClassLoaderManagerAware;
+import org.mule.runtime.module.launcher.DeploymentServiceAware;
+import org.mule.runtime.module.launcher.ServerPluginClassLoaderManagerAware;
 
 /**
  * Manages lifecycle and dependency injection for {@link org.mule.runtime.core.MuleCoreExtension}

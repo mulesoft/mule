@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.assembly;
+package org.mule.runtime.config.spring.parsers.assembly;
 
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
-import org.mule.config.spring.parsers.assembly.configuration.TempWrapperPropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.TempWrapperPropertyConfiguration;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;

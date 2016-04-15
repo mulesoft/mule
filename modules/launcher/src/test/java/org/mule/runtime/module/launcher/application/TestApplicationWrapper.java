@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.application;
+package org.mule.runtime.module.launcher.application;
 
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.module.launcher.DeploymentException;
-import org.mule.module.launcher.DeploymentStopException;
+import org.mule.runtime.module.launcher.DeploymentException;
+import org.mule.runtime.module.launcher.DeploymentStopException;
 
 import java.io.IOException;
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.jndi;
+package org.mule.runtime.config.spring.jndi;
 
 import javax.naming.CompositeName;
 import javax.naming.Name;

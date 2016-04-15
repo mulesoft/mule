@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.query;
+package org.mule.runtime.module.db.internal.resolver.query;
 
 import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -14,10 +14,10 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.module.db.internal.domain.query.Query;
-import org.mule.module.db.internal.domain.query.QueryTemplate;
-import org.mule.module.db.internal.parser.QueryTemplateParser;
-import org.mule.module.db.internal.parser.QueryTemplateParsingException;
+import org.mule.runtime.module.db.internal.domain.query.Query;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
+import org.mule.runtime.module.db.internal.parser.QueryTemplateParser;
+import org.mule.runtime.module.db.internal.parser.QueryTemplateParsingException;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.payload;
+package org.mule.runtime.module.cxf.payload;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.module.cxf.CxfOutboundMessageProcessor;
+import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
 
 import java.security.spec.RSAOtherPrimeInfo;
 

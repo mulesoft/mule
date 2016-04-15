@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.generic;
+package org.mule.runtime.config.spring.parsers.generic;
 
-import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.AbstractChildDefinitionParser;
 
 import org.w3c.dom.Element;
 

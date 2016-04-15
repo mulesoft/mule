@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.query;
+package org.mule.runtime.module.db.internal.resolver.query;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.module.db.internal.domain.query.BulkQuery;
-import org.mule.module.db.internal.domain.query.QueryTemplate;
-import org.mule.module.db.internal.parser.QueryTemplateParser;
+import org.mule.runtime.module.db.internal.domain.query.BulkQuery;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
+import org.mule.runtime.module.db.internal.parser.QueryTemplateParser;
 
 /**
  * Base class for {@link BulkQueryResolver} implementations

@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.result.row;
+package org.mule.runtime.module.db.internal.result.row;
 
-import org.mule.module.db.integration.TestRecordUtil;
-import org.mule.module.db.integration.model.Field;
-import org.mule.module.db.integration.model.Record;
-import org.mule.module.db.test.util.ColumnMetadata;
-import org.mule.module.db.test.util.ResultSetBuilder;
+import org.mule.runtime.module.db.integration.TestRecordUtil;
+import org.mule.runtime.module.db.integration.model.Field;
+import org.mule.runtime.module.db.integration.model.Record;
+import org.mule.runtime.module.db.test.util.ColumnMetadata;
+import org.mule.runtime.module.db.test.util.ResultSetBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

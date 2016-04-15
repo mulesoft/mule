@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.config;
+package org.mule.runtime.module.db.integration.config;
 
 import org.junit.Test;
 

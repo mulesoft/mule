@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.config;
+package org.mule.runtime.module.xml.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -13,12 +13,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.module.xml.transformer.AbstractXmlTransformer;
-import org.mule.module.xml.transformer.DomDocumentToXml;
-import org.mule.module.xml.transformer.ObjectToXml;
-import org.mule.module.xml.transformer.XmlToDomDocument;
-import org.mule.module.xml.transformer.XmlToObject;
-import org.mule.module.xml.transformer.XsltTransformer;
+import org.mule.runtime.module.xml.transformer.AbstractXmlTransformer;
+import org.mule.runtime.module.xml.transformer.DomDocumentToXml;
+import org.mule.runtime.module.xml.transformer.ObjectToXml;
+import org.mule.runtime.module.xml.transformer.XmlToDomDocument;
+import org.mule.runtime.module.xml.transformer.XmlToObject;
+import org.mule.runtime.module.xml.transformer.XsltTransformer;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import org.junit.Test;

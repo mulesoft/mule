@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.json.transformers;
+package org.mule.runtime.module.json.transformers;
 
-import static org.mule.module.xml.filters.SchemaValidationFilter.DEFAULT_SCHEMA_LANGUAGE;
+import static org.mule.runtime.module.xml.filters.SchemaValidationFilter.DEFAULT_SCHEMA_LANGUAGE;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor;
+import org.mule.runtime.module.json.validation.ValidateJsonSchemaMessageProcessor;
 
 import java.util.Map;
 

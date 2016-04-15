@@ -9,10 +9,10 @@ package org.mule.runtime.core.management.config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.runtime.core.api.agent.Agent;
-import org.mule.module.management.agent.JmxApplicationAgent;
-import org.mule.module.management.agent.JmxServerNotificationAgent;
-import org.mule.module.management.agent.Mx4jAgent;
-import org.mule.module.management.support.SimplePasswordJmxAuthenticator;
+import org.mule.runtime.module.management.agent.JmxApplicationAgent;
+import org.mule.runtime.module.management.agent.JmxServerNotificationAgent;
+import org.mule.runtime.module.management.agent.Mx4jAgent;
+import org.mule.runtime.module.management.support.SimplePasswordJmxAuthenticator;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

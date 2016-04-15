@@ -4,35 +4,35 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request;
+package org.mule.runtime.module.http.internal.request;
 
-import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
-import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.module.http.api.HttpHeaders.Names.COOKIE;
-import static org.mule.module.http.api.HttpHeaders.Names.HOST;
-import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
-import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.COOKIE;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.api.metadata.DataType;
-import org.mule.module.http.api.requester.HttpSendBodyMode;
-import org.mule.module.http.api.requester.HttpStreamingType;
-import org.mule.module.http.internal.HttpParser;
-import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
-import org.mule.module.http.internal.domain.EmptyHttpEntity;
-import org.mule.module.http.internal.domain.HttpEntity;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.MultipartHttpEntity;
-import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
-import org.mule.module.http.internal.multipart.HttpPartDataSource;
+import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
+import org.mule.runtime.module.http.api.requester.HttpStreamingType;
+import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
+import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
+import org.mule.runtime.module.http.internal.domain.HttpEntity;
+import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
+import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.api.message.NullPayload;
 import org.mule.runtime.core.util.AttributeEvaluator;

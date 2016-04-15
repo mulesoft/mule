@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.domain.database;
+package org.mule.runtime.module.db.internal.config.domain.database;
 
-import org.mule.module.db.internal.domain.database.ConfigurableDbConfigFactory;
+import org.mule.runtime.module.db.internal.domain.database.ConfigurableDbConfigFactory;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.net.URI;

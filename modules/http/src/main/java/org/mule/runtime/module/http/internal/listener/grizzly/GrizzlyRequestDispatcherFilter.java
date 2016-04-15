@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener.grizzly;
+package org.mule.runtime.module.http.internal.listener.grizzly;
 
 import static org.glassfish.grizzly.http.util.HttpStatus.CONINTUE_100;
 import static org.glassfish.grizzly.http.util.HttpStatus.EXPECTATION_FAILED_417;
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-import static org.mule.module.http.api.HttpHeaders.Names.EXPECT;
-import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
-import static org.mule.module.http.internal.listener.grizzly.MuleSslFilter.SSL_SESSION_ATTRIBUTE_KEY;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.EXPECT;
+import static org.mule.runtime.module.http.api.HttpHeaders.Values.CONTINUE;
+import static org.mule.runtime.module.http.internal.listener.grizzly.MuleSslFilter.SSL_SESSION_ATTRIBUTE_KEY;
 
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.request.ClientConnection;
-import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.module.http.internal.domain.response.HttpResponse;
-import org.mule.module.http.internal.listener.RequestHandlerProvider;
-import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.module.http.internal.listener.async.RequestHandler;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
+import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.runtime.module.http.internal.domain.request.ClientConnection;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
+import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
+import org.mule.runtime.module.http.internal.listener.RequestHandlerProvider;
+import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCallback;
+import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
+import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

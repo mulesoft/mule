@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.functional;
+package org.mule.runtime.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
@@ -36,7 +36,7 @@ public class IncludedXsdTypesFunctionalTestCase extends AbstractWSConsumerFuncti
     {
         MuleEvent event = flowRunner("noParams").withPayload(TEST_MESSAGE).run();
 
-        String expectedResponse = "<ns:noParamsResponse xmlns:ns=\"http://consumer.ws.module.mule.org/\">" +
+        String expectedResponse = "<ns:noParamsResponse xmlns:ns=\"http://consumer.ws.module.runtime.mule.org/\">" +
                                   "<text>TEST</text></ns:noParamsResponse>";
         assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
     }

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.ws.functional;
+package org.mule.runtime.module.ws.functional;
 
 import static org.apache.ws.security.WSPasswordCallback.DECRYPT;
 import static org.apache.ws.security.WSPasswordCallback.SIGNATURE;

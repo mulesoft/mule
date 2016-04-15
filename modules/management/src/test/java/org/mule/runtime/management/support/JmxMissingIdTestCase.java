@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
-import org.mule.module.management.agent.JmxApplicationAgent;
+import org.mule.runtime.module.management.agent.JmxApplicationAgent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

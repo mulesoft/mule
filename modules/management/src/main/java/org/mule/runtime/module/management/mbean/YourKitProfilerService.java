@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.management.mbean;
+package org.mule.runtime.module.management.mbean;
 
-import org.mule.module.management.i18n.ManagementMessages;
+import org.mule.runtime.module.management.i18n.ManagementMessages;
 
 import com.yourkit.api.Controller;
 

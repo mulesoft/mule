@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.builders;
+package org.mule.runtime.config.builders;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.config.ConfigResource;
-import org.mule.config.spring.MuleArtifactContext;
-import org.mule.config.spring.OptionalObjectsController;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.config.spring.MuleArtifactContext;
+import org.mule.runtime.config.spring.OptionalObjectsController;
+import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,7 +43,7 @@ import org.springframework.web.context.support.ServletContextResource;
  * <li> Classpath resources should be in the webapp classpath and should not start
  * with '/'.
  * 
- * @see org.mule.config.spring.SpringXmlConfigurationBuilder
+ * @see org.mule.runtime.config.spring.SpringXmlConfigurationBuilder
  */
 public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBuilder
 {    

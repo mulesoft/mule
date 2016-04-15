@@ -10,8 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.runtime.core.api.agent.Agent;
-import org.mule.module.management.agent.ConfigurableJMXAuthenticator;
-import org.mule.module.management.agent.JmxApplicationAgent;
+import org.mule.runtime.module.management.agent.ConfigurableJMXAuthenticator;
+import org.mule.runtime.module.management.agent.JmxApplicationAgent;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Map;

@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.processor;
+package org.mule.runtime.module.db.internal.processor;
 
-import static org.mule.module.db.internal.domain.query.QueryType.UPDATE;
-import org.mule.module.db.internal.domain.query.QueryType;
+import static org.mule.runtime.module.db.internal.domain.query.QueryType.UPDATE;
+import org.mule.runtime.module.db.internal.domain.query.QueryType;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Collections;

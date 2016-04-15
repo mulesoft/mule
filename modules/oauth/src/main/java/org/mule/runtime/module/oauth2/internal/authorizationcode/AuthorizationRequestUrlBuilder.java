@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.authorizationcode;
+package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
-import org.mule.module.oauth2.internal.OAuthConstants;
+import org.mule.runtime.module.oauth2.internal.OAuthConstants;
 import org.mule.runtime.core.util.Preconditions;
 
 import java.io.UnsupportedEncodingException;

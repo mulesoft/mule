@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.capability.xml;
+package org.mule.runtime.module.extension.internal.capability.xml;
 
 import org.mule.extension.api.annotation.capability.Xml;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
-import org.mule.module.extension.internal.introspection.enricher.AbstractAnnotatedModelEnricher;
-import org.mule.module.extension.internal.util.NameUtils;
+import org.mule.runtime.module.extension.internal.introspection.enricher.AbstractAnnotatedModelEnricher;
+import org.mule.runtime.module.extension.internal.util.NameUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.function.Supplier;

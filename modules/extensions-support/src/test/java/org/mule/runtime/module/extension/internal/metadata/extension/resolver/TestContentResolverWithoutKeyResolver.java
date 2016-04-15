@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.metadata.extension.resolver;
+package org.mule.runtime.module.extension.internal.metadata.extension.resolver;
 
 import org.mule.api.connection.ConnectionException;
 import org.mule.api.metadata.MetadataContext;
@@ -12,7 +12,7 @@ import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.MetadataResolvingException;
 import org.mule.api.metadata.resolving.MetadataContentResolver;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.module.extension.internal.metadata.TestMetadataUtils;
+import org.mule.runtime.module.extension.internal.metadata.TestMetadataUtils;
 
 public class TestContentResolverWithoutKeyResolver implements MetadataContentResolver
 {

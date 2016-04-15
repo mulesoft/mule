@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.describer;
+package org.mule.runtime.module.extension.internal.introspection.describer;
 
-import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
 import org.mule.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
-import org.mule.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Field;
 

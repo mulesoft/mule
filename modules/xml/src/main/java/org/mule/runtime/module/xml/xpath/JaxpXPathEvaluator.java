@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.xpath;
+package org.mule.runtime.module.xml.xpath;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.module.xml.i18n.XmlMessages;
-import org.mule.module.xml.util.NamespaceManager;
+import org.mule.runtime.module.xml.i18n.XmlMessages;
+import org.mule.runtime.module.xml.util.NamespaceManager;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

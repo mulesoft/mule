@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.socket.internal.config;
+package org.mule.runtime.module.socket.internal.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.delegate.RootOrNestedElementBeanDefinitionParser;
-import org.mule.module.socket.internal.DefaultTcpClientSocketProperties;
-import org.mule.module.socket.internal.DefaultTcpServerSocketProperties;
+import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.parsers.delegate.RootOrNestedElementBeanDefinitionParser;
+import org.mule.runtime.module.socket.internal.DefaultTcpClientSocketProperties;
+import org.mule.runtime.module.socket.internal.DefaultTcpServerSocketProperties;
 
 public class SocketsNamespaceHandler extends AbstractMuleNamespaceHandler
 {

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.editors;
+package org.mule.runtime.config.spring.editors;
 
 import java.beans.PropertyEditorSupport;
 import java.util.ArrayList;

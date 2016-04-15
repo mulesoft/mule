@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.delegate;
+package org.mule.runtime.config.spring.parsers.delegate;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
-import org.mule.config.spring.parsers.PostProcessor;
-import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
-import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
-import org.mule.config.spring.parsers.collection.DynamicAttributeDefinitionParser;
-import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.config.spring.util.SpringXMLUtils;
+import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.runtime.config.spring.parsers.PostProcessor;
+import org.mule.runtime.config.spring.parsers.PreProcessor;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.ValueMap;
+import org.mule.runtime.config.spring.parsers.collection.DynamicAttributeDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.runtime.config.spring.util.SpringXMLUtils;
 
 import java.util.Map;
 

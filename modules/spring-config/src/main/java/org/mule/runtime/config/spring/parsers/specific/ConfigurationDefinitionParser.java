@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.specific;
+package org.mule.runtime.config.spring.parsers.specific;
 
-import static org.mule.config.spring.util.ProcessingStrategyUtils.DEFAULT_PROCESSING_STRATEGY;
+import static org.mule.runtime.config.spring.util.ProcessingStrategyUtils.DEFAULT_PROCESSING_STRATEGY;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
-import org.mule.config.spring.util.ProcessingStrategyUtils;
+import org.mule.runtime.config.spring.parsers.generic.NamedDefinitionParser;
+import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;

@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.config;
+package org.mule.runtime.module.db.integration.config;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.internal.domain.database.DbConfig;
-import org.mule.module.db.internal.resolver.database.DbConfigResolver;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.internal.domain.database.DbConfig;
+import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
 
 public abstract class AbstractDynamicDatabaseConfigTestCase extends AbstractDatabaseConfigTestCase
 {

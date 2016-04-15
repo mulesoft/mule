@@ -7,7 +7,7 @@
 package org.mule.extension.ftp.api;
 
 import org.mule.extension.api.introspection.declaration.spi.Describer;
-import org.mule.module.extension.DescriberSupport;
+import org.mule.runtime.module.extension.DescriberSupport;
 
 /**
  * {@link Describer} implementation for the

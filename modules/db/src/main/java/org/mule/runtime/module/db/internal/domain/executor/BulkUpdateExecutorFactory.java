@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.executor;
+package org.mule.runtime.module.db.internal.domain.executor;
 
-import org.mule.module.db.internal.domain.statement.StatementFactory;
+import org.mule.runtime.module.db.internal.domain.statement.StatementFactory;
 
 /**
  * Creates {@link BulkUpdateExecutor} instances

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.config;
+package org.mule.runtime.module.extension.internal.config;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -13,8 +13,8 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.model.Ricin;
+import org.mule.runtime.module.extension.HeisenbergExtension;
+import org.mule.runtime.module.extension.model.Ricin;
 
 import org.junit.Test;
 

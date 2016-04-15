@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.resolver;
+package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.runtime.OperationContext;
-import org.mule.module.extension.internal.runtime.OperationContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 
 /**
  * An implementation of {@link ArgumentResolver} which

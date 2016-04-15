@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.delete;
+package org.mule.runtime.module.db.integration.delete;
 
-import org.mule.module.db.integration.config.AbstractMissingQueryConfigTestCase;
+import org.mule.runtime.module.db.integration.config.AbstractMissingQueryConfigTestCase;
 
 public class DeleteMissingQueryConfigTestCase extends AbstractMissingQueryConfigTestCase
 {

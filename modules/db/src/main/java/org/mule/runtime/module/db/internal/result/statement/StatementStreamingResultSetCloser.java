@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.result.statement;
+package org.mule.runtime.module.db.internal.result.statement;
 
-import org.mule.module.db.internal.domain.connection.DbConnection;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
 
 import java.sql.ResultSet;
 import java.util.ConcurrentModificationException;

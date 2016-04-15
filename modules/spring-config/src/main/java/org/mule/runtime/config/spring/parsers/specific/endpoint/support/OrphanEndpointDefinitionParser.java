@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.specific.endpoint.support;
+package org.mule.runtime.config.spring.parsers.specific.endpoint.support;
 
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
 
 /**
  * A parser for "orphan" (top-level) endpoints - ie GlobalEndpoints.

@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.requester;
+package org.mule.runtime.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpHeaders.Names.COOKIE;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.COOKIE;
 
 import com.google.common.collect.Sets;
 

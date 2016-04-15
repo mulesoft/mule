@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.assembly;
+package org.mule.runtime.config.spring.parsers.assembly;
 
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
 /**
- * This is used by {@link org.mule.config.spring.parsers.delegate.MapDefinitionParserMutator} - it takes
+ * This is used by {@link org.mule.runtime.config.spring.parsers.delegate.MapDefinitionParserMutator} - it takes
  * a normal bean definition and re-packages it as a map (rather than individual values).  The difference
- * between this and {@link org.mule.config.spring.parsers.assembly.AttributeMapBeanAssemblerFactory} is
+ * between this and {@link org.mule.runtime.config.spring.parsers.assembly.AttributeMapBeanAssemblerFactory} is
  * that this allows child elements to generate the properties (it's an ugly consequence of the fact that
  * BDPs are called before nested children - this is a hack that gets "re-called" after the children to
  * complete the work).
@@ -38,7 +38,7 @@ public class TwoStageMapBeanAssembler extends AbstractMapBeanAssembler
      * However, the bean definition is not complete until all child elements have been
      * parsed - and that parsing happens after this routine is called.  So on first
      * pass we set a flag in the definition.  This is picked up by the main
-     * driver loop ({@link org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate})
+     * driver loop ({@link org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate})
      * and our enclosing bean definition parser is called again.  At the same time, to
      * avoid complicating otherwise "normal" BDPs, we pass this assembler to a callback,
      * so that it can be called the second time in a more direct way.

@@ -5,15 +5,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.processor;
+package org.mule.runtime.module.db.internal.config.processor;
 
-import org.mule.module.db.internal.config.domain.query.BulkQueryResolverFactoryBean;
-import org.mule.module.db.internal.domain.executor.BulkUpdateExecutorFactory;
-import org.mule.module.db.internal.metadata.BulkExecuteMetadataProvider;
-import org.mule.module.db.internal.parser.SimpleQueryTemplateParser;
-import org.mule.module.db.internal.processor.BulkExecuteMessageProcessor;
-import org.mule.module.db.internal.resolver.query.FileBulkQueryResolver;
-import org.mule.module.db.internal.util.DefaultFileReader;
+import org.mule.runtime.module.db.internal.config.domain.query.BulkQueryResolverFactoryBean;
+import org.mule.runtime.module.db.internal.domain.executor.BulkUpdateExecutorFactory;
+import org.mule.runtime.module.db.internal.metadata.BulkExecuteMetadataProvider;
+import org.mule.runtime.module.db.internal.parser.SimpleQueryTemplateParser;
+import org.mule.runtime.module.db.internal.processor.BulkExecuteMessageProcessor;
+import org.mule.runtime.module.db.internal.resolver.query.FileBulkQueryResolver;
+import org.mule.runtime.module.db.internal.util.DefaultFileReader;
 import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

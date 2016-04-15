@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.editors;
+package org.mule.runtime.config.spring.editors;
 
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.config.spring.util.ProcessingStrategyUtils;
+import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;

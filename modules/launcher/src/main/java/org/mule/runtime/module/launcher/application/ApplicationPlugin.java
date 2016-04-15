@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.application;
+package org.mule.runtime.module.launcher.application;
 
-import org.mule.module.artifact.Artifact;
-import org.mule.module.launcher.plugin.ApplicationPluginDescriptor;
+import org.mule.runtime.module.artifact.Artifact;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 
 /**
  * Represents an application plugin artifact.

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.ws.security;
+package org.mule.runtime.module.ws.security;
 
 import org.mule.runtime.core.util.Preconditions;
 

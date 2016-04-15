@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertThat;
-import org.mule.module.cxf.builder.SimpleClientMessageProcessorBuilder;
+import org.mule.runtime.module.cxf.builder.SimpleClientMessageProcessorBuilder;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.simple.EchoService;

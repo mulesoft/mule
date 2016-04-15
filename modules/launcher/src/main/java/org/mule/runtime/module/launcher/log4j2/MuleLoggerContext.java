@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.log4j2;
+package org.mule.runtime.module.launcher.log4j2;
 
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withName;
 
 import org.mule.runtime.core.logging.LogConfigChangeSubject;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.launcher.application.ApplicationClassLoader;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.launcher.application.ApplicationClassLoader;
 
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
@@ -31,9 +31,9 @@ import org.apache.logging.log4j.message.MessageFactory;
  * <p/>
  * The most important function of this class though is to override the
  * {@link #reconfigure()} method to to its inherited purpose plus
- * invoking {@link org.mule.module.launcher.log4j2.LoggerContextConfigurer#configure(MuleLoggerContext)}.
+ * invoking {@link org.mule.runtime.module.launcher.log4j2.LoggerContextConfigurer#configure(MuleLoggerContext)}.
  * <p/>
- * The {@link org.mule.module.launcher.log4j2.LoggerContextConfigurer} needs to be invoked here so
+ * The {@link org.mule.runtime.module.launcher.log4j2.LoggerContextConfigurer} needs to be invoked here so
  * that it's invoked each time the configuration is reloaded.
  * <p/>
  * This class must not hold any reference to a {@link java.lang.ClassLoader} since otherwise

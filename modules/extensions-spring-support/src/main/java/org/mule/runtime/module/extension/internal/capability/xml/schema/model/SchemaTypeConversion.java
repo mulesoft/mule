@@ -5,26 +5,26 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.extension.internal.capability.xml.schema.model;
+package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
 
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_BOOLEAN;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_DATE_TIME;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_DECIMAL;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_DOUBLE;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_INTEGER;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_LIST;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_LONG;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_MAP;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_OBJECT;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_STRING;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.STRING;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_BOOLEAN;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_DATE_TIME;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_DECIMAL;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_INT;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_LONG;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_MAP;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_BOOLEAN;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_DATE_TIME;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_DECIMAL;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_DOUBLE;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_INTEGER;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_LIST;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_LONG;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_MAP;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_OBJECT;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.EXPRESSION_STRING;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.STRING;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_BOOLEAN;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_DATE_TIME;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_DECIMAL;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_INT;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_LONG;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_MAP;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
 import org.mule.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
@@ -36,7 +36,7 @@ import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.utils.JavaTypeUtils;
-import org.mule.module.extension.internal.util.MuleExtensionUtils;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.runtime.core.util.ValueHolder;
 
 import javax.xml.namespace.QName;

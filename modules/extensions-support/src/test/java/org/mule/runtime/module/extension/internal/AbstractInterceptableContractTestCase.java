@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal;
+package org.mule.runtime.module.extension.internal;
 
 import static org.mockito.Mockito.verify;
 import static org.mule.tck.MuleTestUtils.spyInjector;
@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.extension.api.runtime.Interceptor;
-import org.mule.module.extension.internal.introspection.AbstractInterceptable;
+import org.mule.runtime.module.extension.internal.introspection.AbstractInterceptable;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.ImmutableList;

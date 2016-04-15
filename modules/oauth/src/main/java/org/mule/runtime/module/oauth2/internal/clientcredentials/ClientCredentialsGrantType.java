@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.clientcredentials;
+package org.mule.runtime.module.oauth2.internal.clientcredentials;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 
@@ -16,12 +16,12 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
-import org.mule.module.oauth2.api.RequestAuthenticationException;
-import org.mule.module.oauth2.internal.AbstractGrantType;
-import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
-import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
+import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
+import org.mule.runtime.module.oauth2.api.RequestAuthenticationException;
+import org.mule.runtime.module.oauth2.internal.AbstractGrantType;
+import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.module.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.api.tls.TlsContextFactory;
 
 /**

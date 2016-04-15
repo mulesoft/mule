@@ -7,7 +7,7 @@
 package org.mule.runtime.core.management.agents;
 
 import org.mule.runtime.core.management.AbstractMuleJmxTestCase;
-import org.mule.module.management.agent.Mx4jAgent;
+import org.mule.runtime.module.management.agent.Mx4jAgent;
 
 import mx4j.tools.adaptor.http.HttpAdaptor;
 import org.junit.Test;

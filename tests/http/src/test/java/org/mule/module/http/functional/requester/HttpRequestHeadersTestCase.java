@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.requester;
+package org.mule.runtime.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH;
-import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_SCHEME;
-import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.module.http.api.HttpHeaders.Names.HOST;
-import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_SCHEME;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
 
 import org.mule.tck.junit4.rule.SystemProperty;
 

@@ -1,6 +1,6 @@
 1. Register Mule listener on a server level. Edit $CATALINA_HOME/conf/server.xml and add this line
 
-    <Listener className="org.mule.module.tomcat.MuleTomcatListener" />
+    <Listener className="org.mule.runtime.module.tomcat.MuleTomcatListener" />
 
 2. Copy Mule lib folder (without boot) as is to $CATALINA_HOME/mule-libs/ (create one if necessary). No need to flatten
    directories.

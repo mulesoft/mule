@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.db.internal.domain.xa;
+package org.mule.runtime.module.db.internal.domain.xa;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;

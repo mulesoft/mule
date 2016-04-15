@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.file.api;
+package org.mule.runtime.module.extension.file.api;
 
 import static java.lang.String.format;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.metadata.DataType;
 import org.mule.api.temporary.MuleMessage;
-import org.mule.module.extension.file.api.command.CopyCommand;
-import org.mule.module.extension.file.api.command.CreateDirectoryCommand;
-import org.mule.module.extension.file.api.command.DeleteCommand;
-import org.mule.module.extension.file.api.command.ListCommand;
-import org.mule.module.extension.file.api.command.MoveCommand;
-import org.mule.module.extension.file.api.command.ReadCommand;
-import org.mule.module.extension.file.api.command.RenameCommand;
-import org.mule.module.extension.file.api.command.WriteCommand;
-import org.mule.module.extension.file.api.lock.PathLock;
+import org.mule.runtime.module.extension.file.api.command.CopyCommand;
+import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand;
+import org.mule.runtime.module.extension.file.api.command.DeleteCommand;
+import org.mule.runtime.module.extension.file.api.command.ListCommand;
+import org.mule.runtime.module.extension.file.api.command.MoveCommand;
+import org.mule.runtime.module.extension.file.api.command.ReadCommand;
+import org.mule.runtime.module.extension.file.api.command.RenameCommand;
+import org.mule.runtime.module.extension.file.api.command.WriteCommand;
+import org.mule.runtime.module.extension.file.api.lock.PathLock;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;

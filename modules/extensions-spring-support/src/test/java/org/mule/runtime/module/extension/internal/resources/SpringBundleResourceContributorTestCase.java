@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.resources;
+package org.mule.runtime.module.extension.internal.resources;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -18,8 +18,8 @@ import org.mule.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.extension.api.introspection.property.XmlModelProperty;
 import org.mule.extension.api.resources.GeneratedResource;
 import org.mule.extension.api.resources.ResourcesGenerator;
-import org.mule.module.extension.internal.capability.xml.SpringBundleResourceContributor;
-import org.mule.module.extension.internal.config.ExtensionNamespaceHandler;
+import org.mule.runtime.module.extension.internal.capability.xml.SpringBundleResourceContributor;
+import org.mule.runtime.module.extension.internal.config.ExtensionNamespaceHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

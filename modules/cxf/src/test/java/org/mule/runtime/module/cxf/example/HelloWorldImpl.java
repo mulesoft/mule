@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.example;
+package org.mule.runtime.module.cxf.example;
 
 import javax.jws.WebService;
 
-@WebService(endpointInterface = "org.mule.module.cxf.example.HelloWorld", serviceName = "HelloWorld")
+@WebService(endpointInterface = "org.mule.runtime.module.cxf.example.HelloWorld", serviceName = "HelloWorld")
 public class HelloWorldImpl implements HelloWorld
 {
 

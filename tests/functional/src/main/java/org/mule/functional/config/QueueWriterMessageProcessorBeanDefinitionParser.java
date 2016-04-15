@@ -7,8 +7,8 @@
 
 package org.mule.functional.config;
 
-import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.functional.client.QueueWriterMessageProcessor;
 
 import org.w3c.dom.Element;

@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.jaas.config;
+package org.mule.runtime.module.jaas.config;
 
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
-import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
-import org.mule.module.jaas.JaasSimpleAuthenticationProvider;
-import org.mule.module.jaas.filters.JaasSecurityFilter;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.NamedDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
+import org.mule.runtime.module.jaas.JaasSimpleAuthenticationProvider;
+import org.mule.runtime.module.jaas.filters.JaasSecurityFilter;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

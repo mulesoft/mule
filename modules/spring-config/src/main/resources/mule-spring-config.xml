@@ -4,10 +4,10 @@
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <bean name="_muleObjectNameProcessor" class="org.mule.config.spring.processors.MuleObjectNameProcessor"/>
+    <bean name="_muleObjectNameProcessor" class="org.mule.runtime.config.spring.processors.MuleObjectNameProcessor"/>
     
     <bean name="_mulePropertyPlaceholderProcessor"
-        class="org.mule.config.spring.processors.PropertyPlaceholderProcessor">
+        class="org.mule.runtime.config.spring.processors.PropertyPlaceholderProcessor">
         <property name="factories">
             <map>
                 <entry key="hostname">
@@ -19,6 +19,6 @@
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
     </bean>
 
-    <bean name="_muleParentContextPropertyPlaceholderProcessor" class="org.mule.config.spring.processors.ParentContextPropertyPlaceholderProcessor"/>
+    <bean name="_muleParentContextPropertyPlaceholderProcessor" class="org.mule.runtime.config.spring.processors.ParentContextPropertyPlaceholderProcessor"/>
 
 </beans>

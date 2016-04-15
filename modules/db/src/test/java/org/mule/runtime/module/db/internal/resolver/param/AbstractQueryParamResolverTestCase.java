@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.param;
+package org.mule.runtime.module.db.internal.resolver.param;
 
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.module.db.internal.domain.query.QueryParamValue;
+import org.mule.runtime.module.db.internal.domain.query.QueryParamValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;

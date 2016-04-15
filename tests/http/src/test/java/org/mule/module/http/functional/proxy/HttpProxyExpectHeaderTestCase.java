@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.proxy;
+package org.mule.runtime.module.http.functional.proxy;
 
 import static org.apache.http.entity.ContentType.DEFAULT_TEXT;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import org.mule.module.http.functional.AbstractHttpExpectHeaderServerTestCase;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import org.mule.runtime.module.http.functional.AbstractHttpExpectHeaderServerTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;

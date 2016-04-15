@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.util;
+package org.mule.runtime.module.extension.internal.util;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -35,10 +35,10 @@ import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.InterceptorFactory;
-import org.mule.module.extension.internal.model.property.ConnectionTypeModelProperty;
-import org.mule.module.extension.internal.model.property.ImplementingMethodModelProperty;
-import org.mule.module.extension.internal.model.property.ImplementingTypeModelProperty;
-import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import com.google.common.base.Joiner;

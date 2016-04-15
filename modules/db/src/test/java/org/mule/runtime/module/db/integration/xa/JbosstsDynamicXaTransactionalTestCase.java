@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.xa;
+package org.mule.runtime.module.db.integration.xa;
 
-import org.mule.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 public class JbosstsDynamicXaTransactionalTestCase extends AbstractDynamicXaTransactionalTestCase
 {

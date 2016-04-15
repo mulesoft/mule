@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.authorizationcode.functional;
+package org.mule.runtime.module.oauth2.internal.authorizationcode.functional;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -12,17 +12,17 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.apache.http.client.fluent.Request.Get;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.mule.module.http.internal.HttpParser.appendQueryParam;
-import static org.mule.module.oauth2.internal.OAuthConstants.CODE_PARAMETER;
-import static org.mule.module.oauth2.internal.OAuthConstants.STATE_PARAMETER;
-import static org.mule.module.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.NO_AUTHORIZATION_CODE_STATUS;
-import static org.mule.module.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.TOKEN_NOT_FOUND_STATUS;
-import static org.mule.module.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.TOKEN_URL_CALL_FAILED_STATUS;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.runtime.module.http.internal.HttpParser.appendQueryParam;
+import static org.mule.runtime.module.oauth2.internal.OAuthConstants.CODE_PARAMETER;
+import static org.mule.runtime.module.oauth2.internal.OAuthConstants.STATE_PARAMETER;
+import static org.mule.runtime.module.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.NO_AUTHORIZATION_CODE_STATUS;
+import static org.mule.runtime.module.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.TOKEN_NOT_FOUND_STATUS;
+import static org.mule.runtime.module.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.TOKEN_URL_CALL_FAILED_STATUS;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
-import org.mule.module.oauth2.internal.StateEncoder;
+import org.mule.runtime.module.oauth2.internal.StateEncoder;
 import org.mule.tck.MuleTestUtils;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.tck.junit4.rule.DynamicPort;

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.config;
+package org.mule.runtime.module.extension.internal.config;
 
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.property.SubTypesModelProperty;
-import org.mule.module.extension.internal.introspection.SubTypesMappingContainer;
+import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.filters;
+package org.mule.runtime.module.xml.filters;
 
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
@@ -19,9 +19,9 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.module.xml.util.NamespaceManager;
-import org.mule.module.xml.xpath.SaxonXpathEvaluator;
-import org.mule.module.xml.xpath.XPathEvaluator;
+import org.mule.runtime.module.xml.util.NamespaceManager;
+import org.mule.runtime.module.xml.xpath.SaxonXpathEvaluator;
+import org.mule.runtime.module.xml.xpath.XPathEvaluator;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.text.MessageFormat;

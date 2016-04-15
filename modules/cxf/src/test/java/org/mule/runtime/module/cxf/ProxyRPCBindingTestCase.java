@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.IOUtils;
@@ -28,7 +28,7 @@ public class ProxyRPCBindingTestCase extends FunctionalTestCase
     @Rule
     public final DynamicPort httpPortService = new DynamicPort("port2");
 
-    public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.module.http.api.HttpConstants.Methods.POST.name()).build();
+    public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.runtime.module.http.api.HttpConstants.Methods.POST.name()).build();
 
     private String getAllRequest;
     private String getAllResponse;

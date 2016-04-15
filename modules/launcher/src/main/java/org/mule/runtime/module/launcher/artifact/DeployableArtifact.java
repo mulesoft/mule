@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.artifact;
+package org.mule.runtime.module.launcher.artifact;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.module.artifact.Artifact;
-import org.mule.module.launcher.DeploymentStartException;
-import org.mule.module.launcher.InstallException;
-import org.mule.module.launcher.descriptor.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.Artifact;
+import org.mule.runtime.module.launcher.DeploymentStartException;
+import org.mule.runtime.module.launcher.InstallException;
+import org.mule.runtime.module.launcher.descriptor.DeployableArtifactDescriptor;
 
 /**
  * An Artifact is an abstract representation of a deployable unit within the mule container.

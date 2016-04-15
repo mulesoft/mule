@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.clientcredentials.functional;
+package org.mule.runtime.module.oauth2.internal.clientcredentials.functional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -14,17 +14,16 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.core.Is.isA;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-
-import java.io.IOException;
-
-import org.mule.module.oauth2.internal.TokenNotFoundException;
+import org.mule.functional.junit4.ApplicationContextBuilder;
+import org.mule.runtime.module.oauth2.internal.TokenNotFoundException;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+
+import java.io.IOException;
 
 import org.junit.Rule;
 import org.junit.Test;

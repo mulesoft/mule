@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.model;
+package org.mule.runtime.module.db.integration.model;
 
 public class Planet
 {

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.application;
+package org.mule.runtime.module.launcher.application;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
@@ -21,19 +21,19 @@ import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.artifact.classloader.DisposableClassLoader;
-import org.mule.module.launcher.DeploymentInitException;
-import org.mule.module.launcher.DeploymentListener;
-import org.mule.module.launcher.DeploymentStartException;
-import org.mule.module.launcher.DeploymentStopException;
-import org.mule.module.launcher.InstallException;
-import org.mule.module.launcher.MuleDeploymentService;
-import org.mule.module.launcher.artifact.MuleContextDeploymentListener;
-import org.mule.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.module.launcher.domain.Domain;
-import org.mule.module.launcher.domain.DomainRepository;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.DisposableClassLoader;
+import org.mule.runtime.module.launcher.DeploymentInitException;
+import org.mule.runtime.module.launcher.DeploymentListener;
+import org.mule.runtime.module.launcher.DeploymentStartException;
+import org.mule.runtime.module.launcher.DeploymentStopException;
+import org.mule.runtime.module.launcher.InstallException;
+import org.mule.runtime.module.launcher.MuleDeploymentService;
+import org.mule.runtime.module.launcher.artifact.MuleContextDeploymentListener;
+import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.launcher.domain.Domain;
+import org.mule.runtime.module.launcher.domain.DomainRepository;
+import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.io.File;

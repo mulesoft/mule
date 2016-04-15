@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.metadata.extension;
+package org.mule.runtime.module.extension.internal.metadata.extension;
 
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.metadata.Content;
@@ -12,13 +12,14 @@ import org.mule.extension.api.annotation.metadata.MetadataKeyParam;
 import org.mule.extension.api.annotation.metadata.MetadataScope;
 import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.introspection.metadata.NullMetadataResolver;
-import org.mule.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
-import org.mule.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithoutKeyResolver;
-import org.mule.module.extension.internal.metadata.extension.resolver.TestContentResolverWithKeyResolver;
-import org.mule.module.extension.internal.metadata.extension.resolver.TestContentResolverWithoutKeyResolver;
-import org.mule.module.extension.internal.metadata.extension.resolver.TestOutputResolverWithKeyResolver;
-import org.mule.module.extension.internal.metadata.extension.resolver.TestOutputResolverWithoutKeyResolver;
-import org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache;
+import org.mule.module.extension.internal.metadata.extension.MetadataOperationsParent;
+import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
+import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithoutKeyResolver;
+import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentResolverWithKeyResolver;
+import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentResolverWithoutKeyResolver;
+import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestOutputResolverWithKeyResolver;
+import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestOutputResolverWithoutKeyResolver;
+import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestResolverWithCache;
 
 @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
         contentResolver = TestContentAndOutputResolverWithKeyResolver.class,

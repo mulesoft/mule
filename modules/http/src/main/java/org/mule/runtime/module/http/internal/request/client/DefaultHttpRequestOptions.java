@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request.client;
+package org.mule.runtime.module.http.internal.request.client;
 
-import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.requester.HttpRequesterConfig;
-import org.mule.module.http.api.requester.HttpStreamingType;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
+import org.mule.runtime.module.http.api.requester.HttpStreamingType;
 import org.mule.api.tls.TlsContextFactory;
 
 /**
- * Default implementation for {@link org.mule.module.http.api.client.HttpRequestOptions}
+ * Default implementation for {@link org.mule.runtime.module.http.api.client.HttpRequestOptions}
  */
 public class DefaultHttpRequestOptions implements HttpRequestOptions
 {

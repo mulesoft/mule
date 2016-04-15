@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.test.util;
+package org.mule.runtime.module.db.test.util;
 
-import org.mule.module.db.internal.resolver.param.StoredProcedureParamTypeResolver;
-import org.mule.module.db.internal.resolver.param.StoredProcedureParamTypeResolverTestCase;
+import org.mule.runtime.module.db.internal.resolver.param.StoredProcedureParamTypeResolver;
+import org.mule.runtime.module.db.internal.resolver.param.StoredProcedureParamTypeResolverTestCase;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;

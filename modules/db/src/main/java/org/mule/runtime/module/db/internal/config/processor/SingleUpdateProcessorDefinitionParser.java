@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.processor;
+package org.mule.runtime.module.db.internal.config.processor;
 
-import org.mule.module.db.internal.domain.executor.UpdateExecutorFactory;
-import org.mule.module.db.internal.domain.query.QueryType;
-import org.mule.module.db.internal.metadata.UpdateMetadataProvider;
-import org.mule.module.db.internal.processor.UpdateMessageProcessor;
+import org.mule.runtime.module.db.internal.domain.executor.UpdateExecutorFactory;
+import org.mule.runtime.module.db.internal.domain.query.QueryType;
+import org.mule.runtime.module.db.internal.metadata.UpdateMetadataProvider;
+import org.mule.runtime.module.db.internal.processor.UpdateMessageProcessor;
 
 import java.util.List;
 

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener.async;
+package org.mule.runtime.module.http.internal.listener.async;
 
-import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 
 /**
  * Handler for sending an http response asynchronously

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.spring.security.filters.http;
+package org.mule.runtime.module.spring.security.filters.http;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.PropertyScope.OUTBOUND;
-import static org.mule.module.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
 
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.PropertyScope;
-import org.mule.module.http.internal.filter.HttpBasicAuthenticationFilter;
+import org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

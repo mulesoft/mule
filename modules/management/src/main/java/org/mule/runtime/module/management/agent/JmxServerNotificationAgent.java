@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.management.agent;
+package org.mule.runtime.module.management.agent;
 
 import org.mule.runtime.core.agent.AbstractNotificationLoggerAgent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
-import org.mule.module.management.support.JmxSupport;
-import org.mule.module.management.support.JmxSupportFactory;
+import org.mule.runtime.module.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.runtime.module.management.support.JmxSupport;
+import org.mule.runtime.module.management.support.JmxSupportFactory;
 
 import java.util.ArrayList;
 import java.util.List;

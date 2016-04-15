@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher;
+package org.mule.runtime.module.launcher;
 
-import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.artifact.ArtifactFactory;
-import org.mule.module.launcher.domain.Domain;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.launcher.application.Application;
+import org.mule.runtime.module.launcher.artifact.ArtifactFactory;
+import org.mule.runtime.module.launcher.domain.Domain;
+import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.runtime.core.util.Preconditions;
 
 import java.io.File;

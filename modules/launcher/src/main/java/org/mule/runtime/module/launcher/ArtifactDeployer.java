@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher;
+package org.mule.runtime.module.launcher;
 
-import org.mule.module.launcher.artifact.DeployableArtifact;
+import org.mule.runtime.module.launcher.artifact.DeployableArtifact;
 
 /**
  * Deployes and Undeploys artifacts in the container.

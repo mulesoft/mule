@@ -4,29 +4,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher;
+package org.mule.runtime.module.launcher;
 
-import static org.mule.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
-import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
-import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
-import org.mule.module.artifact.classloader.MuleClassLoaderLookupPolicy;
-import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.application.CompositeApplicationClassLoaderFactory;
-import org.mule.module.launcher.application.DefaultApplicationFactory;
-import org.mule.module.launcher.application.MuleApplicationClassLoaderFactory;
-import org.mule.module.launcher.artifact.ArtifactFactory;
-import org.mule.module.launcher.descriptor.DomainDescriptor;
-import org.mule.module.launcher.domain.DefaultDomainFactory;
-import org.mule.module.launcher.domain.DefaultDomainManager;
-import org.mule.module.launcher.domain.Domain;
-import org.mule.module.launcher.domain.DomainClassLoaderFactory;
-import org.mule.module.launcher.domain.DomainFactory;
-import org.mule.module.launcher.domain.DomainManager;
-import org.mule.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
-import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
-import org.mule.module.launcher.util.DebuggableReentrantLock;
-import org.mule.module.launcher.util.ObservableList;
+import static org.mule.runtime.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
+import static org.mule.runtime.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.MuleClassLoaderLookupPolicy;
+import org.mule.runtime.module.launcher.application.Application;
+import org.mule.runtime.module.launcher.application.CompositeApplicationClassLoaderFactory;
+import org.mule.runtime.module.launcher.application.DefaultApplicationFactory;
+import org.mule.runtime.module.launcher.application.MuleApplicationClassLoaderFactory;
+import org.mule.runtime.module.launcher.artifact.ArtifactFactory;
+import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
+import org.mule.runtime.module.launcher.domain.DefaultDomainFactory;
+import org.mule.runtime.module.launcher.domain.DefaultDomainManager;
+import org.mule.runtime.module.launcher.domain.Domain;
+import org.mule.runtime.module.launcher.domain.DomainClassLoaderFactory;
+import org.mule.runtime.module.launcher.domain.DomainFactory;
+import org.mule.runtime.module.launcher.domain.DomainManager;
+import org.mule.runtime.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory;
+import org.mule.runtime.module.launcher.util.DebuggableReentrantLock;
+import org.mule.runtime.module.launcher.util.ObservableList;
 import org.mule.runtime.core.util.Preconditions;
 
 import com.google.common.collect.ImmutableSet;

@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.module.xml.transformer.XsltTransformer;
+import org.mule.runtime.module.xml.transformer.XsltTransformer;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import javax.xml.transform.URIResolver;

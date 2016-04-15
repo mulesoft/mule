@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.artifact.descriptor;
+package org.mule.runtime.module.artifact.descriptor;
 
-import org.mule.module.artifact.classloader.ArtifactClassLoaderFilter;
-import org.mule.module.artifact.classloader.ClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
 
 import java.io.File;
 

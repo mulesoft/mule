@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.descriptor;
+package org.mule.runtime.module.launcher.descriptor;
 
-import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
+import static org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 
 import java.io.File;

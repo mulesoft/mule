@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.capability.xml.schema;
+package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

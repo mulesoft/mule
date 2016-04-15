@@ -9,7 +9,7 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
-    <spring:bean name="usernameTokenValidator" class="org.mule.module.cxf.wssec.UsernameTokenTestValidator"/>
+    <spring:bean name="usernameTokenValidator" class="org.mule.runtime.module.cxf.wssec.UsernameTokenTestValidator"/>
 
     <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
     <http:request-config name="requestConfig" host="localhost" port="${port1}" />
@@ -22,7 +22,7 @@
                     <cxf:property key="action" value="UsernameToken"/>
                     <cxf:property key="user" value="joe"/>
                     <cxf:property key="passwordType" value="PasswordText"/>
-                    <cxf:property key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ClientPasswordCallback"/>
+                    <cxf:property key="passwordCallbackClass" value="org.mule.runtime.module.cxf.wssec.ClientPasswordCallback"/>
                 </cxf:ws-config>
             </cxf:ws-security>
         </cxf:jaxws-client>
@@ -34,7 +34,7 @@
 
     <flow name="greeterService">
         <http:listener path="/services/greeter" config-ref="listenerConfig" allowedMethods="POST" parseRequest="false" />
-        <cxf:jaxws-service serviceClass="org.mule.module.cxf.wssec.GreeterWithLatch">
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.wssec.GreeterWithLatch">
             <cxf:ws-security>
                 <cxf:ws-config>
                     <cxf:property key="action" value="UsernameToken"/>
@@ -45,7 +45,7 @@
             </cxf:ws-security>
         </cxf:jaxws-service>
         <component>
-            <singleton-object class="org.mule.module.cxf.wssec.GreeterWithLatch"/>
+            <singleton-object class="org.mule.runtime.module.cxf.wssec.GreeterWithLatch"/>
         </component>
     </flow>
 

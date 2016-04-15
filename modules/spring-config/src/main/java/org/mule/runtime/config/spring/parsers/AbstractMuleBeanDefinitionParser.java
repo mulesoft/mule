@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.runtime.config.spring.parsers;
 
-import static org.mule.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
+import static org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
 import static org.mule.runtime.core.api.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
-import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
-import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
-import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
-import org.mule.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssemblerFactory;
+import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.ValueMap;
+import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.runtime.core.api.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -456,7 +456,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
 
     /**
      * Restricted use - does not include a target.
-     * If possible, use {@link org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser#getBeanAssembler(org.w3c.dom.Element, org.springframework.beans.factory.support.BeanDefinitionBuilder)}
+     * If possible, use {@link org.mule.runtime.config.spring.parsers.AbstractHierarchicalDefinitionParser#getBeanAssembler(org.w3c.dom.Element, org.springframework.beans.factory.support.BeanDefinitionBuilder)}
      *
      * @param bean The bean being constructed
      * @return An assembler that automates Mule-specific logic for bean construction

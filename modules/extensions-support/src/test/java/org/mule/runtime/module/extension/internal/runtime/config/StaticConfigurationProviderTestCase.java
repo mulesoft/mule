@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.config;
+package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -12,17 +12,17 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.module.extension.internal.util.ExtensionsTestUtils.getParameter;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.runtime.ExpirationPolicy;
-import org.mule.module.extension.HeisenbergConnectionProvider;
-import org.mule.module.extension.HeisenbergExtension;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.module.extension.internal.runtime.resolver.StaticValueResolver;
-import org.mule.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.HeisenbergConnectionProvider;
+import org.mule.runtime.module.extension.HeisenbergExtension;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.size.SmallTest;
 
 import com.google.common.collect.ImmutableList;

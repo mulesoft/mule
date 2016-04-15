@@ -7,7 +7,7 @@
 package org.mule.runtime.core.management.mbeans;
 
 import org.mule.runtime.core.management.AbstractMuleJmxTestCase;
-import org.mule.module.management.mbean.YourKitProfilerServiceMBean;
+import org.mule.runtime.module.management.mbean.YourKitProfilerServiceMBean;
 
 import java.lang.reflect.Method;
 

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.api.client;
+package org.mule.runtime.module.http.api.client;
 
 import org.mule.runtime.core.api.client.OperationOptions;
-import org.mule.module.http.api.requester.HttpRequesterConfig;
-import org.mule.module.http.api.requester.HttpStreamingType;
+import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
+import org.mule.runtime.module.http.api.requester.HttpStreamingType;
 import org.mule.api.tls.TlsContextFactory;
 
 /**
@@ -35,7 +35,7 @@ public interface HttpRequestOptions extends OperationOptions
     boolean isParseResponseDisabled();
 
     /**
-     * @return the {@link org.mule.module.http.api.requester.HttpRequesterConfig} to use for sending the request
+     * @return the {@link org.mule.runtime.module.http.api.requester.HttpRequesterConfig} to use for sending the request
      */
     HttpRequesterConfig getRequesterConfig();
 

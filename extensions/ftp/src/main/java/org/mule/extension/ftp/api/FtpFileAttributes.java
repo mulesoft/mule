@@ -6,7 +6,7 @@
  */
 package org.mule.extension.ftp.api;
 
-import org.mule.module.extension.file.api.AbstractFileAttributes;
+import org.mule.runtime.module.extension.file.api.AbstractFileAttributes;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;

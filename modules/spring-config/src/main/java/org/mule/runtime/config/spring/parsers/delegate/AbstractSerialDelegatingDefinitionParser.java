@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.delegate;
+package org.mule.runtime.config.spring.parsers.delegate;
 
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
-import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.runtime.config.spring.parsers.PreProcessor;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Arrays;
@@ -32,8 +32,8 @@ import org.w3c.dom.Element;
  * on the element without worrying about interfering with other parsers.</p>
  *
  * <p>Typically, subclasses will add additional processing with
- * {@link org.mule.config.spring.parsers.PreProcessor} and
- * {@link org.mule.config.spring.parsers.PostProcessor} anonymous classes.</p>
+ * {@link org.mule.runtime.config.spring.parsers.PreProcessor} and
+ * {@link org.mule.runtime.config.spring.parsers.PostProcessor} anonymous classes.</p>
  */
 public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractDelegatingDefinitionParser
 {

@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.management.config;
+package org.mule.runtime.module.management.config;
 
 import org.mule.runtime.core.agent.Log4jNotificationLoggerAgent;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
-import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.ObjectFactoryWrapper;
-import org.mule.module.management.agent.DefaultJmxSupportAgent;
-import org.mule.module.management.agent.JmxServerNotificationAgent;
-import org.mule.module.management.agent.Log4jAgent;
-import org.mule.module.management.agent.Mx4jAgent;
-import org.mule.module.management.agent.RmiRegistryAgent;
-import org.mule.module.management.agent.YourKitProfilerAgent;
+import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.runtime.config.spring.parsers.collection.ChildMapDefinitionParser;
+import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.ObjectFactoryWrapper;
+import org.mule.runtime.module.management.agent.DefaultJmxSupportAgent;
+import org.mule.runtime.module.management.agent.JmxServerNotificationAgent;
+import org.mule.runtime.module.management.agent.Log4jAgent;
+import org.mule.runtime.module.management.agent.Mx4jAgent;
+import org.mule.runtime.module.management.agent.RmiRegistryAgent;
+import org.mule.runtime.module.management.agent.YourKitProfilerAgent;
 
 /**
  * Handles all configuration elements in the Mule Management module.

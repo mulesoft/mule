@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.metadata;
+package org.mule.runtime.module.db.internal.metadata;
 
 import org.mule.common.DefaultResult;
 import org.mule.common.Result;

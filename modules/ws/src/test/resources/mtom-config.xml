@@ -14,8 +14,8 @@
 
     <flow name="server">
         <http:listener path="/services/TestAttachments" config-ref="listenerConfig"/>
-        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestAttachments" mtomEnabled="true"/>
-        <component class="org.mule.module.ws.consumer.TestAttachments"/>
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.ws.consumer.TestAttachments" mtomEnabled="true"/>
+        <component class="org.mule.runtime.module.ws.consumer.TestAttachments"/>
     </flow>
 
     <ws:consumer-config serviceAddress="http://localhost:${port}/services/TestAttachments" wsdlLocation="TestAttachments.wsdl"

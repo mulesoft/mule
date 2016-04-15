@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.consumer;
+package org.mule.runtime.module.ws.consumer;
 
-import org.mule.module.cxf.SoapConstants;
+import org.mule.runtime.module.cxf.SoapConstants;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;

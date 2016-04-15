@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.domain;
+package org.mule.runtime.module.launcher.domain;
 
 import static java.lang.String.format;
-import static org.mule.module.launcher.MuleFoldersUtil.getDomainFolder;
-import static org.mule.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
-import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
+import static org.mule.runtime.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
+import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.module.launcher.DeploymentListener;
-import org.mule.module.launcher.descriptor.DomainDescriptor;
-import org.mule.module.launcher.descriptor.DomainDescriptorParser;
-import org.mule.module.launcher.descriptor.EmptyDomainDescriptor;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.launcher.DeploymentListener;
+import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
+import org.mule.runtime.module.launcher.descriptor.DomainDescriptorParser;
+import org.mule.runtime.module.launcher.descriptor.EmptyDomainDescriptor;
+import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;

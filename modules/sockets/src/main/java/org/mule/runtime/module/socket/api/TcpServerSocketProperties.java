@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.socket.api;
+package org.mule.runtime.module.socket.api;
 
 /**
  * Interface for objects that provide TCP configuration for server sockets.

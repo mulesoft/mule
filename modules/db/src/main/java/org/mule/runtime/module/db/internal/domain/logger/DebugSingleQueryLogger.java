@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.logger;
+package org.mule.runtime.module.db.internal.domain.logger;
 
-import org.mule.module.db.internal.domain.param.InputQueryParam;
-import org.mule.module.db.internal.domain.query.QueryTemplate;
+import org.mule.runtime.module.db.internal.domain.param.InputQueryParam;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
 
 import org.apache.commons.logging.Log;
 

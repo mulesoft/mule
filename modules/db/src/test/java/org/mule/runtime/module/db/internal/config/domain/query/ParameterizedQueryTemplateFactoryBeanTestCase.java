@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.domain.query;
+package org.mule.runtime.module.db.internal.config.domain.query;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -13,19 +13,19 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.module.db.internal.domain.param.DefaultInOutQueryParam;
-import org.mule.module.db.internal.domain.param.DefaultInputQueryParam;
-import org.mule.module.db.internal.domain.param.DefaultOutputQueryParam;
-import org.mule.module.db.internal.domain.param.InOutQueryParam;
-import org.mule.module.db.internal.domain.param.InputQueryParam;
-import org.mule.module.db.internal.domain.param.OutputQueryParam;
-import org.mule.module.db.internal.domain.param.QueryParam;
-import org.mule.module.db.internal.domain.query.QueryTemplate;
-import org.mule.module.db.internal.domain.query.QueryType;
-import org.mule.module.db.internal.domain.type.DbType;
-import org.mule.module.db.internal.domain.type.JdbcTypes;
-import org.mule.module.db.internal.domain.type.UnknownDbType;
-import org.mule.module.db.internal.parser.QueryTemplateParser;
+import org.mule.runtime.module.db.internal.domain.param.DefaultInOutQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.DefaultInputQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.DefaultOutputQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.InOutQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.InputQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.OutputQueryParam;
+import org.mule.runtime.module.db.internal.domain.param.QueryParam;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
+import org.mule.runtime.module.db.internal.domain.query.QueryType;
+import org.mule.runtime.module.db.internal.domain.type.DbType;
+import org.mule.runtime.module.db.internal.domain.type.JdbcTypes;
+import org.mule.runtime.module.db.internal.domain.type.UnknownDbType;
+import org.mule.runtime.module.db.internal.parser.QueryTemplateParser;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

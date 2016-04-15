@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.config;
+package org.mule.runtime.module.xml.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.module.xml.transformer.XmlPrettyPrinter;
+import org.mule.runtime.module.xml.transformer.XmlPrettyPrinter;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.scripting.transformer;
+package org.mule.runtime.module.scripting.transformer;
 
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.module.scripting.component.Scriptable;
+import org.mule.runtime.module.scripting.component.Scriptable;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 import java.util.ArrayList;

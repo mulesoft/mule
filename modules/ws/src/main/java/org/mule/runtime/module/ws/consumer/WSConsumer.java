@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.ws.consumer;
+package org.mule.runtime.module.ws.consumer;
 
-import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MessagingException;
@@ -25,11 +25,11 @@ import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.module.cxf.CxfConstants;
-import org.mule.module.cxf.CxfOutboundMessageProcessor;
-import org.mule.module.cxf.builder.ProxyClientMessageProcessorBuilder;
-import org.mule.module.ws.security.SecurityStrategy;
-import org.mule.module.ws.security.WSSecurity;
+import org.mule.runtime.module.cxf.CxfConstants;
+import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
+import org.mule.runtime.module.cxf.builder.ProxyClientMessageProcessorBuilder;
+import org.mule.runtime.module.ws.security.SecurityStrategy;
+import org.mule.runtime.module.ws.security.WSSecurity;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;

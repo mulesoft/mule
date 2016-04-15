@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring;
+package org.mule.runtime.config.spring;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.agent.Agent;
@@ -102,7 +102,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
 
     /**
      * A lifecycle phase that will delegate to the
-     * {@link org.mule.config.spring.SpringRegistry#doDispose()} method which in turn
+     * {@link org.mule.runtime.config.spring.SpringRegistry#doDispose()} method which in turn
      * will destroy the application context managed by this registry
      */
     class SpringContextDisposePhase extends MuleContextDisposePhase

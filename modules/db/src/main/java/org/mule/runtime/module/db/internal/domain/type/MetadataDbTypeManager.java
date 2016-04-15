@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.type;
+package org.mule.runtime.module.db.internal.domain.type;
 
-import org.mule.module.db.internal.domain.connection.DbConnection;
-import org.mule.module.db.internal.result.resultset.ResultSetIterator;
-import org.mule.module.db.internal.result.resultset.SingleResultResultSetCloser;
-import org.mule.module.db.internal.result.row.InsensitiveMapRowHandler;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
+import org.mule.runtime.module.db.internal.result.resultset.ResultSetIterator;
+import org.mule.runtime.module.db.internal.result.resultset.SingleResultResultSetCloser;
+import org.mule.runtime.module.db.internal.result.row.InsensitiveMapRowHandler;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;

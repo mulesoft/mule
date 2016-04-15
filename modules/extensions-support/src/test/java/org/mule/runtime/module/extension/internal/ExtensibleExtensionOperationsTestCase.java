@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal;
+package org.mule.runtime.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
-import static org.mule.module.extension.HeisenbergExtension.HEISENBERG;
+import static org.mule.runtime.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
+import static org.mule.runtime.module.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.extension.api.annotation.Extensible;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.ExtensionOf;
 import org.mule.extension.api.annotation.Operations;
 import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.module.extension.internal.model.property.ExtendingOperationModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
 
 import org.junit.Test;
 

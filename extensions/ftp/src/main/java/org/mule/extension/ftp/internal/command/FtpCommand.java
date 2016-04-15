@@ -10,8 +10,8 @@ import static java.lang.String.format;
 import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.FtpFileSystem;
-import org.mule.module.extension.file.api.FileSystem;
-import org.mule.module.extension.file.api.command.FileCommand;
+import org.mule.runtime.module.extension.file.api.FileSystem;
+import org.mule.runtime.module.extension.file.api.command.FileCommand;
 
 import java.io.IOException;
 import java.nio.file.Path;

@@ -5,19 +5,19 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.delete;
+package org.mule.runtime.module.db.integration.delete;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mule.module.db.integration.DbTestUtil.assertExpectedUpdateCount;
-import static org.mule.module.db.integration.model.Planet.MARS;
-import static org.mule.module.db.integration.model.Planet.VENUS;
+import static org.mule.runtime.module.db.integration.DbTestUtil.assertExpectedUpdateCount;
+import static org.mule.runtime.module.db.integration.model.Planet.MARS;
+import static org.mule.runtime.module.db.integration.model.Planet.VENUS;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.TestDbConfig;
-import org.mule.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
+import org.mule.runtime.module.db.integration.TestDbConfig;
+import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

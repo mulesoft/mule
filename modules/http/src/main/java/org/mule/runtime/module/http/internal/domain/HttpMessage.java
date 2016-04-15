@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.domain;
+package org.mule.runtime.module.http.internal.domain;
 
 import java.util.Collection;
 
@@ -32,7 +32,7 @@ public interface HttpMessage
     Collection<String> getHeaderValues(String headerName);
 
     /**
-     * @return the entity of the message. If there's no entity an {@link org.mule.module.http.internal.domain.EmptyHttpEntity} is returned
+     * @return the entity of the message. If there's no entity an {@link org.mule.runtime.module.http.internal.domain.EmptyHttpEntity} is returned
      */
     HttpEntity getEntity();
 

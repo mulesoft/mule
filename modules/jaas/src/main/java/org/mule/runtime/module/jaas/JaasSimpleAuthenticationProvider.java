@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.jaas;
+package org.mule.runtime.module.jaas;
 
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
@@ -32,7 +32,7 @@ public class JaasSimpleAuthenticationProvider extends AbstractSecurityProvider
     private String loginContextName;
     private String credentials;
     private String loginModule;
-    private String defaultModule = "org.mule.module.jaas.loginmodule.DefaultLoginModule";
+    private String defaultModule = "org.mule.runtime.module.jaas.loginmodule.DefaultLoginModule";
 
     public JaasSimpleAuthenticationProvider()
     {

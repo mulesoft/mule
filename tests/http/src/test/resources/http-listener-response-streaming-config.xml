@@ -8,7 +8,7 @@
 
     <configuration>
         <expression-language>
-            <import class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase"/>
+            <import class="org.mule.runtime.module.http.functional.listener.HttpListenerResponseStreamingTestCase"/>
             <alias name="inputStreamPayload" expression="new ByteArrayInputStream(HttpListenerResponseStreamingTestCase.TEST_BODY.getBytes())"/>
             <alias name="stringPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY"/>
         </expression-language>

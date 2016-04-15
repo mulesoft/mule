@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.transport;
+package org.mule.runtime.module.cxf.transport;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
@@ -24,10 +24,10 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.module.cxf.CxfConfiguration;
-import org.mule.module.cxf.CxfConstants;
-import org.mule.module.cxf.CxfOutboundMessageProcessor;
-import org.mule.module.cxf.support.DelegatingOutputStream;
+import org.mule.runtime.module.cxf.CxfConfiguration;
+import org.mule.runtime.module.cxf.CxfConstants;
+import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
+import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.message.NullPayload;
 

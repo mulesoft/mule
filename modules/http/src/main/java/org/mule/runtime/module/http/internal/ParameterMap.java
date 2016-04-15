@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal;
+package org.mule.runtime.module.http.internal;
 
 import static java.util.Arrays.toString;
 import static java.util.Collections.unmodifiableMap;
 
-import org.mule.module.http.api.HttpParameters;
+import org.mule.runtime.module.http.api.HttpParameters;
 
 import java.io.Serializable;
 import java.util.AbstractMap;

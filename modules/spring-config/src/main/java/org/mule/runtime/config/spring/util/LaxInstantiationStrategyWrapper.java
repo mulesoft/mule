@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.util;
+package org.mule.runtime.config.spring.util;
 
-import org.mule.config.spring.OptionalObjectsController;
-import org.mule.config.spring.processors.DiscardedOptionalBeanPostProcessor;
+import org.mule.runtime.config.spring.OptionalObjectsController;
+import org.mule.runtime.config.spring.processors.DiscardedOptionalBeanPostProcessor;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

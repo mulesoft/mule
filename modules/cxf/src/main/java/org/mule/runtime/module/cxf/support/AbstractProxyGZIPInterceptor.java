@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.cxf.support;
+package org.mule.runtime.module.cxf.support;
 
 import static com.google.common.net.HttpHeaders.CONTENT_ENCODING;
 

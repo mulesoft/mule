@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.parser;
+package org.mule.runtime.module.db.internal.parser;
 
-import org.mule.module.db.internal.domain.query.QueryTemplate;
+import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
 
 /**
  * Parses a SQL queries

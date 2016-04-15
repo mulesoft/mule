@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
-import org.mule.module.cxf.config.ProxyServiceFactoryBean;
+import org.mule.runtime.module.cxf.config.FlowConfiguringMessageProcessor;
+import org.mule.runtime.module.cxf.config.ProxyServiceFactoryBean;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.List;

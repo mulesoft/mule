@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.source;
+package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.MuleContext;
@@ -13,13 +13,13 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.extension.api.annotation.Parameter;
 import org.mule.extension.api.introspection.source.SourceModel;
 import org.mule.extension.api.runtime.source.Source;
-import org.mule.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.module.extension.internal.util.MuleExtensionUtils;
+import org.mule.runtime.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 /**
  * Resolves and injects the values of a {@link Source} that has fields annotated
- * with {@link Parameter} or {@link org.mule.module.extension.internal.introspection.ParameterGroup}
+ * with {@link Parameter} or {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup}
  *
  * @since 4.0
  */

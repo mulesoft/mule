@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request;
+package org.mule.runtime.module.http.internal.request;
 
 import static java.lang.Integer.MAX_VALUE;
 import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
@@ -34,14 +34,14 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
-import org.mule.module.http.api.HttpAuthentication;
-import org.mule.module.http.api.requester.HttpSendBodyMode;
-import org.mule.module.http.internal.HttpParser;
-import org.mule.module.http.internal.ParameterMap;
-import org.mule.module.http.internal.domain.request.HttpRequest;
-import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
-import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
-import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.runtime.module.http.api.HttpAuthentication;
+import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
+import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.runtime.module.http.internal.ParameterMap;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
+import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 import org.mule.runtime.core.processor.AbstractNonBlockingMessageProcessor;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;

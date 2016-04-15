@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.extension.internal.capability.xml.schema.model;
+package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

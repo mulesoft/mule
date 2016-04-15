@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.collection;
+package org.mule.runtime.config.spring.parsers.collection;
 
-import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
-import org.mule.config.spring.util.SpringXMLUtils;
+import org.mule.runtime.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.runtime.config.spring.util.SpringXMLUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

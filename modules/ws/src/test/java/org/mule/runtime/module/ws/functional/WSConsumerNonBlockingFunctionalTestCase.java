@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.ws.functional;
+package org.mule.runtime.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -55,7 +55,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
     @Test
     public void invalidRequestFormatReturnsSOAPFault() throws Exception
     {
-        String message = "<tns:echo xmlns:tns=\"http://consumer.ws.module.mule.org/\"><invalid>Hello</invalid></tns:echo>";
+        String message = "<tns:echo xmlns:tns=\"http://consumer.ws.module.runtime.mule.org/\"><invalid>Hello</invalid></tns:echo>";
         assertSoapFault("http://localhost:" + dynamicPort.getNumber() + "/in", message, "unexpected element (uri:\"\", local:\"invalid\")");
         muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsDifferent();
     }

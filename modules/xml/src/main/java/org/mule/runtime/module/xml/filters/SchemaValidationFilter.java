@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.filters;
+package org.mule.runtime.module.xml.filters;
 
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.module.xml.transformer.DelayedResult;
-import org.mule.module.xml.util.MuleResourceResolver;
-import org.mule.module.xml.util.XMLUtils;
+import org.mule.runtime.module.xml.transformer.DelayedResult;
+import org.mule.runtime.module.xml.util.MuleResourceResolver;
+import org.mule.runtime.module.xml.util.XMLUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 

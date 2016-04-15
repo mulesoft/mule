@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.builder;
+package org.mule.runtime.module.cxf.builder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -12,11 +12,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.module.cxf.CxfInboundMessageProcessor;
-import org.mule.module.cxf.config.WsConfig;
-import org.mule.module.cxf.config.WsSecurity;
-import org.mule.module.cxf.support.MuleSecurityManagerValidator;
-import org.mule.module.cxf.testmodels.Echo;
+import org.mule.runtime.module.cxf.CxfInboundMessageProcessor;
+import org.mule.runtime.module.cxf.config.WsConfig;
+import org.mule.runtime.module.cxf.config.WsSecurity;
+import org.mule.runtime.module.cxf.support.MuleSecurityManagerValidator;
+import org.mule.runtime.module.cxf.testmodels.Echo;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;

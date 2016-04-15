@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.result;
+package org.mule.runtime.module.db.internal.result;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -13,10 +13,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.module.db.internal.domain.connection.DbConnection;
-import org.mule.module.db.internal.result.row.RowHandler;
-import org.mule.module.db.internal.result.resultset.ResultSetIterator;
-import org.mule.module.db.internal.result.resultset.StreamingResultSetCloser;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
+import org.mule.runtime.module.db.internal.result.row.RowHandler;
+import org.mule.runtime.module.db.internal.result.resultset.ResultSetIterator;
+import org.mule.runtime.module.db.internal.result.resultset.StreamingResultSetCloser;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

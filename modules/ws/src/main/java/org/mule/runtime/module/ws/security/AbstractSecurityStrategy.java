@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.ws.security;
+package org.mule.runtime.module.ws.security;
 
 
 import static org.apache.ws.security.handler.WSHandlerConstants.PW_CALLBACK_REF;

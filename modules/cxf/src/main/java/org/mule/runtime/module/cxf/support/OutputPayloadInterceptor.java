@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.support;
+package org.mule.runtime.module.cxf.support;
 
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.module.xml.transformer.DelayedResult;
+import org.mule.runtime.module.xml.transformer.DelayedResult;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.api.message.NullPayload;
 

@@ -7,8 +7,8 @@
 package org.mule.runtime.core.transformers.xml.xstream;
 
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.module.xml.transformer.XStreamFactory;
-import org.mule.module.xml.transformer.XmlToObject;
+import org.mule.runtime.module.xml.transformer.XStreamFactory;
+import org.mule.runtime.module.xml.transformer.XmlToObject;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.thoughtworks.xstream.XStream;

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.db.internal.domain.xa;
+package org.mule.runtime.module.db.internal.domain.xa;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.module.db.internal.domain.connection.DbPoolingProfile;
+import org.mule.runtime.module.db.internal.domain.connection.DbPoolingProfile;
 
 import javax.sql.DataSource;
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.requester;
+package org.mule.runtime.module.http.functional.requester;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -13,9 +13,9 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.module.http.internal.request.DefaultHttpRequester;
-import org.mule.module.http.internal.request.NtlmProxyConfig;
+import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.runtime.module.http.internal.request.DefaultHttpRequester;
+import org.mule.runtime.module.http.internal.request.NtlmProxyConfig;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.concurrent.Latch;
 

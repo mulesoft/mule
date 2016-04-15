@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.functional;
+package org.mule.runtime.module.cxf.functional;
 
 import static org.junit.Assert.assertEquals;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.module.cxf.CxfInboundMessageProcessor;
-import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
+import org.mule.runtime.module.cxf.CxfInboundMessageProcessor;
+import org.mule.runtime.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 

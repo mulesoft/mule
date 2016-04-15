@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.performance;
+package org.mule.runtime.module.db.performance;
 
 public interface LoadTask
 {

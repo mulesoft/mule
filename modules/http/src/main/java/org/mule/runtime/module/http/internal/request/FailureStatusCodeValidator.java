@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request;
+package org.mule.runtime.module.http.internal.request;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.module.http.api.HttpConstants;
+import org.mule.runtime.module.http.api.HttpConstants;
 
 public class FailureStatusCodeValidator extends RangeStatusCodeValidator
 {

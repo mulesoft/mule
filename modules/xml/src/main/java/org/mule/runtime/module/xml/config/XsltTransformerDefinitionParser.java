@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.config;
+package org.mule.runtime.module.xml.config;
 
-import org.mule.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
-import org.mule.module.xml.transformer.XsltTransformer;
+import org.mule.runtime.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
+import org.mule.runtime.module.xml.transformer.XsltTransformer;
 
 public class XsltTransformerDefinitionParser extends TransformerMessageProcessorDefinitionParser
 {

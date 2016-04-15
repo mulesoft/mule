@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener.grizzly;
+package org.mule.runtime.module.http.internal.listener.grizzly;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.internal.HttpParser;
-import org.mule.module.http.internal.ParameterMap;
-import org.mule.module.http.internal.domain.EmptyHttpEntity;
-import org.mule.module.http.internal.domain.HttpEntity;
-import org.mule.module.http.internal.domain.HttpProtocol;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.MultipartHttpEntity;
-import org.mule.module.http.internal.domain.request.HttpRequest;
-import org.mule.module.http.internal.multipart.HttpPart;
+import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.runtime.module.http.internal.ParameterMap;
+import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
+import org.mule.runtime.module.http.internal.domain.HttpEntity;
+import org.mule.runtime.module.http.internal.domain.HttpProtocol;
+import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
+import org.mule.runtime.module.http.internal.multipart.HttpPart;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.InputStream;

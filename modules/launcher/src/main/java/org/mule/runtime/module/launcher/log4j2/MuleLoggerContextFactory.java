@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.log4j2;
+package org.mule.runtime.module.launcher.log4j2;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
-import org.mule.module.artifact.classloader.DirectoryResourceLocator;
-import org.mule.module.artifact.classloader.LocalResourceLocator;
-import org.mule.module.artifact.classloader.ShutdownListener;
-import org.mule.module.artifact.descriptor.ArtifactDescriptorFactory;
-import org.mule.module.launcher.ApplicationDescriptorFactory;
-import org.mule.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.module.launcher.plugin.ApplicationPluginDescriptorFactory;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.DirectoryResourceLocator;
+import org.mule.runtime.module.artifact.classloader.LocalResourceLocator;
+import org.mule.runtime.module.artifact.classloader.ShutdownListener;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.launcher.ApplicationDescriptorFactory;
+import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory;
+import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;

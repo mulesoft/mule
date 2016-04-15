@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.json.validation;
+package org.mule.runtime.module.json.validation;
 
-import static org.mule.module.json.validation.JsonSchemaTestUtils.getGoodFstab;
+import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getGoodFstab;
 
 import org.junit.Test;
 

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener.grizzly;
+package org.mule.runtime.module.http.internal.listener.grizzly;
 
-import org.mule.module.http.internal.listener.ServerAddressMap;
-import org.mule.module.http.internal.listener.ServerAddress;
+import org.mule.runtime.module.http.internal.listener.ServerAddressMap;
+import org.mule.runtime.module.http.internal.listener.ServerAddress;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.support;
+package org.mule.runtime.module.cxf.support;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,9 +14,9 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
-import static org.mule.module.cxf.MuleSoapHeaders.MULE_10_ACTOR;
-import static org.mule.module.cxf.MuleSoapHeaders.MULE_HEADER;
-import static org.mule.module.cxf.MuleSoapHeaders.MULE_NAMESPACE;
+import static org.mule.runtime.module.cxf.MuleSoapHeaders.MULE_10_ACTOR;
+import static org.mule.runtime.module.cxf.MuleSoapHeaders.MULE_HEADER;
+import static org.mule.runtime.module.cxf.MuleSoapHeaders.MULE_NAMESPACE;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;

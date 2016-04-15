@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.module.xml.stax.StaxSource;
+import org.mule.runtime.module.xml.stax.StaxSource;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.metadata;
+package org.mule.runtime.module.extension.internal.metadata;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -14,12 +14,12 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.extension.internal.metadata.TestMetadataUtils.AGE;
-import static org.mule.module.extension.internal.metadata.TestMetadataUtils.BRAND;
-import static org.mule.module.extension.internal.metadata.TestMetadataUtils.NAME;
-import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
-import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
-import static org.mule.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
+import static org.mule.runtime.module.extension.internal.metadata.TestMetadataUtils.AGE;
+import static org.mule.runtime.module.extension.internal.metadata.TestMetadataUtils.BRAND;
+import static org.mule.runtime.module.extension.internal.metadata.TestMetadataUtils.NAME;
+import static org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
+import static org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
+import static org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
 import org.mule.api.metadata.MetadataCache;
 import org.mule.api.metadata.MetadataKey;
 import org.mule.api.metadata.MetadataManager;
@@ -29,7 +29,7 @@ import org.mule.api.metadata.resolving.MetadataResult;
 import org.mule.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
-import org.mule.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
 import java.util.List;

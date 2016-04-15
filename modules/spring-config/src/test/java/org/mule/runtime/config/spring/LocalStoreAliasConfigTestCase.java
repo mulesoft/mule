@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring;
+package org.mule.runtime.config.spring;
 
 import static org.junit.Assert.assertSame;
 

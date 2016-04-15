@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring;
+package org.mule.runtime.config.spring;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleException;
@@ -18,8 +18,8 @@ import org.mule.runtime.core.config.bootstrap.BootstrapObjectFactory;
 import org.mule.runtime.core.config.bootstrap.ObjectBootstrapProperty;
 import org.mule.runtime.core.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.runtime.core.config.bootstrap.TransformerBootstrapProperty;
-import org.mule.config.spring.factories.BootstrapObjectFactoryBean;
-import org.mule.config.spring.factories.ConstantFactoryBean;
+import org.mule.runtime.config.spring.factories.BootstrapObjectFactoryBean;
+import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.core.transformer.TransformerUtils;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 

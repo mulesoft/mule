@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.util;
+package org.mule.runtime.module.db.internal.util;
 
 /**
  * Abstracts file reading operations

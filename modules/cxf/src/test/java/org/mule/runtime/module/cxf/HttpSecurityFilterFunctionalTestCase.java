@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf;
+package org.mule.runtime.module.cxf;
 
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -78,7 +78,7 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
         {
             int status = client.executeMethod(get);
             assertEquals(UNAUTHORIZED.getStatusCode(), status);
-            String expectedMessage = String.format("Registered authentication is set to org.mule.module.http.internal.filter.HttpBasicAuthenticationFilter " +
+            String expectedMessage = String.format("Registered authentication is set to org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter " +
                     "but there was no security context on the session. Authentication denied on endpoint %s.", get.getURI().getURI());
             assertThat(get.getResponseBodyAsString(), startsWith(expectedMessage));
         }
@@ -104,7 +104,7 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
         {
             int status = client.executeMethod(post);
             assertEquals(UNAUTHORIZED.getStatusCode(), status);
-            assertThat(post.getResponseBodyAsString(), startsWith(String.format("Registered authentication is set to org.mule.module.http.internal.filter.HttpBasicAuthenticationFilter " +
+            assertThat(post.getResponseBodyAsString(), startsWith(String.format("Registered authentication is set to org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter " +
                                                                   "but there was no security context on the session. Authentication denied on endpoint %s.", post.getURI().getURI())));
         }
         finally

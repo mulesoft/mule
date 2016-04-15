@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.domain;
+package org.mule.runtime.module.http.internal.domain;
 
-import org.mule.module.http.internal.multipart.HttpPart;
+import org.mule.runtime.module.http.internal.multipart.HttpPart;
 
 import java.util.Collection;
 

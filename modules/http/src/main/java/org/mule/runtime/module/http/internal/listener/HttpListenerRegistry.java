@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener;
+package org.mule.runtime.module.http.internal.listener;
 
-import static org.mule.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
+import static org.mule.runtime.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.module.http.internal.domain.request.HttpRequest;
-import org.mule.module.http.internal.listener.async.RequestHandler;
-import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
+import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
+import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.core.util.StringUtils;
 

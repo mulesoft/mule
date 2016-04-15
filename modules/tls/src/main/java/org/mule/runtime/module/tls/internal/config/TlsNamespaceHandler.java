@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.tls.internal.config;
+package org.mule.runtime.module.tls.internal.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><tls:connector></code> elements.

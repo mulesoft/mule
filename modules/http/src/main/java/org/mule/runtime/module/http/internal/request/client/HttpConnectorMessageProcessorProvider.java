@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request.client;
+package org.mule.runtime.module.http.internal.request.client;
 
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.client.AbstractConnectorMessageProcessorProvider;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.client.RequestCacheKey;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 
 /**
  * Provider for operations of the HTTP module.

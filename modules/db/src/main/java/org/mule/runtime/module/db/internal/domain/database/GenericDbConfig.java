@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.database;
+package org.mule.runtime.module.db.internal.domain.database;
 
 import static org.mule.common.Result.Status.FAILURE;
 import static org.mule.common.Result.Status.SUCCESS;
-import static org.mule.module.db.internal.domain.transaction.TransactionalAction.NOT_SUPPORTED;
+import static org.mule.runtime.module.db.internal.domain.transaction.TransactionalAction.NOT_SUPPORTED;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.common.DefaultResult;
 import org.mule.common.DefaultTestResult;
@@ -17,8 +17,8 @@ import org.mule.common.Result;
 import org.mule.common.TestResult;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.MetaDataKey;
-import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
-import org.mule.module.db.internal.domain.type.DbTypeManager;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnectionFactory;
+import org.mule.runtime.module.db.internal.domain.type.DbTypeManager;
 
 import java.sql.Connection;
 import java.sql.SQLException;

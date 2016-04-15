@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener.grizzly;
+package org.mule.runtime.module.http.internal.listener.grizzly;
 
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.WorkManagerSource;
-import org.mule.module.http.internal.listener.ServerAddressMap;
-import org.mule.module.http.internal.listener.ServerAddress;
+import org.mule.runtime.module.http.internal.listener.ServerAddressMap;
+import org.mule.runtime.module.http.internal.listener.ServerAddress;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 
 /**
- * {@link org.mule.module.http.internal.listener.grizzly.ExecutorProvider} implementation
+ * {@link org.mule.runtime.module.http.internal.listener.grizzly.ExecutorProvider} implementation
  * that retrieves an {@link java.util.concurrent.Executor} from a {@link org.mule.runtime.core.api.context.WorkManagerSource}
  */
 public class WorkManagerSourceExecutorProvider implements ExecutorProvider
@@ -26,7 +26,7 @@ public class WorkManagerSourceExecutorProvider implements ExecutorProvider
 
     /**
      * Adds an {@link java.util.concurrent.Executor} to be used when a request is made to
-     * a {@link org.mule.module.http.internal.listener.ServerAddress}
+     * a {@link org.mule.runtime.module.http.internal.listener.ServerAddress}
      *
      * @param serverAddress address to which the executor should be applied to
      * @param workManagerSource the executor to use when a request is done to the server address

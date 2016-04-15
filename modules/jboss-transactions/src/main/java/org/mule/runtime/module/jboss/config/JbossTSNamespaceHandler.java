@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.jboss.config;
+package org.mule.runtime.module.jboss.config;
 
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory;
+import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.runtime.module.jboss.transaction.JBossArjunaTransactionManagerFactory;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 

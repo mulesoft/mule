@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.delegate;
+package org.mule.runtime.config.spring.parsers.delegate;
 
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
-import org.mule.config.spring.parsers.PostProcessor;
-import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.runtime.config.spring.parsers.PostProcessor;
+import org.mule.runtime.config.spring.parsers.PreProcessor;
+import org.mule.runtime.config.spring.parsers.assembly.configuration.ValueMap;
 
 import java.util.Map;
 
@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
 
 /**
  * Support for extending a
- * {@link org.mule.config.spring.parsers.MuleDefinitionParser} without
+ * {@link org.mule.runtime.config.spring.parsers.MuleDefinitionParser} without
  * needing to subclass.
  */
 public abstract class AbstractPluggableDelegate implements MuleDefinitionParser

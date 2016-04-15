@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.database;
+package org.mule.runtime.module.db.internal.resolver.database;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -17,10 +17,10 @@ import org.mule.common.Result;
 import org.mule.common.TestResult;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.MetaDataKey;
-import org.mule.module.db.internal.domain.database.DataSourceConfig;
-import org.mule.module.db.internal.domain.database.DataSourceFactory;
-import org.mule.module.db.internal.domain.database.DbConfig;
-import org.mule.module.db.internal.domain.database.DbConfigFactory;
+import org.mule.runtime.module.db.internal.domain.database.DataSourceConfig;
+import org.mule.runtime.module.db.internal.domain.database.DataSourceFactory;
+import org.mule.runtime.module.db.internal.domain.database.DbConfig;
+import org.mule.runtime.module.db.internal.domain.database.DbConfigFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.sql.SQLException;

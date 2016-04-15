@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.connector;
+package org.mule.runtime.module.extension.internal.connector;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -12,8 +12,8 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.api.runtime.ConfigurationInstance;
-import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreClient;
-import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreClient;
+import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
 import java.util.List;

@@ -11,9 +11,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.module.management.agent.AbstractJmxAgent;
-import org.mule.module.management.agent.DefaultJmxSupportAgent;
-import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
+import org.mule.runtime.module.management.agent.AbstractJmxAgent;
+import org.mule.runtime.module.management.agent.DefaultJmxSupportAgent;
+import org.mule.runtime.module.management.agent.FixedHostRmiClientSocketFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Map;

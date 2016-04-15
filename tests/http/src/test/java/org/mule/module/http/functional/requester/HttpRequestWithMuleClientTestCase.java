@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.requester;
+package org.mule.runtime.module.http.functional.requester;
 
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -12,19 +12,19 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import static org.mule.module.http.api.requester.HttpStreamingType.NEVER;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.runtime.module.http.api.requester.HttpStreamingType.NEVER;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.module.http.api.HttpConstants;
-import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.requester.HttpRequesterConfig;
-import org.mule.module.http.api.requester.HttpRequesterConfigBuilder;
+import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
+import org.mule.runtime.module.http.api.requester.HttpRequesterConfigBuilder;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.api.tls.TlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;

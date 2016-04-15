@@ -5,14 +5,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.connection;
+package org.mule.runtime.module.db.internal.domain.connection;
 
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
-import org.mule.module.db.internal.domain.transaction.DbTransactionManager;
-import org.mule.module.db.internal.domain.transaction.TransactionalAction;
-import org.mule.module.db.internal.domain.type.DbTypeManager;
-import org.mule.module.db.internal.resolver.param.GenericParamTypeResolverFactory;
+import org.mule.runtime.module.db.internal.domain.transaction.DbTransactionManager;
+import org.mule.runtime.module.db.internal.domain.transaction.TransactionalAction;
+import org.mule.runtime.module.db.internal.domain.type.DbTypeManager;
+import org.mule.runtime.module.db.internal.resolver.param.GenericParamTypeResolverFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,7 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Creates connections using a {@link org.mule.module.db.internal.domain.transaction.DbTransactionManager} to track active transactions.
+ * Creates connections using a {@link org.mule.runtime.module.db.internal.domain.transaction.DbTransactionManager} to track active transactions.
  */
 public class TransactionalDbConnectionFactory implements DbConnectionFactory
 {

@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.mel;
+package org.mule.runtime.module.oauth2.internal.mel;
 
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
 import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
+import org.mule.runtime.module.oauth2.internal.tokenmanager.TokenManagerConfig;
 
 import java.util.Arrays;
 

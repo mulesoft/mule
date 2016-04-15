@@ -4,6 +4,6 @@
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.spring.SpringRegistryBootstrap" init-method="initialise"/>
+    <bean name="_muleSimpleRegistryBootstrap" class="org.mule.runtime.config.spring.SpringRegistryBootstrap" init-method="initialise"/>
 
 </beans>

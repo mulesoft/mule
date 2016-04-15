@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.database;
+package org.mule.runtime.module.db.internal.domain.database;
 
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.module.db.internal.domain.type.DbType;
+import org.mule.runtime.module.db.internal.domain.type.DbType;
 
 import java.util.List;
 

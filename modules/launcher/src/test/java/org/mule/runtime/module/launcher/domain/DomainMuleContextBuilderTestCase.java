@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.domain;
+package org.mule.runtime.module.launcher.domain;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;

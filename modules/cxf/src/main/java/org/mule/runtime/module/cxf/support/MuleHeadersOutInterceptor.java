@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.cxf.support;
+package org.mule.runtime.module.cxf.support;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
-import static org.mule.module.cxf.MuleSoapHeaders.MULE_HEADER;
+import static org.mule.runtime.module.cxf.MuleSoapHeaders.MULE_HEADER;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.module.cxf.CxfConstants;
-import org.mule.module.cxf.MuleSoapHeaders;
+import org.mule.runtime.module.cxf.CxfConstants;
+import org.mule.runtime.module.cxf.MuleSoapHeaders;
 
 import javax.xml.namespace.QName;
 

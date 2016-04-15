@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.scripting.config;
+package org.mule.runtime.module.scripting.config;
 
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.module.scripting.component.GroovyRefreshableBeanBuilder;
+import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.runtime.module.scripting.component.GroovyRefreshableBeanBuilder;
 
 import org.w3c.dom.Element;
 

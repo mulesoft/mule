@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.select;
+package org.mule.runtime.module.db.integration.select;
 
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.api.MuleContext;

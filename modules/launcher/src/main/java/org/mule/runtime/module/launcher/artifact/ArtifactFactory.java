@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.artifact;
+package org.mule.runtime.module.launcher.artifact;
 
-import org.mule.module.artifact.Artifact;
+import org.mule.runtime.module.artifact.Artifact;
 
 import java.io.File;
 import java.io.IOException;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.connector;
+package org.mule.runtime.module.extension.internal.connector;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -22,7 +22,7 @@ import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.runtime.source.Source;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 

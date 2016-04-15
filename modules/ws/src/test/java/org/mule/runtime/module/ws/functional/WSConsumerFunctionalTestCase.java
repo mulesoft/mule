@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.ws.functional;
+package org.mule.runtime.module.ws.functional;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,7 +46,7 @@ public class WSConsumerFunctionalTestCase extends AbstractWSConsumerFunctionalTe
     @Test
     public void invalidRequestFormatReturnsSOAPFault() throws Exception
     {
-        String message = "<tns:echo xmlns:tns=\"http://consumer.ws.module.mule.org/\"><invalid>Hello</invalid></tns:echo>";
+        String message = "<tns:echo xmlns:tns=\"http://consumer.ws.module.runtime.mule.org/\"><invalid>Hello</invalid></tns:echo>";
         assertSoapFault("client", message, "Client");
     }
 

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.executor;
+package org.mule.runtime.module.extension.internal.runtime.executor;
 
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
-import static org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.toMap;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.toMap;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.ParameterGroup;
@@ -16,14 +16,14 @@ import org.mule.extension.api.annotation.param.UseConfig;
 import org.mule.extension.api.introspection.operation.OperationModel;
 import org.mule.extension.api.introspection.parameter.ParameterModel;
 import org.mule.extension.api.runtime.OperationContext;
-import org.mule.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
-import org.mule.module.extension.internal.runtime.resolver.ArgumentResolver;
-import org.mule.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
-import org.mule.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
-import org.mule.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
-import org.mule.module.extension.internal.runtime.resolver.EventArgumentResolver;
-import org.mule.module.extension.internal.runtime.resolver.MessageArgumentResolver;
-import org.mule.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
+import org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.EventArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.MessageArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener;
+package org.mule.runtime.module.http.internal.listener;
 
-import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.RequestContext;
@@ -23,19 +23,19 @@ import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.execution.MessageProcessingManager;
-import org.mule.module.http.api.HttpConstants.HttpStatus;
-import org.mule.module.http.api.listener.HttpListener;
-import org.mule.module.http.api.listener.HttpListenerConfig;
-import org.mule.module.http.api.requester.HttpStreamingType;
-import org.mule.module.http.internal.HttpParser;
-import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
-import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.module.http.internal.listener.async.RequestHandler;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
-import org.mule.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
-import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.module.http.internal.listener.matcher.MethodRequestMatcher;
+import org.mule.runtime.module.http.api.HttpConstants.HttpStatus;
+import org.mule.runtime.module.http.api.listener.HttpListener;
+import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
+import org.mule.runtime.module.http.api.requester.HttpStreamingType;
+import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
+import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCallback;
+import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
+import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
+import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
+import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.runtime.module.http.internal.listener.matcher.MethodRequestMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,7 +150,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
 
             private void sendErrorResponse(final HttpStatus status, String message, HttpResponseReadyCallback responseCallback)
             {
-                responseCallback.responseReady(new org.mule.module.http.internal.domain.response.HttpResponseBuilder()
+                responseCallback.responseReady(new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder()
                                                        .setStatusCode(status.getStatusCode())
                                                        .setReasonPhrase(status.getReasonPhrase())
                                                        .setEntity(new ByteArrayHttpEntity(message.getBytes()))

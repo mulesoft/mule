@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.describer;
+package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.api.tls.TlsContextFactory;
@@ -12,7 +12,7 @@ import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
-import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 
 import java.lang.reflect.Field;
 

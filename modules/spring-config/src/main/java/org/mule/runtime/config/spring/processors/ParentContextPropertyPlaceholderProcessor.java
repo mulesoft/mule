@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.processors;
+package org.mule.runtime.config.spring.processors;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.config.spring.SpringRegistry;
+import org.mule.runtime.config.spring.SpringRegistry;
 
 import java.util.Map;
 

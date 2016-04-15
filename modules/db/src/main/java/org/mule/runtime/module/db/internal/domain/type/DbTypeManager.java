@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.type;
+package org.mule.runtime.module.db.internal.domain.type;
 
-import org.mule.module.db.internal.domain.connection.DbConnection;
+import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
 
 /**
  * Manages types for a database instance

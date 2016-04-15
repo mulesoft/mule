@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.file.api.matcher;
+package org.mule.runtime.module.extension.file.api.matcher;
 
-import org.mule.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileAttributes;
 
 import java.util.function.Predicate;
 

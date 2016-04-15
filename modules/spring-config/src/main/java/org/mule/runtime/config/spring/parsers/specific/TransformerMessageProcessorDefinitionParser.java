@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.specific;
+package org.mule.runtime.config.spring.parsers.specific;
 
 import org.mule.api.metadata.DataType;
 import org.mule.api.metadata.SimpleDataType;

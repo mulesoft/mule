@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal;
+package org.mule.runtime.module.extension.internal;
 
-import static org.mule.module.extension.HeisenbergExtension.sourceTimesStarted;
-import static org.mule.module.extension.HeisenbergSource.CORE_POOL_SIZE_ERROR_MESSAGE;
-import static org.mule.module.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+import static org.mule.runtime.module.extension.HeisenbergExtension.sourceTimesStarted;
+import static org.mule.runtime.module.extension.HeisenbergSource.CORE_POOL_SIZE_ERROR_MESSAGE;
+import static org.mule.runtime.module.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.module.extension.HeisenbergExtension;
+import org.mule.runtime.module.extension.HeisenbergExtension;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 

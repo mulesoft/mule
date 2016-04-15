@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.config;
+package org.mule.runtime.module.extension.internal.runtime.config;
 
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.module.extension.internal.runtime.ObjectBuilder;
-import org.mule.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
-import org.mule.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.ObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
  * Implementation of {@link ObjectBuilder} to create instances that

@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection;
+package org.mule.runtime.module.extension.internal.introspection;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.expression.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.expression.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.common.MuleVersion;
@@ -44,16 +44,16 @@ import org.mule.extension.api.introspection.declaration.fluent.SourceDeclaration
 import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.extension.api.runtime.Interceptor;
 import org.mule.extension.api.runtime.OperationExecutorFactory;
-import org.mule.module.extension.internal.DefaultDescribingContext;
-import org.mule.module.extension.internal.exception.IllegalParameterModelDefinitionException;
-import org.mule.module.extension.internal.introspection.validation.ConfigurationModelValidator;
-import org.mule.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
-import org.mule.module.extension.internal.introspection.validation.ModelValidator;
-import org.mule.module.extension.internal.introspection.validation.NameClashModelValidator;
-import org.mule.module.extension.internal.introspection.validation.OperationReturnTypeModelValidator;
-import org.mule.module.extension.internal.introspection.validation.ParameterModelValidator;
-import org.mule.module.extension.internal.introspection.validation.TargetParameterModelValidator;
-import org.mule.module.extension.internal.runtime.executor.OperationExecutorFactoryWrapper;
+import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
+import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.module.extension.internal.introspection.validation.ConfigurationModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.ModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.NameClashModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.OperationReturnTypeModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.ParameterModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.TargetParameterModelValidator;
+import org.mule.runtime.module.extension.internal.runtime.executor.OperationExecutorFactoryWrapper;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;

@@ -10,7 +10,7 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/pgp http://www.mulesoft.org/schema/mule/pgp/current/mule-pgp.xsd">
 
-    <spring:bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl"
+    <spring:bean id="pgpKeyManager" class="org.mule.runtime.module.pgp.PGPKeyRingImpl"
         init-method="initialise">
         <spring:property name="publicKeyRingFileName"
             value="serverPublic.gpg" />

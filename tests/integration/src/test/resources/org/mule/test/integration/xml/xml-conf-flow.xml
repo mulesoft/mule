@@ -14,7 +14,7 @@
     </mule-xml:namespace-manager>
 
     <custom-transformer
-        class="org.mule.module.xml.transformer.XmlToDomDocument"
+        class="org.mule.runtime.module.xml.transformer.XmlToDomDocument"
         name="InputStreamToDOM"
         returnClass="org.w3c.dom.Document" />
 

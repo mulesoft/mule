@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.artifact.classloader;
+package org.mule.runtime.module.artifact.classloader;
 
-import org.mule.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 /**
  * Creates {@link ClassLoader} instances for Mule applications

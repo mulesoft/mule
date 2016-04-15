@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.nativelib;
+package org.mule.runtime.module.launcher.nativelib;
 
 import org.mule.runtime.core.util.FileUtils;
 

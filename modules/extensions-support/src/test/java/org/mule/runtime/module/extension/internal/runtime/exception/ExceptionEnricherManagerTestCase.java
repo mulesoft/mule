@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.exception;
+package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -18,7 +18,7 @@ import org.mule.extension.api.introspection.exception.ExceptionEnricher;
 import org.mule.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.extension.api.introspection.source.RuntimeSourceModel;
-import org.mule.module.extension.exception.HeisenbergException;
+import org.mule.runtime.module.extension.exception.HeisenbergException;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Optional;

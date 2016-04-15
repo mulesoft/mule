@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.processor;
+package org.mule.runtime.module.db.internal.config.processor;
 
-import org.mule.module.db.internal.domain.query.QueryType;
+import org.mule.runtime.module.db.internal.domain.query.QueryType;
 
 import java.util.List;
 

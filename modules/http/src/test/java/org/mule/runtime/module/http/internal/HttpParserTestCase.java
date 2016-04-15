@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal;
+package org.mule.runtime.module.http.internal;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
+import static org.mule.runtime.module.http.internal.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

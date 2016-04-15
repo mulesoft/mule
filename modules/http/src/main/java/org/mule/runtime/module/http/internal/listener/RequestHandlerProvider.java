@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.listener;
+package org.mule.runtime.module.http.internal.listener;
 
-import org.mule.module.http.internal.domain.request.HttpRequest;
-import org.mule.module.http.internal.listener.async.RequestHandler;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
+import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
 
 /**
- * Provider of {@link org.mule.module.http.internal.listener.async.RequestHandler} for a certain
+ * Provider of {@link org.mule.runtime.module.http.internal.listener.async.RequestHandler} for a certain
  * incoming http request.
  */
 public interface RequestHandlerProvider

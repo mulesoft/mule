@@ -9,8 +9,8 @@ package org.mule.runtime.core.management.support;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.AbstractMuleJmxTestCase;
-import org.mule.module.management.mbean.StatisticsService;
-import org.mule.module.management.support.JmxModernSupport;
+import org.mule.runtime.module.management.mbean.StatisticsService;
+import org.mule.runtime.module.management.support.JmxModernSupport;
 
 import java.util.Arrays;
 import java.util.List;

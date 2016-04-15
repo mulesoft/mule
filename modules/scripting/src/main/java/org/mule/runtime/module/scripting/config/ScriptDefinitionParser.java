@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.scripting.config;
+package org.mule.runtime.module.scripting.config;
 
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.generic.OptionalChildDefinitionParser;
-import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
-import org.mule.module.scripting.component.Scriptable;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.runtime.config.spring.parsers.generic.OptionalChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.processors.CheckRequiredAttributes;
+import org.mule.runtime.module.scripting.component.Scriptable;
 import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.xml.ParserContext;

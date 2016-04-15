@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.cxf.feature;
+package org.mule.runtime.module.cxf.feature;
 
-import org.mule.module.cxf.support.ProxyGZIPInInterceptor;
-import org.mule.module.cxf.support.ProxyGZIPOutInterceptor;
+import org.mule.runtime.module.cxf.support.ProxyGZIPInInterceptor;
+import org.mule.runtime.module.cxf.support.ProxyGZIPOutInterceptor;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.json.validation;
+package org.mule.runtime.module.json.validation;
 
-import org.mule.module.json.JsonData;
+import org.mule.runtime.module.json.JsonData;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayInputStream;

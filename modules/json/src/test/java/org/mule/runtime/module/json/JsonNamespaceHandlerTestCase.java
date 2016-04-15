@@ -4,21 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.json;
+package org.mule.runtime.module.json;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.module.json.filters.IsJsonFilter;
-import org.mule.module.json.transformers.FruitCollection;
-import org.mule.module.json.transformers.JsonBeanRoundTripTestCase;
-import org.mule.module.json.transformers.JsonSchemaValidationFilter;
-import org.mule.module.json.transformers.JsonToObject;
-import org.mule.module.json.transformers.JsonToXml;
-import org.mule.module.json.transformers.JsonXsltTransformer;
-import org.mule.module.json.transformers.ObjectToJson;
-import org.mule.module.json.transformers.XmlToJson;
+import org.mule.runtime.module.json.filters.IsJsonFilter;
+import org.mule.runtime.module.json.transformers.FruitCollection;
+import org.mule.runtime.module.json.transformers.JsonBeanRoundTripTestCase;
+import org.mule.runtime.module.json.transformers.JsonSchemaValidationFilter;
+import org.mule.runtime.module.json.transformers.JsonToObject;
+import org.mule.runtime.module.json.transformers.JsonToXml;
+import org.mule.runtime.module.json.transformers.JsonXsltTransformer;
+import org.mule.runtime.module.json.transformers.ObjectToJson;
+import org.mule.runtime.module.json.transformers.XmlToJson;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.codehaus.jackson.JsonNode;

@@ -5,11 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.test.util;
+package org.mule.runtime.module.db.test.util;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.module.db.internal.domain.type.DbType;
+import org.mule.runtime.module.db.internal.domain.type.DbType;
 
 import java.sql.ParameterMetaData;
 import java.sql.SQLException;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.runtime.connector.secure;
+package org.mule.runtime.module.extension.internal.runtime.connector.secure;
 
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.Operations;

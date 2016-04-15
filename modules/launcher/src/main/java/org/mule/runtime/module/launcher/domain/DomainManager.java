@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.domain;
+package org.mule.runtime.module.launcher.domain;
 
 /**
  * Tracks {@link Domain} instances deployed on the container

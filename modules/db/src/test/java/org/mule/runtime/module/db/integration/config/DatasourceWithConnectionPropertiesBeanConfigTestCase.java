@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.db.integration.config;
+package org.mule.runtime.module.db.integration.config;
 
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

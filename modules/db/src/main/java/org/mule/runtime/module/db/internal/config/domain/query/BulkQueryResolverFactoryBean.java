@@ -5,15 +5,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.config.domain.query;
+package org.mule.runtime.module.db.internal.config.domain.query;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.module.db.internal.parser.SimpleQueryTemplateParser;
-import org.mule.module.db.internal.resolver.param.ParamValueResolver;
-import org.mule.module.db.internal.resolver.query.BulkQueryResolver;
-import org.mule.module.db.internal.resolver.query.StaticBulkQueryResolver;
-import org.mule.module.db.internal.resolver.query.DynamicBulkQueryResolver;
+import org.mule.runtime.module.db.internal.parser.SimpleQueryTemplateParser;
+import org.mule.runtime.module.db.internal.resolver.param.ParamValueResolver;
+import org.mule.runtime.module.db.internal.resolver.query.BulkQueryResolver;
+import org.mule.runtime.module.db.internal.resolver.query.StaticBulkQueryResolver;
+import org.mule.runtime.module.db.internal.resolver.query.DynamicBulkQueryResolver;
 
 import org.springframework.beans.factory.FactoryBean;
 

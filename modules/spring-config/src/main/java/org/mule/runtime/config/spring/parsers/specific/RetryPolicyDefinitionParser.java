@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.specific;
+package org.mule.runtime.config.spring.parsers.specific;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
-import static org.mule.config.spring.parsers.specific.NameConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
-import static org.mule.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
+import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
+import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
 import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
 
-import org.mule.config.spring.parsers.generic.OptionalChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.OptionalChildDefinitionParser;
 import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;
 
 import org.apache.commons.lang.StringUtils;

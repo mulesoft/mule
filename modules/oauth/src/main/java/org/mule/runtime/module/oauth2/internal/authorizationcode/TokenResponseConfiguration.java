@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.oauth2.internal.authorizationcode;
+package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
-import org.mule.module.oauth2.internal.OAuthConstants;
-import org.mule.module.oauth2.internal.ParameterExtractor;
+import org.mule.runtime.module.oauth2.internal.OAuthConstants;
+import org.mule.runtime.module.oauth2.internal.ParameterExtractor;
 
 import java.util.Collections;
 import java.util.List;

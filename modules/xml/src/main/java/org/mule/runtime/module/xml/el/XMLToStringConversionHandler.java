@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.el;
+package org.mule.runtime.module.xml.el;
 
 import org.dom4j.Node;
 import org.mule.mvel2.ConversionHandler;

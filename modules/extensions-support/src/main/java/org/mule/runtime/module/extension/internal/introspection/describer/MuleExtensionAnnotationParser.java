@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.introspection.describer;
+package org.mule.runtime.module.extension.internal.introspection.describer;
 
-import static org.mule.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
-import static org.mule.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
 import org.mule.runtime.core.api.MuleEvent;
@@ -35,8 +35,8 @@ import org.mule.extension.api.introspection.property.MetadataModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
-import org.mule.module.extension.internal.model.property.DeclaringMemberModelProperty;
-import org.mule.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 

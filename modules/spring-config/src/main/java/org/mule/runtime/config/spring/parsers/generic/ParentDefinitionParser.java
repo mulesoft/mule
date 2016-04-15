@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.generic;
+package org.mule.runtime.config.spring.parsers.generic;
 
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
-import org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.runtime.config.spring.parsers.AbstractHierarchicalDefinitionParser;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;

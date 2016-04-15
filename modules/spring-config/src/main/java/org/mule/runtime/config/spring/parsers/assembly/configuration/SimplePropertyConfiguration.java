@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.assembly.configuration;
+package org.mule.runtime.config.spring.parsers.assembly.configuration;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;

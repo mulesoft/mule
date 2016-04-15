@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.scripting.component;
+package org.mule.runtime.module.scripting.component;
 
 import static org.mule.runtime.core.PropertyScope.INBOUND;
 import static org.mule.runtime.core.config.i18n.CoreMessages.cannotLoadFromClasspath;

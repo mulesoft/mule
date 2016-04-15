@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.modules.schedulers.cron;
+package org.mule.runtime.modules.schedulers.cron;
 
-import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotCreateScheduler;
-import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotPauseSchedulers;
-import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotScheduleJob;
-import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotShutdownScheduler;
+import static org.mule.runtime.modules.schedulers.i18n.SchedulerMessages.couldNotCreateScheduler;
+import static org.mule.runtime.modules.schedulers.i18n.SchedulerMessages.couldNotPauseSchedulers;
+import static org.mule.runtime.modules.schedulers.i18n.SchedulerMessages.couldNotScheduleJob;
+import static org.mule.runtime.modules.schedulers.i18n.SchedulerMessages.couldNotShutdownScheduler;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;

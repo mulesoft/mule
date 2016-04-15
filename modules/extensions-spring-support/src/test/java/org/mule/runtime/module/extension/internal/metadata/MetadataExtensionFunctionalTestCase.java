@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.extension.internal.metadata;
+package org.mule.runtime.module.extension.internal.metadata;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
@@ -25,9 +25,9 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.module.extension.internal.metadata.extension.MetadataConnection;
-import org.mule.module.extension.internal.metadata.extension.MetadataExtension;
-import org.mule.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.runtime.module.extension.internal.metadata.extension.MetadataConnection;
+import org.mule.runtime.module.extension.internal.metadata.extension.MetadataExtension;
+import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;

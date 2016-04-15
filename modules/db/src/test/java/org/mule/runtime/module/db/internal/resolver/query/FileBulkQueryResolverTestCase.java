@@ -5,15 +5,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.query;
+package org.mule.runtime.module.db.internal.resolver.query;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.module.db.internal.domain.query.BulkQuery;
-import org.mule.module.db.internal.parser.QueryTemplateParser;
-import org.mule.module.db.internal.util.FileReader;
+import org.mule.runtime.module.db.internal.domain.query.BulkQuery;
+import org.mule.runtime.module.db.internal.parser.QueryTemplateParser;
+import org.mule.runtime.module.db.internal.util.FileReader;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;

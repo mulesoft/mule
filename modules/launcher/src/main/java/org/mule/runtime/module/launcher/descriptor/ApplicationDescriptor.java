@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.launcher.descriptor;
+package org.mule.runtime.module.launcher.descriptor;
 
-import static org.mule.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.module.launcher.plugin.ApplicationPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
@@ -29,7 +29,7 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor
      * Required to support the '-config spring' shortcut. Don't use a class object so
      * the core doesn't depend on mule-module-spring.
      */
-    public static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
+    public static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.runtime.config.spring.SpringXmlConfigurationBuilder";
 
     private String encoding;
     private String configurationBuilder;

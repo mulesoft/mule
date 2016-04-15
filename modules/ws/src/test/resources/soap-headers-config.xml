@@ -17,8 +17,8 @@
     <flow name="server">
         <http:listener path="/services/Test" config-ref="listenerConfig"/>
         <test:component/>
-        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
-        <component class="org.mule.module.ws.consumer.TestService"/>
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.ws.consumer.TestService"/>
+        <component class="org.mule.runtime.module.ws.consumer.TestService"/>
     </flow>
 
     <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"

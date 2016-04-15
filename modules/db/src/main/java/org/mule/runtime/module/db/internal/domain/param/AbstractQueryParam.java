@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.domain.param;
+package org.mule.runtime.module.db.internal.domain.param;
 
-import org.mule.module.db.internal.domain.type.DbType;
+import org.mule.runtime.module.db.internal.domain.type.DbType;
 
 /**
  * Defines a base class for implementing different kind of { @link QueryParam}

@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.cxf.support;
+package org.mule.runtime.module.cxf.support;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.module.cxf.CxfConstants;
+import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.io.IOException;
 import java.io.OutputStream;

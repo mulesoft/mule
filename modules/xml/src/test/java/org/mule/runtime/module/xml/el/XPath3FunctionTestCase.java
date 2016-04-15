@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.xml.el;
+package org.mule.runtime.module.xml.el;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.el.context.AbstractELTestCase;
-import org.mule.module.xml.xpath.XPathReturnType;
+import org.mule.runtime.module.xml.xpath.XPathReturnType;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

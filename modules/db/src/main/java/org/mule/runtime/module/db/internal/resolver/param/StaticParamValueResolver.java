@@ -5,10 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.internal.resolver.param;
+package org.mule.runtime.module.db.internal.resolver.param;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.module.db.internal.domain.query.QueryParamValue;
+import org.mule.runtime.module.db.internal.domain.query.QueryParamValue;
 
 import java.util.List;
 
