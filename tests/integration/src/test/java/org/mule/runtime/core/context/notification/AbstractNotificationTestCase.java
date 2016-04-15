@@ -7,8 +7,8 @@
 package org.mule.runtime.core.context.notification;
 
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 

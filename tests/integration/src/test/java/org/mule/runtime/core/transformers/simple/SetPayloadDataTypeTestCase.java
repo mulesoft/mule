@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.transformer.simple;
+package org.mule.runtime.core.transformers.simple;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 

@@ -9,16 +9,15 @@ package org.mule.runtime.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import org.junit.Ignore;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.FilenameUtils;
 import org.mule.runtime.core.util.JdkVersionUtils;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.security.Permission;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class MuleServerTestCase extends AbstractMuleTestCase
