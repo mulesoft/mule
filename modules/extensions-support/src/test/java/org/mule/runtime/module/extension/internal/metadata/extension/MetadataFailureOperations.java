@@ -10,6 +10,7 @@ import org.mule.extension.api.annotation.metadata.MetadataScope;
 import org.mule.extension.api.annotation.param.Connection;
 import org.mule.extension.api.annotation.metadata.Content;
 import org.mule.extension.api.annotation.metadata.MetadataKeyParam;
+import org.mule.module.extension.internal.metadata.extension.MetadataOperationsParent;
 import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentResolverWithoutKeyResolver;
 import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestMetadataResolverMetadataResolvingFailure;
 import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestMetadataResolverRuntimeExceptionFailure;

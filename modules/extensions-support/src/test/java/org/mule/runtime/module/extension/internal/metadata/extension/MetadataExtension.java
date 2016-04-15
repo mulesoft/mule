@@ -12,7 +12,9 @@ import org.mule.extension.api.annotation.Sources;
 import org.mule.extension.api.annotation.capability.Xml;
 import org.mule.extension.api.annotation.connector.Providers;
 import org.mule.extension.api.annotation.metadata.MetadataScope;
-import org.mule.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
+import org.mule.module.extension.internal.metadata.extension.MetadataInheritedExtensionResolversOperations;
+import org.mule.module.extension.internal.metadata.extension.MetadataInheritedOperationResolversOperations;
+import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 
 @Extension(name = "Metadata")
 @Operations({MetadataOperations.class, MetadataFailureOperations.class, MetadataInheritedExtensionResolversOperations.class, MetadataInheritedOperationResolversOperations.class})
