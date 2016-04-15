@@ -14,8 +14,8 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.MessagingException;
 import org.mule.construct.Flow;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.module.http.internal.request.NtlmProxyConfig;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
+import org.mule.module.http.internal.request.NtlmProxyConfig;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
@@ -52,6 +52,7 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
 
     private Thread mockProxyAcceptor;
     private Latch latch = new Latch();
+    private Latch proxyReadyLatch = new Latch();
 
     @Parameter(0)
     public String flowName;
@@ -78,10 +79,14 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
     }
 
     @Before
-    public void startMockProxy() throws IOException
+    public void startMockProxy() throws IOException, InterruptedException
     {
         mockProxyAcceptor = new MockProxy();
         mockProxyAcceptor.start();
+
+        // Give time to the proxy thread to start up completely
+        proxyReadyLatch.await();
+        Thread.yield();
     }
 
     @After
@@ -152,6 +157,7 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
             try
             {
                 serverSocket = new ServerSocket(Integer.parseInt(proxyPort.getValue()));
+                proxyReadyLatch.countDown();
                 serverSocket.accept().close();
                 latch.release();
             }
