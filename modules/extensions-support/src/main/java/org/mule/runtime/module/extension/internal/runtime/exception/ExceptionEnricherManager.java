@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
-import org.mule.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.extension.api.introspection.exception.ExceptionEnrichableModel;
 import org.mule.extension.api.introspection.exception.ExceptionEnricher;
 import org.mule.extension.api.introspection.exception.ExceptionEnricherFactory;

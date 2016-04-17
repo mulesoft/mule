@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
-import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionHandlingStrategy;
-import org.mule.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.api.connection.ConnectionValidationResult;
-import org.mule.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Configuration;
 import org.mule.extension.api.annotation.Configurations;

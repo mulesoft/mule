@@ -36,7 +36,7 @@ import org.mule.runtime.module.cxf.transport.MuleUniversalDestination;
 import org.mule.runtime.module.xml.stax.StaxSource;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

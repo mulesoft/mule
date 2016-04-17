@@ -11,7 +11,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.config.ConfigurationModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.operation.OperationModel;

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api;
 
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.message.SessionHandler;
 
 import java.io.Serializable;

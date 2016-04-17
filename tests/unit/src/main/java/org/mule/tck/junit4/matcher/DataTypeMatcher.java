@@ -7,7 +7,7 @@
 
 package org.mule.tck.junit4.matcher;
 
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;

@@ -9,8 +9,8 @@ package org.mule.runtime.core.internal.connection;
 import org.mule.runtime.core.api.Closeable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connection.ConnectionHandlingStrategy;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 
 /**
  * Base class for {@link ConnectionHandlingStrategy} implementations which contains state

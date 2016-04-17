@@ -13,7 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
-import org.mule.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.extension.api.introspection.exception.ExceptionEnricher;
 import org.mule.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.extension.api.introspection.RuntimeExtensionModel;

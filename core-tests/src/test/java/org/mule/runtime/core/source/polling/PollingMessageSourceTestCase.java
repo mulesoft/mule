@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride.NullOverride;
 import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
 

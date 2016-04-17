@@ -4127,7 +4127,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 Exception strategy used to rollback inbound message. It will rollback any transaction or not consume
-                inbound message unless a org.mule.api.exception.MessageRedeliveredException is thrown.
+                inbound message unless a org.mule.runtime.api.exception.MessageRedeliveredException is thrown.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

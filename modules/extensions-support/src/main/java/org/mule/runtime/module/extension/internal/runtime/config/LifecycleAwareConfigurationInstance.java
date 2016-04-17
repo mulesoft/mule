@@ -15,7 +15,7 @@ import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationInstanceNotification;
-import org.mule.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.extension.api.introspection.config.ConfigurationModel;

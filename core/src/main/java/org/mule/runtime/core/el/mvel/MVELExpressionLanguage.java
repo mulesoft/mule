@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.el.mvel.datatype.MvelDataTypeResolver;
 import org.mule.runtime.core.el.mvel.datatype.MvelEnricherDataTypePropagator;
@@ -29,7 +29,7 @@ import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.mvel2.util.CompilerTools;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.transformer.types.TypedValue;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;

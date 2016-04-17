@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.ObjectUtils;
 
 public class MessageProcessorNotification extends ServerNotification implements BlockingServerEvent

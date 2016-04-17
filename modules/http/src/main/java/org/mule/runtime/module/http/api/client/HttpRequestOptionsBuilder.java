@@ -10,7 +10,7 @@ import org.mule.runtime.core.api.client.AbstractBaseOptionsBuilder;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
 import org.mule.runtime.module.http.internal.request.client.DefaultHttpRequestOptions;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 
 /**
  * Builder object for {@link org.mule.runtime.module.http.api.client.HttpRequestOptions}

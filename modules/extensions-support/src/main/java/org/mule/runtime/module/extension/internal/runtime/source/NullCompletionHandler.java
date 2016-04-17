@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import org.mule.api.execution.CompletionHandler;
+import org.mule.runtime.api.execution.CompletionHandler;
 
 /**
  * Ignores the result of asynchronous processing

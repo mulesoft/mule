@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.api.execution.CompletionHandler;
+import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;

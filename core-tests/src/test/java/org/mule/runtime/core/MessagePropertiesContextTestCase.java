@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.transformer.types.MimeTypes;

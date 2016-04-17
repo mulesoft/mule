@@ -12,7 +12,7 @@ import static org.mule.mvel2.MVEL.compileExpression;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;

@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import org.mule.api.config.HasPoolingProfile;
-import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionHandlingStrategy;
-import org.mule.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.config.HasPoolingProfile;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 
 /**

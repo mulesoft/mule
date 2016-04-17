@@ -18,7 +18,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
-import org.mule.api.connection.ConnectionHandler;
+import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreClient;

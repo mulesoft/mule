@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.exception;
 
 
-import org.mule.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;
 
 /**

@@ -9,7 +9,7 @@ package org.mule.runtime.module.http.internal.request.client;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 
 /**
  * Default implementation for {@link org.mule.runtime.module.http.api.client.HttpRequestOptions}

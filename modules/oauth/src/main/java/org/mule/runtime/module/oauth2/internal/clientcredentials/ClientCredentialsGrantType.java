@@ -22,7 +22,7 @@ import org.mule.runtime.module.oauth2.api.RequestAuthenticationException;
 import org.mule.runtime.module.oauth2.internal.AbstractGrantType;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.module.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 
 /**
  * Authorization element for client credentials oauth grant type

@@ -40,7 +40,7 @@ public class NamedStageNameSourceTest
 
     /**
      * This test verifies that if invoked concurrently,
-     * the same {@link org.mule.api.processor.NamedStageNameSource}
+     * the same {@link org.mule.runtime.api.processor.NamedStageNameSource}
      * doesn't break and consistently generates the same name
      */
     @Test

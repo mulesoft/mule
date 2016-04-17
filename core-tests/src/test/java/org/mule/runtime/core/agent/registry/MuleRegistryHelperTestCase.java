@@ -22,7 +22,7 @@ import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.api.metadata.SimpleDataType;
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.util.Predicate;
 
 import java.util.List;

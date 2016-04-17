@@ -45,7 +45,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isRequired;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Extensible;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;

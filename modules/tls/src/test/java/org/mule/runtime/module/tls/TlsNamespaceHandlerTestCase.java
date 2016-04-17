@@ -11,9 +11,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.api.tls.TlsContextFactory;
-import org.mule.api.tls.TlsContextKeyStoreConfiguration;
-import org.mule.api.tls.TlsContextTrustStoreConfiguration;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
+import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 
 import org.junit.Test;

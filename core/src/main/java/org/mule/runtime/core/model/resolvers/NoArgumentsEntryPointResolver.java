@@ -15,10 +15,10 @@ import org.mule.runtime.core.util.ClassUtils;
  * event, this resolver will always only look for No-Arg servic methods.
  * <p/>
  * Note that the {@link org.mule.runtime.core.model.resolvers.ReflectionEntryPointResolver} supports the resolution
- * of no-arg service methods if the event payload received is of type {@link org.mule.api.message.NullPayload}.
+ * of no-arg service methods if the event payload received is of type {@link org.mule.runtime.api.message.NullPayload}.
  *
  * @see org.mule.runtime.core.model.resolvers.ReflectionEntryPointResolver
- * @see org.mule.api.message.NullPayload
+ * @see org.mule.runtime.api.message.NullPayload
  */
 public class NoArgumentsEntryPointResolver extends AbstractArgumentEntryPointResolver
 {

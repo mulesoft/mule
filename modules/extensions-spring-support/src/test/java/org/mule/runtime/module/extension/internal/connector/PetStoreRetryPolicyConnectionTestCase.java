@@ -10,11 +10,11 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
 import org.mule.runtime.core.api.MessagingException;
-import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionExceptionCode;
-import org.mule.api.connection.ConnectionHandlingStrategy;
-import org.mule.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionExceptionCode;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.Operations;

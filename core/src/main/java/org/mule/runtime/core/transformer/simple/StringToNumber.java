@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.api.metadata.SimpleDataType;
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.util.NumberUtils;
 
 import java.text.NumberFormat;

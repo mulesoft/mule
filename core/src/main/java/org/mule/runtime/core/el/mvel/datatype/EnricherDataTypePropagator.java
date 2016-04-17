@@ -12,14 +12,14 @@ import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.core.transformer.types.TypedValue;
 
 /**
- * Propagates {@link org.mule.api.metadata.DataType} from the right to the left side
+ * Propagates {@link org.mule.runtime.api.metadata.DataType} from the right to the left side
  * of an assignment expression if possible
  */
 public interface EnricherDataTypePropagator
 {
 
     /**
-     * Propagates {@link org.mule.api.metadata.DataType} on message enrichment
+     * Propagates {@link org.mule.runtime.api.metadata.DataType} on message enrichment
      *
      * @param event event being enriched
      * @param typedValue value used to enrich the message

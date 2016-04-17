@@ -7,11 +7,11 @@
 package org.mule.runtime.core.internal.connection;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.api.config.PoolingProfile;
-import org.mule.api.connection.ConnectionHandlingStrategy;
-import org.mule.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connection.PoolingListener;
+import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.PoolingListener;
 
 /**
  * Default implementation of {@link ConnectionHandlingStrategyFactory}.

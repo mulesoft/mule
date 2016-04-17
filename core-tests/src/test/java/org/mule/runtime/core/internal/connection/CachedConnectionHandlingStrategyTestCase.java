@@ -14,11 +14,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionExceptionCode;
-import org.mule.api.connection.ConnectionHandler;
-import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionExceptionCode;
+import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;

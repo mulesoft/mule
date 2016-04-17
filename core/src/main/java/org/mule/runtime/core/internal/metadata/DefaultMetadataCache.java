@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
-import org.mule.api.metadata.MetadataCache;
+import org.mule.runtime.api.metadata.MetadataCache;
 
 import com.google.common.collect.ImmutableMap;
 

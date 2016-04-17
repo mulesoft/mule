@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.config;
 
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_TLS_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.TLS_CONTEXT_TYPE;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 

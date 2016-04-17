@@ -9,7 +9,7 @@ package org.mule.runtime.core.transport;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

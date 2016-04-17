@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.expression.RequiredValueException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 import java.util.Iterator;
 

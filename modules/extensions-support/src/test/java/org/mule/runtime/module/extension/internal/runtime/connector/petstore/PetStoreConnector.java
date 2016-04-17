@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.connector.petstore;
 
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.Operations;
 import org.mule.extension.api.annotation.Parameter;

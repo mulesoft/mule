@@ -38,8 +38,8 @@ import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtil
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.api.temporary.MuleMessage;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.extension.api.annotation.Configuration;
 import org.mule.extension.api.annotation.Configurations;

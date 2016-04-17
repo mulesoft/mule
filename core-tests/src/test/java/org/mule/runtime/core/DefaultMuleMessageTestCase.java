@@ -19,7 +19,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.runtime.core.transformer.types.MimeTypes;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayInputStream;

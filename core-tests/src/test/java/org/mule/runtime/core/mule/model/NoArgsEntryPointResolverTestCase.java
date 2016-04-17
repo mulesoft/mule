@@ -12,7 +12,7 @@ import org.mule.runtime.core.model.resolvers.NoArgumentsEntryPointResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 import org.junit.Test;
 

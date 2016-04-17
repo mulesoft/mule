@@ -10,10 +10,10 @@ package org.mule.runtime.core.config;
  * <code>PoolingProfile</code> is a configuration object used to define the object
  * pooling parameters for the service it is associated with.
  *
- * @deprecated as of 4.0. Use {@link org.mule.api.config.PoolingProfile} instead
+ * @deprecated as of 4.0. Use {@link org.mule.runtime.api.config.PoolingProfile} instead
  */
 @Deprecated
-public class PoolingProfile extends org.mule.api.config.PoolingProfile
+public class PoolingProfile extends org.mule.runtime.api.config.PoolingProfile
 {
 
 }

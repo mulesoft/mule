@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.api.connector;
 
-import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connection.ConnectionHandler;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionHandler;
 
 /**
  * Manages all the connections opened between the boundaries of an application.

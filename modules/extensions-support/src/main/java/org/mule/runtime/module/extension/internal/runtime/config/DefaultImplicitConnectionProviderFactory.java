@@ -13,7 +13,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;

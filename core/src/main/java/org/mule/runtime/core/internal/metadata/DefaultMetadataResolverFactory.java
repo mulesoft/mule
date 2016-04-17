@@ -9,9 +9,9 @@ package org.mule.runtime.core.internal.metadata;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.api.metadata.resolving.MetadataContentResolver;
-import org.mule.api.metadata.resolving.MetadataKeysResolver;
-import org.mule.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
+import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
+import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.core.util.ClassUtils;
 

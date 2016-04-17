@@ -7,7 +7,7 @@
 package org.mule.runtime.core.config.i18n;
 
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.Transaction;

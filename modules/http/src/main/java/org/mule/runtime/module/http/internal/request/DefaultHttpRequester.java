@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.debug.DebugInfoProvider;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.runtime.core.api.debug.FieldDebugInfoFactory;
-import org.mule.api.execution.CompletionHandler;
+import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;

@@ -11,7 +11,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.api.temporary.MuleMessage;
+import org.mule.runtime.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.Alias;
 import org.mule.extension.api.annotation.Extension;
 import org.mule.extension.api.annotation.ParameterGroup;
@@ -66,7 +66,7 @@ public final class MuleExtensionAnnotationParser
 
     private static final Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()
             .add(MuleEvent.class)
-            .add(org.mule.api.temporary.MuleMessage.class)
+            .add(org.mule.runtime.api.temporary.MuleMessage.class)
             .add(MuleMessage.class)
             .build();
 

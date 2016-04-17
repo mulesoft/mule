@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 import java.io.StringReader;
 import java.util.List;

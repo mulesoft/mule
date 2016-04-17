@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.NamedObject;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 
 public interface HttpListenerConfig extends Config, NamedObject, AnnotatedObject, Startable, Stoppable
 {

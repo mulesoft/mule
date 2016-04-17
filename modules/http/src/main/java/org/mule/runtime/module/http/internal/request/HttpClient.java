@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
-import org.mule.api.execution.CompletionHandler;
+import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.util.store;
 
 import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 import java.io.Serializable;
 

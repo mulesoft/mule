@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.module.cxf.CxfConstants;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.api.metadata.SimpleDataType;
+import org.mule.runtime.api.metadata.SimpleDataType;
 
 import java.util.Map;
 

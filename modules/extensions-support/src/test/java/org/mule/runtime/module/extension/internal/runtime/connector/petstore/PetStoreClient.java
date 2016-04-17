@@ -10,7 +10,7 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 
 import java.util.List;
 

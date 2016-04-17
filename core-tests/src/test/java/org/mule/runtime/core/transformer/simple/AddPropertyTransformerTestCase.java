@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.tck.size.SmallTest;
 
 import org.mockito.ArgumentCaptor;

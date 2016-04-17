@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import org.mule.api.connection.ConnectionException;
-import org.mule.api.metadata.MetadataContext;
-import org.mule.api.metadata.MetadataKey;
-import org.mule.api.metadata.MetadataKeyBuilder;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.metadata.MetadataContext;
+import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;

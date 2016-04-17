@@ -29,7 +29,7 @@ import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;

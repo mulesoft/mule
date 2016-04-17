@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import org.mule.api.config.PoolingProfile;
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.retry.RetryPolicy;

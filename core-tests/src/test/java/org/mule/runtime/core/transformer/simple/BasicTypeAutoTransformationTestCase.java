@@ -7,7 +7,7 @@
 package org.mule.runtime.core.transformer.simple;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.api.metadata.DataType.STRING_DATA_TYPE;
+import static org.mule.runtime.api.metadata.DataType.STRING_DATA_TYPE;
 import static org.mule.runtime.core.transformer.types.DataTypeFactory.create;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;

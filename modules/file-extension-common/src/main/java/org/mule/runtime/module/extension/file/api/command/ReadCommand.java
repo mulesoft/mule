@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.file.api.command;
 
-import org.mule.api.temporary.MuleMessage;
+import org.mule.runtime.api.temporary.MuleMessage;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.FileSystem;
 

@@ -10,11 +10,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
-import org.mule.api.metadata.MetadataKey;
-import org.mule.api.metadata.SourceId;
-import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
-import org.mule.api.metadata.descriptor.TypeMetadataDescriptor;
-import org.mule.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.SourceId;
+import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
+import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
 import com.google.common.reflect.TypeToken;
 

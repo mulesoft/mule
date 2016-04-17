@@ -8,7 +8,7 @@ package org.mule.runtime.core.session;
 
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.transformer.types.TypedValue;

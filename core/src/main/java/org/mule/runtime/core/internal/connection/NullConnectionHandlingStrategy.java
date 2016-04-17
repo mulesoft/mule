@@ -8,9 +8,9 @@ package org.mule.runtime.core.internal.connection;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connection.ConnectionHandler;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionHandler;
 
 /**
  * A {@link ConnectionHandlerAdapter} which adds no behavior.

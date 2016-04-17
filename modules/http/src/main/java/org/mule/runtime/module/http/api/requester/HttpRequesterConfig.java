@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.module.http.api.HttpAuthentication;
 import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 
 /**
  * Configuration object for an {@code HttpRequester}.
