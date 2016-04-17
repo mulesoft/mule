@@ -197,11 +197,32 @@
     </flow>
 
     <flow name="until-successful">
-        <vm:inbound-endpoint path="in-untils" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="until-successful" exchange-pattern="request-response"/>
         <until-successful objectStore-ref="objectStore">
             <vm:outbound-endpoint path="out-us" exchange-pattern="request-response"/>
         </until-successful>
         <logger message="check1"/>
+    </flow>
+
+    <flow name="until-successful-with-processor-chain">
+        <vm:inbound-endpoint path="until-successful-with-processor-chain" exchange-pattern="request-response"/>
+        <until-successful objectStore-ref="objectStore">
+            <processor-chain>
+                <logger message="check1"/>
+                <vm:outbound-endpoint path="out-us" exchange-pattern="request-response"/>
+            </processor-chain>
+        </until-successful>
+        <logger message="check2"/>
+    </flow>
+
+    <flow name="until-successful-with-enricher">
+        <vm:inbound-endpoint path="until-successful-with-enricher" exchange-pattern="request-response"/>
+        <until-successful objectStore-ref="objectStore">
+            <enricher source="#[payload]" target="#[payload]">
+                <append-string-transformer message="Hello"/>
+            </enricher>
+        </until-successful>
+        <append-string-transformer message="Hello"/>
     </flow>
 
     <flow name="async">
