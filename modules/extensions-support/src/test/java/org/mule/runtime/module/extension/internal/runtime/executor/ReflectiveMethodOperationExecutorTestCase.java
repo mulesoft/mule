@@ -22,12 +22,12 @@ import static org.mule.runtime.module.extension.model.HealthStatus.DEAD;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.temporary.MuleMessage;
-import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.parameter.ParameterModel;
-import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.extension.api.introspection.operation.RuntimeOperationModel;
-import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.HeisenbergExtension;
 import org.mule.runtime.module.extension.HeisenbergOperations;
 import org.mule.runtime.module.extension.internal.runtime.DefaultOperationContext;
@@ -209,54 +209,54 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
         private double doubleValue;
         private boolean booleanValue;
 
-        public void charOperation(@org.mule.extension.api.annotation.param.Optional char value)
+        public void charOperation(@org.mule.runtime.extension.api.annotation.param.Optional char value)
         {
             assertThat(value, is(charValue));
         }
 
-        public void byteOperation(@org.mule.extension.api.annotation.param.Optional byte value)
+        public void byteOperation(@org.mule.runtime.extension.api.annotation.param.Optional byte value)
         {
             assertThat(value, is(byteValue));
         }
 
-        public void shortOperation(@org.mule.extension.api.annotation.param.Optional short value)
+        public void shortOperation(@org.mule.runtime.extension.api.annotation.param.Optional short value)
         {
             assertThat(value, is(shortValue));
         }
 
-        public void intOperation(@org.mule.extension.api.annotation.param.Optional int value)
+        public void intOperation(@org.mule.runtime.extension.api.annotation.param.Optional int value)
         {
             assertThat(value, is(intValue));
         }
 
-        public void longOperation(@org.mule.extension.api.annotation.param.Optional long value)
+        public void longOperation(@org.mule.runtime.extension.api.annotation.param.Optional long value)
         {
             assertThat(value, is(longValue));
         }
 
-        public void floatOperation(@org.mule.extension.api.annotation.param.Optional float value)
+        public void floatOperation(@org.mule.runtime.extension.api.annotation.param.Optional float value)
         {
             assertThat(value, is(floatValue));
         }
 
-        public void doubleOperation(@org.mule.extension.api.annotation.param.Optional double value)
+        public void doubleOperation(@org.mule.runtime.extension.api.annotation.param.Optional double value)
         {
             assertThat(value, is(doubleValue));
         }
 
-        public void booleanOperation(@org.mule.extension.api.annotation.param.Optional boolean value)
+        public void booleanOperation(@org.mule.runtime.extension.api.annotation.param.Optional boolean value)
         {
             assertThat(value, is(booleanValue));
         }
 
-        public void allCombined(@org.mule.extension.api.annotation.param.Optional char charValue,
-                                @org.mule.extension.api.annotation.param.Optional byte byteValue,
-                                @org.mule.extension.api.annotation.param.Optional short shortValue,
-                                @org.mule.extension.api.annotation.param.Optional int intValue,
-                                @org.mule.extension.api.annotation.param.Optional long longValue,
-                                @org.mule.extension.api.annotation.param.Optional float floatValue,
-                                @org.mule.extension.api.annotation.param.Optional double doubleValue,
-                                @org.mule.extension.api.annotation.param.Optional boolean booleanValue)
+        public void allCombined(@org.mule.runtime.extension.api.annotation.param.Optional char charValue,
+                                @org.mule.runtime.extension.api.annotation.param.Optional byte byteValue,
+                                @org.mule.runtime.extension.api.annotation.param.Optional short shortValue,
+                                @org.mule.runtime.extension.api.annotation.param.Optional int intValue,
+                                @org.mule.runtime.extension.api.annotation.param.Optional long longValue,
+                                @org.mule.runtime.extension.api.annotation.param.Optional float floatValue,
+                                @org.mule.runtime.extension.api.annotation.param.Optional double doubleValue,
+                                @org.mule.runtime.extension.api.annotation.param.Optional boolean booleanValue)
         {
             assertThat(charValue, is(this.charValue));
             assertThat(byteValue, is(this.byteValue));

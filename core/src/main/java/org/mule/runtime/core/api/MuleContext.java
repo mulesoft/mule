@@ -36,7 +36,7 @@ import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.extension.api.ExtensionManager;
+import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.util.lock.LockFactory;

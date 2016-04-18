@@ -15,9 +15,9 @@ import static org.mule.runtime.module.extension.internal.capability.xml.schema.m
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.UNBOUNDED;
 import static org.mule.runtime.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDynamicParameters;
-import org.mule.extension.api.introspection.config.ConfigurationModel;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;

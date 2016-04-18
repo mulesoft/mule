@@ -7,12 +7,12 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
-import org.mule.extension.api.annotation.Extension;
-import org.mule.extension.api.introspection.ExtensionFactory;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.declaration.DescribingContext;
-import org.mule.extension.api.introspection.declaration.spi.Describer;
-import org.mule.extension.api.resources.ResourcesGenerator;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.introspection.ExtensionFactory;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
+import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
@@ -49,7 +49,7 @@ import javax.tools.Diagnostic;
  *
  * @since 3.7.0
  */
-@SupportedAnnotationTypes(value = {"org.mule.extension.api.annotation.Extension"})
+@SupportedAnnotationTypes(value = {"org.mule.runtime.extension.api.annotation.Extension"})
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor
 {

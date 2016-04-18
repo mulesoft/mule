@@ -6,10 +6,10 @@
  */
 package org.mule.extension.validation.internal;
 
-import static org.mule.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
-import org.mule.extension.api.annotation.Expression;
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.annotation.param.Optional;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
+import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.extension.validation.api.Validator;
 
 /**

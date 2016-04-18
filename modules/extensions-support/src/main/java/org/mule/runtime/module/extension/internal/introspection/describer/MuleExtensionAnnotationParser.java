@@ -12,26 +12,26 @@ import static org.mule.runtime.core.util.Preconditions.checkState;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.temporary.MuleMessage;
-import org.mule.extension.api.annotation.Alias;
-import org.mule.extension.api.annotation.Extension;
-import org.mule.extension.api.annotation.ParameterGroup;
-import org.mule.extension.api.annotation.RestrictedTo;
-import org.mule.extension.api.annotation.metadata.Content;
-import org.mule.extension.api.annotation.metadata.MetadataKeyParam;
-import org.mule.extension.api.annotation.param.Connection;
-import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.annotation.param.UseConfig;
-import org.mule.extension.api.annotation.param.display.DisplayName;
-import org.mule.extension.api.annotation.param.display.Password;
-import org.mule.extension.api.annotation.param.display.Placement;
-import org.mule.extension.api.annotation.param.display.Text;
-import org.mule.extension.api.introspection.EnrichableModel;
-import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.HasModelProperties;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarer;
-import org.mule.extension.api.introspection.property.DisplayModelProperty;
-import org.mule.extension.api.introspection.property.DisplayModelPropertyBuilder;
-import org.mule.extension.api.introspection.property.MetadataModelProperty;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.RestrictedTo;
+import org.mule.runtime.extension.api.annotation.metadata.Content;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyParam;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Password;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Text;
+import org.mule.runtime.extension.api.introspection.EnrichableModel;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.HasModelProperties;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
+import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
+import org.mule.runtime.extension.api.introspection.property.DisplayModelPropertyBuilder;
+import org.mule.runtime.extension.api.introspection.property.MetadataModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
@@ -131,7 +131,7 @@ public final class MuleExtensionAnnotationParser
     {
         for (Field field : IntrospectionUtils.getParameterFields(JavaTypeUtils.getType(parameterType)))
         {
-            if (field.getAnnotation(org.mule.extension.api.annotation.ParameterGroup.class) != null)
+            if (field.getAnnotation(org.mule.runtime.extension.api.annotation.ParameterGroup.class) != null)
             {
                 parseGroupParameters(getFieldMetadataType(field, typeLoader), parsedParameters, typeLoader);
             }

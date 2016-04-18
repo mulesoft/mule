@@ -21,12 +21,12 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.extension.api.annotation.param.Connection;
-import org.mule.extension.api.annotation.param.UseConfig;
-import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.runtime.ConfigurationInstance;
-import org.mule.extension.api.runtime.source.Source;
-import org.mule.extension.api.runtime.source.SourceContext;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.SourceContext;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 

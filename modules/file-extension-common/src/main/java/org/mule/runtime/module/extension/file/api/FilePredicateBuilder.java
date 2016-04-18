@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.file.api;
 
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.module.extension.file.api.matcher.PathMatcherPredicate;
 import org.mule.runtime.module.extension.file.api.matcher.TimeSinceFunction;
 import org.mule.runtime.module.extension.file.api.matcher.TimeUntilFunction;

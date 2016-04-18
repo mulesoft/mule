@@ -12,8 +12,8 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.extension.api.resources.GeneratedResource;
-import org.mule.extension.api.resources.ResourcesGenerator;
+import org.mule.runtime.extension.api.resources.GeneratedResource;
+import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.tck.size.SmallTest;
 
 import java.io.OutputStream;

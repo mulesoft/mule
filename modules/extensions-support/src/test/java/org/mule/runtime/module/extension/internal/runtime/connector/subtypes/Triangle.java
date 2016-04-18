@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connector.subtypes;
 
-import org.mule.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Alias;
 
 @Alias("triangleAlias")
 public class Triangle extends Shape

@@ -6,9 +6,9 @@
  */
 package org.mule.extension.file.internal;
 
-import org.mule.extension.api.annotation.Alias;
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.runtime.module.extension.file.api.FilePredicateBuilder;
 

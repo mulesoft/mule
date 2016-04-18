@@ -18,12 +18,12 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.extension.api.annotation.Extension;
-import org.mule.extension.api.annotation.Operations;
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.annotation.capability.Xml;
-import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.capability.Xml;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
 import org.junit.Test;

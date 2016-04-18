@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connector.subtypes;
 
-import org.mule.extension.api.annotation.param.Connection;
-import org.mule.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
 
 import java.util.Arrays;
 import java.util.List;

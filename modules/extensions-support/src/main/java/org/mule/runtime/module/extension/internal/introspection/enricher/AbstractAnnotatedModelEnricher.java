@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
-import org.mule.extension.api.introspection.declaration.fluent.BaseDeclaration;
-import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 

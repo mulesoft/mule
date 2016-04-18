@@ -6,7 +6,7 @@
  */
 package org.mule.module.extension.internal.metadata.extension;
 
-import org.mule.extension.api.annotation.metadata.MetadataScope;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 
 @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,

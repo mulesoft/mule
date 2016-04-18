@@ -14,9 +14,9 @@ import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean
 import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
 import org.mule.runtime.core.enricher.MessageEnricher;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.operation.OperationModel;
-import org.mule.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;

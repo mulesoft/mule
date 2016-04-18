@@ -12,7 +12,7 @@ import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
 import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
 import org.mule.runtime.core.api.registry.Registry;
-import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;

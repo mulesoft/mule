@@ -15,9 +15,9 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.annotation.param.display.Password;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Password;
 
 import javax.inject.Inject;
 

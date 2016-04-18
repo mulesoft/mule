@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
-import org.mule.extension.api.introspection.exception.ExceptionEnricher;
+import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
 
 public final class NullExceptionEnricher implements ExceptionEnricher
 {

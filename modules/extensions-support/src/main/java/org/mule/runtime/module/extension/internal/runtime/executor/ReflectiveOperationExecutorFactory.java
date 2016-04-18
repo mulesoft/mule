@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.executor;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.extension.api.runtime.OperationExecutor;
-import org.mule.extension.api.runtime.OperationExecutorFactory;
+import org.mule.runtime.extension.api.runtime.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.OperationExecutorFactory;
 
 import java.lang.reflect.Method;
 

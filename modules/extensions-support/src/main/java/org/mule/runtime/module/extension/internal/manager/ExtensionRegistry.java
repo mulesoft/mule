@@ -12,12 +12,12 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.extension.api.introspection.config.ConfigurationModel;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.extension.api.runtime.ConfigurationInstance;
-import org.mule.extension.api.runtime.ConfigurationProvider;
-import org.mule.extension.api.runtime.ExpirableConfigurationProvider;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.ExpirableConfigurationProvider;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.core.util.collection.ImmutableSetCollector;
 

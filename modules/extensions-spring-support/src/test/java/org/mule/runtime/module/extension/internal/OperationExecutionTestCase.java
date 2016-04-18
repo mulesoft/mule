@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.extension.api.ExtensionManager;
+import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.module.extension.HeisenbergExtension;

@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
-import org.mule.extension.api.annotation.capability.CustomStudioEditor;
-import org.mule.extension.api.annotation.capability.StudioProvidedEditor;
-import org.mule.extension.api.introspection.declaration.DescribingContext;
-import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
-import org.mule.extension.api.introspection.property.StudioModelProperty;
+import org.mule.runtime.extension.api.annotation.capability.CustomStudioEditor;
+import org.mule.runtime.extension.api.annotation.capability.StudioProvidedEditor;
+import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.extension.api.introspection.property.StudioModelProperty;
 
 /**
  * Enriches the {@link ExtensionDeclarer} with a {@link StudioModelProperty}

@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.HeisenbergSource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

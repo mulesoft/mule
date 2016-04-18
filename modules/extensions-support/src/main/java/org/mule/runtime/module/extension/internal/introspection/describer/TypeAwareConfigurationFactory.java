@@ -10,7 +10,7 @@ import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessa
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.extension.api.introspection.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
 
 /**
  * Implementation of {@link ConfigurationFactory} which creates instances

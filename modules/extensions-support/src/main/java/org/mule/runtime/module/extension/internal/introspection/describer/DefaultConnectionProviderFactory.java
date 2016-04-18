@@ -11,8 +11,8 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
-import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.connection.ConnectionProviderFactory;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderFactory;
 
 /**
  * Creates instances of {@link ConnectionProvider} based on a {@link #providerClass}

@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connector.basic;
 
-import org.mule.extension.api.annotation.Expression;
-import org.mule.extension.api.annotation.Extension;
-import org.mule.extension.api.annotation.Operations;
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.annotation.connector.Providers;
-import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 
 @Extension(name = "Basic", description = "Basic Test connector")
 @Operations(VoidOperations.class)

@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreClient;
 import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;

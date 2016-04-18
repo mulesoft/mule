@@ -20,7 +20,7 @@ import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.extension.api.introspection.metadata.NullMetadataKey;
+import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.metadata.api.ClassTypeLoader;

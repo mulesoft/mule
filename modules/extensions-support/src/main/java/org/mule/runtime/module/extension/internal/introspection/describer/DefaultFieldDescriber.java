@@ -8,10 +8,10 @@ package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
-import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarer;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
-import org.mule.extension.api.introspection.property.DisplayModelProperty;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
+import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;

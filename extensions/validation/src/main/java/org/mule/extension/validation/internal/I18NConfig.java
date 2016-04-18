@@ -7,8 +7,8 @@
 package org.mule.extension.validation.internal;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
  * A simple object to configure internationalization.

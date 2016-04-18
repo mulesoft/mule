@@ -8,9 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.module.extension.internal.introspection.utils.ImplicitObjectUtils;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 

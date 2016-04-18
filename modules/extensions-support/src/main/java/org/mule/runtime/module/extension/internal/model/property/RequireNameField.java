@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.model.property;
 
-import org.mule.extension.api.annotation.param.ConfigName;
-import org.mule.extension.api.introspection.config.ConfigurationModel;
-import org.mule.extension.api.introspection.ModelProperty;
+import org.mule.runtime.extension.api.annotation.param.ConfigName;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
+import org.mule.runtime.extension.api.introspection.ModelProperty;
 
 import java.lang.reflect.Field;
 

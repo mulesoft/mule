@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.metadata.extension;
 
-import org.mule.extension.api.annotation.Extension;
-import org.mule.extension.api.annotation.Operations;
-import org.mule.extension.api.annotation.Sources;
-import org.mule.extension.api.annotation.capability.Xml;
-import org.mule.extension.api.annotation.connector.Providers;
-import org.mule.extension.api.annotation.metadata.MetadataScope;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Sources;
+import org.mule.runtime.extension.api.annotation.capability.Xml;
+import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.module.extension.internal.metadata.extension.MetadataInheritedExtensionResolversOperations;
 import org.mule.module.extension.internal.metadata.extension.MetadataInheritedOperationResolversOperations;
 import org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;

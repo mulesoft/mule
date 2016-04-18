@@ -7,8 +7,8 @@
 package org.mule.extension.file.internal;
 
 import org.mule.runtime.api.temporary.MuleMessage;
-import org.mule.extension.api.annotation.param.Connection;
-import org.mule.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.FilePredicateBuilder;
 import org.mule.runtime.module.extension.file.api.FileSystem;

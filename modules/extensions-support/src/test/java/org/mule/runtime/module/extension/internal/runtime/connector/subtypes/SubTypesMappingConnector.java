@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connector.subtypes;
 
-import org.mule.extension.api.annotation.Extension;
-import org.mule.extension.api.annotation.Operations;
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.annotation.SubTypeMapping;
-import org.mule.extension.api.annotation.capability.Xml;
-import org.mule.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.SubTypeMapping;
+import org.mule.runtime.extension.api.annotation.capability.Xml;
+import org.mule.runtime.extension.api.annotation.connector.Providers;
 
 @Extension(name = "SubtypesConnector", description = "Test connector for pojo subtype mapping")
 @Operations(TestOperationsWithSubTypeMapping.class)

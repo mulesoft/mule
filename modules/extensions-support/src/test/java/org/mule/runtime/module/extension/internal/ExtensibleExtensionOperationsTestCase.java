@@ -11,12 +11,12 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.runtime.module.extension.HeisenbergExtension.HEISENBERG;
-import org.mule.extension.api.annotation.Extensible;
-import org.mule.extension.api.annotation.Extension;
-import org.mule.extension.api.annotation.ExtensionOf;
-import org.mule.extension.api.annotation.Operations;
-import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.extension.api.annotation.Extensible;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.ExtensionOf;
+import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
 
 import org.junit.Test;

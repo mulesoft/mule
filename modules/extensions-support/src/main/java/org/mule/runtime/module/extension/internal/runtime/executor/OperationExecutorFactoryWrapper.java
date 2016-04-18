@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.executor;
 
-import org.mule.extension.api.runtime.OperationExecutorFactory;
-import org.mule.extension.api.runtime.Interceptor;
-import org.mule.extension.api.runtime.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.OperationExecutorFactory;
+import org.mule.runtime.extension.api.runtime.Interceptor;
+import org.mule.runtime.extension.api.runtime.OperationExecutor;
 
 import java.util.List;
 

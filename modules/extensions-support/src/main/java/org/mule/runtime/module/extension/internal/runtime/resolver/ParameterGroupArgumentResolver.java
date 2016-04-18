@@ -12,9 +12,9 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.annotation.ParameterGroup;
-import org.mule.extension.api.runtime.OperationContext;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.runtime.OperationContext;
 import org.mule.runtime.module.extension.internal.runtime.executor.ReflectiveMethodOperationExecutor;
 
 import java.lang.reflect.Field;

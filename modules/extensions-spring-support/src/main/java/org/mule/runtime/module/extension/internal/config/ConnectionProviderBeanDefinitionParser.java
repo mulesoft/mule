@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.config;
 
 import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
-import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
