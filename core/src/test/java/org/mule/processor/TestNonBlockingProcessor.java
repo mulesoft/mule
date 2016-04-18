@@ -7,7 +7,6 @@
 package org.mule.processor;
 
 import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -27,11 +26,7 @@ public class TestNonBlockingProcessor implements NonBlockingMessageProcessor
 
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
-        if (!event.getExchangePattern().hasResponse())
-        {
-            return VoidMuleEvent.getInstance();
-        }
-        else if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)
+        if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)
         {
             executor.execute(new Runnable()
             {

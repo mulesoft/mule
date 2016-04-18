@@ -18,6 +18,7 @@ import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.context.notification.ExceptionStrategyNotification;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.message.DefaultExceptionPayload;
@@ -37,7 +38,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
     {
         try
         {
-            boolean nonBlocking = event.isAllowNonBlocking();
+            boolean nonBlocking = event.isAllowNonBlocking() && event.getReplyToHandler() instanceof NonBlockingReplyToHandler;
 
             muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, ExceptionStrategyNotification.PROCESS_START));
             FlowConstruct flowConstruct = event.getFlowConstruct();
@@ -49,8 +50,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             // MULE-8551 Still need to add support for non-blocking components in excepton strategies.
             if(nonBlocking)
             {
-                // Make event synchronous and clear replyToHandler.  Given only HTTP supports non-blocking this will not
-                // affect other replyToHandlers like for example JmsReplyToHandler.
+                // Make event synchronous and clear replyToHandler.
                 event = new DefaultMuleEvent(event, event.getFlowConstruct(), null, null, true);
             }
             event = beforeRouting(exception, event);
