@@ -7,9 +7,9 @@
 package org.mule.runtime.module.extension.file.api;
 
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.api.metadata.DataType;
-import org.mule.api.temporary.MuleMessage;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import java.io.InputStream;

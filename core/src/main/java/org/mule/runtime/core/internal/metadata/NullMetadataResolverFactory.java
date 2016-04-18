@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
-import org.mule.api.metadata.resolving.MetadataContentResolver;
-import org.mule.api.metadata.resolving.MetadataKeysResolver;
-import org.mule.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
+import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
+import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.extension.api.introspection.metadata.NullMetadataResolver;
 

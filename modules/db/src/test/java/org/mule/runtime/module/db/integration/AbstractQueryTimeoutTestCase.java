@@ -15,7 +15,7 @@ import static org.hamcrest.core.IsNot.not;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;

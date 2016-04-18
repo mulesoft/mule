@@ -10,7 +10,7 @@ import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_POOLING_PROFILE_TYPE;
 import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
 
-import org.mule.api.config.PoolingProfile;
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
 
 import org.springframework.beans.factory.config.BeanDefinition;

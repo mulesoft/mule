@@ -29,7 +29,7 @@ import org.mule.runtime.module.cxf.CxfConstants;
 import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

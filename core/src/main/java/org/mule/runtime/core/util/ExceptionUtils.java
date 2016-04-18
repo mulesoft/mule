@@ -7,7 +7,7 @@
 package org.mule.runtime.core.util;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import org.mule.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionException;
 
 import java.util.Arrays;
 import java.util.List;

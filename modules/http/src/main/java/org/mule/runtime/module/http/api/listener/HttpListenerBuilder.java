@@ -19,7 +19,7 @@ import org.mule.runtime.module.http.internal.listener.DefaultHttpListener;
 import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.runtime.module.http.internal.listener.HttpListenerConfigBuilder;
 import org.mule.runtime.module.http.internal.listener.HttpResponseBuilder;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.Preconditions;
 
 import java.net.MalformedURLException;

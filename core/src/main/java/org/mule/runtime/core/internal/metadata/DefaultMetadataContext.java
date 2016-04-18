@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
-import org.mule.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.api.metadata.MetadataCache;
-import org.mule.api.metadata.MetadataContext;
+import org.mule.runtime.api.metadata.MetadataCache;
+import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.extension.api.runtime.ConfigurationInstance;
 
 import java.util.Optional;

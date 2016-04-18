@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.ExtensionModel;
 import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;

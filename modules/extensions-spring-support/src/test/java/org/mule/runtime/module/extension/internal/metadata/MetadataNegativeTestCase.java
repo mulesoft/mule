@@ -9,13 +9,13 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.MISSING_ELEMENT_ERROR_MESSAGE;
 
 import org.mule.runtime.core.internal.metadata.InvalidComponentIdException;
-import org.mule.api.metadata.MetadataKey;
-import org.mule.api.metadata.MetadataResolvingException;
-import org.mule.api.metadata.ProcessorId;
-import org.mule.api.metadata.SourceId;
-import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
-import org.mule.api.metadata.resolving.FailureCode;
-import org.mule.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.ProcessorId;
+import org.mule.runtime.api.metadata.SourceId;
+import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
+import org.mule.runtime.api.metadata.resolving.FailureCode;
+import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
 import java.io.IOException;
 import java.util.List;

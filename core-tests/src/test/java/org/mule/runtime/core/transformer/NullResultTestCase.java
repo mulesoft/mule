@@ -9,7 +9,7 @@ package org.mule.runtime.core.transformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 import org.junit.Test;
 

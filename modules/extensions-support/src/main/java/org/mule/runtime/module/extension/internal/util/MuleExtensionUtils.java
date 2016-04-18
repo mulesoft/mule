@@ -16,7 +16,7 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.extension.api.annotation.param.Optional;
 import org.mule.extension.api.exception.IllegalModelDefinitionException;

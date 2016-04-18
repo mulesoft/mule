@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.lifecycle.JSR250LifecycleTrackerComponent;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 import org.junit.Test;
 

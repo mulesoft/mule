@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 /**
  * An {@link AbstractValidator} which verifies that

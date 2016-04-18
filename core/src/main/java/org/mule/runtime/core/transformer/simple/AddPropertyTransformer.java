@@ -9,7 +9,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 
 public class AddPropertyTransformer extends AbstractAddVariablePropertyTransformer
 {

@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.transformer.types;
 
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

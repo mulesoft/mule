@@ -17,8 +17,8 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.api.message.NullPayload;
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -1468,9 +1468,9 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     }
 
     @Override
-    public <Payload, Attributes extends Serializable> org.mule.api.temporary.MuleMessage<Payload, Attributes> asNewMessage()
+    public <Payload, Attributes extends Serializable> org.mule.runtime.api.temporary.MuleMessage<Payload, Attributes> asNewMessage()
     {
-        return (org.mule.api.temporary.MuleMessage<Payload, Attributes>) this;
+        return (org.mule.runtime.api.temporary.MuleMessage<Payload, Attributes>) this;
     }
 
     /**

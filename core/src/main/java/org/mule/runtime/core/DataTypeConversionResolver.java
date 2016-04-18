@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core;
 
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 
 import java.util.List;

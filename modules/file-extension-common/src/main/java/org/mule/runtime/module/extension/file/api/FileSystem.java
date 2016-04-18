@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.file.api;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.api.metadata.DataType;
-import org.mule.api.temporary.MuleMessage;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.temporary.MuleMessage;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.module.extension.file.api.lock.PathLock;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 import java.io.InputStream;
 import java.nio.file.Path;

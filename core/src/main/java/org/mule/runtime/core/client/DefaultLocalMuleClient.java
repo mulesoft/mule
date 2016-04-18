@@ -30,7 +30,7 @@ import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 import java.util.Map;
 

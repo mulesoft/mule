@@ -27,7 +27,7 @@ import org.mule.runtime.module.http.internal.listener.HttpListenerConnectionMana
 import org.mule.runtime.module.http.internal.listener.ServerAddress;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;

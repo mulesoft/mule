@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf.payload;
 
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 public interface PayloadTestConstants
 {

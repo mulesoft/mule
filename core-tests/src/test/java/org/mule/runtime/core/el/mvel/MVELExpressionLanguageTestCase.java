@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.el.context.AppContext;

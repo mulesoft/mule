@@ -46,7 +46,7 @@ public class SequentialStageNameSourceTest
 
     /**
      * This test verifies that if invoked concurrently,
-     * the same {@link org.mule.api.processor.SequentialStageNameSource}
+     * the same {@link org.mule.runtime.api.processor.SequentialStageNameSource}
      * doesn't generate the same name twice
      */
     @Test

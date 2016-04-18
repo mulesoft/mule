@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.extension.api.annotation.Alias;

@@ -9,7 +9,7 @@ package org.mule.runtime.module.http.api.client;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 
 /**
  * Options that can be configured for making an HTTP request using {@link org.mule.runtime.core.api.client.MuleClient}

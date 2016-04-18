@@ -28,7 +28,7 @@ import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.runtime.core.session.DefaultMuleSession;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.IOUtils;
 
 import com.google.common.net.MediaType;

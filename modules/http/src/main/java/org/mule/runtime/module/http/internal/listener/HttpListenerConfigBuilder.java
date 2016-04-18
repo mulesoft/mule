@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.ObjectNameHelper;
 
 public class HttpListenerConfigBuilder

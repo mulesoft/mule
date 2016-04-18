@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connector.petstore;
 
-import org.mule.api.connection.ConnectionHandlingStrategy;
-import org.mule.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 
 public class SimplePetStoreConnectionProvider extends PetStoreConnectionProvider
 {

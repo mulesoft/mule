@@ -10,12 +10,12 @@ import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessa
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.api.config.PoolingProfile;
-import org.mule.api.connection.ConnectionException;
-import org.mule.api.connection.ConnectionHandler;
-import org.mule.api.connection.ConnectionProvider;
-import org.mule.api.connection.ConnectionValidationResult;
-import org.mule.api.connection.PoolingListener;
+import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.PoolingListener;
 
 import java.util.NoSuchElementException;
 

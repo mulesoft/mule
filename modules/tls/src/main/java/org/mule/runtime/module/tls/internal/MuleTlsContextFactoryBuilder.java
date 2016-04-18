@@ -12,8 +12,8 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.api.tls.TlsContextFactory;
-import org.mule.api.tls.TlsContextFactoryBuilder;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
 
 @DefaultTlsContextFactoryBuilder

@@ -26,7 +26,7 @@ import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 
 import org.junit.Before;
 import org.junit.Test;

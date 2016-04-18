@@ -37,7 +37,7 @@ import org.mule.runtime.core.context.notification.OptimisedNotificationHandler;
 import org.mule.runtime.core.management.stats.ComponentStatistics;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.transformer.TransformerTemplate;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.ArrayList;

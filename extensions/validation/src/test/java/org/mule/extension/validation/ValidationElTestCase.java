@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.extension.validation.internal.validator.NumberType;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 import com.google.common.collect.ImmutableList;
 

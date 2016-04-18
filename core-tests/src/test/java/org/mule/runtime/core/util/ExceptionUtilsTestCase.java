@@ -20,7 +20,7 @@ import static org.mule.runtime.core.util.ExceptionUtils.extractRootConnectionExc
 import static org.mule.runtime.core.util.ExceptionUtils.getDeepestOccurenceOfType;
 import static org.mule.runtime.core.util.ExceptionUtils.getFullStackTraceWithoutMessages;
 
-import org.mule.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

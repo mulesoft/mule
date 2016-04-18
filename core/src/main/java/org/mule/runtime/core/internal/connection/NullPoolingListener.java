@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import org.mule.api.connection.PoolingListener;
+import org.mule.runtime.api.connection.PoolingListener;
 
 /**
  * Implementation of the Null Object design pattern for the {@link PoolingListener} interface.

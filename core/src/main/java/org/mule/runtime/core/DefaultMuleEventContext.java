@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.client.LocalMuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;

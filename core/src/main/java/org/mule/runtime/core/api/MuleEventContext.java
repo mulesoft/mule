@@ -8,7 +8,7 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.TransformerException;
 

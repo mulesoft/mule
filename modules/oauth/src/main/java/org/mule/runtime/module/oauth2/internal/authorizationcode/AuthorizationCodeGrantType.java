@@ -10,7 +10,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.module.oauth2.internal.ApplicationCredentials;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
-import org.mule.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 /**

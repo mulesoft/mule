@@ -75,8 +75,8 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>
             expectedClass = ((ParameterizedType) expectedClass).getRawType();
         }
 
-        org.mule.api.metadata.DataType sourceDataType = DataTypeFactory.create(object.getClass());
-        org.mule.api.metadata.DataType targetDataType = DataTypeFactory.create((Class) expectedClass);
+        org.mule.runtime.api.metadata.DataType sourceDataType = DataTypeFactory.create(object.getClass());
+        org.mule.runtime.api.metadata.DataType targetDataType = DataTypeFactory.create((Class) expectedClass);
 
         Transformer transformer;
         try

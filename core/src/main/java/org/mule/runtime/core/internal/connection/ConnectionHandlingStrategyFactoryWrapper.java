@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import org.mule.api.connection.ConnectionHandlingStrategy;
-import org.mule.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.api.connection.PoolingListener;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.runtime.api.connection.PoolingListener;
 
 /**
  * Base class for {@link ConnectionHandlingStrategyFactory} decorators

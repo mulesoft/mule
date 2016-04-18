@@ -7,9 +7,9 @@
 package org.mule.runtime.core.transformer.types;
 
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.api.metadata.DataType;
-import org.mule.api.metadata.ImmutableDataType;
-import org.mule.api.metadata.SimpleDataType;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.ImmutableDataType;
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.util.generics.GenericsUtils;
 import org.mule.runtime.core.util.generics.MethodParameter;
 

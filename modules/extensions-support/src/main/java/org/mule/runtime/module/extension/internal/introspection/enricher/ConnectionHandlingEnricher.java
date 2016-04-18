@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
-import org.mule.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.extension.api.introspection.declaration.DescribingContext;
 import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;

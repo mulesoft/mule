@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf;
 
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 
 /**
  * This enum defines the strategies to convert a Payload to an array of arguments

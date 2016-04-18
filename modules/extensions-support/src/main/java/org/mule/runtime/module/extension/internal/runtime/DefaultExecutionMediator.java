@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.String.format;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;

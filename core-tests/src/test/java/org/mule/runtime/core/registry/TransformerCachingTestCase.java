@@ -13,7 +13,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.api.metadata.SimpleDataType;
+import org.mule.runtime.api.metadata.SimpleDataType;
 
 import java.io.FilterInputStream;
 

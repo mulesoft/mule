@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate;

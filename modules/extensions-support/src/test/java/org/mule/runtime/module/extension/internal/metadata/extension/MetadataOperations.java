@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.metadata.extension;
 
-import org.mule.api.temporary.MuleMessage;
+import org.mule.runtime.api.temporary.MuleMessage;
 import org.mule.extension.api.annotation.metadata.Content;
 import org.mule.extension.api.annotation.metadata.MetadataKeyParam;
 import org.mule.extension.api.annotation.metadata.MetadataScope;

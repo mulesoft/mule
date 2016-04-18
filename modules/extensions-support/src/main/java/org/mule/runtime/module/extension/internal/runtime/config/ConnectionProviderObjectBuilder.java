@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.api.config.PoolingProfile;
-import org.mule.api.connection.ConnectionProvider;
+import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;

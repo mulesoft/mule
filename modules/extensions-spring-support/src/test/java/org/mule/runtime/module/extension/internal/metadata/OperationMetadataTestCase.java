@@ -20,12 +20,12 @@ import static org.mule.runtime.module.extension.internal.metadata.TestMetadataUt
 import static org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
-import org.mule.api.metadata.MetadataCache;
-import org.mule.api.metadata.MetadataKey;
-import org.mule.api.metadata.MetadataManager;
-import org.mule.api.metadata.ProcessorId;
-import org.mule.api.metadata.descriptor.ComponentMetadataDescriptor;
-import org.mule.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.metadata.MetadataCache;
+import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataManager;
+import org.mule.runtime.api.metadata.ProcessorId;
+import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
+import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;

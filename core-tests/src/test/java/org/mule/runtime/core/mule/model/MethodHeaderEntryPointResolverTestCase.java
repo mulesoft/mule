@@ -7,7 +7,7 @@
 package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.api.message.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
