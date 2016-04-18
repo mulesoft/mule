@@ -64,7 +64,11 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
         assertNotNull(client.send("vm://custom-agg", testList, null));
         assertNotNull(client.send("vm://chunk-agg", "test", null));
         assertNotNull(client.send("vm://wire-tap", "test", null));
-        assertNotNull(client.send("vm://in-untils", "test", null));
+        assertNotNull(client.send("vm://until-successful", "test", null));
+        client.request("vm://out-us", RECEIVE_TIMEOUT);
+        assertNotNull(client.send("vm://until-successful-with-processor-chain", "test", null));
+        client.request("vm://out-us", RECEIVE_TIMEOUT);
+        assertNotNull(client.send("vm://until-successful-with-enricher", "test", null));
     }
 
     @Override
@@ -212,6 +216,18 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
                 .serial(pre())
                 .serial(new Node()
                     .parallel(prePost())
+                    .parallel(post().serial(prePost())))
+
+                // until successful with processor chain
+                .serial(pre())
+                .serial(new Node()
+                    .parallel(pre().serial(prePost()).serial(prePost()).serial(post()))
+                    .parallel(post().serial(prePost())))
+
+                 // until successful with enricher
+                .serial(pre())
+                .serial(new Node()
+                    .parallel(pre().serial(prePost()).serial(post()))
                     .parallel(post().serial(prePost())))
                 ;
     }
