@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.request;
 
+import static org.mule.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
@@ -17,11 +18,11 @@ import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.DataType;
 import org.mule.module.http.api.requester.HttpSendBodyMode;
 import org.mule.module.http.api.requester.HttpStreamingType;
@@ -96,12 +97,13 @@ public class MuleEventToHttpRequest
             }
         }
 
-        if (!event.getMessage().getOutboundPropertyNames().contains(MuleProperties.CONTENT_TYPE_PROPERTY))
+        if (!event.getMessage().getOutboundPropertyNames().contains(CONTENT_TYPE_PROPERTY)
+            && !builder.getHeaders().containsKey(CONTENT_TYPE_PROPERTY))
         {
             DataType<?> dataType = event.getMessage().getDataType();
             if (!MimeTypes.ANY.equals(dataType.getMimeType()))
             {
-                builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
+                builder.addHeader(CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
             }
         }
 
