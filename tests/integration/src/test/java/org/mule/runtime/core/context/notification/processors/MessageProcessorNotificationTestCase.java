@@ -7,6 +7,7 @@
 package org.mule.runtime.core.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -64,6 +65,9 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
         assertNotNull(flowRunner("customAggregator").withPayload(testList).run());
         assertNotNull(flowRunner("chunkAggregator").withPayload(TEST_PAYLOAD).run());
         assertNotNull(flowRunner("wire-tap").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("until-successful").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("until-successful-with-processor-chain").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("until-successful-with-enricher").withPayload(TEST_PAYLOAD).run());
     }
 
     @Override
@@ -203,7 +207,23 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
                 .serial(prePost())
                 .serial(prePost())
 
-                ;
+                 // until successful
+                 .serial(pre())
+                 .serial(new Node()
+                                   .parallel(prePost())
+                                   .parallel(post().serial(prePost())))
+    
+                 // until successful with processor chain
+                 .serial(pre())
+                 .serial(new Node()
+                                   .parallel(pre().serial(prePost()).serial(prePost()).serial(post()))
+                                   .parallel(post().serial(prePost())))
+    
+                 // until successful with enricher
+                 .serial(pre())
+                 .serial(new Node()
+                                   .parallel(pre().serial(prePost()).serial(post()))
+                                   .parallel(post().serial(prePost())));
     }
 
     @Override
