@@ -6,12 +6,10 @@
  */
 package org.mule.tck.junit4;
 
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
+import static org.mule.tck.functional.FlowAssert.verify;
 import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
-import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
@@ -23,7 +21,6 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
 import org.mule.api.service.Service;
-import org.mule.api.transport.ReplyToHandler;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
@@ -39,7 +36,6 @@ import org.mule.util.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -227,25 +223,41 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
      * @param flowName the name of the flow to be executed
      * @throws Exception
      */
-    protected void testFlow(String flowName) throws Exception
+    protected MuleEvent testFlow(String flowName) throws Exception
     {
-        testFlow(flowName, getTestEvent("data", MessageExchangePattern.ONE_WAY));
+        return testFlow(flowName, getTestEvent("data", MessageExchangePattern.ONE_WAY));
     }
 
     /**
      * Looks up the given flow in the registry and processes it with the given event.
-     * A flow asserting is then executed by calling {@link
-     * org.mule.tck.functional.FlowAssert.verify(String)}
+     * A flow asserting is then executed by calling {@link FlowAssert#verify()}
      * 
      * @param flowName the name of the flow to be executed
-     * @param event the event ot execute with
+     * @param event the event to execute with
      * @throws Exception
      */
-    protected void testFlow(String flowName, MuleEvent event) throws Exception
+    protected MuleEvent testFlow(String flowName, MuleEvent event) throws Exception
     {
         Flow flow = this.lookupFlowConstruct(flowName);
-        flow.process(event);
-        FlowAssert.verify(flowName);
+        MuleEvent result = flow.process(event);
+        verify(flowName);
+        return result;
+    }
+
+    /**
+     * Looks up the given flow in the registry and processes it with the given message exchange pattern.
+     * A flow asserting is then executed by calling {@link FlowAssert#verify()}
+     *
+     * @param flowName the name of the flow to be executed
+     * @param messageExchangePattern the message exchange pattern to execute with
+     * @throws Exception
+     */
+    protected MuleEvent testFlow(String flowName, MessageExchangePattern messageExchangePattern) throws Exception
+    {
+        Flow flow = this.lookupFlowConstruct(flowName);
+        MuleEvent result = flow.process(getTestEvent(TEST_MESSAGE, messageExchangePattern));
+        verify(flowName);
+        return result;
     }
 
     /**
@@ -256,7 +268,20 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     protected void testFlowNonBlocking(String flowName) throws Exception
     {
         runFlowNonBlocking(flowName);
-        FlowAssert.verify(flowName);
+        verify(flowName);
+    }
+
+    /**
+     * Runs the given flow before ensuring all assertions defined in the flow configuration were met.
+     *
+     * @param flowName the flow to test
+     * @param  messageExchangePattern the message exchange pattern to use
+     * @throws Exception
+     */
+    protected void testFlowNonBlocking(String flowName, MessageExchangePattern messageExchangePattern) throws Exception
+    {
+        runFlowNonBlocking(flowName, messageExchangePattern);
+        verify(flowName);
     }
 
     /**
@@ -267,7 +292,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     protected void testFlowNonBlocking(String flowName, MuleEvent event) throws Exception
     {
         runFlowNonBlocking(flowName, event);
-        FlowAssert.verify(flowName);
+        verify(flowName);
     }
 
     /**
@@ -293,6 +318,20 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     {
         Flow flow = this.lookupFlowConstruct(flowName);
         return runFlowNonBlocking(flowName, getTestEvent(TEST_MESSAGE, flow));
+    }
+
+    /**
+     * Runs the given non blocking flow with a default event and a specific message exchange pattern
+     *
+     * @param flowName the name of the flow to be executed
+     * @param messageExchangePattern the message exchange pattern to use
+     * @return the resulting <code>MuleEvent</code>
+     * @throws Exception
+     */
+    protected MuleEvent runFlowNonBlocking(String flowName, MessageExchangePattern messageExchangePattern) throws Exception
+    {
+        Flow flow = this.lookupFlowConstruct(flowName);
+        return runFlowNonBlocking(flowName, getTestEvent(TEST_MESSAGE, flow, messageExchangePattern));
     }
 
     /**

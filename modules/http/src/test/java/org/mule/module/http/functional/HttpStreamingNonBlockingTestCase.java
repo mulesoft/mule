@@ -16,6 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.construct.Flow;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -39,7 +40,7 @@ public class HttpStreamingNonBlockingTestCase extends HttpStreamingTestCase
         latch.await();
     }
 
-    private static class StopReplyToHandler implements ReplyToHandler
+    private static class StopReplyToHandler implements NonBlockingReplyToHandler
     {
         private final Latch latch;
 

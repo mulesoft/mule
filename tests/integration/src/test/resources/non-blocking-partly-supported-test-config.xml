@@ -10,7 +10,7 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <configuration>
+    <configuration defaultProcessingStrategy="non-blocking">
         <expression-language>
             <global-functions>
                 def assertPayload(){payload == org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE}
@@ -37,16 +37,6 @@
                 <test:assert count="1" expression="#[Thread.currentThread()==beforeThread  and assertPayload()]"/>
             </processor-chain>
         </wire-tap>
-        <test:non-blocking-processor/>
-    </flow>
-
-    <flow name="async">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
-        <async processingStrategy="asynchronous">
-            <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
-            <test:non-blocking-processor/>
-            <test:assert count="1" expression="#[Thread.currentThread()==beforeThread and assertPayload()]"/>
-        </async>
         <test:non-blocking-processor/>
     </flow>
 

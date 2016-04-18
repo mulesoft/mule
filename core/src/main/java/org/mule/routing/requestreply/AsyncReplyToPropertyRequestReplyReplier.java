@@ -9,6 +9,7 @@ package org.mule.routing.requestreply;
 import org.mule.api.NonBlockingSupported;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
+import org.mule.transport.DefaultReplyToHandler;
 
 public class AsyncReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier implements NonBlockingSupported
 {
@@ -16,7 +17,9 @@ public class AsyncReplyToPropertyRequestReplyReplier extends AbstractReplyToProp
     @Override
     protected boolean shouldProcessEvent(MuleEvent event)
     {
-        return !event.getExchangePattern().hasResponse() && (event.getFlowConstruct() instanceof Flow);
+        // Only process ReplyToHandler is running one-way and standard ReplyToHandler is being used.
+        return !event.getExchangePattern().hasResponse() && (event.getFlowConstruct() instanceof Flow) && event
+                .getReplyToHandler() instanceof DefaultReplyToHandler;
     }
 
 }

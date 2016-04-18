@@ -10,10 +10,10 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.util.concurrent.Latch;
 
-public class SensingNullReplyToHandler implements ReplyToHandler
+public class SensingNullReplyToHandler implements NonBlockingReplyToHandler
 {
 
     public MuleEvent event;

@@ -14,7 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.processor.TestNonBlockingProcessor;
 import org.mule.transport.AbstractMessageDispatcher;
 
@@ -69,7 +69,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
             try
             {
                 final MuleMessage response = event.getMessage();
-                event = new DefaultMuleEvent(event, new ReplyToHandler()
+                event = new DefaultMuleEvent(event, new NonBlockingReplyToHandler()
                 {
                     @Override
                     public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo)

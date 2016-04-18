@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NonBlockingSupported;
+import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.api.transport.ReplyToHandler;
 
 /**
@@ -96,7 +97,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
     protected ReplyToHandler createReplyToHandler(final MuleEvent request)
     {
         final ReplyToHandler originalReplyToHandler = request.getReplyToHandler();
-        return new ReplyToHandler()
+        return new NonBlockingReplyToHandler()
         {
             @Override
             public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException

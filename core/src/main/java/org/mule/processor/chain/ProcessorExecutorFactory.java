@@ -29,7 +29,7 @@ public class ProcessorExecutorFactory
                                                      MessageProcessorExecutionTemplate executionTemplate,
                                                      boolean copyOnVoidEvent)
     {
-        if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)
+        if (event.isAllowNonBlocking())
         {
             return new NonBlockingProcessorExecutor(event, processors, executionTemplate, copyOnVoidEvent);
         }

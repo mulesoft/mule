@@ -6,6 +6,7 @@
  */
 package org.mule.processor.chain;
 
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -13,6 +14,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.MessageExchangePattern;
 import org.mule.NonBlockingVoidMuleEvent;
@@ -20,19 +22,21 @@ import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.Pipeline;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.processor.ProcessorExecutor;
+import org.mule.construct.Flow;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.NonBlockingProcessorExecutor;
+import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.tck.SensingNullReplyToHandler;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -50,21 +54,19 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
     public void before() throws MessagingException
     {
         super.before();
-        when(event.getReplyToHandler()).thenReturn(nullReplyToHandler);
         when(event.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
         when(event.isSynchronous()).thenReturn(false);
         when(event.isAllowNonBlocking()).thenReturn(true);
-    }
-    
-    protected Matcher<MuleEvent> requestResponseMatecher() {
-        return not(sameInstance(event));
+        Pipeline mockFlow = mock(Flow.class);
+        when(mockFlow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
+        when(event.getFlowConstruct()).thenReturn(mockFlow);
     }
 
     @Test
     public void executeRequestResponseNonBlocking() throws MuleException, InterruptedException
     {
         setupNonBlockingRequestResponseEvent();
-        assertNonBlockingExecution(processors);
+        assertNonBlockingExecutionWithReplyTo(processors);
     }
 
     @Test
@@ -138,6 +140,21 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
         assertThat(nullReplyToHandler.event, CoreMatchers.<MuleEvent>not(VoidMuleEvent.getInstance()));
     }
 
+    @Test
+    public void executeOneWay() throws MuleException, InterruptedException
+    {
+        setupOneWayEvent();
+        assertNonBlockingExecutionWithoutReplyTo(processors);
+    }
+
+    @Test
+    public void executeOneWayWithReplyTo() throws MuleException, InterruptedException
+    {
+        setupOneWayEvent();
+        when(event.getReplyToHandler()).thenReturn(nullReplyToHandler);
+        assertNonBlockingExecutionWithReplyTo(processors);
+    }
+
     private class TestContainerMessageProcessor implements  MessageProcessor, MessageProcessorContainer{
 
         @Override
@@ -164,7 +181,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
     {
         ProcessorExecutor executor = createProcessorExecutor(processors);
 
-        if (event.getExchangePattern() == MessageExchangePattern.REQUEST_RESPONSE)
+        if (event.isAllowNonBlocking())
         {
             assertThat(executor.execute(), CoreMatchers.<MuleEvent>equalTo(NonBlockingVoidMuleEvent.getInstance()));
         }
@@ -173,20 +190,30 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
             assertThat(executor.execute(), equalTo(event));
         }
 
-        assertThat(nullReplyToHandler.latch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS), is(true));
+        assertThat(processor3.latch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS), is(true));
 
         assertThat(processor1.event, is(notNullValue()));
-        assertThat(processor1.thread, equalTo(Thread.currentThread()));
+        assertThat(processor1.thread, not(equalTo(currentThread())));
 
         assertThat(processor2.event, is(notNullValue()));
         assertThat(processor2.thread, not(equalTo(processor1.thread)));
 
         assertThat(processor3.event, is(notNullValue()));
         assertThat(processor3.thread, not(equalTo(processor2.thread)));
+    }
 
+    private void assertNonBlockingExecutionWithReplyTo(List<MessageProcessor> processors) throws MuleException, InterruptedException
+    {
+        assertNonBlockingExecution(processors);
+        assertThat(nullReplyToHandler.latch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS), is(true));
         assertThat(nullReplyToHandler.event.getMessageAsString(), equalTo(RESULT));
     }
 
+    private void assertNonBlockingExecutionWithoutReplyTo(List<MessageProcessor> processors) throws MuleException, InterruptedException
+    {
+        assertNonBlockingExecution(processors);
+        assertThat(nullReplyToHandler.latch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS), is(false));
+    }
 
     private void setupNonBlockingRequestResponseEvent()
     {

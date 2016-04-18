@@ -21,6 +21,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.transport.ExceptionHandlingReplyToHandlerDecorator;
+import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.transaction.MuleTransactionConfig;
 
@@ -167,7 +168,7 @@ public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessi
 
     }
 
-    class FlowProcessingNonBlockingReplyToHandler implements ReplyToHandler
+    class FlowProcessingNonBlockingReplyToHandler implements NonBlockingReplyToHandler
     {
 
         private final AsyncResponseFlowProcessingPhaseTemplate template;

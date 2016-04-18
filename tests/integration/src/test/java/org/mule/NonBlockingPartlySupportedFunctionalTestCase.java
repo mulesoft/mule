@@ -6,16 +6,7 @@
  */
 package org.mule;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.construct.Flow;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FlowAssert;
-import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.concurrent.Latch;
-
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -38,12 +29,6 @@ public class NonBlockingPartlySupportedFunctionalTestCase extends FunctionalTest
     public void wiretap() throws Exception
     {
         testFlowNonBlocking("wiretap");
-    }
-
-    @Test
-    public void async() throws Exception
-    {
-        testFlowNonBlocking("async");
     }
 
 }

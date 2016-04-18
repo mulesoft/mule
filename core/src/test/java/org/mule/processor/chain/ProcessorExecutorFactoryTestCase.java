@@ -6,7 +6,6 @@
  */
 package org.mule.processor.chain;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -68,7 +67,7 @@ public class ProcessorExecutorFactoryTestCase extends AbstractMuleTestCase
         when(muleEvent.getFlowConstruct()).thenReturn(mock(Flow.class));
         when(muleEvent.isAllowNonBlocking()).thenReturn(true);
         assertThat(createProcessorExecutor().getClass(), CoreMatchers.<Class>equalTo(
-                (BlockingProcessorExecutor.class)));
+                (NonBlockingProcessorExecutor.class)));
     }
 
     @Test

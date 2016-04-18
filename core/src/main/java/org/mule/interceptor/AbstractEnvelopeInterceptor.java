@@ -17,6 +17,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.interceptor.Interceptor;
+import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.management.stats.ProcessingTime;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
@@ -98,7 +99,7 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
         this.flowConstruct = flowConstruct;
     }
 
-    class ResponseReplyToHandler implements ReplyToHandler
+    class ResponseReplyToHandler implements NonBlockingReplyToHandler
     {
 
         private final ReplyToHandler originalReplyToHandler;

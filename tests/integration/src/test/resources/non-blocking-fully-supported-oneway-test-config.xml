@@ -15,149 +15,149 @@
     </configuration>
 
     <flow name="flow">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <test:non-blocking-processor/>
         <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
 
     <flow name="subFlow">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <flow-ref name="subFlowChild"/>
-        <test:assert count="1"/>
+        <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
     <sub-flow name="subFlowChild">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <test:non-blocking-processor/>
         <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </sub-flow>
 
     <flow name="childFlow">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <flow-ref name="childFlowChild"/>
+        <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
         <test:assert count="1" expression="#[flow.name=='childFlow']"/>
     </flow>
     <flow name="childFlowChild">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <test:non-blocking-processor/>
         <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
 
     <flow name="processorChain">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <processor-chain>
             <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
             <test:non-blocking-processor/>
+            <test:assert expression="#[assertPayload()]"/>
+            <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
         </processor-chain>
         <test:non-blocking-processor/>
         <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
 
     <flow name="filterAccepts">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <expression-filter expression="#[true]"/>
         <test:non-blocking-processor/>
         <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
 
     <flow name="filterRejects">
-        <test:assert-intercepting responseCount="0"/>
         <expression-filter expression="#[false]"/>
         <test:non-blocking-processor/>
+        <test:assert count="0"/>
     </flow>
 
     <flow name="filterAfterNonBlockingAccepts">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <test:non-blocking-processor/>
         <expression-filter expression="#[true]"/>
+        <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
 
     <flow name="filterAfterNonBlockingRejects">
-        <test:assert-intercepting responseCount="0"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <test:non-blocking-processor/>
+        <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
         <expression-filter expression="#[false]"/>
+        <test:assert count="0"/>
     </flow>
 
     <flow name="filterAfterEnricherBeforeNonBlocking">
-        <test:assert-intercepting responseCount="0"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <enricher source="#[payload]" target="#[payload]">
             <set-payload value="#[payload]"/>
         </enricher>
         <expression-filter expression="#[false]"/>
         <test:non-blocking-processor/>
+        <test:assert count="0"/>
     </flow>
 
     <flow name="filterBeforeNonBlockingAccepts">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <expression-filter expression="#[true]"/>
         <test:non-blocking-processor/>
         <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
 
     <flow name="filterBeforeNonBlockingRejects">
-        <test:assert-intercepting responseCount="0"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <expression-filter expression="#[false]"/>
         <test:non-blocking-processor/>
+        <test:assert count="0"/>
     </flow>
 
     <flow name="security-filter">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <custom-processor class="org.mule.processor.SecurityFilterMessageProcessor"/>
         <test:non-blocking-processor/>
         <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
 
     <flow name="transformer">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <expression-transformer expression="#[true]"/>
         <test:non-blocking-processor/>
         <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
 
     <flow name="choice">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <choice>
             <when expression="#[true]">
                 <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
                 <test:non-blocking-processor/>
             </when>
         </choice>
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <test:non-blocking-processor/>
         <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
 
     <flow name="enricher">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <enricher source="#[payload]" target="#[payload]">
             <processor-chain>
                 <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
                 <test:non-blocking-processor/>
             </processor-chain>
         </enricher>
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <test:non-blocking-processor/>
         <test:assert expression="#[assertPayload()]"/>
-    </flow>
-
-    <flow name="response">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
-        <response>
-            <test:assert expression="#[assertPayload()]"/>
-        </response>
-        <test:non-blocking-processor/>
-        <test:assert expression="#[assertPayload()]"/>
-    </flow>
-
-    <flow name="responseWithNullEvent">
-        <test:assert-intercepting responseCount="0"/>
-        <response>
-            <test:assert count="0"/>
-        </response>
-        <test:non-blocking-processor/>
-        <expression-filter expression="#[false]"/>
     </flow>
 
     <flow name="enricherIssue">
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <enricher target="flowVars['match']">
             <set-payload value="false"/>
         </enricher>
@@ -166,41 +166,36 @@
         </message-filter>
         <test:non-blocking-processor/>
         <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
 
     <flow name="enricherIssueNonBlocking">
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <enricher target="flowVars['match']">
             <test:non-blocking-processor/>
         </enricher>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
         <message-filter>
             <expression-filter expression="#[true]"/>
         </message-filter>
         <test:non-blocking-processor/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
 
     <flow name="enricherFlowVar">
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <enricher target="flowVars[org.mule.NonBlockingFullySupportedFunctionalTestCase.FOO]">
             <test:non-blocking-processor/>
         </enricher>
         <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
 
     <flow name="testOutboundEndpoint">
         <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
-        <set-property propertyName="foo" value="bar"/>
-        <outbound-endpoint address="test://test" exchange-pattern="request-response">
-            <set-variable variableName="endpointRequestMPInvoked" value="true"/>
-            <response>
-                <set-variable variableName="endpointResponseMPInvoked" value="true"/>
-            </response>
-            <property key="responseProperties" value="foo"/>
-        </outbound-endpoint>
-        <test:assert expression="#[assertPayload()]" />
-        <test:assert expression="#[flowVars['endpointRequestMPInvoked'] == 'true']" />
-        <test:assert expression="#[flowVars['endpointResponseMPInvoked'] == 'true']" />
-        <test:assert expression="#[message.outboundProperties['foo'] == 'bar']" />
-        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread]"/>
+        <outbound-endpoint address="test://test" exchange-pattern="request-response" />
+        <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
     </flow>
 
     <flow name="testOutboundEndpointError">
@@ -209,18 +204,18 @@
         <catch-exception-strategy>
             <test:assert expression="#[assertPayload()]" />
             <test:assert expression="#[exception.causedBy(org.mule.api.routing.RoutingException)]" />
-            <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread]"/>
+            <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
         </catch-exception-strategy>
     </flow>
 
     <flow name="async">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <async processingStrategy="asynchronous">
             <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
             <test:non-blocking-processor/>
             <test:assert count="1" expression="#[Thread.currentThread()!=beforeThread and assertPayload()]"/>
         </async>
         <test:non-blocking-processor/>
+        <test:assert expression="#[assertPayload()]" />
     </flow>
 
 </mule>

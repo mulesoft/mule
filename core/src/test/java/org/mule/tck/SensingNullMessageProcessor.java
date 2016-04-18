@@ -47,7 +47,6 @@ public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProce
     @Override
     protected void processNonBlocking(final MuleEvent event, CompletionHandler completionHandler) throws MuleException
     {
-        sense(event);
         Executors.newSingleThreadExecutor().execute(new Runnable()
         {
             @Override
@@ -55,6 +54,7 @@ public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProce
             {
                 try
                 {
+                    sense(event);
                     MuleEvent eventToProcess = event;
                     if (StringUtils.isNotEmpty(appendString))
                     {

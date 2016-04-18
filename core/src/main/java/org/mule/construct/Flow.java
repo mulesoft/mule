@@ -30,6 +30,7 @@ import org.mule.api.processor.SequentialStageNameSource;
 import org.mule.api.processor.StageNameSource;
 import org.mule.api.processor.StageNameSourceProvider;
 import org.mule.api.transport.ExceptionHandlingReplyToHandlerDecorator;
+import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
@@ -106,26 +107,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     @Override
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
-        final Object replyToDestination = event.getReplyToDestination();
-        final ReplyToHandler replyToHandler = event.getReplyToHandler();
-
-        ReplyToHandler nonBlockingReplyToHandler = new ExceptionHandlingReplyToHandlerDecorator(new ReplyToHandler()
-        {
-            @Override
-            public void processReplyTo(MuleEvent result, MuleMessage returnMessage, Object replyTo) throws MuleException
-            {
-                replyToHandler.processReplyTo(createReturnEventForParentFlowConstruct(result, event), null, null);
-            }
-
-            @Override
-            public void processExceptionReplyTo(MessagingException exception, Object replyTo)
-            {
-                exception.setProcessedEvent(createReturnEventForParentFlowConstruct(exception.getEvent(), event));
-                replyToHandler.processExceptionReplyTo(exception, null);
-            }
-        }, getExceptionListener());
-
-        final MuleEvent newEvent = createMuleEventForCurrentFlow(event, replyToDestination, nonBlockingReplyToHandler);
+        final MuleEvent newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
         try
         {
             ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, getExceptionListener());
@@ -155,11 +137,41 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     private MuleEvent createMuleEventForCurrentFlow(MuleEvent event, Object replyToDestination, ReplyToHandler
             replyToHandler)
     {
+        // Wrap and propagte reply to handler only if it's not a standard DefaultReplyToHandler.
+        if (replyToHandler != null && replyToHandler instanceof NonBlockingReplyToHandler)
+        {
+            replyToHandler = createNonBlockingReplyToHandler(event, replyToHandler);
+        }
+        else
+        {
+            // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
+            // referenced flows. If it is passded on they two replyTo responses are sent.
+            replyToHandler = null;
+        }
+
         // Create new event for current flow with current flowConstruct, replyToHandler etc.
-        event = new DefaultMuleEvent(event, this, event.isAllowNonBlocking() ? replyToHandler : null,
-                                    replyToDestination, event.isSynchronous() || isSynchronous());
+        event = new DefaultMuleEvent(event, this, replyToHandler, replyToDestination, event.isSynchronous() || isSynchronous());
         resetRequestContextEvent(event);
         return event;
+    }
+
+    private ReplyToHandler createNonBlockingReplyToHandler(final MuleEvent event, final ReplyToHandler replyToHandler)
+    {
+        return new ExceptionHandlingReplyToHandlerDecorator(new NonBlockingReplyToHandler()
+        {
+            @Override
+            public void processReplyTo(MuleEvent result, MuleMessage returnMessage, Object replyTo) throws MuleException
+            {
+                replyToHandler.processReplyTo(createReturnEventForParentFlowConstruct(result, event), null, null);
+            }
+
+            @Override
+            public void processExceptionReplyTo(MessagingException exception, Object replyTo)
+            {
+                exception.setProcessedEvent(createReturnEventForParentFlowConstruct(exception.getEvent(), event));
+                replyToHandler.processExceptionReplyTo(exception, null);
+            }
+        }, getExceptionListener());
     }
 
     private MuleEvent createReturnEventForParentFlowConstruct(MuleEvent result, MuleEvent original)
