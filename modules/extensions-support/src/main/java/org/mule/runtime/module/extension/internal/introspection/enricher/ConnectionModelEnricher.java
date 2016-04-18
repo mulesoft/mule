@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
-import org.mule.extension.api.introspection.operation.OperationModel;
-import org.mule.extension.api.introspection.declaration.DescribingContext;
-import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connector.ConnectionInterceptor;
 

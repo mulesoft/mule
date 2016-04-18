@@ -7,9 +7,9 @@
 package org.mule.runtime.module.extension.vegan;
 
 import static org.mule.runtime.module.extension.vegan.VeganExtension.BANANA;
-import org.mule.extension.api.annotation.Configuration;
-import org.mule.extension.api.annotation.Operations;
-import org.mule.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.Configuration;
+import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.connector.Providers;
 
 @Configuration(name = BANANA)
 @Operations(EatBananaOperation.class)

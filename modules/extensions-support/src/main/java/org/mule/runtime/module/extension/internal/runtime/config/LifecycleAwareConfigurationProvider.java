@@ -18,9 +18,9 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.extension.api.runtime.ConfigurationInstance;
-import org.mule.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.core.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
 

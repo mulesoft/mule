@@ -7,12 +7,12 @@
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.extension.api.introspection.declaration.DescribingContext;
-import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
-import org.mule.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
+import org.mule.runtime.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
 
 import java.util.List;
 

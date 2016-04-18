@@ -18,12 +18,12 @@ import org.mule.runtime.core.api.config.ConfigurationInstanceNotification;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.extension.api.introspection.config.ConfigurationModel;
-import org.mule.extension.api.introspection.Interceptable;
-import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.extension.api.runtime.ConfigurationInstance;
-import org.mule.extension.api.runtime.ConfigurationStats;
-import org.mule.extension.api.runtime.Interceptor;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
+import org.mule.runtime.extension.api.introspection.Interceptable;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.ConfigurationStats;
+import org.mule.runtime.extension.api.runtime.Interceptor;
 import org.mule.runtime.module.extension.internal.introspection.AbstractInterceptable;
 import org.mule.runtime.core.time.TimeSupplier;
 

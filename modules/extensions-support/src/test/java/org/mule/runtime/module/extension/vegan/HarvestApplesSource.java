@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.vegan;
 
-import org.mule.extension.api.annotation.Alias;
-import org.mule.extension.api.annotation.param.UseConfig;
-import org.mule.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.io.Serializable;

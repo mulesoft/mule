@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connector.basic;
 
-import org.mule.extension.api.annotation.Expression;
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 
 public class Account
 {

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
-import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
 
 /**
  * Validates that a constructed model is legal, meaning it's consistent and

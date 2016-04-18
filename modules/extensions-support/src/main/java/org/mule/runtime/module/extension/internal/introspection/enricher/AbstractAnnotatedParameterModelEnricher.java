@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
-import org.mule.extension.api.introspection.ModelProperty;
-import org.mule.extension.api.introspection.declaration.DescribingContext;
-import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterizedDeclaration;
+import org.mule.runtime.extension.api.introspection.ModelProperty;
+import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 
 import java.lang.annotation.Annotation;

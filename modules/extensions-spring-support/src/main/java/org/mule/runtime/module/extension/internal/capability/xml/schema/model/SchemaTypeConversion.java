@@ -25,7 +25,7 @@ import static org.mule.runtime.module.extension.internal.capability.xml.schema.m
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_LONG;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_MAP;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
-import org.mule.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.DateTimeType;

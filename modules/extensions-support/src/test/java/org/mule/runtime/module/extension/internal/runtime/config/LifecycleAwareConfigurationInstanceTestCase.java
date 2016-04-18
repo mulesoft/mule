@@ -28,7 +28,7 @@ import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
-import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.module.extension.internal.AbstractInterceptableContractTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;

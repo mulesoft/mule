@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
-import org.mule.extension.api.ExtensionManager;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
 import java.util.Optional;
 

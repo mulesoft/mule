@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import org.mule.extension.api.runtime.Interceptor;
+import org.mule.runtime.extension.api.runtime.Interceptor;
 
 import java.util.List;
 

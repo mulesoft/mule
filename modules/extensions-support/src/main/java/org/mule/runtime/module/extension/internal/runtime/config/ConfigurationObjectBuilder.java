@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.module.extension.internal.runtime.ObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;

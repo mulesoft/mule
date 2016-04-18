@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.vegan;
 
-import org.mule.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.tck.testmodels.fruit.Kiwi;
 
 public class EatKiwiOperation

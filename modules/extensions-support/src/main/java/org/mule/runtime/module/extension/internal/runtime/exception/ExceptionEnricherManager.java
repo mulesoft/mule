@@ -7,12 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.extension.api.introspection.exception.ExceptionEnrichableModel;
-import org.mule.extension.api.introspection.exception.ExceptionEnricher;
-import org.mule.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.extension.api.introspection.operation.RuntimeOperationModel;
-import org.mule.extension.api.introspection.source.RuntimeSourceModel;
+import org.mule.runtime.extension.api.introspection.exception.ExceptionEnrichableModel;
+import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
+import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
+import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.util.Optional;

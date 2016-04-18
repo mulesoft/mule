@@ -9,9 +9,9 @@ package org.mule.runtime.module.extension.file.api;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.temporary.MuleMessage;
-import org.mule.extension.api.annotation.DataTypeParameters;
-import org.mule.extension.api.annotation.param.Connection;
-import org.mule.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.DataTypeParameters;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.StringUtils;
 

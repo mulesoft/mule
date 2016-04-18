@@ -12,7 +12,7 @@ import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import com.google.common.collect.Multimap;
 

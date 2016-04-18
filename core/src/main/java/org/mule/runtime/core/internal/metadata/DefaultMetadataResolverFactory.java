@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
-import org.mule.extension.api.introspection.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.core.util.ClassUtils;
 
 

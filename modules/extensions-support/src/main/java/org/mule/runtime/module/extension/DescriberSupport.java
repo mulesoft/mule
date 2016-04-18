@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension;
 
-import org.mule.extension.api.introspection.declaration.DescribingContext;
-import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
-import org.mule.extension.api.introspection.declaration.spi.Describer;
+import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 
 /**

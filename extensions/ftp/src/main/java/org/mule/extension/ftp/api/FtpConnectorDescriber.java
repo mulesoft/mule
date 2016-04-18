@@ -6,7 +6,7 @@
  */
 package org.mule.extension.ftp.api;
 
-import org.mule.extension.api.introspection.declaration.spi.Describer;
+import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.module.extension.DescriberSupport;
 
 /**

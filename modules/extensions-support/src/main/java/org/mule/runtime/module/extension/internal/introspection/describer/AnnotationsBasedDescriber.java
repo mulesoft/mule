@@ -29,44 +29,44 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.extension.api.annotation.Alias;
-import org.mule.extension.api.annotation.Configuration;
-import org.mule.extension.api.annotation.Configurations;
-import org.mule.extension.api.annotation.Expression;
-import org.mule.extension.api.annotation.Extensible;
-import org.mule.extension.api.annotation.Extension;
-import org.mule.extension.api.annotation.ExtensionOf;
-import org.mule.extension.api.annotation.OnException;
-import org.mule.extension.api.annotation.Operations;
-import org.mule.extension.api.annotation.Sources;
-import org.mule.extension.api.annotation.SubTypesMapping;
-import org.mule.extension.api.annotation.connector.Providers;
-import org.mule.extension.api.annotation.metadata.MetadataScope;
-import org.mule.extension.api.annotation.param.Connection;
-import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.annotation.param.UseConfig;
-import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.declaration.DescribingContext;
-import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclarer;
-import org.mule.extension.api.introspection.declaration.fluent.ConnectionProviderDeclarer;
-import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
-import org.mule.extension.api.introspection.declaration.fluent.HasConnectionProviderDeclarer;
-import org.mule.extension.api.introspection.declaration.fluent.HasModelProperties;
-import org.mule.extension.api.introspection.declaration.fluent.HasOperationDeclarer;
-import org.mule.extension.api.introspection.declaration.fluent.HasSourceDeclarer;
-import org.mule.extension.api.introspection.declaration.fluent.OperationDeclarer;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclarer;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
-import org.mule.extension.api.introspection.declaration.fluent.SourceDeclarer;
-import org.mule.extension.api.introspection.declaration.spi.Describer;
-import org.mule.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.extension.api.introspection.property.DisplayModelProperty;
-import org.mule.extension.api.introspection.property.DisplayModelPropertyBuilder;
-import org.mule.extension.api.introspection.property.SubTypesModelProperty;
-import org.mule.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Configuration;
+import org.mule.runtime.extension.api.annotation.Configurations;
+import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.Extensible;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.ExtensionOf;
+import org.mule.runtime.extension.api.annotation.OnException;
+import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Sources;
+import org.mule.runtime.extension.api.annotation.SubTypesMapping;
+import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.HasConnectionProviderDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.HasModelProperties;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.HasOperationDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.HasSourceDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
+import org.mule.runtime.extension.api.introspection.property.DisplayModelPropertyBuilder;
+import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
+import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.config.ThreadingProfile;
@@ -348,7 +348,7 @@ public final class AnnotationsBasedDescriber implements Describer
             {
                 throw new IllegalParameterModelDefinitionException(String.format("@%s can not be applied along with @%s. Affected field [%s] in [%s].",
                                                                                  Optional.class.getSimpleName(),
-                                                                                 org.mule.extension.api.annotation.ParameterGroup.class.getSimpleName(),
+                                                                                 org.mule.runtime.extension.api.annotation.ParameterGroup.class.getSimpleName(),
                                                                                  field.getName(),
                                                                                  annotatedType));
             }

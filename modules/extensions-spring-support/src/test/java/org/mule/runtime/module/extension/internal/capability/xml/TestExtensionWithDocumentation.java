@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml;
 
-import org.mule.extension.api.annotation.Extension;
-import org.mule.extension.api.annotation.Operations;
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.annotation.ParameterGroup;
-import org.mule.extension.api.annotation.capability.Xml;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.capability.Xml;
 
 @Extension(name = "documentation")
 @Operations({TestDocumentedExtensionOperations.class})

@@ -8,9 +8,9 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 
 import java.util.List;

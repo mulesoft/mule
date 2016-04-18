@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import org.mule.extension.api.annotation.Alias;
-import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.utils.JavaTypeUtils;

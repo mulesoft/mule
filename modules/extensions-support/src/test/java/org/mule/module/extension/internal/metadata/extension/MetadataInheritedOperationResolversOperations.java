@@ -6,9 +6,9 @@
  */
 package org.mule.module.extension.internal.metadata.extension;
 
-import org.mule.extension.api.annotation.metadata.Content;
-import org.mule.extension.api.annotation.metadata.MetadataKeyParam;
-import org.mule.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.metadata.Content;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyParam;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.module.extension.internal.metadata.extension.MetadataConnection;
 
 public class MetadataInheritedOperationResolversOperations extends MetadataOperationsParent

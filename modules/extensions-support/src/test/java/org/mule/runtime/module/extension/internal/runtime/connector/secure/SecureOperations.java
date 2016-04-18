@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connector.secure;
 
-import org.mule.extension.api.annotation.param.display.Password;
-import org.mule.extension.api.annotation.param.display.Text;
+import org.mule.runtime.extension.api.annotation.param.display.Password;
+import org.mule.runtime.extension.api.annotation.param.display.Text;
 
 public class SecureOperations
 {

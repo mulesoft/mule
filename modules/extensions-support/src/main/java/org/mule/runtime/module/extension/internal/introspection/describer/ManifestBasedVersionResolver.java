@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import org.mule.runtime.core.config.MuleManifest;
-import org.mule.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.extension.internal.introspection.VersionResolver;
 import org.mule.runtime.core.util.ClassUtils;
 

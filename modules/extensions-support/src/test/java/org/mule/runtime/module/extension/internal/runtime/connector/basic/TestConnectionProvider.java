@@ -11,10 +11,10 @@ import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.extension.api.annotation.Expression;
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.annotation.param.Optional;
-import org.mule.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 
 public class TestConnectionProvider implements ConnectionProvider<TestConnector, Object>
 {

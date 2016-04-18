@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import org.mule.extension.api.runtime.ConfigurationStats;
+import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 
 /**
  * A specialization of {@link ConfigurationStats} which adds behavior

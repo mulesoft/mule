@@ -8,9 +8,9 @@ package org.mule.runtime.module.extension.internal.config;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.source.SourceModel;
-import org.mule.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.runtime.extension.api.runtime.source.Source;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;

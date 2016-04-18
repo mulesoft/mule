@@ -13,9 +13,9 @@ import static org.mule.runtime.module.extension.vegan.VeganExtension.APPLE;
 import static org.mule.runtime.module.extension.vegan.VeganExtension.BANANA;
 import static org.mule.runtime.module.extension.vegan.VeganExtension.KIWI;
 import static org.mule.runtime.module.extension.vegan.VeganExtension.VEGAN;
-import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.module.extension.vegan.VeganExtension;
 import org.mule.tck.size.SmallTest;
 

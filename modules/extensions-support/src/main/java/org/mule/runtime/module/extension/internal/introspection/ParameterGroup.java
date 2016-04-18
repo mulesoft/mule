@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal.introspection;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.extension.api.introspection.EnrichableModel;
-import org.mule.extension.api.introspection.ModelProperty;
-import org.mule.extension.api.introspection.parameter.ParameterModel;
-import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.introspection.EnrichableModel;
+import org.mule.runtime.extension.api.introspection.ModelProperty;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 
 import com.google.common.collect.ImmutableMap;

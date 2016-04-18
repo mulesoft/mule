@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.model;
 
-import org.mule.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import java.util.Calendar;
 import java.util.Date;

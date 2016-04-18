@@ -8,11 +8,11 @@ package org.mule.runtime.module.extension.internal.manager;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.extension.api.introspection.ExtensionDiscoverer;
-import org.mule.extension.api.introspection.ExtensionFactory;
-import org.mule.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
-import org.mule.extension.api.introspection.declaration.spi.Describer;
+import org.mule.runtime.extension.api.introspection.ExtensionDiscoverer;
+import org.mule.runtime.extension.api.introspection.ExtensionFactory;
+import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.runtime.core.registry.SpiServiceRegistry;

@@ -8,9 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.extension.api.introspection.parameter.ParameterModel;
-import org.mule.extension.api.introspection.operation.RuntimeOperationModel;
-import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 import java.util.HashMap;

@@ -11,10 +11,10 @@ import static org.mule.runtime.module.extension.internal.introspection.utils.Imp
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.extension.api.introspection.config.ConfigurationModel;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**

@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.core.lifecycle.LifecycleObject;
 import org.mule.runtime.core.lifecycle.NotificationLifecycleObject;
 import org.mule.runtime.core.util.annotation.AnnotationMetaData;

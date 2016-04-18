@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.vegan;
 
-import org.mule.extension.api.annotation.Configurations;
-import org.mule.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Configurations;
+import org.mule.runtime.extension.api.annotation.Extension;
 
 @Extension(name = VeganExtension.VEGAN)
 @Configurations({AppleConfig.class, BananaConfig.class, KiwiConfig.class})

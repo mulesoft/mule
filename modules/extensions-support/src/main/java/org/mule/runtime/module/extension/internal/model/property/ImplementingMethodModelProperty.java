@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.model.property;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.extension.api.introspection.ModelProperty;
-import org.mule.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.ModelProperty;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 
 import java.lang.reflect.Method;
 

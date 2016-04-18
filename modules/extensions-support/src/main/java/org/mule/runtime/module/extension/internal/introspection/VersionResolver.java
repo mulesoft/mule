@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.introspection;
 
-import org.mule.extension.api.annotation.Extension;
-import org.mule.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
 
 /**
  * Component that resolves an extension's version.

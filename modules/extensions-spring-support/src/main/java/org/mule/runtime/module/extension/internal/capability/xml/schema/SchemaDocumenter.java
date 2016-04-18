@@ -13,14 +13,14 @@ import static org.mule.runtime.module.extension.internal.capability.xml.schema.A
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.extension.api.annotation.Configuration;
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.annotation.ParameterGroup;
-import org.mule.extension.api.introspection.ExtensionModel;
-import org.mule.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.extension.api.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.extension.api.annotation.Configuration;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 

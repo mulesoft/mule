@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import org.mule.extension.api.runtime.ConfigurationInstance;
-import org.mule.extension.api.runtime.ExceptionCallback;
-import org.mule.extension.api.runtime.MessageHandler;
-import org.mule.extension.api.runtime.source.SourceContext;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.ExceptionCallback;
+import org.mule.runtime.extension.api.runtime.MessageHandler;
+import org.mule.runtime.extension.api.runtime.source.SourceContext;
 
 final class ImmutableSourceContext implements SourceContext
 {

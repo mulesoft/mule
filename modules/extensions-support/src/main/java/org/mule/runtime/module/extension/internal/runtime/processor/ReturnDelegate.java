@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.processor;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.extension.api.runtime.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.OperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 
 /**

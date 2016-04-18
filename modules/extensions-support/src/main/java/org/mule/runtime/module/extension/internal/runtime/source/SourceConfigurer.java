@@ -10,9 +10,9 @@ import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessa
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.extension.api.annotation.Parameter;
-import org.mule.extension.api.introspection.source.SourceModel;
-import org.mule.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
