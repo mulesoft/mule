@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
@@ -63,7 +64,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         if (nonBlocking && responseProcessing)
         {
             final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
-            eventToProcess = new DefaultMuleEvent(event, new ReplyToHandler()
+            eventToProcess = new DefaultMuleEvent(event, new NonBlockingReplyToHandler()
             {
                 @Override
                 public void processReplyTo(MuleEvent result, MuleMessage returnMessage, Object replyTo) throws

@@ -8,6 +8,7 @@ package org.mule.runtime.module.cxf.transport;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -19,17 +20,17 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.module.cxf.CxfConfiguration;
 import org.mule.runtime.module.cxf.CxfConstants;
 import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -227,7 +228,7 @@ public class MuleUniversalConduit extends AbstractConduit
             {
                 final ReplyToHandler originalReplyToHandler = reqEvent.getReplyToHandler();
 
-                reqEvent = new DefaultMuleEvent(reqEvent, new ReplyToHandler()
+                reqEvent = new DefaultMuleEvent(reqEvent, new NonBlockingReplyToHandler()
                 {
                     @Override
                     public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException

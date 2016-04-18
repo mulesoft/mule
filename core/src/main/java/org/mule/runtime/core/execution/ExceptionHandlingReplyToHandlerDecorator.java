@@ -10,6 +10,7 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 
@@ -24,7 +25,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
  * {@link org.mule.runtime.core.api.connector.ReplyToHandler#processExceptionReplyTo(org.mule.runtime.core.api.MessagingException, Object)} depending on the
  * result of {@link org.mule.runtime.core.api.MessagingException#handled()} after the MessagingExceptionHandler has been invoked.
  */
-public class ExceptionHandlingReplyToHandlerDecorator implements ReplyToHandler
+public class ExceptionHandlingReplyToHandlerDecorator implements NonBlockingReplyToHandler
 {
 
     private final MessagingExceptionHandler messagingExceptionHandler;

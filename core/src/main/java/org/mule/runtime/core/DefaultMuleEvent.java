@@ -100,6 +100,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     private FlowCallStack flowCallStack = new DefaultFlowCallStack();
     private ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
+    private boolean nonBlocking;
 
     // Constructors
 
@@ -234,6 +235,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.timeout = timeout;
         this.transacted = false;
         this.synchronous = resolveEventSynchronicity();
+        this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
     }
 
     /**
@@ -291,6 +293,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.timeout = 0;
         this.transacted = false;
         this.synchronous = resolveEventSynchronicity();
+        this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
     }
 
     // Constructors to copy MuleEvent
@@ -433,6 +436,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.transacted = rewriteEvent.isTransacted();
         this.notificationsEnabled = rewriteEvent.isNotificationsEnabled();
         this.synchronous = synchronous;
+        this.nonBlocking = rewriteEvent.isAllowNonBlocking() || isFlowConstructNonBlockingProcessingStrategy();
         this.flowCallStack = rewriteEvent.getFlowCallStack() == null ? new DefaultFlowCallStack() : rewriteEvent.getFlowCallStack().clone();
         // We want parallel paths of the same flows (i.e.: async events) to contribute to this list and be available at the end, so we copy only the reference.
         this.processorsTrace = rewriteEvent.getProcessorsTrace();
@@ -467,6 +471,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.replyToDestination = replyToDestination;
         this.transacted = transacted;
         this.synchronous = resolveEventSynchronicity() && replyToHandler == null;
+        this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
         this.timeout = timeout;
         this.outputStream = outputStream;
     }
@@ -503,6 +508,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.replyToDestination = replyToDestination;
         this.transacted = transacted;
         this.synchronous = synchronous;
+        this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
         this.timeout = timeout;
         this.outputStream = outputStream;
     }
@@ -1103,7 +1109,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public boolean isAllowNonBlocking()
     {
-        return exchangePattern.hasResponse() && !isSynchronous();
+        return nonBlocking && !synchronous;
     }
 
     @Override

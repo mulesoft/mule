@@ -221,6 +221,18 @@ public class TestEventBuilder
     }
 
     /**
+     * Configures the product event to have the provided {@link MessageExchangePattern}.
+     *
+     * @return this {@link TestEventBuilder}
+     */
+    public TestEventBuilder withExchangePattern(MessageExchangePattern exchangePattern)
+    {
+        this.exchangePattern = exchangePattern;
+
+        return this;
+    }
+
+    /**
      * Will spy the built {@link MuleMessage} and {@link MuleEvent}. See {@link Mockito#spy(Object) spy}.
      * 
      * @return this {@link TestEventBuilder}

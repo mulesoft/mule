@@ -14,12 +14,13 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.chain.ProcessorExecutorFactory;
 
@@ -65,7 +66,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
         if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)
         {
             final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
-            event = new DefaultMuleEvent(event, new ReplyToHandler()
+            event = new DefaultMuleEvent(event, new NonBlockingReplyToHandler()
             {
                 @Override
                 public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws

@@ -8,6 +8,7 @@ package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
 
+import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -173,6 +174,21 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
     
         return (R) this;
     }
+
+    /**
+     * Configures this runner to run this flow as using the provided {@link MessageExchangePattern}.
+     * This is useful if the exchange pattern needs to be paramatized, otherwise {@link #asynchronously()} can be used.
+     *
+     * @return this {@link FlowRunner}
+     */
+    public R withExchangePAttern(MessageExchangePattern exchangePattern)
+    {
+        eventBuilder.withExchangePattern(exchangePattern);
+
+        return (R) this;
+    }
+
+
 
     /**
      * Will spy the built {@link MuleMessage} and {@link MuleEvent}. See {@link Mockito#spy(Object) spy}.

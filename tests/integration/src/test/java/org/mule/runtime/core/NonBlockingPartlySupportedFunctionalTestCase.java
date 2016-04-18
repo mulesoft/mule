@@ -32,11 +32,5 @@ public class NonBlockingPartlySupportedFunctionalTestCase extends FunctionalTest
         flowRunner("wiretap").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
-    @Test
-    public void async() throws Exception
-    {
-        flowRunner("async").withPayload(TEST_MESSAGE).nonBlocking().run();
-    }
-
 }
 

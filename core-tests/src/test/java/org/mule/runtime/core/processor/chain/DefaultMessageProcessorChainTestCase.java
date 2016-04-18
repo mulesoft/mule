@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
@@ -40,17 +41,19 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.runtime.core.routing.filters.AcceptAllFilter;
+import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.util.ObjectUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -93,8 +96,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
                 {MessageExchangePattern.REQUEST_RESPONSE, true, false},
                 {MessageExchangePattern.ONE_WAY, false, true},
                 {MessageExchangePattern.ONE_WAY, false, false},
-                {MessageExchangePattern.ONE_WAY, true, true},
-                {MessageExchangePattern.ONE_WAY, true, false},
+                {MessageExchangePattern.ONE_WAY, true, true}
         });
     }
 
@@ -564,7 +566,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         }, getAppendingMP("2"));
         assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload());
 
-        assertEquals(isMultipleThreadsUsed() ? 2 : 1, threads);
+        assertEquals(isMultipleThreadsUsed() ? 3 : 1, threads);
     }
 
     @Test
@@ -1024,7 +1026,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 
         public MuleEvent process(final MuleEvent event) throws MuleException
         {
-            if (nonBlocking && event.isAllowNonBlocking())
+            if (nonBlocking && event.isAllowNonBlocking() && event.getReplyToHandler() != null)
             {
                 executor.execute(new Runnable()
                 {
@@ -1245,10 +1247,14 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         when(event.getMessage()).thenReturn(message);
         when(event.getExchangePattern()).thenReturn(exchangePattern);
         when(event.getMuleContext()).thenReturn(muleContext);
-        when(event.getFlowConstruct()).thenReturn(mock(Flow.class));
+        Pipeline mockFlow = mock(Flow.class);
+        when(mockFlow.getProcessingStrategy()).thenReturn(nonBlocking ? new NonBlockingProcessingStrategy() : new
+                DefaultFlowProcessingStrategy());
+        when(event.getFlowConstruct()).thenReturn(mockFlow);
         when(event.getSession()).thenReturn(mock(MuleSession.class));
         when(event.isSynchronous()).thenReturn(synchronous);
-        when(event.isAllowNonBlocking()).thenReturn(!synchronous && exchangePattern.hasResponse());
+        when(event.isAllowNonBlocking()).thenReturn(!synchronous && nonBlocking);
+        //when(event.isNonBlocking()).thenReturn(nonBlocking);
         return event;
     }
 

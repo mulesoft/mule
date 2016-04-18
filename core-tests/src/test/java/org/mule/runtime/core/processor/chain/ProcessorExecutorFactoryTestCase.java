@@ -57,7 +57,7 @@ public class ProcessorExecutorFactoryTestCase extends AbstractMuleTestCase
         when(muleEvent.getFlowConstruct()).thenReturn(mock(Flow.class));
         when(muleEvent.isAllowNonBlocking()).thenReturn(true);
         assertThat(createProcessorExecutor().getClass(), CoreMatchers.<Class>equalTo(
-                (BlockingProcessorExecutor.class)));
+                (NonBlockingProcessorExecutor.class)));
     }
 
     @Test

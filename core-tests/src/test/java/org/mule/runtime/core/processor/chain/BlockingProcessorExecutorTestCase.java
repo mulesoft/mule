@@ -104,11 +104,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
     public void executeRequestResponse() throws MuleException
     {
         setupRequestResponseEvent();
-        assertBlockingExecution(processors, requestResponseMatecher());
-    }
-    
-    protected Matcher<MuleEvent> requestResponseMatecher() {
-        return sameInstance(event);
+        assertBlockingExecution(processors, sameInstance(event));
     }
 
     @Test
@@ -127,16 +123,15 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void executeOneWay() throws MuleException
+    public void executeOneWay() throws MuleException, InterruptedException
     {
         setupOneWayEvent();
         assertBlockingExecution(processors, sameInstance(event));
     }
 
-    private void setupOneWayEvent()
+    protected void setupOneWayEvent()
     {
         when(event.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
-        when(event.isAllowNonBlocking()).thenReturn(false);
         when(event.isSynchronous()).thenReturn(false);
     }
 

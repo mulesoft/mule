@@ -13,6 +13,7 @@ import static org.mule.runtime.module.cxf.HttpRequestPropertyManager.getScheme;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
@@ -24,19 +25,19 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
 import org.mule.runtime.module.cxf.transport.MuleUniversalDestination;
 import org.mule.runtime.module.xml.stax.StaxSource;
-import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -252,7 +253,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             {
                 final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
 
-                event = new DefaultMuleEvent(event, new ReplyToHandler()
+                event = new DefaultMuleEvent(event, new NonBlockingReplyToHandler()
                 {
                     @Override
                     public void processReplyTo(MuleEvent responseEvent, MuleMessage returnMessage, Object replyTo) throws MuleException
