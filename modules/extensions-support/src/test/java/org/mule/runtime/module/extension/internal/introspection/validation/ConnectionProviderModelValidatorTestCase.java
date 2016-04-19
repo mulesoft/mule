@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
+import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -18,14 +20,14 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
-import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
+import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
+import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -237,7 +239,7 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
 
     private ExtensionModel modelFor(Class<?> connectorClass)
     {
-        return extensionFactory.createFrom(new AnnotationsBasedDescriber(connectorClass).describe(new DefaultDescribingContext()));
+        return extensionFactory.createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion())).describe(new DefaultDescribingContext()));
     }
 
     private void validate(Class<?> connectorClass)

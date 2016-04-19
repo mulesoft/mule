@@ -7,8 +7,11 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 
 /**
  * Constants for the Extensions Framework
@@ -28,16 +31,6 @@ public class ExtensionProperties
     public static final String CONNECTION_PARAM = PROPERTY_PREFIX + "CONNECTION_PARAM";
 
     /**
-     * The key of an operation's variable on which the corresponding {@link ContentMetadata} is available
-     */
-    public static final String CONTENT_METADATA = PROPERTY_PREFIX + "CONTENT_METADATA";
-
-    /**
-     * The key of an operation's variable on which the corresponding input {@link ContentType} is available
-     */
-    public static final String CONTENT_TYPE = PROPERTY_PREFIX + "CONTENT_TYPE";
-
-    /**
      * The name of a parameter that allows configuring the mimeType that should be applied
      */
     public static final String MIME_TYPE_PARAMETER_NAME = "outputMimeType";
@@ -55,6 +48,18 @@ public class ExtensionProperties
      */
     public static final String TARGET_ATTRIBUTE = "target";
 
+    /**
+     * The name of an attribute which allows referencing a {@link TlsContextFactory}
+     */
     public static final String TLS_ATTRIBUTE_NAME = "tlsContext";
+
+    /**
+     * The name of an attribute which allows specifying a {@link ThreadingProfile}
+     */
     public static final String THREADING_PROFILE_ATTRIBUTE_NAME = "threadingProfile";
+
+    /**
+     * The name of a file which contains each plugin's {@link ExtensionManifest}
+     */
+    public static final String EXTENSION_MANIFEST_FILE_NAME = "extension-manifest.xml";
 }

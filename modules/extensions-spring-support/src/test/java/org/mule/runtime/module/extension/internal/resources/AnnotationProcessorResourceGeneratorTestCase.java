@@ -12,7 +12,6 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.tck.size.SmallTest;
 
@@ -38,27 +37,21 @@ public class AnnotationProcessorResourceGeneratorTestCase extends ResourcesGener
     @Override
     protected ResourcesGenerator buildGenerator()
     {
-        return new AnnotationProcessorResourceGenerator(processingEnvironment, serviceRegistry);
+        return new AnnotationProcessorResourceGenerator(resourceFactories, processingEnvironment);
     }
 
     @Test
-    public void dumpAll() throws Exception
+    public void write() throws Exception
     {
-        final String filepath = "path";
-        final String content = "hello world!";
-
-        GeneratedResource resource = generator.get(filepath);
-        resource.getContentBuilder().append(content);
-
         FileObject file = mock(FileObject.class);
-        when(processingEnvironment.getFiler().createResource(SOURCE_OUTPUT, EMPTY, filepath)).thenReturn(file);
+        when(processingEnvironment.getFiler().createResource(SOURCE_OUTPUT, EMPTY, RESOURCE_PATH)).thenReturn(file);
 
         OutputStream out = mock(OutputStream.class, RETURNS_DEEP_STUBS);
         when(file.openOutputStream()).thenReturn(out);
 
-        generator.dumpAll();
+        generator.generateFor(extensionModel);
 
-        verify(out).write(content.getBytes());
+        verify(out).write(RESOURCE_CONTENT);
         verify(out).flush();
     }
 }

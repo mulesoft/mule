@@ -6,82 +6,51 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
-import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
-import org.mule.runtime.extension.api.resources.spi.GenerableResourceContributor;
+import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 
 /**
  * Base implementation of {@link ResourcesGenerator}
  * that takes care of the basic contract except for actually writing the resources to
  * a persistent store. Implementations are only required to provide that piece of logic
- * by using the {@link #write(GeneratedResource)}
- * template method
+ * by using the {@link #write(GeneratedResource)} template method
  *
  * @since 3.7.0
  */
 public abstract class AbstractResourcesGenerator implements ResourcesGenerator
 {
 
-    private Map<String, GeneratedResource> resources = new HashMap<>();
-    private ServiceRegistry serviceRegistry;
+    private final List<GeneratedResourceFactory> resourceFactories;
 
-    public AbstractResourcesGenerator(ServiceRegistry serviceRegistry)
+    public AbstractResourcesGenerator(Collection<GeneratedResourceFactory> resourceFactories)
     {
-        this.serviceRegistry = serviceRegistry;
+        this.resourceFactories = ImmutableList.copyOf(resourceFactories);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public GeneratedResource get(String filepath)
+    public List<GeneratedResource> generateFor(ExtensionModel extensionModel)
     {
-        GeneratedResource resource = resources.get(filepath);
+        List<GeneratedResource> resources = resourceFactories.stream()
+                .map(factory -> factory.generateResource(extensionModel))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(new ImmutableListCollector<>());
 
-        if (resource == null)
-        {
-            resource = new DefaultGeneratedResource(filepath);
-            resources.put(filepath, resource);
-        }
-
-        return resource;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void generateFor(ExtensionModel extensionModel)
-    {
-        for (GenerableResourceContributor contributor : serviceRegistry.lookupProviders(GenerableResourceContributor.class, getClass().getClassLoader()))
-        {
-            contributor.contribute(extensionModel, this);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<GeneratedResource> dumpAll()
-    {
-        ImmutableList.Builder<GeneratedResource> generatedResources = ImmutableList.builder();
-        for (GeneratedResource resource : resources.values())
-        {
-            generatedResources.add(resource);
-            write(resource);
-        }
-
-        return generatedResources.build();
+        resources.forEach(this::write);
+        return resources;
     }
 
     /**

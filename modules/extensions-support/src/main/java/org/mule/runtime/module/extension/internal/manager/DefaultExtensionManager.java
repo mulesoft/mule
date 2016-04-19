@@ -4,15 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.runtime.module.extension.internal.manager;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -20,29 +23,36 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.extension.api.introspection.ExtensionDiscoverer;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.time.Time;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
+import org.mule.runtime.extension.api.manifest.ExtensionManifest;
+import org.mule.runtime.extension.api.persistence.manifest.ExtensionManifestXmlSerializer;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConfigurationFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.StaticConfigurationProvider;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.time.Time;
 
-import com.google.common.collect.ImmutableList;
-
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Default implementation of {@link ExtensionManagerAdapter}. This implementation uses standard Java SPI
@@ -62,22 +72,18 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
 
     private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
     private final ImplicitConfigurationFactory implicitConfigurationFactory = new DefaultImplicitConfigurationFactory();
+    private final DescriberResolver describerResolver = new DescriberResolver();
 
     private MuleContext muleContext;
     private ExtensionRegistry extensionRegistry;
-    private ExtensionDiscoverer extensionDiscoverer;
+    private ExtensionFactory extensionFactory;
     private ConfigurationExpirationMonitor configurationExpirationMonitor;
 
     @Override
     public void initialise() throws InitialisationException
     {
         extensionRegistry = new ExtensionRegistry(muleContext.getRegistry());
-        if (extensionDiscoverer == null)
-        {
-            extensionDiscoverer = new DefaultExtensionDiscoverer(
-                    new DefaultExtensionFactory(serviceRegistry, muleContext.getExecutionClassLoader()),
-                    serviceRegistry);
-        }
+        extensionFactory = new DefaultExtensionFactory(serviceRegistry, muleContext.getExecutionClassLoader());
     }
 
     /**
@@ -101,21 +107,6 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     public void stop() throws MuleException
     {
         configurationExpirationMonitor.stopMonitoring();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<RuntimeExtensionModel> discoverExtensions(ClassLoader classLoader)
-    {
-        LOGGER.info("Starting discovery of extensions");
-
-        List<RuntimeExtensionModel> discovered = extensionDiscoverer.discover(classLoader);
-        LOGGER.info("Discovered {} extensions", discovered.size());
-
-        discovered.forEach(this::registerExtension);
-        return ImmutableList.copyOf(extensionRegistry.getExtensions());
     }
 
     /**
@@ -148,6 +139,18 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
      * {@inheritDoc}
      */
     @Override
+    public void registerExtension(ExtensionManifest manifest, ClassLoader classLoader)
+    {
+        Describer describer = describerResolver.resolve(manifest, classLoader);
+        RuntimeExtensionModel extensionModel = extensionFactory.createFrom(describer.describe(new DefaultDescribingContext()));
+
+        registerExtension(extensionModel);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public <C> void registerConfigurationProvider(ConfigurationProvider<C> configurationProvider)
     {
         extensionRegistry.registerConfigurationProvider(configurationProvider);
@@ -156,7 +159,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     /**
      * {@inheritDoc}
      */
-    //TODO: muleEvent should actually be of MuleEvent type when mule-api jar becomes available
+    //TODO: MULE-8946
     @Override
     public <C> ConfigurationInstance<C> getConfiguration(String configurationProviderName, Object muleEvent)
     {
@@ -168,7 +171,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     /**
      * {@inheritDoc}
      */
-    //TODO: muleEvent should actually be of MuleEvent type when mule-api jar becomes available
+    //TODO: MULE-8946
     @Override
     public <C> ConfigurationInstance<C> getConfiguration(ExtensionModel extensionModel, Object muleEvent)
     {
@@ -271,6 +274,22 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
                 .build();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ExtensionManifest parseExtensionManifestXml(URL manifestUrl)
+    {
+        try (InputStream manifestStream = manifestUrl.openStream())
+        {
+            return new ExtensionManifestXmlSerializer().deserialize(IOUtils.toString(manifestStream));
+        }
+        catch (IOException e)
+        {
+            throw new MuleRuntimeException(createStaticMessage("Could not read extension manifest on plugin " + manifestUrl.toString()), e);
+        }
+    }
+
     private void disposeConfiguration(String key, ConfigurationInstance<Object> configuration)
     {
         try
@@ -301,10 +320,5 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     public void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;
-    }
-
-    void setExtensionsDiscoverer(ExtensionDiscoverer discoverer)
-    {
-        extensionDiscoverer = discoverer;
     }
 }

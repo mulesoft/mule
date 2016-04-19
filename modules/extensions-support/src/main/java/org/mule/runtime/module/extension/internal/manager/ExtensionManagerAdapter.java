@@ -8,8 +8,11 @@ package org.mule.runtime.module.extension.internal.manager;
 
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
+import java.net.URL;
 import java.util.Optional;
 
 /**
@@ -46,4 +49,29 @@ public interface ExtensionManagerAdapter extends ExtensionManager
      * @return an {@link Optional} {@link ConfigurationProvider}
      */
     <C> Optional<ConfigurationProvider<C>> getConfigurationProvider(String configurationProviderName);
+
+    /**
+     * Registers the given {@link ExtensionModel}.
+     *
+     * @param extensionModel the {@link ExtensionModel} to be registered. Cannot be {@code null}
+     */
+    void registerExtension(RuntimeExtensionModel extensionModel);
+
+    /**
+     * Registered the given {@link ConfigurationProvider} which should be later be used to
+     * serve invocations to {@link #getConfigurationProvider(ExtensionModel)} and
+     * {@link #getConfiguration(String, Object)}
+     *
+     * @param configurationProvider a {@link ConfigurationProvider}
+     * @param <C>                   the generic type of the configuration instances to be returned
+     */
+    <C> void registerConfigurationProvider(ConfigurationProvider<C> configurationProvider);
+
+    /**
+     * Deserializes an {@link ExtensionManifest} in {@code XML} format
+     *
+     * @param manifestUrl the {@link URL} to a file which contains the input data
+     * @return a {@link ExtensionManifest}
+     */
+    ExtensionManifest parseExtensionManifestXml(URL manifestUrl);
 }

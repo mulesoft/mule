@@ -1198,6 +1198,11 @@
                 <artifactId>mule-extensions-api</artifactId>
                 <version>${muleExtensionsApiVersion}</version>
             </dependency>
+            <dependency>
+                <groupId>org.mule.extensions</groupId>
+                <artifactId>mule-extensions-api-persistence</artifactId>
+                <version>${muleExtensionsApiVersion}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.mule.mvel</groupId>
