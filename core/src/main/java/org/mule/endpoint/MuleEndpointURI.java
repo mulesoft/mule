@@ -6,6 +6,8 @@
  */
 package org.mule.endpoint;
 
+import static java.net.URLDecoder.decode;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
@@ -22,7 +24,6 @@ import org.mule.util.StringUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -496,6 +497,7 @@ public class MuleEndpointURI implements EndpointURI
         return filterAddress;
     }
 
+    @Override
     public String getUser()
     {
         if (user == null)
@@ -520,6 +522,7 @@ public class MuleEndpointURI implements EndpointURI
         return user;
     }
 
+    @Override
     public String getPassword()
     {
         if (password == null)
@@ -552,11 +555,11 @@ public class MuleEndpointURI implements EndpointURI
             decode = false;
         }
         String data = null;
-        if (StringUtils.isNotBlank(userInfoData))
+        if (isNotBlank(userInfoData))
         {
             data = extractor.extract(userInfoData);
         }
-        return (data != null && decode) ? URLDecoder.decode(data) : data;
+        return (data != null && decode) ? decode(data) : data;
     }
 
     public String getResponseTransformers()
