@@ -122,9 +122,11 @@
 /mule-standalone-${productVersion}/lib/mule/mule-common-3.8.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-extensions-api-persistence-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-artifact-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-metadata-model-api-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-metadata-model-java-1.0.0-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-metadata-model-persistence-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-builders-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-client-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-cxf-${productVersion}.jar
@@ -223,6 +225,7 @@
 /mule-standalone-${productVersion}/lib/opt/grizzly-http-2.3.24.jar
 /mule-standalone-${productVersion}/lib/opt/grizzly-http-server-2.3.24.jar
 /mule-standalone-${productVersion}/lib/opt/grizzly-websockets-2.3.24.jar
+/mule-standalone-${productVersion}/lib/opt/gson-2.6.2.jar
 /mule-standalone-${productVersion}/lib/opt/connection-pool-2.3.24.jar
 /mule-standalone-${productVersion}/lib/opt/groovy-all-2.4.4-indy.jar
 /mule-standalone-${productVersion}/lib/opt/guava-18.0.jar
