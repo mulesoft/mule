@@ -18,20 +18,6 @@
         </expression-language>
     </configuration>
 
-    <flow name="catchExceptionStrategy">
-        <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
-        <flow-ref name="catchExceptionStrategyChild"/>
-    </flow>
-    <flow name="catchExceptionStrategyChild">
-        <test:component throwException="true"/>
-        <catch-exception-strategy>
-            <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
-            <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
-            <test:non-blocking-processor/>
-            <test:assert count="1" expression="#[Thread.currentThread()==beforeThread  and assertPayload()]"/>
-        </catch-exception-strategy>
-    </flow>
-
     <flow name="splitter">
         <test:assert-intercepting responseSameThread="true"/>
         <splitter expression="#[payload]"/>
@@ -140,6 +126,32 @@
         </transactional>
         <test:assert-intercepting responseSameThread="true"/>
         <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="catchRollbackExceptionStrategy">
+        <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
+        <flow-ref name="rollbackExceptionStrategyChild"/>
+        <catch-exception-strategy>
+            <test:assert expression="#[Thread.currentThread()==beforeThread and assertPayload()]"/>
+            <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+            <test:non-blocking-processor/>
+        </catch-exception-strategy>
+    </flow>
+    <flow name="rollbackRollbackExceptionStrategy">
+        <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
+        <flow-ref name="rollbackExceptionStrategyChild"/>
+        <rollback-exception-strategy>
+            <test:assert expression="#[Thread.currentThread()==beforeThread  and assertPayload()]"/>
+            <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
+            <test:non-blocking-processor/>
+        </rollback-exception-strategy>
+    </flow>
+    <flow name="rollbackExceptionStrategyChild">
+        <test:component throwException="true"/>
+        <rollback-exception-strategy>
+            <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
+            <test:non-blocking-processor/>
+        </rollback-exception-strategy>
     </flow>
 
 </mule>

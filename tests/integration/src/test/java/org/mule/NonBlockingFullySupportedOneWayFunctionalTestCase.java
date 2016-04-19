@@ -177,11 +177,17 @@ public class NonBlockingFullySupportedOneWayFunctionalTestCase extends Functiona
         assertVoidMuleEventResponse("testOutboundEndpointError");
     }
 
-
     @Test
     public void async() throws Exception
     {
         assertVoidMuleEventResponse("async");
+    }
+
+    @Test
+    public void catchExceptionStrategy() throws Exception
+    {
+        assertVoidMuleEventResponse("catchExceptionStrategy");
+        verify("catchExceptionStrategyChild");
     }
 
     private void assertVoidMuleEventResponse(String flowName) throws Exception
