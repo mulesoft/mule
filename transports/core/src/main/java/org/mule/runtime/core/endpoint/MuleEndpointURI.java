@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.endpoint;
 
+import static java.net.URLDecoder.decode;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.mule.runtime.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
 
 import org.mule.runtime.core.api.MuleContext;
@@ -72,6 +74,9 @@ public class MuleEndpointURI implements EndpointURI
     private boolean dynamic;
     private transient MuleContext muleContext;
     private Properties serviceOverrides;
+
+    private String user;
+    private String password;
 
     MuleEndpointURI(String address,
                     String endpointName,
@@ -162,7 +167,7 @@ public class MuleEndpointURI implements EndpointURI
             {
                 throw new MalformedEndpointException(uri, e);
             }
-            this.userInfo = this.uri.getRawUserInfo();
+            this.userInfo = this.uri.getUserInfo();
         }
     }
 
@@ -517,39 +522,72 @@ public class MuleEndpointURI implements EndpointURI
     @Override
     public String getUser()
     {
-        if (StringUtils.isNotBlank(userInfo))
+        if(user == null)
         {
-            int i = userInfo.indexOf(':');
-            if (i == -1)
+            user = getUserInfoDataUsing(new DataExtractor()
             {
-                return userInfo;
-            }
-            else
-            {
-                return userInfo.substring(0, i);
-            }
+                @Override
+                public String extract(String source)
+                {
+                    int i = source.indexOf(':');
+                    if (i == -1)
+                    {
+                        return source;
+                    }
+                    else
+                    {
+                        return source.substring(0, i);
+                    }                
+                }
+            });
         }
-        return null;
+        return user;
+    }
+
+    @Override
+    public String getPassword()
+    {
+        if (password == null)
+        {
+            password = getUserInfoDataUsing(new DataExtractor()
+            {
+                @Override
+                public String extract(String source)
+                {
+                    int i = source.indexOf(':');
+                    if (i > -1)
+                    {
+                        return source.substring(i + 1);
+                    }
+                    return null;
+                }
+            });
+        }
+        return password;
+    }
+
+    private String getUserInfoDataUsing(DataExtractor extractor)
+    {
+        // try getting it from raw data, but fallback to available data if not possible
+        String userInfoData = getRawUserInfo();
+        boolean decode = true;
+        if (userInfoData == null)
+        {
+            userInfoData = userInfo;
+            decode = false;
+        }
+        String data = null;
+        if (isNotBlank(userInfoData))
+        {
+            data = extractor.extract(userInfoData);
+        }
+        return (data != null && decode) ? decode(data) : data;
     }
 
     @Override
     public String getResponseTransformers()
     {
         return responseTransformers;
-    }
-
-    @Override
-    public String getPassword()
-    {
-        if (StringUtils.isNotBlank(userInfo))
-        {
-            int i = userInfo.indexOf(':');
-            if (i > -1)
-            {
-                return userInfo.substring(i + 1);
-            }
-        }
-        return null;
     }
 
     @Override
@@ -648,5 +686,10 @@ public class MuleEndpointURI implements EndpointURI
                 schemeMetaInfo,
                 resourceInfo
         });
+    }
+
+    private abstract class DataExtractor
+    {
+        public abstract String extract(String source);
     }
 }
