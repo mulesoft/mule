@@ -6,15 +6,16 @@
  */
 package org.mule.endpoint;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import org.mule.api.MuleException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Properties;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class MuleEndpointURITestCase extends AbstractMuleContextTestCase
 {
@@ -162,6 +163,14 @@ public class MuleEndpointURITestCase extends AbstractMuleContextTestCase
     {
         MuleEndpointURI uri = new MuleEndpointURI("test://theUser%40theEmailHost:password@theHost", muleContext);
         assertEquals("test://theUser%40theEmailHost:****@theHost", uri.toString());
+    }
+
+    @Test
+    public void userPasswordEncoding() throws MuleException
+    {
+        MuleEndpointURI uri = buildEndpointUri("test://user%3Aname%40somehost.com:pass%3Aword@host:8081");
+        assertThat(uri.getUser(), is("user:name@somehost.com"));
+        assertThat(uri.getPassword(), is("pass:word"));
     }
     
     private MuleEndpointURI buildEndpointUri(String uriString) throws MuleException
