@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDiscoverer
 {
 
-    public static final String SERVICE_PATH = "META-INF/services/org/mule/config/";
+    public static final String SERVICE_PATH = "META-INF/services/org/mule/runtime/core/config/";
     public static final String CORE_EXTENSION_PROPERTIES = "core-extensions.properties";
 
     private static Log logger = LogFactory.getLog(ClasspathMuleCoreExtensionDiscoverer.class);
