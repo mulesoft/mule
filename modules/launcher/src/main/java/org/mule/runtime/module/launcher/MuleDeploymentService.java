@@ -55,9 +55,7 @@ public class MuleDeploymentService implements DeploymentService
 
     //TODO(pablo.kraan): MULE-9524: Add a way to configure system packages used on class loading lookup
     public static final Set<String> SYSTEM_PACKAGES = ImmutableSet.of(
-            "java.", "org.mule", "com.mulesoft.mule.config", "com.mulesoft.mule.bti", "com.mulesoft.mule.cache",
-            "com.mulesoft.mule.cluster", "com.mulesoft.mule.plugin", "com.mulesoft.mule.saml", "com.mulesoft.mule.throttling",
-            "com.mulesoft.mule.tracking", "com.mulesoft.mule.transaction", "com.mulesoft.module",
+            "java.", "org.mule.runtime", "com.mulesoft.mule.runtime",
             "org.apache.logging.log4j", "org.slf4j", "org.apache.commons.logging", "org.apache.log4j"
     );
     public static final String ARTIFACT_ANCHOR_SUFFIX = "-anchor.txt";
