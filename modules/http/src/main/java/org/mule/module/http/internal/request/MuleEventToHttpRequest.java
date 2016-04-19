@@ -74,7 +74,10 @@ public class MuleEventToHttpRequest
 
         for (String outboundProperty : event.getMessage().getOutboundPropertyNames())
         {
-            builder.addHeader(outboundProperty, event.getMessage().getOutboundProperty(outboundProperty).toString());
+            if (!builder.getHeaders().containsKey(outboundProperty))
+            {
+                builder.addHeader(outboundProperty, event.getMessage().getOutboundProperty(outboundProperty).toString());
+            }
         }
 
         builder.setEntity(createRequestEntity(builder, event, resolvedMethod));
