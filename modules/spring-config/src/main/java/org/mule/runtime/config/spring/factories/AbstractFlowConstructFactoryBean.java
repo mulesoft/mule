@@ -10,10 +10,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.AbstractFlowConstruct;
 import org.mule.runtime.core.construct.builder.AbstractFlowConstructBuilder;
+import org.mule.runtime.core.construct.builder.AbstractFlowConstructWithSingleInboundEndpointBuilder;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
@@ -28,16 +30,19 @@ public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<Fl
 
     protected AbstractFlowConstruct flowConstruct;
 
+    @Override
     public boolean isSingleton()
     {
         return true;
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;
@@ -58,7 +63,16 @@ public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<Fl
     public void setMessageSource(MessageSource messageSource)
     {
         final AbstractFlowConstructBuilder<?, ?> flowConstructBuilder = getFlowConstructBuilder();
-        flowConstructBuilder.messageSource(messageSource);
+
+        if ((flowConstructBuilder instanceof AbstractFlowConstructWithSingleInboundEndpointBuilder<?, ?>)
+            && (messageSource instanceof InboundEndpoint))
+        {
+            ((AbstractFlowConstructWithSingleInboundEndpointBuilder<?, ?>) flowConstructBuilder).inboundEndpoint((InboundEndpoint) messageSource);
+        }
+        else
+        {
+            flowConstructBuilder.messageSource(messageSource);
+        }
     }
 
     public void setExceptionListener(MessagingExceptionHandler exceptionListener)
@@ -66,6 +80,7 @@ public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<Fl
         getFlowConstructBuilder().exceptionStrategy(exceptionListener);
     }
 
+    @Override
     public FlowConstruct getObject() throws Exception
     {
         if (flowConstruct == null)

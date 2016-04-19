@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+
+    <vm:connector name="VMQueue">
+        <vm:queueProfile maxOutstandingMessages="10">
+            <default-persistent-queue-store />
+        </vm:queueProfile>
+    </vm:connector>
+
+    <custom-transformer name="testTransformer"
+        class="org.mule.runtime.core.transformer.simple.StringToObjectArray" />
+
+
+    <flow name="ReceiverUMO">
+
+        <vm:inbound-endpoint path="receiver"
+            exchange-pattern="one-way" />
+
+        <vm:outbound-endpoint path="echo"
+            exchange-pattern="one-way">
+            <transformer ref="testTransformer" />
+        </vm:outbound-endpoint>
+
+    </flow>
+
+    <flow name="EchoUMO">
+
+        <vm:inbound-endpoint path="echo"
+            exchange-pattern="one-way" />
+        <vm:outbound-endpoint path="out"
+            exchange-pattern="one-way" />
+
+    </flow>
+
+
+    <flow name="ReceiverUMOFlow">
+        <vm:inbound-endpoint path="flowReceiver"
+            exchange-pattern="one-way" />
+        <vm:outbound-endpoint path="fLowEcho"
+            exchange-pattern="one-way">
+            <transformer ref="testTransformer" />
+        </vm:outbound-endpoint>
+    </flow>
+
+    <flow name="EchoUMOFlow">
+        <vm:inbound-endpoint path="fLowEcho"
+            exchange-pattern="one-way" />
+        <vm:outbound-endpoint path="flowOut"
+            exchange-pattern="one-way" />
+    </flow>
+</mule>

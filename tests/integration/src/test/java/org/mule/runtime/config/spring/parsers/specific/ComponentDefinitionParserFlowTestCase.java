@@ -10,6 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.config.spring.parsers.specific.ComponentDelegatingDefinitionParser.CheckExclusiveClassAttributeObjectFactoryException;
+import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -17,12 +21,10 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.component.AbstractJavaComponent;
+import org.mule.runtime.core.component.DefaultInterfaceBinding;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.component.PooledJavaComponent;
 import org.mule.runtime.core.config.PoolingProfile;
-import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.runtime.config.spring.parsers.specific.ComponentDelegatingDefinitionParser.CheckExclusiveClassAttributeObjectFactoryException;
-import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver;
@@ -57,6 +59,7 @@ public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase
         assertEquals(DefaultJavaComponent.class, flow.getMessageProcessors().get(0).getClass());
         assertEquals(PrototypeObjectFactory.class, ((AbstractJavaComponent) flow.getMessageProcessors().get(0)).getObjectFactory()
             .getClass());
+        assertEquals(1, ((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings().size());
         assertNotNull(((JavaComponent) flow.getMessageProcessors().get(0)).getEntryPointResolverSet());
         assertEquals(
             2,
@@ -78,6 +81,7 @@ public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase
         assertEquals(DefaultJavaComponent.class, flow.getMessageProcessors().get(0).getClass());
         assertEquals(PrototypeObjectFactory.class, ((AbstractJavaComponent) flow.getMessageProcessors().get(0)).getObjectFactory()
             .getClass());
+        assertEquals(1, ((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings().size());
         assertNotNull(((JavaComponent) flow.getMessageProcessors().get(0)).getEntryPointResolverSet());
         assertEquals(
             1,
@@ -97,6 +101,7 @@ public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase
         assertEquals(DefaultJavaComponent.class, flow.getMessageProcessors().get(0).getClass());
         assertEquals(SingletonObjectFactory.class, ((AbstractJavaComponent) flow.getMessageProcessors().get(0)).getObjectFactory()
             .getClass());
+        assertEquals(1, ((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings().size());
         assertNotNull(((JavaComponent) flow.getMessageProcessors().get(0)).getEntryPointResolverSet());
         assertEquals(
             1,
@@ -117,6 +122,7 @@ public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase
         assertEquals(DefaultJavaComponent.class, flow.getMessageProcessors().get(0).getClass());
         assertEquals(SpringBeanLookup.class, ((AbstractJavaComponent) flow.getMessageProcessors().get(0)).getObjectFactory()
             .getClass());
+        assertEquals(1, ((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings().size());
         assertNotNull(((JavaComponent) flow.getMessageProcessors().get(0)).getEntryPointResolverSet());
         assertEquals(
             1,
@@ -150,6 +156,7 @@ public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase
         assertEquals(PooledJavaComponent.class, flow.getMessageProcessors().get(0).getClass());
         assertEquals(PrototypeObjectFactory.class, ((AbstractJavaComponent) flow.getMessageProcessors().get(0)).getObjectFactory()
             .getClass());
+        assertEquals(1, ((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings().size());
         validatePoolingProfile(flow);
         assertNotNull(((JavaComponent) flow.getMessageProcessors().get(0)).getEntryPointResolverSet());
         assertEquals(
@@ -171,6 +178,7 @@ public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase
         assertEquals(PooledJavaComponent.class, flow.getMessageProcessors().get(0).getClass());
         assertEquals(PrototypeObjectFactory.class, ((AbstractJavaComponent) flow.getMessageProcessors().get(0)).getObjectFactory()
             .getClass());
+        assertEquals(1, ((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings().size());
         validatePoolingProfile(flow);
         assertNotNull(((JavaComponent) flow.getMessageProcessors().get(0)).getEntryPointResolverSet());
         assertEquals(
@@ -192,6 +200,7 @@ public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase
         assertEquals(PooledJavaComponent.class, flow.getMessageProcessors().get(0).getClass());
         assertEquals(SingletonObjectFactory.class, ((AbstractJavaComponent) flow.getMessageProcessors().get(0)).getObjectFactory()
             .getClass());
+        assertEquals(1, ((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings().size());
         validatePoolingProfile(flow);
         assertNotNull(((JavaComponent) flow.getMessageProcessors().get(0)).getEntryPointResolverSet());
         assertEquals(
@@ -213,6 +222,7 @@ public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase
         assertEquals(PooledJavaComponent.class, flow.getMessageProcessors().get(0).getClass());
         assertEquals(SpringBeanLookup.class, ((AbstractJavaComponent) flow.getMessageProcessors().get(0)).getObjectFactory()
             .getClass());
+        assertEquals(1, ((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings().size());
         validatePoolingProfile(flow);
         assertNull(((JavaComponent) flow.getMessageProcessors().get(0)).getEntryPointResolverSet());
     }
@@ -244,6 +254,8 @@ public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase
         assertTrue(flow.getMessageProcessors().get(0) instanceof JavaComponent);
         assertEquals(DummyComponentWithBinding.class, ((JavaComponent) flow.getMessageProcessors().get(0)).getObjectType());
         assertNotNull(((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings());
+        assertEquals(1, ((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings().size());
+        assertTrue(((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings().get(0) instanceof DefaultInterfaceBinding);
         assertTrue(((JavaComponent) flow.getMessageProcessors().get(0)).getLifecycleAdapterFactory() instanceof TestComponentLifecycleAdapterFactory);
     }
 

@@ -18,24 +18,26 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.runtime.api.metadata.DataType.ANY_MIME_TYPE;
 import static org.mule.runtime.api.metadata.DataType.STRING_DATA_TYPE;
-import static org.mule.tck.MuleTestUtils.getTestEvent;
-import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.runtime.core.transformer.types.MimeTypes.ANY;
 import static org.mule.runtime.core.transformer.types.MimeTypes.APPLICATION_XML;
+import static org.mule.tck.MuleTestUtils.getTestEvent;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
 import java.util.Collections;
@@ -64,6 +66,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public void setUp() throws Exception
     {
         when(muleContext.getConfiguration().getDefaultEncoding()).thenReturn(DEFAULT_ENCODING);
+        when(muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE)).thenReturn(mock(RetryPolicyTemplate.class));
         transformationService = new TransformationService(muleContext);
     }
 

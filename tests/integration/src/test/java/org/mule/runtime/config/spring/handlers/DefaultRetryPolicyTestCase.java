@@ -12,7 +12,10 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
+
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.transport.Connector;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 
 import org.junit.Test;
@@ -34,4 +37,18 @@ public class DefaultRetryPolicyTestCase extends FunctionalTestCase
         assertThat(((SimpleRetryPolicyTemplate) obj).getCount(), is(3));
     }
 
+    @Test
+    public void testConnectorPolicy() throws Exception
+    {
+        Connector c = muleContext.getRegistry().lookupConnector("testConnector");
+        assertThat(c, not(nullValue()));
+
+        RetryPolicyTemplate rpf = c.getRetryPolicyTemplate();
+        assertThat(rpf, not(nullValue()));
+        assertThat(rpf, instanceOf(SimpleRetryPolicyTemplate.class));
+        assertThat(((SimpleRetryPolicyTemplate) rpf).getCount(), is(3));
+        
+        assertThat(c.isConnected(), is(true));
+        assertThat(c.isStarted(), is(true));
+    }
 }

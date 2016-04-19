@@ -9,6 +9,7 @@ package org.mule.runtime.core.connector;
 import org.mule.runtime.core.api.LocatedMuleException;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.transport.AbstractTransportMessageHandler;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -30,21 +31,24 @@ public class ConnectException extends LocatedMuleException
     {
         super(message, failed);
         // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
-        this.failed = failed;
+        this.failed = failed instanceof AbstractTransportMessageHandler ? ((AbstractTransportMessageHandler) failed).getConnector() : failed;
+        ;
     }
 
     public ConnectException(Message message, Throwable cause, Connectable failed)
     {
         super(message, cause, failed);
         // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
-        this.failed = failed;
+        this.failed = failed instanceof AbstractTransportMessageHandler ? ((AbstractTransportMessageHandler) failed).getConnector() : failed;
+        ;
     }
 
     public ConnectException(Throwable cause, Connectable failed)
     {
         super(cause, failed);
         // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
-        this.failed = failed;
+        this.failed = failed instanceof AbstractTransportMessageHandler ? ((AbstractTransportMessageHandler) failed).getConnector() : failed;
+        ;
     }
     
     public Connectable getFailed()

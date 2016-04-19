@@ -9,6 +9,8 @@ package org.mule.runtime.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.exception.AbstractExceptionListener;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
@@ -45,6 +47,35 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase
         assertEquals(0, router.getMessageProcessors().size());
 
         router.addEndpoint(Mockito.mock(MessageProcessor.class));
+        assertEquals(1, router.getMessageProcessors().size());
+
+        router.setMessageProcessors(list);
+        assertNotNull(router.getMessageProcessors());
+        assertEquals(2, router.getMessageProcessors().size());
+    }
+
+    @Test
+    public void testAddGoodEndpointTransport() throws Exception
+    {
+        AbstractExceptionListener router = new DefaultMessagingExceptionStrategy(null);
+        OutboundEndpoint endpoint = Mockito.mock(OutboundEndpoint.class);
+        router.addEndpoint(endpoint);
+        assertNotNull(router.getMessageProcessors());
+        assertTrue(router.getMessageProcessors().contains(endpoint));
+    }
+
+    @Test
+    public void testSetGoodEndpointsTransport() throws Exception
+    {
+        List<MessageProcessor> list = new ArrayList<MessageProcessor>();
+        list.add(Mockito.mock(OutboundEndpoint.class));
+        list.add(Mockito.mock(OutboundEndpoint.class));
+
+        AbstractExceptionListener router = new DefaultMessagingExceptionStrategy(null);
+        assertNotNull(router.getMessageProcessors());
+        assertEquals(0, router.getMessageProcessors().size());
+
+        router.addEndpoint(Mockito.mock(OutboundEndpoint.class));
         assertEquals(1, router.getMessageProcessors().size());
 
         router.setMessageProcessors(list);

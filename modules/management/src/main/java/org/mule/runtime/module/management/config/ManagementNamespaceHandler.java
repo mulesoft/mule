@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.module.management.config;
 
-import org.mule.runtime.core.agent.Log4jNotificationLoggerAgent;
+import org.mule.runtime.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.runtime.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ObjectFactoryWrapper;
+import org.mule.runtime.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
+import org.mule.runtime.core.agent.EndpointNotificationLoggerAgent;
+import org.mule.runtime.core.agent.Log4jNotificationLoggerAgent;
 import org.mule.runtime.module.management.agent.DefaultJmxSupportAgent;
 import org.mule.runtime.module.management.agent.JmxServerNotificationAgent;
 import org.mule.runtime.module.management.agent.Log4jAgent;
@@ -26,6 +29,7 @@ import org.mule.runtime.module.management.agent.YourKitProfilerAgent;
 public class ManagementNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
+    @Override
     public void init()
     {
         registerBeanDefinitionParser("jmx-server", new JmxAgentDefinitionParser());
@@ -45,8 +49,11 @@ public class ManagementNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("log4j-notifications", new DefaultNameMuleOrphanDefinitionParser(Log4jNotificationLoggerAgent.class));
         registerBeanDefinitionParser("chainsaw-notifications", new DefaultNameMuleOrphanDefinitionParser(Log4jNotificationLoggerAgent.class));
 
+        registerBeanDefinitionParser("publish-notifications", new DefaultNameMuleOrphanDefinitionParser(EndpointNotificationLoggerAgent.class));
         registerBeanDefinitionParser("rmi-server", new DefaultNameMuleOrphanDefinitionParser(RmiRegistryAgent.class));
         registerBeanDefinitionParser("yourkit-profiler", new DefaultNameMuleOrphanDefinitionParser(YourKitProfilerAgent.class));
+
+        registerBeanDefinitionParser("outbound-endpoint", new ChildEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
 
         // This gets processed by the jmx-server parser
         registerIgnoredElement("connector-server");

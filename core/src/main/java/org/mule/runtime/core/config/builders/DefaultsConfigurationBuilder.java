@@ -11,7 +11,6 @@ import org.mule.runtime.core.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ObjectStore;
@@ -19,8 +18,10 @@ import org.mule.runtime.core.config.ChainedThreadingProfile;
 import org.mule.runtime.core.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.runtime.core.connector.MuleConnectorOperationLocator;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguageWrapper;
+import org.mule.runtime.core.endpoint.DefaultEndpointFactory;
 import org.mule.runtime.core.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
+import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.security.MuleSecurityManager;
@@ -34,21 +35,22 @@ import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 
 /**
- * Configures defaults required by Mule. This configuration builder is used to
- * configure mule with these defaults when no other ConfigurationBuilder that sets
- * these is being used. This is used by both AbstractMuleTestCase and MuleClient. <br>
+ * Configures defaults required by Mule. This configuration builder is used to configure mule with these defaults when
+ * no other ConfigurationBuilder that sets these is being used. This is used by both AbstractMuleTestCase and
+ * MuleClient. <br>
  * <br>
  * Default instances of the following are configured:
  * <ul>
- * <li> {@link SimpleRegistryBootstrap}
- * <li> {@link QueueManager}
- * <li> {@link SecurityManager}
- * <li> {@link ObjectStore}
- * <li> {@link ThreadingProfile} defaultThreadingProfile
- * <li> {@link ThreadingProfile} defaultMessageDispatcherThreadingProfile
- * <li> {@link ThreadingProfile} defaultMessageRequesterThreadingProfile
- * <li> {@link ThreadingProfile} defaultMessageReceiverThreadingProfile
- * <li> {@link ThreadingProfile} defaultComponentThreadingProfile
+ * <li>{@link SimpleRegistryBootstrap}
+ * <li>{@link QueueManager}
+ * <li>{@link SecurityManager}
+ * <li>{@link ObjectStore}
+ * <li>{@link DefaultEndpointFactory}
+ * <li>{@link ThreadingProfile} defaultThreadingProfile
+ * <li>{@link ThreadingProfile} defaultMessageDispatcherThreadingProfile
+ * <li>{@link ThreadingProfile} defaultMessageRequesterThreadingProfile
+ * <li>{@link ThreadingProfile} defaultMessageReceiverThreadingProfile
+ * <li>{@link ThreadingProfile} defaultComponentThreadingProfile
  * </ul>
  */
 public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
@@ -86,6 +88,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER,
             new MuleMessageProcessingManager());
 
+        registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
         registry.registerObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE,
             new DefaultStreamCloserService());
 

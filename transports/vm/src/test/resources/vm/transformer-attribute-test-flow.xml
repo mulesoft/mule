@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <custom-transformer name="appendString"
+        class="org.mule.functional.functional.StringAppendTestTransformer" />
+
+
+    <flow name="testServiceSimple">
+
+        <vm:inbound-endpoint path="simple"
+            exchange-pattern="request-response">
+            <transformer ref="appendString" />
+        </vm:inbound-endpoint>
+
+        <test:component appendString=" Received" />
+    </flow>
+
+
+
+    <flow name="testServiceChained">
+
+        <vm:inbound-endpoint path="chained"
+            exchange-pattern="request-response" />
+
+
+        <vm:outbound-endpoint path="out"
+            exchange-pattern="request-response" />
+
+    </flow>
+
+    <flow name="testServiceChainedB">
+
+        <vm:inbound-endpoint path="out"
+            exchange-pattern="request-response">
+            <transformer ref="appendString" />
+        </vm:inbound-endpoint>
+
+        <test:component appendString=" Received" />
+    </flow>
+
+</mule>

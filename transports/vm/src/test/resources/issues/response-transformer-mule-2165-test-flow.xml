@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <vm:connector name="default">
+        <service-overrides
+            inboundTransformer="org.mule.runtime.core.transformer.simple.InboundAppendTransformer"
+            outboundTransformer="org.mule.runtime.core.transformer.simple.OutboundAppendTransformer" />
+    </vm:connector>
+
+    <vm:connector name="queue" />
+
+    <custom-transformer name="response"
+        class="org.mule.runtime.core.transformer.simple.StringAppendTransformer">
+        <spring:property name="message" value=" response" />
+    </custom-transformer>
+
+    <vm:endpoint name="in-global-name-global-transformer"
+        path="in-global-name-global-transformer" connector-ref="default"
+        exchange-pattern="one-way" />
+    <vm:endpoint name="out-global-name-global-transformer"
+        path="out-global-name-global-transformer" connector-ref="queue"
+        exchange-pattern="one-way" />
+    <vm:endpoint name="global-name-global-transformer" path="global-name-global-transformer"
+        connector-ref="default" exchange-pattern="request-response">
+        <response>
+            <transformer ref="response" />
+        </response>
+    </vm:endpoint>
+
+    <vm:endpoint name="in-global-name-url-transformer" path="in-global-name-url-transformer"
+        connector-ref="default" exchange-pattern="one-way" />
+    <vm:endpoint name="out-global-name-url-transformer"
+        path="out-global-name-url-transformer" connector-ref="queue"
+        exchange-pattern="one-way" />
+    <vm:endpoint name="global-name-url-transformer"
+        path="global-name-url-transformer?responseTransformers=response"
+        connector-ref="default" exchange-pattern="request-response" />
+
+    <vm:endpoint name="in-global-name-local-transformer"
+        path="in-global-name-local-transformer" connector-ref="default"
+        exchange-pattern="one-way" />
+    <vm:endpoint name="out-global-name-local-transformer"
+        path="out-global-name-local-transformer" connector-ref="queue"
+        exchange-pattern="one-way" />
+    <vm:endpoint name="global-name-local-transformer" path="global-name-local-transformer"
+        connector-ref="default" exchange-pattern="request-response" />
+
+    <vm:endpoint name="in-local-name-local-transformer"
+        path="in-local-name-local-transformer" connector-ref="default"
+        exchange-pattern="one-way" />
+    <vm:endpoint name="out-local-name-local-transformer"
+        path="out-local-name-local-transformer" connector-ref="queue"
+        exchange-pattern="one-way" />
+
+    <vm:endpoint name="in-local-name-url-transformer" path="in-local-name-url-transformer"
+        connector-ref="default" exchange-pattern="one-way" />
+    <vm:endpoint name="out-local-name-url-transformer" path="out-local-name-url-transformer"
+        connector-ref="queue" exchange-pattern="one-way" />
+
+
+    <flow name="gngt">
+
+        <inbound-endpoint ref="in-global-name-global-transformer" />
+
+        <echo-component />
+
+
+        <outbound-endpoint ref="global-name-global-transformer" />
+        <outbound-endpoint ref="out-global-name-global-transformer" />
+
+    </flow>
+
+    <flow name="gngt-bounce">
+
+        <inbound-endpoint ref="global-name-global-transformer" />
+
+        <echo-component />
+    </flow>
+
+    <flow name="gnut">
+
+        <inbound-endpoint ref="in-global-name-url-transformer" />
+
+        <echo-component />
+
+
+        <outbound-endpoint ref="global-name-url-transformer" />
+        <outbound-endpoint ref="out-global-name-url-transformer" />
+
+    </flow>
+
+    <flow name="gnut-bounce">
+
+        <inbound-endpoint ref="global-name-url-transformer" />
+
+        <echo-component />
+    </flow>
+
+    <flow name="gnlt">
+
+        <inbound-endpoint ref="in-global-name-local-transformer" />
+
+        <echo-component />
+        <outbound-endpoint ref="global-name-local-transformer">
+            <response>
+                <transformer ref="response" />
+            </response>
+        </outbound-endpoint>
+        <outbound-endpoint ref="out-global-name-local-transformer" />
+
+    </flow>
+
+    <flow name="gnlt-bounce">
+
+        <inbound-endpoint ref="global-name-local-transformer" />
+
+        <echo-component />
+    </flow>
+
+    <flow name="lnlt">
+
+        <inbound-endpoint ref="in-local-name-local-transformer" />
+
+        <echo-component />
+
+
+        <vm:outbound-endpoint path="local-name-local-transformer"
+            exchange-pattern="request-response" connector-ref="default">
+            <response>
+                <transformer ref="response" />
+            </response>
+        </vm:outbound-endpoint>
+        <outbound-endpoint ref="out-local-name-local-transformer" />
+
+
+    </flow>
+
+    <flow name="lnlt-bounce">
+
+        <vm:inbound-endpoint path="local-name-local-transformer"
+            connector-ref="default" exchange-pattern="request-response" />
+
+        <echo-component />
+    </flow>
+
+    <flow name="lnut">
+
+        <inbound-endpoint ref="in-local-name-url-transformer" />
+
+        <echo-component />
+
+        <vm:outbound-endpoint
+            path="local-name-url-transformer?responseTransformers=response"
+            exchange-pattern="request-response" connector-ref="default" />
+        <outbound-endpoint ref="out-local-name-url-transformer" />
+
+    </flow>
+
+    <flow name="lnut-bounce">
+
+        <vm:inbound-endpoint path="local-name-url-transformer"
+            connector-ref="default" exchange-pattern="request-response" />
+
+        <echo-component />
+    </flow>
+
+</mule>

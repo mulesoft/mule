@@ -34,8 +34,8 @@
         <cxf:ws-config>
             <cxf:property key="action" value="Timestamp Signature Encrypt"/>
             <cxf:property key="user" value="joe"/>
-            <cxf:property key="signaturePropFile" value="org/mule/module/cxf/wssec/wssecurity.properties" />
-            <cxf:property key="encryptionPropFile" value="org/mule/module/cxf/wssec/wssecurity.properties" />
+            <cxf:property key="signaturePropFile" value="org/mule/runtime/module/cxf/wssec/wssecurity.properties" />
+            <cxf:property key="encryptionPropFile" value="org/mule/runtime/module/cxf/wssec/wssecurity.properties" />
             <cxf:property key="encryptionUser" value="joe"/>
             <cxf:property key="passwordCallbackRef" value-ref="clientPasswordCallback"/>
         </cxf:ws-config>

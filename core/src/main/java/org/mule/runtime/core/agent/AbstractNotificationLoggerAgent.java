@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationListener
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.context.notification.ComponentMessageNotification;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
-import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
+import org.mule.runtime.core.context.notification.EndpointMessageNotification;
 import org.mule.runtime.core.context.notification.ManagementNotification;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
@@ -299,7 +299,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
 
         if (!ignoreMessageNotifications && !ignoreEndpointMessageNotifications)
         {
-            ServerNotificationListener<ConnectorMessageNotification> l =
+            ServerNotificationListener<EndpointMessageNotification> l =
                     notification -> logEvent(notification);
             try
             {
@@ -329,8 +329,8 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
 
         if (!ignoreMessageNotifications && !ignoreMessageProcessorNotifications)
         {
-            ServerNotificationListener<MessageProcessorNotification> l
-                    = notification -> logEvent(notification);
+            ServerNotificationListener<MessageProcessorNotification> l =
+                    notification -> logEvent(notification);
             try
             {
                 muleContext.registerListener(l);

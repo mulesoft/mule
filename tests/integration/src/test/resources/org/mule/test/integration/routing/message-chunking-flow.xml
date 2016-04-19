@@ -8,7 +8,9 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <!-- the test registers notifications via java that we want the connector to respond to, so disable caching -->
-    <notifications dynamic="true"/>
+    <notifications dynamic="true">
+        <notification event="ENDPOINT-MESSAGE"/>
+    </notifications>
 
     <flow name="Receiver">
         <message-chunk-splitter messageSize="2"/>

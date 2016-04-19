@@ -6,31 +6,42 @@
  */
 package org.mule.runtime.core.processor;
 
+import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.tck.testmodels.mule.TestTransaction;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class LaxSedaStageInterceptingMessageProcessorTestCase extends
     SedaStageInterceptingMessageProcessorTestCase
 {
 
+    @Override
+    @Test
+    public void testProcessOneWay() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
+
+        assertAsync(messageProcessor, event);
+    }
+
+    @Override
     @Test
     public void testProcessRequestResponse() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
 
         assertSync(messageProcessor, event);
     }
 
+    @Override
     @Test
     public void testProcessOneWayWithTx() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(MessageExchangePattern.ONE_WAY));
         Transaction transaction = new TestTransaction(muleContext);
         TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -44,10 +55,11 @@ public class LaxSedaStageInterceptingMessageProcessorTestCase extends
         }
     }
 
+    @Override
     @Test
     public void testProcessRequestResponseWithTx() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
         Transaction transaction = new TestTransaction(muleContext);
         TransactionCoordination.getInstance().bindTransaction(transaction);
 

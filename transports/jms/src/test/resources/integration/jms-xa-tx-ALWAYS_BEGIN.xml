@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:jbossts="http://www.mulesoft.org/schema/mule/jbossts"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/current/mule-jbossts.xsd">
+
+    <jbossts:transaction-manager/>
+
+    <flow name="Part1">
+        <jms:inbound-endpoint ref="in">
+            <xa-transaction action="BEGIN_OR_JOIN"/>
+        </jms:inbound-endpoint>
+        <component>
+            <singleton-object
+                    class="org.mule.runtime.transport.jms.integration.JmsXAAlwaysBeginTestCase$TestRollbackComponent"/>
+        </component>
+        <jms:outbound-endpoint ref="out">
+            <xa-transaction action="ALWAYS_BEGIN"/>
+        </jms:outbound-endpoint>
+    </flow>
+
+</mule>

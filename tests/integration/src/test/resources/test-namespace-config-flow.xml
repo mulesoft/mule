@@ -9,6 +9,15 @@
 
     <spring:bean name="exceptionBean" class="java.io.IOException" />
 
+    <spring:bean name="factory"
+        class="org.mule.test.tck.MuleTestNamespaceTestCase$StubDispatcherPoolFactory" />
+
+    <test:connector name="testConnectorWithDefaultFactory" />
+
+    <test:connector name="testConnectorWithOverriddenFactory"
+        dispatcherPoolFactory-ref="factory" />
+
+
     <flow name="testService1">
         <test:component enableNotifications="false"
             enableMessageHistory="false">

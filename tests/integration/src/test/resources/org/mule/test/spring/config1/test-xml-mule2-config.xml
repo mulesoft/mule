@@ -21,11 +21,60 @@
 
     <spring:bean name="txManagerFactory" class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
 
+    <custom-connector name="dummyConnector" class="org.mule.tck.testmodels.mule.TestConnector">
+        <spring:property name="someProperty" value="someValue"/>
+        <dispatcher-threading-profile maxBufferSize="2"/>
+        <service-overrides
+                xaTransactedMessageReceiver="org.mule.tck.testmodels.mule.TestMessageReceiver"
+                messageFactory="org.mule.test.spring.MockMuleMessageFactory"/>
+    </custom-connector>
+
     <custom-transformer name="TestCompressionTransformer"
                         class="org.mule.tck.testmodels.mule.TestCompressionTransformer" returnClass="java.lang.String">
         <spring:property name="beanProperty2" value="12"/>
         <spring:property name="containerProperty" value="myString"/>
     </custom-transformer>
+
+    <endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ" exchange-pattern="one-way">
+        <message-property-filter pattern="foo=bar"/>
+    </endpoint>
+    <endpoint name="waterMelonEndpoint" address="test://test.queue" exchange-pattern="one-way"
+              encoding="UTF-8-TEST"/>
+    <endpoint name="appleInEndpoint" address="test://AppleQueue" exchange-pattern="one-way"/>
+    <endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue" exchange-pattern="one-way"/>
+    <endpoint name="orangeEndpoint" address="test://orangeQ" exchange-pattern="one-way">
+        <property key="beanProperty2" value="12"/>
+        <property key="containerProperty" value="myString"/>
+    </endpoint>
+    <endpoint name="testEPWithCS" address="test://test.queue2" exchange-pattern="one-way"/>
+
+    <endpoint name="endpointWithProps" address="test://endpointWithProps" exchange-pattern="one-way">
+        <properties>
+            <spring:entry key="brand" value="Juicy Baby!"/>
+            <spring:entry key="segments" value="9"/>
+            <spring:entry key="radius" value="4.21"/>
+            <spring:entry key="mapProperties">
+                <spring:map>
+                    <spring:entry key="prop1" value="prop1"/>
+                    <spring:entry key="prop2" value="prop2"/>
+                </spring:map>
+            </spring:entry>
+            <spring:entry key="listProperties">
+                <spring:list>
+                    <spring:value>prop1</spring:value>
+                    <spring:value>prop2</spring:value>
+                    <spring:value>prop3</spring:value>
+                </spring:list>
+            </spring:entry>
+            <spring:entry key="arrayProperties">
+                <spring:list>
+                    <spring:value>prop4</spring:value>
+                    <spring:value>prop5</spring:value>
+                    <spring:value>prop6</spring:value>
+                </spring:list>
+            </spring:entry>
+        </properties>
+    </endpoint>
 
     <spring:bean name="apple" class="org.mule.tck.testmodels.fruit.Apple"/>
 
@@ -62,10 +111,25 @@
     </interceptor-stack>
 
     <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
+        <outbound-endpoint address=" test://component.exceptions " exchange-pattern="one-way"/>
         <spring:property name="testProperty" value="testValue"/>
     </custom-exception-strategy>
 
     <flow name="orangeComponent">
+        <composite-source>
+            <inbound-endpoint name="Orange" address="test://orange/" exchange-pattern="one-way">
+                <transformer ref="TestCompressionTransformer"/>
+                <response>
+                    <transformer ref="TestCompressionTransformer"/>
+                </response>
+            </inbound-endpoint>
+            <inbound-endpoint ref="orangeEndpoint" exchange-pattern="one-way">
+                <payload-type-filter expectedType="java.lang.String"/>
+                <transformer ref="TestCompressionTransformer"/>
+                <property key="testLocal" value="value1"/>
+            </inbound-endpoint>
+        </composite-source>
+
         <component>
             <logging-interceptor/>
             <interceptor-stack ref="testInterceptorStack"/>
@@ -74,9 +138,29 @@
                 <spring:property name="testProperty" value="testValue"/>
             </custom-entry-point-resolver-set>
             <spring-object bean="orange"/>
+            <binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
+                <outbound-endpoint address="test://do.wash" exchange-pattern="one-way"/>
+            </binding>
+            <binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
+                <outbound-endpoint address="test://do.polish" exchange-pattern="one-way"/>
+            </binding>
         </component>
 
-        <default-exception-strategy/>
+        <request-reply timeout="10001">
+            <outbound-endpoint ref="appleInEndpoint" exchange-pattern="one-way">
+                <transformer ref="TestCompressionTransformer"/>
+            </outbound-endpoint>
+            <inbound-endpoint ref="appleResponseEndpoint">
+                <custom-aggregator class="org.mule.tck.testmodels.mule.TestResponseAggregator">
+                    <spring:property name="testProperty" value="testValue"/>
+                </custom-aggregator>
+            </inbound-endpoint>
+        </request-reply>
+
+        <default-exception-strategy>
+            <outbound-endpoint address="test://orange.exceptions" exchange-pattern="one-way"/>
+        </default-exception-strategy>
+
     </flow>
 
     <!-- MULE-3932 Ensure interceptors can be used with shortcut component config -->
@@ -87,16 +171,22 @@
     </flow>
 
     <flow name="appleComponent">
+        <inbound-endpoint ref="appleInEndpoint">
+            <payload-type-filter expectedType="java.lang.String"/>
+            <idempotent-message-filter/>
+        </inbound-endpoint>
         <component>
             <spring-object bean="apple"/>
         </component>
         <choice>
             <when>
-                <set-payload value="hi"/>
+                <outbound-endpoint address="test://appleQ2" name="TestApple-Out" exchange-pattern="one-way">
+                    <transformer ref="TestCompressionTransformer"/>
+                </outbound-endpoint>
                 <payload-type-filter expectedType="java.lang.String"/>
             </when>
             <when>
-                <set-payload value="hi"/>
+                <outbound-endpoint ref="waterMelonEndpoint"/>
                 <and-filter>
                     <regex-filter pattern="the quick brown (.*)"/>
                     <regex-filter pattern="(.*) brown (.*)"/>
@@ -106,6 +196,7 @@
     </flow>
 
     <flow name="anotherComponent">
+        <inbound-endpoint address="test://KiwiIn" exchange-pattern="one-way"/>
         <custom-aggregator class="org.mule.tck.testmodels.mule.TestCorrelationAggregator">
             <spring:property name="testProperty" value="testValue"/>
         </custom-aggregator>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <jms:activemq-connector name="jmsConnector" maxRedelivery="1">
+        <dispatcher-threading-profile doThreading="false"/>
+    </jms:activemq-connector>
+    
+    <jms:activemq-connector name="activeMqJmsConnector"/>
+
+    <jms:activemq-connector name="activeMqJmsConnectorWithUsernameAndPassword" specification="1.1" username="username"
+                            password="password"/>
+
+    <jms:activemq-connector name="customActiveMqJmsConnector"
+                            acknowledgementMode="DUPS_OK_ACKNOWLEDGE"
+                            clientId="myClient"
+                            durable="true"
+                            noLocal="true"
+                            persistentDelivery="true"
+                            maxRedelivery="5"
+                            cacheJmsSessions="true"
+                            eagerConsumer="false"
+                            specification="1.1"
+                            redeliveryHandlerFactory-ref="redeliveryHandlerFactory"/>
+
+     <spring:bean name="redeliveryHandlerFactory" class="org.mule.runtime.transport.jms.test.TestRedeliveryHandlerFactory"/>
+
+</mule>

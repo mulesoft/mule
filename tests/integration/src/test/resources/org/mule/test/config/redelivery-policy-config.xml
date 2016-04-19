@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <test:connector name="testConnector"/>
+     <endpoint name="global" address="test://foo">
+         <string-to-byte-array-transformer/>
+     </endpoint>
+
+
+    <flow name="inMemoryStore">
+        <inbound-endpoint ref="global">
+            <idempotent-redelivery-policy maxRedeliveryCount="12">
+                <dead-letter-queue>
+                    <outbound-endpoint address="test://dead-letter-queue"/>
+                </dead-letter-queue>
+            </idempotent-redelivery-policy>
+        </inbound-endpoint>
+        <test:component/>
+    </flow>
+
+    <flow name="simpleTextFileStore">
+        <inbound-endpoint address="test://foo">
+            <idempotent-redelivery-policy useSecureHash="false" idExpression="#[message:id]">
+                <dead-letter-queue>
+                    <outbound-endpoint address="test://dead-letter-queue"/>
+                </dead-letter-queue>
+            </idempotent-redelivery-policy>
+        </inbound-endpoint>
+        <test:component/>
+    </flow>
+
+    <flow name="customObjectStore">
+        <inbound-endpoint address="test://foo">
+            <idempotent-redelivery-policy>
+                <dead-letter-queue>
+                    <outbound-endpoint address="test://dead-letter-queue"/>
+                </dead-letter-queue>
+            </idempotent-redelivery-policy>
+        </inbound-endpoint>
+        <test:component/>
+    </flow>
+</mule>
+

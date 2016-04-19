@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <vm:connector name="vmConnector">
+        <receiver-threading-profile
+            maxThreadsActive="1" />
+        <dispatcher-threading-profile
+            maxThreadsActive="1" />
+        <vm:queue-profile maxOutstandingMessages="2">
+            <default-persistent-queue-store />
+        </vm:queue-profile>
+    </vm:connector>
+
+    <flow name="vmService">
+
+        <vm:inbound-endpoint path="in" />
+        <vm:outbound-endpoint address="vm://out" />
+                
+    </flow>
+
+</mule>

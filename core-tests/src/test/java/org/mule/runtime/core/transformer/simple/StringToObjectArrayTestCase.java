@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import org.mule.runtime.core.api.endpoint.EndpointBuilder;
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.LocaleMessageHandler;
+import org.mule.runtime.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
@@ -62,6 +65,13 @@ public class StringToObjectArrayTestCase extends AbstractTransformerTestCase
     {
         Transformer trans = createObject(StringToObjectArray.class);
         trans.setReturnDataType(DataTypeFactory.create(Object[].class));
+
+        EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
+        builder.setEncoding(encoding);
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
+                builder);
+        trans.setEndpoint(endpoint);
+
         return trans;
     }
 

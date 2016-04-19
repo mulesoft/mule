@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+
+    <vm:connector name="Connector1">
+        <vm:queueProfile maxOutstandingMessages="100000">
+            <default-persistent-queue-store />
+        </vm:queueProfile>
+    </vm:connector>
+
+    <vm:connector name="Connector2">
+        <vm:queueProfile maxOutstandingMessages="100000" />
+    </vm:connector>
+
+    <vm:endpoint name="VmReceiver1" path="receiver1"
+        exchange-pattern="one-way" />
+    <vm:endpoint name="VmReceiver2" path="receiver2"
+        exchange-pattern="one-way" />
+
+
+    <flow name="EchoUMO1">
+    
+        <composite-source>
+            <vm:inbound-endpoint ref="VmReceiver1"
+                connector-ref="Connector1" />
+            <vm:inbound-endpoint ref="VmReceiver2"
+                connector-ref="Connector2" />
+        </composite-source>
+
+        <vm:outbound-endpoint address="vm://out"
+            connector-ref="Connector2" exchange-pattern="one-way" />
+
+    </flow>
+
+</mule>

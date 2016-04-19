@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <custom-queue-store
+        class="org.mule.runtime.transport.vm.VMFunctionalTestCase$CustomObjectStore"
+        name="custom-store" />
+    <vm:connector name="vm">
+        <vm:queue-profile>
+            <queue-store ref="custom-store" />
+        </vm:queue-profile>
+    </vm:connector>
+
+    <flow name="myAsyncService">
+
+        <vm:inbound-endpoint path="in"
+            exchange-pattern="one-way" />
+
+        <test:component>
+            <test:return-data>Polo</test:return-data>
+        </test:component>
+
+        <vm:outbound-endpoint path="out"
+            exchange-pattern="one-way" />
+
+    </flow>
+
+
+
+    <flow name="OneWayServiceChain1">
+
+        <vm:inbound-endpoint path="in1"
+            exchange-pattern="one-way" />
+
+        <vm:outbound-endpoint path="hop1"
+            exchange-pattern="one-way" />
+
+    </flow>
+
+    <flow name="OneWayServiceChain2">
+
+        <vm:inbound-endpoint path="hop1"
+            exchange-pattern="one-way" />
+
+        <test:component>
+            <test:return-data>Polo</test:return-data>
+        </test:component>
+
+        <vm:outbound-endpoint path="out1"
+            exchange-pattern="one-way" />
+
+    </flow>
+
+
+
+    <flow name="RRServiceChain1">
+
+        <vm:inbound-endpoint path="in2"
+            exchange-pattern="request-response" />
+
+        <vm:outbound-endpoint path="hop2"
+            exchange-pattern="request-response" />
+
+    </flow>
+
+    <flow name="RRServiceChain2">
+
+        <vm:inbound-endpoint path="hop2"
+            exchange-pattern="request-response" />
+
+        <test:component>
+            <test:return-data>Polo</test:return-data>
+        </test:component>
+    </flow>
+
+</mule>

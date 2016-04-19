@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.transformer;
 
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
@@ -19,7 +20,6 @@ import org.mule.runtime.core.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
@@ -87,11 +87,13 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
         }
     }
 
+    @Override
     public Object transform(Object src, MuleEvent event) throws TransformerMessagingException
     {
         return transform(src, getEncoding(src), event);
     }
 
+    @Override
     public final Object transform(Object src, String enc, MuleEvent event) throws TransformerMessagingException
     {
         DataType<?> sourceType = DataTypeFactory.create(src.getClass());
@@ -105,7 +107,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
             else
             {
                 Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(),
-                    src.getClass());
+                        endpoint, src.getClass());
                 /// FIXME
                 throw new TransformerMessagingException(msg, event, this);
             }

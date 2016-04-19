@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:util="http://www.springframework.org/schema/util"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+           http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <vm:connector name="vmConnector"/>
+
+    <flow name="QueueFromJndi">
+        <!-- this queue is looked up from JNDI -->
+        <inbound-endpoint ref="ep_jndi-queue"/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
+    </flow>
+
+    <flow name="TopicFromJndi">
+        <!-- this topic is looked up from JNDI -->
+        <inbound-endpoint ref="ep_jndi-topic"/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
+    </flow>
+
+    <flow name="NonJndiQueue">
+        <inbound-endpoint ref="ep_non-jndi-queue"/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
+    </flow>
+
+
+    <!-- Similar services but using JndiNameResolvers instead of JmsConnector properties -->
+
+    <flow name="QueueFromJndiWithJndiNameResolver">
+        <!-- this queue is looked up from JNDI -->
+        <inbound-endpoint ref="ep_jndi-queue-with-jndi-name-resolver"/>
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+    <flow name="TopicFromJndiWithJndiNameResolver">
+        <!-- this topic is looked up from JNDI -->
+        <inbound-endpoint ref="ep_jndi-topic-with-jndi-name-resolver"/>
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+    <flow name="NonJndiQueueWithJndiNameResolver">
+        <inbound-endpoint ref="ep_non-jndi-queue-with-jndi-name-resolver"/>
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+</mule>

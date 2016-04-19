@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <spring:bean name="connectionFactory"
+                 class="org.mule.runtime.transport.jms.JmsReconnectionActiveMQTestCase$CustomConnectionFactory">
+        <spring:property name="brokerURL" value="tcp://localhost:${port}"/>
+    </spring:bean>
+
+    <jms:connector name="jmsConnector" specification="1.1" eagerConsumer="true"
+                   connectionFactory-ref="connectionFactory">
+        <reconnect count="10" frequency="300" blocking="true"/>
+    </jms:connector>
+
+    <flow name="put">
+        <jms:outbound-endpoint queue="queue" connector-ref="jmsConnector"/>
+    </flow>
+
+    <flow name="get">
+        <jms:inbound-endpoint queue="queue" connector-ref="jmsConnector"/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
+    </flow>
+
+</mule>

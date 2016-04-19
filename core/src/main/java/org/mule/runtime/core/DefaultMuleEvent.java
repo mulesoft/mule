@@ -7,6 +7,8 @@
 package org.mule.runtime.core;
 
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -15,16 +17,17 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.context.notification.DefaultProcessorsTrace;
 import org.mule.runtime.core.management.stats.ProcessingTime;
@@ -34,7 +37,6 @@ import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.transformer.types.TypedValue;
-import org.mule.runtime.core.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
@@ -46,6 +48,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,14 +78,14 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     private final MuleSession session;
     private transient FlowConstruct flowConstruct;
 
-    private final Credentials credentials;
-    private final String encoding;
-    private final MessageExchangePattern exchangePattern;
-    private final URI messageSourceURI;
-    private final String messageSourceName;
+    private Credentials credentials;
+    private String encoding;
+    private MessageExchangePattern exchangePattern;
+    private URI messageSourceURI;
+    private String messageSourceName;
     private final ReplyToHandler replyToHandler;
-    private final boolean transacted;
-    private final boolean synchronous;
+    private boolean transacted;
+    private boolean synchronous;
 
     /** Mutable MuleEvent state **/
     private boolean stopFurtherProcessing = false;
@@ -292,6 +295,25 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.messageSourceURI = null;
         this.timeout = 0;
         this.transacted = false;
+
+        this.synchronous = resolveEventSynchronicity();
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public void populateFieldsFromInboundEndpoint(InboundEndpoint endpoint)
+    {
+        this.credentials = extractCredentials(endpoint);
+        this.encoding = endpoint.getEncoding();
+        this.exchangePattern = endpoint.getExchangePattern();
+        this.messageSourceName = endpoint.getName();
+        this.messageSourceURI = endpoint.getEndpointURI().getUri();
+        this.timeout = endpoint.getResponseTimeout();
+        this.transacted = endpoint.getTransactionConfig().isTransacted();
+        fillProperties(endpoint);
+
         this.synchronous = resolveEventSynchronicity();
         this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
     }
@@ -546,6 +568,29 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    protected void fillProperties(InboundEndpoint endpoint)
+    {
+        if (endpoint != null && endpoint.getProperties() != null)
+        {
+            for (Iterator<?> iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
+            {
+                String prop = (String) iterator.next();
+
+                // don't overwrite property on the message
+                if (!ignoreProperty(prop))
+                {
+                    // inbound endpoint flowVariables are in the invocation scope
+                    Object value = endpoint.getProperties().get(prop);
+                    setFlowVariable(prop, value);
+                }
+            }
+        }
+    }
+
+    /**
      * This method is used to determine if a property on the previous event should be ignored for the next
      * event. This method is here because we don't have proper scoped handling of meta data yet The rules are
      * <ol>
@@ -573,6 +618,25 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         }
 
         return null != message.getOutboundProperty(key);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    protected Credentials extractCredentials(InboundEndpoint endpoint)
+    {
+        if (null != endpoint && null != endpoint.getEndpointURI()
+            && null != endpoint.getEndpointURI().getUserInfo())
+        {
+            final String userName = endpoint.getEndpointURI().getUser();
+            final String password = endpoint.getEndpointURI().getPassword();
+            if (password != null && userName != null)
+            {
+                return new MuleCredentials(userName, password.toCharArray());
+            }
+        }
+        return null;
     }
 
     @Override

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+    xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+
+    <endpoint name="in1" address="${inbound.destination1}"
+        connector-ref="jmsConnector1" exchange-pattern="one-way">
+        <jms:transaction action="BEGIN_OR_JOIN" />
+    </endpoint>
+    <endpoint name="in2" address="${inbound.destination2}"
+        connector-ref="jmsConnector1" exchange-pattern="one-way">
+        <jms:transaction action="BEGIN_OR_JOIN" />
+    </endpoint>
+    <endpoint name="in3" address="${inbound.destination3}"
+        connector-ref="jmsConnector1" exchange-pattern="one-way">
+        <jms:transaction action="BEGIN_OR_JOIN" />
+    </endpoint>
+    <endpoint name="in4" address="${inbound.destination4}"
+        connector-ref="jmsConnector1" exchange-pattern="one-way">
+        <jms:transaction action="BEGIN_OR_JOIN" />
+    </endpoint>
+    <endpoint name="in5" address="${inbound.destination5}"
+        connector-ref="jmsConnector1" exchange-pattern="one-way">
+        <jms:transaction action="BEGIN_OR_JOIN" />
+    </endpoint>
+
+    <spring:beans>
+        <spring:import resource="jms-single-tx-single-common.xml" />
+    </spring:beans>
+</mule>

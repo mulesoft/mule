@@ -14,7 +14,10 @@
 
     <global-property name="property" value="value"/>
 
+    <endpoint name="endpoint" address="test://${property}"/>
+
     <flow name="service">
+        <inbound-endpoint ref="endpoint"/>
         <component>
             <spring-object bean="poot"/>
         </component>

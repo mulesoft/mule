@@ -360,6 +360,17 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xsd:element name="publish-notifications" type="publishNotificationType" substitutionGroup="mule:abstract-agent"/>
+    <xsd:complexType name="publishNotificationType">
+        <xsd:complexContent>
+            <xsd:extension base="notificationLoggerAgentType">
+                <xsd:sequence>
+                    <xsd:element ref="mule:abstract-outbound-endpoint" minOccurs="0" maxOccurs="1"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="yourkit-profiler" substitutionGroup="mule:abstract-agent"/>
 
 </xsd:schema>

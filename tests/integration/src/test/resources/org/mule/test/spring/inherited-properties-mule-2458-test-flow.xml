@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <endpoint name="endpoint" address="test://path?url-only=url&amp;all=url&amp;global-and-url=url&amp;local-and-url=url">
+        <property key="global-and-url" value="global"/>
+        <!-- old style for test -->
+        <properties>
+            <spring:entry key="all" value="global"/>
+            <spring:entry key="global-only" value="global"/>
+            <spring:entry key="global-and-local" value="global"/>
+        </properties>
+    </endpoint>
+
+    <flow name="service">
+        <inbound-endpoint ref="endpoint">
+            <property key="all" value="local"/>
+            <property key="local-only" value="local"/>
+            <properties>
+                <spring:entry key="global-and-local" value="local"/>
+                <spring:entry key="local-and-url" value="local"/>
+            </properties>
+        </inbound-endpoint>
+        <null-component/>
+    </flow>
+    
+</mule>

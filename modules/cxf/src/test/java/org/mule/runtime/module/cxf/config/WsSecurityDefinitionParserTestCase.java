@@ -11,8 +11,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.module.cxf.wssec.ClientPasswordCallback;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.cxf.wssec.ClientPasswordCallback;
 
 import java.util.Map;
 
@@ -64,8 +64,8 @@ public class WsSecurityDefinitionParserTestCase extends FunctionalTestCase
         assertEquals(WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " "
                 + WSHandlerConstants.ENCRYPT, wsProperties.get(WSHandlerConstants.ACTION));
         assertEquals("joe", wsProperties.get(WSHandlerConstants.USER));
-        assertEquals("org/mule/module/cxf/wssec/wssecurity.properties", wsProperties.get(WSHandlerConstants.SIG_PROP_FILE));
-        assertEquals("org/mule/module/cxf/wssec/wssecurity.properties", wsProperties.get(WSHandlerConstants.ENC_PROP_FILE));
+        assertEquals("org/mule/runtime/module/cxf/wssec/wssecurity.properties", wsProperties.get(WSHandlerConstants.SIG_PROP_FILE));
+        assertEquals("org/mule/runtime/module/cxf/wssec/wssecurity.properties", wsProperties.get(WSHandlerConstants.ENC_PROP_FILE));
         assertTrue(wsProperties.get(WSHandlerConstants.PW_CALLBACK_REF) instanceof ClientPasswordCallback);
     }
 

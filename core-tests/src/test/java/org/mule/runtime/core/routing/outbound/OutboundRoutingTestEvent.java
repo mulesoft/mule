@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -13,17 +14,17 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.management.stats.ProcessingTime;
-import org.mule.tck.MuleTestUtils;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.UUID;
+import org.mule.tck.MuleTestUtils;
 
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -42,12 +43,15 @@ public class OutboundRoutingTestEvent implements MuleEvent
     private String id = UUID.getUUID();
     private boolean stopFurtherProcessing;
     int timeout = -1;
+    private InboundEndpoint endpoint;
 
     public OutboundRoutingTestEvent(MuleMessage message, MuleSession session, MuleContext muleContext)
         throws Exception
     {
         this.message = message;
         this.session = session;
+        this.endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE,
+                muleContext);
     }
 
     @Override
@@ -203,7 +207,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     @Override
     public MessageExchangePattern getExchangePattern()
     {
-        return MessageExchangePattern.REQUEST_RESPONSE;
+        return endpoint.getExchangePattern();
     }
 
     @Override

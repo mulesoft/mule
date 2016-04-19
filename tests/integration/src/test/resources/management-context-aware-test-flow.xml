@@ -11,6 +11,11 @@
 
 
     <flow name="service">
+
+        <inbound-endpoint address="test://foo">
+            <transformer ref="bean" />
+        </inbound-endpoint>
+
         <component>
             <singleton-object class="org.mule.runtime.config.spring.DummyComponent">
                 <property key="property" value-ref="bean" />

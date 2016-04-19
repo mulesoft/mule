@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:util="http://www.springframework.org/schema/util"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <spring:beans>
+        <util:properties id="providerProperties">
+            <!--
+                    see http://activemq.apache.org/jndi-support.html for configuring queues/topics
+                    through JNDI properties
+                -->
+            <!--<spring:prop key="queue.in2">in-queue2</spring:prop>-->
+            <!--<spring:prop key="topic.with/long/path">in-topic3</spring:prop>-->
+            <spring:prop key="queue.jndi-queue-in">in</spring:prop>
+            <spring:prop key="topic.jndi-topic-in">in</spring:prop>
+        </util:properties>
+    </spring:beans>
+
+    <!-- Use JNDI ConnectionFactory but not JNDI Destinations -->
+    <jms:connector name="jmsConnector1"
+                   jndiInitialFactory="org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                   jndiProviderUrl="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"
+                   connectionFactoryJndiName="ConnectionFactory"/>
+
+    <!-- Use JNDI ConnectionFactory and optional JNDI Destinations -->
+    <jms:activemq-connector name="jmsConnector2"
+                            jndiInitialFactory="org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                            jndiProviderUrl="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"
+                            jndiProviderProperties-ref="providerProperties"
+                            jndiDestinations="true"
+                            connectionFactoryJndiName="ConnectionFactory"/>
+
+    <!-- Use JNDI ConnectionFactory and force JNDI Destinations -->
+    <jms:activemq-connector name="jmsConnector3"
+                            jndiInitialFactory="org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                            jndiProviderUrl="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"
+                            jndiProviderProperties-ref="providerProperties"
+                            jndiDestinations="true"
+                            forceJndiDestinations="true"
+                            connectionFactoryJndiName="ConnectionFactory"/>
+
+    <jms:endpoint name="ep_non-jndi-queue" queue="in1" connector-ref="jmsConnector1" 
+        exchange-pattern="one-way"/>
+    <jms:endpoint name="ep_non-jndi-queue-optional-jndi" queue="in1" connector-ref="jmsConnector2"
+        exchange-pattern="one-way"/>
+    <jms:endpoint name="ep_non-jndi-queue-force-jndi" queue="in1" connector-ref="jmsConnector3"
+        exchange-pattern="one-way"/>
+    <jms:endpoint name="ep_jndi-queue" queue="jndi-queue-in" connector-ref="jmsConnector2"
+        exchange-pattern="one-way"/>
+    <jms:endpoint name="ep_jndi-topic" topic="jndi-topic-in" connector-ref="jmsConnector2"
+        exchange-pattern="one-way"/>
+
+    <!-- Use JNDI ConnectionFactory but not JNDI Destinations -->
+    <jms:connector name="jmsConnector4"
+                   connectionFactoryJndiName="ConnectionFactory">
+        <jms:default-jndi-name-resolver
+                jndiInitialFactory="org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                jndiProviderUrl="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"
+                jndiProviderProperties-ref="providerProperties"/>
+    </jms:connector>
+
+    <!-- Use JNDI ConnectionFactory and optional JNDI Destinations -->
+    <jms:activemq-connector name="jmsConnector5"
+                            jndiDestinations="true"
+                            connectionFactoryJndiName="ConnectionFactory">
+        <jms:custom-jndi-name-resolver class="org.mule.runtime.transport.jms.jndi.CachedJndiNameResolver">
+            <spring:property name="jndiInitialFactory" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+            <spring:property name="jndiProviderUrl"
+                             value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
+            <spring:property name="jndiProviderProperties" ref="providerProperties"/>
+        </jms:custom-jndi-name-resolver>
+    </jms:activemq-connector>
+
+    <!-- Use JNDI ConnectionFactory and force JNDI Destinations -->
+    <jms:activemq-connector name="jmsConnector6"
+                            jndiDestinations="true"
+                            forceJndiDestinations="true"
+                            connectionFactoryJndiName="ConnectionFactory">
+        <jms:default-jndi-name-resolver
+                jndiInitialFactory="org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                jndiProviderUrl="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"
+                jndiProviderProperties-ref="providerProperties"/>
+    </jms:activemq-connector>
+
+    <jms:endpoint name="ep_non-jndi-queue-with-jndi-name-resolver" queue="in1" connector-ref="jmsConnector4"
+                  exchange-pattern="one-way"/>
+    <jms:endpoint name="ep_non-jndi-queue-optional-jndi-with-jndi-name-resolver" queue="in1"
+                  connector-ref="jmsConnector5"
+                  exchange-pattern="one-way"/>
+    <jms:endpoint name="ep_non-jndi-queue-force-jndi-with-jndi-name-resolver" queue="in1" connector-ref="jmsConnector6"
+                  exchange-pattern="one-way"/>
+    <jms:endpoint name="ep_jndi-queue-with-jndi-name-resolver" queue="jndi-queue-in" connector-ref="jmsConnector5"
+                  exchange-pattern="one-way"/>
+    <jms:endpoint name="ep_jndi-topic-with-jndi-name-resolver" topic="jndi-topic-in" connector-ref="jmsConnector5"
+                  exchange-pattern="one-way"/>
+</mule>

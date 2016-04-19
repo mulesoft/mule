@@ -8,8 +8,9 @@ package org.mule.runtime.module.cxf.wssec;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.runtime.core.api.MuleMessage;
+
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class SAMLValidatorTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "org/mule/module/cxf/wssec/saml-validator-conf-httpn.xml";
+        return "org/mule/runtime/module/cxf/wssec/saml-validator-conf-httpn.xml";
     }
 
     @Test

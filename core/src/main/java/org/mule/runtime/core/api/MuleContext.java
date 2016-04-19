@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.endpoint.EndpointFactory;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -36,11 +37,11 @@ import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.util.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
+import org.mule.runtime.extension.api.ExtensionManager;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -267,6 +268,16 @@ public interface MuleContext extends Lifecycle
      * @see org.mule.runtime.core.api.expression.ExpressionManager
      */
     ExpressionManager getExpressionManager();
+
+    /**
+     * Returns the EndpointFactory configured for this instance of Mule
+     * 
+     * @return the EndpointFactory configured for this instance of Mule
+     * @see EndpointFactory
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    EndpointFactory getEndpointFactory();
 
     void setExecutionClassLoader(ClassLoader cl);
 

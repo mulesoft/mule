@@ -31,12 +31,12 @@
         <script:component>
             <script:script engine="groovy">
                 if (message.getProperty("foo", org.mule.runtime.core.PropertyScope.INBOUND) != null)
-                return message
+                    return message
                 else
                 {
-                //This shouldn't be needed but null does not stop the async-reply...
-                eventContext.setStopFurtherProcessing(true)
-                return null
+                    //This shouldn't be needed but null does not stop the async-reply...
+                    eventContext.setStopFurtherProcessing(true)
+                    return null
                 }
             </script:script>
         </script:component>

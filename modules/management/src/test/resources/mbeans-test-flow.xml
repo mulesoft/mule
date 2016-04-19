@@ -12,12 +12,24 @@
 
 
     <flow name="SimpleBridge">
-        <set-payload value="hi"/>
+
+        <inbound-endpoint address="test://in-1"
+            exchange-pattern="one-way" />
+
+        <outbound-endpoint address="test://out-1"
+            exchange-pattern="one-way" />
+
     </flow>
 
 	<!-- Tests flow with colon on name -->
 	<flow name="flow:SimpleBridge">
-        <set-payload value="hi"/>
+
+        <inbound-endpoint address="test://in-2"
+            exchange-pattern="one-way" />
+
+        <outbound-endpoint address="test://out-2"
+            exchange-pattern="one-way" />
+
     </flow>
 
 </mule>

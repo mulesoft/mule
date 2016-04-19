@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -136,6 +137,10 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
         if (logger.isDebugEnabled())
         {
+            if (route instanceof OutboundEndpoint)
+            {
+                logger.debug("Message being sent to: " + ((OutboundEndpoint) route).getEndpointURI());
+            }
             logger.debug(eventToRoute.getMessage());
         }
 
@@ -145,10 +150,18 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
             {
                 logger.trace("Request payload: \n"
                              + StringMessageUtils.truncate(muleContext.getTransformationService().getPayloadForLogging(eventToRoute.getMessage()), 100, false));
+                if (route instanceof OutboundEndpoint)
+                {
+                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
+                }
             }
             catch (Exception e)
             {
                 logger.trace("Request payload: \n(unable to retrieve payload: " + e.getMessage());
+                if (route instanceof OutboundEndpoint)
+                {
+                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
+                }
             }
         }
 
@@ -207,6 +220,11 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
             // well
             message.setReplyTo(replyTo);
             message.setOutboundProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, service.getName());
+            if (logger.isDebugEnabled() && route instanceof OutboundEndpoint)
+            {
+                logger.debug("Setting replyTo=" + replyTo + " for outbound route: "
+                             + ((OutboundEndpoint) route).getEndpointURI());
+            }
         }
         if (enableCorrelation != CorrelationMode.NEVER)
         {
@@ -247,6 +265,10 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
             {
                 StringBuilder buf = new StringBuilder();
                 buf.append("Setting Correlation info on Outbound router");
+                if (route instanceof OutboundEndpoint)
+                {
+                    buf.append(" for endpoint: ").append(((OutboundEndpoint) route).getEndpointURI());
+                }
                 buf.append(SystemUtils.LINE_SEPARATOR).append("Id=").append(correlation);
                 // buf.append(", ").append("Seq=").append(seq);
                 // buf.append(", ").append("Group Size=").append(group);
@@ -391,6 +413,28 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     public boolean isDynamicRoutes()
     {
         return false;
+    }
+
+    /**
+     * @param name the route identifier
+     * @return the route or null if the endpoint's Uri is not registered
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public MessageProcessor getRoute(String name)
+    {
+        for (MessageProcessor route : routes)
+        {
+            if (route instanceof OutboundEndpoint)
+            {
+                OutboundEndpoint endpoint = (OutboundEndpoint) route;
+                if (endpoint.getName().equals(name))
+                {
+                    return endpoint;
+                }
+            }
+        }
+        return null;
     }
 
     public RouterResultsHandler getResultsHandler()

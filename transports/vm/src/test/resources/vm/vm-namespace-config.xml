@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <spring:bean name="txFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory">
+        <spring:property name="value" value="foo"/>
+    </spring:bean>
+
+    <vm:connector name="vmConnectorDefaults" />
+
+    <vm:connector name="vmConnector1" />
+
+    <vm:connector name="vmConnector2" queueTimeout="5000">
+        <vm:queue-profile maxOutstandingMessages="10" >
+            <default-persistent-queue-store/>
+        </vm:queue-profile>
+    </vm:connector>
+
+    <vm:endpoint path="queue" name="vmEndpoint" connector-ref="vmConnector1" exchange-pattern="one-way"/>
+
+    <vm:endpoint path="foo" name="globalWithTx" connector-ref="vmConnectorDefaults" exchange-pattern="one-way">
+        <vm:transaction action="ALWAYS_BEGIN" timeout="42"/>
+    </vm:endpoint>
+    
+    <vm:endpoint path="bar" name="customTx" connector-ref="vmConnectorDefaults" exchange-pattern="one-way">
+        <custom-transaction action="JOIN_IF_POSSIBLE" factory-ref="txFactory"/>
+    </vm:endpoint>
+    
+    <vm:endpoint path="baz" name="xaTx" connector-ref="vmConnectorDefaults" exchange-pattern="one-way">
+        <xa-transaction action="ALWAYS_JOIN"/>
+    </vm:endpoint>
+</mule>

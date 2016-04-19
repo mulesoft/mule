@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.management.stats;
 
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.management.stats.Statistics;
 import org.mule.runtime.core.management.stats.printers.SimplePrinter;
 
@@ -53,6 +54,7 @@ public class RouterStatistics implements Statistics
     /**
      * @see org.mule.runtime.core.api.management.stats.Statistics#isEnabled()
      */
+    @Override
     public boolean isEnabled()
     {
         return enabled;
@@ -117,7 +119,14 @@ public class RouterStatistics implements Statistics
         }
 
         String name;
-        name = endpoint.toString();
+        if (endpoint instanceof ImmutableEndpoint)
+        {
+            name = ((ImmutableEndpoint) endpoint).getName();
+        }
+        else
+        {
+            name = endpoint.toString();
+        }
 
         Long cpt = (Long) routed.get(name);
         long count = 0;

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <vm:connector name="vmConnector"/>
+
+    <flow name="dlqExceptionInboundEndpoint">
+        <vm:inbound-endpoint path="in1">
+            <custom-transformer
+                    class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$FailingTransformer"/>
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+        <test:component/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way">
+            <vm:transaction action="ALWAYS_JOIN"/>
+        </vm:outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <vm:outbound-endpoint path="dead.letter" exchange-pattern="one-way">
+                <vm:transaction action="ALWAYS_JOIN"/>
+            </vm:outbound-endpoint>
+        </default-exception-strategy>
+    </flow>
+
+    <flow name="dlqExceptionInboundEndpointResponse">
+        <vm:inbound-endpoint path="in2" exchange-pattern="request-response">
+            <response>
+                <custom-transformer
+                        class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$FailingTransformer"/>
+            </response>
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+        <test:component/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way">
+            <vm:transaction action="ALWAYS_JOIN"/>
+        </vm:outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <vm:outbound-endpoint path="dead.letter" exchange-pattern="one-way">
+                <vm:transaction action="ALWAYS_JOIN"/>
+            </vm:outbound-endpoint>
+        </default-exception-strategy>
+    </flow>
+
+    <flow name="dlqExceptionComponent">
+        <vm:inbound-endpoint path="in3">
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+        <test:component throwException="true"/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way">
+            <vm:transaction action="ALWAYS_JOIN"/>
+        </vm:outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <vm:outbound-endpoint path="dead.letter" exchange-pattern="one-way">
+                <vm:transaction action="ALWAYS_JOIN"/>
+            </vm:outbound-endpoint>
+        </default-exception-strategy>
+    </flow>
+
+    <flow name="dlqExceptionOutboundEndpoint">
+        <vm:inbound-endpoint path="in4">
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+        <test:component/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way">
+            <custom-transformer
+                    class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$FailingTransformer"/>
+            <vm:transaction action="ALWAYS_JOIN"/>
+        </vm:outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <vm:outbound-endpoint path="dead.letter" exchange-pattern="one-way">
+                <vm:transaction action="ALWAYS_JOIN"/>
+            </vm:outbound-endpoint>
+        </default-exception-strategy>
+    </flow>
+
+    <flow name="deadLetterQueueService">
+        <vm:inbound-endpoint path="dead.letter">
+            <vm:transaction action="NONE"/>
+        </vm:inbound-endpoint>
+        <component
+                class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$DeadLetterQueueComponent"/>
+    </flow>
+
+    <flow name="outboundFlow">
+        <vm:inbound-endpoint path="out">
+            <vm:transaction action="NONE"/>
+        </vm:inbound-endpoint>
+        <component
+                class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$OutboundComponent"/>
+    </flow>
+
+</mule>

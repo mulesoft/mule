@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="defaultFlow">
+		<inbound-endpoint address="test://in.default" />
+		<echo-component />
+	</flow>
+	<flow name="startedFlow" initialState="started">
+		<inbound-endpoint address="test://in.started" />
+		<echo-component />
+	</flow>
+	<flow name="stoppedFlow" initialState="stopped">
+		<inbound-endpoint address="test://in.stopped" />
+		<echo-component />
+	</flow>
+</mule>

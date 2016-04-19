@@ -21,8 +21,8 @@ public class SpringSecurityWithWsSecurityTestCase extends UsernameTokenTestCase
     protected String[] getConfigFiles()
     {
         return new String[] {
-                "org/mule/module/cxf/wssec/cxf-secure-service-security-manager-ws-security-flow-httpn.xml",
-                "org/mule/module/cxf/wssec/spring-security-ws-security-conf.xml"
+                             "org/mule/runtime/module/cxf/wssec/cxf-secure-service-security-manager-ws-security-flow-httpn.xml",
+                             "org/mule/runtime/module/cxf/wssec/spring-security-ws-security-conf.xml"
         };
     }
 

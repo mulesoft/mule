@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way"/>
+    <endpoint name="middle" address="${middle.destination}" exchange-pattern="one-way"/>
+    <endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way"/>
+    <!-- TODO properly configure these -->
+    <endpoint name="q1" address="${protocol}://middle2" exchange-pattern="one-way"/>
+    <endpoint name="q2" address="${protocol}://middle3" exchange-pattern="one-way"/>
+
+    <flow name="Part1">
+        <jms:inbound-endpoint ref="in">
+            <jms:transaction action="BEGIN_OR_JOIN"/>
+        </jms:inbound-endpoint>
+        <test:component/>
+        <jms:outbound-endpoint ref="middle">
+            <jms:transaction action="NONE"/>
+        </jms:outbound-endpoint>
+    </flow>
+
+    <flow name="Part2">
+        <jms:inbound-endpoint ref="middle">
+            <jms:transaction action="BEGIN_OR_JOIN"/>
+        </jms:inbound-endpoint>
+        <test:component/>
+        <jms:outbound-endpoint ref="q1">
+            <jms:transaction action="BEGIN_OR_JOIN"/>
+        </jms:outbound-endpoint>
+    </flow>
+
+    <flow name="Part3">
+        <jms:inbound-endpoint ref="q1">
+            <jms:transaction action="BEGIN_OR_JOIN"/>
+        </jms:inbound-endpoint>
+        <test:component/>
+        <jms:outbound-endpoint ref="q2">
+            <jms:transaction action="BEGIN_OR_JOIN"/>
+        </jms:outbound-endpoint>
+    </flow>
+
+    <flow name="Part4">
+        <jms:inbound-endpoint ref="q2">
+            <jms:transaction action="BEGIN_OR_JOIN"/>
+        </jms:inbound-endpoint>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <jms:outbound-endpoint ref="out">
+            <jms:transaction action="BEGIN_OR_JOIN"/>
+        </jms:outbound-endpoint>
+    </flow>
+
+</mule>

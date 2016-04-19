@@ -12,10 +12,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.RETURNS_DEFAULTS;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.module.xml.util.NamespaceManager;
+import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.module.xml.xpath.SaxonXpathEvaluator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -51,7 +54,8 @@ public class XPathFilterTestCase extends AbstractMuleTestCase
     @Before
     public void before() throws Exception {
         xpathManager = new SaxonXpathEvaluator();
-        when(muleContext.getRegistry().lookupObject(NamespaceManager.class)).thenReturn(null);
+        when(muleContext.getRegistry()).thenReturn(mock(MuleRegistry.class, RETURNS_DEFAULTS));
+
 
         filter = new XPathFilter();
         filter.setMuleContext(muleContext);

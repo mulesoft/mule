@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.api.transformer;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.NameableObject;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.endpoint.EndpointAware;
 
 import java.util.List;
 
@@ -19,7 +21,7 @@ import java.util.List;
  * <code>Transformer</code> can be chained together to covert message payloads
  * from one object type to another.
  */
-public interface Transformer extends MessageProcessor, Initialisable, Disposable, NameableObject, MuleContextAware
+public interface Transformer extends MessageProcessor, Initialisable, Disposable, NameableObject, MuleContextAware, EndpointAware
 {
 
     /**
@@ -109,4 +111,12 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
      */
     String getEncoding();
     
+    /**
+     * The endpoint that this transformer is attached to
+     * 
+     * @return the endpoint associated with the transformer
+     * @deprecated
+     */
+    @Deprecated
+    ImmutableEndpoint getEndpoint();
 }

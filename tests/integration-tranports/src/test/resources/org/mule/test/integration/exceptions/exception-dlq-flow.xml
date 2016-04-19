@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:jbossts="http://www.mulesoft.org/schema/mule/jbossts" 
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+        http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/current/mule-jbossts.xsd">
+
+    <jms:activemq-connector name="jmsConn" maxRedelivery="1"
+        brokerURL="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
+
+    <jboss-transaction-manager/>
+
+    <flow name="RollbackComponent">
+        <jms:inbound-endpoint queue="request.queue">
+            <jms:transaction action="BEGIN_OR_JOIN"/>
+        </jms:inbound-endpoint>
+        <null-component/>
+        <!-- this endpoint should never be invoked because the NullComponent will always throw an exception if invoked -->
+        <jms:outbound-endpoint queue="out.queue" exchange-pattern="one-way"/>
+        <!-- this exception strategy will forward the current message to a jms queue and will do so in the current transaction 
+            if it is available -->
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <jms:outbound-endpoint queue="DLQ" exchange-pattern="one-way">
+                <jms:transaction action="BEGIN_OR_JOIN"/>
+            </jms:outbound-endpoint>
+        </default-exception-strategy>
+    </flow>
+
+</mule>
+

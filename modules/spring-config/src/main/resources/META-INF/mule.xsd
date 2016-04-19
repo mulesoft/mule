@@ -129,9 +129,9 @@
             <xsd:element ref="abstract-security-manager"/>
             <xsd:element ref="abstract-transaction-manager"/>
             <xsd:element ref="abstract-shared-transaction-manager"/>
-            <!-- TODO: remove once we migrate all connectors to SDK extensions-->
             <xsd:element ref="abstract-connector"/>
             <xsd:element ref="abstract-shared-connector"/>
+            <xsd:element ref="abstract-global-endpoint"/>
             <xsd:element ref="abstract-exception-strategy"/>
             <xsd:element ref="abstract-flow-construct" />
             <xsd:element ref="flow" />
@@ -226,14 +226,14 @@
     <xsd:element name="abstract-shared-connector" abstract="true" type="abstractConnectorType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for connector elements. Connector elements allow properties to be configured across all message processors that use the same connector.
+                A placeholder for connector elements. Connector elements allow properties to be configured across all endpoints that use the same transport. If multiple connectors are defined for the same transport, each endpoint must name which connector is being used.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:element name="abstract-connector" abstract="true" type="abstractConnectorType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for connector elements. Connector elements allow properties to be configured across all message processors that use the same connector.
+                A placeholder for connector elements. Connector elements allow properties to be configured across all endpoints that use the same transport. If multiple connectors are defined for the same transport, each endpoint must name which connector is being used.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -377,6 +377,69 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="abstract-global-endpoint" abstract="true" type="abstractGlobalEndpointType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for global endpoint elements. Global endpoints are named templates that allow you to define an endpoint once and refer to it in several places. The same template can be used for both inbound and outbound endpoints.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractGlobalEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="name" type="substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the endpoint so that other elements can reference it. This name can also be referenced in the MuleClient.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-inbound-endpoint" abstract="true" type="abstractInboundEndpointType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for inbound endpoint elements. Inbound endpoints receive messages from the underlying transport. The message payload is then delivered to the component for processing.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractInboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="name" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the endpoint in the registry. There is no need to set the 'name' attribute on inbound or outbound endpoints, only on global endpoints.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-outbound-endpoint" abstract="true" type="abstractOutboundEndpointType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for outbound endpoint elements. Outbound endpoints dispatch messages to the underlying transport.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractOutboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="name" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the endpoint in the registry. There is not need to set the 'name' attribute on inbound or outbound endpoints, only on global endpoints.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <!-- Message Processors -->
     <xsd:element name="abstract-message-processor" abstract="true" type="abstractMessageProcessorType">
         <xsd:annotation>
@@ -419,12 +482,19 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:group name="messageProcessorOrMixedContentMessageProcessor">
+    <xsd:group name="messageProcessorOrOutboundEndpoint">
         <xsd:choice>
             <xsd:element ref="abstract-message-processor">
                 <xsd:annotation>
                     <xsd:documentation>
                         A message processor
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element ref="abstract-outbound-endpoint">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        An outbound endpoint
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -504,7 +574,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded" />
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded" />
                 </xsd:sequence>
                 <xsd:attribute name="name" type="nonBlankString" use="required">
                     <xsd:annotation>
@@ -529,7 +599,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="substitutableName" use="optional">
                     <xsd:annotation>
@@ -605,7 +675,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" />
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" />
                     <xsd:element name="enrich" type="extractEnrichPairType" minOccurs="0"
                         maxOccurs="unbounded" />
                 </xsd:sequence>
@@ -666,7 +736,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
                 </xsd:sequence>
                  <xsd:attribute name="processingStrategy" use="optional" default="queued-asynchronous">
                     <xsd:annotation>
@@ -712,6 +782,52 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Optional name that will be used to name the threads used by this flow.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="request-reply" type="requestReplyType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Provides support for the asynchronous request/reply pattern where a message is sent via a one-way outbound endpoint
+                and an asynchronous response is received via a seperate inbound one-way endpoint.  Message flow is blocked while
+                waiting for the reply message.  Note: This does not currently support setting of replyTo property on the outbound message.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="requestReplyType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The outbound endpoint or message processor that will perform the asynchronous request.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:group>
+                    <xsd:element ref="abstract-inbound-endpoint">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The inbound endpoint from which the asynchronous reply message will be received.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="timeout" type="substitutableInt" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The time (ms) to wait for an asynchronous reply message to be received.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="storePrefix" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines the prefix of the object store names.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -871,7 +987,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="action" type="transactionalActionType" default="ALWAYS_BEGIN"/>
@@ -901,6 +1017,25 @@
         </xsd:complexContent>
     </xsd:complexType>
     
+    <xsd:group name="messageSourceOrInboundEndpoint">
+        <xsd:choice>
+            <xsd:element ref="abstract-message-source">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        A message source
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element ref="abstract-inbound-endpoint">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        An inbound endpoint
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:choice>
+    </xsd:group>
+
     <xsd:element name="custom-source" type="customMessageSourceType" substitutionGroup="abstract-message-source"/>
     <xsd:complexType name="customMessageSourceType">
         <xsd:complexContent>
@@ -918,7 +1053,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractMessageSourceType">
                 <xsd:sequence maxOccurs="unbounded">
-                    <xsd:element ref="abstract-message-source"/>
+                    <xsd:group ref="messageSourceOrInboundEndpoint"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -1057,14 +1192,35 @@
                     <xsd:element name="default-threading-profile" type="threadingProfileType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The default threading profile, used by components for dispatching and receiving if no more specific configuration is given.
+                                The default threading profile, used by components and by endpoints for dispatching and receiving if no more specific configuration is given.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="default-dispatcher-threading-profile" type="threadingProfileType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The default dispatching threading profile, which modifies the default-threading-profile values and is used by endpoints for dispatching messages. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="default-receiver-threading-profile" type="threadingProfileType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The default receiving threading profile, which modifies the default-threading-profile values and is used by endpoints for receiving messages. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="default-service-threading-profile" type="threadingProfileType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The default service threading profile, which modifies the default-threading-profile and is used by services for processing messages. This can also be configured on models or services, in which case these configurations will be used instead of this default.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                     <xsd:element ref="abstract-reconnection-strategy" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The default reconnection strategy, used by connectors and sources. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
+                                The default reconnection strategy, used by connectors and endpoints. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -1147,7 +1303,7 @@
                 <xsd:attribute name="flowEndingWithOneWayEndpointReturnsNull" type="substitutableBoolean" default="false">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Backwards Compatabilty Flag: Used to revert to Mule 3.2 behaviour of one-way message processors when they are the last element inside a request-response flow. When true the value returned by the processor will be null, otherwise will be an echo of the received event.
+                            Backwards Compatabilty Flag: Used to revert to Mule 3.2 behaviour of one-way outbound endpoints when they are the last element inside a request-response flow. When true the value returned by the endpoint will be null, otherwise will be an echo of the received event.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1310,6 +1466,7 @@
             <xsd:enumeration value="CONTEXT"/>
             <xsd:enumeration value="SECURITY"/>
             <xsd:enumeration value="ASYNC-MESSAGE"/>
+            <xsd:enumeration value="ENDPOINT-MESSAGE"/>
             <xsd:enumeration value="CONNECTOR-MESSAGE"/>
             <xsd:enumeration value="COMPONENT-MESSAGE"/>
             <xsd:enumeration value="PIPELINE-MESSAGE"/>
@@ -1686,9 +1843,9 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="0" maxOccurs="1">
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
-                            <xsd:documentation>Destination to which an ExceptionMessage will be sent; this could be a router, or other message processor.
+                            <xsd:documentation>Destination to which an ExceptionMessage will be sent; this could be an outbound endpoint, a router, or other message processor.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:group>
@@ -2016,17 +2173,17 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element ref="abstract-message-source" minOccurs="0" maxOccurs="1"/>
+                    <xsd:group ref="messageSourceOrInboundEndpoint" minOccurs="0"/>
                     <xsd:choice minOccurs="1" maxOccurs="unbounded">
-                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor"/>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
                         <xsd:element name="response">
                             <xsd:annotation>
                                 <xsd:documentation>
-                                    A set of message processors to handle the response of the flow
+                                    An outbound endpoint
                                 </xsd:documentation>
                             </xsd:annotation>
                             <xsd:complexType>
-                                <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
+                                <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
                             </xsd:complexType>
                         </xsd:element>
                     </xsd:choice>
@@ -2283,6 +2440,13 @@
                         </xsd:annotation>
                     </xsd:element>
                     <xsd:element ref="abstract-lifecycle-adapter-factory" minOccurs="0"/>
+                    <xsd:element name="binding" type="pojoBindingType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A binding associates a Mule endpoint with an injected Java interface. This is like using Spring to inject a bean, but instead of calling a method on the bean, a message is sent to an endpoint.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass">
                     <xsd:annotation>
@@ -2316,11 +2480,43 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+
+    <xsd:complexType name="pojoBindingType">
+        <xsd:sequence>
+            <xsd:element ref="abstract-outbound-endpoint" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="interface" use="required" type="substitutableClass">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The interface to be injected. A proxy will be created that implements this interface by calling out to the endpoint.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="method" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The method on the interface that should be used. This can be omitted if the interface has a single method.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
     <xsd:complexType name="defaultComponentType">
         <xsd:complexContent>
             <xsd:extension base="abstractComponentType"/>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <!-- don't expose this, it's not needed -->
+    <!-- xsd:element name="pass-through-component" type="defaultComponentType" substitutionGroup="abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                The default, "do nothing" component.
+                The message is simply transferred from inbound to outbound endpoints.
+                This is the default and need not be specified.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element -->
 
     <xsd:element name="echo-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
@@ -2444,6 +2640,34 @@
     <xsd:complexType name="baseTransactionType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransactionType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-transaction" type="customTransactionType" substitutionGroup="abstract-transaction">
+        <xsd:annotation>
+            <xsd:documentation>
+                A user-defined or otherwise unsupported third-party transactions.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="customTransactionType">
+        <xsd:complexContent>
+            <xsd:extension base="baseTransactionType">
+                <xsd:attribute name="factory-class" type="substitutableClass">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A class that implements the TransactionFactory interface that will be instantiated and used to generate a transaction. This attribute and the 'factory-ref' attribute are mutually exclusive; one of the two is required.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="factory-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A bean that implements the TransactionFactory interface that will be used to generate a transaction. This attribute and the 'factory-class' attribute are mutually exclusive; one of the two is required.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -2593,6 +2817,76 @@
     </xsd:complexType>
 
 
+    <!--==============================================================-->
+    <!--   Endpoint elements                                          -->
+    <!--==============================================================-->
+
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="abstract-global-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>
+                A global endpoint, which acts as a template that can be used to construct an inbound or outbound endpoint elsewhere in the configuration by referencing the global endpoint name. Each transport implements its own endpoint element, with a more friendly syntax, but this generic element can be used with any transport by supplying the correct address URI. For example, "vm://foo" describes a VM transport endpoint.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="globalEndpointTypeWithoutExchangePattern">
+        <xsd:complexContent>
+            <xsd:extension base="abstractGlobalEndpointType">
+                <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="globalEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="globalEndpointTypeWithoutExchangePattern">
+                <xsd:attributeGroup ref="allExchangePatterns"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <!-- extend this type for endpoints that support XA transactions -->
+    <xsd:complexType name="globalEndpointWithXaType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractGlobalEndpointType">
+                <xsd:group ref="defaultXaEndpointElements"/>
+                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+                <xsd:attributeGroup ref="allExchangePatterns"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="abstract-inbound-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>
+                An inbound endpoint receives messages via the associated transport. As with global endpoints, each transport implements its own inbound endpoint element.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="inboundEndpointTypeWithoutExchangePattern">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInboundEndpointType">
+                <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="inboundEndpointTypeWithoutExchangePattern">
+                <xsd:attributeGroup ref="allExchangePatterns"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <!-- extend this type for endpoints that support XA transactions -->
+    <xsd:complexType name="inboundEndpointWithXaType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInboundEndpointType">
+                <xsd:group ref="defaultXaEndpointElements"/>
+                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+                <xsd:attributeGroup ref="allExchangePatterns"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="abstract-scheduler" abstract="true" type="abstractSchedulerType">
         <xsd:annotation>
             <xsd:documentation>
@@ -2636,20 +2930,20 @@
 
     <xsd:element name="fixed-frequency-scheduler" type="fixedSchedulerType" substitutionGroup="abstract-scheduler"/>
 
-    <xsd:element name="poll" type="pollMessageSourceType" substitutionGroup="abstract-message-source">
+    <xsd:element name="poll" type="pollInboundEndpointType" substitutionGroup="abstract-message-source">
         <xsd:annotation>
             <xsd:documentation>
                 Polls the nested message processor for new messages
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="pollMessageSourceType">
+    <xsd:complexType name="pollInboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageSourceType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-scheduler" minOccurs="0" maxOccurs="1"/>
                     <xsd:element ref="abstract-poll-override" minOccurs="0" maxOccurs="1"/>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor"/>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
                 </xsd:sequence>
                 <xsd:attribute name="frequency"  type="substitutableLong" default="1000">
                     <xsd:annotation>
@@ -2662,13 +2956,86 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="abstract-outbound-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>
+                An outbound endpoint sends messages via the associated transport. As with global endpoints, each transport implements its own outbound endpoint element.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="outboundEndpointTypeWithoutExchangePattern">
+        <xsd:complexContent>
+            <xsd:extension base="abstractOutboundEndpointType">
+                <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="outboundEndpointTypeWithoutExchangePattern">
+                <xsd:attributeGroup ref="allExchangePatterns"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="outboundEndpointWithXaType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractOutboundEndpointType">
+                <xsd:group ref="defaultXaEndpointElements"/>
+                <xsd:attributeGroup ref="allExchangePatterns"/>
+                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="response">
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded"/>
+                <xsd:group ref="endpointMessageProcessorElements" minOccurs="1" maxOccurs="unbounded"/>
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
+
+    <!-- these include option/repeats - should be embedded once -->
+        <!-- these include option/repeats - should be embedded once -->
+    <xsd:group name="commonDefaultEndpointElements">
+        <xsd:sequence>
+            <xsd:group ref="endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="response" minOccurs="0"/>
+            <xsd:element ref="abstract-redelivery-policy" minOccurs="0"/>
+            <xsd:element ref="abstract-transaction" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:group>
+
+    <xsd:group name="defaultEndpointElements">
+        <xsd:sequence>
+            <xsd:group ref="commonDefaultEndpointElements"/>
+            <xsd:element ref="abstract-reconnection-strategy" minOccurs="0"/>
+            <xsd:element ref="abstract-multi-transaction" minOccurs="0"/>
+            <xsd:group ref="propertiesGroup"/>
+        </xsd:sequence>
+    </xsd:group>
+
+    <xsd:group name="defaultXaEndpointElements">
+        <xsd:sequence>
+            <xsd:group ref="commonDefaultEndpointElements"/>
+            <xsd:element ref="abstract-xa-transaction" minOccurs="0"/>
+            <xsd:group ref="propertiesGroup"/>
+        </xsd:sequence>
+    </xsd:group>
+
+    <xsd:group name="endpointMessageProcessorElements">
+        <xsd:choice>
+            <xsd:element ref="abstract-transformer" />
+            <xsd:element ref="abstract-filter" />
+            <xsd:element ref="abstract-security-filter"/>
+            <xsd:element ref="abstract-intercepting-message-processor"/>
+            <xsd:element ref="abstract-observer-message-processor"/>
+            <xsd:element ref="processor"/>
+            <xsd:element ref="custom-processor"/>
+            <xsd:element ref="abstract-mixed-content-message-processor"/>
+        </xsd:choice>
+    </xsd:group>
 
     <xsd:element name="abstract-security-filter" abstract="true" type="abstractSecurityFilterType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
@@ -2774,6 +3141,120 @@
                     Determines how many requests are queued when the pool is at maximum usage capacity and the pool exhausted action is WAIT. The buffer is used as an overflow.
                 </xsd:documentation>
             </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+
+    <xsd:attributeGroup name="defaultEndpointAttributes">
+        <xsd:attributeGroup ref="restrictedEndpointAttributes"/>
+        <!-- these next two attributes are mutually exclusive and one is required.
+             but there is no way to define this in a schema... -->
+        <!-- endpoint references - dynamically checked to make sure not top level -->
+        <xsd:attribute name="ref" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A reference to a global endpoint, which is used as a template to construct this endpoint. A template fixes the address (protocol, path, host, etc.), and may specify initial values for various properties, but further properties can be defined locally (as long as they do not change the address in any way).
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <!-- explicit or global endpoints -->
+        <xsd:attribute name="address" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The generic address for this endpoint. If this attribute is used, the protocol must be specified as part of the URI. Alternatively, most transports provide their own attributes for specifying the address (path, host, etc.). Note that the address attribute cannot be combined with 'ref' or with the transport-provided alternative attributes.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="restrictedEndpointAttributes">
+        <xsd:attributeGroup ref="mimeTypeAttributes"/>
+        <xsd:attribute name="responseTimeout" type="substitutableInt">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The timeout for a response if making a synchronous endpoint call
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="encoding" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    String encoding used for messages.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="connector-ref" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The name of the connector associated with this endpoint. This must be specified if more than one connector is defined for this transport.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A list of the transformers that will be applied (in order) to the message before it is delivered to the component.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="responseTransformer-refs" type="xsd:NMTOKENS">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A list of the transformers that will be applied (in order) to the synchronous response before it is returned via the transport.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="disableTransportTransformer" type="substitutableBoolean" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Don't use the default inbound/outbound/response transformer which corresponds to this endpoint's transport, if any.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:complexType name="endpointRefType">
+        <xsd:attribute name="address" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The destination address for a reply message.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="ref" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The reference name of a global endpoint to use. If this EndpointRef will be associated to a message such as a Reply-To address, this endpoint ref has to be available on the remote Mule instance that reads the Reply-To address.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="allExchangePatterns">
+        <xsd:attribute name="exchange-pattern">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="one-way"/>
+                    <xsd:enumeration value="request-response"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+    <xsd:attributeGroup name="oneWayOnlyExchangePattern">
+        <xsd:attribute name="exchange-pattern">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="one-way"/>
+                </xsd:restriction>
+            </xsd:simpleType>
         </xsd:attribute>
     </xsd:attributeGroup>
 
@@ -4145,9 +4626,9 @@
         <xsd:complexContent>
             <xsd:extension base="abstractNotificationExceptionStrategyType">
                 <xsd:sequence>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="0" maxOccurs="unbounded">
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>Destination to which a MuleMessage with an ExceptionPayload will be sent; this could be any message processor.
+                            <xsd:documentation>Destination to which a MuleMessage with an ExceptionPayload will be sent; this could be any message processor or outbound endpoint.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:group>
@@ -4178,9 +4659,9 @@
         <xsd:complexContent>
             <xsd:extension base="abstractNotificationExceptionStrategyType">
                 <xsd:sequence>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="0" maxOccurs="unbounded">
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>Destination to which the message will be sent; this could be a router, or message processor.
+                            <xsd:documentation>Destination to which the message will be sent; this could be an outbound endpoint, a router, or message processor.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:group>
@@ -4189,10 +4670,10 @@
                             <xsd:complexContent>
                                 <xsd:extension base="annotatedType">
                                     <xsd:sequence>
-                                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="0" maxOccurs="unbounded">
+                                        <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="unbounded">
                                             <xsd:annotation>
                                                 <xsd:documentation>Destination to which the message will be sent in case that max redelivery attempts configured is exceeded, this
-                                                    could be any sequence of router, or message processor.
+                                                    could be any sequence of outbound endpoint, router, or message processor.
                                                 </xsd:documentation>
                                             </xsd:annotation>
                                         </xsd:group>
@@ -4250,7 +4731,41 @@
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A class that implements the ExceptionListener interface.
+                            A class that implements the ExceptionListener interface. In addition, if an 'outbound-endpoint' element is specified, it is set as an "endpoint" bean property.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- Custom connector element -->
+
+    <xsd:element name="custom-connector" type="customConnectorType" substitutionGroup="abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                A user-defined connector.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="customConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="connectorType">
+                <!-- This is already on the standard connector (but probably shouldn't be...)
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                 -->
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A class that implements the Connector interface.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -4542,7 +5057,7 @@
                  substitutionGroup="abstract-global-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. By default, the expression used is '#[message:id]', which means the underlying message source must support unique message IDs for this to work. Otherwise, a UniqueIdNotSupportedException is thrown.
+                Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. By default, the expression used is '#[message:id]', which means the underlying endpoint must support unique message IDs for this to work. Otherwise, a UniqueIdNotSupportedException is thrown.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -4624,7 +5139,7 @@
        <xsd:complexContent>
             <xsd:extension base="abstractRoutingMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="1"/>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -4689,14 +5204,14 @@
     <xsd:element name="wire-tap" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                The WireTap inbound router allows you to route certain messages to a different message processors as well as to the component.
+                The WireTap inbound router allows you to route certain messages to a different endpoint as well as to the component.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="abstractInterceptingMessageProcessorType">
                     <xsd:sequence>
-                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="1"/>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="1"/>
                         <xsd:element ref="abstract-filter" minOccurs="0"/>
                     </xsd:sequence>
                 </xsd:extension>
@@ -4948,7 +5463,7 @@
             <!-- if the first message processor is a filter, it determines
                  whether this when clause is chosen or not.  This is only allowed when
                  no expression is specified -->
-            <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded" />
+            <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded" />
           </xsd:sequence>
           <xsd:attribute name="expression" type="xsd:string" use="optional">
               <xsd:annotation>
@@ -4963,7 +5478,7 @@
     <xsd:complexType name="otherwiseMessageProcessorFilterPairType">
       <xsd:complexContent>
         <xsd:extension base="abstractMessageProcessorFilterPairType">
-          <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded" />
+          <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded" />
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
@@ -4974,7 +5489,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractInterceptingMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="collection" use="optional" type="xsd:string">
                     <xsd:annotation>
@@ -5030,7 +5545,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractRoutingMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded" />
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded" />
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -5075,7 +5590,7 @@
                  substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Sends the message to the first message processor whose condition has been satisfied. If no conditions were satisfied, sends to the configured default message processor if configured, or throws an exception if not configured.
+                Sends the message to the first endpoint whose condition has been satisfied. If no conditions were satisfied, sends to the configured default endpoint if configured, or throws an exception if not configured.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -5084,7 +5599,7 @@
     <xsd:element name="all" type="baseMultipleRoutesRoutingMessageProcessorType" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Sends the same message to multiple message processors.
+                Sends the same message to multiple message processors or outbound endpoints.
                 @Deprecated since 3.5.0. Use scatter-gather instead
             </xsd:documentation>
         </xsd:annotation>
@@ -5094,7 +5609,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractRoutingMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -5104,7 +5619,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractRoutingMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="1"/>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -5150,7 +5665,7 @@
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
-                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="1"/>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1"/>
                     </xsd:sequence>
                     <xsd:attribute name="objectStore-ref" type="xsd:string" use="optional">
                         <xsd:annotation>
@@ -5202,7 +5717,7 @@
                     <xsd:attribute name="deadLetterQueue-ref" type="xsd:string" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The message processor to which undeliverable messages are sent after all retries have been attempted.
+                                The endpoint or message processor to which undeliverable messages are sent after all retries have been attempted.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
@@ -5221,7 +5736,7 @@
     <xsd:element name="scatter-gather" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Sends the same message to multiple message processors in parallel.
+                Sends the same message to multiple message processors or outbound endpoints in parallel.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -5242,7 +5757,7 @@
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
-                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="2" maxOccurs="unbounded"/>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="2" maxOccurs="unbounded"/>
                     </xsd:sequence>
                     <xsd:attribute name="timeout" type="substitutableLong" use="optional" default="0">
                         <xsd:annotation>
@@ -5290,6 +5805,26 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="recipient-list" substitutionGroup="abstract-routing-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Sends the same message to multiple endpoints, over the same endpoint, or implements routing-slip behavior where the next destination for the message is determined from message properties or the payload. The recipients can be extracted from the message using an expression, or you can specify a static list of recipient endpoints. (As of version 2.1)
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="abstractRoutingMessageProcessorType">
+                    <xsd:sequence>
+                       <xsd:element ref="abstract-message-info-mapping" minOccurs="0"/>
+                    </xsd:sequence>
+                    <xsd:attributeGroup ref="defaultCorrelationAttributes"/>
+                    <xsd:attributeGroup ref="expressionAttributes"/>
+                    <!--  See MULE-5069 <xsd:attributeGroup ref="allExchangePatterns" />-->
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
     <xsd:element name="dynamic-round-robin" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -5306,7 +5841,7 @@
     <xsd:element name="dynamic-all" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Sends the same message to multiple message processors. THe list of message processors is obtained dynamically using the configured route resolver
+                Sends the same message to multiple message processors or outbound endpoints. THe list of message processors is obtained dynamically using the configured route resolver
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -6220,7 +6755,7 @@
             <xsd:element name="property" type="keyValueType" minOccurs="0" maxOccurs="unbounded">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Sets a Mule property. This is a name/value pair that can be set on components, services, etc., and which provide a generic way of configuring the system. Typically, you shouldn't need to use a generic property like this, since almost all functionality is exposed via dedicated elements.
+                        Sets a Mule property. This is a name/value pair that can be set on components, services, etc., and which provide a generic way of configuring the system. Typically, you shouldn't need to use a generic property like this, since almost all functionality is exposed via dedicated elements. However, it can be useful in configuring obscure or overlooked options and in configuring transports from the generic endpoint elements.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -6305,6 +6840,161 @@
     <!--==============================================================-->
     <!--   Connector support                                          -->
     <!--==============================================================-->
+
+    <xsd:complexType name="connectorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractConnectorType">
+                <xsd:sequence>
+                    <!-- for normal connectors, this is for emergency use only, but it is
+                         critical for custom connector -->
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The threading profile to use when a connector receives messages.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="dispatcher-threading-profile" type="threadingProfileType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The threading profile to use when a connector dispatches messages.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="abstract-reconnection-strategy" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Reconnection strategy that defines how Mule should handle a connection failure.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Service overrides allow the connector to be further configured/customized by allowing parts of the transport implementation to be overridden, for example, the message receiver or dispatcher implementation, or the message adaptor that is used.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="dynamicNotification" type="substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Enables dynamic notifications for notifications fired by this connector. This allows listeners to be registered dynamically at runtime via the MuleContext, and the configured notification can be changed. This overrides the default value defined in the 'configuration' element.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="validateConnections" type="substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Causes Mule to validate connections before use. Note that this is only a configuration hint,
+                            transport implementations may or may not make an extra effort to validate the connection. Default is true.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="dispatcherPoolFactory-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows Spring beans to be defined as a dispatcher pool factory
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="serviceOverridesType">
+        <xsd:attribute name="messageReceiver" type="xsd:string"/>
+        <xsd:attribute name="transactedMessageReceiver" type="xsd:string"/>
+        <xsd:attribute name="xaTransactedMessageReceiver" type="xsd:string"/>
+        <xsd:attribute name="dispatcherFactory" type="xsd:string"/>
+        <xsd:attribute name="inboundTransformer" type="xsd:string"/>
+        <xsd:attribute name="outboundTransformer" type="xsd:string"/>
+        <xsd:attribute name="responseTransformer" type="xsd:string"/>
+        <xsd:attribute name="endpointBuilder" type="xsd:string"/>
+        <xsd:attribute name="messageFactory" type="xsd:string"/>
+        <xsd:attribute name="serviceFinder" type="xsd:string"/>
+        <xsd:attribute name="sessionHandler" type="xsd:string"/>
+        <xsd:attribute name="inboundExchangePatterns" type="xsd:string"/>
+        <xsd:attribute name="outboundExchangePatterns" type="xsd:string"/>
+        <xsd:attribute name="defaultExchangePattern" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="transactedConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="connectorType">
+                <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to create multiple concurrent receivers for this connector. This property is used by transports that support transactions, specifically receivers that extend the TransactedPollingMessageReceiver, and provides better throughput.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="numberOfConcurrentTransactedReceivers" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If createMultipleTransactedReceivers is set to true, the number of concurrent receivers that will be launched.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--==============================================================-->
+    <!--   JNDI support                                               -->
+    <!--==============================================================-->
+
+    <xsd:complexType name="jndiConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="connectorType">
+                <xsd:sequence>
+                    <xsd:element name="jndi-provider-property" type="keyValueType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Direct setting of a JNDI property.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="jndi-provider-properties" type="mapType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Direct setting of JNDI properties (allows access to the full Spring map entry).
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="jndiContext-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Set the complete context directly, via a bean reference.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="jndiInitialFactory" type="substitutableClass">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The initial context factory to use. The value of the property should be the fully qualified class name of the factory class that will create an initial context.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="jndiProviderUrl" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The service provider to use. The value of the property should contain a URL string (such as "ldap://somehost:389").
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="jndiUrlPkgPrefixes" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The list of package prefixes to use when loading in URL context factories. The value of the property should be a colon-separated list of package prefixes for the class name of the factory class that will create a URL context factory.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:complexType name="dataReferenceType" mixed="true">
         <xsd:attribute name="file" type="xsd:string"/>

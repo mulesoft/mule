@@ -17,6 +17,7 @@
         <module>infrastructure</module>
         <module>performance</module>
         <module>integration</module>
+        <module>integration-tranports</module>
         <module>http</module>
         <module>test-extensions</module>
     </modules>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+
+    <flow name="service1">
+
+        <vm:inbound-endpoint path="test1-in"
+            exchange-pattern="one-way">
+            <append-string-transformer
+                message="1" />
+            <append-string-transformer
+                message="2" />
+            <append-string-transformer
+                message="3" />
+        </vm:inbound-endpoint>
+
+        <vm:outbound-endpoint path="test1-out"
+            exchange-pattern="one-way" />
+
+    </flow>
+
+
+    <append-string-transformer message="1"
+        name="1" />
+    <append-string-transformer message="2"
+        name="2" />
+    <append-string-transformer message="3"
+        name="3" />
+
+
+    <flow name="service2">
+
+        <vm:inbound-endpoint path="test2-in"
+            exchange-pattern="one-way">
+            <transformer ref="1" />
+            <transformer ref="2" />
+            <transformer ref="3" />
+        </vm:inbound-endpoint>
+
+
+        <vm:outbound-endpoint path="test2-out"
+            exchange-pattern="one-way" />
+
+    </flow>
+
+
+
+    <flow name="service3">
+
+        <vm:inbound-endpoint path="test3-in"
+            exchange-pattern="one-way">
+            <append-string-transformer
+                message="1" />
+            <append-string-transformer
+                message="2" />
+            <append-string-transformer
+                message="3" />
+        </vm:inbound-endpoint>
+
+
+        <vm:outbound-endpoint path="test3-out"
+            exchange-pattern="one-way">
+            <append-string-transformer
+                message="a" />
+            <append-string-transformer
+                message="b" />
+            <append-string-transformer
+                message="c" />
+        </vm:outbound-endpoint>
+
+    </flow>
+
+</mule>

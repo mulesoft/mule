@@ -6,29 +6,38 @@
  */
 package org.mule.runtime.core.registry;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NameableObject;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.endpoint.EndpointBuilder;
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.registry.AbstractServiceDescriptor;
 import org.mule.runtime.core.api.registry.LifecycleRegistry;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.registry.RegistryProvider;
 import org.mule.runtime.core.api.registry.ResolverException;
+import org.mule.runtime.core.api.registry.ServiceDescriptor;
+import org.mule.runtime.core.api.registry.ServiceDescriptorFactory;
+import org.mule.runtime.core.api.registry.ServiceException;
+import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transport.Connector;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.Predicate;
+import org.mule.runtime.core.util.SpiUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.UUID;
 
@@ -40,6 +49,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
@@ -93,6 +103,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public void initialise() throws InitialisationException
     {
         //no-op
@@ -104,12 +115,14 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public void dispose()
     {
         transformerListCache.clear();
         exactTransformerCache.clear();
     }
 
+    @Override
     public void fireLifecycle(String phase) throws LifecycleException
     {
         if (Initialisable.PHASE_NAME.equals(phase))
@@ -127,8 +140,47 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     }
 
     /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    @Override
+    public Connector lookupConnector(String name)
+    {
+        return (Connector) registry.lookupObject(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    @Override
+    public EndpointBuilder lookupEndpointBuilder(String name)
+    {
+        Object o = registry.lookupObject(name);
+        if (o instanceof EndpointBuilder)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Global endpoint EndpointBuilder for name: " + name + " found");
+            }
+            return (EndpointBuilder) o;
+        }
+        else
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("No endpoint builder with the name: " + name + " found.");
+            }
+            return null;
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
+    @Override
     public Transformer lookupTransformer(String name)
     {
         return (Transformer) registry.lookupObject(name);
@@ -137,6 +189,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public Transformer lookupTransformer(DataType source, DataType result) throws TransformerException
     {
         final String dataTypePairHash = getDataTypeSourceResultPairHash(source, result);
@@ -201,6 +254,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Transformer> lookupTransformers(DataType source, DataType result)
     {
         final String dataTypePairHash = getDataTypeSourceResultPairHash(source, result);
@@ -252,6 +306,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public Agent lookupAgent(String name)
     {
         return (Agent) registry.lookupObject(name);
@@ -260,6 +315,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public FlowConstruct lookupFlowConstruct(String name)
     {
         return (FlowConstruct) registry.lookupObject(name);
@@ -268,6 +324,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public Collection<FlowConstruct> lookupFlowConstructs()
     {
         return lookupObjects(FlowConstruct.class);
@@ -276,6 +333,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void registerTransformer(Transformer transformer) throws MuleException
     {
         registerObject(getName(transformer), transformer, Transformer.class);
@@ -324,16 +382,97 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     }
 
     /**
-     * {@inheritDoc}
+     * Looks up the service descriptor from a singleton cache and creates a new one if not found.
+     * 
+     * @deprecated Transport infrastructure is deprecated.
      */
-    public void registerAgent(Agent agent) throws MuleException
+    @Deprecated
+    @Override
+    public ServiceDescriptor lookupServiceDescriptor(ServiceType type, String name, Properties overrides) throws ServiceException
     {
-        registry.registerObject(getName(agent), agent, Agent.class);
+        String key = new AbstractServiceDescriptor.Key(name, overrides).getKey();
+        // TODO If we want these descriptors loaded form Spring we need to change the key mechanism
+        // and the scope, and then deal with circular reference issues.
+
+        synchronized (this)
+        {
+            ServiceDescriptor sd = registry.lookupObject(key);
+            if (sd == null)
+            {
+                sd = createServiceDescriptor(type, name, overrides);
+                try
+                {
+                    registry.registerObject(key, sd, ServiceDescriptor.class);
+                }
+                catch (RegistrationException e)
+                {
+                    throw new ServiceException(e.getI18nMessage(), e);
+                }
+            }
+            return sd;
+        }
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    protected ServiceDescriptor createServiceDescriptor(ServiceType type, String name, Properties overrides) throws ServiceException
+    {
+        // Stripe off and use the meta-scheme if present
+        String scheme = name;
+        if (name.contains(":"))
+        {
+            scheme = name.substring(0, name.indexOf(":"));
+        }
+
+        Properties props = SpiUtils.findServiceDescriptor(type, scheme);
+        if (props == null)
+        {
+            throw new ServiceException(CoreMessages.failedToLoad(type + " " + scheme));
+        }
+
+        return ServiceDescriptorFactory.create(type, name, props, overrides, muleContext,
+                muleContext.getExecutionClassLoader());
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
+    public void registerAgent(Agent agent) throws MuleException
+    {
+        registry.registerObject(getName(agent), agent, Agent.class);
+    }
+
+    @Override
+    public void registerConnector(Connector connector) throws MuleException
+    {
+        registry.registerObject(getName(connector), connector, Connector.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void registerEndpoint(ImmutableEndpoint endpoint) throws MuleException
+    {
+        registry.registerObject(getName(endpoint), endpoint, ImmutableEndpoint.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void registerEndpointBuilder(String name, EndpointBuilder builder) throws MuleException
+    {
+        registry.registerObject(name, builder, EndpointBuilder.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException
     {
         registry.registerObject(getName(flowConstruct), flowConstruct, FlowConstruct.class);
@@ -342,6 +481,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public void unregisterAgent(String agentName) throws MuleException
     {
         registry.unregisterObject(agentName, Agent.class);
@@ -378,6 +518,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public void unregisterTransformer(String transformerName) throws MuleException
     {
         Transformer transformer = lookupTransformer(transformerName);
@@ -389,6 +530,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object applyProcessorsAndLifecycle(Object object) throws MuleException
     {
         object = applyProcessors(object);
@@ -436,6 +578,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
         return registry.lookupObject(type);
@@ -444,6 +587,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T lookupObject(String key)
     {
@@ -462,6 +606,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public <T> Collection<T> lookupObjects(Class<T> type)
     {
         return registry.lookupObjects(type);
@@ -476,17 +621,20 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
     {
         return registry.lookupObjectsForLifecycle(type);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T get(String key)
     {
         return (T) registry.get(key);
     }
 
+    @Override
     public <T> Map<String, T> lookupByType(Class<T> type)
     {
         return registry.lookupByType(type);
@@ -495,6 +643,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public void registerObject(String key, Object value, Object metadata) throws RegistrationException
     {
         registry.registerObject(key, value, metadata);
@@ -518,6 +667,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public void registerObject(String key, Object value) throws RegistrationException
     {
         registry.registerObject(key, value);
@@ -543,6 +693,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public void registerObjects(Map objects) throws RegistrationException
     {
         registry.registerObjects(objects);
@@ -556,6 +707,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object unregisterObject(String key, Object metadata) throws RegistrationException
     {
         return registry.unregisterObject(key, metadata);
@@ -564,6 +716,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object unregisterObject(String key) throws RegistrationException
     {
         return registry.unregisterObject(key);
@@ -608,6 +761,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getRegistryId()
     {
         return this.toString();
@@ -616,6 +770,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isReadOnly()
     {
         return false;
@@ -624,6 +779,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isRemote()
     {
         return false;
@@ -638,6 +794,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     private class TransformerResolverComparator implements Comparator<TransformerResolver>
     {
 
+        @Override
         public int compare(TransformerResolver transformerResolver, TransformerResolver transformerResolver1)
         {
             if (transformerResolver.getClass().equals(TypeBasedTransformerResolver.class))

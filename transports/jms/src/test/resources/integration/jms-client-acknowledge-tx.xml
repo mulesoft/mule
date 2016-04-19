@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way"/>
+    <endpoint name="middle" address="${middle.destination}" exchange-pattern="one-way"/>
+    <endpoint name="middle2" address="${middle2.destination}" exchange-pattern="one-way"/>
+    <endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way"/>
+
+    <flow name="InputPart">
+        <inbound-endpoint ref="in">
+            <jms:transaction action="BEGIN_OR_JOIN"/>
+        </inbound-endpoint>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="middle">
+            <jms:transaction action="NONE"/>
+        </outbound-endpoint>
+    </flow>
+
+    <flow name="JmsClientAcknowledgeTransactionFactory">
+        <inbound-endpoint ref="middle">
+            <jms:transaction action="ALWAYS_BEGIN"/>
+        </inbound-endpoint>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out">
+            <jms:transaction action="NONE"/>
+        </outbound-endpoint>
+    </flow>
+
+</model>
+
+        </mule>

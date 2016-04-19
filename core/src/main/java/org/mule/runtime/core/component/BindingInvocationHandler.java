@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.component;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
@@ -14,7 +15,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.component.InterfaceBinding;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.StringMessageUtils;
 
@@ -40,9 +40,8 @@ public class BindingInvocationHandler implements InvocationHandler
 
     protected MuleContext muleContext;
 
-    public BindingInvocationHandler(InterfaceBinding router, MuleContext muleContext)
+    public BindingInvocationHandler(InterfaceBinding router)
     {
-        this.muleContext = muleContext;
         this.routers = new ConcurrentHashMap<String, InterfaceBinding>();
         addRouterForInterface(router);
     }
@@ -64,6 +63,7 @@ public class BindingInvocationHandler implements InvocationHandler
         {
             routers.put(router.getMethod(), router);
         }
+        muleContext = router.getEndpoint().getMuleContext();
     }
 
     @Override

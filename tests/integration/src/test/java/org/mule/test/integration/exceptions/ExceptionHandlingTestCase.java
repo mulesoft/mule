@@ -11,6 +11,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -274,7 +276,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
                             .run();
 
         assertFalse(latch.await(3, TimeUnit.SECONDS));
-        Mockito.verify(latch).countDown();
+        verify(latch).countDown();
     }
 
     public static class ExecutionCountProcessor implements MessageProcessor

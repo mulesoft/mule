@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+      xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/vm/current/mule-jms.xsd               
+               http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <flow name="router">
+        <vm:inbound-endpoint path="inBound" exchange-pattern="request-response"/>
+        <message-properties-transformer scope="outbound">
+            <add-message-property key="queueName" value="step2"/>
+        </message-properties-transformer>
+        <request-reply timeout="5000">
+            <jms:outbound-endpoint path="#[header:OUTBOUND:queueName]" exchange-pattern="one-way"/>
+            <vm:inbound-endpoint path="reply" exchange-pattern="one-way"/>
+        </requesr-reply>
+    </flow>
+
+    <flow name="step2Service">
+        <vm:inbound-endpoint path="step2" exchange-pattern="one-way"/>
+        <scripting:component>
+            <scripting:script engine="groovy">
+                return "step2Service";
+            </scripting:script>
+        </scripting:component>
+        <vm:outbound-endpoint path="reply" exchange-pattern="one-way"/>
+    </service>
+
+</mule>

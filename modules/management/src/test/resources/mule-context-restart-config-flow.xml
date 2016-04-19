@@ -11,7 +11,13 @@
 
 
     <flow name="SimpleBridge">
-        <set-payload value="hi"/>
+
+        <inbound-endpoint address="test://in"
+            exchange-pattern="one-way" />
+
+        <outbound-endpoint address="test://out"
+            exchange-pattern="one-way" />
+
     </flow>
 
 </mule>

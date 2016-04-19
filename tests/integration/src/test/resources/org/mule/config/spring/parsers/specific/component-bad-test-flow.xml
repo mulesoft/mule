@@ -6,6 +6,9 @@
     <flow name="service">
         <component class="org.mule.functional.functional.FunctionalTestComponent">
             <singleton-object class="org.mule.runtime.core.component.simple.StaticComponent"/>
+            <binding interface="java.lang.String" method="setPrefix">
+                <outbound-endpoint address="test://test"/>
+            </binding>
         </component>
     </flow>
     

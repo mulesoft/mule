@@ -6,6 +6,8 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
+    <endpoint name="testqueue" address="test://queue"/>
+
     <flow name="component1">
         <component class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyComponent"/>
 
@@ -14,6 +16,7 @@
     </flow>
 
     <flow name="component2">
+        <inbound-endpoint ref="testqueue" exchange-pattern="request-response"/>
         <component class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyComponent"/>
     </flow>
 
