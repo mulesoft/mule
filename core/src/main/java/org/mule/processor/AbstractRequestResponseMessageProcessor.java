@@ -59,7 +59,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
         catch (MessagingException e)
         {
             exception = e;
-            throw e;
+            return processCatch(event, e);
         }
         finally
         {
@@ -67,30 +67,33 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
         }
     }
 
-    protected MuleEvent processNonBlocking(MuleEvent event) throws MuleException
+    protected MuleEvent processNonBlocking(final MuleEvent event) throws MuleException
     {
-        event = new DefaultMuleEvent(event, createReplyToHandler(event));
+        MessagingException exception = null;
+        MuleEvent eventToProcess = new DefaultMuleEvent(event, createReplyToHandler(event));
         // Update RequestContext ThreadLocal for backwards compatibility
-        event = OptimizedRequestContext.unsafeSetEvent(event);
+        eventToProcess = OptimizedRequestContext.unsafeSetEvent(eventToProcess);
 
         try
         {
-            MuleEvent result = processNext(processRequest(event));
+            MuleEvent result = processNext(processRequest(eventToProcess));
             if (!(result instanceof NonBlockingVoidMuleEvent))
             {
-                MuleEvent after = processResponse(result, event);
-                processFinally(after, null);
-                return after;
+                return processResponse(recreateEventWithOriginalReplyToHandler(result, event.getReplyToHandler()), event);
             }
             else
             {
                 return result;
             }
         }
-        catch (MessagingException exception)
+        catch (MessagingException e)
+        {
+            exception = e;
+            return processCatch(event, e);
+        }
+        finally
         {
             processFinally(event, exception);
-            throw exception;
         }
     }
 
@@ -102,19 +105,40 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
             @Override
             public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
             {
-                MuleEvent response = processResponse(recreateEventWithOriginalReplyToHandler(event, originalReplyToHandler), request);
-                if (!NonBlockingVoidMuleEvent.getInstance().equals(response))
+                try
                 {
-                    originalReplyToHandler.processReplyTo(response, null, null);
+                    MuleEvent response = processResponse(recreateEventWithOriginalReplyToHandler(event, originalReplyToHandler), request);
+                    if (!NonBlockingVoidMuleEvent.getInstance().equals(response))
+                    {
+                        originalReplyToHandler.processReplyTo(response, null, null);
+                    }
                 }
-                processFinally(event, null);
+                catch (Exception e)
+                {
+                    processExceptionReplyTo(new MessagingException(event, e), null);
+                }
+                finally
+                {
+                    processFinally(event, null);
+                }
             }
 
             @Override
             public void processExceptionReplyTo(MessagingException exception, Object replyTo)
             {
-                originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
-                processFinally(exception.getEvent(), exception);
+                try
+                {
+                    MuleEvent handledEvent = processCatch(exception.getEvent(), exception);
+                    originalReplyToHandler.processReplyTo(handledEvent, null, null);
+                }
+                catch (Exception e)
+                {
+                    originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
+                }
+                finally
+                {
+                    processFinally(exception.getEvent(), exception);
+                }
             }
         };
     }
@@ -130,9 +154,9 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
         return event;
     }
 
-    private boolean isNonBlocking(MuleEvent event)
+    protected boolean isNonBlocking(MuleEvent event)
     {
-        return event.isAllowNonBlocking() && event.getReplyToHandler() != null && next != null;
+        return event.isAllowNonBlocking() && event.getReplyToHandler() != null;
     }
 
     /**
@@ -187,6 +211,11 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
     protected void processFinally(MuleEvent event, MessagingException exception)
     {
 
+    }
+
+    protected MuleEvent processCatch(MuleEvent event, MessagingException exception) throws MessagingException
+    {
+        throw exception;
     }
 
 }

@@ -218,4 +218,18 @@
         <test:assert expression="#[assertPayload()]" />
     </flow>
 
+    <flow name="catchExceptionStrategy">
+        <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
+        <flow-ref name="catchExceptionStrategyChild"/>
+        <test:assert count="1" expression="#[Thread.currentThread()!=beforeThread and assertPayload()]"/>
+    </flow>
+    <flow name="catchExceptionStrategyChild">
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <set-variable variableName="beforeThreadChild" value="#[Thread.currentThread()]"/>
+            <test:non-blocking-processor/>
+            <test:assert count="1" expression="#[Thread.currentThread()!=beforeThreadChild  and assertPayload()]"/>
+        </catch-exception-strategy>
+    </flow>
+
 </mule>

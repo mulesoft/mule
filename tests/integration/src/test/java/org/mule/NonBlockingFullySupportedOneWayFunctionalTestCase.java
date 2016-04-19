@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.MessageExchangePattern.ONE_WAY;
+import static org.mule.tck.functional.FlowAssert.verify;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -152,11 +153,17 @@ public class NonBlockingFullySupportedOneWayFunctionalTestCase extends Functiona
         assertVoidMuleEventResponse("testOutboundEndpointError");
     }
 
-
     @Test
     public void async() throws Exception
     {
         assertVoidMuleEventResponse("async");
+    }
+
+    @Test
+    public void catchExceptionStrategy() throws Exception
+    {
+        assertVoidMuleEventResponse("catchExceptionStrategy");
+        verify("catchExceptionStrategyChild");
     }
 
     private void assertVoidMuleEventResponse(String flowName) throws Exception

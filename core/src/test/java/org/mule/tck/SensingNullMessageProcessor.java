@@ -13,6 +13,7 @@ import org.mule.api.CompletionHandler;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.processor.AbstractNonBlockingMessageProcessor;
@@ -60,6 +61,7 @@ public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProce
                     {
                         eventToProcess = append(eventToProcess);
                     }
+                    ((ThreadSafeAccess) eventToProcess).resetAccessControl();
                     event.getReplyToHandler().processReplyTo(eventToProcess, null, null);
                     latch.countDown();
                 }
