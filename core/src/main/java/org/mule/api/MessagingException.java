@@ -213,7 +213,7 @@ public class MessagingException extends MuleException
         if (processedEvent != null && !VoidMuleEvent.getInstance().equals(processedEvent))
         {
             this.processedEvent = processedEvent;
-            this.muleMessage = this.processedEvent.getMessage();
+            extractMuleMessage(processedEvent);
         }
         else
         {
@@ -384,9 +384,7 @@ public class MessagingException extends MuleException
 
     protected void extractMuleMessage(MuleEvent event)
     {
-        this.muleMessage = event == null || VoidMuleEvent.getInstance().equals(event)
-                                                                                     ? null
-                                                                                     : event.getMessage();
+        this.muleMessage = event == null || event instanceof VoidMuleEvent ? null : event.getMessage();
     }
 
     private void writeObject(ObjectOutputStream out) throws Exception
