@@ -66,6 +66,12 @@ public interface EndpointURI extends Serializable, Initialisable
 
     String getQuery();
 
+    /**
+     * Returns the decoded user-information component of this EndpointURI.
+     *
+     * @return  The decoded user-information component of this EndpointURI,
+     *          or {@code null} if the user information is undefined
+     */
     String getUserInfo();
 
     String getTransformers();
@@ -78,8 +84,20 @@ public interface EndpointURI extends Serializable, Initialisable
 
     String getResourceInfo();
 
+    /**
+     * Returns the decoded user component of this EndpointURI.
+     *
+     * @return  The decoded user component of this EndpointURI,
+     *          or {@code null} if the user is undefined
+     */
     String getUser();
 
+    /**
+     * Returns the decoded password component of this EndpointURI.
+     *
+     * @return  The decoded password component of this EndpointURI,
+     *          or {@code null} if the password is undefined
+     */
     String getPassword();
 
     MuleContext getMuleContext();
