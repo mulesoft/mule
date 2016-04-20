@@ -13,9 +13,9 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.module.extension.model.HealthStatus;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.heisenberg.extension.model.HealthStatus;
 
 import org.junit.Before;
 import org.junit.Test;

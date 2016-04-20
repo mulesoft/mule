@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreClient;
+import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;

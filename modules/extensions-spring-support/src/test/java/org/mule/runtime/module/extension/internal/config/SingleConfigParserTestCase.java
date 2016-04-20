@@ -13,8 +13,8 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.module.extension.HeisenbergExtension;
-import org.mule.runtime.module.extension.model.Ricin;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.model.Ricin;
 
 import org.junit.Test;
 

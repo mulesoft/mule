@@ -25,9 +25,10 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.module.extension.internal.metadata.extension.MetadataConnection;
-import org.mule.runtime.module.extension.internal.metadata.extension.MetadataExtension;
+import org.mule.test.metadata.extension.MetadataConnection;
+import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -99,7 +100,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     {
         typeLoader = ExtensionsTestUtils.TYPE_LOADER;
         personKey = MetadataKeyBuilder.newKey(MetadataConnection.PERSON).build();
-        personType = TestMetadataUtils.getMetadata(personKey);
+        personType = TestMetadataResolverUtils.getMetadata(personKey);
     }
 
     protected ComponentMetadataDescriptor getComponentDynamicMetadata()

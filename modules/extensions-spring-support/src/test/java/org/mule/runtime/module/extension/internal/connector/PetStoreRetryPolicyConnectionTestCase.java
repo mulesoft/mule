@@ -22,10 +22,10 @@ import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreClient;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreOperations;
+import org.mule.test.petstore.extension.PetStoreClient;
+import org.mule.test.petstore.extension.PetStoreConnectionProvider;
+import org.mule.test.petstore.extension.PetStoreConnector;
+import org.mule.test.petstore.extension.PetStoreOperations;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 
 import org.junit.Rule;

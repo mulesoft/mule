@@ -12,7 +12,7 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.module.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import java.nio.charset.Charset;
 

@@ -10,9 +10,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.runtime.module.extension.HeisenbergSource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.heisenberg.extension.HeisenbergSource;
 
 import java.lang.reflect.InvocationTargetException;
 

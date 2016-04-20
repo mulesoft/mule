@@ -8,13 +8,12 @@ package org.mule.runtime.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.runtime.module.extension.HeisenbergExtension;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import org.junit.Test;
 

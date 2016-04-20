@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.module.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import org.junit.Test;
 

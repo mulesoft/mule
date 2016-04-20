@@ -7,12 +7,12 @@
 package org.mule.runtime.module.extension.internal.config;
 
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.module.extension.HeisenbergExtension;
-import org.mule.runtime.module.extension.model.HealthStatus;
-import org.mule.runtime.module.extension.model.Ricin;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.model.HealthStatus;
+import org.mule.test.heisenberg.extension.model.Ricin;
 
 import java.util.Arrays;
 import java.util.HashMap;

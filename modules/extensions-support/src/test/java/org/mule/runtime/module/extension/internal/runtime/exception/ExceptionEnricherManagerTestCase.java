@@ -18,7 +18,7 @@ import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
-import org.mule.runtime.module.extension.exception.HeisenbergException;
+import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Optional;

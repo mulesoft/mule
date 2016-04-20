@@ -12,16 +12,16 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.module.extension.HeisenbergExtension;
-import org.mule.runtime.module.extension.subtypes.CarDoor;
-import org.mule.runtime.module.extension.subtypes.FinalPojo;
-import org.mule.runtime.module.extension.subtypes.HouseDoor;
-import org.mule.runtime.module.extension.subtypes.Square;
-import org.mule.runtime.module.extension.subtypes.SubTypesConnectorConnection;
-import org.mule.runtime.module.extension.subtypes.SubTypesMappingConnector;
-import org.mule.runtime.module.extension.subtypes.Triangle;
-import org.mule.runtime.module.extension.vegan.VeganCookBook;
-import org.mule.runtime.module.extension.vegan.VeganExtension;
+import org.mule.test.vegan.extension.VeganCookBook;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.subtypes.extension.CarDoor;
+import org.mule.test.subtypes.extension.FinalPojo;
+import org.mule.test.subtypes.extension.HouseDoor;
+import org.mule.test.subtypes.extension.Square;
+import org.mule.test.subtypes.extension.SubTypesConnectorConnection;
+import org.mule.test.subtypes.extension.SubTypesMappingConnector;
+import org.mule.test.subtypes.extension.Triangle;
+import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.List;
 
