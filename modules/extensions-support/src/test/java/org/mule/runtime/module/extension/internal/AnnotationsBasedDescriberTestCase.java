@@ -19,28 +19,32 @@ import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.module.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
-import static org.mule.runtime.module.extension.HeisenbergExtension.AGE;
-import static org.mule.runtime.module.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
-import static org.mule.runtime.module.extension.HeisenbergExtension.HEISENBERG;
-import static org.mule.runtime.module.extension.HeisenbergExtension.PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
-import static org.mule.runtime.module.extension.HeisenbergExtension.PARAMETER_OVERRIDED_DISPLAY_NAME;
-import static org.mule.runtime.module.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
-import static org.mule.runtime.module.extension.HeisenbergExtension.RICIN_GROUP_NAME;
-import static org.mule.runtime.module.extension.HeisenbergExtension.SCHEMA_VERSION;
-import static org.mule.runtime.module.extension.HeisenbergOperations.KILL_WITH_GROUP;
-import static org.mule.runtime.module.extension.HeisenbergOperations.OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
-import static org.mule.runtime.module.extension.HeisenbergOperations.OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DEFAULT_CONNECTION_PROVIDER_NAME;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import org.mule.runtime.core.api.MuleEvent;
+import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.PARAMETER_OVERRIDED_DISPLAY_NAME;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
+import static org.mule.test.heisenberg.extension.HeisenbergOperations.KILL_WITH_GROUP;
+import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
+import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME;
+import org.mule.metadata.api.model.AnyType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.NullType;
+import org.mule.metadata.java.annotation.GenericTypesAnnotation;
 import org.mule.runtime.api.temporary.MuleMessage;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -48,13 +52,10 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
@@ -62,31 +63,28 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Extension
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
+import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataModelProperty;
-import org.mule.metadata.api.model.AnyType;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.NullType;
-import org.mule.metadata.java.annotation.GenericTypesAnnotation;
-import org.mule.runtime.module.extension.HeisenbergConnection;
-import org.mule.runtime.module.extension.HeisenbergConnectionProvider;
-import org.mule.runtime.module.extension.HeisenbergExtension;
-import org.mule.runtime.module.extension.HeisenbergOperations;
-import org.mule.runtime.module.extension.HeisenbergSource;
-import org.mule.runtime.module.extension.MoneyLaunderingOperation;
-import org.mule.runtime.module.extension.exception.CureCancerExceptionEnricher;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.module.extension.internal.metadata.extension.MetadataExtension;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.model.ExtendedPersonalInfo;
-import org.mule.runtime.module.extension.model.HealthStatus;
-import org.mule.runtime.module.extension.model.KnockeableDoor;
-import org.mule.runtime.module.extension.model.Ricin;
-import org.mule.runtime.module.extension.model.Weapon;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.test.heisenberg.extension.HeisenbergConnection;
+import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.HeisenbergOperations;
+import org.mule.test.heisenberg.extension.HeisenbergSource;
+import org.mule.test.heisenberg.extension.MoneyLaunderingOperation;
+import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
+import org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo;
+import org.mule.test.heisenberg.extension.model.HealthStatus;
+import org.mule.test.heisenberg.extension.model.KnockeableDoor;
+import org.mule.test.heisenberg.extension.model.Ricin;
+import org.mule.test.heisenberg.extension.model.Weapon;
+import org.mule.test.metadata.extension.MetadataExtension;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -597,7 +595,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     }
 
     @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
-    @Xml(schemaVersion = SCHEMA_VERSION)
     @Configurations(HeisenbergExtension.class)
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
     @Providers(HeisenbergConnectionProvider.class)
@@ -608,7 +605,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     }
 
     @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
-    @Xml(schemaVersion = SCHEMA_VERSION)
     @Configurations({HeisenbergExtension.class, NamedHeisenbergAlternateConfig.class})
     @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
     public static class HeisenbergPointerPlusExternalConfig

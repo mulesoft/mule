@@ -34,7 +34,7 @@ import org.junit.runners.Parameterized;
 public class ValidateSchemaFunctionalTestCase extends AbstractValidateSchemaFunctionalTestCase
 {
 
-    private static final String SCHEMA_LOCATION = "schemaLocation";
+    private static final String SCHEMA_LOCATION = "namespaceLocation";
     private static final String DEREFERENCING = "dereferencing";
 
     @Parameterized.Parameters(name = "{0}")

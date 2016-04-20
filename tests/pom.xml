@@ -18,6 +18,7 @@
         <module>performance</module>
         <module>integration</module>
         <module>http</module>
+        <module>test-extensions</module>
     </modules>
 
     <build>

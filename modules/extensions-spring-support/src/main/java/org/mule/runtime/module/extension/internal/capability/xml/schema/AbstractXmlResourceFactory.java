@@ -66,12 +66,4 @@ abstract class AbstractXmlResourceFactory implements GeneratedResourceFactory
         return content.replaceAll(":", "\\\\:");
     }
 
-    /**
-     * @param xmlModelProperty the extension's {@link XmlModelProperty}. Non {@code null} parameter
-     * @return The name that of the extension's XSD file
-     */
-    protected String getXsdFileName(XmlModelProperty xmlModelProperty)
-    {
-        return String.format("mule-%s%s", xmlModelProperty.getNamespace(), XSD_EXTENSION);
-    }
 }

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
-import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.DISABLE_VALIDATION;
@@ -85,12 +84,8 @@ final class ConnectionProviderSchemaDelegate
 
     private void addConnectionProviderPoolingProfile(ExplicitGroup choice, ConnectionProviderModel providerModel)
     {
-        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.class).get();
-        TopLevelElement objectElement = new TopLevelElement();
-
-        objectElement.setMinOccurs(connectionHandlingType.getPoolingSupport() == PoolingSupport.REQUIRED ? ONE : ZERO);
-        objectElement.setMaxOccurs("1");
-        objectElement.setRef(MULE_POOLING_PROFILE_TYPE);
+        PoolingSupport poolingSupport = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.class).get().getPoolingSupport();
+        TopLevelElement objectElement = builder.createRefElement(MULE_POOLING_PROFILE_TYPE, poolingSupport == PoolingSupport.REQUIRED);
 
         choice.getParticle().add(objectFactory.createElement(objectElement));
     }

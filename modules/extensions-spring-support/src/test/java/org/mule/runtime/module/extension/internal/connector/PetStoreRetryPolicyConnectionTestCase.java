@@ -22,10 +22,10 @@ import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreClient;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreConnectionProvider;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreOperations;
+import org.mule.test.petstore.extension.PetStoreClient;
+import org.mule.test.petstore.extension.PetStoreConnectionProvider;
+import org.mule.test.petstore.extension.PetStoreConnector;
+import org.mule.test.petstore.extension.PetStoreOperations;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 
 import org.junit.Rule;
@@ -94,7 +94,7 @@ public class PetStoreRetryPolicyConnectionTestCase extends ExtensionFunctionalTe
     @Extension(name = "petstore", description = "PetStore Test connector")
     @Operations(PetStoreOperationsWithFailures.class)
     @Providers({PooledPetStoreConnectionProviderWithFailureInvalidConnection.class, PooledPetStoreConnectionProviderWithValidConnection.class})
-    @Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore", schemaVersion = "4.0")
+    @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore")
     public static class PetStoreConnectorWithConnectionFailure extends PetStoreConnector
     {
     }

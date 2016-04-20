@@ -21,9 +21,9 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.CON
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreClient;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.SimplePetStoreConnectionProvider;
+import org.mule.test.petstore.extension.PetStoreClient;
+import org.mule.test.petstore.extension.PetStoreConnector;
+import org.mule.test.petstore.extension.SimplePetStoreConnectionProvider;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Optional;

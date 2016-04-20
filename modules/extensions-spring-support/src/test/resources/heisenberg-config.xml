@@ -200,7 +200,7 @@
             </spring:entry>
         </util:map>
 
-        <util:map id="labeledRicins" value-type="org.mule.runtime.module.extension.model.Ricin">
+        <util:map id="labeledRicins" value-type="org.mule.test.heisenberg.extension.Ricin">
             <spring:entry key="pojo" value-ref="ricin"/>
         </util:map>
 

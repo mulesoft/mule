@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal;
 
 import org.mule.functional.junit4.InvalidExtensionConfigTestCase;
-import org.mule.runtime.module.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 public class HeisenbergDefaultConfigNegativeTestCase extends InvalidExtensionConfigTestCase
 {

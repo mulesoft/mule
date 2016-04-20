@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Text;
 @Extension(name = "secure", description = "Secure Test connector")
 @Operations(SecureOperations.class)
 @Providers(SecureConnectionProvider.class)
-@Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/secure", namespace = "secure", schemaVersion = "4.0")
+@Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/secure", namespace = "secure")
 public class SecureConnector
 {
 

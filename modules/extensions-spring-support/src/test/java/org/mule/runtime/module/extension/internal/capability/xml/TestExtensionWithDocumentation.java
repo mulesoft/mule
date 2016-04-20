@@ -14,7 +14,7 @@ import org.mule.runtime.extension.api.annotation.capability.Xml;
 
 @Extension(name = "documentation")
 @Operations({TestDocumentedExtensionOperations.class})
-@Xml(schemaLocation = "schemaLocation", namespace = "documentation", schemaVersion = "1.0")
+@Xml(namespaceLocation = "namespaceLocation", namespace = "documentation")
 public class TestExtensionWithDocumentation
 {
 

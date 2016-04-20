@@ -13,17 +13,17 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getParameter;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
-import org.mule.runtime.module.extension.HeisenbergConnectionProvider;
-import org.mule.runtime.module.extension.HeisenbergExtension;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import com.google.common.collect.ImmutableList;
 
