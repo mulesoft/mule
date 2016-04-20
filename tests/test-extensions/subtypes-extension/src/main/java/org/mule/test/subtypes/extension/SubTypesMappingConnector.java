@@ -41,6 +41,9 @@ public class SubTypesMappingConnector
     @Parameter
     private FinalPojo finalPojo;
 
+    @Parameter
+    private Ricin ricin;
+
     public Shape getAbstractShape()
     {
         return abstractShape;

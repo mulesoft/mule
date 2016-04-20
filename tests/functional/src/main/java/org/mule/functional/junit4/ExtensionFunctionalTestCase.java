@@ -18,9 +18,9 @@ import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
@@ -41,7 +41,9 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.Manifest;
 
 import org.apache.commons.io.FileUtils;
@@ -168,12 +170,9 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
             loadExtensionsFromDescribers(extensionManager, describers);
         }
 
-        ResourcesGenerator generator = new ExtensionsTestInfrastructureResourcesGenerator(getResourceFactories(), generatedResourcesDirectory);
-
-        for (ExtensionModel extensionModel : extensionManager.getExtensions())
-        {
-            generateResourcesAndAddToClasspath(generator.generateFor(extensionModel));
-        }
+        ExtensionsTestInfrastructureResourcesGenerator generator = new ExtensionsTestInfrastructureResourcesGenerator(getResourceFactories(), generatedResourcesDirectory);
+        extensionManager.getExtensions().forEach(generator::generateFor);
+        generateResourcesAndAddToClasspath(generator.dumpAll());
     }
 
     private void loadExtensionsFromDescribers(ExtensionManagerAdapter extensionManager, Describer[] describers)
@@ -254,6 +253,7 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
     {
 
         private File targetDirectory;
+        private Map<String, StringBuilder> contents = new HashMap<>();
 
         private ExtensionsTestInfrastructureResourcesGenerator(Collection<GeneratedResourceFactory> resourceFactories, File targetDirectory)
         {
@@ -264,15 +264,40 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
         @Override
         protected void write(GeneratedResource resource)
         {
-            File targetFile = new File(targetDirectory, resource.getPath());
-            try
+            StringBuilder builder = contents.get(resource.getPath());
+            if (builder == null)
             {
-                FileUtils.write(targetFile, new String(resource.getContent()));
+                builder = new StringBuilder();
+                contents.put(resource.getPath(), builder);
             }
-            catch (IOException e)
+
+            if (builder.length() > 0)
             {
-                throw new RuntimeException(e);
+                builder.append("\n");
             }
+
+            builder.append(new String(resource.getContent()));
+        }
+
+        List<GeneratedResource> dumpAll()
+        {
+            List<GeneratedResource> allResources = contents.entrySet().stream()
+                    .map(entry -> new GeneratedResource(entry.getKey(), entry.getValue().toString().getBytes()))
+                    .collect(new ImmutableListCollector<>());
+
+            allResources.forEach(resource -> {
+                File targetFile = new File(targetDirectory, resource.getPath());
+                try
+                {
+                    FileUtils.write(targetFile, new String(resource.getContent()));
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            return allResources;
         }
     }
 

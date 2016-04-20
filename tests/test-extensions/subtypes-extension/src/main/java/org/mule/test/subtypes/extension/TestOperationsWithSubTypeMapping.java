@@ -39,6 +39,6 @@ public class TestOperationsWithSubTypeMapping
 
     public List<Object> subtypedAndConcreteParameters(Shape shapeParam, Door doorParam, FinalPojo finalPojoParam, VeganCookBook cookBook)
     {
-        return Arrays.asList(shapeParam, doorParam, finalPojoParam);
+        return Arrays.asList(shapeParam, doorParam, finalPojoParam, cookBook);
     }
 }

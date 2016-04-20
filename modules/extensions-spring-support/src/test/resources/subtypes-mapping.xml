@@ -15,11 +15,11 @@
             <subtypes:house-door locked="true"/>
         </subtypes:connection>
 
-        <heisenberg:ricin microgramsPerKilo="2"/>
         <subtypes:square side="1" area="1"/>
         <subtypes:car-door color="red"/>
         <subtypes:explicit-square side="2" area="4"/>
         <subtypes:final-pojo someString="message"/>
+        <heisenberg:ricin microgramsPerKilo="2"/>
     </subtypes:config>
 
     <flow name="shapeRetriever">

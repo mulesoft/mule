@@ -16,12 +16,4 @@
     <name>Mule Vegan Test Extension</name>
     <description>A Mule extension for testing</description>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-unit</artifactId>
-            <version>4.0-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
-
 </project>

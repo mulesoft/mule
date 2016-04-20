@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -136,6 +137,8 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
         assertThat(responseEvent.getMessage().getPayload(), notNullValue());
 
         List<Object> payload = (List<Object>) responseEvent.getMessage().getPayload();
+        assertThat(payload, hasSize(4));
+
         assertThat(payload.get(0), instanceOf(Square.class));
         assertThat(((Square) payload.get(0)).getSide(), is(3));
         assertThat(((Square) payload.get(0)).getArea(), is(9));
@@ -146,6 +149,6 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
         assertThat(payload.get(2), instanceOf(FinalPojo.class));
         assertThat(((FinalPojo) payload.get(2)).getSomeString(), is("globalString"));
 
-        assertThat(payload.get(2), instanceOf(VeganCookBook.class));
+        assertThat(payload.get(3), instanceOf(VeganCookBook.class));
     }
 }
