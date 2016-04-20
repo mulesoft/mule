@@ -183,16 +183,6 @@ public class FlowRefTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void nonBlockingFlowRefToQueuedAsyncFlow() throws Exception
-    {
-        Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefToQueuedAsyncFlow"))
-                .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
-        HttpResponse httpResponse = response.returnResponse();
-        assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), containsString(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE));
-    }
-
-    @Test
     public void nonBlockingFlowRefToAsyncFlow() throws Exception
     {
         Response response = Request.Post(String.format("http://localhost:%s/%s", port.getNumber(), "nonBlockingFlowRefToAsyncFlow"))

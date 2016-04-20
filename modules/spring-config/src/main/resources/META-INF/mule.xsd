@@ -738,10 +738,10 @@
                 <xsd:sequence>
                     <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                 <xsd:attribute name="processingStrategy" use="optional" default="queued-asynchronous">
+                 <xsd:attribute name="processingStrategy" use="optional" default="asynchronous">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Strategy used to process the configured message processors when exchange pattern is 'one-way'.  
+                            Strategy used to process the configured message processors when exchange pattern is 'one-way'.
                             This attribute accepts either one of the enumerated strategies with default configuration options or a reference to a gloablly defined strategy.
                         </xsd:documentation>
                     </xsd:annotation>
@@ -762,14 +762,6 @@
                                         <xsd:annotation>
                                             <xsd:documentation>
                                                 Uses a thread pool to process the pipeline of message processors asynchronously.
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                    <xsd:enumeration value="queued-asynchronous">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                Decouples the recieving of a new message from it's processing using a queue. 
-                                                The queue is polled and a thread pool is used to process the pipeline of message processors asynchronously.
                                             </xsd:documentation>
                                         </xsd:annotation>
                                     </xsd:enumeration>
@@ -955,25 +947,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <!--  TODO
-    <xsd:element name="seda-stage" substitutionGroup="abstract-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Processes the nest list of message processors asychronously using a seda stage.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="asyncType">
-                    <xsd:sequence>
-                        <xsd:element ref="queue-profile" minOccurs="0"/>
-                    </xsd:sequence>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-    -->
 
     <xsd:element name="transactional" type="abstractTransactional" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
@@ -2109,7 +2082,7 @@
                     <xsd:enumeration value="default">
                         <xsd:annotation>
                             <xsd:documentation>
-                                This processing strategy uses the 'queued-asynchronous' strategy where possible, but if an event is synchronous it processes it synchronously rather than failing.
+                                This processing strategy uses the 'asynchronous' strategy where possible, but if an event is synchronous it processes it synchronously rather than failing.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>
@@ -2132,29 +2105,6 @@
                         <xsd:annotation>
                             <xsd:documentation>
                                 Uses a thread pool to process the pipeline of message processors asynchronously.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="queued-asynchronous">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Decouples the receiving of a new message from its processing using a queue.
-                                The queue is polled and a thread pool is used to process the pipeline of message processors asynchronously.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="thread-per-processor">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                EXPERIMENTAL: Uses a thread pool to process each message processors asynchronously. (each processor has it's own thread pool currently)
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="queued-thread-per-processor">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                EXPERIMENTAL:  Decouples the processing of each message processor using a queue.
-                                The queue is polled and use a thread pool to process each message processor asynchronously. (each processor has it's own thread pool currently)
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>
@@ -2285,61 +2235,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:element name="queued-asynchronous-processing-strategy" type="queuedAsynchronousProcessingStrategy" substitutionGroup="abstract-processing-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                Decouples the receiving of a new message from it's processing using a queue.
-                The queue is polled and a thread pool is used to process the pipeline of message processors asynchronously in a worker thread.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="queuedAsynchronousProcessingStrategy">
-        <xsd:complexContent>
-            <xsd:extension base="asynchronousProcessingStrategy">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-queue-store" minOccurs="0">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The queue store that stores the queue's elements.  If not specified, this will be the default-in-memory-queue-store.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="queueTimeout" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The timeout used when taking messages from the service queue.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="maxQueueSize" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Defines the maximum number of messages that can be queued or '-1' for unlimited.  From 3.6 the default value used is four times the value of the 'maxThreads' attribute, previously the default value was '-1' (unlimited).
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="thread-per-processor-processing-strategy" type="asynchronousProcessingStrategy" substitutionGroup="abstract-processing-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                EXPERIMENTAL: Uses a thread pool to process each message processors asynchronously in a worker thread. (each processor has it's own thread pool currently)
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="queued-thread-per-processor-processing-strategy" type="queuedAsynchronousProcessingStrategy" substitutionGroup="abstract-processing-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                EXPERIMENTAL:  Decouples the processing of each message processor using a queue. 
-                The queue is polled and use a thread pool to process each message processor asynchronously in a worker thread. (each processor has it's own thread pool currently)
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
 
     <xsd:element name="non-blocking-processing-strategy" type="nonBlockingProcessingStrategy" substitutionGroup="abstract-processing-strategy">
         <xsd:annotation>

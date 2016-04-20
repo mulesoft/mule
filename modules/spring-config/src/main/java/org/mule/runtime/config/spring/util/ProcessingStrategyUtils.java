@@ -10,10 +10,7 @@ import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.QueuedAsynchronousProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.ThreadPerProcessorProcessingStrategy;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -29,9 +26,6 @@ public class ProcessingStrategyUtils
     public static String SYNC_PROCESSING_STRATEGY = "synchronous";
     public static String NON_BLOCKING_PROCESSING_STRATEGY = "non-blocking";
     public static String ASYNC_PROCESSING_STRATEGY = "asynchronous";
-    public static String QUEUED_ASYNC_PROCESSING_STRATEGY = "queued-asynchronous";
-    public static String THREAD_PER_PROCESSOR_PROCESSING_STRATEGY = "thread-per-processor";
-    public static String QUEUED_THREAD_PER_PROCESSOR_PROCESSING_STRATEGY = "queued-thread-per-processor";
 
     public static void configureProcessingStrategy(Element element,
                                                    BeanDefinitionBuilder builder,
@@ -52,7 +46,6 @@ public class ProcessingStrategyUtils
 
     public static ProcessingStrategy parseProcessingStrategy(String processingStrategy)
     {
-
         if (DEFAULT_PROCESSING_STRATEGY.equals(processingStrategy))
         {
             return new DefaultFlowProcessingStrategy();
@@ -69,19 +62,6 @@ public class ProcessingStrategyUtils
         {
             return new AsynchronousProcessingStrategy();
         }
-        else if (QUEUED_ASYNC_PROCESSING_STRATEGY.equals(processingStrategy))
-        {
-            return new QueuedAsynchronousProcessingStrategy();
-        }
-        else if (THREAD_PER_PROCESSOR_PROCESSING_STRATEGY.equals(processingStrategy))
-        {
-            return new ThreadPerProcessorProcessingStrategy();
-        }
-        else if (QUEUED_THREAD_PER_PROCESSOR_PROCESSING_STRATEGY.equals(processingStrategy))
-        {
-            return new QueuedThreadPerProcessorProcessingStrategy();
-        }
-
         return null;
     }
 

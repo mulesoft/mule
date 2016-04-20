@@ -131,9 +131,6 @@ import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.InvokerMessageProcessor;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.QueuedAsynchronousProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.ThreadPerProcessorProcessingStrategy;
 import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
 import org.mule.runtime.core.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
@@ -429,15 +426,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         // Processing Strategies
         registerMuleBeanDefinitionParser("asynchronous-processing-strategy",
             new OrphanDefinitionParser(AsynchronousProcessingStrategy.class, false)).addMapping(
-            "poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS).addIgnored("name");
-        registerMuleBeanDefinitionParser("queued-asynchronous-processing-strategy",
-            new OrphanDefinitionParser(QueuedAsynchronousProcessingStrategy.class, false)).addMapping(
-            "poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS).addIgnored("name");
-        registerMuleBeanDefinitionParser("thread-per-processor-processing-strategy",
-            new OrphanDefinitionParser(ThreadPerProcessorProcessingStrategy.class, false)).addMapping(
-            "poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS).addIgnored("name");
-        registerMuleBeanDefinitionParser("queued-thread-per-processor-processing-strategy",
-            new OrphanDefinitionParser(QueuedThreadPerProcessorProcessingStrategy.class, false)).addMapping(
             "poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS).addIgnored("name");
         registerMuleBeanDefinitionParser("non-blocking-processing-strategy",
             new OrphanDefinitionParser(NonBlockingProcessingStrategy.class, false)).addMapping(

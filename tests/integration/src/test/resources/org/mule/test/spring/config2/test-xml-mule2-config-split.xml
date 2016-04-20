@@ -11,10 +11,8 @@
     <bean name="txFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory"/>
 
     <mule:mule>
-        <mule:queued-asynchronous-processing-strategy name="customStrategy" maxBufferSize="6" maxThreads="12"
-                                                 poolExhaustedAction="DISCARD" maxQueueSize="102">
-            <mule:default-persistent-queue-store/>
-        </mule:queued-asynchronous-processing-strategy>
+        <mule:asynchronous-processing-strategy name="customStrategy" maxBufferSize="6" maxThreads="12"
+                                                 poolExhaustedAction="DISCARD" />
 
         <mule:flow name="appleComponent2" processingStrategy="customStrategy">
             <mule:composite-source>

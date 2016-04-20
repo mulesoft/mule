@@ -26,7 +26,7 @@ public class AsyncMessageProcessorsDefinitionParser extends ChildDefinitionParse
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         ProcessingStrategyUtils.configureProcessingStrategy(element, builder,
-            ProcessingStrategyUtils.QUEUED_ASYNC_PROCESSING_STRATEGY);
+            ProcessingStrategyUtils.ASYNC_PROCESSING_STRATEGY);
         super.parseChild(element, parserContext, builder);
     }
 

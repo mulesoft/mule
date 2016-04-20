@@ -93,7 +93,7 @@
         <flow-ref name="FlowRef-3" />
         <test:assert expression="#[flowVars.P4]" message="I failed" />
     </flow>
-    <flow name="FlowRef-2" processingStrategy="queued-asynchronous">
+    <flow name="FlowRef-2" processingStrategy="asynchronous">
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
         <processor ref="addP3" />

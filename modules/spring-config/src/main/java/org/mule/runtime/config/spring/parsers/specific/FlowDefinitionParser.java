@@ -25,13 +25,13 @@ public class FlowDefinitionParser extends OrphanDefinitionParser
         addIgnored("processingStrategy");
     }
 
-    @java.lang.Override
+    @Override
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         builder.addConstructorArgValue(element.getAttribute(ATTRIBUTE_NAME));
         builder.addConstructorArgReference(MuleProperties.OBJECT_MULE_CONTEXT);
         ProcessingStrategyUtils.configureProcessingStrategy(element, builder,
-            ProcessingStrategyUtils.QUEUED_ASYNC_PROCESSING_STRATEGY);
+            ProcessingStrategyUtils.ASYNC_PROCESSING_STRATEGY);
         super.doParse(element, parserContext, builder);
     }
 }
