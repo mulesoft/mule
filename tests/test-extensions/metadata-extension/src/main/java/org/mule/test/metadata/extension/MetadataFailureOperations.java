@@ -14,7 +14,7 @@ import org.mule.test.metadata.extension.resolver.TestContentResolverWithoutKeyRe
 import org.mule.test.metadata.extension.resolver.TestMetadataResolverMetadataResolvingFailure;
 import org.mule.test.metadata.extension.resolver.TestMetadataResolverRuntimeExceptionFailure;
 
-public class MetadataFailureOperations
+public class MetadataFailureOperations extends MetadataOperationsParent
 {
 
     // MetadataResolver throws MetadataResolvingException
