@@ -129,6 +129,15 @@ public class HttpParser
         return path.startsWith("/") ? path : "/" + path;
     }
 
+    public static String sanitizePathWithEndSlash(String path)
+    {
+        if (path == null || (path.equals("/")))
+        {
+            return null;
+        }
+        return path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
+    }
+
     public static ParameterMap decodeQueryString(String queryString)
     {
         return decodeUrlEncodedBody(queryString, Charsets.UTF_8.name());
