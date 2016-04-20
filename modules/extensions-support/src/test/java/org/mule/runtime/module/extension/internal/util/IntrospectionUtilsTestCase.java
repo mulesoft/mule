@@ -23,7 +23,7 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
-import org.mule.runtime.module.extension.model.LifetimeInfo;
+import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -32,7 +32,7 @@ import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBox;
 import org.mule.tck.testmodels.fruit.Kiwi;
-import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.test.heisenberg.extension.model.LifetimeInfo;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

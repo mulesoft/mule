@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.config;
 
 import org.mule.functional.junit4.InvalidExtensionConfigTestCase;
-import org.mule.runtime.module.extension.vegan.VeganExtension;
+import org.mule.test.vegan.extension.VeganExtension;
 
 public class ConfigLevelSourceNegativeTestCase extends InvalidExtensionConfigTestCase
 {

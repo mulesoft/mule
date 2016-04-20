@@ -12,8 +12,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreClient;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
+import org.mule.test.petstore.extension.PetStoreClient;
+import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 
 import org.junit.Test;

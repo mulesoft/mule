@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreClient;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.PetStoreConnector;
+import org.mule.test.petstore.extension.PetStoreClient;
+import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Collection;
