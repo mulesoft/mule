@@ -31,7 +31,6 @@ public class DefaultHttpListenerConfigTestCase extends AbstractMuleTestCase
 {
 
     private static final String LOCALHOST = "localhost";
-    private static final String RESOURCE = "/resource";
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -71,26 +70,6 @@ public class DefaultHttpListenerConfigTestCase extends AbstractMuleTestCase
         listenerConfig.setTlsContext(mockTlsContextFactory);
         listenerConfig.initialise();
         assertThat(listenerConfig.getPort(), is(HTTPS.getDefaultPort()));
-    }
-
-    @Test
-    public void validPathWhenBasePathIsForwardSlash() throws Exception
-    {
-        listenerConfig.setProtocol(HTTP);
-        listenerConfig.setBasePath("/");
-        listenerConfig.initialise();
-        assertThat(listenerConfig.getFullListenerPath(RESOURCE).getResolvedPath(), is(RESOURCE));
-    }
-
-    @Test
-    public void validPathWhenBasePathHasTrailingForwardSlash() throws Exception
-    {
-        String basePath = "/base/";
-        listenerConfig.setProtocol(HTTP);
-        listenerConfig.setBasePath(basePath);
-        listenerConfig.initialise();
-        assertThat(listenerConfig.getFullListenerPath(RESOURCE).getResolvedPath(),
-                is(basePath.substring(0, basePath.length() - 1) + RESOURCE));
     }
 
     @Test

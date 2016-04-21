@@ -139,7 +139,6 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
             return;
         }
         basePath = HttpParser.sanitizePathWithStartSlash(this.basePath);
-        basePath = HttpParser.sanitizePathWithEndSlash(this.basePath);
         if (workerThreadingProfile == null)
         {
             workerThreadingProfile = new MutableThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
