@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.management.support;
+package org.mule.runtime.management.support;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;

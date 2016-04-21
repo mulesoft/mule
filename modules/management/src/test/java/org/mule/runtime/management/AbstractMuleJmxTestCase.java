@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.management;
+package org.mule.runtime.management;
 
 import org.mule.runtime.module.management.agent.RmiRegistryAgent;
 import org.mule.runtime.module.management.support.AutoDiscoveryJmxSupportFactory;
@@ -30,6 +30,7 @@ public abstract class AbstractMuleJmxTestCase extends AbstractMuleContextTestCas
     protected JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
     protected JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
 
+    @Override
     protected void doSetUp() throws Exception
     {
         RmiRegistryAgent rmiRegistryAgent = new RmiRegistryAgent();
@@ -57,6 +58,7 @@ public abstract class AbstractMuleJmxTestCase extends AbstractMuleContextTestCas
         }
     }
 
+    @Override
     protected void doTearDown() throws Exception
     {
         String domainName = jmxSupport.getDomainName(muleContext);

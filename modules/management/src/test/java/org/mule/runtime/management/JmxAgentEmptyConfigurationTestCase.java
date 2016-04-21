@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.management;
+package org.mule.runtime.management;
 
-import org.junit.Rule;
-import org.mule.runtime.module.management.agent.FixedHostRmiClientSocketFactory;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.management.agent.FixedHostRmiClientSocketFactory;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.net.ConnectException;
 import java.net.Socket;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class JmxAgentEmptyConfigurationTestCase extends FunctionalTestCase
 {
