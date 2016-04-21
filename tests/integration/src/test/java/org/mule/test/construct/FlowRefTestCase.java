@@ -7,22 +7,23 @@
 package org.mule.test.construct;
 
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -188,7 +189,7 @@ public class FlowRefTestCase extends FunctionalTestCase
                 .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Unable to process a synchronous event asynchronously."));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), containsString(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE));
     }
 
     @Test
@@ -198,7 +199,7 @@ public class FlowRefTestCase extends FunctionalTestCase
                 .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Unable to process a synchronous event asynchronously."));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), containsString(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE));
     }
 
     @Test

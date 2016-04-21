@@ -45,7 +45,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     implements ExceptionListener
 {
 
-    public static final String EXPECTING_SYNCHRONOUS_EVENT_ERROR = "Exception expected: '" + AsyncInterceptingMessageProcessor.SYNCHRONOUS_EVENT_ERROR_MESSAGE + "'";
+    public static final String EXPECTING_SYNCHRONOUS_EVENT_ERROR = "Exception expected: '" + AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE + "'";
 
     protected AsyncInterceptingMessageProcessor messageProcessor;
     protected TestListener target = new TestListener();

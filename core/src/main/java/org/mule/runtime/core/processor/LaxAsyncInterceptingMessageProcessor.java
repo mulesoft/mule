@@ -28,7 +28,7 @@ public class LaxAsyncInterceptingMessageProcessor extends AsyncInterceptingMessa
 
     protected boolean isProcessAsync(MuleEvent event) throws MessagingException
     {
-        return doThreading && !event.isSynchronous() && !event.isTransacted();
+        return doThreading && canProcessAsync(event);
     }
 
 }

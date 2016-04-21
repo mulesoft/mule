@@ -10,7 +10,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.functional.functional.FlowAssert.verify;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MessagingException;
 
 import org.junit.Test;
 
@@ -41,6 +43,35 @@ public class NonBlockingFullySupportedOneWayFunctionalTestCase extends Functiona
     public void childFlow() throws Exception
     {
         assertVoidMuleEventResponse("childFlow");
+        verify("childFlowChild");
+    }
+
+    @Test
+    public void childDefaultFlow() throws Exception
+    {
+        flowRunner("childDefaultFlow").withPayload(TEST_MESSAGE).asynchronously().run();
+        verify("childDefaultFlowChild");
+    }
+
+    @Test
+    public void childSyncFlow() throws Exception
+    {
+        flowRunner("childSyncFlow").withPayload(TEST_MESSAGE).asynchronously().run();
+        verify("childSyncFlowChild");
+    }
+
+    @Test(expected = MessagingException.class)
+    public void childAsyncFlow() throws Exception
+    {
+        flowRunner("childAsyncFlow").withPayload(TEST_MESSAGE).asynchronously().run();
+        verify("childAsyncFlowChild");
+    }
+
+    @Test(expected = MessagingException.class)
+    public void childQueuedAsyncFlow() throws Exception
+    {
+        assertThat(flowRunner("childQueuedAsyncFlow").withPayload(TEST_MESSAGE).asynchronously().run(), instanceOf(DefaultMuleEvent.class));
+        verify("childQueuedAsyncFlowChild");
     }
 
     @Test

@@ -9,7 +9,6 @@ package org.mule.runtime.core.processor;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -26,7 +25,7 @@ import javax.resource.spi.work.Work;
  * processing of the next {@link MessageProcessor}.
  */
 public class LaxSedaStageInterceptingMessageProcessor extends SedaStageInterceptingMessageProcessor
-    implements Work, Lifecycle, Pausable, Resumable, NonBlockingSupported
+    implements Work, Lifecycle, Pausable, Resumable
 {
 
     public LaxSedaStageInterceptingMessageProcessor(String name,
@@ -43,6 +42,6 @@ public class LaxSedaStageInterceptingMessageProcessor extends SedaStageIntercept
     @Override
     protected boolean isProcessAsync(MuleEvent event) throws MessagingException
     {
-        return doThreading && !event.isSynchronous() && !event.isTransacted() && !event.getExchangePattern().hasResponse();
+        return doThreading && canProcessAsync(event);
     }
 }
