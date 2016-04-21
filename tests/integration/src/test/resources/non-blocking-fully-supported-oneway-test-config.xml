@@ -41,9 +41,55 @@
         <test:assert count="1" expression="#[flow.name=='childFlow']"/>
     </flow>
     <flow name="childFlowChild">
+        <expression-component>flowVars['requestThreadChild'] = Thread.currentThread()</expression-component>
         <test:non-blocking-processor/>
+        <test:assert expression="#[flowVars['requestThreadChild'] != Thread.currentThread()]"/>
+        <test:assert expression="#[assertPayload()]"/>
+    </flow>
+
+    <flow name="childDefaultFlow">
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
+        <flow-ref name="childDefaultFlowChild"/>
         <test:assert expression="#[assertPayload()]"/>
         <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
+        <test:assert expression="#[flow.name=='childDefaultFlow']"/>
+    </flow>
+    <flow name="childDefaultFlowChild" processingStrategy="default">
+        <expression-component>flowVars['requestThreadChild'] = Thread.currentThread()</expression-component>
+        <test:non-blocking-processor/>
+        <test:assert expression="#[flowVars['requestThreadChild'] != Thread.currentThread()]"/>
+        <test:assert expression="#[assertPayload()]"/>
+    </flow>
+
+    <flow name="childSyncFlow">
+        <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"  message="1"/>
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
+        <flow-ref name="childSyncFlowChild"/>
+        <test:assert expression="#[assertPayload()]"  message="2"/>
+        <test:assert expression="#[flowVars['requestThread'] == Thread.currentThread()]"  message="3"/>
+        <test:assert expression="#[flow.name=='childSyncFlow']"/>
+    </flow>
+    <flow name="childSyncFlowChild" processingStrategy="synchronous">
+        <expression-component>flowVars['requestThreadChild'] = Thread.currentThread()</expression-component>
+        <test:non-blocking-processor/>
+        <test:assert expression="#[flowVars['requestThreadChild'] == Thread.currentThread()]"  message="4"/>
+        <test:assert expression="#[assertPayload()]"/>
+    </flow>
+
+    <flow name="childAsyncFlow">
+        <flow-ref name="childAsyncFlowChild"/>
+    </flow>
+    <flow name="childAsyncFlowChild" processingStrategy="asynchronous">
+        <test:non-blocking-processor/>
+        <test:assert expression="#[assertPayload()]"/>
+    </flow>
+
+    <flow name="childQueuedAsyncFlow">
+        <flow-ref name="childQueuedAsyncFlowChild"/>
+    </flow>
+    <flow name="childQueuedAsyncFlowChild" processingStrategy="queued-asynchronous">
+        <test:non-blocking-processor/>
+        <test:assert expression="#[assertPayload()]"/>
     </flow>
 
     <flow name="processorChain">
@@ -209,12 +255,14 @@
     </flow>
 
     <flow name="async">
+        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <async processingStrategy="asynchronous">
             <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
             <test:non-blocking-processor/>
             <test:assert count="1" expression="#[Thread.currentThread()!=beforeThread and assertPayload()]"/>
         </async>
         <test:non-blocking-processor/>
+        <test:assert expression="#[flowVars['requestThread'] != Thread.currentThread()]"/>
         <test:assert expression="#[assertPayload()]" />
     </flow>
 
