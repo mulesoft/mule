@@ -4,15 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.mule.security;
+package org.mule.runtime.core.mule.security;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
 
 public class PbeEncryptionStrategyTestCase extends AbstractMuleTestCase
 {

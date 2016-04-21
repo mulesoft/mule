@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.model;
+package org.mule.runtime.core.mule.model;
+
+import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.AbstractArgumentEntryPointResolver;
@@ -16,8 +18,6 @@ import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
 {

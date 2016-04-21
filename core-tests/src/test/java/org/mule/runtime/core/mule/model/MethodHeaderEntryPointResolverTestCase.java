@@ -7,11 +7,11 @@
 package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
-import org.mule.runtime.core.model.MultiplePayloadsTestObject;
 import org.mule.runtime.core.model.resolvers.MethodHeaderPropertyEntryPointResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;

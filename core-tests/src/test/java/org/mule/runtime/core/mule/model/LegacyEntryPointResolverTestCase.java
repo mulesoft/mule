@@ -4,7 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.model;
+package org.mule.runtime.core.mule.model;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleException;
@@ -27,10 +31,6 @@ import org.mule.tck.testmodels.fruit.WaterMelon;
 import java.util.Arrays;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCase
 {
@@ -175,11 +175,13 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
         Apple apple = new Apple();
         apple.setAppleCleaner(new FruitCleaner()
         {
+            @Override
             public void wash(Fruit fruit)
             {
                 // dummy
             }
 
+            @Override
             public void polish(Fruit fruit)
             {
                 // dummy
