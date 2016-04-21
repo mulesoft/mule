@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.management.config;
+package org.mule.runtime.management.config;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.management.mbeans;
+package org.mule.runtime.management.mbeans;
 
-import org.mule.runtime.core.management.AbstractMuleJmxTestCase;
+import org.mule.runtime.management.AbstractMuleJmxTestCase;
 import org.mule.runtime.module.management.mbean.YourKitProfilerServiceMBean;
 
 import java.lang.reflect.Method;

@@ -10,7 +10,7 @@
 
     <mulexml:object-to-xml-transformer name="ObjectToXml">
         <mulexml:alias name="apple" class="org.mule.tck.testmodels.fruit.Apple"/>
-        <mulexml:converter class="org.mule.runtime.core.transformers.xml.xstream.DummyConverter"/>
+        <mulexml:converter class="org.mule.runtime.module.xml.transformers.xml.xstream.DummyConverter"/>
     </mulexml:object-to-xml-transformer>
 
     <!-- TODO: allow finer control over xstream configuration.  Sample shown here -->
