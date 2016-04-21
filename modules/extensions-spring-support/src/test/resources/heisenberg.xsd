@@ -78,7 +78,7 @@
                                                 <xs:element minOccurs="0" maxOccurs="1" name="ricin">
                                                     <xs:complexType>
                                                         <xs:complexContent>
-                                                            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.Ricin"></xs:extension>
+                                                            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.test.heisenberg.extension.model.Ricin"></xs:extension>
                                                         </xs:complexContent>
                                                     </xs:complexType>
                                                 </xs:element>
@@ -93,7 +93,7 @@
                         <xs:element minOccurs="0" maxOccurs="1" name="next-door">
                             <xs:complexType>
                                 <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.KnockeableDoor"></xs:extension>
+                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
                                 </xs:complexContent>
                             </xs:complexType>
                         </xs:element>
@@ -103,7 +103,7 @@
                                     <xs:element minOccurs="0" maxOccurs="unbounded" name="ricin-pack">
                                         <xs:complexType>
                                             <xs:complexContent>
-                                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.Ricin"></xs:extension>
+                                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.test.heisenberg.extension.model.Ricin"></xs:extension>
                                             </xs:complexContent>
                                         </xs:complexType>
                                     </xs:element>
@@ -119,7 +119,7 @@
                                                 <xs:element minOccurs="0" maxOccurs="1" name="door">
                                                     <xs:complexType>
                                                         <xs:complexContent>
-                                                            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.KnockeableDoor"></xs:extension>
+                                                            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
                                                         </xs:complexContent>
                                                     </xs:complexType>
                                                 </xs:element>
@@ -148,8 +148,8 @@
                     <xs:attribute type="mule:expressionList" use="optional" name="wildCardList"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="wildCardWeaponMap"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="candidateDoors"></xs:attribute>
-                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.runtime.module.extension.model.HealthStatusEnumType" use="optional" default="CANCER" name="initialHealth"></xs:attribute>
-                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.runtime.module.extension.model.HealthStatusEnumType" use="required" name="finalHealth"></xs:attribute>
+                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="optional" default="CANCER" name="initialHealth"></xs:attribute>
+                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="required" name="finalHealth"></xs:attribute>
                     <xs:attribute type="mule:expressionString" use="optional" name="labAddress"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="firstEndevour"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" default="#[payload]" name="literalExpressionWithDefault"></xs:attribute>
@@ -162,14 +162,14 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:complexType name="org.mule.runtime.module.extension.model.KnockeableDoor">
+    <xs:complexType name="org.mule.test.heisenberg.extension.model.KnockeableDoor">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="1" name="previous">
                         <xs:complexType>
                             <xs:complexContent>
-                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.KnockeableDoor"></xs:extension>
+                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
                             </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
@@ -182,20 +182,20 @@
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="door">
         <xs:complexType>
             <xs:complexContent>
-                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.KnockeableDoor">
-                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.test.heisenberg.extension.model.KnockeableDoor">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:complexType name="org.mule.runtime.module.extension.model.Ricin">
+    <xs:complexType name="org.mule.test.heisenberg.extension.model.Ricin">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="1" name="destination">
                         <xs:complexType>
                             <xs:complexContent>
-                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.KnockeableDoor"></xs:extension>
+                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
                             </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
@@ -207,8 +207,8 @@
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="ricin">
         <xs:complexType>
             <xs:complexContent>
-                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.Ricin">
-                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.test.heisenberg.extension.model.Ricin">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -503,7 +503,7 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithWeaponType" substitutionGroup="heisenberg-empire" name="kill-with-weapon"></xs:element>
-    <xs:complexType name="org.mule.runtime.module.extension.model.WeaponWeaponAttributes">
+    <xs:complexType name="org.mule.test.heisenberg.extension.model.WeaponWeaponAttributes">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:attribute type="mule:expressionString" use="optional" name="brand"></xs:attribute>
@@ -513,8 +513,8 @@
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="weapon-attributes">
         <xs:complexType>
             <xs:complexContent>
-                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.WeaponWeaponAttributes">
-                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.test.heisenberg.extension.model.WeaponWeaponAttributes">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -526,7 +526,7 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="weapon-attributes">
                         <xs:complexType>
                             <xs:complexContent>
-                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.WeaponWeaponAttributes"></xs:extension>
+                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.test.heisenberg.extension.model.WeaponWeaponAttributes"></xs:extension>
                             </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
@@ -537,7 +537,7 @@
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="required" name="weapon"></xs:attribute>
-                <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.runtime.module.extension.model.WeaponWeaponTypeEnumType" use="required" name="type"></xs:attribute>
+                <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.WeaponWeaponTypeEnumType" use="required" name="type"></xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="weaponAttributes"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
@@ -555,7 +555,7 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="door">
                         <xs:complexType>
                             <xs:complexContent>
-                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.KnockeableDoor"></xs:extension>
+                                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
                             </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
@@ -585,7 +585,7 @@
                                 <xs:element minOccurs="0" maxOccurs="unbounded" name="door">
                                     <xs:complexType>
                                         <xs:complexContent>
-                                            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.runtime.module.extension.model.KnockeableDoor"></xs:extension>
+                                            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/heisenberg" base="org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
                                         </xs:complexContent>
                                     </xs:complexType>
                                 </xs:element>
@@ -703,7 +703,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:simpleType name="org.mule.runtime.module.extension.model.HealthStatusEnumType">
+    <xs:simpleType name="org.mule.test.heisenberg.extension.model.HealthStatusEnumType">
         <xs:union>
             <xs:simpleType>
                 <xs:restriction base="xs:string">
@@ -717,7 +717,7 @@
             </xs:simpleType>
         </xs:union>
     </xs:simpleType>
-    <xs:simpleType name="org.mule.runtime.module.extension.model.WeaponWeaponTypeEnumType">
+    <xs:simpleType name="org.mule.test.heisenberg.extension.model.WeaponWeaponTypeEnumType">
         <xs:union>
             <xs:simpleType>
                 <xs:restriction base="xs:string">

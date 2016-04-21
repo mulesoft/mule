@@ -7,8 +7,6 @@
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
@@ -18,6 +16,7 @@ import static org.mule.runtime.module.extension.internal.introspection.describer
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseMetadataAnnotations;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
@@ -27,6 +26,9 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
+import org.mule.extension.api.annotation.Import;
+import org.mule.extension.api.annotation.ImportedTypes;
+import org.mule.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -36,6 +38,8 @@ import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.core.util.collection.ImmutableMapCollector;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -46,6 +50,7 @@ import org.mule.runtime.extension.api.annotation.ExtensionOf;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
+import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.SubTypesMapping;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
@@ -101,7 +106,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -177,6 +181,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 .withModelProperty(new ImplementingTypeModelProperty(extensionType));
 
         declareSubTypesMapping(declaration, extensionType);
+        declareImportedTypes(declaration, extensionType);
         declareConfigurations(declaration, extensionType);
         declareOperations(declaration, extensionType);
         declareConnectionProviders(declaration, extensionType);
@@ -192,21 +197,31 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareSubTypesMapping(ExtensionDeclarer declaration, Class<?> extensionType)
     {
-        SubTypesMapping typesMapping = extensionType.getAnnotation(SubTypesMapping.class);
+        List<SubTypeMapping> typeMappings = parseRepeatableAnnotation(extensionType, SubTypeMapping.class, c -> ((SubTypesMapping) c).value());
 
-        if (typesMapping != null)
+        if (!typeMappings.isEmpty())
         {
-            Map<MetadataType, List<MetadataType>> subTypesMap = stream(typesMapping.value()).collect(
-                    toMap(
-                            mapping -> getMetadataType(mapping.baseType(), typeLoader),
-                            mapping ->
-                                    stream(mapping.subTypes())
-                                            .map(subType -> getMetadataType(subType, typeLoader))
-                                            .collect(toList())
-                            , (k1, k2) -> k1,
-                            LinkedHashMap::new));
+            Map<MetadataType, List<MetadataType>> subTypesMap = typeMappings.stream().collect(
+                    new ImmutableMapCollector<>(mapping -> getMetadataType(mapping.baseType(), typeLoader),
+                                                mapping -> stream(mapping.subTypes())
+                                                        .map(subType -> getMetadataType(subType, typeLoader))
+                                                        .collect(new ImmutableListCollector<>())));
 
             declaration.withModelProperty(new SubTypesModelProperty(subTypesMap));
+        }
+    }
+
+    private void declareImportedTypes(ExtensionDeclarer declaration, Class<?> extensionType)
+    {
+        List<Import> importTypes = parseRepeatableAnnotation(extensionType, Import.class, c -> ((ImportedTypes) c).value());
+
+        if (!importTypes.isEmpty())
+        {
+            Map<MetadataType, MetadataType> importedTypes = importTypes.stream().collect(
+                    new ImmutableMapCollector<>(imports -> getMetadataType(imports.type(), typeLoader),
+                                                imports -> getMetadataType(imports.from(), typeLoader)));
+
+            declaration.withModelProperty(new ImportedTypesModelProperty(importedTypes));
         }
     }
 
@@ -631,7 +646,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 stream(method.getParameters())
                         .filter(parameter -> parameter.isAnnotationPresent(annotationClass));
 
-        List<java.lang.reflect.Parameter> parameterList = parametersStream.collect(toList());
+        List<java.lang.reflect.Parameter> parameterList = parametersStream.collect(new ImmutableListCollector<>());
 
         if (parameterList.size() > 1)
         {

@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+      http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd
       http://www.mulesoft.org/schema/mule/subtypes http://www.mulesoft.org/schema/mule/subtypes/current/mule-subtypes.xsd">
 
     <subtypes:config name="config">
@@ -15,6 +19,7 @@
         <subtypes:car-door color="red"/>
         <subtypes:explicit-square side="2" area="4"/>
         <subtypes:final-pojo someString="message"/>
+        <heisenberg:ricin microgramsPerKilo="2"/>
     </subtypes:config>
 
     <flow name="shapeRetriever">
@@ -51,11 +56,14 @@
     <subtypes:triangle-alias name="global-triangle" height="6" area="3"/>
     <subtypes:final-pojo name="global-final-pojo" someString="globalString"/>
 
+    <vegan:vegan-cook-book name="global-cookbook" numberOfPages="10"/>
+
     <flow name="subtypedAndConcreteParametersAsAttributes">
         <subtypes:subtyped-and-concrete-parameters
                 doorParam="global-car-door"
                 shapeParam="global-square"
                 finalPojoParam="global-final-pojo"
+                cookBook="global-cookbook"
         />
     </flow>
 </mule>

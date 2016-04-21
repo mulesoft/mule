@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
+import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_PREFIX;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -46,7 +47,7 @@ public class SchemaGenerator
     public String generate(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty)
     {
         validate(extensionModel, xmlModelProperty);
-        SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(extensionModel, xmlModelProperty.getSchemaLocation());
+        SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(extensionModel, xmlModelProperty.getNamespaceUri());
 
         extensionModel.getConfigurationModels().forEach(conf -> schemaBuilder.registerConfigElement((RuntimeConfigurationModel) conf));
         extensionModel.getOperationModels().forEach(schemaBuilder::registerOperation);
@@ -64,7 +65,7 @@ public class SchemaGenerator
         {
             JAXBContext jaxbContext = JAXBContext.newInstance(Schema.class);
             Marshaller marshaller = jaxbContext.createMarshaller();
-            NamespaceFilter outFilter = new NamespaceFilter("mule", MULE_NAMESPACE, true);
+            NamespaceFilter outFilter = new NamespaceFilter(MULE_PREFIX, MULE_NAMESPACE, true);
             OutputFormat format = new OutputFormat();
             format.setIndent(true);
             format.setNewlines(true);

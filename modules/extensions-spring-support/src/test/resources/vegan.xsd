@@ -9,7 +9,47 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="cook-book">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/vegan" base="org.mule.test.vegan.extension.VeganCookBook"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="cookBook"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.vegan.extension.VeganCookBook">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="recipes">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="recipe">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionInt" use="optional" name="numberOfPages"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="vegan-cook-book">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/vegan" base="org.mule.test.vegan.extension.VeganCookBook">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>

@@ -202,7 +202,7 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
         for (ExtensionModel extensionModel : extensionManager.getExtensions())
         {
             XmlModelProperty xmlProperty = extensionModel.getModelProperty(XmlModelProperty.class).get();
-            if (namespace.equals(xmlProperty.getSchemaLocation()))
+            if (namespace.equals(xmlProperty.getNamespaceUri()))
             {
                 return extensionModel;
             }

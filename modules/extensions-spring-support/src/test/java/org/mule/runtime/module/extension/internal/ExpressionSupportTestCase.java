@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
-import org.mule.runtime.module.extension.HeisenbergExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import org.junit.Test;
 

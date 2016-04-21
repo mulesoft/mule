@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static org.mule.runtime.module.extension.internal.metadata.extension.resolver.TestResolverWithCache.MISSING_ELEMENT_ERROR_MESSAGE;
+import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.MISSING_ELEMENT_ERROR_MESSAGE;
 
 import org.mule.runtime.core.internal.metadata.InvalidComponentIdException;
 import org.mule.runtime.api.metadata.MetadataKey;

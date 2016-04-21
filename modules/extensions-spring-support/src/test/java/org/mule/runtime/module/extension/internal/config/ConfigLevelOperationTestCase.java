@@ -10,11 +10,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.module.extension.vegan.VeganExtension;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.Kiwi;
+import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.Arrays;
 import java.util.Collection;

@@ -6,16 +6,15 @@
  */
 package org.mule.extension.validation.internal;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.extension.validation.api.Validator;
 import org.mule.mvel2.compiler.BlankLiteral;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.ResourceBundle;
-
-import org.springframework.util.StringUtils;
 
 /**
  * A {@link MessageFactory} that provides the feedback messages

@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderFactory;
-import org.mule.runtime.module.extension.internal.runtime.connector.petstore.SimplePetStoreConnectionProvider;
+import org.mule.test.petstore.extension.SimplePetStoreConnectionProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

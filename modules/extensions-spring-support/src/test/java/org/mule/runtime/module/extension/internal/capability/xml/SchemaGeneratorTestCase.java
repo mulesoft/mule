@@ -19,7 +19,6 @@ import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
-import org.mule.runtime.module.extension.HeisenbergExtension;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaGenerator;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
@@ -31,10 +30,11 @@ import org.mule.runtime.module.extension.internal.runtime.connector.basic.ListCo
 import org.mule.runtime.module.extension.internal.runtime.connector.basic.MapConnector;
 import org.mule.runtime.module.extension.internal.runtime.connector.basic.StringListConnector;
 import org.mule.runtime.module.extension.internal.runtime.connector.basic.TestConnector;
-import org.mule.runtime.module.extension.internal.runtime.connector.subtypes.SubTypesMappingConnector;
-import org.mule.runtime.module.extension.vegan.VeganExtension;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.subtypes.extension.SubTypesMappingConnector;
+import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.Arrays;
 import java.util.Collection;

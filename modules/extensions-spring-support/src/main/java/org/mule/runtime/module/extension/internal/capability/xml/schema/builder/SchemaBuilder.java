@@ -9,16 +9,17 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
 import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_NAMESPACE;
 import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.capability.xml.XmlModelUtils.createXmlModelProperty;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.CONFIG_ATTRIBUTE;
@@ -40,24 +41,14 @@ import static org.mule.runtime.module.extension.internal.capability.xml.schema.m
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.TLS_CONTEXT_TYPE;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.XML_NAMESPACE;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isRequired;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.extension.api.annotation.Extensible;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
-import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
-import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -68,10 +59,26 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.utils.MetadataTypeUtils;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.ValueHolder;
+import org.mule.runtime.extension.api.annotation.Extensible;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.capability.Xml;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
+import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
+import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
+import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
@@ -102,10 +109,11 @@ import org.mule.runtime.module.extension.internal.model.property.TypeRestriction
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.NameUtils;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -142,6 +150,7 @@ public final class SchemaBuilder
     private Schema schema;
     private boolean requiresTls = false;
     private SubTypesMappingContainer subTypesMapping;
+    private Map<MetadataType, MetadataType> importedTypes;
 
     public static SchemaBuilder newSchema(ExtensionModel extensionModel, String targetNamespace)
     {
@@ -156,7 +165,10 @@ public final class SchemaBuilder
                 .importMuleExtensionNamespace();
 
         Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
-        builder.withTypeMapping(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : Collections.emptyMap());
+        builder.withTypeMapping(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : ImmutableMap.of());
+
+        Optional<Map<MetadataType, MetadataType>> importedTypes = extensionModel.getModelProperty(ImportedTypesModelProperty.class).map(ImportedTypesModelProperty::getImportedTypes);
+        builder.withImportedTypes(importedTypes.isPresent() ? importedTypes.get() : ImmutableMap.of());
 
         return builder;
     }
@@ -164,6 +176,12 @@ public final class SchemaBuilder
     private SchemaBuilder withTypeMapping(Map<MetadataType, List<MetadataType>> subTypesMapping)
     {
         this.subTypesMapping = new SubTypesMappingContainer(subTypesMapping);
+        return this;
+    }
+
+    private SchemaBuilder withImportedTypes(Map<MetadataType, MetadataType> importedTypes)
+    {
+        this.importedTypes = importedTypes;
         return this;
     }
 
@@ -220,11 +238,7 @@ public final class SchemaBuilder
 
     protected void addRetryPolicy(ExplicitGroup sequence)
     {
-        TopLevelElement providerElementRetry = new TopLevelElement();
-        providerElementRetry.setMinOccurs(ZERO);
-        providerElementRetry.setMaxOccurs("1");
-        providerElementRetry.setRef(MULE_ABSTRACT_RECONNECTION_STRATEGY);
-
+        TopLevelElement providerElementRetry = createRefElement(MULE_ABSTRACT_RECONNECTION_STRATEGY, false);
         sequence.getParticle().add(objectFactory.createElement(providerElementRetry));
     }
 
@@ -240,9 +254,9 @@ public final class SchemaBuilder
         return this;
     }
 
-    Attribute createNameAttribute()
+    Attribute createNameAttribute(boolean required)
     {
-        return createAttribute(SchemaConstants.ATTRIBUTE_NAME_NAME, load(String.class), true, NOT_SUPPORTED);
+        return createAttribute(SchemaConstants.ATTRIBUTE_NAME_NAME, load(String.class), required, NOT_SUPPORTED);
     }
 
     public SchemaBuilder registerOperation(OperationModel operationModel)
@@ -499,7 +513,7 @@ public final class SchemaBuilder
         objectElement.setName(getTopLevelTypeName(metadataType));
 
         LocalComplexType complexContent = newLocalComplexTypeWithBase(metadataType, description);
-        complexContent.getComplexContent().getExtension().getAttributeOrAttributeGroup().add(createNameAttribute());
+        complexContent.getComplexContent().getExtension().getAttributeOrAttributeGroup().add(createNameAttribute(false));
         objectElement.setComplexType(complexContent);
 
         objectElement.setSubstitutionGroup(MULE_ABSTRACT_EXTENSION);
@@ -874,6 +888,12 @@ public final class SchemaBuilder
 
                 defaultVisit(objectType);
 
+                if (importedTypes.get(objectType) != null)
+                {
+                    addImportedTypeRef(getType(importedTypes.get(objectType)), parameterModel, all);
+                    return;
+                }
+
                 if (ExpressionSupport.REQUIRED != parameterModel.getExpressionSupport())
                 {
                     if (shouldGeneratePojoChildElements(clazz))
@@ -935,6 +955,21 @@ public final class SchemaBuilder
         };
     }
 
+    private void addImportedTypeRef(Class<?> extensionType, ParameterModel parameterModel, ExplicitGroup all)
+    {
+        XmlModelProperty xml = createXmlModelProperty(getAnnotation(extensionType, Xml.class),
+                                                      getAnnotation(extensionType, Extension.class).name(), "");
+
+        Import schemaImport = new Import();
+        schemaImport.setNamespace(xml.getNamespaceUri());
+        schemaImport.setSchemaLocation(xml.getSchemaLocation());
+
+        schema.getIncludeOrImportOrRedefine().add(schemaImport);
+
+        QName qName = new QName(xml.getNamespaceUri(), hyphenize(getAliasName(parameterModel.getType())), xml.getNamespace());
+        all.getParticle().add(objectFactory.createElement(createRefElement(qName, false)));
+    }
+
     private void registerPojoSubtypes(List<MetadataType> subTypes, ExplicitGroup all)
     {
         ExplicitGroup choice = new ExplicitGroup();
@@ -942,7 +977,7 @@ public final class SchemaBuilder
         choice.setMaxOccurs("1");
 
         subTypes.forEach(subtype -> {
-            TopLevelElement subtypeElement = createTopLevelElement(hyphenize(IntrospectionUtils.getAliasName(subtype)), ZERO, "1");
+            TopLevelElement subtypeElement = createTopLevelElement(hyphenize(getAliasName(subtype)), ZERO, "1");
             subtypeElement.setComplexType(newLocalComplexTypeWithBase((ObjectType) subtype, EMPTY));
             choice.getParticle().add(objectFactory.createElement(subtypeElement));
         });
@@ -993,12 +1028,16 @@ public final class SchemaBuilder
                                                                          false,
                                                                          ExpressionSupport.NOT_SUPPORTED));
 
+        all.getParticle().add(objectFactory.createElement(createRefElement(elementRef, false)));
+    }
+
+    TopLevelElement createRefElement(QName elementRef, boolean isRequired)
+    {
         TopLevelElement element = new TopLevelElement();
         element.setRef(elementRef);
-        element.setMinOccurs(ZERO);
+        element.setMinOccurs(isRequired ? ONE : ZERO);
         element.setMaxOccurs("1");
-
-        all.getParticle().add(objectFactory.createElement(element));
+        return element;
     }
 
     private boolean shouldGeneratePojoChildElements(Class<?> type)

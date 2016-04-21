@@ -89,7 +89,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension xmlns="http://www.mulesoft.org/schema/mule/basic" base="org.mule.runtime.module.extension.internal.runtime.connector.basic.Owner">
-                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>

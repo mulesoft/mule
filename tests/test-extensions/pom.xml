@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.mule.tests</groupId>
+        <artifactId>mule-tests</artifactId>
+        <version>4.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>org.mule.tests</groupId>
+    <artifactId>mule-test-extensions-parent</artifactId>
+    <version>4.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Parent Pom for Mule Test Extension</name>
+
+    <properties>
+        <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
+    </properties>
+
+    <modules>
+        <module>petstore-extension</module>
+        <module>heisenberg-extension</module>
+        <module>metadata-extension</module>
+        <module>vegan-extension</module>
+        <module>subtypes-extension</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.extensions</groupId>
+            <artifactId>mule-extensions-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-unit</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.mule.extensions</groupId>
+                    <artifactId>mule-extensions-maven-plugin</artifactId>
+                    <version>${mule.extensions.maven.plugin.version}</version>
+                    <extensions>true</extensions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.mule.extensions</groupId>
+                <artifactId>mule-extensions-maven-plugin</artifactId>
+                <version>${mule.extensions.maven.plugin.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
