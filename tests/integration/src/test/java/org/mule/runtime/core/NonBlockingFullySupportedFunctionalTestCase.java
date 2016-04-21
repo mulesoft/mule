@@ -222,6 +222,13 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
                 .run();
     }
 
+    @Test
+    public void catchExceptionStrategy() throws Exception
+    {
+        flowRunner("catchExceptionStrategy").withPayload(TEST_MESSAGE).withExchangePAttern(getMessageExchnagePattern()).nonBlocking().run();
+        verify("catchExceptionStrategyChild");
+    }
+
     protected MessageExchangePattern getMessageExchnagePattern()
     {
         return MessageExchangePattern.REQUEST_RESPONSE;

@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 import org.mule.runtime.core.transaction.TransactionCoordination;
@@ -38,64 +39,85 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
     {
         try
         {
-            boolean nonBlocking = event.isAllowNonBlocking() && event.getReplyToHandler() instanceof NonBlockingReplyToHandler;
+            return new ExceptionMessageProcessor(exception, muleContext, event.getFlowConstruct()).process(event);
+        }
+        catch (MuleException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 
-            muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, ExceptionStrategyNotification.PROCESS_START));
-            FlowConstruct flowConstruct = event.getFlowConstruct();
-            fireNotification(exception);
-            logException(exception, event);
-            processStatistics(event);
-            event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
+    private class ExceptionMessageProcessor extends AbstractRequestResponseMessageProcessor{
 
-            // MULE-8551 Still need to add support for non-blocking components in excepton strategies.
-            if(nonBlocking)
+        private Exception exception;
+
+        public ExceptionMessageProcessor(Exception exception, MuleContext muleContext, FlowConstruct flowConstruct)
+        {
+            this.exception = exception;
+            setMuleContext(muleContext);
+            setFlowConstruct(flowConstruct);
+        }
+
+        @Override
+        protected MuleEvent processRequest(MuleEvent request) throws MuleException
+        {
+            if (!handleException && request.getReplyToHandler() instanceof NonBlockingReplyToHandler)
             {
-                // Make event synchronous and clear replyToHandler.
-                event = new DefaultMuleEvent(event, event.getFlowConstruct(), null, null, true);
+                request = new DefaultMuleEvent(request, request.getFlowConstruct(), null, null, true);
             }
-            event = beforeRouting(exception, event);
-            event = route(event, exception);
-            processOutboundRouterStatistics(flowConstruct);
-            event = afterRouting(exception, event);
+            muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(request, ExceptionStrategyNotification.PROCESS_START));
+            fireNotification(exception);
+            logException(exception, request);
+            processStatistics(request);
+            request.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
             markExceptionAsHandledIfRequired(exception);
-            if (event != null && !VoidMuleEvent.getInstance().equals(event))
+            return beforeRouting(exception, request);
+        }
+
+        @Override
+        protected MuleEvent processResponse(MuleEvent response, MuleEvent request) throws MuleException
+        {
+            processOutboundRouterStatistics(flowConstruct);
+            response = afterRouting(exception, response);
+            if (response != null && !VoidMuleEvent.getInstance().equals(response))
             {
                 // Only process reply-to if non-blocking is not enabled. Checking the exchange pattern is not sufficient
                 // because JMS inbound endpoints for example use a REQUEST_RESPONSE exchange pattern and async processing.
-                if (!nonBlocking)
+                if (!(request.isAllowNonBlocking() && request.getReplyToHandler() instanceof NonBlockingReplyToHandler))
                 {
-                    processReplyTo(event, exception);
+                    processReplyTo(response, exception);
                 }
-                closeStream(event.getMessage());
-                nullifyExceptionPayloadIfRequired(event);
+                closeStream(response.getMessage());
+                nullifyExceptionPayloadIfRequired(response);
             }
-            return event;
+            return response;
         }
-        catch (Exception e)
+
+        @Override
+        protected MuleEvent processNext(MuleEvent event) throws MuleException
         {
-            MessagingException messagingException;
-            if (e instanceof MessagingException)
-            {
-                messagingException = (MessagingException) e;
-            }
-            else 
-            {
-                messagingException = new MessagingException(event, e); 
-            }
+            return route(event, exception);
+        }
+
+        @Override
+        protected MuleEvent processCatch(MuleEvent event, MessagingException exception) throws MessagingException
+        {
             try
             {
                 logger.error("Exception during exception strategy execution");
-                doLogException(e);
+                doLogException(exception);
                 TransactionCoordination.getInstance().rollbackCurrentTransaction();
             }
             catch (Exception ex)
             {
                 //Do nothing
             }
-            event.getMessage().setExceptionPayload(new DefaultExceptionPayload(messagingException));
+            event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
             return event;
         }
-        finally
+
+        @Override
+        protected void processFinally(MuleEvent event, MessagingException exception)
         {
             muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, ExceptionStrategyNotification.PROCESS_END));
         }
@@ -108,7 +130,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             markExceptionAsHandled(exception);
         }
     }
-    
+
     protected void markExceptionAsHandled(Exception exception)
     {
         if (exception instanceof MessagingException)
@@ -153,7 +175,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             try
             {
                 event.getMessage().setExceptionPayload(new DefaultExceptionPayload(t));
-                MuleEvent result = configuredMessageProcessors.process(event);                
+                MuleEvent result = configuredMessageProcessors.process(event);
                 return result;
             }
             catch (Exception e)

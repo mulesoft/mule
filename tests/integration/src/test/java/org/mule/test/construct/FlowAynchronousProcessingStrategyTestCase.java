@@ -6,6 +6,7 @@
  */
 package org.mule.test.construct;
 
+import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
 import org.mule.runtime.core.api.MessagingException;
 
 import org.junit.Rule;
@@ -46,7 +47,7 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
     private void setUpExpectedException()
     {
         expectedException.expect(MessagingException.class);
-        expectedException.expectMessage("Unable to process a synchronous event asynchronously");
+        expectedException.expectMessage(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE);
     }
 
 }

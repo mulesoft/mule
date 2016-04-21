@@ -6,13 +6,14 @@
  */
 package org.mule.tck;
 
+import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.processor.AbstractNonBlockingMessageProcessor;
@@ -59,6 +60,11 @@ public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProce
                     if (StringUtils.isNotEmpty(appendString))
                     {
                         eventToProcess = append(eventToProcess);
+                    }
+                    if(eventToProcess instanceof ThreadSafeAccess)
+                    {
+                        // Reset acess given we use same event in new thread
+                        ((ThreadSafeAccess) eventToProcess).resetAccessControl();
                     }
                     event.getReplyToHandler().processReplyTo(eventToProcess, null, null);
                     latch.countDown();

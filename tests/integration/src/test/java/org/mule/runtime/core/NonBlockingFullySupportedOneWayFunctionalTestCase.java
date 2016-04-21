@@ -173,6 +173,13 @@ public class NonBlockingFullySupportedOneWayFunctionalTestCase extends Functiona
         assertVoidMuleEventResponse("async");
     }
 
+    @Test
+    public void catchExceptionStrategy() throws Exception
+    {
+        assertVoidMuleEventResponse("catchExceptionStrategy");
+        verify("catchExceptionStrategyChild");
+    }
+
     private void assertVoidMuleEventResponse(String flowName) throws Exception
     {
         assertThat(flowRunner(flowName).withPayload(TEST_MESSAGE).asynchronously().run(), instanceOf(VoidMuleEvent.class));
