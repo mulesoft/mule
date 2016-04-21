@@ -4,8 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.model;
+package org.mule.runtime.core.mule.model;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
@@ -19,7 +23,6 @@ import org.mule.tck.testmodels.fruit.FruitLover;
 import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.lang.reflect.Method;
 
@@ -27,9 +30,6 @@ import org.junit.Test;
 import org.mockito.cglib.proxy.Enhancer;
 import org.mockito.cglib.proxy.MethodInterceptor;
 import org.mockito.cglib.proxy.MethodProxy;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTestCase
 {
@@ -137,6 +137,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
             super();
         }
         
+        @Override
         public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable
         {
             System.out.println("before: " + method.getName());

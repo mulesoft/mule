@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.mule.security;
+package org.mule.runtime.core.mule.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
+
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -41,6 +42,7 @@ public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase
         ske.setAlgorithm("Blowfish");
         ske.setKeyFactory(new SecretKeyFactory()
         {
+            @Override
             public byte[] getKey()
             {
                 return "shhhh".getBytes();
