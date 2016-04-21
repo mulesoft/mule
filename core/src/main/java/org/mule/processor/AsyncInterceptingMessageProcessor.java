@@ -10,6 +10,7 @@ import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.NonBlockingSupported;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.construct.MessageProcessorPathResolver;
 import org.mule.api.context.WorkManager;
@@ -21,6 +22,7 @@ import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.AsyncMessageNotification;
 import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
@@ -37,10 +39,10 @@ import org.mule.work.MuleWorkManager;
  * present then an exception is thrown.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements Startable, Stoppable, MessagingExceptionHandlerAware
+    implements Startable, Stoppable, MessagingExceptionHandlerAware, NonBlockingSupported
 {
 
-    public static final String SYNCHRONOUS_EVENT_ERROR_MESSAGE = "Unable to process a synchronous event asynchronously";
+    public static final String SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE = "Unable to process a synchronous or non-blocking event asynchronously";
 
     protected WorkManagerSource workManagerSource;
     protected boolean doThreading = true;
@@ -132,13 +134,19 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     protected boolean isProcessAsync(MuleEvent event) throws MessagingException
     {
-        if (event.isSynchronous() || event.isTransacted())
+        if (!canProcessAsync(event))
         {
             throw new MessagingException(
-                CoreMessages.createStaticMessage(SYNCHRONOUS_EVENT_ERROR_MESSAGE),
+                CoreMessages.createStaticMessage(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE),
                 event, this);
         }
-        return doThreading && !event.isSynchronous();
+        return doThreading && canProcessAsync(event);
+    }
+
+    protected boolean canProcessAsync(MuleEvent event) throws MessagingException
+    {
+        return !(event.isSynchronous() || event.isTransacted() || event.getReplyToHandler() instanceof
+                NonBlockingReplyToHandler);
     }
 
     protected void processNextAsync(MuleEvent event) throws MuleException

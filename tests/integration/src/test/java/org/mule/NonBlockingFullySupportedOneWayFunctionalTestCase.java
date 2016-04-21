@@ -11,6 +11,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.MessageExchangePattern.ONE_WAY;
+import static org.mule.tck.functional.FlowAssert.verify;
+import org.mule.api.MessagingException;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -19,12 +21,6 @@ public class NonBlockingFullySupportedOneWayFunctionalTestCase extends Functiona
 {
 
     public static String FOO = "foo";
-
-    @Override
-    public int getTestTimeoutSecs()
-    {
-        return 600;
-    }
 
     @Override
     protected String getConfigFile()
@@ -48,6 +44,35 @@ public class NonBlockingFullySupportedOneWayFunctionalTestCase extends Functiona
     public void childFlow() throws Exception
     {
         assertVoidMuleEventResponse("childFlow");
+        verify("childFlowChild");
+    }
+
+    @Test
+    public void childDefaultFlow() throws Exception
+    {
+        testFlow("childDefaultFlow", ONE_WAY);
+        verify("childDefaultFlowChild");
+    }
+
+    @Test
+    public void childSyncFlow() throws Exception
+    {
+        testFlow("childSyncFlow", ONE_WAY);
+        verify("childSyncFlowChild");
+    }
+
+    @Test(expected = MessagingException.class)
+    public void childAsyncFlow() throws Exception
+    {
+        testFlow("childAsyncFlow", ONE_WAY);
+        verify("childAsyncFlowChild");
+    }
+
+    @Test(expected = MessagingException.class)
+    public void childQueuedAsyncFlow() throws Exception
+    {
+        assertThat(testFlow("childQueuedAsyncFlow", ONE_WAY), instanceOf(DefaultMuleEvent.class));
+        verify("childQueuedAsyncFlowChild");
     }
 
     @Test

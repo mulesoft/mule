@@ -350,7 +350,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus, boolean shareFlowVars)
     {
         this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus,
-             shareFlowVars, rewriteEvent.getExchangePattern());
+             shareFlowVars, rewriteEvent.getExchangePattern(), rewriteEvent.getReplyToHandler());
     }
 
     /**
@@ -360,9 +360,19 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             MessageExchangePattern messageExchangePattern)
     {
         this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus,
-             shareFlowVars, messageExchangePattern);
+             shareFlowVars, messageExchangePattern, rewriteEvent.getReplyToHandler());
     }
 
+    /**
+     * Copy constructor to be used when synchronicity,
+     * {@link org.mule.MessageExchangePattern} and {@link ReplyToHandler} all need changing.
+     */
+    public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus, boolean shareFlowVars,
+                            MessageExchangePattern messageExchangePattern, ReplyToHandler replyToHandler)
+    {
+        this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus,
+             shareFlowVars, messageExchangePattern, replyToHandler);
+    }
 
     /**
      * A helper constructor used to rewrite an event payload
@@ -391,9 +401,10 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                                MuleSession session,
                                boolean synchronous,
                                boolean shareFlowVars,
-                               MessageExchangePattern messageExchangePattern)
+                               MessageExchangePattern messageExchangePattern,
+                               ReplyToHandler replyToHandler)
     {
-        this(message, rewriteEvent, flowConstruct, session, synchronous, rewriteEvent.getReplyToHandler(),
+        this(message, rewriteEvent, flowConstruct, session, synchronous, replyToHandler,
              rewriteEvent.getReplyToDestination(), shareFlowVars, messageExchangePattern);
     }
 
