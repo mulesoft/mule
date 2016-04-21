@@ -215,6 +215,13 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
         testFlowNonBlocking("async");
     }
 
+    @Test
+    public void catchExceptionStrategy() throws Exception
+    {
+        testFlowNonBlocking("catchExceptionStrategy", getMessageExchnagePattern());
+        verify("catchExceptionStrategyChild");
+    }
+
     protected MessageExchangePattern getMessageExchnagePattern()
     {
         return MessageExchangePattern.REQUEST_RESPONSE;

@@ -6,11 +6,16 @@
  */
 package org.mule;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mule.tck.functional.FlowAssert.verify;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.component.ComponentException;
 import org.mule.construct.Flow;
+import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
@@ -32,12 +37,6 @@ public class NonBlockingNotSupportedFunctionalTestCase extends FunctionalTestCas
     public void syncFlow() throws Exception
     {
         testFlowNonBlocking("syncFlow");
-    }
-
-    @Test
-    public void catchExceptionStrategy() throws Exception
-    {
-        testFlowNonBlocking("catchExceptionStrategy");
     }
 
     @Test
@@ -109,7 +108,7 @@ public class NonBlockingNotSupportedFunctionalTestCase extends FunctionalTestCas
         message3.setMessageRootId(message1.getMessageRootId());
         runFlowNonBlocking("aggregator", new DefaultMuleEvent(message3, MessageExchangePattern.REQUEST_RESPONSE, flow));
 
-        FlowAssert.verify("aggregator");
+        verify("aggregator");
     }
 
     @Test
@@ -125,13 +124,39 @@ public class NonBlockingNotSupportedFunctionalTestCase extends FunctionalTestCas
             }
         });
         latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
-        FlowAssert.verify("poll");
+        verify("poll");
     }
 
     @Test
     public void transactional() throws Exception
     {
         testFlowNonBlocking("transactional");
+    }
+
+    @Test
+    public void rollbackRollbackExceptionStrategy() throws Exception
+    {
+        try
+        {
+            runFlowNonBlocking("rollbackRollbackExceptionStrategy");
+            fail("Exception Expected");
+        }
+        catch (ComponentException componentException)
+        {
+            assertThat(componentException.getCause(), instanceOf(FunctionalTestException.class));
+        }
+        finally
+        {
+            verify("rollbackRollbackExceptionStrategy");
+            verify("rollbackExceptionStrategyChild");
+        }
+    }
+
+    @Test
+    public void catchRollbackExceptionStrategy() throws Exception
+    {
+        testFlowNonBlocking("catchRollbackExceptionStrategy");
+        verify("rollbackExceptionStrategyChild");
     }
 
 }
