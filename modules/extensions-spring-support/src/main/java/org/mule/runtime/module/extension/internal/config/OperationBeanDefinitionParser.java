@@ -7,21 +7,23 @@
 package org.mule.runtime.module.extension.internal.config;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_SINGLETON;
-import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
-import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
-import org.mule.runtime.config.spring.util.SpringXMLUtils;
-import org.mule.runtime.core.enricher.MessageEnricher;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.utils.JavaTypeUtils;
+import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
+import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
+import org.mule.runtime.config.spring.util.SpringXMLUtils;
+import org.mule.runtime.core.api.NestedProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.enricher.MessageEnricher;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.module.extension.internal.util.NameUtils;
 
 import java.util.List;
@@ -63,15 +65,17 @@ final class OperationBeanDefinitionParser extends BaseExtensionBeanDefinitionPar
     @Override
     protected void doParse(BeanDefinitionBuilder builder, Element element, XmlExtensionParserDelegate parserDelegate, ParserContext parserContext)
     {
-        parserDelegate.parseConfigRef(element, builder);
+        withClassLoader(getClassLoader(extensionModel), () -> {
+            parserDelegate.parseConfigRef(element, builder);
 
-        builder.addConstructorArgValue(extensionModel)
-                .addConstructorArgValue(operationModel)
-                .addConstructorArgValue(parserDelegate.toElementDescriptorBeanDefinition(element))
-                .addConstructorArgValue(parseNestedOperations(element, parserContext))
-                .addConstructorArgReference(OBJECT_MULE_CONTEXT);
+            builder.addConstructorArgValue(extensionModel)
+                    .addConstructorArgValue(operationModel)
+                    .addConstructorArgValue(parserDelegate.toElementDescriptorBeanDefinition(element))
+                    .addConstructorArgValue(parseNestedOperations(element, parserContext))
+                    .addConstructorArgReference(OBJECT_MULE_CONTEXT);
 
-        attachProcessorDefinition(parserContext, builder.getBeanDefinition());
+            attachProcessorDefinition(parserContext, builder.getBeanDefinition());
+        });
     }
 
     private ManagedMap<String, ManagedList<MessageProcessor>> parseNestedOperations(final Element element, final ParserContext parserContext)

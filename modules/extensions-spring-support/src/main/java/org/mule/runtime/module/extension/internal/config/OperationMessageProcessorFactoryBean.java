@@ -8,18 +8,20 @@ package org.mule.runtime.module.extension.internal.config;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.util.ObjectNameHelper;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.processor.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.core.util.ObjectNameHelper;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -64,13 +66,22 @@ public class OperationMessageProcessorFactoryBean extends ExtensionComponentFact
     @Override
     public OperationMessageProcessor getObject() throws Exception
     {
-        ResolverSet resolverSet = parserDelegate.getResolverSet(element, operationModel.getParameterModels(), nestedOperations);
-        OperationMessageProcessor processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target, resolverSet, extensionManager);
+        return withClassLoader(getClassLoader(extensionModel), () -> {
+            try
+            {
+                ResolverSet resolverSet = parserDelegate.getResolverSet(element, operationModel.getParameterModels(), nestedOperations);
+                OperationMessageProcessor processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProviderName, target, resolverSet, extensionManager);
 
-        //TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
-        muleContext.getInjector().inject(processor);
+                //TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
+                muleContext.getInjector().inject(processor);
 
-        return processor;
+                return processor;
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
+            }
+        });
     }
 
     private String getTarget(ElementDescriptor element)

@@ -12,34 +12,35 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.Described;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
-import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
 import org.mule.runtime.extension.api.introspection.InterceptableModel;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.Interceptor;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -296,6 +297,13 @@ public class MuleExtensionUtils
     public static Method getImplementingMethod(OperationDeclaration operationDeclaration)
     {
         return operationDeclaration.getModelProperty(ImplementingMethodModelProperty.class).map(ImplementingMethodModelProperty::getMethod).orElse(null);
+    }
+
+    public static ClassLoader getClassLoader(ExtensionModel extensionModel)
+    {
+        return extensionModel.getModelProperty(ClassLoaderModelProperty.class)
+                .map(ClassLoaderModelProperty::getClassLoader)
+                .orElse(Thread.currentThread().getContextClassLoader());
     }
 
     private static class DescribedComparator implements Comparator<Described>

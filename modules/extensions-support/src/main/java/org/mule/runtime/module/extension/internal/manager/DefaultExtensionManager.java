@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.time.Time;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -142,7 +143,8 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     public void registerExtension(ExtensionManifest manifest, ClassLoader classLoader)
     {
         Describer describer = describerResolver.resolve(manifest, classLoader);
-        RuntimeExtensionModel extensionModel = extensionFactory.createFrom(describer.describe(new DefaultDescribingContext()));
+        RuntimeExtensionModel extensionModel = ClassUtils.withClassLoader(classLoader, () ->
+                extensionFactory.createFrom(describer.describe(new DefaultDescribingContext())));
 
         registerExtension(extensionModel);
     }

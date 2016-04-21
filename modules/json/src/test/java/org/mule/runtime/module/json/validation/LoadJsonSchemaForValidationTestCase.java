@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
 import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_JSON;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -46,16 +47,9 @@ public class LoadJsonSchemaForValidationTestCase extends AbstractMuleTestCase
     @Test
     public void usesThreadClassloader() throws Exception
     {
-        doWithMockClasssLoader(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                JsonSchemaValidator.builder()
-                        .setSchemaLocation(SCHEMA_FSTAB_JSON)
-                        .build();
-            }
-        });
+        doWithMockClassLoader(() -> JsonSchemaValidator.builder()
+                .setSchemaLocation(SCHEMA_FSTAB_JSON)
+                .build());
 
         verify(mockClassLoader).getResource(SCHEMA_FSTAB_JSON);
     }
@@ -63,32 +57,16 @@ public class LoadJsonSchemaForValidationTestCase extends AbstractMuleTestCase
     @Test
     public void usesThreadClassloaderWithRedirect() throws Exception
     {
-        doWithMockClasssLoader(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                JsonSchemaValidator.builder()
-                        .setSchemaLocation("http://mule.org/schemas/fstab.json")
-                        .addSchemaRedirect("http://mule.org/schemas/fstab.json", SCHEMA_FSTAB_JSON)
-                        .build();
-            }
-        });
+        doWithMockClassLoader(() -> JsonSchemaValidator.builder()
+                .setSchemaLocation("http://mule.org/schemas/fstab.json")
+                .addSchemaRedirect("http://mule.org/schemas/fstab.json", SCHEMA_FSTAB_JSON)
+                .build());
 
         verify(mockClassLoader).getResource(SCHEMA_FSTAB_JSON);
     }
 
-    private void doWithMockClasssLoader(Runnable closure)
+    private void doWithMockClassLoader(Runnable closure)
     {
-        final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            Thread.currentThread().setContextClassLoader(mockClassLoader);
-            closure.run();
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(originalClassLoader);
-        }
+        withClassLoader(mockClassLoader, closure);
     }
 }

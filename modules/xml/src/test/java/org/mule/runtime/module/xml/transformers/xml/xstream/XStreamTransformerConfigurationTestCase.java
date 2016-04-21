@@ -6,7 +6,14 @@
  */
 package org.mule.runtime.module.xml.transformers.xml.xstream;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.xml.transformer.XStreamFactory;
 import org.mule.runtime.module.xml.transformer.XmlToObject;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -18,21 +25,17 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 /**
  * Tests configuration and creation of XStream-based transformers
  */
 public class XStreamTransformerConfigurationTestCase extends AbstractMuleTestCase
 {
+
     public static volatile boolean MyDriverDidInitialize;
 
     protected static class MyDOMDriver extends DomDriver
     {
+
         public MyDOMDriver()
         {
             super();
@@ -95,29 +98,24 @@ public class XStreamTransformerConfigurationTestCase extends AbstractMuleTestCas
     @Test
     public void testClassLoader()
     {
-
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-
-        try
-        {
-            TestClassLoader classLoader =  new TestClassLoader();   
-            Thread.currentThread().setContextClassLoader(classLoader);
-            XmlToObject transformer = new XmlToObject();
-            transformer.initialise();
-            assertEquals(classLoader, transformer.getXStream().getClassLoader());
-        }
-        catch (Exception e)
-        {
-            fail(e.getMessage());
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(originalClassLoader);
-        }
+        TestClassLoader classLoader = new TestClassLoader();
+        withClassLoader(classLoader, () -> {
+            try
+            {
+                XmlToObject transformer = new XmlToObject();
+                transformer.initialise();
+                assertEquals(classLoader, transformer.getXStream().getClassLoader());
+            }
+            catch (Exception e)
+            {
+                fail(e.getMessage());
+            }
+        });
     }
 
     private static class TestClassLoader extends ClassLoader
     {
+
     }
 
 }

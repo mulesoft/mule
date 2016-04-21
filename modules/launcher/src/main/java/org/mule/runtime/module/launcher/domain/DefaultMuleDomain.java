@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.domain;
 
+import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -242,16 +243,7 @@ public class DefaultMuleDomain implements Domain
             }
             // null CCL ensures we log at 'system' level
             // TODO create a more usable wrapper for any logger to be logged at sys level
-            final ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-            try
-            {
-                Thread.currentThread().setContextClassLoader(null);
-                deployLogger.info(miniSplash(String.format("Started domain '%s'", getArtifactName())));
-            }
-            finally
-            {
-                Thread.currentThread().setContextClassLoader(oldCl);
-            }
+            withClassLoader(null, () -> deployLogger.info(miniSplash(String.format("Started domain '%s'", getArtifactName()))));
         }
         catch (Exception e)
         {

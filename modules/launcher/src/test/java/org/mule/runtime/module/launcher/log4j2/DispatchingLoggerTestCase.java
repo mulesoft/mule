@@ -9,7 +9,7 @@ package org.mule.runtime.module.launcher.log4j2;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -82,31 +82,19 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase
     @Test
     public void anotherClassLoader()
     {
-        Thread.currentThread().setContextClassLoader(additionalClassLoader);
-        try
-        {
+        withClassLoader(additionalClassLoader, () -> {
             logger.info(MESSAGE);
             verify(originalLogger).info(MESSAGE);
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(currentClassLoader);
-        }
+        });
     }
 
     @Test
     public void artifactClassLoader()
     {
-        Thread.currentThread().setContextClassLoader(artifactClassLoader);
-        try
-        {
+        withClassLoader(artifactClassLoader, () -> {
             logger.info(MESSAGE);
             verify(contextSelector).getContext(LOGGER_NAME, artifactClassLoader, true);
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(artifactClassLoader);
-        }
+        });
     }
 
 }

@@ -8,6 +8,7 @@ package org.mule.runtime.core.routing.filters;
 
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
+import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -34,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ExpressionFilter implements Filter, MuleContextAware
 {
+
     /**
      * logger used by this class
      */
@@ -50,7 +52,9 @@ public class ExpressionFilter implements Filter, MuleContextAware
      **/
     private ClassLoader expressionEvaluationClassLoader = Thread.currentThread().getContextClassLoader();
 
-    /** For evaluators that are not expression languages we can delegate the execution to another filter */
+    /**
+     * For evaluators that are not expression languages we can delegate the execution to another filter
+     */
     private Filter delegateFilter;
 
     public ExpressionFilter(String expression)
@@ -72,7 +76,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
 
     /**
      * Check a given message against this filter.
-     * 
+     *
      * @param message a non null message to filter.
      * @return <code>true</code> if the message matches the filter
      */
@@ -108,17 +112,8 @@ public class ExpressionFilter implements Filter, MuleContextAware
         // class-loader to used is to switch it out here. We may want to consider
         // passing the class-loader to the ExpressionManager and only doing this for
         // certain ExpressionEvaluators further in.
-        ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            Thread.currentThread().setContextClassLoader(expressionEvaluationClassLoader);
-            return muleContext.getExpressionManager().evaluateBoolean(getFullExpression(), event, nullReturnsTrue, !nullReturnsTrue);
-        }
-        finally
-        {
-            // Restore original context class-loader
-            Thread.currentThread().setContextClassLoader(originalContextClassLoader);
-        }
+        return withClassLoader(expressionEvaluationClassLoader, () ->
+                muleContext.getExpressionManager().evaluateBoolean(getFullExpression(), event, nullReturnsTrue, !nullReturnsTrue));
     }
 
     protected String getFullExpression()
@@ -150,8 +145,14 @@ public class ExpressionFilter implements Filter, MuleContextAware
     @Override
     public boolean equals(Object obj)
     {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
 
         final ExpressionFilter other = (ExpressionFilter) obj;
         return equal(config, other.config) && equal(delegateFilter, other.delegateFilter)
@@ -161,6 +162,6 @@ public class ExpressionFilter implements Filter, MuleContextAware
     @Override
     public int hashCode()
     {
-        return hash(new Object[]{this.getClass(), config, delegateFilter, nullReturnsTrue});
+        return hash(new Object[] {this.getClass(), config, delegateFilter, nullReturnsTrue});
     }
 }

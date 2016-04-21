@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
+import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 
 import java.util.List;
@@ -13,9 +14,9 @@ import java.util.List;
 /**
  * This class process a message through a set of {@link org.mule.runtime.core.execution.MessageProcessPhase} using
  * the message content and message processing context provided by {@link org.mule.runtime.core.execution.MessageProcessTemplate} and {@link org.mule.runtime.core.execution.MessageProcessContext}.
- * 
+ * <p>
  * This class will handle any message processing failure by calling the {@link org.mule.runtime.core.api.exception.SystemExceptionHandler} defined by the application.
- * 
+ * <p>
  * Each {@link org.mule.runtime.core.execution.MessageProcessPhase} can be executed with a different threading mechanism.
  * {@link org.mule.runtime.core.execution.MessageProcessPhase} implementation must guarantee that upon phase completion the method {@link PhaseResultNotifier#phaseSuccessfully()}  is executed,
  * if there was a failure processing the message then the method {@link PhaseResultNotifier#phaseFailure(Exception)} must be executed and if the phase consumed the message the method
@@ -43,6 +44,7 @@ public class PhaseExecutionEngine
 
     public class InternalPhaseExecutionEngine implements PhaseResultNotifier
     {
+
         private int currentPhase = 0;
         private final MessageProcessContext messageProcessContext;
         private final MessageProcessTemplate messageProcessTemplate;
@@ -62,7 +64,7 @@ public class PhaseExecutionEngine
             {
                 if (phaseList.get(currentPhase).supportsTemplate(messageProcessTemplate))
                 {
-                    phaseList.get(currentPhase).runPhase(messageProcessTemplate,messageProcessContext,this);
+                    phaseList.get(currentPhase).runPhase(messageProcessTemplate, messageProcessContext, this);
                 }
                 else
                 {
@@ -95,18 +97,14 @@ public class PhaseExecutionEngine
                 endPhaseProcessed = true;
                 if (endProcessPhase.supportsTemplate(messageProcessTemplate))
                 {
-                    endProcessPhase.runPhase((EndPhaseTemplate) messageProcessTemplate, messageProcessContext,this);
+                    endProcessPhase.runPhase((EndPhaseTemplate) messageProcessTemplate, messageProcessContext, this);
                 }
             }
         }
 
         public void process()
         {
-            ClassLoader originalClassLoader = null;
-            try
-            {
-                originalClassLoader = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(messageProcessContext.getExecutionClassLoader());
+            withClassLoader(messageProcessContext.getExecutionClassLoader(), () -> {
                 for (MessageProcessPhase phase : phaseList)
                 {
                     if (phase.supportsTemplate(messageProcessTemplate))
@@ -116,11 +114,7 @@ public class PhaseExecutionEngine
                     }
                     currentPhase++;
                 }
-            }
-            finally
-            {
-                Thread.currentThread().setContextClassLoader(originalClassLoader);
-            }
+            });
         }
 
     }
