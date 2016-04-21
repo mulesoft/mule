@@ -6,8 +6,8 @@
  */
 package org.mule.test.petstore.extension;
 
-import org.mule.runtime.api.connection .ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection .ConnectionHandlingStrategyFactory;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.extension.api.annotation.Alias;
 
 @Alias("poolable")

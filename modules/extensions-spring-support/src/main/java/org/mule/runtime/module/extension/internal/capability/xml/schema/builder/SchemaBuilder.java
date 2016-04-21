@@ -58,7 +58,6 @@ import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.metadata.utils.MetadataTypeUtils;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.NestedProcessor;
@@ -110,10 +109,11 @@ import org.mule.runtime.module.extension.internal.model.property.TypeRestriction
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.NameUtils;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -165,10 +165,10 @@ public final class SchemaBuilder
                 .importMuleExtensionNamespace();
 
         Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
-        builder.withTypeMapping(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : Collections.emptyMap());
+        builder.withTypeMapping(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : ImmutableMap.of());
 
         Optional<Map<MetadataType, MetadataType>> importedTypes = extensionModel.getModelProperty(ImportedTypesModelProperty.class).map(ImportedTypesModelProperty::getImportedTypes);
-        builder.withImportedTypes(importedTypes.isPresent() ? importedTypes.get() : Collections.emptyMap());
+        builder.withImportedTypes(importedTypes.isPresent() ? importedTypes.get() : ImmutableMap.of());
 
         return builder;
     }
@@ -890,7 +890,7 @@ public final class SchemaBuilder
 
                 if (importedTypes.get(objectType) != null)
                 {
-                    addImportedTypeRef(JavaTypeUtils.getType(importedTypes.get(objectType)), parameterModel, all);
+                    addImportedTypeRef(getType(importedTypes.get(objectType)), parameterModel, all);
                     return;
                 }
 

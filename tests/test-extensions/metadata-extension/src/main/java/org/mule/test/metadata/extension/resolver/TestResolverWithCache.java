@@ -6,9 +6,15 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
+import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.AGE;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.APPLICATION_JAVA_MIME_TYPE;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.BRAND;
-import org.mule.runtime.api.connection .ConnectionException;
+import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.NAME;
+import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getKeys;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataFormat;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -17,9 +23,6 @@ import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
-import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.MetadataFormat;
-import org.mule.metadata.api.model.MetadataType;
 
 import java.io.Serializable;
 import java.util.List;
@@ -69,9 +72,9 @@ public class TestResolverWithCache implements MetadataContentResolver, MetadataO
     @Override
     public List<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
     {
-        context.getCache().put(TestMetadataResolverUtils.AGE, AGE_VALUE);
-        context.getCache().put(TestMetadataResolverUtils.NAME, NAME_VALUE);
-        return TestMetadataResolverUtils.getKeys(context);
+        context.getCache().put(AGE, AGE_VALUE);
+        context.getCache().put(NAME, NAME_VALUE);
+        return getKeys(context);
     }
 
     private final class SerializableAccount implements Serializable

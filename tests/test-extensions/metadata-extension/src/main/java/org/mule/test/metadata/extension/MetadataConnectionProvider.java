@@ -6,11 +6,11 @@
  */
 package org.mule.test.metadata.extension;
 
-import org.mule.runtime.api.connection .ConnectionException;
-import org.mule.runtime.api.connection .ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection .ConnectionHandlingStrategyFactory;
-import org.mule.runtime.api.connection.ConnectionProvider;;
-import org.mule.runtime.api.connection .ConnectionValidationResult;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 
 public class MetadataConnectionProvider implements ConnectionProvider<MetadataExtension, MetadataConnection>
 {

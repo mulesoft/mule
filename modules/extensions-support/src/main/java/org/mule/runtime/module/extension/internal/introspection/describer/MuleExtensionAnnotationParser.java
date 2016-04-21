@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
+import static org.mule.runtime.core.util.Preconditions.checkState;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
-import static org.mule.runtime.core.util.Preconditions.checkState;
-
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
@@ -32,13 +36,8 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Parameter
 import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.runtime.extension.api.introspection.property.DisplayModelPropertyBuilder;
 import org.mule.runtime.extension.api.introspection.property.MetadataModelProperty;
-import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.CollectionUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -49,7 +48,6 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -133,20 +131,19 @@ public final class MuleExtensionAnnotationParser
     static <T extends Annotation> List<T> parseRepeatableAnnotation(Class<?> extensionType, Class<T> annotation,
                                                                     Function<Annotation, T[]> containerConsumer)
     {
-        List<T> annotationDeclarations = Collections.emptyList();
+        List<T> annotationDeclarations = ImmutableList.of();
 
         Repeatable repeatableContainer = annotation.getAnnotation(Repeatable.class);
         if (repeatableContainer != null)
         {
-            //TODO FIXME look parent objects
-            Annotation container = extensionType.getAnnotation(repeatableContainer.value());
+            Annotation container = IntrospectionUtils.getAnnotation(extensionType, repeatableContainer.value());
             if (container != null)
             {
                 annotationDeclarations = ImmutableList.copyOf(containerConsumer.apply(container));
             }
         }
 
-        T singleDeclaration = extensionType.getAnnotation(annotation);
+        T singleDeclaration = IntrospectionUtils.getAnnotation(extensionType, annotation);
         if (singleDeclaration != null)
         {
             annotationDeclarations = ImmutableList.of(singleDeclaration);

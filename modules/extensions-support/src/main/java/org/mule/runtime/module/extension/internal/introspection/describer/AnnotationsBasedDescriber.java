@@ -7,8 +7,6 @@
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
@@ -40,6 +38,8 @@ import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.core.util.collection.ImmutableMapCollector;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -197,15 +197,15 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareSubTypesMapping(ExtensionDeclarer declaration, Class<?> extensionType)
     {
-        List<SubTypeMapping> typeMappings = parseRepeatableAnnotation(extensionType, SubTypeMapping.class, c -> ((SubTypesMapping)c).value());
+        List<SubTypeMapping> typeMappings = parseRepeatableAnnotation(extensionType, SubTypeMapping.class, c -> ((SubTypesMapping) c).value());
 
         if (!typeMappings.isEmpty())
         {
-            Map<MetadataType, List<MetadataType>> subTypesMap = typeMappings.stream().collect(toMap(
-                    mapping -> getMetadataType(mapping.baseType(), typeLoader),
-                    mapping -> stream(mapping.subTypes())
-                            .map(subType -> getMetadataType(subType, typeLoader))
-                            .collect(toList())));
+            Map<MetadataType, List<MetadataType>> subTypesMap = typeMappings.stream().collect(
+                    new ImmutableMapCollector<>(mapping -> getMetadataType(mapping.baseType(), typeLoader),
+                                                mapping -> stream(mapping.subTypes())
+                                                        .map(subType -> getMetadataType(subType, typeLoader))
+                                                        .collect(new ImmutableListCollector<>())));
 
             declaration.withModelProperty(new SubTypesModelProperty(subTypesMap));
         }
@@ -213,13 +213,13 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareImportedTypes(ExtensionDeclarer declaration, Class<?> extensionType)
     {
-        List<Import> importTypes = parseRepeatableAnnotation(extensionType, Import.class, c -> ((ImportedTypes)c).value());
+        List<Import> importTypes = parseRepeatableAnnotation(extensionType, Import.class, c -> ((ImportedTypes) c).value());
 
         if (!importTypes.isEmpty())
         {
-            Map<MetadataType, MetadataType> importedTypes = importTypes.stream().collect(toMap(
-                    imports -> getMetadataType(imports.type(), typeLoader),
-                    imports -> getMetadataType(imports.from(), typeLoader)));
+            Map<MetadataType, MetadataType> importedTypes = importTypes.stream().collect(
+                    new ImmutableMapCollector<>(imports -> getMetadataType(imports.type(), typeLoader),
+                                                imports -> getMetadataType(imports.from(), typeLoader)));
 
             declaration.withModelProperty(new ImportedTypesModelProperty(importedTypes));
         }
@@ -646,7 +646,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 stream(method.getParameters())
                         .filter(parameter -> parameter.isAnnotationPresent(annotationClass));
 
-        List<java.lang.reflect.Parameter> parameterList = parametersStream.collect(toList());
+        List<java.lang.reflect.Parameter> parameterList = parametersStream.collect(new ImmutableListCollector<>());
 
         if (parameterList.size() > 1)
         {
