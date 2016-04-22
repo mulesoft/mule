@@ -5,12 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
-
-import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_NAMESPACE;
-import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_EXTENSION_PREFIX;
-import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
-import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_PREFIX;
+package org.mule.runtime.module.extension.internal.xml;
 
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 
@@ -24,13 +19,21 @@ public final class SchemaConstants
     public static final String SPRING_FRAMEWORK_NAMESPACE = "http://www.springframework.org/schema/beans";
     public static final String SPRING_FRAMEWORK_SCHEMA_LOCATION = "http://www.springframework.org/schema/beans/spring-beans-3.0.xsd";
     public static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
+
+    public static final String MULE_EXTENSION_NAMESPACE = "http://www.mulesoft.org/schema/mule/extension";
+    public static final String MULE_EXTENSION_PREFIX = "extension";
     public static final String MULE_EXTENSION_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd";
+
     public static final String MULE_TLS_NAMESPACE = "http://www.mulesoft.org/schema/mule/tls";
     public static final String MULE_TLS_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd";
     public static final String OPERATION_SUBSTITUTION_GROUP_SUFFIX = "-OperationGroup";
     public static final String GROUP_SUFFIX = "-group";
-    public static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/%s";
 
+    public static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/%s";
+    public static final String MULE_NAMESPACE = String.format(DEFAULT_SCHEMA_LOCATION_MASK, "core");
+    public static final String MULE_PREFIX = "mule";
+
+    public static final QName MULE_ABSTRACT_MESSAGE_SOURCE_TYPE = new QName(MULE_NAMESPACE, "abstractMessageSourceType", MULE_PREFIX);
     public static final QName MULE_ABSTRACT_EXTENSION = new QName(MULE_NAMESPACE, "abstract-extension", MULE_PREFIX);
     public static final QName MULE_PROPERTY_PLACEHOLDER_TYPE = new QName(MULE_NAMESPACE, "propertyPlaceholderType", MULE_PREFIX);
     public static final QName MULE_ABSTRACT_POOLING_PROFILE_TYPE = new QName(MULE_NAMESPACE, "abstractPoolingProfileType", MULE_PREFIX);

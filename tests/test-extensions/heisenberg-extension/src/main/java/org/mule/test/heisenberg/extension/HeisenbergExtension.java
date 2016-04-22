@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -31,6 +32,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
+import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
@@ -52,10 +54,10 @@ import javax.inject.Inject;
 @OnException(HeisenbergConnectionExceptionEnricher.class)
 @Providers(HeisenbergConnectionProvider.class)
 @Sources(HeisenbergSource.class)
+@Export(classes = {HeisenbergException.class})
 public class HeisenbergExtension implements Lifecycle, MuleContextAware
 {
 
-    public static final String SCHEMA_VERSION = "1.0-blue";
     public static final String HEISENBERG = "Heisenberg";
     public static final String AGE = "50";
     public static final String EXTENSION_DESCRIPTION = "My Test Extension just to unit test";

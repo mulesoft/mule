@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal.capability.xml;
 
 import static java.util.Arrays.asList;
-import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.compareXML;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
@@ -23,6 +23,7 @@ import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaGenerator;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
+import org.mule.runtime.module.extension.internal.introspection.enricher.XmlModelEnricher;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
 import org.mule.runtime.module.extension.internal.runtime.connector.basic.GlobalInnerPojoConnector;
 import org.mule.runtime.module.extension.internal.runtime.connector.basic.GlobalPojoConnector;
@@ -38,12 +39,7 @@ import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.Difference;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -102,26 +98,6 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
 
         String schema = generator.generate(extensionModel, capability);
 
-        XMLUnit.setNormalizeWhitespace(true);
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreComments(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
-
-        Diff diff = XMLUnit.compareXML(expectedSchema, schema);
-        if (!(diff.similar() && diff.identical()))
-        {
-            System.out.println(schema);
-            DetailedDiff detDiff = new DetailedDiff(diff);
-            @SuppressWarnings("rawtypes")
-            List differences = detDiff.getAllDifferences();
-            StringBuilder diffLines = new StringBuilder();
-            for (Object object : differences)
-            {
-                Difference difference = (Difference) object;
-                diffLines.append(difference.toString() + '\n');
-            }
-
-            assertEquals(String.format("The Output for extension [%s] schema was not the expected:", extensionUnderTest.getName()), expectedSchema, schema);
-        }
+        compareXML(expectedSchema, schema);
     }
 }

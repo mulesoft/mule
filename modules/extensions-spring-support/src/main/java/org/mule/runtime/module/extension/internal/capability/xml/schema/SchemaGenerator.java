@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
-import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
-import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_PREFIX;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_PREFIX;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;

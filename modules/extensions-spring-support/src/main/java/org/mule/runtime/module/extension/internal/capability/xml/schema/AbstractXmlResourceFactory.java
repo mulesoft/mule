@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.XSD_EXTENSION;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 import org.mule.runtime.extension.api.resources.GeneratedResource;

@@ -14,13 +14,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.metadata.java.JavaTypeLoader.JAVA;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.config.MuleManifest;
-import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeHandlerManagerFactory;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -30,6 +23,13 @@ import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.handler.TypeHandlerManager;
 import org.mule.metadata.java.utils.ParsingContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeHandlerManagerFactory;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.io.File;
@@ -37,11 +37,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.jar.Manifest;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.Difference;
+import org.custommonkey.xmlunit.XMLUnit;
 
 public abstract class ExtensionsTestUtils
 {
@@ -166,4 +171,36 @@ public abstract class ExtensionsTestUtils
         return manifestFile;
     }
 
+    /**
+     * Receives to {@link String} representation of two XML
+     * files and verify that they are semantically equivalent
+     *
+     * @param expected the reference content
+     * @param actual   the actual content
+     * @throws Exception if comparison fails
+     */
+    public static void compareXML(String expected, String actual) throws Exception
+    {
+        XMLUnit.setNormalizeWhitespace(true);
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreComments(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
+
+        Diff diff = XMLUnit.compareXML(expected, actual);
+        if (!(diff.similar() && diff.identical()))
+        {
+            System.out.println(actual);
+            DetailedDiff detDiff = new DetailedDiff(diff);
+            @SuppressWarnings("rawtypes")
+            List differences = detDiff.getAllDifferences();
+            StringBuilder diffLines = new StringBuilder();
+            for (Object object : differences)
+            {
+                Difference difference = (Difference) object;
+                diffLines.append(difference.toString() + '\n');
+            }
+
+            throw new IllegalArgumentException(String.format("The Output for extension [%s] schema was not the expected:", diffLines.toString()));
+        }
+    }
 }
