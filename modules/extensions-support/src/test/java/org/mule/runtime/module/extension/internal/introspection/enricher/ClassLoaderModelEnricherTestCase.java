@@ -12,11 +12,10 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_CLASSLOADER;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
@@ -38,7 +37,7 @@ public class ClassLoaderModelEnricherTestCase extends AbstractMuleTestCase
     @Mock(answer = RETURNS_DEEP_STUBS)
     private DescribingContext describingContext;
 
-    @Mock
+    @Mock(answer = RETURNS_DEEP_STUBS)
     private ExtensionDeclarer extensionDeclarer;
 
     @Mock
@@ -66,12 +65,11 @@ public class ClassLoaderModelEnricherTestCase extends AbstractMuleTestCase
         assertThat(property.getClassLoader(), is(sameInstance(classLoader)));
     }
 
-    @Test
+    @Test(expected = IllegalModelDefinitionException.class)
     public void noClassLoaderForEnrichment()
     {
         setClassLoaderParameter(null);
         enricher.enrich(describingContext);
-        verify(extensionDeclarer, never()).withModelProperty(any());
     }
 
     private void setClassLoaderParameter(ClassLoader classLoader)

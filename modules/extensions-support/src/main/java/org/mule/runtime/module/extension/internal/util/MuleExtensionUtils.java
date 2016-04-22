@@ -301,17 +301,29 @@ public class MuleExtensionUtils
 
     /**
      * If the {@code extensionModel} contains a {@link ClassLoaderModelProperty}, then it returns
-     * the {@link ClassLoader} associated to such property. If the property is not present,
-     * it returns the current {@link Thread}'s context classLoader.
+     * the {@link ClassLoader} associated to such property.
      *
      * @param extensionModel a {@link ExtensionModel}
      * @return a {@link ClassLoader}
+     * @throws IllegalModelDefinitionException if no {@link ClassLoaderModelProperty} is set on the extension
      */
     public static ClassLoader getClassLoader(ExtensionModel extensionModel)
     {
         return extensionModel.getModelProperty(ClassLoaderModelProperty.class)
                 .map(ClassLoaderModelProperty::getClassLoader)
-                .orElse(Thread.currentThread().getContextClassLoader());
+                .orElseThrow(() -> noClassLoaderException(extensionModel.getName()));
+    }
+
+    /**
+     * Creates an exception that says that no {@link ClassLoader} was specified for
+     * the extension of the given {@code extensionName}
+     *
+     * @param extensionName the name of the offending extension
+     * @return an {@link IllegalModelDefinitionException}
+     */
+    public static IllegalModelDefinitionException noClassLoaderException(String extensionName)
+    {
+        return new IllegalModelDefinitionException("No ClassLoader was specified for extension " + extensionName);
     }
 
     private static class DescribedComparator implements Comparator<Described>
