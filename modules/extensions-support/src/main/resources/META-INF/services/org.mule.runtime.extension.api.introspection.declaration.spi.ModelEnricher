@@ -3,3 +3,4 @@ org.mule.runtime.module.extension.internal.introspection.enricher.ConnectionMode
 org.mule.runtime.module.extension.internal.introspection.enricher.StudioModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.ConnectionHandlingEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.ConfigNameModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.ClassLoaderModelEnricher

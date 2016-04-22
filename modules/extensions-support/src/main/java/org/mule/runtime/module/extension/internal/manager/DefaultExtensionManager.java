@@ -10,7 +10,9 @@ package org.mule.runtime.module.extension.internal.manager;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_CLASSLOADER;
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -142,7 +144,11 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     public void registerExtension(ExtensionManifest manifest, ClassLoader classLoader)
     {
         Describer describer = describerResolver.resolve(manifest, classLoader);
-        RuntimeExtensionModel extensionModel = extensionFactory.createFrom(describer.describe(new DefaultDescribingContext()));
+        final DefaultDescribingContext context = new DefaultDescribingContext();
+        context.addParameter(EXTENSION_CLASSLOADER, classLoader);
+
+        RuntimeExtensionModel extensionModel = withContextClassLoader(classLoader, () ->
+                extensionFactory.createFrom(describer.describe(context)));
 
         registerExtension(extensionModel);
     }

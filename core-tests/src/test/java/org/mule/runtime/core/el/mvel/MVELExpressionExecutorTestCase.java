@@ -13,10 +13,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.el.context.AbstractELTestCase;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.el.context.AbstractELTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.size.SmallTest;
 
@@ -83,21 +84,18 @@ public class MVELExpressionExecutorTestCase extends AbstractELTestCase
     @Test
     public void useContextClassLoader() throws ClassNotFoundException
     {
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            Thread.currentThread().setContextClassLoader(new MyClassClassLoader());
-            assertFalse((Boolean) mvel.execute("1 is org.MyClass", null));
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(originalClassLoader);
-        }
+        withContextClassLoader(new MyClassClassLoader(), () -> {
+            try
+            {
+                assertFalse((Boolean) mvel.execute("1 is org.MyClass", null));
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                fail(e.getMessage());
+            }
+
+        });
     }
 
     @Test

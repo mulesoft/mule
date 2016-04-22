@@ -8,6 +8,7 @@ package org.mule.runtime.module.launcher.application;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -21,6 +22,7 @@ import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.DisposableClassLoader;
 import org.mule.runtime.module.launcher.DeploymentInitException;
@@ -34,7 +36,6 @@ import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.domain.Domain;
 import org.mule.runtime.module.launcher.domain.DomainRepository;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
-import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -137,16 +138,7 @@ public class DefaultMuleApplication implements Application
 
             // null CCL ensures we log at 'system' level
             // TODO getDomainClassLoader a more usable wrapper for any logger to be logged at sys level
-            final ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-            try
-            {
-                Thread.currentThread().setContextClassLoader(null);
-                deployLogger.info(miniSplash(format("Started app '%s'", descriptor.getName())));
-            }
-            finally
-            {
-                Thread.currentThread().setContextClassLoader(oldCl);
-            }
+            withContextClassLoader(null, () -> deployLogger.info(miniSplash(format("Started app '%s'", descriptor.getName()))));
         }
         catch (Exception e)
         {

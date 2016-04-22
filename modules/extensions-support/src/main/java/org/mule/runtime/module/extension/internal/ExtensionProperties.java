@@ -62,4 +62,9 @@ public class ExtensionProperties
      * The name of a file which contains each plugin's {@link ExtensionManifest}
      */
     public static final String EXTENSION_MANIFEST_FILE_NAME = "extension-manifest.xml";
+
+    /**
+     * The name of a property which points to the {@link ClassLoader} that an extension should use
+     */
+    public static final String EXTENSION_CLASSLOADER = "extension_classloader";
 }

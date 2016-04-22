@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.util;
 
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -16,6 +18,9 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mule.runtime.core.util.ClassUtils.getSatisfiableMethods;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.AbstractFruit;
@@ -186,37 +191,37 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testGetSatisfiableMethods() throws Exception
     {
-        List methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true,
+        List methods = getSatisfiableMethods(FruitBowl.class, new Class[] {Apple.class}, true,
                                                         true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(2, methods.size());
 
-        methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, false, true,
+        methods = getSatisfiableMethods(FruitBowl.class, new Class[] {Apple.class}, false, true,
                                                    ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         // Test object param being unacceptible
-        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true,
+        methods = getSatisfiableMethods(DummyObject.class, new Class[] {WaterMelon.class}, true,
                                                    false, ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         // Test object param being acceptible
-        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true,
+        methods = getSatisfiableMethods(DummyObject.class, new Class[] {WaterMelon.class}, true,
                                                    true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(2, methods.size());
 
         // Test object param being acceptible but not void
-        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, false,
+        methods = getSatisfiableMethods(DummyObject.class, new Class[] {WaterMelon.class}, false,
                                                    true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
         assertEquals("doSomethingElse", ((Method) methods.get(0)).getName());
 
         // Test object param being acceptible by interface Type
-        methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{WaterMelon[].class}, true,
+        methods = getSatisfiableMethods(FruitBowl.class, new Class[] {WaterMelon[].class}, true,
                                                    true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
@@ -255,15 +260,15 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         Object a = new HashBlob(1);
         Object b = new HashBlob(2);
         assertTrue(ClassUtils.hash(new Object[] {a, b, a, b}) == ClassUtils.hash(new Object[] {a, b, a, b}));
-        assertFalse(ClassUtils.hash(new Object[]{a, b, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
-        assertFalse(ClassUtils.hash(new Object[]{a, b, a, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
+        assertFalse(ClassUtils.hash(new Object[] {a, b, a}) == ClassUtils.hash(new Object[] {a, b, a, b}));
+        assertFalse(ClassUtils.hash(new Object[] {a, b, a, a}) == ClassUtils.hash(new Object[] {a, b, a, b}));
         assertFalse(ClassUtils.hash(new Object[] {b, a, b, a}) == ClassUtils.hash(new Object[] {a, b, a, b}));
     }
 
     @Test
     public void testClassTypesWithNullInArray()
     {
-        Object[] array = new Object[]{"hello", null, "world"};
+        Object[] array = new Object[] {"hello", null, "world"};
         Class<?>[] classTypes = ClassUtils.getClassTypes(array);
         assertEquals(3, classTypes.length);
         assertEquals(String.class, classTypes[0]);
@@ -274,8 +279,8 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testCompareWithNull()
     {
-        Class[] c1 = new Class[]{String.class, Integer.class};
-        Class[] c2 = new Class[]{String.class, null};
+        Class[] c1 = new Class[] {String.class, Integer.class};
+        Class[] c2 = new Class[] {String.class, null};
         assertFalse(ClassUtils.compare(c1, c2, true));
         assertFalse(ClassUtils.compare(c2, c1, true));
     }
@@ -374,6 +379,37 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertThat(ClassUtils.isInstance(long.class, Boolean.FALSE), is(false));
     }
 
+    @Test
+    public void runWithClassLoader()
+    {
+        final ClassLoader originalClassLoader = currentThread().getContextClassLoader();
+        final ClassLoader mockClassLoader = mock(ClassLoader.class);
+
+        withContextClassLoader(mockClassLoader, () -> assertContextClassLoader(mockClassLoader));
+        assertContextClassLoader(originalClassLoader);
+    }
+
+    @Test
+    public void returnWithClassLoader()
+    {
+        final String value = "Hello World!";
+        final ClassLoader originalClassLoader = currentThread().getContextClassLoader();
+        final ClassLoader mockClassLoader = mock(ClassLoader.class);
+
+        String response = withContextClassLoader(mockClassLoader, () -> {
+            assertContextClassLoader(mockClassLoader);
+            return value;
+        });
+
+        assertContextClassLoader(originalClassLoader);
+        assertThat(response, is(value));
+    }
+
+    private void assertContextClassLoader(ClassLoader mockClassLoader)
+    {
+        assertThat(currentThread().getContextClassLoader(), is(sameInstance(mockClassLoader)));
+    }
+
     private void simpleNameHelper(String target, Class clazz)
     {
         assertEquals(target, ClassUtils.getSimpleName(clazz));
@@ -381,6 +417,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
 
     private static class DummyObject
     {
+
         public void doSomething(Object object)
         {
             // do nothing

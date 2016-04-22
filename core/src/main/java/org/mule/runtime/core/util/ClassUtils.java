@@ -10,6 +10,7 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 
+import com.google.common.base.Supplier;
 import com.google.common.primitives.Primitives;
 
 import java.io.BufferedReader;
@@ -48,15 +49,15 @@ import java.util.Set;
  * that works across different applications servers. The resource and classloading
  * methods are SecurityManager friendly.</p>
  */
-// @ThreadSafe
 public class ClassUtils extends org.apache.commons.lang.ClassUtils
 {
-    public static final Object[] NO_ARGS = new Object[]{};
-    public static final Class<?>[] NO_ARGS_TYPE = new Class<?>[]{};
 
-    private static final Map<Class<?>, Class<?>> wrapperToPrimitiveMap = new HashMap<Class<?>, Class<?>>();
-    private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<String, Class<?>>(32);
-    private static final List<Class<?>> consumableClasses = new ArrayList<Class<?>>();
+    public static final Object[] NO_ARGS = new Object[] {};
+    public static final Class<?>[] NO_ARGS_TYPE = new Class<?>[] {};
+
+    private static final Map<Class<?>, Class<?>> wrapperToPrimitiveMap = new HashMap<>();
+    private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<>(32);
+    private static final List<Class<?>> consumableClasses = new ArrayList<>();
 
     static
     {
@@ -70,7 +71,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         wrapperToPrimitiveMap.put(Float.class, Float.TYPE);
         wrapperToPrimitiveMap.put(Void.TYPE, Void.TYPE);
 
-        Set<Class<?>> primitiveTypes = new HashSet<Class<?>>(32);
+        Set<Class<?>> primitiveTypes = new HashSet<>(32);
         primitiveTypes.addAll(wrapperToPrimitiveMap.values());
         for (Class<?> primitiveType : primitiveTypes)
         {
@@ -119,40 +120,27 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
-     *
      * @return A URL pointing to the resource to load or null if the resource is not found
      */
     public static URL getResource(final String resourceName, final Class<?> callingClass)
     {
-        URL url = AccessController.doPrivileged(new PrivilegedAction<URL>()
-        {
-            public URL run()
-            {
-                final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-                return cl != null ? cl.getResource(resourceName) : null;
-            }
+        URL url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> {
+            final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            return cl != null ? cl.getResource(resourceName) : null;
         });
 
         if (url == null)
         {
-            url = AccessController.doPrivileged(new PrivilegedAction<URL>()
-            {
-                public URL run()
-                {
-                    return ClassUtils.class.getClassLoader().getResource(resourceName);
-                }
-            });
+            url = AccessController.doPrivileged((PrivilegedAction<URL>) () ->
+                    ClassUtils.class.getClassLoader().getResource(resourceName)
+            );
         }
 
         if (url == null)
         {
-            url = AccessController.doPrivileged(new PrivilegedAction<URL>()
-            {
-                public URL run()
-                {
-                    return callingClass.getClassLoader().getResource(resourceName);
-                }
-            });
+            url = AccessController.doPrivileged((PrivilegedAction<URL>) () ->
+                    callingClass.getClassLoader().getResource(resourceName)
+            );
         }
 
         return url;
@@ -160,54 +148,42 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     public static Enumeration<URL> getResources(final String resourceName, final Class<?> callingClass)
     {
-        Enumeration<URL> enumeration = AccessController.doPrivileged(new PrivilegedAction<Enumeration<URL>>()
-        {
-            public Enumeration<URL> run()
+        Enumeration<URL> enumeration = AccessController.doPrivileged((PrivilegedAction<Enumeration<URL>>) () -> {
+            try
             {
-                try
-                {
-                    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-                    return cl != null ? cl.getResources(resourceName) : null;
-                }
-                catch (IOException e)
-                {
-                    return null;
-                }
+                final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                return cl != null ? cl.getResources(resourceName) : null;
+            }
+            catch (IOException e)
+            {
+                return null;
             }
         });
 
         if (enumeration == null)
         {
-            enumeration = AccessController.doPrivileged(new PrivilegedAction<Enumeration<URL>>()
-            {
-                public Enumeration<URL> run()
+            enumeration = AccessController.doPrivileged((PrivilegedAction<Enumeration<URL>>) () -> {
+                try
                 {
-                    try
-                    {
-                        return ClassUtils.class.getClassLoader().getResources(resourceName);
-                    }
-                    catch (IOException e)
-                    {
-                        return null;
-                    }
+                    return ClassUtils.class.getClassLoader().getResources(resourceName);
+                }
+                catch (IOException e)
+                {
+                    return null;
                 }
             });
         }
 
         if (enumeration == null)
         {
-            enumeration = AccessController.doPrivileged(new PrivilegedAction<Enumeration<URL>>()
-            {
-                public Enumeration<URL> run()
+            enumeration = AccessController.doPrivileged((PrivilegedAction<Enumeration<URL>>) () -> {
+                try
                 {
-                    try
-                    {
-                        return callingClass.getClassLoader().getResources(resourceName);
-                    }
-                    catch (IOException e)
-                    {
-                        return null;
-                    }
+                    return callingClass.getClassLoader().getResources(resourceName);
+                }
+                catch (IOException e)
+                {
+                    return null;
                 }
             });
         }
@@ -236,6 +212,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     {
         return loadClass(className, callingClass, Object.class);
     }
+
     /**
      * Load a class with a given name. <p/> It will try to load the class in the
      * following order:
@@ -250,7 +227,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      *
      * @param className    The name of the class to load
      * @param callingClass The Class object of the calling object
-     * @param type the class type to expect to load
+     * @param type         the class type to expect to load
      * @return The Class instance
      * @throws ClassNotFoundException If the class cannot be found anywhere.
      */
@@ -265,73 +242,57 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             }
         }
 
-        Class<?> clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
-        {
-            public Class<?> run()
+        Class<?> clazz = AccessController.doPrivileged((PrivilegedAction<Class<?>>) () -> {
+            try
             {
-                try
-                {
-                    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-                    return cl != null ? cl.loadClass(className) : null;
+                final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                return cl != null ? cl.loadClass(className) : null;
 
-                }
-                catch (ClassNotFoundException e)
-                {
-                    return null;
-                }
+            }
+            catch (ClassNotFoundException e)
+            {
+                return null;
             }
         });
 
         if (clazz == null)
         {
-            clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
-            {
-                public Class<?> run()
+            clazz = AccessController.doPrivileged((PrivilegedAction<Class<?>>) () -> {
+                try
                 {
-                    try
-                    {
-                        return Class.forName(className);
-                    }
-                    catch (ClassNotFoundException e)
-                    {
-                        return null;
-                    }
+                    return Class.forName(className);
+                }
+                catch (ClassNotFoundException e)
+                {
+                    return null;
                 }
             });
         }
 
         if (clazz == null)
         {
-            clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
-            {
-                public Class<?> run()
+            clazz = AccessController.doPrivileged((PrivilegedAction<Class<?>>) () -> {
+                try
                 {
-                    try
-                    {
-                        return ClassUtils.class.getClassLoader().loadClass(className);
-                    }
-                    catch (ClassNotFoundException e)
-                    {
-                        return null;
-                    }
+                    return ClassUtils.class.getClassLoader().loadClass(className);
+                }
+                catch (ClassNotFoundException e)
+                {
+                    return null;
                 }
             });
         }
 
         if (clazz == null)
         {
-            clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
-            {
-                public Class<?> run()
+            clazz = AccessController.doPrivileged((PrivilegedAction<Class<?>>) () -> {
+                try
                 {
-                    try
-                    {
-                        return callingClass.getClassLoader().loadClass(className);
-                    }
-                    catch (ClassNotFoundException e)
-                    {
-                        return null;
-                    }
+                    return callingClass.getClassLoader().loadClass(className);
+                }
+                catch (ClassNotFoundException e)
+                {
+                    return null;
                 }
             });
         }
@@ -341,9 +302,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             throw new ClassNotFoundException(className);
         }
 
-        if(type.isAssignableFrom(clazz))
+        if (type.isAssignableFrom(clazz))
         {
-            return (T)clazz;
+            return (T) clazz;
         }
         else
         {
@@ -354,7 +315,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     /**
      * Load a class with a given name from the given classloader.
      *
-     * @param className the name of the class to load
+     * @param className   the name of the class to load
      * @param classLoader the loader to load it from
      * @return the instance of the class
      * @throws ClassNotFoundException if the class is not available in the class loader
@@ -496,7 +457,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                                             + argsString);
         }
 
-        return (T)ctor.newInstance(constructorArgs);
+        return (T) ctor.newInstance(constructorArgs);
     }
 
     public static Object instanciateClass(String name, Object... constructorArgs)
@@ -551,7 +512,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             }
         }
 
-        return new Class[]{};
+        return new Class[] {};
     }
 
     /**
@@ -595,9 +556,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     }
 
     /**
-     *  Returns available constructor in the target class that as the parameters specified.
+     * Returns available constructor in the target class that as the parameters specified.
      *
-     * @param clazz the class to search
+     * @param clazz      the class to search
      * @param paramTypes the param types to match against
      * @param exactMatch should exact types be used (i.e. equals rather than isAssignableFrom.)
      * @return The matching constructor or null if no matching constructor is found
@@ -657,7 +618,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @param ignoredMethodNames a Set of method names to ignore. Often 'equals' is
      *                           not a desired match. This argument can be null.
      * @return a List of methods on the class that match the criteria. If there are
-     *         none, an empty list is returned
+     * none, an empty list is returned
      */
     public static List<Method> getSatisfiableMethods(Class<?> implementation,
                                                      Class<?>[] parameterTypes,
@@ -681,7 +642,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      *                           not a desired match. This argument can be null.
      * @param filter             Wildcard expression filter that allows methods to be matched using wildcards i.e. 'get*'
      * @return a List of methods on the class that match the criteria. If there are
-     *         none, an empty list is returned
+     * none, an empty list is returned
      */
     public static List<Method> getSatisfiableMethods(Class<?> implementation,
                                                      Class<?>[] parameterTypes,
@@ -690,7 +651,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                                                      Collection<String> ignoredMethodNames,
                                                      WildcardFilter filter)
     {
-        List<Method> result = new ArrayList<Method>();
+        List<Method> result = new ArrayList<>();
 
         if (ignoredMethodNames == null)
         {
@@ -726,9 +687,10 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     /**
      * Match all method son a class with a defined return type
-     * @param implementation the class to search
-     * @param returnType the return type to match
-     * @param matchOnObject whether {@link Object} methods should be matched
+     *
+     * @param implementation     the class to search
+     * @param returnType         the return type to match
+     * @param matchOnObject      whether {@link Object} methods should be matched
      * @param ignoredMethodNames a set of method names to ignore
      * @return the list of methods that matched the return type and criteria. If none are found an empty result is returned
      */
@@ -737,7 +699,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                                                                    boolean matchOnObject,
                                                                    Set<String> ignoredMethodNames)
     {
-        List<Method> result = new ArrayList<Method>();
+        List<Method> result = new ArrayList<>();
 
         if (ignoredMethodNames == null)
         {
@@ -750,7 +712,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             Method method = methods[i];
             Class returns = method.getReturnType();
 
-            if (compare(new Class[]{returns}, new Class[]{returnType}, matchOnObject))
+            if (compare(new Class[] {returns}, new Class[] {returnType}, matchOnObject))
             {
                 if (!ignoredMethodNames.contains(method.getName()))
                 {
@@ -817,7 +779,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         }
         else
         {
-            types = new Class[]{object.getClass()};
+            types = new Class[] {object.getClass()};
         }
 
         return types;
@@ -844,12 +806,12 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * is a parameter of type Object in c1 then the method returns false. If
      * acceptNulls argument is true, null values are accepted in c2.
      *
-     * @param c1 parameter types array
-     * @param c2 parameter types array
+     * @param c1            parameter types array
+     * @param c2            parameter types array
      * @param matchOnObject return false if there is a parameter of type Object in c1
-     * @param acceptNulls allows null parameter types in c2
+     * @param acceptNulls   allows null parameter types in c2
      * @return true if arrays are the same size and the types assignable from c2 to
-     *         c1
+     * c1
      */
     public static boolean compare(Class[] c1, Class[] c2, boolean matchOnObject, boolean acceptNulls)
     {
@@ -1001,8 +963,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     /**
      * Simple helper for writing object equalities.
-     *
+     * <p>
      * TODO Is there a better place for this?
+     *
      * @param a object to compare
      * @param b object to be compared to
      * @return true if the objects are equal (value or reference), false otherwise
@@ -1062,9 +1025,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         // object,
         // as this method is usually protected in those classloaders
         Class refClass = URLClassLoader.class;
-        Method methodAddUrl = refClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+        Method methodAddUrl = refClass.getDeclaredMethod("addURL", new Class[] {URL.class});
         methodAddUrl.setAccessible(true);
-        for (Iterator it = urls.iterator(); it.hasNext();)
+        for (Iterator it = urls.iterator(); it.hasNext(); )
         {
             URL url = (URL) it.next();
             methodAddUrl.invoke(sysCl, url);
@@ -1198,7 +1161,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         {
             return false;
         }
-        
+
         for (Class<?> c : consumableClasses)
         {
             if (c.isAssignableFrom(payloadClass))
@@ -1207,5 +1170,49 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             }
         }
         return false;
+    }
+
+    /**
+     * Executes the given {@code supplier} using the given {@code classLoader}
+     * as the current {@link Thread}'s context classloader.
+     * <p>
+     * This method guarantees that whatever the outcome, the thread's context classloader
+     * is set back to the value that it had before executing this method
+     *
+     * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
+     * @param supplier    a {@link Supplier}
+     * @return the value that the {@code supplier} produced
+     */
+    public static <T> T withContextClassLoader(ClassLoader classLoader, Supplier<T> supplier)
+    {
+        final Thread currentThread = Thread.currentThread();
+        final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+        currentThread.setContextClassLoader(classLoader);
+        try
+        {
+            return supplier.get();
+        }
+        finally
+        {
+            currentThread.setContextClassLoader(currentClassLoader);
+        }
+    }
+
+    /**
+     * Executes the given {@code runnable} using the given {@code classLoader}
+     * as the current {@link Thread}'s context classloader.
+     * <p>
+     * This method guarantees that whatever the outcome, the thread's context classloader
+     * is set back to the value that it had before executing this method
+     *
+     * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
+     * @param runnable    a closure
+     */
+    public static void withContextClassLoader(ClassLoader classLoader, Runnable runnable)
+    {
+        withContextClassLoader(classLoader, () -> {
+            runnable.run();
+            return null;
+        });
     }
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.artifact;
 
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.launcher.DeploymentStartException;
@@ -33,14 +34,7 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
 
     public void dispose()
     {
-        executeWithinArtifactClassLoader(new ArtifactAction()
-        {
-            @Override
-            public void execute()
-            {
-                delegate.dispose();
-            }
-        });
+        executeWithinArtifactClassLoader(delegate::dispose);
     }
 
     @Override
@@ -56,26 +50,12 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
 
     public void init()
     {
-        executeWithinArtifactClassLoader(new ArtifactAction()
-        {
-            @Override
-            public void execute()
-            {
-                delegate.init();
-            }
-        });
+        executeWithinArtifactClassLoader(delegate::init);
     }
 
     public void install() throws InstallException
     {
-        executeWithinArtifactClassLoader(new ArtifactAction()
-        {
-            @Override
-            public void execute()
-            {
-                delegate.install();
-            }
-        });
+        executeWithinArtifactClassLoader(delegate::install);
     }
 
     @Override
@@ -98,48 +78,21 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
 
     public void start() throws DeploymentStartException
     {
-        executeWithinArtifactClassLoader(new ArtifactAction()
-        {
-            @Override
-            public void execute()
-            {
-                delegate.start();
-            }
-        });
+        executeWithinArtifactClassLoader(delegate::start);
     }
 
     public void stop()
     {
-        executeWithinArtifactClassLoader(new ArtifactAction()
-        {
-            @Override
-            public void execute()
-            {
-                delegate.stop();
-            }
-        });
+        executeWithinArtifactClassLoader(delegate::stop);
     }
 
     private void executeWithinArtifactClassLoader(ArtifactAction artifactAction)
     {
-        final ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            if (getArtifactClassLoader() != null)
-            {
-                // if not initialized yet, it can be null
-                ClassLoader artifactCl = getArtifactClassLoader().getClassLoader();
-                if (artifactCl != null)
-                {
-                    Thread.currentThread().setContextClassLoader(artifactCl);
-                }
-            }
-            artifactAction.execute();
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(originalCl);
-        }
+        ClassLoader classLoader = getArtifactClassLoader() != null
+                                  ? getArtifactClassLoader().getClassLoader()
+                                  : Thread.currentThread().getContextClassLoader();
+
+        withContextClassLoader(classLoader, artifactAction::execute);
     }
 
     public String getAppName()
@@ -160,6 +113,7 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
 
     private interface ArtifactAction
     {
+
         void execute();
     }
 }

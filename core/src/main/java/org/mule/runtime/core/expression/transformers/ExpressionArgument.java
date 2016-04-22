@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.expression.transformers;
 
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -101,7 +102,6 @@ public class ExpressionArgument implements MuleContextAware
      */
     public Object evaluate(MuleEvent event) throws ExpressionRuntimeException
     {
-        Object result = null;
 
         // MULE-4797 Because there is no way to specify the class-loader that script
         // engines use and because scripts when used for expressions are compiled in
@@ -109,17 +109,9 @@ public class ExpressionArgument implements MuleContextAware
         // class-loader to used is to switch it out here. We may want to consider
         // passing the class-loader to the ExpressionManager and only doing this for
         // certain ExpressionEvaluators further in.
-        ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            Thread.currentThread().setContextClassLoader(expressionEvaluationClassLoader);
-            result = muleContext.getExpressionManager().evaluate(getExpression(), event, !isOptional());
-        }
-        finally
-        {
-            // Restore original context class-loader
-            Thread.currentThread().setContextClassLoader(originalContextClassLoader);
-        }
+        Object result = withContextClassLoader(expressionEvaluationClassLoader, () ->
+                muleContext.getExpressionManager().evaluate(getExpression(), event, !isOptional())
+        );
 
         if (getReturnClass() != null && result != null)
         {

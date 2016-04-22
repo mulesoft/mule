@@ -6,24 +6,27 @@
  */
 package org.mule.runtime.module.extension.internal.config;
 
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.util.Preconditions.checkState;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
-import static org.mule.runtime.core.util.Preconditions.checkState;
-import org.mule.runtime.config.spring.MuleArtifactContext;
-import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.source.SourceModel;
-import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
-import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.config.spring.MuleArtifactContext;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
+import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
+import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 
 import com.google.common.collect.HashMultimap;
@@ -100,14 +103,16 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
         try
         {
             ExtensionModel extensionModel = locateExtensionByNamespace(namespace);
+            withContextClassLoader(getClassLoader(extensionModel), () -> {
 
-            registerTopLevelParameters(extensionModel);
-            registerConfigurations(extensionModel);
-            registerOperations(extensionModel, extensionModel.getOperationModels());
-            registerConnectionProviders(extensionModel, extensionModel.getConnectionProviders());
-            registerMessageSources(extensionModel, extensionModel.getSourceModels());
+                registerTopLevelParameters(extensionModel);
+                registerConfigurations(extensionModel);
+                registerOperations(extensionModel, extensionModel.getOperationModels());
+                registerConnectionProviders(extensionModel, extensionModel.getConnectionProviders());
+                registerMessageSources(extensionModel, extensionModel.getSourceModels());
 
-            handledExtensions.put(namespace, extensionModel);
+                handledExtensions.put(namespace, extensionModel);
+            });
         }
         catch (Exception e)
         {
