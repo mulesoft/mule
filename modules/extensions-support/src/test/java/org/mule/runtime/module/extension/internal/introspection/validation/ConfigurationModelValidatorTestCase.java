@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
-import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -108,7 +107,8 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase
 
     private ExtensionModel modelFor(Class<?> connectorClass)
     {
-        return extensionFactory.createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion())).describe(new DefaultDescribingContext()));
+        return extensionFactory.createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion()))
+                                                   .describe(new DefaultDescribingContext(connectorClass.getClassLoader())));
     }
 
     private void validate(Class<?> connectorClass)

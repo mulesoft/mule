@@ -51,7 +51,8 @@ public class StudioModelPropertyTestCase extends AbstractMuleTestCase
     @Test
     public void verifyPropertyIsPopulated() throws Exception
     {
-        ExtensionDeclarer declarer = new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion())).describe(new DefaultDescribingContext());
+        ExtensionDeclarer declarer = new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()))
+                .describe(new DefaultDescribingContext(HeisenbergExtension.class.getClassLoader()));
         ExtensionModel extensionModel = extensionFactory.createFrom(declarer);
         StudioModelProperty studioModelProperty = extensionModel.getModelProperty(StudioModelProperty.class).get();
         assertThat(studioModelProperty.getEditorFileName(), is(""));

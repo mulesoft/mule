@@ -10,11 +10,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
-import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -110,7 +110,7 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
     private XmlModelProperty enrich(Class<?> type)
     {
         extensionDeclarer.withModelProperty(new ImplementingTypeModelProperty(type));
-        modelEnricher.enrich(new DefaultDescribingContext(extensionDeclarer));
+        modelEnricher.enrich(new DefaultDescribingContext(extensionDeclarer, type.getClassLoader()));
         return extensionDeclarer.getExtensionDeclaration().getModelProperty(XmlModelProperty.class).get();
     }
 

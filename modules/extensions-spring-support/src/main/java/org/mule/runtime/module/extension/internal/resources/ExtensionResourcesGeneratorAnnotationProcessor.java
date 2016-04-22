@@ -94,7 +94,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
         Describer describer = new AnnotationsBasedDescriber(extensionClass, new StaticVersionResolver(getVersion()));
 
-        DescribingContext context = new DefaultDescribingContext();
+        DescribingContext context = new DefaultDescribingContext(extensionClass.getClassLoader());
         context.addParameter(EXTENSION_ELEMENT, extensionElement);
         context.addParameter(PROCESSING_ENVIRONMENT, processingEnv);
         context.addParameter(ROUND_ENVIRONMENT, roundEnvironment);

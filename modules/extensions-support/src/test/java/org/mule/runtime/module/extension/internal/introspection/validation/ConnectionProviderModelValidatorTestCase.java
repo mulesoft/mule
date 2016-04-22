@@ -239,7 +239,8 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
 
     private ExtensionModel modelFor(Class<?> connectorClass)
     {
-        return extensionFactory.createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion())).describe(new DefaultDescribingContext()));
+        return extensionFactory.createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion()))
+                                                   .describe(new DefaultDescribingContext(connectorClass.getClassLoader())));
     }
 
     private void validate(Class<?> connectorClass)
