@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.config;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.runtime.core.api.MuleContext;
@@ -66,7 +66,7 @@ public class OperationMessageProcessorFactoryBean extends ExtensionComponentFact
     @Override
     public OperationMessageProcessor getObject() throws Exception
     {
-        return withClassLoader(getClassLoader(extensionModel), () -> {
+        return withContextClassLoader(getClassLoader(extensionModel), () -> {
             try
             {
                 ResolverSet resolverSet = parserDelegate.getResolverSet(element, operationModel.getParameterModels(), nestedOperations);

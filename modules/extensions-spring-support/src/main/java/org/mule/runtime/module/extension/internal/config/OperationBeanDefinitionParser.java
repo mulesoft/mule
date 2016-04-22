@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.config;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_SINGLETON;
 import org.mule.metadata.api.model.ArrayType;
@@ -65,7 +65,7 @@ final class OperationBeanDefinitionParser extends BaseExtensionBeanDefinitionPar
     @Override
     protected void doParse(BeanDefinitionBuilder builder, Element element, XmlExtensionParserDelegate parserDelegate, ParserContext parserContext)
     {
-        withClassLoader(getClassLoader(extensionModel), () -> {
+        withContextClassLoader(getClassLoader(extensionModel), () -> {
             parserDelegate.parseConfigRef(element, builder);
 
             builder.addConstructorArgValue(extensionModel)

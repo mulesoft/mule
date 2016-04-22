@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.work;
 
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -279,7 +279,7 @@ public class WorkerContext implements Work
         // and ignore/replace whatever is associated with the current thread.
         try
         {
-            withClassLoader(executionClassLoader, worker::run);
+            withContextClassLoader(executionClassLoader, worker::run);
             workListener.workCompleted(new WorkEvent(this, WorkEvent.WORK_COMPLETED, worker, null));
         }
         catch (Throwable e)

@@ -11,9 +11,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.xml.transformer.XStreamFactory;
 import org.mule.runtime.module.xml.transformer.XmlToObject;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -99,7 +98,7 @@ public class XStreamTransformerConfigurationTestCase extends AbstractMuleTestCas
     public void testClassLoader()
     {
         TestClassLoader classLoader = new TestClassLoader();
-        withClassLoader(classLoader, () -> {
+        withContextClassLoader(classLoader, () -> {
             try
             {
                 XmlToObject transformer = new XmlToObject();

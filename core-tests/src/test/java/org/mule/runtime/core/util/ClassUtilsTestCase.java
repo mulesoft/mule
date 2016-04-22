@@ -19,7 +19,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.getSatisfiableMethods;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.AbstractFruit;
@@ -190,37 +191,37 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void testGetSatisfiableMethods() throws Exception
     {
-        List methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[] {Apple.class}, true,
+        List methods = getSatisfiableMethods(FruitBowl.class, new Class[] {Apple.class}, true,
                                                         true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(2, methods.size());
 
-        methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[] {Apple.class}, false, true,
+        methods = getSatisfiableMethods(FruitBowl.class, new Class[] {Apple.class}, false, true,
                                                    ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         // Test object param being unacceptible
-        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[] {WaterMelon.class}, true,
+        methods = getSatisfiableMethods(DummyObject.class, new Class[] {WaterMelon.class}, true,
                                                    false, ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         // Test object param being acceptible
-        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[] {WaterMelon.class}, true,
+        methods = getSatisfiableMethods(DummyObject.class, new Class[] {WaterMelon.class}, true,
                                                    true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(2, methods.size());
 
         // Test object param being acceptible but not void
-        methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[] {WaterMelon.class}, false,
+        methods = getSatisfiableMethods(DummyObject.class, new Class[] {WaterMelon.class}, false,
                                                    true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
         assertEquals("doSomethingElse", ((Method) methods.get(0)).getName());
 
         // Test object param being acceptible by interface Type
-        methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[] {WaterMelon[].class}, true,
+        methods = getSatisfiableMethods(FruitBowl.class, new Class[] {WaterMelon[].class}, true,
                                                    true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
@@ -384,7 +385,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         final ClassLoader originalClassLoader = currentThread().getContextClassLoader();
         final ClassLoader mockClassLoader = mock(ClassLoader.class);
 
-        withClassLoader(mockClassLoader, () -> assertContextClassLoader(mockClassLoader));
+        withContextClassLoader(mockClassLoader, () -> assertContextClassLoader(mockClassLoader));
         assertContextClassLoader(originalClassLoader);
     }
 
@@ -395,7 +396,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         final ClassLoader originalClassLoader = currentThread().getContextClassLoader();
         final ClassLoader mockClassLoader = mock(ClassLoader.class);
 
-        String response = withClassLoader(mockClassLoader, () -> {
+        String response = withContextClassLoader(mockClassLoader, () -> {
             assertContextClassLoader(mockClassLoader);
             return value;
         });

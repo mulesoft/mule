@@ -8,7 +8,7 @@ package org.mule.runtime.core.routing.filters;
 
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -112,7 +112,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
         // class-loader to used is to switch it out here. We may want to consider
         // passing the class-loader to the ExpressionManager and only doing this for
         // certain ExpressionEvaluators further in.
-        return withClassLoader(expressionEvaluationClassLoader, () ->
+        return withContextClassLoader(expressionEvaluationClassLoader, () ->
                 muleContext.getExpressionManager().evaluateBoolean(getFullExpression(), event, nullReturnsTrue, !nullReturnsTrue));
     }
 

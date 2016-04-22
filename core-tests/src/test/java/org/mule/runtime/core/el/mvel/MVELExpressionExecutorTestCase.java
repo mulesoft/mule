@@ -13,7 +13,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -84,7 +84,7 @@ public class MVELExpressionExecutorTestCase extends AbstractELTestCase
     @Test
     public void useContextClassLoader() throws ClassNotFoundException
     {
-        withClassLoader(new MyClassClassLoader(), () -> {
+        withContextClassLoader(new MyClassClassLoader(), () -> {
             try
             {
                 assertFalse((Boolean) mvel.execute("1 is org.MyClass", null));

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 
 import java.util.List;
@@ -104,7 +104,7 @@ public class PhaseExecutionEngine
 
         public void process()
         {
-            withClassLoader(messageProcessContext.getExecutionClassLoader(), () -> {
+            withContextClassLoader(messageProcessContext.getExecutionClassLoader(), () -> {
                 for (MessageProcessPhase phase : phaseList)
                 {
                     if (phase.supportsTemplate(messageProcessTemplate))

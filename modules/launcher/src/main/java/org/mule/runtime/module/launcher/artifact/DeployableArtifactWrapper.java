@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.launcher.artifact;
 
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.launcher.DeploymentStartException;
@@ -92,7 +92,7 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
                                   ? getArtifactClassLoader().getClassLoader()
                                   : Thread.currentThread().getContextClassLoader();
 
-        withClassLoader(classLoader, artifactAction::execute);
+        withContextClassLoader(classLoader, artifactAction::execute);
     }
 
     public String getAppName()

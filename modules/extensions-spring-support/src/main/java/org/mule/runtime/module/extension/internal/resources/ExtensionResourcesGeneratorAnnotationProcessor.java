@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 import static com.google.common.collect.ImmutableList.copyOf;
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.ExceptionUtils;
@@ -73,7 +73,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         {
             findExtensions(roundEnv).forEach(extensionElement -> {
                 final Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
-                withClassLoader(extensionClass.getClassLoader(), () -> {
+                withContextClassLoader(extensionClass.getClassLoader(), () -> {
                     ExtensionModel extensionModel = parseExtension(extensionElement, roundEnv);
                     generator.generateFor(extensionModel);
                 });

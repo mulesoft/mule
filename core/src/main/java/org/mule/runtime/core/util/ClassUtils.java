@@ -1183,7 +1183,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @param supplier    a {@link Supplier}
      * @return the value that the {@code supplier} produced
      */
-    public static <T> T withClassLoader(ClassLoader classLoader, Supplier<T> supplier)
+    public static <T> T withContextClassLoader(ClassLoader classLoader, Supplier<T> supplier)
     {
         final Thread currentThread = Thread.currentThread();
         final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
@@ -1208,18 +1208,11 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
      * @param runnable    a closure
      */
-    public static void withClassLoader(ClassLoader classLoader, Runnable runnable)
+    public static void withContextClassLoader(ClassLoader classLoader, Runnable runnable)
     {
-        final Thread currentThread = Thread.currentThread();
-        final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-        currentThread.setContextClassLoader(classLoader);
-        try
-        {
+        withContextClassLoader(classLoader, () -> {
             runnable.run();
-        }
-        finally
-        {
-            currentThread.setContextClassLoader(currentClassLoader);
-        }
+            return null;
+        });
     }
 }

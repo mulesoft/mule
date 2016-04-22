@@ -31,7 +31,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
@@ -2816,7 +2816,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private MuleRegistry getMuleRegistry(Application app)
     {
-        return withClassLoader(app.getArtifactClassLoader().getClassLoader(), () -> app.getMuleContext().getRegistry());
+        return withContextClassLoader(app.getArtifactClassLoader().getClassLoader(), () -> app.getMuleContext().getRegistry());
     }
 
     private void assertDeploymentFailure(final DeploymentListener listener, final String artifactName)

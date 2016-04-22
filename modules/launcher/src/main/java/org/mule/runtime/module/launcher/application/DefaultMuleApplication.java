@@ -8,7 +8,7 @@ package org.mule.runtime.module.launcher.application;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -138,7 +138,7 @@ public class DefaultMuleApplication implements Application
 
             // null CCL ensures we log at 'system' level
             // TODO getDomainClassLoader a more usable wrapper for any logger to be logged at sys level
-            withClassLoader(null, () -> deployLogger.info(miniSplash(format("Started app '%s'", descriptor.getName()))));
+            withContextClassLoader(null, () -> deployLogger.info(miniSplash(format("Started app '%s'", descriptor.getName()))));
         }
         catch (Exception e)
         {

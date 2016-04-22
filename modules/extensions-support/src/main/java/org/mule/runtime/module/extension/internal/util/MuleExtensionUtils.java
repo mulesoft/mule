@@ -299,6 +299,14 @@ public class MuleExtensionUtils
         return operationDeclaration.getModelProperty(ImplementingMethodModelProperty.class).map(ImplementingMethodModelProperty::getMethod).orElse(null);
     }
 
+    /**
+     * If the {@code extensionModel} contains a {@link ClassLoaderModelProperty}, then it returns
+     * the {@link ClassLoader} associated to such property. If the property is not present,
+     * it returns the current {@link Thread}'s context classLoader.
+     *
+     * @param extensionModel a {@link ExtensionModel}
+     * @return a {@link ClassLoader}
+     */
     public static ClassLoader getClassLoader(ExtensionModel extensionModel)
     {
         return extensionModel.getModelProperty(ClassLoaderModelProperty.class)

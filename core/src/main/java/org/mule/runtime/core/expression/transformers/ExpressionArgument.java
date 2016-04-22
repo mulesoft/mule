@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.expression.transformers;
 
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -109,7 +109,7 @@ public class ExpressionArgument implements MuleContextAware
         // class-loader to used is to switch it out here. We may want to consider
         // passing the class-loader to the ExpressionManager and only doing this for
         // certain ExpressionEvaluators further in.
-        Object result = withClassLoader(expressionEvaluationClassLoader, () ->
+        Object result = withContextClassLoader(expressionEvaluationClassLoader, () ->
                 muleContext.getExpressionManager().evaluate(getExpression(), event, !isOptional())
         );
 

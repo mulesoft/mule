@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config;
 
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
@@ -28,7 +28,6 @@ import org.mule.runtime.extension.api.introspection.property.SubTypesModelProper
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -104,7 +103,7 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
         try
         {
             ExtensionModel extensionModel = locateExtensionByNamespace(namespace);
-            withClassLoader(getClassLoader(extensionModel), () -> {
+            withContextClassLoader(getClassLoader(extensionModel), () -> {
 
                 registerTopLevelParameters(extensionModel);
                 registerConfigurations(extensionModel);

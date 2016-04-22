@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.launcher.domain;
 
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -17,6 +17,8 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.builders.AutoConfigurationBuilder;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.launcher.DeploymentInitException;
 import org.mule.runtime.module.launcher.DeploymentListener;
@@ -28,8 +30,6 @@ import org.mule.runtime.module.launcher.application.NullDeploymentListener;
 import org.mule.runtime.module.launcher.artifact.MuleContextDeploymentListener;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -243,7 +243,7 @@ public class DefaultMuleDomain implements Domain
             }
             // null CCL ensures we log at 'system' level
             // TODO create a more usable wrapper for any logger to be logged at sys level
-            withClassLoader(null, () -> deployLogger.info(miniSplash(String.format("Started domain '%s'", getArtifactName()))));
+            withContextClassLoader(null, () -> deployLogger.info(miniSplash(String.format("Started domain '%s'", getArtifactName()))));
         }
         catch (Exception e)
         {

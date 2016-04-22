@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.util.ClassUtils.withClassLoader;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_JSON;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -67,6 +67,6 @@ public class LoadJsonSchemaForValidationTestCase extends AbstractMuleTestCase
 
     private void doWithMockClassLoader(Runnable closure)
     {
-        withClassLoader(mockClassLoader, closure);
+        withContextClassLoader(mockClassLoader, closure);
     }
 }

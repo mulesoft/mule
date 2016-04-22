@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_CLASSLOADER;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
+import org.mule.runtime.module.extension.internal.ExtensionProperties;
 
 /**
- * Adds a {@link ClassLoaderModelProperty} at the {@link ExtensionModel} level, which
- * points to the current {@link Thread}'s context {@link ClassLoader}
+ * If the {@link ExtensionProperties#EXTENSION_CLASSLOADER} parameter is set on
+ * the {@link DescribingContext}, then a {@link ClassLoaderModelProperty} is added
+ * at the {@link ExtensionModel} level, pointing to such property's value
  *
  * @since 4.0
  */
@@ -23,6 +26,10 @@ public class ClassLoaderModelEnricher implements ModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        describingContext.getExtensionDeclarer().withModelProperty(new ClassLoaderModelProperty(Thread.currentThread().getContextClassLoader()));
+        ClassLoader classLoader = describingContext.getParameter(EXTENSION_CLASSLOADER, ClassLoader.class);
+        if (classLoader != null)
+        {
+            describingContext.getExtensionDeclarer().withModelProperty(new ClassLoaderModelProperty(classLoader));
+        }
     }
 }
