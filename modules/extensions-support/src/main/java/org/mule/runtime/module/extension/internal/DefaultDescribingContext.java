@@ -28,14 +28,16 @@ public final class DefaultDescribingContext implements DescribingContext
     private final ExtensionDeclarer extensionDeclarer;
     private final Map<String, Object> customParameters = new HashMap<>();
 
-    public DefaultDescribingContext()
+    public DefaultDescribingContext(ClassLoader classLoader)
     {
-        this(new ExtensionDeclarer());
+        this(new ExtensionDeclarer(), classLoader);
+
     }
 
-    public DefaultDescribingContext(ExtensionDeclarer extensionDeclarer)
+    public DefaultDescribingContext(ExtensionDeclarer extensionDeclarer, ClassLoader classLoader)
     {
         this.extensionDeclarer = extensionDeclarer;
+        addParameter(ExtensionProperties.EXTENSION_CLASSLOADER, classLoader);
     }
 
     /**

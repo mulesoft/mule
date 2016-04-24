@@ -21,6 +21,7 @@ import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
+import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
@@ -179,7 +180,8 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
     {
         for (Describer describer : describers)
         {
-            extensionManager.registerExtension(extensionFactory.createFrom(describer.describe(new DefaultDescribingContext())));
+            final DescribingContext context = new DefaultDescribingContext(getClass().getClassLoader());
+            extensionManager.registerExtension(extensionFactory.createFrom(describer.describe(context)));
         }
     }
 

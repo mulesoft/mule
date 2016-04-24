@@ -60,7 +60,7 @@ public class StudioModelEnricherTestCase extends AbstractMuleTestCase
     private StudioModelProperty enrich(Class<?> type)
     {
         extensionDeclarer.withModelProperty(new ImplementingTypeModelProperty(type));
-        modelEnricher.enrich(new DefaultDescribingContext(extensionDeclarer));
+        modelEnricher.enrich(new DefaultDescribingContext(extensionDeclarer, type.getClassLoader()));
         return extensionDeclarer.getExtensionDeclaration().getModelProperty(StudioModelProperty.class).get();
     }
 

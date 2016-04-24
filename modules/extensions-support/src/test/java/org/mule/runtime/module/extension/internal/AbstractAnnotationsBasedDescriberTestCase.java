@@ -38,7 +38,7 @@ public abstract class AbstractAnnotationsBasedDescriberTestCase extends Abstract
 
     protected ExtensionDeclarer describeExtension()
     {
-        return getDescriber().describe(new DefaultDescribingContext());
+        return getDescriber().describe(new DefaultDescribingContext(getClass().getClassLoader()));
     }
 
     protected OperationDeclaration getOperation(ExtensionDeclaration extensionDeclaration, final String operationName)

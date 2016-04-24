@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_CLASSLOADER;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -34,7 +35,7 @@ public class DefaultDescribingContextTestCase extends AbstractMuleTestCase
     public void before()
     {
         descriptor = new ExtensionDeclarer();
-        context = new DefaultDescribingContext(descriptor);
+        context = new DefaultDescribingContext(descriptor, getClass().getClassLoader());
         context.addParameter(KEY, VALUE);
     }
 
@@ -68,5 +69,9 @@ public class DefaultDescribingContextTestCase extends AbstractMuleTestCase
         context.addParameter(KEY, null);
     }
 
-
+    @Test
+    public void getClassLoader()
+    {
+        assertThat(context.getParameter(EXTENSION_CLASSLOADER, ClassLoader.class), is(sameInstance(getClass().getClassLoader())));
+    }
 }

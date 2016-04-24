@@ -162,7 +162,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     public void parseMetadataAnnotationsOnParameter()
     {
         setDescriber(describerFor(MetadataExtension.class));
-        ExtensionDeclarer declarer = getDescriber().describe(new DefaultDescribingContext());
+        ExtensionDeclarer declarer = getDescriber().describe(new DefaultDescribingContext(MetadataExtension.class.getClassLoader()));
         ExtensionDeclaration declaration = declarer.getDeclaration();
 
         List<ParameterDeclaration> parameters = getOperation(declaration, "contentMetadataWithKeyParam").getParameters();
@@ -261,37 +261,37 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     @Test(expected = IllegalConfigurationModelDefinitionException.class)
     public void heisenbergWithOperationsConfig() throws Exception
     {
-        describerFor(HeisenbergWithSameOperationsAndConfigs.class).describe(new DefaultDescribingContext());
+        describerFor(HeisenbergWithSameOperationsAndConfigs.class).describe(new DefaultDescribingContext(HeisenbergWithSameOperationsAndConfigs.class.getClassLoader()));
     }
 
     @Test(expected = IllegalModelDefinitionException.class)
     public void heisenbergWithParameterGroupAsOptional() throws Exception
     {
-        describerFor(HeisenbergWithParameterGroupAsOptional.class).describe(new DefaultDescribingContext());
+        describerFor(HeisenbergWithParameterGroupAsOptional.class).describe(new DefaultDescribingContext(HeisenbergWithSameOperationsAndConfigs.class.getClassLoader()));
     }
 
     @Test(expected = IllegalModelDefinitionException.class)
     public void heisenbergWithMoreThanOneConfigInOperation() throws Exception
     {
-        describerFor(HeisenbergWithInvalidOperation.class).describe(new DefaultDescribingContext());
+        describerFor(HeisenbergWithInvalidOperation.class).describe(new DefaultDescribingContext(HeisenbergWithSameOperationsAndConfigs.class.getClassLoader()));
     }
 
     @Test(expected = IllegalOperationModelDefinitionException.class)
     public void heisenbergWithOperationPointingToExtension() throws Exception
     {
-        describerFor(HeisenbergWithOperationsPointingToExtension.class).describe(new DefaultDescribingContext());
+        describerFor(HeisenbergWithOperationsPointingToExtension.class).describe(new DefaultDescribingContext(HeisenbergWithSameOperationsAndConfigs.class.getClassLoader()));
     }
 
     @Test(expected = IllegalConfigurationModelDefinitionException.class)
     public void heisenbergWithOperationPointingToExtensionAndDefaultConfig() throws Exception
     {
-        describerFor(HeisenbergWithOperationsPointingToExtensionAndDefaultConfig.class).describe(new DefaultDescribingContext());
+        describerFor(HeisenbergWithOperationsPointingToExtensionAndDefaultConfig.class).describe(new DefaultDescribingContext(HeisenbergWithSameOperationsAndConfigs.class.getClassLoader()));
     }
 
     @Test
     public void messageOperationWithoutGenerics() throws Exception
     {
-        ExtensionDeclarer declarer = describerFor(HeisenbergWithGenericlessMessageOperation.class).describe(new DefaultDescribingContext());
+        ExtensionDeclarer declarer = describerFor(HeisenbergWithGenericlessMessageOperation.class).describe(new DefaultDescribingContext(HeisenbergWithSameOperationsAndConfigs.class.getClassLoader()));
         OperationDeclaration operation = getOperation(declarer.getDeclaration(), "noGenerics");
 
         assertThat(operation.getReturnType(), is(instanceOf(AnyType.class)));

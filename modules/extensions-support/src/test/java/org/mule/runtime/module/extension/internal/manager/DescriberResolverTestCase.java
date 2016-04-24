@@ -62,7 +62,7 @@ public class DescriberResolverTestCase extends AbstractMuleTestCase
         Describer describer = resolver.resolve(manifest, getClass().getClassLoader());
         assertThat(describer, instanceOf(AnnotationsBasedDescriber.class));
 
-        final DefaultDescribingContext context = new DefaultDescribingContext();
+        final DefaultDescribingContext context = new DefaultDescribingContext(getClass().getClassLoader());
         ExtensionModel model = extensionFactory.createFrom(describer.describe(context), context);
         assertThat(model.getName(), equalTo(manifest.getName()));
     }

@@ -109,7 +109,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     @Override
     public RuntimeExtensionModel createFrom(ExtensionDeclarer declarer)
     {
-        return createFrom(declarer, new DefaultDescribingContext(declarer));
+        return createFrom(declarer, new DefaultDescribingContext(declarer, getClass().getClassLoader()));
     }
 
     /**
