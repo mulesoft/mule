@@ -6,12 +6,9 @@
  */
 package org.mule.construct;
 
-import java.util.Collections;
-
-import org.apache.commons.lang.Validate;
 import org.mule.MessageExchangePattern;
-import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
+import org.mule.VoidMuleEvent;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -19,6 +16,8 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstructInvalidException;
+import org.mule.api.construct.MuleConnectionsBuilder;
+import org.mule.api.construct.MuleConnectionsBuilder.MuleConnectionDirection;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -39,6 +38,10 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.routing.ChoiceRouter;
 import org.mule.util.StringUtils;
+
+import java.util.Collections;
+
+import org.apache.commons.lang.Validate;
 
 public class Validator extends AbstractConfigurationPattern
 {
@@ -207,6 +210,7 @@ public class Validator extends AbstractConfigurationPattern
             this.errorExpressionTransformer = errorExpressionTransformer;
         }
 
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             final MuleEvent nextResult = super.processNext(event);
@@ -229,6 +233,7 @@ public class Validator extends AbstractConfigurationPattern
          * Returns the incoming event whatever the outcome of the rest of the chain maybe. Sets an exception payload on
          * the incoming event if an error occurred downstream.
          */
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             final MuleEvent result = RequestContext.setEvent(event);
@@ -292,5 +297,11 @@ public class Validator extends AbstractConfigurationPattern
             ((Initialisable) outboundEndpoint).initialise();
         }
         super.doInitialise();
+    }
+
+    @Override
+    public void visitForConnections(MuleConnectionsBuilder visitor)
+    {
+        visitor.visit(outboundEndpoint.getProtocol(), outboundEndpoint.getAddress(), MuleConnectionDirection.TO, outboundEndpoint.getConnector().isConnected());
     }
 }

@@ -12,6 +12,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
+import org.mule.api.construct.MuleConnectionsBuilder;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -254,4 +255,11 @@ public class SimpleService extends AbstractConfigurationPattern
     {
         return "Simple-Service";
     }
+
+    @Override
+    public void visitForConnections(MuleConnectionsBuilder visitor)
+    {
+        // Nothing to do
+    }
+
 }

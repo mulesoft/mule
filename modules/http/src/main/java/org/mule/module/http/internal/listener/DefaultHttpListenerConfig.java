@@ -9,6 +9,7 @@ package org.mule.module.http.internal.listener;
 import static java.lang.String.format;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -226,6 +227,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         return new ServerAddress(NetworkUtils.getLocalHostIp(host), port);
     }
 
+    @Override
     public void setMuleContext(final MuleContext muleContext)
     {
         this.muleContext = muleContext;
@@ -241,11 +243,13 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         return listenerParseRequest != null ? listenerParseRequest : (parseRequest != null ? parseRequest : true);
     }
 
+    @Override
     public int getPort()
     {
         return port;
     }
 
+    @Override
     public String getHost()
     {
         return host;
@@ -311,7 +315,7 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
         }
     }
 
-    private String listenerUrl()
+    protected String listenerUrl()
     {
         return String.format("%s://%s:%d%s", protocol.getScheme(), getHost(), getPort(), StringUtils.defaultString(basePath));
     }

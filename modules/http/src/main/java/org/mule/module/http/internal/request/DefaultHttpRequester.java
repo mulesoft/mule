@@ -36,15 +36,18 @@ import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.processor.AbstractNonBlockingMessageProcessor;
+import org.mule.processor.OutboundMessageProcessor;
 import org.mule.util.AttributeEvaluator;
 
 import com.google.common.collect.Lists;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 
-public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor implements Initialisable, MuleContextAware, FlowConstructAware
+public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor implements Initialisable, MuleContextAware, FlowConstructAware, OutboundMessageProcessor
 {
 
     public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
@@ -564,5 +567,45 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
+    }
+
+    @Override
+    public String getProtocol()
+    {
+        if (url.getRawValue() != null)
+        {
+            try
+            {
+                return new URL(url.getRawValue()).getProtocol();
+            }
+            catch (MalformedURLException e)
+            {
+                return "http";
+            }
+        }
+        else
+        {
+            return requestConfig.getScheme();
+        }
+    }
+
+    @Override
+    public String getAddress()
+    {
+        final String rawValue = url.getRawValue();
+        if (rawValue != null)
+        {
+            return rawValue;
+        }
+        else
+        {
+            String resolvedPath = buildPath(basePath.getRawValue(), path.getRawValue());
+
+            // Encode spaces to generate a valid HTTP request.
+            resolvedPath = HttpParser.encodeSpaces(resolvedPath);
+
+            return String.format("%s:%s%s", host.getRawValue(),
+                    port.getRawValue(), resolvedPath);
+        }
     }
 }

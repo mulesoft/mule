@@ -32,14 +32,17 @@ import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 import org.mule.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.module.http.internal.listener.matcher.MethodRequestMatcher;
+import org.mule.processor.InboundMessageSource;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultHttpListener implements HttpListener, Initialisable, MuleContextAware, FlowConstructAware
+public class DefaultHttpListener implements HttpListener, Initialisable, MuleContextAware, FlowConstructAware, InboundMessageSource
 {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultHttpListener.class);
@@ -291,5 +294,24 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     public String[] getAllowedMethods()
     {
         return parsedAllowedMethods;
+    }
+
+    @Override
+    public String getProtocol()
+    {
+        try
+        {
+            return new URL(config.listenerUrl()).getProtocol();
+        }
+        catch (MalformedURLException e)
+        {
+            return "http";
+        }
+    }
+
+    @Override
+    public String getAddress()
+    {
+        return config.listenerUrl();
     }
 }

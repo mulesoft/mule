@@ -6,11 +6,9 @@
  */
 package org.mule.construct;
 
-import java.util.List;
-
-import org.apache.commons.lang.Validate;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
+import org.mule.api.construct.MuleConnectionsBuilder;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -18,6 +16,10 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
+
+import java.util.List;
+
+import org.apache.commons.lang.Validate;
 
 /**
  * A simple bridge between a single inbound endpoint and a single outbound endpoint. It enforces a consistent exchange
@@ -139,5 +141,11 @@ public class Bridge extends AbstractConfigurationPattern
     public String getConstructType()
     {
         return "Bridge";
+    }
+
+    @Override
+    public void visitForConnections(MuleConnectionsBuilder visitor)
+    {
+        // Nothing to do
     }
 }

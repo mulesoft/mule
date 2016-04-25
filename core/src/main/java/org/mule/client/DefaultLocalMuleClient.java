@@ -21,6 +21,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.client.OperationOptions;
 import org.mule.api.connector.ConnectorOperationLocator;
+import org.mule.api.construct.MuleConnectionsBuilder;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointCache;
 import org.mule.api.endpoint.EndpointException;
@@ -64,6 +65,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         return connectorOperatorLocator;
     }
 
+    @Override
     public MuleMessage process(OutboundEndpoint endpoint,
                                Object payload,
                                Map<String, Object> messageProperties) throws MuleException
@@ -72,11 +74,13 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
     }
 
+    @Override
     public MuleMessage process(OutboundEndpoint endpoint, MuleMessage message) throws MuleException
     {
         return returnMessage(endpoint.process(createMuleEvent(message, endpoint)));
     }
 
+    @Override
     public MuleMessage request(InboundEndpoint endpoint, long timeout) throws MuleException
     {
         try
@@ -89,18 +93,21 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         }
     }
 
+    @Override
     public void dispatch(String url, Object payload, Map<String, Object> messageProperties)
         throws MuleException
     {
         dispatch(url, new DefaultMuleMessage(payload, messageProperties, muleContext));
     }
 
+    @Override
     public MuleMessage send(String url, Object payload, Map<String, Object> messageProperties)
         throws MuleException
     {
         return send(url, new DefaultMuleMessage(payload, messageProperties, muleContext));
     }
 
+    @Override
     public MuleMessage send(String url, MuleMessage message) throws MuleException
     {
         final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateConnectorOperation(url, newOptions().build(), MessageExchangePattern.REQUEST_RESPONSE);
@@ -129,6 +136,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         }
     }
 
+    @Override
     public MuleMessage send(String url, Object payload, Map<String, Object> messageProperties, long timeout)
         throws MuleException
     {
@@ -136,6 +144,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
     }
 
+    @Override
     public MuleMessage send(String url, MuleMessage message, long timeout) throws MuleException
     {
         return send(url, message, newOptions().responseTimeout(timeout).build());
@@ -147,6 +156,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         return returnMessage(endpoint.process(createMuleEvent(message, endpoint)));
     }
 
+    @Override
     public void dispatch(String url, MuleMessage message) throws MuleException
     {
         final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateConnectorOperation(url, newOptions().build(), MessageExchangePattern.ONE_WAY);
@@ -175,6 +185,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         }
     }
 
+    @Override
     public MuleMessage request(String url, long timeout) throws MuleException
     {
         InboundEndpoint endpoint = endpointCache.getInboundEndpoint(url, MessageExchangePattern.ONE_WAY);
@@ -188,6 +199,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         }
     }
 
+    @Override
     public MuleMessage process(String uri,
                                MessageExchangePattern mep,
                                Object payload,
@@ -196,6 +208,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         return process(uri, mep, new DefaultMuleMessage(payload, messageProperties, muleContext));
     }
 
+    @Override
     public MuleMessage process(String uri, MessageExchangePattern mep, MuleMessage message)
         throws MuleException
     {
@@ -241,31 +254,37 @@ public class DefaultLocalMuleClient implements LocalMuleClient
             this.muleContext = muleContext;
         }
 
+        @Override
         public String getName()
         {
             return "MuleClient";
         }
 
+        @Override
         public MessagingExceptionHandler getExceptionListener()
         {
             return new DefaultMessagingExceptionStrategy(muleContext);
         }
 
+        @Override
         public LifecycleState getLifecycleState()
         {
             return null;
         }
 
+        @Override
         public FlowConstructStatistics getStatistics()
         {
             return null;
         }
 
+        @Override
         public MuleContext getMuleContext()
         {
             return muleContext;
         }
 
+        @Override
         public MessageInfoMapping getMessageInfoMapping()
         {
             return null;
@@ -274,6 +293,12 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         public MessageProcessorChain getMessageProcessorChain()
         {
             return null;
+        }
+
+        @Override
+        public void visitForConnections(MuleConnectionsBuilder visitor)
+        {
+            // Nothing to do
         }
     }
 }

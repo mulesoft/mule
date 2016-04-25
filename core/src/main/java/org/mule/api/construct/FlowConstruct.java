@@ -45,4 +45,6 @@ public interface FlowConstruct extends NamedObject, LifecycleStateEnabled
      */
     MuleContext getMuleContext();
 
+    void visitForConnections(MuleConnectionsBuilder visitor);
+
 }

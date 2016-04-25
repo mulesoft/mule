@@ -14,6 +14,8 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstructInvalidException;
+import org.mule.api.construct.MuleConnectionsBuilder;
+import org.mule.api.construct.MuleConnectionsBuilder.MuleConnectionDirection;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
@@ -31,6 +33,8 @@ import org.mule.api.source.ClusterizableMessageSource;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
 import org.mule.api.source.NonBlockingMessageSource;
+import org.mule.api.transport.MessageDispatcher;
+import org.mule.api.transport.MessageRequester;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.context.notification.PipelineMessageNotification;
@@ -38,12 +42,17 @@ import org.mule.exception.ChoiceMessagingExceptionStrategy;
 import org.mule.exception.RollbackMessagingExceptionStrategy;
 import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.processor.AbstractRequestResponseMessageProcessor;
+import org.mule.processor.InboundMessageSource;
+import org.mule.processor.OutboundMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.source.ClusterizableMessageSourceWrapper;
+import org.mule.transport.polling.MessageProcessorPollingConnector;
+import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 import org.mule.util.NotificationUtils;
 
 import java.util.ArrayList;
@@ -465,4 +474,59 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         super.doDispose();
     }
 
+    @Override
+    public void visitForConnections(MuleConnectionsBuilder visitor)
+    {
+        // visitor.visit(messageSource);
+        if (messageSource instanceof InboundEndpoint)
+        {
+            if (((InboundEndpoint) messageSource).getConnector() instanceof MessageProcessorPollingConnector)
+            {
+                doVisitForConnections(visitor,
+                        Collections.singletonList((MessageProcessor) ((InboundEndpoint) messageSource).getProperty(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME)));
+            }
+            else
+            {
+                visitor.visit(((InboundEndpoint) messageSource).getProtocol(), ((InboundEndpoint) messageSource).getAddress(), MuleConnectionDirection.FROM,
+                        ((InboundEndpoint) messageSource).getConnector().isConnected());
+            }
+
+        }
+        else if (messageSource instanceof InboundMessageSource)
+        {
+            visitor.visit(((InboundMessageSource) messageSource).getProtocol(), ((InboundMessageSource) messageSource).getAddress(), MuleConnectionDirection.FROM, true);
+        }
+
+        doVisitForConnections(visitor, getMessageProcessors());
+    }
+
+    public static void doVisitForConnections(MuleConnectionsBuilder visitor, final List<MessageProcessor> messageProcessors2)
+    {
+        for (MessageProcessor messageProcessor : messageProcessors2)
+        {
+            if (messageProcessor instanceof AbstractMessageProcessorOwner)
+            {
+                AbstractMessageProcessorOwner o = (AbstractMessageProcessorOwner) messageProcessor;
+                o.visitForConnections(visitor);
+            }
+            else if (messageProcessor instanceof MessageDispatcher)
+            {
+                MessageDispatcher d = (MessageDispatcher) messageProcessor;
+                visitor.visit(d.getEndpoint().getProtocol(), d.getEndpoint().getAddress(), MuleConnectionDirection.TO, d.getEndpoint().getConnector().isConnected());
+
+            }
+            else if (messageProcessor instanceof MessageRequester)
+            {
+                MessageRequester r = (MessageRequester) messageProcessor;
+
+                visitor.visit(r.getEndpoint().getProtocol(), r.getEndpoint().getAddress(), MuleConnectionDirection.FROM, r.getEndpoint().getConnector().isConnected());
+            }
+            else if (messageProcessor instanceof OutboundMessageProcessor)
+            {
+                OutboundMessageProcessor omp = (OutboundMessageProcessor) messageProcessor;
+
+                visitor.visit(omp.getProtocol(), omp.getAddress(), MuleConnectionDirection.TO, true);
+            }
+        }
+    }
 }

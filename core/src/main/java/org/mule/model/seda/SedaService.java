@@ -9,6 +9,7 @@ package org.mule.model.seda;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.construct.MuleConnectionsBuilder;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
@@ -73,6 +74,7 @@ public class SedaService extends AbstractService
         return new ProcessIfStartedWaitIfSyncPausedMessageProcessor(this, lifecycleManager.getState());
     }
 
+    @Override
     protected void addMessageProcessors(MessageProcessorChainBuilder builder)
     {
         builder.chain(new ProcessingTimeInterceptor(null, this));
@@ -193,4 +195,9 @@ public class SedaService extends AbstractService
         super.doResume();
     }
 
+    @Override
+    public void visitForConnections(MuleConnectionsBuilder visitor)
+    {
+        // Nothing to do
+    }
 }
