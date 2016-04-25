@@ -302,6 +302,6 @@ public class Validator extends AbstractConfigurationPattern
     @Override
     public void visitForConnections(MuleConnectionsBuilder visitor)
     {
-        visitor.visit(outboundEndpoint.getProtocol(), outboundEndpoint.getAddress(), MuleConnectionDirection.TO, outboundEndpoint.getConnector().isConnected());
+        visitor.addConsumed(outboundEndpoint.getProtocol(), outboundEndpoint.getAddress(), MuleConnectionDirection.TO, outboundEndpoint.getConnector().isConnected(), "");
     }
 }

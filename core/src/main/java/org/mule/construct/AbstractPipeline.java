@@ -6,6 +6,7 @@
  */
 package org.mule.construct;
 
+import org.mule.api.AnnotatedObject;
 import org.mule.api.GlobalNameableObject;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -18,6 +19,7 @@ import org.mule.api.construct.MuleConnectionsBuilder;
 import org.mule.api.construct.MuleConnectionsBuilder.MuleConnectionDirection;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.DefaultMessageProcessorPathElement;
@@ -60,6 +62,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.namespace.QName;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link MessageProcessor}s
@@ -480,21 +484,23 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         // visitor.visit(messageSource);
         if (messageSource instanceof InboundEndpoint)
         {
-            if (((InboundEndpoint) messageSource).getConnector() instanceof MessageProcessorPollingConnector)
+            final InboundEndpoint endpoint = (InboundEndpoint) messageSource;
+            if (endpoint.getConnector() instanceof MessageProcessorPollingConnector)
             {
                 doVisitForConnections(visitor,
-                        Collections.singletonList((MessageProcessor) ((InboundEndpoint) messageSource).getProperty(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME)));
+                        Collections.singletonList((MessageProcessor) endpoint.getProperty(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME)));
             }
             else
             {
-                visitor.visit(((InboundEndpoint) messageSource).getProtocol(), ((InboundEndpoint) messageSource).getAddress(), MuleConnectionDirection.FROM,
-                        ((InboundEndpoint) messageSource).getConnector().isConnected());
+                visitor.setProvided(endpoint.getProtocol(), endpoint.getAddress(), MuleConnectionDirection.FROM,
+                        endpoint.getConnector().isConnected(), getDescription(((InboundEndpoint) messageSource).getConnector()));
             }
 
         }
         else if (messageSource instanceof InboundMessageSource)
         {
-            visitor.visit(((InboundMessageSource) messageSource).getProtocol(), ((InboundMessageSource) messageSource).getAddress(), MuleConnectionDirection.FROM, true);
+            final InboundMessageSource source = (InboundMessageSource) messageSource;
+            visitor.setProvided(source.getProtocol(), source.getAddress(), MuleConnectionDirection.FROM, true, getDescription(messageSource));
         }
 
         doVisitForConnections(visitor, getMessageProcessors());
@@ -511,22 +517,34 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             }
             else if (messageProcessor instanceof MessageDispatcher)
             {
-                MessageDispatcher d = (MessageDispatcher) messageProcessor;
-                visitor.visit(d.getEndpoint().getProtocol(), d.getEndpoint().getAddress(), MuleConnectionDirection.TO, d.getEndpoint().getConnector().isConnected());
+                final OutboundEndpoint endpoint = ((MessageDispatcher) messageProcessor).getEndpoint();
+                visitor.addConsumed(endpoint.getProtocol(), endpoint.getAddress(), MuleConnectionDirection.TO, endpoint.getConnector().isConnected(), getDescription(messageProcessor));
 
             }
             else if (messageProcessor instanceof MessageRequester)
             {
-                MessageRequester r = (MessageRequester) messageProcessor;
-
-                visitor.visit(r.getEndpoint().getProtocol(), r.getEndpoint().getAddress(), MuleConnectionDirection.FROM, r.getEndpoint().getConnector().isConnected());
+                final InboundEndpoint endpoint = ((MessageRequester) messageProcessor).getEndpoint();
+                visitor.addConsumed(endpoint.getProtocol(), endpoint.getAddress(), MuleConnectionDirection.FROM, endpoint.getConnector().isConnected(),
+                        getDescription(((MessageRequester) messageProcessor).getConnector()));
             }
             else if (messageProcessor instanceof OutboundMessageProcessor)
             {
                 OutboundMessageProcessor omp = (OutboundMessageProcessor) messageProcessor;
 
-                visitor.visit(omp.getProtocol(), omp.getAddress(), MuleConnectionDirection.TO, true);
+                visitor.addConsumed(omp.getProtocol(), omp.getAddress(), MuleConnectionDirection.TO, true, getDescription(omp));
             }
+        }
+    }
+
+    private static String getDescription(Object o)
+    {
+        if (o instanceof AnnotatedObject)
+        {
+            return (String) ((AnnotatedObject) o).getAnnotation(new QName("http://www.mulesoft.org/schema/mule/doc", "description"));
+        }
+        else
+        {
+            return "";
         }
     }
 }

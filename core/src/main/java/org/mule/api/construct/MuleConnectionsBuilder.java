@@ -18,11 +18,37 @@ public class MuleConnectionsBuilder
         private String address;
         private MuleConnectionDirection direction;
         private boolean connected;
+        private String description;
 
         @Override
         public String toString()
         {
             return protocol + "://" + address + " (" + direction + ", " + connected + ")";
+        }
+
+        public String getProtocol()
+        {
+            return protocol;
+        }
+
+        public String getAddress()
+        {
+            return address;
+        }
+
+        public MuleConnectionDirection getDirection()
+        {
+            return direction;
+        }
+
+        public boolean isConnected()
+        {
+            return connected;
+        }
+
+        public String getDescription()
+        {
+            return description;
         }
     }
 
@@ -32,10 +58,23 @@ public class MuleConnectionsBuilder
         TO, FROM;
     }
 
-    private Set<MuleConnection> connections = new HashSet<>();
+    private MuleConnection provided;
+    private Set<MuleConnection> consumed = new HashSet<>();
 
 
-    public void visit(String protocol, String address, MuleConnectionDirection direction, boolean connected)
+    public void setProvided(String protocol, String address, MuleConnectionDirection direction, boolean connected, String description)
+    {
+        final MuleConnection mc = buildConnection(protocol, address, direction, connected, description);
+        provided = mc;
+    }
+
+    public void addConsumed(String protocol, String address, MuleConnectionDirection direction, boolean connected, String description)
+    {
+        final MuleConnection mc = buildConnection(protocol, address, direction, connected, description);
+        consumed.add(mc);
+    }
+
+    protected MuleConnection buildConnection(String protocol, String address, MuleConnectionDirection direction, boolean connected, String description)
     {
         final MuleConnection mc = new MuleConnection();
         mc.protocol = protocol.toUpperCase();
@@ -51,12 +90,23 @@ public class MuleConnectionsBuilder
 
         mc.direction = direction;
         mc.connected = connected;
-        connections.add(mc);
+        mc.description = description;
+        return mc;
     }
 
     @Override
     public String toString()
     {
-        return "MuleConnectionsBuilder: " + connections.toString();
+        return "MuleConnectionsBuilder[provided: " + provided.toString() + "; consumed: " + consumed.toString() + "]";
+    }
+
+    public MuleConnection getProvidedConnection()
+    {
+        return provided;
+    }
+
+    public Set<MuleConnection> getConsumedConnections()
+    {
+        return consumed;
     }
 }

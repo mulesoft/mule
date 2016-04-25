@@ -7,6 +7,8 @@
 package org.mule.transport;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+
+import org.mule.AbstractAnnotatedObject;
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
@@ -134,7 +136,7 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  * <li>Dispose Receivers
  * </ol>
  */
-public abstract class AbstractConnector implements Connector, WorkListener
+public abstract class AbstractConnector extends AbstractAnnotatedObject implements Connector, WorkListener
 {
     /**
      * Default number of concurrent transactional receivers.
