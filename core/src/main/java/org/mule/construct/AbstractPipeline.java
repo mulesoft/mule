@@ -487,8 +487,30 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             final InboundEndpoint endpoint = (InboundEndpoint) messageSource;
             if (endpoint.getConnector() instanceof MessageProcessorPollingConnector)
             {
-                doVisitForConnections(visitor,
-                        Collections.singletonList((MessageProcessor) endpoint.getProperty(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME)));
+                final Object pollingProcessor = endpoint.getProperty(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME);
+                if (pollingProcessor instanceof AbstractMessageProcessorOwner)
+                {
+                    AbstractMessageProcessorOwner o = (AbstractMessageProcessorOwner) pollingProcessor;
+                    o.visitForConnections(visitor);
+                }
+                else if (pollingProcessor instanceof MessageDispatcher)
+                {
+                    final OutboundEndpoint ppEndpoint = ((MessageDispatcher) pollingProcessor).getEndpoint();
+                    visitor.setProvided(ppEndpoint.getProtocol(), ppEndpoint.getAddress(), MuleConnectionDirection.TO, ppEndpoint.getConnector().isConnected(), getDescription(pollingProcessor));
+
+                }
+                else if (pollingProcessor instanceof MessageRequester)
+                {
+                    final InboundEndpoint ppEndpoint = ((MessageRequester) pollingProcessor).getEndpoint();
+                    visitor.setProvided(ppEndpoint.getProtocol(), ppEndpoint.getAddress(), MuleConnectionDirection.FROM, ppEndpoint.getConnector().isConnected(),
+                            getDescription(((MessageRequester) pollingProcessor).getConnector()));
+                }
+                else if (pollingProcessor instanceof OutboundMessageProcessor)
+                {
+                    OutboundMessageProcessor omp = (OutboundMessageProcessor) pollingProcessor;
+
+                    visitor.setProvided(omp.getProtocol(), omp.getAddress(), MuleConnectionDirection.TO, true, getDescription(omp));
+                }
             }
             else
             {
@@ -506,9 +528,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         doVisitForConnections(visitor, getMessageProcessors());
     }
 
-    public static void doVisitForConnections(MuleConnectionsBuilder visitor, final List<MessageProcessor> messageProcessors2)
+    public static void doVisitForConnections(MuleConnectionsBuilder visitor, final List<MessageProcessor> messageProcessors)
     {
-        for (MessageProcessor messageProcessor : messageProcessors2)
+        for (MessageProcessor messageProcessor : messageProcessors)
         {
             if (messageProcessor instanceof AbstractMessageProcessorOwner)
             {

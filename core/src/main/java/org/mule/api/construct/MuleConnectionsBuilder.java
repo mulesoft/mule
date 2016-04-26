@@ -97,7 +97,7 @@ public class MuleConnectionsBuilder
     @Override
     public String toString()
     {
-        return "MuleConnectionsBuilder[provided: " + provided.toString() + "; consumed: " + consumed.toString() + "]";
+        return "MuleConnectionsBuilder[provided: " + (provided != null ? provided.toString() : "null") + "; consumed: " + consumed.toString() + "]";
     }
 
     public MuleConnection getProvidedConnection()
