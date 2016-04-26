@@ -565,14 +565,34 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
             visitor.addConsumed(omp.getProtocol(), omp.getAddress(), MuleConnectionDirection.TO, true, getDescription(omp));
         }
-        else if (isDevKit(messageProcessor))
+        else if (isGithub(messageProcessor))
         {
             try
             {
                 final Set<Field> fields = ReflectionUtils.getFields(Class.forName("org.mule.devkit.processor.DevkitBasedMessageProcessor"), ReflectionUtils.withName("operationName"));
                 final Field field = fields.iterator().next();
                 field.setAccessible(true);
-                visitor.addConsumed("GITHUB", (String) field.get(messageProcessor), MuleConnectionDirection.FROM, true, "");
+                visitor.addConsumed("GITHUB", "github.com/" + (String) field.get(messageProcessor), MuleConnectionDirection.FROM, true, "");
+            }
+            catch (ClassNotFoundException e)
+            {
+            }
+            catch (IllegalArgumentException e)
+            {
+            }
+            catch (IllegalAccessException e)
+            {
+            }
+
+        }
+        else if (isSalesforce(messageProcessor))
+        {
+            try
+            {
+                final Set<Field> fields = ReflectionUtils.getFields(Class.forName("org.mule.devkit.processor.DevkitBasedMessageProcessor"), ReflectionUtils.withName("operationName"));
+                final Field field = fields.iterator().next();
+                field.setAccessible(true);
+                visitor.addConsumed("SFDC", "salsforce.com/" + (String) field.get(messageProcessor), MuleConnectionDirection.FROM, true, "");
             }
             catch (ClassNotFoundException e)
             {
@@ -587,11 +607,25 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         }
     }
 
-    private static boolean isDevKit(MessageProcessor messageProcessor)
+    private static boolean isGithub(MessageProcessor messageProcessor)
     {
         try
         {
-            return Class.forName("org.mule.devkit.processor.DevkitBasedMessageProcessor").isAssignableFrom(messageProcessor.getClass());
+            return messageProcessor.getClass().getName().startsWith("org.mule.modules.github")
+                   && Class.forName("org.mule.devkit.processor.DevkitBasedMessageProcessor").isAssignableFrom(messageProcessor.getClass());
+        }
+        catch (ClassNotFoundException e)
+        {
+            return false;
+        }
+    }
+
+    private static boolean isSalesforce(MessageProcessor messageProcessor)
+    {
+        try
+        {
+            return messageProcessor.getClass().getName().startsWith("org.mule.modules.salesforce")
+                   && Class.forName("org.mule.devkit.processor.DevkitBasedMessageProcessor").isAssignableFrom(messageProcessor.getClass());
         }
         catch (ClassNotFoundException e)
         {
