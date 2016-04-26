@@ -57,13 +57,17 @@ import org.mule.transport.polling.MessageProcessorPollingConnector;
 import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 import org.mule.util.NotificationUtils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
+
+import org.reflections.ReflectionUtils;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link MessageProcessor}s
@@ -532,31 +536,69 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     {
         for (MessageProcessor messageProcessor : messageProcessors)
         {
-            if (messageProcessor instanceof AbstractMessageProcessorOwner)
-            {
-                AbstractMessageProcessorOwner o = (AbstractMessageProcessorOwner) messageProcessor;
-                o.visitForConnections(visitor);
-            }
-            else if (messageProcessor instanceof MessageDispatcher)
-            {
-                final OutboundEndpoint endpoint = ((MessageDispatcher) messageProcessor).getEndpoint();
-                visitor.addConsumed(endpoint.getProtocol(), endpoint.getAddress(), MuleConnectionDirection.TO, endpoint.getConnector().isConnected(), getDescription(messageProcessor));
-
-            }
-            else if (messageProcessor instanceof MessageRequester)
-            {
-                final InboundEndpoint endpoint = ((MessageRequester) messageProcessor).getEndpoint();
-                visitor.addConsumed(endpoint.getProtocol(), endpoint.getAddress(), MuleConnectionDirection.FROM, endpoint.getConnector().isConnected(),
-                        getDescription(((MessageRequester) messageProcessor).getConnector()));
-            }
-            else if (messageProcessor instanceof OutboundMessageProcessor)
-            {
-                OutboundMessageProcessor omp = (OutboundMessageProcessor) messageProcessor;
-
-                visitor.addConsumed(omp.getProtocol(), omp.getAddress(), MuleConnectionDirection.TO, true, getDescription(omp));
-            }
+            doVisit(visitor, messageProcessor);
         }
     }
+
+    public static void doVisit(MuleConnectionsBuilder visitor, MessageProcessor messageProcessor)
+    {
+        if (messageProcessor instanceof AbstractMessageProcessorOwner)
+        {
+            AbstractMessageProcessorOwner o = (AbstractMessageProcessorOwner) messageProcessor;
+            o.visitForConnections(visitor);
+        }
+        else if (messageProcessor instanceof MessageDispatcher)
+        {
+            final OutboundEndpoint endpoint = ((MessageDispatcher) messageProcessor).getEndpoint();
+            visitor.addConsumed(endpoint.getProtocol(), endpoint.getAddress(), MuleConnectionDirection.TO, endpoint.getConnector().isConnected(), getDescription(messageProcessor));
+
+        }
+        else if (messageProcessor instanceof MessageRequester)
+        {
+            final InboundEndpoint endpoint = ((MessageRequester) messageProcessor).getEndpoint();
+            visitor.addConsumed(endpoint.getProtocol(), endpoint.getAddress(), MuleConnectionDirection.FROM, endpoint.getConnector().isConnected(),
+                    getDescription(((MessageRequester) messageProcessor).getConnector()));
+        }
+        else if (messageProcessor instanceof OutboundMessageProcessor)
+        {
+            OutboundMessageProcessor omp = (OutboundMessageProcessor) messageProcessor;
+
+            visitor.addConsumed(omp.getProtocol(), omp.getAddress(), MuleConnectionDirection.TO, true, getDescription(omp));
+        }
+        else if (isDevKit(messageProcessor))
+        {
+            try
+            {
+                final Set<Field> fields = ReflectionUtils.getFields(Class.forName("org.mule.devkit.processor.DevkitBasedMessageProcessor"), ReflectionUtils.withName("operationName"));
+                final Field field = fields.iterator().next();
+                field.setAccessible(true);
+                visitor.addConsumed("GITHUB", (String) field.get(messageProcessor), MuleConnectionDirection.FROM, true, "");
+            }
+            catch (ClassNotFoundException e)
+            {
+            }
+            catch (IllegalArgumentException e)
+            {
+            }
+            catch (IllegalAccessException e)
+            {
+            }
+
+        }
+    }
+
+    private static boolean isDevKit(MessageProcessor messageProcessor)
+    {
+        try
+        {
+            return Class.forName("org.mule.devkit.processor.DevkitBasedMessageProcessor").isAssignableFrom(messageProcessor.getClass());
+        }
+        catch (ClassNotFoundException e)
+        {
+            return false;
+        }
+    }
+
 
     private static String getDescription(Object o)
     {

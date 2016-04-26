@@ -23,7 +23,7 @@ public class MuleConnectionsBuilder
         @Override
         public String toString()
         {
-            return protocol + "://" + address + " (" + direction + ", " + connected + ")";
+            return protocol + "://" + address + " (" + direction + ", " + connected + ") " + description;
         }
 
         public String getProtocol()
