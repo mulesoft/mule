@@ -37,7 +37,7 @@ Mule is a powerful and complex project. Before contributing to the Mule source c
 There are many resources available to help you become familiar with Mule and its features:
 
 - MuleSoft's [blog](http://blogs.mulesoft.com/). The fastest way of knowing about new features in mule. 
-- [Mule User Guide](https://developer.mulesoft.com/docs/display/current/Mule+User+Guide), the official documentation around usage of Mule Runtime.
+- [Mule User Guide](https://docs.mulesoft.com/mule-user-guide), the official documentation around usage of Mule Runtime.
 - The books [Mule in Action (2nd Edition)](http://www.manning.com/dossot2/) and [Getting Started with Mule Cloud Connect](http://shop.oreilly.com/product/0636920025726.do). Both are excellent resources for learning how to use and extend Mule.
 - [@MuleSoft](https://twitter.com/MuleSoft)'s twitter account. You might also want to check the [#MuleESB](https://twitter.com/hashtag/MuleESB) hashtag.
 
@@ -51,7 +51,7 @@ Before you begin, please take a few minutes to review community meeting
 points to make sure someone else hasn't already taken on your challenge:
 
 1. Review [existing JIRAs](http://www.mulesoft.org/jira/browse/MULE) to see if a bug has already been logged.
-2. Follow the [MuleSoft Forum](http://forum.mulesoft.org/mulesoft) chatter to see if anyone else has started resolving the problem or initiated an improvement.
+2. Follow the [MuleSoft Forum](https://forums.mulesoft.com/) chatter to see if anyone else has started resolving the problem or initiated an improvement.
 3. Scan [StackOverflow](http://stackoverflow.com/questions/tagged/mule) to see if there is already a proposed solution to your problem.
 
 ### Understanding the Extension Mechanisms
@@ -60,9 +60,9 @@ points to make sure someone else hasn't already taken on your challenge:
 Avoiding adding functionality to the project. Rather, using one of the mechanisms to extend Mule is probably the more favorable option.
 It is important to understand both.
 
-- The **first** and more intuitive mechanism for extensions is the [Anypoint Connector DevKit](https://docs.mulesoft.com/anypoint-connector-devkit/v/3.7/index), an **annotation-based framework** for easy construction of extensions.
+- The **first** and more intuitive mechanism for extensions is the [Anypoint Connector DevKit](https://docs.mulesoft.com/anypoint-connector-devkit), an **annotation-based framework** for easy construction of extensions.
 
-- The **second** choice is to extend Mule through the [Extensions](https://docs.mulesoft.com/mule-fundamentals/v/3.7/extending-mule) mechanism.
+- The **second** choice is to extend Mule through the [Extensions](https://docs.mulesoft.com/mule-fundamentals) mechanism.
 
 ## Setting Up the Development Environment
 
@@ -78,13 +78,13 @@ Before you get started, you need to set yourself up with an environment in which
 
 * A **Java SDK**.
 * A recent version of **Maven**.
-* A development environment tool or *IDE* (most preferably Anypoint Studio with DevKit plugin installed).
+* A development environment tool or **IDE**.
 * A new **branch** of code to work on.
 
 #### Java
 
 1. If you are working with *Windows* or **Linux**, install one of the following [Java Development Kits](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your local drive.
-2. If you are working on a **Mac**, simply confirm that the JDK shipped with your Mac OS X is _Java SE Development Kit 7 (also known as Java SE)_ or newer using the command
+2. If you are working on a **Mac**, simply confirm that the JDK shipped with your Mac OS X is _Java SE Development Kit 8 (also known as Java SE)_ or newer using the command
 `java -version`. Then skip to step 4 below.
 3. Create an environment variable called `JAVA_HOME`, setting it to the directory in which you installed the JDK.
 4. Update the `PATH` environment variable so that it includes the path to JDK binaries. Add the following to the `PATH` variable:
@@ -103,7 +103,7 @@ Before you get started, you need to set yourself up with an environment in which
     - local_policy.jar
     - US_export_policy.jar 
 
-   These two files prevent any problems regarding cryptography. If not present, download the [Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 6.0](http://www.oracle.com/technetwork/java/javase/downloads/jce-6-download-429243.html), then copy the files into the security directory identified above.
+   These two files prevent any problems regarding cryptography. If not present, download the [Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 8.0](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html), then copy the files into the security directory identified above.
 
 #### Maven
 
@@ -130,7 +130,7 @@ If you are new to Git, consider reading [Pro Git](http://git-scm.com/book) to le
 2.  If you haven't already done so, [set up Git](https://help.github.com/articles/set-up-git) on your local drive.
 3.  Navigate to Mule's GitHub page located at [https://github.com/mulesoft/mule.git](https://github.com/mulesoft).
 4.  Click the **Fork** button at the top right corner of the page, then select your own Git repository into which GitHub will insert a copy.
-5.  Prepare to **Clone** your forked repository from your GitHub account to your local drive through a secure file transfer connection. As per GitHub recommendation, we encourage  using HTTPS to transfer the source code files to your local drive. However, if you prefer to establish a secure connection for transferring the files via SSH, follow GitHub procedure to [generate SSH keys](https://help.github.com/articles/generating-ssh-keys).
+5.  Prepare to **Clone** your forked repository from your GitHub account to your local drive through a secure file transfer connection. As per GitHub recommendation, we encourage  using HTTPS to transfer the source code files to your local drive. However, if you prefer to establish a secure connection for transferring the files via SSH, follow GitHub procedure to [generate SSH keys](https://help.github.com/articles/generating-an-ssh-key/).
 6.  From the **command line**, create or navigate to an existing folder on your local drive into which you wish to store your forked clone of the connector source code.
 7.  Then, execute one of the following:
 
@@ -160,7 +160,7 @@ If you are new to Git, consider reading [Pro Git](http://git-scm.com/book) to le
 
 ### Understanding the Build
 
-This is an excellent moment read the [Guide to Build Mule](BUILD.md). A correct understanding of how the Mule project is organized and build is key for a productive development.
+This is an excellent moment to read the [Guide to Build Mule](BUILD.md). A correct understanding of how the Mule project is organized and built is key for a productive development.
 
 We are ready to develop our improvements. But, instead of doing it manually, we may want to configure an IDE for better productivity. We will expand on this in the next section.
 
@@ -258,7 +258,7 @@ Use IntelliJ's IDEA integration platform to modify or add to your cloned Mule so
 2. Open IDEA, then select **File > Open...**
 3. Browse to the directory into which you downloaded the Mule source code, then select the `pom.xml` file. 
 4. Click **OK**. IDEA takes awhile to process all the pom.xml files.
-5. Set the correct source for the JDK on your local drive. Right click the **mule-transport-jdbc** directory, then select  **Module Settings > Sources > src > main > jdk6** or **jdk7**. Repeat this step for test sources, as tests.
+5. Set the correct source for the JDK on your local drive. Right click the **mule-transport-jdbc** directory, then select  **Module Settings > Sources > src > main > jdk7** or **jdk8**. Repeat this step for test sources, as tests.
 
 > **Troubleshooting** : if IntelliJ presents any compilation errors in test classes from the CXF module when you create the project, it is safe to ignore them. Those classes depend on some test classes generated by the Maven build during execution. Right click on the error message, then select **Exclude from compile**.  Alternatively, you can run `mvn install` from the command line to fix the errors.
 
