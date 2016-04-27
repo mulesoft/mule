@@ -19,17 +19,16 @@ public final class SchemaConstants
     public static final String SPRING_FRAMEWORK_NAMESPACE = "http://www.springframework.org/schema/beans";
     public static final String SPRING_FRAMEWORK_SCHEMA_LOCATION = "http://www.springframework.org/schema/beans/spring-beans-3.0.xsd";
     public static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
+    public static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/%s";
 
-    public static final String MULE_EXTENSION_NAMESPACE = "http://www.mulesoft.org/schema/mule/extension";
+    public static final String MULE_EXTENSION_NAMESPACE = String.format(DEFAULT_SCHEMA_LOCATION_MASK, "extension");
     public static final String MULE_EXTENSION_PREFIX = "extension";
     public static final String MULE_EXTENSION_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd";
 
-    public static final String MULE_TLS_NAMESPACE = "http://www.mulesoft.org/schema/mule/tls";
+    public static final String MULE_TLS_NAMESPACE = String.format(DEFAULT_SCHEMA_LOCATION_MASK, "tls");
     public static final String MULE_TLS_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd";
     public static final String OPERATION_SUBSTITUTION_GROUP_SUFFIX = "-OperationGroup";
     public static final String GROUP_SUFFIX = "-group";
-
-    public static final String DEFAULT_SCHEMA_LOCATION_MASK = "http://www.mulesoft.org/schema/mule/%s";
     public static final String MULE_NAMESPACE = String.format(DEFAULT_SCHEMA_LOCATION_MASK, "core");
     public static final String MULE_PREFIX = "mule";
 
