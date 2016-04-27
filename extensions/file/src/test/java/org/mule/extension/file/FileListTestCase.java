@@ -17,21 +17,15 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.TreeNode;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class FileListTestCase extends FileConnectorTestCase
 {
-
-    private static final String TEST_FILE_PATTERN = "test-file-%d.html";
-    private static final String SUB_DIRECTORY_NAME = "subDirectory";
-    private static final String CONTENT = "foo";
 
     @Override
     protected String getConfigFile()
@@ -171,27 +165,5 @@ public class FileListTestCase extends FileConnectorTestCase
         assertThat(attributes.isDirectory(), is(true));
 
         return node;
-    }
-
-    private void createTestFiles() throws Exception
-    {
-        createTestFiles(temporaryFolder.getRoot(), 0, 5);
-        createSubDirectory();
-    }
-
-    private void createSubDirectory() throws Exception
-    {
-        createTestFiles(temporaryFolder.newFolder(SUB_DIRECTORY_NAME), 5, 7);
-    }
-
-    private void createTestFiles(File parentFolder, int startIndex, int endIndex) throws Exception
-    {
-        for (int i = startIndex; i < endIndex; i++)
-        {
-            String name = String.format(TEST_FILE_PATTERN, i);
-            File file = new File(parentFolder, name);
-            file.createNewFile();
-            FileUtils.write(file, CONTENT);
-        }
     }
 }

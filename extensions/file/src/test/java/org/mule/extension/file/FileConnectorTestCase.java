@@ -34,6 +34,9 @@ public abstract class FileConnectorTestCase extends ExtensionFunctionalTestCase
     protected static final String HELLO_WORLD = "Hello World!";
     protected static final String HELLO_FILE_NAME = "hello.json";
     protected static final String HELLO_PATH = "files/" + HELLO_FILE_NAME;
+    protected static final String TEST_FILE_PATTERN = "test-file-%d.html";
+    protected static final String SUB_DIRECTORY_NAME = "subDirectory";
+    protected static final String CONTENT = "foo";
 
     @ClassRule
     public static TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -113,5 +116,27 @@ public abstract class FileConnectorTestCase extends ExtensionFunctionalTestCase
         FileUtils.write(hello, HELLO_WORLD);
 
         return hello;
+    }
+
+    protected void createTestFiles() throws Exception
+    {
+        createTestFiles(temporaryFolder.getRoot(), 0, 5);
+        createSubDirectory();
+    }
+
+    protected void createSubDirectory() throws Exception
+    {
+        createTestFiles(temporaryFolder.newFolder(SUB_DIRECTORY_NAME), 5, 7);
+    }
+
+    protected void createTestFiles(File parentFolder, int startIndex, int endIndex) throws Exception
+    {
+        for (int i = startIndex; i < endIndex; i++)
+        {
+            String name = String.format(TEST_FILE_PATTERN, i);
+            File file = new File(parentFolder, name);
+            file.createNewFile();
+            FileUtils.write(file, CONTENT);
+        }
     }
 }
