@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>mule-vegan-extension</artifactId>
-    <packaging>mule-extension</packaging>
+    <packaging>jar</packaging>
 
     <name>Mule Vegan Test Extension</name>
     <description>A Mule extension for testing</description>
