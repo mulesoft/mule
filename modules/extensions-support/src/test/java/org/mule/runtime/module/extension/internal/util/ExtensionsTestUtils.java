@@ -25,22 +25,16 @@ import org.mule.metadata.java.handler.TypeHandlerManager;
 import org.mule.metadata.java.utils.ParsingContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.jar.Manifest;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.custommonkey.xmlunit.DetailedDiff;
@@ -145,32 +139,6 @@ public abstract class ExtensionsTestUtils
         return (C) extensionManager.getConfiguration(key, muleEvent).getValue();
     }
 
-    public static File getMetaInfDirectory(Class clazz)
-    {
-        URL classUrl = clazz.getResource(clazz.getSimpleName() + ".class");
-        String classPath = classUrl.getPath();
-        return new File(String.format("%starget/test-classes/META-INF", classPath.substring(0, classPath.indexOf("target"))));
-    }
-
-    public static File createManifestFileIfNecessary(File targetDirectory) throws IOException
-    {
-        return createManifestFileIfNecessary(targetDirectory, MuleManifest.getManifest());
-    }
-
-    public static File createManifestFileIfNecessary(File targetDirectory, Manifest sourceManifest) throws IOException
-    {
-        File manifestFile = new File(targetDirectory.getPath(), "MANIFEST.MF");
-        if (!manifestFile.exists())
-        {
-            Manifest manifest = new Manifest(sourceManifest);
-            try (FileOutputStream fileOutputStream = new FileOutputStream(manifestFile))
-            {
-                manifest.write(fileOutputStream);
-            }
-        }
-        return manifestFile;
-    }
-
     /**
      * Receives to {@link String} representation of two XML
      * files and verify that they are semantically equivalent
@@ -200,7 +168,7 @@ public abstract class ExtensionsTestUtils
                 diffLines.append(difference.toString() + '\n');
             }
 
-            throw new IllegalArgumentException(String.format("The Output for extension [%s] schema was not the expected:", diffLines.toString()));
+            throw new IllegalArgumentException("Actual XML differs from expected: \n" + diffLines.toString());
         }
     }
 }
