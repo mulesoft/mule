@@ -7,13 +7,13 @@
 package org.mule.runtime.module.extension.internal.config;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE;
-import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE_TYPE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE_TYPE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
 import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.config.ChainedThreadingProfile;
 import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.processors.ConstructorReference;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.config.ChainedThreadingProfile;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.ManagedMap;

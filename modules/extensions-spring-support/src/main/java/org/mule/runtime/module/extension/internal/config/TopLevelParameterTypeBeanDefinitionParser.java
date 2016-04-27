@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.config;
 
-import static org.mule.runtime.config.spring.parsers.specific.NameConstants.MULE_NAMESPACE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;

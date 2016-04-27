@@ -6,7 +6,7 @@
  */
 package org.mule.test.subtypes.extension;
 
-import org.mule.extension.api.annotation.Import;
+import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;

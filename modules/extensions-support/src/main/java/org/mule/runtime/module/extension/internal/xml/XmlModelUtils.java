@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.capability.xml;
+package org.mule.runtime.module.extension.internal.xml;
 
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.CURRENT_VERSION;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.DEFAULT_SCHEMA_LOCATION_MASK;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaConstants.XSD_EXTENSION;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CURRENT_VERSION;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.DEFAULT_SCHEMA_LOCATION_MASK;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XSD_EXTENSION;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -78,5 +78,4 @@ public final class XmlModelUtils
     {
         return StringUtils.removeEndIgnoreCase(name, word);
     }
-
 }

@@ -1,1 +1,1 @@
-org.mule.runtime.module.extension.internal.resources.ExtensionManifestGenerator
+org.mule.runtime.module.extension.internal.resources.manifest.ExtensionManifestGenerator

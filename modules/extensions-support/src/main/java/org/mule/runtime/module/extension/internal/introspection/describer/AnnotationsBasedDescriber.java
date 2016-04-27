@@ -26,9 +26,9 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
-import org.mule.extension.api.annotation.Import;
-import org.mule.extension.api.annotation.ImportedTypes;
-import org.mule.extension.api.introspection.property.ImportedTypesModelProperty;
+import org.mule.runtime.extension.api.annotation.Import;
+import org.mule.runtime.extension.api.annotation.ImportedTypes;
+import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionProvider;

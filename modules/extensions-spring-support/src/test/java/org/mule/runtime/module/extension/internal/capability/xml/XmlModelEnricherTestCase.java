@@ -16,6 +16,7 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Extension
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
+import org.mule.runtime.module.extension.internal.introspection.enricher.XmlModelEnricher;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

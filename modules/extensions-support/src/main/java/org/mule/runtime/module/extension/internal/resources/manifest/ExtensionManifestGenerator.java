@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.resources;
+package org.mule.runtime.module.extension.internal.resources.manifest;
 
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DESCRIBER_ID;
@@ -25,7 +25,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class ExtensionManifestGenerator implements GeneratedResourceFactory
+public final class ExtensionManifestGenerator implements GeneratedResourceFactory
 {
 
     /**
@@ -41,10 +41,13 @@ public class ExtensionManifestGenerator implements GeneratedResourceFactory
             return Optional.empty();
         }
 
+        ExportedArtifactsCollector exportCollector = new ExportedArtifactsCollector(extensionModel);
         ExtensionManifestBuilder builder = new ExtensionManifestBuilder();
         builder.setName(extensionModel.getName())
                 .setDescription(extensionModel.getDescription())
                 .setVersion(extensionModel.getVersion())
+                .addExportedPackages(exportCollector.getExportedPackages())
+                .addExportedResources(exportCollector.getExportedResources())
                 .withDescriber()
                 .setId(DESCRIBER_ID)
                 .addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName());
