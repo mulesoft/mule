@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.xml.bind.DatatypeConverter;
@@ -130,7 +131,7 @@ public class DateTimeTestCase extends AbstractMuleContextTestCase
     @Test
     public void withLocale()
     {
-        SimpleDateFormat df = new SimpleDateFormat("E");
+        SimpleDateFormat df = new SimpleDateFormat("E", Locale.US);
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         assertEquals(df.format(new Date()), now.withLocale("en_US").format("E"));
     }
