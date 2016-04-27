@@ -1,10 +1,10 @@
 
-# Contributing to MuleSoft ESB Runtime Community Edition (CE)
+# Contributing to Mule Kernel
 
 Thank you! Really, thank you for taking some of your precious time
-helping improve the **Mule Runtime** project.
+helping improve the **Kernel** project.
 
-This guide will help you get started with the Mule Runtime's development
+This guide will help you get started with the Mule Kernel's development
 environment. You will also learn the set of rules you are expected to
 follow in order to submit improvements and/or fixes to these projects.
 
@@ -30,16 +30,16 @@ follow in order to submit improvements and/or fixes to these projects.
  
 ## Before You Begin 
 
-Mule is a powerful and complex project. Before contributing to the Mule source code, it is important to understand the domain of the Enterprise Integration, the Mule Runtime from the user point of view and the different mechanisms to extend Mule.
+Mule is a powerful and complex project. Before contributing to the Mule source code, it is important to understand the domain of the Enterprise Integration, the Mule Kernel from the user point of view and the different mechanisms to extend Mule.
 
 ### Starting Points
 
 There are many resources available to help you become familiar with Mule and its features:
 
-- MuleSoft's [blog](http://blogs.mulesoft.com/). The fastest way of knowing about new features in mule. 
+- MuleSoft's [blog](http://blogs.mulesoft.com/). The fastest way of knowing about new features in Mule. 
 - [Mule User Guide](https://docs.mulesoft.com/mule-user-guide), the official documentation around usage of Mule Runtime.
 - The books [Mule in Action (2nd Edition)](http://www.manning.com/dossot2/) and [Getting Started with Mule Cloud Connect](http://shop.oreilly.com/product/0636920025726.do). Both are excellent resources for learning how to use and extend Mule.
-- [@MuleSoft](https://twitter.com/MuleSoft)'s twitter account. You might also want to check the [#MuleESB](https://twitter.com/hashtag/MuleESB) hashtag.
+- [@MuleSoft](https://twitter.com/MuleSoft)'s twitter account.
 
 ### Visiting the Community Meeting Points
 
@@ -56,7 +56,7 @@ points to make sure someone else hasn't already taken on your challenge:
 
 ### Understanding the Extension Mechanisms
 
-**Mule ESB** has two different extension mechanisms for writing modules and connectors.
+**Mule Kernel** has two different extension mechanisms for writing modules and connectors.
 Avoiding adding functionality to the project. Rather, using one of the mechanisms to extend Mule is probably the more favorable option.
 It is important to understand both.
 
