@@ -90,7 +90,7 @@ final class ConfigurationSchemaDelegate
     private void addConnectionProviderElement(ExplicitGroup all, RuntimeConfigurationModel configurationModel)
     {
         ExtensionModel extensionModel = configurationModel.getExtensionModel();
-        if (!extensionModel.getConnectionProviders().isEmpty())
+        if (!extensionModel.getConnectionProviders().isEmpty() || !configurationModel.getConnectionProviders().isEmpty())
         {
             TopLevelElement objectElement = new TopLevelElement();
 
