@@ -10,6 +10,7 @@
             <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="cook-book">
                             <xs:complexType>
@@ -97,6 +98,9 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
+                    </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
@@ -130,6 +134,9 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
+                    </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
