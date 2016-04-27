@@ -977,9 +977,9 @@ public final class SchemaBuilder
         choice.setMaxOccurs("1");
 
         subTypes.forEach(subtype -> {
-            TopLevelElement subtypeElement = createTopLevelElement(hyphenize(getAliasName(subtype)), ZERO, "1");
-            subtypeElement.setComplexType(newLocalComplexTypeWithBase((ObjectType) subtype, EMPTY));
-            choice.getParticle().add(objectFactory.createElement(subtypeElement));
+            registerPojoType((ObjectType) subtype, EMPTY);
+            TopLevelElement refElement = createRefElement(new QName(schema.getTargetNamespace(), hyphenize(getAliasName(subtype))), false);
+            choice.getParticle().add(objectFactory.createElement(refElement));
         });
 
         all.getParticle().add(objectFactory.createChoice(choice));

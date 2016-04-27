@@ -11,7 +11,7 @@
 
     <subtypes:config name="config">
         <subtypes:connection>
-            <subtypes:triangle-alias height="2" area="1"/>
+            <subtypes:triangle-alias name="Asdasd" height="2" area="1"/>
             <subtypes:house-door locked="true"/>
         </subtypes:connection>
 

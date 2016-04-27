@@ -6,29 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.config;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getGenericTypeAt;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.pluralize;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.singularize;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
 import static org.springframework.util.xml.DomUtils.getChildElements;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
-import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -39,6 +28,21 @@ import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.annotation.GenericTypesAnnotation;
+import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.NestedProcessor;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.TemplateParser;
+import org.mule.runtime.core.util.ValueHolder;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.module.extension.internal.introspection.BasicTypeMetadataVisitor;
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 import org.mule.runtime.module.extension.internal.runtime.DefaultObjectBuilder;
@@ -55,9 +59,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpre
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.NameUtils;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.TemplateParser;
-import org.mule.runtime.core.util.ValueHolder;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -635,6 +636,11 @@ final class XmlExtensionParserDelegate
 
         if (childElement != null)
         {
+            if (!StringUtils.isBlank(childElement.getAttribute("name")))
+            {
+                throw new IllegalModelDefinitionException(String.format("Element %s is not allowed to have a [name] attribute", childElement.getName()));
+            }
+
             return getPojoValueResolver(pojoType, childElement);
         }
 
