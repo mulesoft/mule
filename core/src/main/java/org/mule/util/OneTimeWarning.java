@@ -30,15 +30,30 @@ public class OneTimeWarning
         this.message = message;
     }
 
+    /**
+     * Fire one time warning.
+     */
     public void warn()
     {
         delegate.warn();
+    }
+
+    /**
+     * Fire one time warning using arguments passing arguments to logger
+     *
+     * @param args arguments to pass to logger along with message defined when this instance was created.
+     */
+    public void warn(Object... args)
+    {
+        delegate.warn(args);
     }
 
     private interface Delegate
     {
 
         void warn();
+
+        void warn(Object... args);
     }
 
     private class FirstTimeDelegate implements Delegate
@@ -47,9 +62,22 @@ public class OneTimeWarning
         @Override
         public synchronized void warn()
         {
+            warn(null);
+        }
+
+        @Override
+        public synchronized void warn(Object... args)
+        {
             if (warned == false)
             {
-                logger.warn(message);
+                if (args != null)
+                {
+                    logger.warn(message, args);
+                }
+                else
+                {
+                    logger.warn(message);
+                }
                 warned = true;
                 delegate = new NoOpDelegate();
             }
@@ -61,6 +89,11 @@ public class OneTimeWarning
 
         @Override
         public void warn()
+        {
+        }
+
+        @Override
+        public void warn(Object... args)
         {
         }
     }
