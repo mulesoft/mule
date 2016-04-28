@@ -7,6 +7,7 @@
 package org.mule.module.extension.internal;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -15,6 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.extension.ExtensionManager;
 import org.mule.module.extension.HeisenbergExtension;
+import org.mule.module.extension.internal.runtime.processor.OperationMessageProcessor;
 import org.mule.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
 
@@ -125,6 +127,7 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
     @Test
     public void manyNestedOperations() throws Exception
     {
+        int originalProcessorInstances = muleContext.getRegistry().lookupObjects(OperationMessageProcessor.class).size();
         MuleEvent event = runFlow("killMany");
         String expected = "Killed the following because I'm the one who knocks:\n" +
                           "bye bye, Gustavo Fring\n" +
@@ -132,6 +135,9 @@ public class OperationExecutionTestCase extends ExtensionsFunctionalTestCase
                           "bye bye, Nazi dudes\n";
 
         assertThat(expected, is(event.getMessageAsString()));
+
+        int newProcessorInstances = muleContext.getRegistry().lookupObjects(OperationMessageProcessor.class).size();
+        assertThat(originalProcessorInstances, equalTo(newProcessorInstances));
     }
 
     @Test
