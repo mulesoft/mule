@@ -220,7 +220,7 @@
         <jodaTimeVersion>2.9.1</jodaTimeVersion>
         <jschVersion>0.1.51</jschVersion>
         <junitVersion>4.11</junitVersion>
-        <log4jVersion>2.1</log4jVersion>
+        <log4jVersion>2.3</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <maven.buildnumber.plugin.version>1.1</maven.buildnumber.plugin.version>
         <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>

@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.launcher.log4j2.LoggerContextConfigurer.FORCED_CONSOLE_APPENDER_NAME;
 import static org.mule.module.launcher.log4j2.LoggerContextConfigurer.PER_APP_FILE_APPENDER_NAME;
+
 import org.mule.api.config.MuleProperties;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -58,7 +59,7 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase
 {
 
     private static final String CURRENT_DIRECTORY = ".";
-    private static final String INTERVAL_PROPERTY = "interval";
+    private static final String INTERVAL_PROPERTY = "intervalSeconds";
     private static final String SHUTDOWN_HOOK_PROPERTY = "isShutdownHookEnabled";
     private static final int MONITOR_INTERVAL = 60000;
     private static final String CONVERTER_COMPONENT = "Converter";
