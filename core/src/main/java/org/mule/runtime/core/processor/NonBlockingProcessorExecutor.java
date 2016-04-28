@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
+import org.mule.runtime.core.util.OneTimeWarning;
 
 import java.util.List;
 
@@ -40,6 +41,10 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
     private static final Logger logger = LoggerFactory.getLogger(NonBlockingProcessorExecutor.class);
     private final ReplyToHandler replyToHandler;
     private final MessageExchangePattern messageExchangePattern;
+    final OneTimeWarning fallbackWarning = new OneTimeWarning(logger, "The message processor {} does not currently support non-blocking execution and " +
+                                                                      "processing will now fall back to blocking.  The 'non-blocking' processing strategy is " +
+                                                                      "not recommended if unsupported message processors are being used.  ");
+
 
     public NonBlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
                                         MessageProcessorExecutionTemplate executionTemplate, boolean copyOnVoidEvent)
@@ -56,9 +61,7 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
         {
             if (!processorSupportsNonBlocking(processor))
             {
-                logger.info("The message processor {} does not currently support non-blocking execution and " +
-                            "processing will now fall back to blocking.  The 'non-blocking' processing strategy is " +
-                            "not recommended if unsupported message processors are being used.  ", processor.getClass());
+                fallbackWarning.warn(processor.getClass());
                 // Make event synchronous so that non-blocking is not used
                 event = new DefaultMuleEvent(event, event.getFlowConstruct(), event.getReplyToHandler(), event.getReplyToDestination(), true);
                 // Update RequestContext ThreadLocal for backwards compatibility
