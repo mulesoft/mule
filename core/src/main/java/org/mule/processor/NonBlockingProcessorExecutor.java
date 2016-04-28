@@ -19,6 +19,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.execution.MessageProcessorExecutionTemplate;
+import org.mule.util.OneTimeWarning;
 
 import java.util.List;
 
@@ -37,6 +38,9 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
 
     private static final Logger logger = LoggerFactory.getLogger(NonBlockingProcessorExecutor.class);
     private final ReplyToHandler replyToHandler;
+    final OneTimeWarning fallbackWarning = new OneTimeWarning(logger, "The message processor {} does not currently support non-blocking execution and " +
+                                                                      "processing will now fall back to blocking.  The 'non-blocking' processing strategy is " +
+                                                                      "not recommended if unsupported message processors are being used.  ");
 
     public NonBlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
                                         MessageProcessorExecutionTemplate executionTemplate, boolean copyOnVoidEvent)
@@ -52,9 +56,7 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
         {
             if (!processorSupportsNonBlocking(processor))
             {
-                logger.info("The message processor {} does not currently support non-blocking execution and " +
-                            "processing will now fall back to blocking.  The 'non-blocking' processing strategy is " +
-                            "not recommended if unsupported message processors are being used.  ", processor.getClass());
+                fallbackWarning.warn(processor.getClass());
                 // Make event synchronous and clear replyToHandler.  Given only HTTP supports non-blocking this will not
                 // affect other replyToHandlers like for example JmsReplyToHandler.
                 event = new DefaultMuleEvent(event, event.getFlowConstruct(), null, null, true);
