@@ -12,18 +12,7 @@
  */
 package com.ning.http.client.providers.grizzly;
 
-import com.ning.http.client.AsyncHandler;
-import com.ning.http.client.ProxyServer;
-import com.ning.http.client.Request;
-import com.ning.http.client.providers.grizzly.events.GracefulCloseEvent;
-import com.ning.http.client.uri.Uri;
-import com.ning.http.client.ws.WebSocket;
-import com.ning.http.util.AsyncHttpProviderUtils;
-import com.ning.http.util.ProxyUtils;
-
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.glassfish.grizzly.CloseListener;
 import org.glassfish.grizzly.CloseType;
@@ -39,6 +28,15 @@ import org.glassfish.grizzly.http.HttpHeader;
 import org.glassfish.grizzly.http.HttpResponsePacket;
 import org.glassfish.grizzly.websockets.HandShake;
 import org.glassfish.grizzly.websockets.ProtocolHandler;
+
+import com.ning.http.client.AsyncHandler;
+import com.ning.http.client.ProxyServer;
+import com.ning.http.client.Request;
+import com.ning.http.client.providers.grizzly.events.GracefulCloseEvent;
+import com.ning.http.client.uri.Uri;
+import com.ning.http.client.ws.WebSocket;
+import com.ning.http.util.AsyncHttpProviderUtils;
+import com.ning.http.util.ProxyUtils;
 
 /**
  *
@@ -90,8 +88,8 @@ public final class HttpTransactionContext {
     /**
      * <tt>true</tt> if the request is fully sent, or <tt>false</tt>otherwise.
      */
-    volatile boolean isRequestFullySent;
-    Set<CompletionHandler<HttpTransactionContext>> reqFullySentHandlers;
+    private boolean isRequestFullySent;
+    private CleanupTask cleanupTask;
 
     private final CloseListener listener = new CloseListener<Closeable, CloseType>() {
         @Override
@@ -131,20 +129,7 @@ public final class HttpTransactionContext {
 
         assert httpTxContext != null;
 
-        if (httpTxContext.isRequestFullySent)
-        {
-            cleanupTransaction(httpCtx, httpTxContext);
-            completionHandler.completed(httpTxContext);
-        }
-        else
-        {
-            httpTxContext.addRequestSentCompletionHandler(completionHandler);
-            if (httpTxContext.isRequestFullySent &&
-                httpTxContext.removeRequestSentCompletionHandler(completionHandler))
-            {
-                completionHandler.completed(httpTxContext);
-            }
-        }
+        httpTxContext.scheduleCleanup(httpCtx, completionHandler);
     }
 
     static void cleanupTransaction(final HttpContext httpCtx,
@@ -281,54 +266,66 @@ public final class HttpTransactionContext {
         connection.closeSilently();
     }
 
-    private synchronized void addRequestSentCompletionHandler(final CompletionHandler<HttpTransactionContext> completionHandler)
+    private void scheduleCleanup(final HttpContext httpCtx,
+                                 final CompletionHandler<HttpTransactionContext> completionHandler)
     {
-        if (reqFullySentHandlers == null)
+        synchronized (this)
         {
-            reqFullySentHandlers = new HashSet<>();
+            if (!isRequestFullySent)
+            {
+                assert cleanupTask == null; // scheduleCleanup should be called only once
+                cleanupTask = new CleanupTask(httpCtx, completionHandler);
+                return;
+            }
         }
-        reqFullySentHandlers.add(completionHandler);
+
+        assert isRequestFullySent;
+        cleanup(httpCtx);
+        completionHandler.completed(this);
     }
 
-    private synchronized boolean removeRequestSentCompletionHandler(final CompletionHandler<HttpTransactionContext> completionHandler)
+    private void cleanup(final HttpContext httpCtx)
     {
-        return reqFullySentHandlers != null
-                ? reqFullySentHandlers.remove(completionHandler)
-                : false;
-    }
-
-    boolean isRequestFullySent()
-    {
-        return isRequestFullySent;
+        httpCtx.getCloseable().removeCloseListener(listener);
+        REQUEST_STATE_ATTR.remove(httpCtx);
     }
 
     @SuppressWarnings("unchecked")
     void onRequestFullySent()
     {
-        this.isRequestFullySent = true;
-
-        Object[] handlers = null;
         synchronized (this)
         {
-            if (reqFullySentHandlers != null)
+            if (isRequestFullySent)
             {
-                handlers = reqFullySentHandlers.toArray();
-                reqFullySentHandlers = null;
+                return;
             }
+
+            isRequestFullySent = true;
         }
 
-        if (handlers != null)
+        if (cleanupTask != null)
         {
-            for (Object o : handlers)
-            {
-                try
-                {
-                    ((CompletionHandler<HttpTransactionContext>) o).completed(this);
-                }
-                catch (Exception e)
-                {
-                }
-            }
+            cleanupTask.run();
+        }
+    }
+
+    private class CleanupTask implements Runnable
+    {
+        private final HttpContext httpCtx;
+        private final CompletionHandler<HttpTransactionContext> completionHandler;
+
+        private CleanupTask(final HttpContext httpCtx,
+                final CompletionHandler<HttpTransactionContext> completionHandler)
+        {
+            this.httpCtx = httpCtx;
+            this.completionHandler = completionHandler;
+        }
+
+        @Override
+        public void run()
+        {
+            cleanup(httpCtx);
+            completionHandler.completed(HttpTransactionContext.this);
         }
     }
 } // END HttpTransactionContext
