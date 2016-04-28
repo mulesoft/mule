@@ -63,7 +63,7 @@ final class OperationBeanDefinitionParser implements BeanDefinitionParser
     public BeanDefinition parse(Element element, ParserContext parserContext)
     {
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(OperationMessageProcessorFactoryBean.class);
-        builder.setScope(BeanDefinition.SCOPE_PROTOTYPE);
+        builder.setScope(BeanDefinition.SCOPE_SINGLETON);
         parseConfigRef(element, builder);
         builder.addConstructorArgValue(extension);
         builder.addConstructorArgValue(operation);
