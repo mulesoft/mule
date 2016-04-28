@@ -119,13 +119,14 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner>
                         {
                             throw nullSensingReplyToHandler.exception;
                         }
+                        return nullSensingReplyToHandler.event;
                     }
                     catch (Exception e)
                     {
                         throw new MuleRuntimeException(e);
                     }
                 }
-                return nullSensingReplyToHandler.event;
+                return responseEvent;
             }
         };
 
