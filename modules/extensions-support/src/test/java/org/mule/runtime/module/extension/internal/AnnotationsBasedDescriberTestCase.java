@@ -84,6 +84,7 @@ import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
+import org.mule.test.heisenberg.extension.model.WeaponType;
 import org.mule.test.metadata.extension.MetadataExtension;
 
 import java.math.BigDecimal;
@@ -336,9 +337,9 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(parameters, "labAddress", "", toMetadataType(String.class), false, REQUIRED, null);
         assertParameter(parameters, "firstEndevour", "", toMetadataType(String.class), false, NOT_SUPPORTED, null);
         assertParameter(parameters, "weapon", "", toMetadataType(Weapon.class), false, SUPPORTED, null);
-        assertParameter(parameters, "moneyFunction", "", TYPE_BUILDER.objectType()
+        assertParameter(parameters, "weaponTypeFunction", "", TYPE_BUILDER.objectType()
                                 .id(Function.class.getName())
-                                .with(new GenericTypesAnnotation(asList(MuleEvent.class.getName(), Integer.class.getName())))
+                                .with(new GenericTypesAnnotation(asList(MuleEvent.class.getName(), WeaponType.class.getName())))
                                 .build(),
                         false, SUPPORTED, null);
         assertParameter(parameters, "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false, SUPPORTED, null);
@@ -416,7 +417,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(3));
         assertParameter(operation.getParameters(), "weapon", "", toMetadataType(Weapon.class), true, SUPPORTED, null);
-        assertParameter(operation.getParameters(), "type", "", toMetadataType(Weapon.WeaponType.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "type", "", toMetadataType(WeaponType.class), true, SUPPORTED, null);
         assertParameter(operation.getParameters(), "weaponAttributes", "", toMetadataType(Weapon.WeaponAttributes.class), true, SUPPORTED, null);
 
 

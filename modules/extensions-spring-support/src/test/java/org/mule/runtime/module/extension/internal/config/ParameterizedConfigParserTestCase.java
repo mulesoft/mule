@@ -21,11 +21,12 @@ import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
+import static org.mule.test.heisenberg.extension.model.WeaponType.FIRE_WEAPON;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
-import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -128,6 +129,14 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION, event);
         HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_EXPRESSION, anotherEvent);
         assertThat(config, is(not(sameInstance(anotherConfig))));
+    }
+
+    @Test
+    public void getFunctionParameterFromConfig() throws Exception
+    {
+        MuleEvent event = getHeisenbergEvent();
+        HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION, event);
+        assertThat(config.getWeaponTypeFunction().apply(event), is(FIRE_WEAPON));
     }
 
     @Test

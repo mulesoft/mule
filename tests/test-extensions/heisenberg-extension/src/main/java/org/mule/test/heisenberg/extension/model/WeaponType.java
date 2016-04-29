@@ -6,24 +6,7 @@
  */
 package org.mule.test.heisenberg.extension.model;
 
-public interface Weapon
+public enum WeaponType
 {
-
-    class WeaponAttributes
-    {
-
-        public String getBrand()
-        {
-            return brand;
-        }
-
-        public void setBrand(String brand)
-        {
-            this.brand = brand;
-        }
-
-        public String brand;
-    }
-
-    String kill();
+    FIRE_WEAPON, MELEE_WEAPON
 }

@@ -10,16 +10,17 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.connection.HasConnectionProviderModels;
 import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
@@ -174,46 +175,34 @@ final class ExportedArtifactsCollector
 
     private void collectParameterClasses()
     {
-        collectParameterClasses(
-                extensionModel.getConnectionProviders(),
-                extensionModel.getConfigurationModels(),
-                extensionModel.getOperationModels(),
-                extensionModel.getSourceModels());
+        exportedClasses.addAll(getParameterClasses(extensionModel, parameter -> {
+            ValueHolder<Boolean> accept = new ValueHolder<>(false);
 
-        extensionModel.getConfigurationModels().forEach(configuration ->
-                                                                collectParameterClasses(
-                                                                        configuration.getConnectionProviders(),
-                                                                        configuration.getOperationModels(),
-                                                                        configuration.getSourceModels())
-        );
-    }
-
-    private void collectParameterClasses(Collection<? extends ParametrizedModel>... parametrizedModelsArray)
-    {
-        MetadataTypeVisitor visitor = new MetadataTypeVisitor()
-        {
-            @Override
-            public void visitDictionary(DictionaryType dictionaryType)
+            MetadataTypeVisitor visitor = new MetadataTypeVisitor()
             {
-                dictionaryType.getKeyType().accept(this);
-                dictionaryType.getValueType().accept(this);
-            }
+                @Override
+                public void visitDictionary(DictionaryType dictionaryType)
+                {
+                    dictionaryType.getKeyType().accept(this);
+                    dictionaryType.getValueType().accept(this);
+                }
 
-            @Override
-            public void visitArrayType(ArrayType arrayType)
-            {
-                arrayType.getType().accept(this);
-            }
+                @Override
+                public void visitArrayType(ArrayType arrayType)
+                {
+                    arrayType.getType().accept(this);
+                }
 
-            @Override
-            public void visitObject(ObjectType objectType)
-            {
-                exportedClasses.add(getType(objectType));
-            }
-        };
+                @Override
+                public void visitObject(ObjectType objectType)
+                {
+                    accept.set(true);
+                }
+            };
 
-        stream(parametrizedModelsArray).forEach(modelList -> modelList.forEach(
-                model -> model.getParameterModels().forEach(p -> p.getType().accept(visitor))));
+            parameter.getType().accept(visitor);
+            return accept.get();
+        }));
     }
 
     private void collectImplementingClasses()

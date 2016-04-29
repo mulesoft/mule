@@ -33,6 +33,7 @@ import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
+import org.mule.test.heisenberg.extension.model.WeaponType;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -52,7 +53,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     private static final String GOODBYE_MESSAGE = "Say hello to my little friend";
     private static final String VICTIM = "Skyler";
     public static final String HEISENBERG = "heisenberg";
-    public static final String KILL_RESULT = String.format("Killed with: %s , Type %s and attribute %s", RICIN_KILL_MESSAGE, Weapon.WeaponType.MELEE_WEAPON.name(), "Pizza on the rooftop");
+    public static final String KILL_RESULT = String.format("Killed with: %s , Type %s and attribute %s", RICIN_KILL_MESSAGE, WeaponType.MELEE_WEAPON.name(), "Pizza on the rooftop");
 
     public static final long PAYMENT = 100;
 

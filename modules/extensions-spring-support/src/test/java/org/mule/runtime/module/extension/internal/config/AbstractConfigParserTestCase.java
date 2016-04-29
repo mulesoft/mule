@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.config;
 
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
+import static org.mule.test.heisenberg.extension.model.WeaponType.FIRE_WEAPON;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.ArrayUtils;
@@ -91,6 +92,7 @@ public class AbstractConfigParserTestCase extends ExtensionFunctionalTestCase
         event.setFlowVariable("shoppingMall", SHOPPING_MALL);
         event.setFlowVariable("initialHealth", INITIAL_HEALTH);
         event.setFlowVariable("finalHealth", FINAL_HEALTH);
+        event.setFlowVariable("weaponType", FIRE_WEAPON);
         WEAPON.setMicrogramsPerKilo(10L);
         event.setFlowVariable("weapon", WEAPON);
 
