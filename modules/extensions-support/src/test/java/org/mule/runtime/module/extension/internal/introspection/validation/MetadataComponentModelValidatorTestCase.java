@@ -25,6 +25,7 @@ import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationMo
 import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Map;
 
@@ -49,11 +50,6 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     private RuntimeSourceModel sourceModel;
 
     private MetadataComponentModelValidator validator = new MetadataComponentModelValidator();
-
-    private class SimplePOJO
-    {
-
-    }
 
     public static class SimpleOutputResolver implements MetadataOutputResolver
     {
@@ -87,42 +83,42 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     }
 
     @Test(expected = IllegalModelDefinitionException.class)
-    public void operationObjectReturnType()
+    public void operationReturnsObjectype()
     {
         when(operationModel.getReturnType()).thenReturn(toMetadataType(Object.class));
         validator.validate(extensionModel);
     }
 
     @Test(expected = IllegalModelDefinitionException.class)
-    public void operationMapReturnType()
+    public void operationReturnsDictionaryType()
     {
         when(operationModel.getReturnType()).thenReturn(toMetadataType(Map.class));
         validator.validate(extensionModel);
     }
 
     @Test(expected = IllegalModelDefinitionException.class)
-    public void sourceObjectReturnType()
+    public void sourceReturnsObjectType()
     {
         when(sourceModel.getReturnType()).thenReturn(toMetadataType(Object.class));
         validator.validate(extensionModel);
     }
 
     @Test(expected = IllegalModelDefinitionException.class)
-    public void sourceMapReturnType()
+    public void sourceReturnsDictionaryType()
     {
         when(sourceModel.getReturnType()).thenReturn(toMetadataType(Map.class));
         validator.validate(extensionModel);
     }
 
     @Test
-    public void sourcePOJOReturnType()
+    public void sourceReturnsPOJOType()
     {
-        when(sourceModel.getReturnType()).thenReturn(toMetadataType(SimplePOJO.class));
+        when(sourceModel.getReturnType()).thenReturn(toMetadataType(Apple.class));
         validator.validate(extensionModel);
     }
 
     @Test
-    public void sourceObjectReturnTypeWithOutputResolver()
+    public void sourceReturnsObjectTypeWithDefinedOutputResolver()
     {
         when(sourceModel.getReturnType()).thenReturn(toMetadataType(Object.class));
         when(sourceModel.getMetadataResolverFactory()).thenReturn(new DefaultMetadataResolverFactory(NullMetadataResolver.class, NullMetadataResolver.class, SimpleOutputResolver.class));

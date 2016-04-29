@@ -10,16 +10,26 @@ import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
+import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Validates that all {@link OperationModel operations} which
+ * return type is a {@link Object} or a {@link Map} have defined
+ * a {@link MetadataOutputResolver}. The {@link MetadataOutputResolver}
+ * can't be the {@link NullMetadataResolver}.
+ *
+ * @since 4.0
+ */
 public class MetadataComponentModelValidator implements ModelValidator
 {
 
@@ -33,21 +43,17 @@ public class MetadataComponentModelValidator implements ModelValidator
 
     private void doValidate(ExtensionModel extensionModel, List<? extends ComponentModel> operations)
     {
-        for (ComponentModel operationModel : operations)
-        {
-            validateMetadataReturnType(extensionModel, operationModel);
-        }
+        operations.stream().forEach(operationModel -> validateMetadataReturnType(extensionModel, operationModel));
     }
 
     private void validateMetadataReturnType(ExtensionModel extensionModel, ComponentModel componentModel)
     {
         RuntimeComponentModel component = (RuntimeComponentModel) componentModel;
         MetadataType returnMetadataType = component.getReturnType();
-        Class returnType = JavaTypeUtils.getType(returnMetadataType);
 
         if (returnMetadataType instanceof ObjectType || returnMetadataType instanceof DictionaryType)
         {
-            validateReturnType(extensionModel, component, returnType);
+            validateReturnType(extensionModel, component, JavaTypeUtils.getType(returnMetadataType));
         }
     }
 
