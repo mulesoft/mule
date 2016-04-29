@@ -14,6 +14,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -131,6 +132,17 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
         invoker.setArgumentTypes(new Class[]{String.class, Integer.TYPE});
         invoker.initialise();
         assertEquals("12(string and int)", invoker.process(getTestEvent("")).getMessageAsString());
+
+    }
+
+    @Test
+    public void testMethodWithPrimitiveArgTypes() throws MuleException, Exception
+    {
+        invoker.setMethodName("testDuplicateNameMethod");
+        invoker.setArgumentTypes(new Class<?>[] { String.class, Integer.class });
+        invoker.setArguments(Arrays.asList("some String", 42));
+        invoker.initialise();
+        assertEquals("some String42(string and int)", invoker.process(getTestEvent("")).getMessageAsString());
 
     }
 
