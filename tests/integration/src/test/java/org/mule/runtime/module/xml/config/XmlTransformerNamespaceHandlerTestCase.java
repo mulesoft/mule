@@ -11,15 +11,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.module.xml.transformer.AbstractXmlTransformer;
 import org.mule.runtime.module.xml.transformer.DomDocumentToXml;
 import org.mule.runtime.module.xml.transformer.ObjectToXml;
 import org.mule.runtime.module.xml.transformer.XmlToDomDocument;
 import org.mule.runtime.module.xml.transformer.XmlToObject;
 import org.mule.runtime.module.xml.transformer.XsltTransformer;
-import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import org.junit.Test;
 

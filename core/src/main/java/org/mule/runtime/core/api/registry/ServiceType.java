@@ -11,7 +11,11 @@ package org.mule.runtime.core.api.registry;
  */
 public enum ServiceType
 {
-    TRANSPORT("transport", "org/mule/runtime/core/transport"),
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    TRANSPORT("transport", "org/mule/runtime/transport"),
     EXCEPTION("exception", "org/mule/runtime/core/config");
 
     private String name;

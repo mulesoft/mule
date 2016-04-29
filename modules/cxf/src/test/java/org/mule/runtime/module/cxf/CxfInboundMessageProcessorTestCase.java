@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.module.cxf;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -15,10 +20,6 @@ import org.mule.runtime.module.cxf.testmodels.Echo;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
@@ -39,6 +40,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         
         MessageProcessor messageProcessor = new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 payload = event.getMessage().getPayload();
@@ -50,7 +52,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         };
         processor.setListener(messageProcessor);
         
-        MuleEvent event = getTestEvent(msg);
+        MuleEvent event = getTestEvent(msg, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
         
         MuleEvent response = processor.process(event);
         
@@ -68,6 +70,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         
         MessageProcessor messageProcessor = new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 payload = event.getMessage().getPayload();
@@ -79,7 +82,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         };
         processor.setListener(messageProcessor);
         
-        MuleEvent event = getTestEvent(msg);
+        MuleEvent event = getTestEvent(msg, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
         
         MuleEvent response = processor.process(event);
         

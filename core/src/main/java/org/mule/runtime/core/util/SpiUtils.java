@@ -8,6 +8,7 @@ package org.mule.runtime.core.util;
 
 import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.transport.service.TransportFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +31,21 @@ public class SpiUtils
 
     public static Properties findServiceDescriptor(ServiceType type, String name)
     {
-        if (type.equals(ServiceType.EXCEPTION))
+        if (type.equals(ServiceType.TRANSPORT))
+        {
+            // for better EE transports support from earlier versions, try the preferred-xxx lookup first without
+            // fallback
+            Properties tsd = findServiceDescriptor(type.getPath(), name, TransportFactory.class, false);
+
+            if (tsd == null)
+            {
+                // regular flow
+                tsd = findServiceDescriptor(type.getPath(), name, TransportFactory.class);
+            }
+
+            return tsd;
+        }
+        else if (type.equals(ServiceType.EXCEPTION))
         {
             return findServiceDescriptor(type.getPath(), name, ExceptionHelper.class);
         }

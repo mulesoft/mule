@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd              
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <!-- we don't use jms:endpoint since it causes problems with the wmq transport version of the tests which your an address of 'wmq://' -->
+    <endpoint name="out1" address="${outbound.destination1}"
+              connector-ref="jmsConnector1" exchange-pattern="one-way">
+        <jms:transaction action="NONE"/>
+    </endpoint>
+    <endpoint name="out2" address="${outbound.destination2}"
+              connector-ref="jmsConnector1" exchange-pattern="one-way">
+        <jms:transaction action="ALWAYS_BEGIN"/>
+    </endpoint>
+    <endpoint name="out3" address="${outbound.destination3}"
+              connector-ref="jmsConnector1" exchange-pattern="one-way">
+        <jms:transaction action="BEGIN_OR_JOIN"/>
+    </endpoint>
+    <endpoint name="out4" address="${outbound.destination4}"
+              connector-ref="jmsConnector1" exchange-pattern="one-way">
+        <jms:transaction action="ALWAYS_JOIN"/>
+    </endpoint>
+    <endpoint name="out5" address="${outbound.destination5}"
+              connector-ref="jmsConnector1" exchange-pattern="one-way">
+        <jms:transaction action="JOIN_IF_POSSIBLE"/>
+    </endpoint>
+
+    <flow name="testNone">
+        <inbound-endpoint ref="in1"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out1"/>
+        <custom-exception-strategy
+                class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
+            <spring:property name="testProperty" value="true"></spring:property>
+        </custom-exception-strategy>
+    </flow>
+
+    <flow name="testAlwaysBegin">
+        <inbound-endpoint ref="in2"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out2"/>
+        <custom-exception-strategy
+                class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
+            <spring:property name="testProperty" value="true"></spring:property>
+        </custom-exception-strategy>
+    </flow>
+
+    <flow name="testBeginOrJoin">
+        <inbound-endpoint ref="in3"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out3"/>
+        <custom-exception-strategy
+                class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
+            <spring:property name="testProperty" value="true"></spring:property>
+        </custom-exception-strategy>
+    </flow>
+
+    <flow name="testAlwaysJoin">
+        <inbound-endpoint ref="in4"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out4"/>
+        <custom-exception-strategy
+                class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
+            <spring:property name="testProperty" value="true"></spring:property>
+        </custom-exception-strategy>
+    </flow>
+
+    <flow name="testJoinIfPossible">
+        <inbound-endpoint ref="in5"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out5"/>
+        <custom-exception-strategy
+                class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
+            <spring:property name="testProperty" value="true"></spring:property>
+        </custom-exception-strategy>
+    </flow>
+
+</mule>

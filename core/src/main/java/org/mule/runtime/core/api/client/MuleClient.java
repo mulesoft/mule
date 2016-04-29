@@ -19,129 +19,111 @@ public interface MuleClient
 {
 
     /**
-     * @deprecated use {@link #dispatch(String, org.mule.runtime.core.api.MuleMessage)} instead
+     * @deprecated use {@link #dispatch(String, org.mule.api.MuleMessage)} instead
      *
-     * Dispatches an event asynchronously to a endpointUri via a Mule server. The URL
-     * determines where to dispatch the event to.
+     *             Dispatches an event asynchronously to a endpointUri via a Mule server. The URL determines where to
+     *             dispatch the event to.
      * 
-     * @param url the Mule URL used to determine the destination and transport of the
-     *            message
+     * @param url the Mule URL used to determine the destination and transport of the message
      * @param payload the object that is the payload of the event
-     * @param messageProperties any properties to be associated with the payload. In
-     *            the case of JMS you could set the JMSReplyTo property in these
-     *            properties.
-     * @throws org.mule.runtime.core.api.MuleException
+     * @param messageProperties any properties to be associated with the payload. In the case of JMS you could set the
+     *            JMSReplyTo property in these properties.
+     * @throws org.mule.api.MuleException
      */
     @Deprecated
     void dispatch(String url, Object payload, Map<String, Object> messageProperties) throws MuleException;
 
     /**
-     * Dispatches an event asynchronously to a endpointUri via a Mule server. The URL
-     * determines where to dispatch the event to.
+     * Dispatches an event asynchronously to a endpointUri via a Mule server. The URL determines where to dispatch the
+     * event to.
      * 
-     * @param url the Mule URL used to determine the destination and transport of the
-     *            message
+     * @param url the Mule URL used to determine the destination and transport of the message
      * @param message the message to send
-     * @throws org.mule.runtime.core.api.MuleException
+     * @throws org.mule.api.MuleException
      */
     void dispatch(String url, MuleMessage message) throws MuleException;
 
     /**
-     * Dispatches an event asynchronously to a endpointUri via a Mule server. The URL
-     * determines where to dispatch the event to.
+     * Dispatches an event asynchronously to a endpointUri via a Mule server. The URL determines where to dispatch the
+     * event to.
      *
-     * @param url the Mule URL used to determine the destination and transport of the
-     *            message
+     * @param url the Mule URL used to determine the destination and transport of the message
      * @param message the message to send
      * @param operationOptions the options to configure the operation
-     * @throws org.mule.runtime.core.api.MuleException
+     * @throws org.mule.api.MuleException
      */
     void dispatch(String url, MuleMessage message, OperationOptions operationOptions) throws MuleException;
 
     /**
-     * @deprecated use {@link #send(String, org.mule.runtime.core.api.MuleMessage)} instead
+     * @deprecated use {@link #send(String, org.mule.api.MuleMessage)} instead
      *
-     * Sends an event synchronously to a endpointUri via a Mule server and a
-     * resulting message is returned.
+     *             Sends an event synchronously to a endpointUri via a Mule server and a resulting message is returned.
      * 
-     * @param url the Mule URL used to determine the destination and transport of the
-     *            message
+     * @param url the Mule URL used to determine the destination and transport of the message
      * @param payload the object that is the payload of the event
-     * @param messageProperties any properties to be associated with the payload. In
-     *            the case of Jms you could set the JMSReplyTo property in these
-     *            properties.
-     * @return A return message, this could be <code>null</code> if the the
-     *         components invoked explicitly sets a return as <code>null</code>.
-     * @throws org.mule.runtime.core.api.MuleException
+     * @param messageProperties any properties to be associated with the payload. In the case of Jms you could set the
+     *            JMSReplyTo property in these properties.
+     * @return A return message, this could be <code>null</code> if the the components invoked explicitly sets a return
+     *         as <code>null</code>.
+     * @throws org.mule.api.MuleException
      */
     @Deprecated
     MuleMessage send(String url, Object payload, Map<String, Object> messageProperties) throws MuleException;
 
     /**
      *
-     * Sends an event synchronously to a endpointUri via a Mule server and a
-     * resulting message is returned.
+     * Sends an event synchronously to a endpointUri via a Mule server and a resulting message is returned.
      * 
-     * @param url the Mule URL used to determine the destination and transport of the
-     *            message
+     * @param url the Mule URL used to determine the destination and transport of the message
      * @param message the Message for the event
-     * @return A return message, this could be <code>null</code> if the the
-     *         components invoked explicitly sets a return as <code>null</code>.
-     * @throws org.mule.runtime.core.api.MuleException
+     * @return A return message, this could be <code>null</code> if the the components invoked explicitly sets a return
+     *         as <code>null</code>.
+     * @throws org.mule.api.MuleException
      */
     MuleMessage send(String url, MuleMessage message) throws MuleException;
 
     /**
      *
-     * Sends an event synchronously to a endpointUri via a Mule server and a
-     * resulting message is returned.
+     * Sends an event synchronously to a endpointUri via a Mule server and a resulting message is returned.
      *
-     * @param url the Mule URL used to determine the destination and transport of the
-     *            message
+     * @param url the Mule URL used to determine the destination and transport of the message
      * @param message the Message for the event
      * @param operationOptions the options to configure the operation
-     * @return A return message, this could be <code>null</code> if the the
-     *         components invoked explicitly sets a return as <code>null</code>.
-     * @throws org.mule.runtime.core.api.MuleException
+     * @return A return message, this could be <code>null</code> if the the components invoked explicitly sets a return
+     *         as <code>null</code>.
+     * @throws org.mule.api.MuleException
      */
     MuleMessage send(String url, MuleMessage message, OperationOptions operationOptions) throws MuleException;
 
     /**
-     * @deprecated use {@link #send(String, org.mule.runtime.core.api.MuleMessage, OperationOptions)}
+     * @deprecated use {@link #send(String, org.mule.api.MuleMessage, OperationOptions)}
      *
-     * Sends an event synchronously to a endpointUri via a mule server and a
-     * resulting message is returned.
+     *             Sends an event synchronously to a endpointUri via a mule server and a resulting message is returned.
      * 
-     * @param url the Mule URL used to determine the destination and transport of the
-     *            message
+     * @param url the Mule URL used to determine the destination and transport of the message
      * @param payload the object that is the payload of the event
-     * @param messageProperties any properties to be associated with the payload. In
-     *            the case of Jms you could set the JMSReplyTo property in these
-     *            properties.
-     * @param timeout The time in milliseconds the the call should block waiting for
-     *            a response
-     * @return A return message, this could be <code>null</code> if the the
-     *         components invoked explicitly sets a return as <code>null</code>.
-     * @throws org.mule.runtime.core.api.MuleException
+     * @param messageProperties any properties to be associated with the payload. In the case of Jms you could set the
+     *            JMSReplyTo property in these properties.
+     * @param timeout The time in milliseconds the the call should block waiting for a response
+     * @return A return message, this could be <code>null</code> if the the components invoked explicitly sets a return
+     *         as <code>null</code>.
+     * @throws org.mule.api.MuleException
      */
     @Deprecated
     MuleMessage send(String url, Object payload, Map<String, Object> messageProperties, long timeout)
         throws MuleException;
 
     /**
-     * @deprecated use {@link #send(String, org.mule.runtime.core.api.MuleMessage, OperationOptions)} instead
+     * @deprecated use {@link #send(String, org.mule.api.MuleMessage, OperationOptions)} instead
      *
-     * Sends an event synchronously to a endpointUri via a mule server and a
-     * resulting message is returned.
+     *             Sends an event synchronously to a endpointUri via a mule server and a resulting message is returned.
      * 
-     * @param url the Mule URL used to determine the destination and transport of the
-     *            message
+     * @param url the Mule URL used to determine the destination and transport of the message
      * @param message The message to send
-     * @param timeout The time in milliseconds the the call should block waiting for
-     *            a response
-     * @return A return message, this could be <code>null</code> if the the
-     *         components invoked explicitly sets a return as <code>null</code>.
-     * @throws org.mule.runtime.core.api.MuleException
+     * @param timeout The time in milliseconds the the call should block waiting for a response
+     * @return A return message, this could be <code>null</code> if the the components invoked explicitly sets a return
+     *         as <code>null</code>.
+     * @throws org.mule.api.MuleException
      */
     @Deprecated
     MuleMessage send(String url, MuleMessage message, long timeout) throws MuleException;
@@ -149,13 +131,11 @@ public interface MuleClient
     /**
      * Will receive an event from an endpointUri determined by the URL.
      * 
-     * @param url the Mule URL used to determine the destination and transport of the
-     *            message
-     * @param timeout how long to block waiting to receive the event, if set to 0 the
-     *            receive will not wait at all and if set to -1 the receive will wait
-     *            forever
+     * @param url the Mule URL used to determine the destination and transport of the message
+     * @param timeout how long to block waiting to receive the event, if set to 0 the receive will not wait at all and
+     *            if set to -1 the receive will wait forever
      * @return the message received or <code>null</code> if no message was received
-     * @throws org.mule.runtime.core.api.MuleException
+     * @throws org.mule.api.MuleException
      */
     MuleMessage request(String url, long timeout) throws MuleException;
 

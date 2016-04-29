@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <jms:activemq-connector name="jmsConnector" disableTemporaryReplyToDestinations="true"/>    
+
+    <jms:endpoint name="in_olga" queue="in" exchange-pattern="one-way">
+        <jms:selector expression="JMSType = 'OLGA'"/>
+    </jms:endpoint>
+
+    <jms:endpoint name="in_natali" queue="in" exchange-pattern="one-way">
+        <jms:selector expression="JMSType = 'NATALI'"/>
+    </jms:endpoint>
+
+    <jms:endpoint name="out" queue="out" exchange-pattern="one-way"/>
+</mule>

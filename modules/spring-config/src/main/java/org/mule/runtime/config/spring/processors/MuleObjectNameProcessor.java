@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring.processors;
 import org.mule.runtime.core.api.NameableObject;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transport.Connector;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -22,12 +23,13 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 public class MuleObjectNameProcessor implements BeanPostProcessor
 {
     private boolean overwrite = false;
-    private final Class<? extends NameableObject> managedTypes[] = new Class[]
-            {
-                    Transformer.class,
-                    Agent.class
-            };
+    private final Class<? extends NameableObject> managedTypes[] = new Class[] {
+                                                                                Connector.class,
+                                                                                Transformer.class,
+                                                                                Agent.class
+    };
 
+    @Override
     public Object postProcessBeforeInitialization(Object object, String beanName) throws BeansException
     {
         for (Class<? extends NameableObject> managedType : managedTypes)
@@ -49,6 +51,7 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
         }
     }
 
+    @Override
     public Object postProcessAfterInitialization(Object o, String s) throws BeansException
     {
         return o;

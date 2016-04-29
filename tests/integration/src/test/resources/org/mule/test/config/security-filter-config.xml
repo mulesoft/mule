@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <security-manager>
+        <password-encryption-strategy name="PBE" password="mule"/>
+    </security-manager>
+
+    <!-- needs testing since the :factory-class" is an alias for "class" making this a special case -->
+    <endpoint name="testEndpoint1" address="test://test1" exchange-pattern="request-response">
+        <custom-security-filter class="org.mule.test.config.SecurityFilterTestCase$CustomSecurityFilter"/>
+    </endpoint>
+
+    <endpoint name="testEndpoint2" address="test://test2" exchange-pattern="request-response">
+        <encryption-security-filter strategy-ref="PBE"/>
+    </endpoint>
+</mule>

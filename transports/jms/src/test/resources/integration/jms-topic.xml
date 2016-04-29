@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way"/>
+    <endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way"/>
+    <endpoint name="topic" address="${broadcast.topic.destination}" exchange-pattern="one-way"/>
+
+    <flow name="InputPart">
+        <inbound-endpoint ref="in"/>
+        <test:component/>
+        <outbound-endpoint ref="topic"/>
+    </flow>
+
+    <flow name="Topic1">
+        <inbound-endpoint ref="topic"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out"/>
+    </flow>
+
+    <flow name="Topic2">
+        <inbound-endpoint ref="topic"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out"/>
+    </flow>
+
+</mule>

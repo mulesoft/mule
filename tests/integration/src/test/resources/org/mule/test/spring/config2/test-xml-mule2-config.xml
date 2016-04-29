@@ -20,6 +20,14 @@
 
         <mule:custom-transaction-manager class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
 
+        <mule:custom-connector name="dummyConnector" class="org.mule.tck.testmodels.mule.TestConnector">
+            <mule:dispatcher-threading-profile maxBufferSize="2"/>
+        </mule:custom-connector>
+
+        <mule:endpoint name="AppleQueue" address="test://apple.queue" exchange-pattern="one-way"/>
+        <mule:endpoint name="Banana_Queue" address="test://banana.queue" exchange-pattern="one-way"/>
+        <mule:endpoint name="TestQueue" address="test://test.queue" exchange-pattern="one-way"/>
+
         <mule:custom-transformer name="TestCompressionTransformer"
                                  class="org.mule.tck.testmodels.mule.TestCompressionTransformer"
                                  returnClass="java.lang.String">
@@ -28,6 +36,52 @@
             <property name="containerProperty" value="a string"/>
         </mule:custom-transformer>
         <test:no-action-transformer name="TestTransformer" returnClass="[B"/>
+
+        <mule:endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ" exchange-pattern="one-way">
+            <mule:message-property-filter pattern="foo=bar"/>
+        </mule:endpoint>
+        <!-- cannot have aliases -->
+        <!-- mule:endpoint name="waterMelonEndpoint" ref="TestQueue"/ -->
+        <mule:endpoint name="waterMelonEndpoint" address="test://test.queue" exchange-pattern="one-way"
+                       encoding="UTF-8-TEST"/>
+        <mule:endpoint name="appleInEndpoint" address="test://AppleQueue" exchange-pattern="one-way"/>
+        <mule:endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue"
+                       exchange-pattern="one-way"/>
+        <mule:endpoint name="orangeEndpoint" address="test://orangeQ" exchange-pattern="one-way">
+            <mule:properties>
+                <entry key="testGlobal" value="value1"/>
+            </mule:properties>
+        </mule:endpoint>
+        <mule:endpoint name="testEPWithCS" address="test://test.queue2" exchange-pattern="one-way"/>
+
+        <mule:endpoint name="endpointWithProps" address="test://endpointWithProps" exchange-pattern="one-way">
+            <mule:properties>
+                <entry key="brand" value="Juicy Baby!"/>
+                <entry key="segments" value="9"/>
+                <entry key="radius" value="4.21"/>
+                <entry key="mapProperties">
+                    <map>
+                        <entry key="prop1" value="prop1"/>
+                        <entry key="prop2" value="prop2"/>
+                    </map>
+                </entry>
+                <entry key="listProperties">
+                    <list>
+                        <value>prop1</value>
+                        <value>prop2</value>
+                        <value>prop3</value>
+                    </list>
+                </entry>
+                <entry key="arrayProperties">
+                    <list>
+                        <value>prop4</value>
+                        <value>prop5</value>
+                        <value>prop6</value>
+                    </list>
+                </entry>
+            </mule:properties>
+        </mule:endpoint>
+
 
         <bean name="apple" class="org.mule.tck.testmodels.fruit.Apple"/>
 
@@ -59,6 +113,8 @@
 
         <mule:flow name="msgInfoMappingTestComponent">
             <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
+            <mule:outbound-endpoint address="test://msgInfoMappingTestComponent"
+                                    exchange-pattern="one-way" name="msgInfoMappingTestComponent-Out"/>
             <mule:expression-message-info-mapping messageIdExpression="#[message.outboundProperties.id]"
                                                   correlationIdExpression="#[message.outboundProperties.correlation]"/>
         </mule:flow>
@@ -70,6 +126,20 @@
         </mule:interceptor-stack>
 
         <mule:flow name="orangeComponent">
+            <mule:composite-source>
+                <mule:inbound-endpoint name="OrangeEP" address="test://orange/" exchange-pattern="one-way">
+                    <mule:transformer ref="TestCompressionTransformer"/>
+                    <mule:response>
+                        <mule:transformer ref="TestCompressionTransformer"/>
+                    </mule:response>
+                </mule:inbound-endpoint>
+                <mule:inbound-endpoint ref="orangeEndpoint" exchange-pattern="one-way">
+                    <mule:payload-type-filter expectedType="java.lang.String"/>
+                    <mule:transformer ref="TestCompressionTransformer"/>
+                    <mule:property key="testLocal" value="value1"/>
+                </mule:inbound-endpoint>
+            </mule:composite-source>
+
             <mule:component>
                 <mule:logging-interceptor/>
                 <mule:interceptor-stack ref="testInterceptorStack"/>
@@ -78,10 +148,28 @@
                     <property name="testProperty" value="testValue"/>
                 </mule:custom-entry-point-resolver-set>
                 <mule:spring-object bean="orange"/>
+                <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
+                    <mule:outbound-endpoint address="test://do.wash" exchange-pattern="one-way"/>
+                </mule:binding>
+                <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
+                    <mule:outbound-endpoint address="test://do.polish" exchange-pattern="one-way"/>
+                </mule:binding>
             </mule:component>
 
+            <mule:request-reply timeout="10001">
+                <mule:outbound-endpoint ref="appleInEndpoint" exchange-pattern="one-way">
+                    <mule:transformer ref="TestCompressionTransformer"/>
+                </mule:outbound-endpoint>
+                <mule:inbound-endpoint ref="appleResponseEndpoint">
+                    <mule:custom-aggregator class="org.mule.tck.testmodels.mule.TestResponseAggregator">
+                        <property name="testProperty" value="testValue"/>
+                    </mule:custom-aggregator>
+                </mule:inbound-endpoint>
+            </mule:request-reply>
 
-            <mule:default-exception-strategy/>
+            <mule:default-exception-strategy>
+                <mule:outbound-endpoint address="test://orange.exceptions" exchange-pattern="one-way"/>
+            </mule:default-exception-strategy>
 
         </mule:flow>
 
@@ -93,14 +181,22 @@
         </mule:flow>
 
         <mule:flow name="appleComponent">
+            <mule:inbound-endpoint ref="appleInEndpoint">
+                <mule:payload-type-filter expectedType="java.lang.String"/>
+                <mule:idempotent-message-filter/>
+            </mule:inbound-endpoint>
             <mule:component>
                 <mule:spring-object bean="apple"/>
             </mule:component>
             <mule:choice>
                 <mule:when>
+                    <mule:outbound-endpoint address="test://appleQ2" name="TestApple-Out" exchange-pattern="one-way">
+                        <mule:transformer ref="TestCompressionTransformer"/>
+                    </mule:outbound-endpoint>
                     <mule:payload-type-filter expectedType="java.lang.String"/>
                 </mule:when>
                 <mule:when>
+                    <mule:outbound-endpoint ref="waterMelonEndpoint"/>
                     <mule:and-filter>
                         <mule:regex-filter pattern="the quick brown (.*)"/>
                         <mule:regex-filter pattern="(.*) brown (.*)"/>
@@ -110,6 +206,7 @@
         </mule:flow>
 
         <mule:flow name="anotherComponent">
+            <mule:inbound-endpoint address="test://KiwiIn" exchange-pattern="one-way"/>
             <mule:custom-aggregator class="org.mule.tck.testmodels.mule.TestCorrelationAggregator">
                 <property name="testProperty" value="testValue"/>
             </mule:custom-aggregator>

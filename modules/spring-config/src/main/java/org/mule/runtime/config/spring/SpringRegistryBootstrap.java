@@ -7,19 +7,20 @@
 package org.mule.runtime.config.spring;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.config.spring.factories.BootstrapObjectFactoryBean;
+import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.registry.RegistryProvider;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.bootstrap.AbstractRegistryBootstrap;
 import org.mule.runtime.core.config.bootstrap.BootstrapObjectFactory;
 import org.mule.runtime.core.config.bootstrap.ObjectBootstrapProperty;
 import org.mule.runtime.core.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.runtime.core.config.bootstrap.TransformerBootstrapProperty;
-import org.mule.runtime.config.spring.factories.BootstrapObjectFactoryBean;
-import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.core.transformer.TransformerUtils;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 

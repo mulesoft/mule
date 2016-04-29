@@ -30,6 +30,10 @@
 
     <management:chainsaw-notifications chainsawPort="8080" chainsawHost="127.0.0.1"/>
 
+    <management:publish-notifications>
+        <outbound-endpoint address="test://test"/>
+    </management:publish-notifications>
+
     <!-- needs profiler installed -->
     <!-- management:yourkit-profiler/ -->
 

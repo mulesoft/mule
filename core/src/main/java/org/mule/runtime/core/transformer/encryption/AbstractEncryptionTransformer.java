@@ -87,6 +87,20 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
     @Override
     public void initialise() throws InitialisationException
     {
+        if (strategyName != null)
+        {
+            if (endpoint.getMuleContext().getSecurityManager() == null)
+            {
+                if (strategy == null)
+                {
+                    throw new InitialisationException(CoreMessages.authSecurityManagerNotSet(), this);
+                }
+            }
+            else
+            {
+                strategy = endpoint.getMuleContext().getSecurityManager().getEncryptionStrategy(strategyName);
+            }
+        }
         if (strategy == null)
         {
             throw new InitialisationException(CoreMessages.encryptionStrategyNotSet(), this);

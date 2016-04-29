@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <jms:activemq-connector name="jmsConnector1" />
+    <jms:activemq-connector name="jmsConnector2" />
+
+    <endpoint name="out1" address="jms://out1"
+        connector-ref="jmsConnector1" exchange-pattern="one-way">
+    </endpoint>
+    <endpoint name="out2" address="jms://out2"
+        connector-ref="jmsConnector1" exchange-pattern="one-way">
+    </endpoint>
+    <endpoint name="out3" address="jms://out3"
+        connector-ref="jmsConnector2" exchange-pattern="one-way">
+    </endpoint>
+
+    <endpoint name="out3NotSupported" address="jms://out3"
+            connector-ref="jmsConnector2" exchange-pattern="one-way">
+        <jms:transaction action="NOT_SUPPORTED"/>
+    </endpoint>
+
+</mule>

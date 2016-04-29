@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <flow name="synchronous">
+        <vm:inbound-endpoint path="in-synch" exchange-pattern="request-response"/>
+        <vm:outbound-endpoint path="out-synch" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="echo">
+        <vm:inbound-endpoint path="out-synch" exchange-pattern="request-response"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="asynchronous">
+        <vm:inbound-endpoint path="in-asynch" exchange-pattern="one-way"/>
+        <vm:outbound-endpoint path="out-asynch" exchange-pattern="one-way"/>
+    </flow>
+</mule>

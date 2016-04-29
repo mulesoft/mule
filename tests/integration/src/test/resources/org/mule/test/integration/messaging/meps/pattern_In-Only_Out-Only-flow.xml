@@ -21,9 +21,9 @@
         <script:component>
             <script:script engine="groovy">
                 if (message.getProperty("foo", org.mule.runtime.core.PropertyScope.INBOUND)!=null)
-                return "foo header received"
+                    return "foo header received"
                 else
-                return "foo header not received"
+                    return "foo header not received"
             </script:script>
         </script:component>
         

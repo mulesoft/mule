@@ -9,10 +9,12 @@ package org.mule.runtime.core.processor;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.security.SecurityFilter;
+import org.mule.runtime.core.endpoint.EndpointAware;
 
 /**
  * Filters the flow using the specified {@link SecurityFilter}. 
@@ -20,7 +22,7 @@ import org.mule.runtime.core.api.security.SecurityFilter;
  * message is not send or dispatched by the transport. When unauthorised the request
  * message is returned as the response.
  */
-public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor implements Initialisable, NonBlockingSupported
+public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor implements EndpointAware, Initialisable, NonBlockingSupported
 {
     private SecurityFilter filter;
 
@@ -28,6 +30,7 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
      * For IoC only
      * @deprecated Use SecurityFilterMessageProcessor(SecurityFilter filter) instead
      */
+    @Deprecated
     public SecurityFilterMessageProcessor()
     {
         super();
@@ -49,6 +52,7 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
         return filter;
     }
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (filter != null)
@@ -63,4 +67,16 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
         this.filter = filter;
     }
 
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    @Override
+    public void setEndpoint(ImmutableEndpoint ep)
+    {
+        if (filter instanceof EndpointAware)
+        {
+            ((EndpointAware) filter).setEndpoint(ep);
+        }
+    }
 }

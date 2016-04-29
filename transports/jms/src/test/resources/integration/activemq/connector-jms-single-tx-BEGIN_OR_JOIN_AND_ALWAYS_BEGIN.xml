@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <jms:activemq-connector name="jmsConnector1" disableTemporaryReplyToDestinations="true"/>
+    <jms:activemq-connector name="jmsConnector2"/>
+
+    <jms:endpoint name="in" queue="in" connector-ref="jmsConnector1" exchange-pattern="one-way">
+        <jms:transaction action="ALWAYS_BEGIN"/>
+    </jms:endpoint>
+
+    <jms:endpoint name="middle" queue="middle" connector-ref="jmsConnector1" exchange-pattern="one-way">
+        <jms:transaction action="NONE"/>
+    </jms:endpoint>
+
+    <jms:endpoint name="middle2" queue="middle" connector-ref="jmsConnector1" exchange-pattern="one-way">
+        <jms:transaction action="ALWAYS_BEGIN"/>
+    </jms:endpoint>
+
+    <jms:endpoint name="out" queue="out" connector-ref="jmsConnector2" exchange-pattern="one-way">
+        <jms:transaction action="ALWAYS_BEGIN"/>
+    </jms:endpoint>
+
+</mule>

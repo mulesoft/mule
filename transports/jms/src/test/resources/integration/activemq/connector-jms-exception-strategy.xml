@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <jms:activemq-connector name="jmsConnector" maxRedelivery="10" acknowledgementMode="DUPS_OK_ACKNOWLEDGE"/>
+
+    <jms:endpoint name="jmsInTx" queue="in">
+        <jms:transaction action="ALWAYS_BEGIN" />
+    </jms:endpoint>
+
+    <jms:endpoint name="jmsOutTx" queue="out">
+        <jms:transaction action="ALWAYS_JOIN"/>
+    </jms:endpoint>
+
+    <jms:endpoint name="jmsInNoTx" queue="in2"/>
+    <jms:endpoint name="jmsOutNoTx" queue="out2"/>
+    
+    <jms:endpoint name="jmsInDefaultStrategyConfigured" queue="in3"/>
+    <jms:endpoint name="jmsOutDefaultStrategyConfigured" queue="out3"/>
+    
+    <jms:endpoint name="jmsInSendExceptionNotification" queue="in4"/>
+    <jms:endpoint name="jmsOutSendExceptionNotification" queue="out4"/>
+    <jms:endpoint name="jmsExceptionSendExceptionNotification" queue="exception4"/>
+
+    <jms:endpoint name="jmsInDeadLetter" queue="in5"/>
+    <jms:endpoint name="jmsOutDeadLetter" queue="out5"/>
+    <jms:endpoint name="jmsDLQDeadLetter" queue="DLQ5"/>
+
+    <jms:endpoint name="jmsInDeadLetterTx" queue="in6"/>
+    <jms:endpoint name="jmsOutDeadLetterTx" queue="out6"/>
+    <jms:endpoint name="jmsDLQDeadLetterTx" queue="DLQ6"/>
+    
+</mule>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <custom-transformer name="t1" class="org.mule.tck.testmodels.mule.TestInboundTransformer" />
+    <custom-transformer name="t2" class="org.mule.tck.testmodels.mule.TestInboundTransformer" />
+
+    <custom-transformer name="rt1" class="org.mule.tck.testmodels.mule.TestResponseTransformer" />
+    <custom-transformer name="rt2" class="org.mule.tck.testmodels.mule.TestResponseTransformer" />
+
+    <endpoint name="ep1" address="test://ep1?transformers=t1&amp;responseTransformers=rt1" />
+
+    <endpoint name="ep2" address="test://ep2?transformers=t1,t2&amp;responseTransformers=rt1,rt2" />
+
+    <flow name="globalEndpoints">
+        <inbound-endpoint ref="ep1"/>
+        <outbound-endpoint ref="ep2"/>
+    </flow>
+
+    <flow name="localEndpoints">
+        <inbound-endpoint address="test://ep3?transformers=t1&amp;responseTransformers=rt1"/>
+        <outbound-endpoint address="test://ep4?transformers=t1&amp;responseTransformers=rt1"/>
+    </flow>
+    
+</mule>

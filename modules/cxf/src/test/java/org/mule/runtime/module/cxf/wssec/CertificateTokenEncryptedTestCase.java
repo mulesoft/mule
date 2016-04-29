@@ -13,8 +13,8 @@ public class CertificateTokenEncryptedTestCase extends CertificateTokenTestCase
     protected String[] getConfigFiles()
     {
         return new String[] {
-                "org/mule/module/cxf/wssec/cxf-secure-service-flow-httpn.xml",
-                "org/mule/module/cxf/wssec/certificate-token-encrypted-conf.xml"
+                             "org/mule/runtime/module/cxf/wssec/cxf-secure-service-flow-httpn.xml",
+                             "org/mule/runtime/module/cxf/wssec/certificate-token-encrypted-conf.xml"
         };
     }
 }

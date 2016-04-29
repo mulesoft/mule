@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.component;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
 public interface InterfaceBinding extends MessageProcessor
@@ -36,6 +37,18 @@ public interface InterfaceBinding extends MessageProcessor
      */
     @Override
     MuleEvent process(MuleEvent event) throws MuleException;
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    void setEndpoint(ImmutableEndpoint endpoint) throws MuleException;
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    ImmutableEndpoint getEndpoint();
 
     Class<?> getInterface();
 

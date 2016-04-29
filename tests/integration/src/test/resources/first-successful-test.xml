@@ -47,7 +47,7 @@
 
     <flow name="test-router4">
         <first-successful>
-            <test:component throwException="true"/>
+            <outbound-endpoint address="test://AlwaysFail"/>
             <flow-ref name="test-router4-handler"/>
         </first-successful>
     </flow>

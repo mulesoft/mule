@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <custom-connector name="testConnector1"
+        class="org.mule.tck.testmodels.mule.TestConnector" />
+    <custom-connector name="testConnector2"
+        class="org.mule.tck.testmodels.mule.TestConnector" />
+
+    <endpoint name="globalEndpoint1" address="test://ge1"
+        connector-ref="testConnector1" />
+    <endpoint name="globalEndpoint2" address="test://ge2"
+        connector-ref="testConnector2" />
+
+
+    <flow name="testService">
+        <composite-source>
+            <!-- Removing the connector name from endpoint will fail initialisation, 
+                as there are multiple connectors available for the same transport. -->
+            <inbound-endpoint address="test://endpoint1"
+                connector-ref="testConnector1" />
+
+            <!-- Test that global endpoint connector attribute is carried 
+                over correctly for ref endpoints -->
+            <inbound-endpoint ref="globalEndpoint2" />
+        </composite-source>
+        <null-component />
+
+        <outbound-endpoint ref="globalEndpoint1" />
+
+    </flow>
+
+</mule>

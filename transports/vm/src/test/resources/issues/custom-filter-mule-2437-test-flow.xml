@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <!-- yes, this is a standard filter, but the test here is for custom filter
+         so please don't "fix" -->
+    <custom-filter name="consonant-filter" class="org.mule.runtime.core.routing.filters.RegExFilter">
+        <spring:property name="pattern" value="^[bcdfghjklmnpqrstvwxyz]+$"/>
+    </custom-filter>
+
+    <flow name="service">
+        <vm:inbound-endpoint path="in"/>
+        <message-filter onUnaccepted="consonantsSubFlow">
+            <custom-filter class="org.mule.runtime.core.routing.filters.RegExFilter">
+                <spring:property name="pattern" value="^[aeiou]+$"/>
+            </custom-filter>
+        </message-filter>
+        <vm:outbound-endpoint path="vowels"/>
+    </flow>
+
+    <sub-flow name="consonantsSubFlow">
+        <filter ref="consonant-filter"/>
+        <vm:outbound-endpoint path="consonants"/>
+    </sub-flow>  
+    
+</mule>

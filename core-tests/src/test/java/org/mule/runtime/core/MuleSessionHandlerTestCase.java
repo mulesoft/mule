@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -90,7 +91,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     @Test
     public void testSessionProperties() throws Exception
     {
-        MuleEvent event = MuleTestUtils.getTestEvent("Test Message", muleContext);
+        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test Message", muleContext), MuleTestUtils.getTestFlow(muleContext));
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
         String string = "bar";
@@ -128,7 +129,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     @Test
     public void testNonSerializableSessionProperties() throws Exception
     {
-        MuleEvent event = MuleTestUtils.getTestEvent("Test Message", muleContext);
+        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test Message", muleContext), MuleTestUtils.getTestFlow(muleContext));
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
         NotSerializableClass clazz = new NotSerializableClass();
@@ -149,7 +150,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     @Test
     public void testSecurityContext() throws Exception
     {
-        MuleEvent event = MuleTestUtils.getTestEvent("Test Message", muleContext);
+        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test Message", muleContext), MuleTestUtils.getTestFlow(muleContext));
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
         Credentials credentials = new MuleCredentials("joe", "secret".toCharArray());
@@ -223,11 +224,13 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
             super();
         }
 
+        @Override
         public void setAuthentication(Authentication authentication)
         {
             // nothing to do
         }
 
+        @Override
         public Authentication getAuthentication()
         {
             return null;

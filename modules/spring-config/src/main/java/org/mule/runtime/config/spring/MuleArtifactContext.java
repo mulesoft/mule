@@ -11,14 +11,15 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.config.ConfigResource;
+
 import org.mule.runtime.config.spring.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.spring.processors.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.spring.processors.LifecycleStatePostProcessor;
 import org.mule.runtime.config.spring.processors.MuleInjectorProcessor;
 import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.util.IOUtils;
 

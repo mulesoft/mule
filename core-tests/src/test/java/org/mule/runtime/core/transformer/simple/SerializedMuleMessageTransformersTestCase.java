@@ -11,9 +11,9 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -38,8 +38,9 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
         props.put("string", "hello");
         testObject = new DefaultMuleMessage("test", props, muleContext);
         
-        RequestContext.setEvent(
-                new DefaultMuleEvent(testObject, getTestFlow(), MuleTestUtils.getTestSession(muleContext)));
+        final DefaultMuleEvent event = new DefaultMuleEvent(testObject, getTestFlow(), MuleTestUtils.getTestSession(muleContext));
+        event.populateFieldsFromInboundEndpoint(getTestInboundEndpoint("test"));
+        RequestContext.setEvent(event);
     }
 
     @Override

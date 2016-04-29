@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <spring:bean name="connectionFactory" class="org.mule.runtime.transport.jms.test.TestConnectionFactory"/>
+
+    <!-- Default config -->
+    <jms:connector name="jmsConnector" connectionFactory-ref="connectionFactory"/>
+
+    <!-- DON'T use jms:endpoints here as we are testing for resolution from uri
+         (all that the jms topic attribute does is make an address using "jms://topic:") -->
+    <endpoint name="ep1" address="jms://queue.NotATopic" exchange-pattern="one-way"/>
+    <endpoint name="ep2" address="jms://context.aTopic?topic=true" exchange-pattern="one-way"/>
+    <endpoint name="ep3" address="jms://topic:context.ThisIsATopic" exchange-pattern="one-way"/>
+    <endpoint name="ep4" address="jms://topic:context.ThisIsATopic?topic=false" exchange-pattern="one-way"/>
+    <endpoint name="ep5" address="jms://context.aTopic.Properties" exchange-pattern="one-way">
+        <property key="topic" value="true"/>
+    </endpoint>
+    <endpoint name="ep6" address="jms://topic:/context/TopicWithLeadingSlash" exchange-pattern="one-way"/>
+    <endpoint name="ep7" address="jms://topic:context/TopicWithSlashes" exchange-pattern="one-way"/>
+    <endpoint name="ep8" address="jms://queue/testQueue" exchange-pattern="one-way"/>
+</mule>

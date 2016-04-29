@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <!--
+        The endpoints referenced here are declared in connector-jms-single-tx-BEGIN_OR_JOIN_AND_ALWAYS_BEGIN.xml
+        See AbstractJmsFunctionalTestCase's getBuilder() method for how they are combined for
+        the test run.
+    -->
+
+    <flow name="InputPart">
+        <inbound-endpoint ref="in"/>
+        <test:component/>
+        <outbound-endpoint ref="middle"/>
+    </flow>
+
+    <flow name="OutputPart">
+        <inbound-endpoint ref="middle"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <outbound-endpoint ref="out"/>
+    </flow>
+
+</mule>

@@ -6,15 +6,22 @@
  */
 package org.mule.runtime.core.config.i18n;
 
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.endpoint.EndpointURI;
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.exception.AbstractExceptionListener;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.DateUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
@@ -128,6 +135,51 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 30, target);
     }
 
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message lifecycleErrorCannotUseConnector(String name, String lifecyclePhase)
+    {
+        return factory.createMessage(BUNDLE_PATH, 32, name, lifecyclePhase);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message connectorCausedError()
+    {
+        return connectorCausedError(null);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message endpointIsNullForListener()
+    {
+        return factory.createMessage(BUNDLE_PATH, 34);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message listenerAlreadyRegistered(EndpointURI endpointUri)
+    {
+        return factory.createMessage(BUNDLE_PATH, 35, endpointUri);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message objectAlreadyInitialised(String name)
+    {
+        return factory.createMessage(BUNDLE_PATH, 37, name);
+    }
+
     public static Message connectorCausedError(Object connector)
     {
         return factory.createMessage(BUNDLE_PATH, 33, connector);
@@ -205,9 +257,11 @@ public class CoreMessages extends MessageFactory
     }
 
     public static Message transformOnObjectUnsupportedTypeOfEndpoint(String name,
+                                                                     ImmutableEndpoint endpoint,
                                                                      Class<?> class1)
     {
-        return factory.createMessage(BUNDLE_PATH, 54, name, StringMessageUtils.toString(class1));
+        return factory.createMessage(BUNDLE_PATH, 54, name, StringMessageUtils.toString(class1),
+                (endpoint != null ? endpoint.getEndpointURI() : null));
     }
 
     public static Message transformFailedFrom(Class<?> clazz)
@@ -287,10 +341,45 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 70, type);
     }
 
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message cannotInstanciateFinder(String serviceFinder)
+    {
+        return factory.createMessage(BUNDLE_PATH, 73, serviceFinder);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message failedToCreateObjectWith(String string, Object arg)
+    {
+        return factory.createMessage(BUNDLE_PATH, 74, string, arg);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message objectNotSetInService(Object object, Object service)
+    {
+        return factory.createMessage(BUNDLE_PATH, 75, object, service);
+    }
 
     public static Message objectNotFound(Object object)
     {
         return factory.createMessage(BUNDLE_PATH, 76, object);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message objectNotFound(String type, String object)
+    {
+        return factory.createMessage(BUNDLE_PATH, 76, type + ": " + object);
     }
 
     public static Message transactionMarkedForRollback()
@@ -321,6 +410,24 @@ public class CoreMessages extends MessageFactory
     public static Message objectNotRegistered(String type, String name)
     {
         return factory.createMessage(BUNDLE_PATH, 82, type, name);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message failedToSetPropertiesOn(String string)
+    {
+        return factory.createMessage(BUNDLE_PATH, 83, string);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message failedToCreateConnectorFromUri(EndpointURI uri)
+    {
+        return factory.createMessage(BUNDLE_PATH, 84, uri);
     }
 
     public static Message initialisationFailure(String string)
@@ -444,6 +551,15 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 112);
     }
 
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message schemeNotCompatibleWithConnector(String scheme, Class<?> expectedClass)
+    {
+        return factory.createMessage(BUNDLE_PATH, 115, scheme, expectedClass);
+    }
+
     public static Message noEntryPointFoundWithArgs(Object object, Object args)
     {
         return factory.createMessage(BUNDLE_PATH, 116, StringMessageUtils.toString(object),
@@ -478,6 +594,15 @@ public class CoreMessages extends MessageFactory
     public static Message eventProcessingFailedFor(String name)
     {
         return factory.createMessage(BUNDLE_PATH, 127, name);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message failedToDispatchToReplyto(ImmutableEndpoint endpoint)
+    {
+        return factory.createMessage(BUNDLE_PATH, 128, endpoint);
     }
 
     public static Message authTypeNotRecognised(String string)
@@ -792,14 +917,97 @@ public class CoreMessages extends MessageFactory
             StringMessageUtils.toString(returnType));
     }
 
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message moreThanOneConnectorWithProtocol(String protocol, String connectors)
+    {
+        return factory.createMessage(BUNDLE_PATH, 221, protocol, connectors);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message failedToGetOutputStream()
+    {
+        return factory.createMessage(BUNDLE_PATH, 223);
+    }
+
     public static Message noEntryPointFoundForNoArgsMethod(final Object component, final String methodName)
     {
         return factory.createMessage(BUNDLE_PATH, 224, component, methodName);
     }
 
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message noDelegateClassAndMethodProvidedForNoArgsWrapper()
+    {
+        return factory.createMessage(BUNDLE_PATH, 225);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message noDelegateClassIfDelegateInstanceSpecified()
+    {
+        return factory.createMessage(BUNDLE_PATH, 226);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message noServiceTransportDescriptor(String protocol)
+    {
+        return factory.createMessage(BUNDLE_PATH, 227, protocol);
+    }
+
     public static Message failedToInvokeLifecycle(String phaseName, Object object)
     {
         return factory.createMessage(BUNDLE_PATH, 228, phaseName, object);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message unrecognisedServiceType(ServiceType type)
+    {
+        return factory.createMessage(BUNDLE_PATH, 229, type);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message serviceFinderCantFindService(String name)
+    {
+        return factory.createMessage(BUNDLE_PATH, 230, name);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message outboundRouterMustUseOutboudEndpoints(OutboundRouter router,
+                                                                ImmutableEndpoint endpoint)
+    {
+        return factory.createMessage(BUNDLE_PATH, 233, endpoint, router);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message exceptionListenerMustUseOutboundEndpoint(AbstractExceptionListener exceptionListener,
+                                                                   ImmutableEndpoint endpoint)
+    {
+        return factory.createMessage(BUNDLE_PATH, 235, endpoint, exceptionListener);
     }
 
     /**
@@ -1091,6 +1299,38 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 311, processor, transactionConfig);
     }
 
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    private static String getEndpointDescription(InboundEndpoint endpoint)
+    {
+        String endpointString = endpoint.getName();
+        if (endpointString == null)
+        {
+            endpointString = endpoint.getEndpointURI().getUri().toString();
+        }
+        return endpointString;
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message failedToStartInboundEndpoint(InboundEndpoint endpoint)
+    {
+        return factory.createMessage(BUNDLE_PATH, 312, getEndpointDescription(endpoint));
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message failedToStopInboundEndpoint(InboundEndpoint endpoint)
+    {
+        return factory.createMessage(BUNDLE_PATH, 313, getEndpointDescription(endpoint));
+    }
+
     public static Message messageRejectedByFilter()
     {
         return factory.createMessage(BUNDLE_PATH, 314);
@@ -1134,6 +1374,17 @@ public class CoreMessages extends MessageFactory
     public static Message failedToFindEntrypointForComponent(String message)
     {
         return factory.createMessage(BUNDLE_PATH, 322, message);
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    public static Message exchangePatternForEndpointNotSupported(MessageExchangePattern mep,
+                                                                 String direction,
+                                                                 EndpointURI endpointURI)
+    {
+        return factory.createMessage(BUNDLE_PATH, 323, mep.name(), direction, endpointURI);
     }
 
     public static Message illegalMIMEType(String badMIMIEType)

@@ -19,6 +19,7 @@ import javax.management.NotCompliantMBeanException;
 public class JmxApplicationAgent extends AbstractJmxAgent
 {
 
+    @Override
     protected void registerServices() throws MuleException, NotCompliantMBeanException, MBeanRegistrationException, InstanceAlreadyExistsException, MalformedObjectNameException
     {
         registerWrapperService();
@@ -26,6 +27,8 @@ public class JmxApplicationAgent extends AbstractJmxAgent
         registerMuleService();
         registerConfigurationService();
         registerFlowConstructServices();
+        registerEndpointServices();
+        registerConnectorServices();
         registerApplicationServices();
     }
 

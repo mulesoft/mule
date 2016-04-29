@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:util="http://www.springframework.org/schema/util"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mgmt="http://www.mulesoft.org/schema/mule/management"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd">
+
+    <queued-asynchronous-processing-strategy name="customStrategy" maxBufferSize="6" maxThreads="12"
+                                             poolExhaustedAction="DISCARD" maxQueueSize="102">
+        <default-persistent-queue-store/>
+    </queued-asynchronous-processing-strategy>
+
+    <flow name="appleComponent2" processingStrategy="customStrategy">
+        <composite-source>
+            <inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"
+                              exchange-pattern="one-way"/>
+            <inbound-endpoint name="transactedInboundEndpoint" address="test://endpoint.in2"
+                              exchange-pattern="one-way">
+                <property key="testEndpointProperty" value="Prop1"/>
+            </inbound-endpoint>
+        </composite-source>
+        <pooled-component class="org.mule.tck.testmodels.fruit.Apple">
+            <pooling-profile maxActive="9" maxIdle="6" maxWait="4002"
+                             exhaustedAction="WHEN_EXHAUSTED_FAIL" initialisationPolicy="INITIALISE_ALL"/>
+        </pooled-component>
+        <outbound-endpoint name="transactedOutboundEndpoint" address="test://endpoint.out"
+                           exchange-pattern="one-way"/>
+    </flow>
+
+</mule>

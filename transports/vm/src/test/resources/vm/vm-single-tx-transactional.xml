@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd              
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <vm:connector name="vmConnector1"/>
+
+    <vm:endpoint name="out1" path="out1"/>
+    <vm:endpoint name="out2" path="out2"/>
+    <vm:endpoint name="out3" path="out3"/>
+    
+
+    <flow name="transactional">
+        <append-string-transformer message=" a"/>
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <vm:outbound-endpoint ref="out2"/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailInTheMiddle">
+        <append-string-transformer message=" b"/>
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <test:component throwException="true"/>
+            <vm:outbound-endpoint ref="out2"/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailAtEnd">
+        <append-string-transformer message=" c"/>
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <vm:outbound-endpoint ref="out2"/>
+            <test:component throwException="true"/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailAfterEnd">
+        <append-string-transformer message=" d"/>
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <vm:outbound-endpoint ref="out2"/>
+        </transactional>
+        <test:component throwException="true"/>
+    </flow>
+
+    <flow name="transactionalFailInTheMiddleWithCatchExceptionStrategy">
+        <append-string-transformer message=" e"/>
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <test:component throwException="true"/>
+            <vm:outbound-endpoint ref="out2"/>
+            <catch-exception-strategy/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalFailAtEndWithCatchExceptionStrategy">
+        <append-string-transformer message=" f"/>
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <vm:outbound-endpoint ref="out2"/>
+            <test:component throwException="true"/>
+            <catch-exception-strategy/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalWorksWithAnotherResourceType">
+        <append-string-transformer message=" g"/>
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <vm:outbound-endpoint ref="out2"/>
+            <vm:outbound-endpoint ref="out3"/>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalDoesntFailWithAnotherResourceType">
+        <append-string-transformer message=" h"/>
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <vm:outbound-endpoint ref="out2"/>
+            <vm:outbound-endpoint ref="out3">
+                <vm:transaction action="NOT_SUPPORTED"/>
+            </vm:outbound-endpoint>
+        </transactional>
+    </flow>
+
+    <flow name="transactionalWithAnotherResourceTypeAndExceptionAtEnd">
+        <append-string-transformer message=" i"/>
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <vm:outbound-endpoint ref="out3">
+                <vm:transaction action="NOT_SUPPORTED"/>
+            </vm:outbound-endpoint>
+            <vm:outbound-endpoint ref="out2"/>
+            <test:component throwException="true"/>
+        </transactional>
+    </flow>
+
+
+    <flow name="nestedTransactional">
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <transactional>
+                <vm:outbound-endpoint ref="out2"/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalFail">
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <transactional>
+                <vm:outbound-endpoint ref="out2"/>
+                <test:component throwException="true"/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalFailWithCatch">
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <transactional>
+                <vm:outbound-endpoint ref="out2"/>
+                <test:component throwException="true"/>
+                <catch-exception-strategy/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalWithBeginOrJoin">
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <transactional action="BEGIN_OR_JOIN">
+                <vm:outbound-endpoint ref="out2"/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalWithBeginOrJoinFail">
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <transactional action="BEGIN_OR_JOIN">
+                <vm:outbound-endpoint ref="out2"/>
+                <test:component throwException="true"/>
+            </transactional>
+        </transactional>
+    </flow>
+
+    <flow name="nestedTransactionalWithBeginOrJoinFailWithCatch">
+        <transactional>
+            <vm:outbound-endpoint ref="out1"/>
+            <transactional action="BEGIN_OR_JOIN">
+                <vm:outbound-endpoint ref="out2"/>
+                <test:component throwException="true"/>
+                <catch-exception-strategy/>
+            </transactional>
+        </transactional>
+    </flow>
+
+</mule>

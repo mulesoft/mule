@@ -6,23 +6,15 @@
  */
 package org.mule.runtime.config.spring.handlers;
 
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
-import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.component.DefaultJavaComponent;
-import org.mule.runtime.core.component.PooledJavaComponent;
-import org.mule.runtime.core.component.SimpleCallableJavaComponent;
-import org.mule.runtime.core.component.simple.EchoComponent;
-import org.mule.runtime.core.component.simple.LogComponent;
-import org.mule.runtime.core.component.simple.NullComponent;
 import org.mule.runtime.config.spring.factories.AggregationStrategyDefinitionParser;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.CompositeMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.DefaultMemoryQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.DefaultPersistentQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.FileQueueStoreFactoryBean;
+import org.mule.runtime.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
+import org.mule.runtime.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
@@ -46,6 +38,7 @@ import org.mule.runtime.config.spring.parsers.processors.CheckExclusiveAttribute
 import org.mule.runtime.config.spring.parsers.processors.CheckRequiredAttributesWhenNoChildren;
 import org.mule.runtime.config.spring.parsers.specific.AggregatorDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.AsyncMessageProcessorsDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.BindingDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ComponentDelegatingDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
@@ -87,14 +80,28 @@ import org.mule.runtime.config.spring.parsers.specific.SimpleComponentDefinition
 import org.mule.runtime.config.spring.parsers.specific.SplitterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.StaticComponentDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.TransactionDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.TransactionManagerDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.TypedPropertyMapEntryDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.XaTransactionDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.component.DefaultInterfaceBinding;
+import org.mule.runtime.core.component.DefaultJavaComponent;
+import org.mule.runtime.core.component.PooledJavaComponent;
+import org.mule.runtime.core.component.SimpleCallableJavaComponent;
+import org.mule.runtime.core.component.simple.EchoComponent;
+import org.mule.runtime.core.component.simple.LogComponent;
+import org.mule.runtime.core.component.simple.NullComponent;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.el.ExpressionLanguageComponent;
+import org.mule.runtime.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.runtime.core.exception.CatchMessagingExceptionStrategy;
@@ -155,11 +162,14 @@ import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.filters.logic.AndFilter;
 import org.mule.runtime.core.routing.filters.logic.NotFilter;
 import org.mule.runtime.core.routing.filters.logic.OrFilter;
+import org.mule.runtime.core.routing.outbound.ExpressionRecipientList;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
+import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter;
 import org.mule.runtime.core.security.filters.MuleEncryptionEndpointSecurityFilter;
+import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
 import org.mule.runtime.core.transaction.lookup.GenericTransactionManagerLookupFactory;
 import org.mule.runtime.core.transaction.lookup.JBossTransactionManagerLookupFactory;
@@ -199,7 +209,6 @@ import org.mule.runtime.core.transformer.simple.RemoveSessionVariableTransformer
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.SetPayloadMessageProcessor;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
-import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
 import org.mule.runtime.core.util.store.ManagedObjectStore;
 import org.mule.runtime.core.util.store.TextFileObjectStore;
@@ -344,6 +353,10 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("websphere-transaction-manager", new TransactionManagerDefinitionParser(WebsphereTransactionManagerLookupFactory.class));
 
         //Endpoint elements
+        registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
+        registerBeanDefinitionParser("inbound-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
+        registerBeanDefinitionParser("outbound-endpoint", new ChildEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
+        registerBeanDefinitionParser("custom-transaction", new TransactionDefinitionParser());
         registerBeanDefinitionParser("xa-transaction", new XaTransactionDefinitionParser(XaTransactionFactory.class));
         registerBeanDefinitionParser("idempotent-redelivery-policy", new ChildDefinitionParser("redeliveryPolicy", IdempotentRedeliveryPolicy.class));
 
@@ -434,6 +447,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("component", new ComponentDelegatingDefinitionParser(DefaultJavaComponent.class));
         registerBeanDefinitionParser("pooled-component", new ComponentDelegatingDefinitionParser(PooledJavaComponent.class));
 
+        registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("interfaceBinding", DefaultInterfaceBinding.class));
+
         // Simple Components
         registerBeanDefinitionParser("log-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, LogComponent.class));
         registerBeanDefinitionParser("null-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, NullComponent.class));
@@ -484,7 +499,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("all", new ChildDefinitionParser("messageProcessor", MulticastingRouter.class));
         registerBeanDefinitionParser("scatter-gather", new ChildDefinitionParser("messageProcessor", ScatterGatherRouterFactoryBean.class));
         registerBeanDefinitionParser("custom-aggregation-strategy", new AggregationStrategyDefinitionParser());
+        registerBeanDefinitionParser("recipient-list", new ChildDefinitionParser("messageProcessor", ExpressionRecipientList.class));
 
+        registerBeanDefinitionParser("request-reply", new ChildDefinitionParser("messageProcessor", SimpleAsyncRequestReplyRequester.class));
         registerBeanDefinitionParser("first-successful", new ChildDefinitionParser("messageProcessor", FirstSuccessful.class));
         registerBeanDefinitionParser("until-successful", new ChildDefinitionParser("messageProcessor", UntilSuccessful.class));
         registerBeanDefinitionParser("round-robin", new ChildDefinitionParser("messageProcessor", RoundRobin.class));
@@ -532,7 +549,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-security-provider", new NameTransferDefinitionParser("providers"));
         registerMuleBeanDefinitionParser("custom-encryption-strategy", new NameTransferDefinitionParser("encryptionStrategies")).addAlias("strategy", "encryptionStrategy");
         registerBeanDefinitionParser("password-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", PasswordBasedEncryptionStrategy.class));
-        registerMuleBeanDefinitionParser("secret-key-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", SecretKeyEncryptionStrategy.class)).registerPreProcessor(new CheckExclusiveAttributes(new String[][] {new String[] {"key"}, new String[] {"keyFactory-ref"}}));
+        registerMuleBeanDefinitionParser("secret-key-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", SecretKeyEncryptionStrategy.class)).registerPreProcessor(
+                new CheckExclusiveAttributes(new String[][] {new String[] {"key"}, new String[] {"keyFactory-ref"}}));
         registerBeanDefinitionParser("encryption-security-filter", new SecurityFilterDefinitionParser(MuleEncryptionEndpointSecurityFilter.class));
         registerBeanDefinitionParser("custom-security-filter", new SecurityFilterDefinitionParser());
         registerBeanDefinitionParser("username-password-filter", new SecurityFilterDefinitionParser(UsernamePasswordAuthenticationFilter.class));

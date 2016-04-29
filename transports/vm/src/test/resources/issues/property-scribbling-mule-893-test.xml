@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+       xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <vm:endpoint name="dispatch" path="bridge" exchange-pattern="one-way"/>
+    <vm:endpoint name="receive" path="result" exchange-pattern="one-way"/>
+
+    <flow name="bridge">
+        <inbound-endpoint ref="dispatch"/>
+        <vm:outbound-endpoint path="responder" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="responder">
+        <vm:inbound-endpoint path="responder" exchange-pattern="request-response"/>
+        <test:component appendString=" Received" logMessageDetails="true"/>
+    </flow>
+
+</mule>

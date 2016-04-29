@@ -9,6 +9,7 @@ package org.mule.runtime.core.registry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.InjectProcessor;
@@ -17,6 +18,7 @@ import org.mule.runtime.core.api.registry.ObjectProcessor;
 import org.mule.runtime.core.api.registry.PreInitProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transport.Connector;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -74,7 +76,9 @@ public class TransientRegistry extends AbstractRegistry
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        applyProcessors(lookupObjects(Connector.class), null);
         applyProcessors(lookupObjects(Transformer.class), null);
+        applyProcessors(lookupObjects(ImmutableEndpoint.class), null);
         applyProcessors(lookupObjects(Agent.class), null);
         applyProcessors(lookupObjects(Object.class), null);
     }
@@ -130,6 +134,7 @@ public class TransientRegistry extends AbstractRegistry
     }
 
 
+    @Override
     public void registerObjects(Map<String, Object> objects) throws RegistrationException
     {
         if (objects == null)
@@ -143,6 +148,7 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> Map<String, T> lookupByType(Class<T> type)
     {
@@ -168,6 +174,7 @@ public class TransientRegistry extends AbstractRegistry
         return results;
     }
 
+    @Override
     public <T> T lookupObject(String key)
     {
         return doGet(key);
@@ -179,6 +186,7 @@ public class TransientRegistry extends AbstractRegistry
         return super.lookupObject(type);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> Collection<T> lookupObjects(Class<T> returntype)
     {
@@ -254,6 +262,7 @@ public class TransientRegistry extends AbstractRegistry
      * @param key
      * @param value
      */
+    @Override
     public void registerObject(String key, Object value) throws RegistrationException
     {
         registerObject(key, value, Object.class);
@@ -262,6 +271,7 @@ public class TransientRegistry extends AbstractRegistry
     /**
      * Allows for arbitrary registration of transient objects
      */
+    @Override
     public void registerObject(String key, Object object, Object metadata) throws RegistrationException
     {
         checkDisposed();
@@ -339,11 +349,13 @@ public class TransientRegistry extends AbstractRegistry
     // Registry Metadata
     // /////////////////////////////////////////////////////////////////////////
 
+    @Override
     public boolean isReadOnly()
     {
         return false;
     }
 
+    @Override
     public boolean isRemote()
     {
         return false;

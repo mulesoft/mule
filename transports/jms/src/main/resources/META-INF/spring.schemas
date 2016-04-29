@@ -1,0 +1,8 @@
+http\://www.mulesoft.org/schema/mule/jms/3.1/mule-jms.xsd=META-INF/mule-jms.xsd
+http\://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd=META-INF/mule-jms.xsd
+http\://www.mulesoft.org/schema/mule/jms/3.3/mule-jms.xsd=META-INF/mule-jms.xsd
+http\://www.mulesoft.org/schema/mule/jms/3.4/mule-jms.xsd=META-INF/mule-jms.xsd
+http\://www.mulesoft.org/schema/mule/jms/3.5/mule-jms.xsd=META-INF/mule-jms.xsd
+http\://www.mulesoft.org/schema/mule/jms/3.6/mule-jms.xsd=META-INF/mule-jms.xsd
+http\://www.mulesoft.org/schema/mule/jms/3.7/mule-jms.xsd=META-INF/mule-jms.xsd
+http\://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd=META-INF/mule-jms.xsd

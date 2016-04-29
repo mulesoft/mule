@@ -24,4 +24,10 @@
         <echo-component />
     </flow>
 
+<!--     <flow name="jms"> -->
+<!--         <inbound-endpoint address="jms://in?connector=sharedJmsConnector" /> -->
+<!--         <custom-processor class="org.mule.shutdown.ShutdownAppInDomainTestCase$RetrieveRequestContext"/> -->
+<!--         <echo-component /> -->
+<!--         <outbound-endpoint address="jms://out?connector=sharedJmsConnector" /> -->
+<!--     </flow> -->
 </mule>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:jbossts="http://www.mulesoft.org/schema/mule/jbossts"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/current/mule-jbossts.xsd">
+
+    <jbossts:transaction-manager/>
+
+    <vm:connector name="vm-normal" />
+    <vm:connector name="vm-queue" />
+    <vm:connector name="vm-queue2" />
+
+    <vm:endpoint name="queue2" path="queue2" connector-ref="vm-queue2" exchange-pattern="one-way">
+        <xa-transaction action="ALWAYS_JOIN" interactWithExternal="true"/>
+    </vm:endpoint>
+    <vm:endpoint name="queue" path="queue" connector-ref="vm-queue" exchange-pattern="request-response">
+        <xa-transaction action="ALWAYS_JOIN" interactWithExternal="true"/>
+    </vm:endpoint>
+    <vm:endpoint name="entry" path="entry" connector-ref="vm-normal" exchange-pattern="request-response">
+        <xa-transaction action="ALWAYS_JOIN" interactWithExternal="true"/>
+    </vm:endpoint>
+
+    <flow name="testService">
+        <vm:inbound-endpoint path="entry" connector-ref="vm-normal" exchange-pattern="one-way">
+            <xa-transaction action="ALWAYS_JOIN" interactWithExternal="true"/>
+        </vm:inbound-endpoint>
+        <test:component appendString=" Received"/>
+        <outbound-endpoint ref="queue" exchange-pattern="one-way">
+            <xa-transaction action="ALWAYS_JOIN" interactWithExternal="true"/>
+        </outbound-endpoint>
+    </flow>
+
+    <flow name="testServices">
+        <vm:inbound-endpoint path="queue" connector-ref="vm-queue" exchange-pattern="one-way">
+            <xa-transaction action="ALWAYS_JOIN" interactWithExternal="true"/>
+        </vm:inbound-endpoint>
+        <test:component appendString=" Received"/>
+        <!-- <outbound> <pass-through-router> <outbound-endpoint ref="queue2" exchange-pattern="one-way"> <xa-transaction 
+            action="ALWAYS_JOIN" interactWithExternal="true"/> </outbound-endpoint> </pass-through-router> </outbound> -->
+    </flow>
+
+</mule>

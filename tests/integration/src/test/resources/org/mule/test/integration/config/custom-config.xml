@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <!-- Test custom conntector parsing -->
+    <custom-connector name="customConnector" class="org.mule.tck.testmodels.mule.TestConnector">
+        <spring:property name="someProperty" value="foo"/>
+    </custom-connector>
+
+    <custom-transformer name="testTransformer" class="org.mule.tck.testmodels.mule.TestCompressionTransformer">
+        <spring:property name="beanProperty1" value="soo"/>
+        <spring:property name="beanProperty2" value="12345"/>
+    </custom-transformer>
+
+    <!-- Test custom filter parsing -->
+    <endpoint address="test://foo" name="fooEndpoint" exchange-pattern="one-way">
+        <custom-filter class="org.mule.test.integration.config.TestFilter">
+           <spring:property name="foo" value="goo"/>
+           <spring:property name="bar" value="12"/>
+        </custom-filter>
+    </endpoint>
+    
+</mule>

@@ -10,6 +10,8 @@
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/3.8/mule.xsd"/>
 
+    <xsd:element name="connector" type="mule:connectorType" substitutionGroup="mule:abstract-connector"/>
+
     <xsd:element name="component" type="testComponentType" substitutionGroup="mule:abstract-component">
         <xsd:annotation>
             <xsd:documentation>

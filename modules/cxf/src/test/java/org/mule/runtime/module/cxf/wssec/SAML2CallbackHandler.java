@@ -7,10 +7,8 @@
 package org.mule.runtime.module.cxf.wssec;
 
 import java.io.IOException;
-import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
-import java.util.Properties;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -24,9 +22,7 @@ import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
-import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
-import org.apache.ws.security.util.Loader;
 import org.opensaml.common.SAMLVersion;
 
 /**
@@ -43,7 +39,7 @@ public class SAML2CallbackHandler implements CallbackHandler
     public SAML2CallbackHandler() throws WSSecurityException
     {
         if (certs == null) {
-            Crypto crypto = CryptoFactory.getInstance("org/mule/module/cxf/wssec/wssecurity.properties");
+            Crypto crypto = CryptoFactory.getInstance("org/mule/runtime/module/cxf/wssec/wssecurity.properties");
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias("joe");
             certs = crypto.getX509Certificates(cryptoType);
@@ -55,6 +51,7 @@ public class SAML2CallbackHandler implements CallbackHandler
         confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
     }
 
+    @Override
     public void handle(Callback[] callbacks)
             throws IOException, UnsupportedCallbackException
     {

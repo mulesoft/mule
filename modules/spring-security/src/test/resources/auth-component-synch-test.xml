@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+       xmlns:spring-security="http://www.mulesoft.org/schema/mule/spring-security"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd">
+
+    <!-- this doesn't work if the import is embedded in "other" -->
+
+    <import resource="auth-component-security.xml"/>
+
+    <mule:mule>
+        <spring-security:security-manager>
+            <spring-security:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
+        </spring-security:security-manager>
+
+        <mule:security-manager>
+            <mule:password-encryption-strategy name="PBE" password="mule"/>
+        </mule:security-manager>
+
+        <mule:flow name="echoUMO">
+            <mule:inbound-endpoint address="vm://test" exchange-pattern="request-response">
+                <mule:encryption-security-filter strategy-ref="PBE"/>
+            </mule:inbound-endpoint>
+            <mule:component>
+                <mule:spring-object bean="echoComponent"/>
+            </mule:component>
+        </mule:flow>
+
+    </mule:mule>
+</beans>

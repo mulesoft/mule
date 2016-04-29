@@ -263,6 +263,14 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="connector-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to the connector that will be used by this component. The protocol of the service
+                            address must be supported by this connector.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="connectorConfig" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+
+    <!--// START SNIPPET: full-config -->
+    <description>
+        Receives a message from another party and processes the message. Then the message is sent to another service (or
+        application) for processing. A Reply-To endpoint is attached to the message and this is used by the second
+        service to return a result. Note that if the external service is not a Mule instance the protocol being used
+        will need to have the notion of a back channel or reply-to destination, i.e. JMS, WS-Addressing, Socket-based
+        protocols.
+    </description>
+
+    <jms:activemq-connector name="jmsConnector"/>
+
+    <vm:endpoint path="test.inbound" name="inboundEndpoint" exchange-pattern="request-response"/>
+    <jms:endpoint queue="test.external.app" name="externalEndpoint" exchange-pattern="one-way"/>
+    <jms:endpoint queue="test.reply" name="replyEndpoint" exchange-pattern="one-way"/>
+
+    <flow name="In-Out_Out-Only-Async-Service">
+        <inbound-endpoint ref="inboundEndpoint"/>
+        <request-reply timeout="4000">
+            <outbound-endpoint ref="externalEndpoint">
+                <message-properties-transformer>
+                    <add-message-property key="foo" value="bar"/>
+                </message-properties-transformer>
+                <jms:object-to-jmsmessage-transformer/>
+            </outbound-endpoint>
+            <inbound-endpoint ref="replyEndpoint"/>
+        </request-reply>
+    </flow>
+
+    <flow name="ExternalApp">
+        <inbound-endpoint ref="externalEndpoint">
+            <message-properties-transformer>
+                <!-- propagate the property explicitly -->
+                <add-message-property key="foo" value="#[header:INBOUND:foo]"/>
+            </message-properties-transformer>
+        </inbound-endpoint>
+        <test:component logMessageDetails="true">
+            <test:return-data>got it!</test:return-data>
+        </test:component>
+    </flow>
+    <!--// END SNIPPET: full-config -->
+</mule>

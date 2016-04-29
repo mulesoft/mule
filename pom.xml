@@ -107,6 +107,7 @@
         <module>modules</module>
         <module>tests</module>
         <module>extensions</module>
+        <module>transports</module>
     </modules>
 
     <properties>

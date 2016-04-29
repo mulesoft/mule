@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.security;
 
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -16,7 +17,6 @@ import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.security.AbstractOperationSecurityFilter;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 public class CustomSecurityFilter extends AbstractOperationSecurityFilter
@@ -31,6 +31,16 @@ public class CustomSecurityFilter extends AbstractOperationSecurityFilter
     protected void authenticateInbound(MuleEvent event)
         throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
         EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException
+    {
+        if (!isValid(event))
+        {
+            throw new UnauthorisedException(CoreMessages.authFailedForUser("a"));
+        }
+    }
+
+    @Override
+    public void authenticate(MuleEvent event)
+        throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
     {
         if (!isValid(event))
         {

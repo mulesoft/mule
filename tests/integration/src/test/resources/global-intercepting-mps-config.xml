@@ -14,6 +14,7 @@
     <combine-collections-transformer name="combineCollectionsTransformer" />
 
     <flow name="flow1">
+        <inbound-endpoint address="test://foo"/>
         <processor ref="idempotentFilter"/>
         <processor ref="idempotentSecureHashMessageFilter"/>
         <processor ref="messageFilter"/>

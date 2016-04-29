@@ -9,8 +9,9 @@ package org.mule.runtime.module.cxf.wssec;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.runtime.core.api.MuleMessage;
+
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.xml.ws.soap.SOAPFaultException;
@@ -29,7 +30,7 @@ public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "org/mule/module/cxf/wssec/ws-security-config-mel-expression-config-httpn.xml";
+        return "org/mule/runtime/module/cxf/wssec/ws-security-config-mel-expression-config-httpn.xml";
     }
 
     @Test

@@ -175,6 +175,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="decoupledEndpoint" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The reply to endpoint for clients which have WS-Addressing enabled. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

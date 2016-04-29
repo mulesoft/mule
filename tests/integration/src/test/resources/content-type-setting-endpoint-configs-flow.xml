@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <endpoint name="global" address="test://addr" mimeType="application/xml" encoding="iso-8859-1"/>
+
+    <flow name="service">
+        <inbound-endpoint name="inbound" address="test://addr2" mimeType="text/xml" encoding="utf-8"/>
+        <outbound-endpoint name="outbound" address="test://addr3" mimeType="application/json"
+            encoding="iso-8859-2"/>
+    </flow>
+
+    <flow name="service2">
+        <inbound-endpoint ref="global"/>
+        <outbound-endpoint ref="global"/>
+    </flow>
+
+</mule>

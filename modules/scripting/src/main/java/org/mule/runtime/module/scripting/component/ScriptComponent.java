@@ -127,7 +127,8 @@ public class ScriptComponent extends AbstractComponent
                 {
                     Object proxy = Proxy.newProxyInstance(muleContext.getExecutionClassLoader(),
                         new Class[]{interfaceBinding.getInterface()},
-                        new BindingInvocationHandler(interfaceBinding, muleContext));
+                            new BindingInvocationHandler(interfaceBinding));
+                    // new BindingInvocationHandler(interfaceBinding, muleContext));
                     proxies.put(bindingName, proxy);
                 }
             }

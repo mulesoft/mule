@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <spring:bean name="txFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory">
+        <spring:property name="value" value="foo"/>
+    </spring:bean>
+
+    <spring:bean name="connectionFactory" class="org.mule.runtime.transport.jms.test.TestConnectionFactory"/>
+    
+    <spring:bean name="redeliveryHandlerFactory" class="org.mule.runtime.transport.jms.test.TestRedeliveryHandlerFactory"/>
+    
+    <!-- Default config -->
+    <jms:connector name="jmsConnectorDefaults"
+                   connectionFactory-ref="connectionFactory"
+                   redeliveryHandlerFactory-ref="redeliveryHandlerFactory"/>
+
+    <jms:connector name="jmsConnector1"
+                   acknowledgementMode="DUPS_OK_ACKNOWLEDGE"
+                   clientId="myClient"
+                   durable="true"
+                   noLocal="true"
+                   persistentDelivery="true"
+                   maxRedelivery="5"
+                   cacheJmsSessions="true"
+                   eagerConsumer="false"
+                   specification="1.1"
+                   numberOfConsumers="7"
+                   connectionFactory-ref="connectionFactory"
+                   redeliveryHandlerFactory-ref="redeliveryHandlerFactory"
+                   username="myuser"
+                   password="mypass"
+                   embeddedMode="true"/>
+
+    <jms:custom-connector name="jmsConnector2" class="org.mule.runtime.transport.jms.JmsConnector"
+                          specification="1.1">
+         <spring:property name="connectionFactory" ref="connectionFactory"/>
+    </jms:custom-connector>
+
+    <jms:connector name="jmsConnector3"
+                    acknowledgementMode="DUPS_OK_ACKNOWLEDGE"
+                    clientId="myClient"
+                    durable="true"
+                    noLocal="true"
+                    persistentDelivery="true"
+                    maxRedelivery="5"
+                    cacheJmsSessions="true"
+                    eagerConsumer="false"
+                    specification="1.1"
+                    connectionFactory-ref="connectionFactory"
+                    redeliveryHandlerFactory-ref="redeliveryHandlerFactory"/>
+
+    <jms:endpoint name="endpoint1" queue="blah" connector-ref="jmsConnectorDefaults" 
+        disableTemporaryReplyToDestinations="true" exchange-pattern="one-way">
+        <jms:selector expression="foo"/>
+    </jms:endpoint>
+
+    <jms:endpoint name="endpoint2" address="jms://blah" connector-ref="jmsConnectorDefaults"
+        exchange-pattern="one-way">
+        <not-filter>
+            <jms:property-filter pattern="bar"/>
+        </not-filter>
+    </jms:endpoint>
+
+    <jms:endpoint name="endpoint3" queue="blah" connector-ref="jmsConnectorDefaults"
+        exchange-pattern="one-way">
+        <custom-transaction factory-ref="txFactory" action="BEGIN_OR_JOIN"/>
+    </jms:endpoint>
+
+    <jms:endpoint name="endpoint4" queue="blub" connector-ref="jmsConnectorDefaults" 
+        exchange-pattern="one-way">
+        <xa-transaction action="ALWAYS_JOIN"/>
+    </jms:endpoint>
+    
+    <spring:beans>
+        <util:properties id="providerProperties">
+            <spring:prop key="key">value</spring:prop>
+        </util:properties>
+    </spring:beans>
+    
+    <jms:connector name="jmsJndiConnector" 
+                   jndiInitialFactory="org.mule.runtime.transport.jms.test.JmsTestContextFactory"
+                   jndiProviderUrl="jndi://test"
+                   jndiProviderProperties-ref="providerProperties"
+                   connectionFactoryJndiName="jms/connectionFactory" 
+                   jndiDestinations="true"
+                   forceJndiDestinations="true">
+
+        <spring:property name="connectionFactoryProperties">
+            <spring:map>
+                <spring:entry key="customProperty" value="customValue"/>
+            </spring:map>
+        </spring:property>
+    </jms:connector>
+
+    <jms:activemq-connector name="jmsActiveMqConnector" numberOfConsumers="1"/>
+    <jms:activemq-xa-connector name="jmsActiveMqConnectorXa" numberOfConsumers="1"/>
+
+    <flow name="testService">
+        <jms:inbound-endpoint name="inboundEndpoint" topic="myTopic" connector-ref="jmsConnectorDefaults"
+                              durableName="testCustomDurableName" exchange-pattern="one-way"/>
+        <echo-component/>
+    </flow>
+    
+</mule>

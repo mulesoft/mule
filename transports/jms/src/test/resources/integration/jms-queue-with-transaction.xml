@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:tx="http://www.springframework.org/schema/tx"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+
+    <vm:connector name="VMQueue"/>
+
+    <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way"/>
+
+    <!-- see MULE-3342 for what this test is supposed to check -->
+    <flow name="vm-to-jms-queue">
+        <inbound-endpoint address="vm://in" exchange-pattern="one-way"/>
+        <outbound-endpoint ref="in">
+            <jms:transaction action="ALWAYS_BEGIN" timeout="3000"/>
+        </outbound-endpoint>
+    </flow>
+
+    <flow name="jms-to-vm">
+        <inbound-endpoint ref="in"/>
+        <outbound-endpoint address="vm://out" exchange-pattern="one-way"/>
+    </flow>
+
+</mule>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:parsers-test="http://www.mulesoft.org/schema/mule/parsers-test"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/parsers-test http://www.mulesoft.org/schema/mule/parsers-test/current/mule-parsers-test.xsd">
+
+    <append-string-transformer message="a" name="a"/>
+    <append-string-transformer message="b" name="b"/>
+    <append-string-transformer message="c" name="c"/>
+
+    <parsers-test:addressed-orphan-endpoint name="many" path="foo">
+        <transformer ref="a" />
+        <transformer ref="b" />
+        <transformer ref="c" />
+    </parsers-test:addressed-orphan-endpoint>
+    <parsers-test:addressed-orphan-endpoint name="single" path="foo">
+        <transformer ref="a" />
+    </parsers-test:addressed-orphan-endpoint>
+
+</mule>

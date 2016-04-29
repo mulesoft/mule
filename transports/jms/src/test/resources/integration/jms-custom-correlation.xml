@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <vm:connector name="vmConnector"/>
+
+    <endpoint name="replyTo" address="${inbound.destination}" connector-ref="jmsConnector1"
+              exchange-pattern="one-way"/>
+
+    <flow name="JMSService">
+        <vm:inbound-endpoint path="in4" exchange-pattern="request-response"/>
+        <request-reply>
+            <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"
+                               exchange-pattern="one-way">
+                <property key="priority" value="1"/>
+            </outbound-endpoint>
+            <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"
+                              exchange-pattern="one-way"/>
+        </request-reply>
+        <expression-message-info-mapping messageIdExpression="#[message.inboundProperties.customCorrelation]"
+                                         correlationIdExpression="#[message.correlationId]"/>
+    </flow>
+
+    <flow name="TestService1">
+        <inbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1"/>
+        <test:component appendString=" TestService1"/>
+    </flow>
+
+</mule>

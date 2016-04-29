@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.registry.RegistryBroker;
@@ -17,6 +18,7 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Kiwi;
+import org.mule.tck.testmodels.mule.TestConnector;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -50,6 +52,8 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase
         TransientRegistry reg2 = new TransientRegistry(muleContext);
         reg2.initialise();
 
+        reg1.registerObject("conn", new LifecycleTrackerConnector("conn", muleContext));
+        reg2.registerObject("conn2", new LifecycleTrackerConnector("conn2", muleContext));
         reg1.registerObject("flow", new LifecycleTrackerFlow("flow", muleContext));
         reg2.registerObject("flow2", new LifecycleTrackerFlow("flow2", muleContext));
 
@@ -59,13 +63,37 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase
         muleContext.start();
 
         // Both connectors are started before either flow
-        assertEquals("flow2-start flow-start ", tracker.toString());
+        assertEquals("conn2-start conn-start flow2-start flow-start ", tracker.toString());
 
         tracker = new String();
         muleContext.stop();
 
         // Both services are stopped before either connector
-        assertEquals("flow2-stop flow-stop ", tracker);
+        assertEquals("flow2-stop flow-stop conn2-stop conn-stop ", tracker);
+    }
+
+    class LifecycleTrackerConnector extends TestConnector
+    {
+
+        public LifecycleTrackerConnector(String name, MuleContext context)
+        {
+            super(context);
+            this.name = name;
+        }
+
+        @Override
+        protected void doStart()
+        {
+            super.doStart();
+            tracker += name + "-start ";
+        }
+
+        @Override
+        protected void doStop()
+        {
+            super.doStop();
+            tracker += name + "-stop ";
+        }
     }
 
     class LifecycleTrackerFlow extends Flow

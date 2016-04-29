@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.transformer;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 
@@ -139,12 +140,35 @@ public class CompositeConverter implements Converter
         return chain.peekLast().getEncoding();
     }
 
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    @Override
+    public ImmutableEndpoint getEndpoint()
+    {
+        return chain.peekFirst().getEndpoint();
+    }
+
     @Override
     public void dispose()
     {
         for (Converter converter : chain)
         {
             converter.dispose();
+        }
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    @Override
+    public void setEndpoint(ImmutableEndpoint ep)
+    {
+        for (Converter converter : chain)
+        {
+            converter.setEndpoint(ep);
         }
     }
 

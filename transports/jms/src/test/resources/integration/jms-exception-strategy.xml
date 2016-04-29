@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+    http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+    http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
+
+    <flow name="flowWithoutExceptionStrategyAndTx">
+        <inbound-endpoint ref="jmsInTx"/>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="jmsOutTx"/>
+    </flow>
+
+    <flow name="flowWithoutExceptionStrategyAndNoTx" processingStrategy="synchronous">
+        <inbound-endpoint ref="jmsInNoTx"/>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="jmsOutNoTx"/>
+    </flow>
+
+    <flow name="flowWithDefaultStrategyConfigured" processingStrategy="synchronous">
+        <inbound-endpoint ref="jmsInDefaultStrategyConfigured"/>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="jmsOutDefaultStrategyConfigured" />
+        <default-exception-strategy/>
+    </flow>
+
+    <flow name="flowWithExceptionNotification" processingStrategy="synchronous">
+        <inbound-endpoint ref="jmsInSendExceptionNotification"/>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="jmsOutSendExceptionNotification" />
+        <default-exception-strategy>
+            <outbound-endpoint ref="jmsExceptionSendExceptionNotification"/>
+        </default-exception-strategy>
+    </flow>
+
+    <flow name="flowConfiguredForDeadLetterQueue" processingStrategy="synchronous">
+        <inbound-endpoint ref="jmsInDeadLetter"/>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="jmsOutDeadLetter" />
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <outbound-endpoint ref="jmsDLQDeadLetter"/>
+        </default-exception-strategy>
+    </flow>
+
+    <flow name="flowConfiguredForDeadLetterQueueTx" processingStrategy="synchronous">
+        <inbound-endpoint ref="jmsInDeadLetterTx">
+            <jms:transaction action="ALWAYS_BEGIN"/>
+        </inbound-endpoint>
+        <test:component throwException="true"/>
+        <outbound-endpoint ref="jmsOutDeadLetterTx" >
+            <jms:transaction action="ALWAYS_JOIN"/>
+        </outbound-endpoint>
+        <default-exception-strategy>
+            <commit-transaction exception-pattern="*"/>
+            <outbound-endpoint ref="jmsDLQDeadLetterTx">
+                <jms:transaction action="ALWAYS_JOIN"/>
+            </outbound-endpoint>
+        </default-exception-strategy>
+    </flow>
+
+</mule>

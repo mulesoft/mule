@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <vm:connector name="vm-in1" />
+    <vm:connector name="vm-in2" />
+    <vm:connector name="vm-out1" />
+    <vm:connector name="vm-out2" />
+
+    <vm:endpoint name="inbound1" path="in1" connector-ref="vm-in1" exchange-pattern="request-response"/>
+    <vm:endpoint name="outbound1" path="out1" connector-ref="vm-out1" exchange-pattern="request-response"/>
+    <vm:endpoint name="inbound2" path="in2" connector-ref="vm-in2" exchange-pattern="request-response"/>
+    <vm:endpoint name="outbound2" path="out2" connector-ref="vm-out2" exchange-pattern="request-response"/>
+
+    <flow name="testService1">
+        <vm:inbound-endpoint ref="inbound1"/>
+        <outbound-endpoint ref="outbound1">
+            <set-property propertyName="Content-Type" value="text/xml;charset=UTF-8"/>
+        </outbound-endpoint>
+    </flow>
+
+    <flow name="echo">
+        <vm:inbound-endpoint ref="outbound1"/>
+        <component class="org.mule.runtime.transport.vm.functional.TransformerContentTypeTestCase$EchoComponent"/>
+    </flow>
+
+    <flow name="testService2">
+        <vm:inbound-endpoint ref="inbound2"/>
+        <outbound-endpoint ref="outbound2">
+            <set-property propertyName="Content-Type" value="text/plain;charset=UTF-8"/>
+        </outbound-endpoint>
+    </flow>
+
+    <flow name="echo2">
+        <vm:inbound-endpoint ref="outbound2"/>
+        <component class="org.mule.runtime.transport.vm.functional.TransformerContentTypeTestCase$EchoComponent"/>
+    </flow>
+
+</mule>

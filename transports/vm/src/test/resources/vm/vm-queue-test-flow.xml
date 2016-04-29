@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <vm:endpoint name="queue" path="foo" />
+    <vm:endpoint name="entry" path="entry" />
+
+
+    <flow name="testService">
+
+        <vm:inbound-endpoint path="entry"
+            exchange-pattern="one-way" />
+
+        <test:component appendString=" Received" />
+
+        <outbound-endpoint ref="queue"
+            exchange-pattern="one-way" />
+
+    </flow>
+
+</mule>

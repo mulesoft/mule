@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:jbossts="http://www.mulesoft.org/schema/mule/jbossts"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/current/mule-jbossts.xsd">
+
+    <regex-filter pattern=".*ABC.*" name="globalMf" />
+
+    <custom-processor name="reject1"
+        class="org.mule.runtime.transport.vm.functional.transactions.MessageFilterTestCase$Reject1" />
+
+    <custom-processor name="reject2"
+        class="org.mule.runtime.transport.vm.functional.transactions.MessageFilterTestCase$Reject2" />
+
+    <message-filter name="acceptAll">
+        <regex-filter pattern="." />
+    </message-filter>
+
+    <message-filter name="firstMf" onUnaccepted="reject1">
+        <filter ref="globalMf" />
+    </message-filter>
+
+    <message-filter name="secondMf" onUnaccepted="reject2" throwOnUnaccepted="true">
+        <regex-filter pattern=".*DEF.*" />
+    </message-filter>
+
+    <flow name="Order Validation">
+
+        <vm:inbound-endpoint path="order.validation" exchange-pattern="request-response">
+            <processor ref="acceptAll" />
+            <processor ref="firstMf" />
+            <processor ref="secondMf" />
+            <!-- uncomment this to see the bug: Spring will try to call setUnacceptedMessageProcessor
+                on the endpoint <message-filter> <filter ref="globalMf"/> <custom-processor
+                class="org.mule.runtime.transport.vm.functional.transactions.MessageFilterTestCase$Reject1"/>
+                </message-filter> -->
+            <payload-type-filter expectedType="java.lang.String" />
+        </vm:inbound-endpoint>
+
+        <test:component appendString="(success)" />
+    </flow>
+</mule>

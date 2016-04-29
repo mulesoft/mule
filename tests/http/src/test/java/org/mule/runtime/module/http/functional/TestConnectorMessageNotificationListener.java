@@ -8,7 +8,8 @@ package org.mule.runtime.module.http.functional;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.context.notification.ConnectorMessageNotificationListener;
+
+import org.mule.runtime.core.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
@@ -88,7 +89,8 @@ public class TestConnectorMessageNotificationListener implements ServerNotificat
     public static ServerNotificationManager register(ServerNotificationManager serverNotificationManager)
     {
         final Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> mapping = serverNotificationManager.getInterfaceToTypes();
-        if (!mapping.containsKey(ConnectorMessageNotificationListener.class))
+        if (!mapping.containsKey(EndpointMessageNotificationListener.class))
+        // if (!mapping.containsKey(ConnectorMessageNotificationListener.class))
         {
             serverNotificationManager.addInterfaceToType(TestConnectorMessageNotificationListener.class, ConnectorMessageNotification.class);
             serverNotificationManager.addListener(new TestConnectorMessageNotificationListener());

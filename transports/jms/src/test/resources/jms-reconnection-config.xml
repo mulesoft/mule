@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <jms:activemq-connector name="activemqconnector" brokerURL="tcp://localhost:${port}" numberOfConsumers="4">
+        <reconnect-forever frequency="1000" blocking="false"/>
+    </jms:activemq-connector>
+
+
+    <flow name="put">
+        <jms:outbound-endpoint queue="in" connector-ref="activemqconnector"/>
+    </flow>
+
+    <flow name="get">
+        <jms:inbound-endpoint queue="in" connector-ref="activemqconnector"/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way" />
+    </flow>
+
+
+</mule>
