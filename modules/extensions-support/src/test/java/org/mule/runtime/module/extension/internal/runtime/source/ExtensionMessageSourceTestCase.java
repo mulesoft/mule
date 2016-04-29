@@ -25,18 +25,17 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
-import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.tck.MuleTestUtils.spyInjector;
-
+import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -47,28 +46,30 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.execution.MessageProcessingManager;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
+import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
+import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceContext;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
-import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
-import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 
 import java.nio.charset.Charset;
 import java.util.Optional;
 
 import javax.resource.spi.work.Work;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -359,7 +360,23 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
 
         Exception e = new RuntimeException();
         doThrow(e).when((Stoppable) source).stop();
-        expectedException.expectCause(is(sameInstance(e)));
+        expectedException.expect(new BaseMatcher<Throwable>()
+                                 {
+                                     @Override
+                                     public boolean matches(Object item)
+                                     {
+                                         Exception exception = (Exception) item;
+                                         return exception.getCause() instanceof MuleException &&
+                                                exception.getCause().getCause() == e;
+                                     }
+
+                                     @Override
+                                     public void describeTo(Description description)
+                                     {
+                                         description.appendText("Exception was not wrapped as expected");
+                                     }
+                                 }
+        );
 
         messageSource.stop();
         verify(workManager).dispose();
