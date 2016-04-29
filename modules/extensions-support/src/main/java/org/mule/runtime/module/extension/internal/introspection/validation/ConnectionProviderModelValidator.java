@@ -56,7 +56,7 @@ public final class ConnectionProviderModelValidator implements ModelValidator
 
     private void validateConfigType(RuntimeConnectionProviderModel providerModel, ExtensionModel extensionModel)
     {
-        Class<?> providerConfigType = ((RuntimeConnectionProviderModel) providerModel).getConfigurationType();
+        Class<?> providerConfigType = providerModel.getConfigurationType();
         for (ConfigurationModel configurationModel : extensionModel.getConfigurationModels())
         {
             ImplementingTypeModelProperty typeProperty = configurationModel.getModelProperty(ImplementingTypeModelProperty.class).orElse(null);
