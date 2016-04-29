@@ -884,7 +884,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             {
                 return false;
             }
-            if (!c1[i].isAssignableFrom(c2[i]))
+            if (!primitiveToWrapper(c1[i]).isAssignableFrom(primitiveToWrapper(c2[i])))
             {
                 return false;
             }
@@ -892,6 +892,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         return true;
     }
 
+   
     public static Class wrapperToPrimitive(Class wrapper)
     {
         return (Class) MapUtils.getObject(wrapperToPrimitiveMap, wrapper, wrapper);
