@@ -132,13 +132,6 @@ public final class HttpTransactionContext {
         httpTxContext.scheduleCleanup(httpCtx, completionHandler);
     }
 
-    static void cleanupTransaction(final HttpContext httpCtx,
-                                   final HttpTransactionContext httpTxContext)
-    {
-        httpCtx.getCloseable().removeCloseListener(httpTxContext.listener);
-        REQUEST_STATE_ATTR.remove(httpCtx);
-    }
-
     static HttpTransactionContext currentTransaction(
             final HttpHeader httpHeader) {
         return currentTransaction(httpHeader.getProcessingState().getHttpContext());
