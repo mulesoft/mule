@@ -12,6 +12,10 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
+/* 
+ * @deprecated Transport infrastructure is deprecated.
+ */
+@Deprecated
 public interface InterfaceBinding extends MessageProcessor
 {
     /**

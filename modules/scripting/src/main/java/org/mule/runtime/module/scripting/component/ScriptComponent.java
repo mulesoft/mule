@@ -7,20 +7,9 @@
 package org.mule.runtime.module.scripting.component;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.component.InterfaceBinding;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.component.AbstractComponent;
-import org.mule.runtime.core.component.BindingInvocationHandler;
-import org.mule.runtime.core.util.ClassUtils;
-
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import javax.script.Bindings;
 
@@ -36,25 +25,13 @@ public class ScriptComponent extends AbstractComponent
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScriptComponent.class);
 
-    protected List<InterfaceBinding> bindings = new ArrayList<InterfaceBinding>();
-
     private Scriptable script;
-
-    private Map<String, Object> proxies;
 
     @Override
     protected void doInitialise() throws InitialisationException
     {
         LifecycleUtils.initialiseIfNeeded(script, muleContext);
         super.doInitialise();
-        try
-        {
-            configureComponentBindings();
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
     }
 
     @Override
@@ -68,10 +45,7 @@ public class ScriptComponent extends AbstractComponent
     {
         // Set up initial script variables.
         Bindings bindings = script.getScriptEngine().createBindings();
-        if (proxies.size() > 0)
-        {
-            bindings.putAll(proxies);
-        }
+        putBindings(bindings);
         script.populateBindings(bindings, event);
         try
         {
@@ -86,6 +60,11 @@ public class ScriptComponent extends AbstractComponent
         }
     }
 
+    protected void putBindings(Bindings bindings)
+    {
+        // template method
+    }
+
     public Scriptable getScript()
     {
         return script;
@@ -94,44 +73,5 @@ public class ScriptComponent extends AbstractComponent
     public void setScript(Scriptable script)
     {
         this.script = script;
-    }
-
-    public List<InterfaceBinding> getInterfaceBindings()
-    {
-        return bindings;
-    }
-
-    public void setInterfaceBindings(List<InterfaceBinding> bindingCollection)
-    {
-        this.bindings = bindingCollection;
-    }
-
-    protected void configureComponentBindings() throws MuleException
-    {
-        proxies = new HashMap<String, Object>();
-        // Initialise the nested router and bind the endpoints to the methods using a
-        // Proxy
-        if (bindings != null && bindings.size() > 0)
-        {
-            for (Iterator<?> it = bindings.iterator(); it.hasNext();)
-            {
-                InterfaceBinding interfaceBinding = (InterfaceBinding) it.next();
-                String bindingName = ClassUtils.getSimpleName(interfaceBinding.getInterface());
-                if (proxies.containsKey(bindingName))
-                {
-                    Object proxy = proxies.get(bindingName);
-                    BindingInvocationHandler handler = (BindingInvocationHandler) Proxy.getInvocationHandler(proxy);
-                    handler.addRouterForInterface(interfaceBinding);
-                }
-                else
-                {
-                    Object proxy = Proxy.newProxyInstance(muleContext.getExecutionClassLoader(),
-                        new Class[]{interfaceBinding.getInterface()},
-                            new BindingInvocationHandler(interfaceBinding));
-                    // new BindingInvocationHandler(interfaceBinding, muleContext));
-                    proxies.put(bindingName, proxy);
-                }
-            }
-        }
     }
 }

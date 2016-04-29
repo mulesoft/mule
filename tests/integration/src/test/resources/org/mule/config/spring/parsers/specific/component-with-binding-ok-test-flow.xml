@@ -11,27 +11,33 @@
 
 
         <flow name="service1">
-            <component class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding">
+            <component-with-bindings class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding">
                 <entry-point-resolver-set>
                     <array-entry-point-resolver/>
                     <callable-entry-point-resolver/>
                 </entry-point-resolver-set>
                 <custom-lifecycle-adapter-factory class="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/>
-            </component>
+                <binding interface="org.mule.runtime.config.spring.parsers.specific.DummyBinding" method="doSomething">
+                    <outbound-endpoint address="test://test" />
+                </binding>
+            </component-with-bindings>
         </flow>
 
         <flow name="service2">
-            <component>
+            <component-with-bindings>
                 <entry-point-resolver-set>
                     <callable-entry-point-resolver/>
                 </entry-point-resolver-set>
                 <prototype-object class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding" />
                 <custom-lifecycle-adapter-factory class="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/>
-            </component>
+                <binding interface="org.mule.runtime.config.spring.parsers.specific.DummyBinding">
+                    <outbound-endpoint address="test://test" />
+                </binding>
+            </component-with-bindings>
         </flow>
     
         <flow name="service3">
-            <component>
+            <component-with-bindings>
                 <entry-point-resolver-set>
                     <method-entry-point-resolver>
                         <include-entry-point method="onCall"/>
@@ -39,63 +45,81 @@
                 </entry-point-resolver-set>
                 <singleton-object class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding" />
                 <custom-lifecycle-adapter-factory class="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/>
-            </component>
+                <binding interface="org.mule.runtime.config.spring.parsers.specific.DummyBinding" method="doSomething">
+                    <outbound-endpoint address="test://test" />
+                </binding>
+            </component-with-bindings>
         </flow>
  
         <flow name="service4">
-            <component>
+            <component-with-bindings>
                 <entry-point-resolver-set>
                     <no-arguments-entry-point-resolver/>
                 </entry-point-resolver-set>            
                 <spring-object bean="testSpringBean"  />
                 <custom-lifecycle-adapter-factory class="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/>
-            </component>
+                <binding interface="org.mule.runtime.config.spring.parsers.specific.DummyBinding" method="doSomething">
+                    <outbound-endpoint address="test://test" />
+                </binding>
+            </component-with-bindings>
         </flow>
 
         <flow name="service5">
-            <pooled-component class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding">
+            <pooled-component-with-bindings class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding">
                 <entry-point-resolver-set>
                     <property-entry-point-resolver/>
                 </entry-point-resolver-set>
                 <custom-lifecycle-adapter-factory class="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/>
+                <binding interface="org.mule.runtime.config.spring.parsers.specific.DummyBinding">
+                    <outbound-endpoint address="test://test" />
+                </binding>
                 <pooling-profile exhaustedAction="WHEN_EXHAUSTED_FAIL"
                     initialisationPolicy="INITIALISE_ALL" maxActive="1"
                     maxIdle="2" maxWait="3" />
-            </pooled-component>
+            </pooled-component-with-bindings>
         </flow>
 
         <flow name="service6">
-            <pooled-component>
+            <pooled-component-with-bindings>
                 <reflection-entry-point-resolver/>
                 <prototype-object class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding" />
                 <custom-lifecycle-adapter-factory class="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/>
+                <binding interface="org.mule.runtime.config.spring.parsers.specific.DummyBinding" method="doSomething">
+                    <outbound-endpoint address="test://test" />
+                </binding>
                 <pooling-profile exhaustedAction="WHEN_EXHAUSTED_FAIL"
                     initialisationPolicy="INITIALISE_ALL" maxActive="1"
                     maxIdle="2" maxWait="3" />
-            </pooled-component>
+            </pooled-component-with-bindings>
         </flow>
     
         <flow name="service7">
-            <pooled-component>
+            <pooled-component-with-bindings>
                 <entry-point-resolver-set>
                     <reflection-entry-point-resolver/>
                 </entry-point-resolver-set>
                 <singleton-object class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding" />
                 <custom-lifecycle-adapter-factory class="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/>
+                <binding interface="org.mule.runtime.config.spring.parsers.specific.DummyBinding" method="doSomething">
+                    <outbound-endpoint address="test://test" />
+                </binding>
                 <pooling-profile exhaustedAction="WHEN_EXHAUSTED_FAIL"
                     initialisationPolicy="INITIALISE_ALL" maxActive="1"
                     maxIdle="2" maxWait="3" />
-            </pooled-component>
+            </pooled-component-with-bindings>
         </flow>
     
         <flow name="service8">
-            <pooled-component>
+            <pooled-component-with-bindings>
                 <spring-object bean="testSpringBean"  />
                 <custom-lifecycle-adapter-factory class="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/>
+                <binding interface="org.mule.runtime.config.spring.parsers.specific.DummyBinding" method="doSomething">
+                    <outbound-endpoint address="test://test" />
+                </binding>
                 <pooling-profile exhaustedAction="WHEN_EXHAUSTED_FAIL"
                     initialisationPolicy="INITIALISE_ALL" maxActive="1"
                     maxIdle="2" maxWait="3" />
-            </pooled-component>
+            </pooled-component-with-bindings>
         </flow>
 
     

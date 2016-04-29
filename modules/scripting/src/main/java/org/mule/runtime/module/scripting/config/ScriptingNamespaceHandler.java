@@ -13,6 +13,7 @@ import org.mule.runtime.config.spring.parsers.specific.ComponentDefinitionParser
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.runtime.core.component.DefaultInterfaceBinding;
 import org.mule.runtime.module.scripting.component.ScriptComponent;
+import org.mule.runtime.module.scripting.component.ScriptComponentWithBindings;
 import org.mule.runtime.module.scripting.filter.ScriptFilter;
 import org.mule.runtime.module.scripting.transformer.ScriptTransformer;
 
@@ -25,6 +26,8 @@ public class ScriptingNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("script", new ScriptDefinitionParser());
         registerBeanDefinitionParser("text", new TextDefinitionParser("scriptText"));
         registerBeanDefinitionParser("component", new ComponentDefinitionParser(ScriptComponent.class));
+
+        registerBeanDefinitionParser("component-with-bindings", new ComponentDefinitionParser(ScriptComponentWithBindings.class));
         registerMuleBeanDefinitionParser("java-interface-binding", new BindingDefinitionParser("interfaceBinding", DefaultInterfaceBinding.class)).addCollection("bindingCollection.routers");
 
         registerBeanDefinitionParser("transformer", new MessageProcessorDefinitionParser(ScriptTransformer.class));

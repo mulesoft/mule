@@ -2440,13 +2440,6 @@
                         </xsd:annotation>
                     </xsd:element>
                     <xsd:element ref="abstract-lifecycle-adapter-factory" minOccurs="0"/>
-                    <xsd:element name="binding" type="pojoBindingType" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                A binding associates a Mule endpoint with an injected Java interface. This is like using Spring to inject a bean, but instead of calling a method on the bean, a message is sent to an endpoint.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass">
                     <xsd:annotation>
@@ -2480,6 +2473,56 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="component-with-bindings" type="defaultJavaWithBindingsComponentType" substitutionGroup="abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                A simple POJO (Plain Old Java Object) component that will be invoked by Mule when a message is received. The class or object instance to be used can be specified using a child object factory element, or via the 'class' attribute.  If the 'class' attribute is used, an object factory cannot be configured as well. Using the 'class' attribute is equivilant to using the propotype object factory ('prototype-object' child element).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="defaultJavaWithBindingsComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="defaultJavaComponentType">
+                <xsd:sequence>
+                    <xsd:element name="binding" type="pojoBindingType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A binding associates a Mule endpoint with an injected Java interface. This is like using Spring to inject a bean, but instead of calling a method on the bean, a message is sent to an endpoint.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="pooled-component-with-bindings" type="pooledJavaWithBindingsComponentType" substitutionGroup="abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                A pooled POJO (Plain Old Java Object) component that will be invoked by Mule when a message is received. The instance can be specified via a factory or a class.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="pooledJavaWithBindingsComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="defaultJavaComponentType">
+                <xsd:sequence>
+                    <xsd:element name="binding" type="pojoBindingType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A binding associates a Mule endpoint with an injected Java interface. This is like using Spring to inject a bean, but instead of calling a method on the bean, a message is sent to an endpoint.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="abstract-pooling-profile" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>Characteristics of the object pool.</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:complexType name="pojoBindingType">
         <xsd:sequence>

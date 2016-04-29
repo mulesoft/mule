@@ -7,6 +7,7 @@
 package org.mule.runtime.core.component;
 
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.InterfaceBinding;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.component.LifecycleAdapter;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -17,11 +18,16 @@ import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
+import java.util.List;
+
 /**
- * Default implementation of {@link JavaComponent}. Component lifecycle is
- * propagated to the component object instance via the {@link LifecycleAdapter}.
+ * Default implementation of {@link JavaComponent}. Component lifecycle is propagated to the component object instance
+ * via the {@link LifecycleAdapter}.
+ * 
+ * @deprecated Transport infrastructure is deprecated.
  */
-public class DefaultJavaComponent extends AbstractJavaComponent
+@Deprecated
+public class DefaultJavaWithBindingComponent extends AbstractJavaWithBindingsComponent
 {
 
     protected LifecycleAdapter singletonComponentLifecycleAdapter;
@@ -29,20 +35,21 @@ public class DefaultJavaComponent extends AbstractJavaComponent
     /**
      * For spring only
      */
-    public DefaultJavaComponent()
+    public DefaultJavaWithBindingComponent()
     {
         super();
     }
 
-    public DefaultJavaComponent(ObjectFactory objectFactory)
+    public DefaultJavaWithBindingComponent(ObjectFactory objectFactory)
     {
         super(objectFactory);
     }
 
-    public DefaultJavaComponent(ObjectFactory objectFactory,
-            EntryPointResolverSet entryPointResolverSet)
+    public DefaultJavaWithBindingComponent(ObjectFactory objectFactory,
+                                EntryPointResolverSet entryPointResolverSet,
+                                List<InterfaceBinding> bindings)
     {
-        super(objectFactory, entryPointResolverSet);
+        super(objectFactory, entryPointResolverSet, bindings);
     }
 
     @Override
@@ -89,6 +96,10 @@ public class DefaultJavaComponent extends AbstractJavaComponent
     protected void doInitialise() throws InitialisationException
     {
         LifecycleUtils.initialiseIfNeeded(objectFactory);
+        for (InterfaceBinding binding : bindings)
+        {
+            applyLifecycleAndDependencyInjection(binding);
+        }
     }
 
     @Override

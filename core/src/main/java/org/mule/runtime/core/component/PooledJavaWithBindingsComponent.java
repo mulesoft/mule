@@ -9,6 +9,7 @@ package org.mule.runtime.core.component;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.Component;
+import org.mule.runtime.core.api.component.InterfaceBinding;
 import org.mule.runtime.core.api.component.LifecycleAdapter;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -19,36 +20,42 @@ import org.mule.runtime.core.util.pool.DefaultLifecycleEnabledObjectPool;
 import org.mule.runtime.core.util.pool.LifecyleEnabledObjectPool;
 import org.mule.runtime.core.util.pool.ObjectPool;
 
+import java.util.List;
+
 /**
  * <code>PooledJavaComponent</code> implements pooling.
+ * 
+ * @deprecated Transport infrastructure is deprecated.
  */
-public class PooledJavaComponent extends AbstractJavaComponent
+@Deprecated
+public class PooledJavaWithBindingsComponent extends AbstractJavaWithBindingsComponent
 {
 
     protected PoolingProfile poolingProfile;
     protected LifecyleEnabledObjectPool lifecycleAdapterPool;
 
-    public PooledJavaComponent()
+    public PooledJavaWithBindingsComponent()
     {
         super();
     }
 
-    public PooledJavaComponent(ObjectFactory objectFactory)
+    public PooledJavaWithBindingsComponent(ObjectFactory objectFactory)
     {
         this(objectFactory, null);
     }
 
-    public PooledJavaComponent(ObjectFactory objectFactory, PoolingProfile poolingProfile)
+    public PooledJavaWithBindingsComponent(ObjectFactory objectFactory, PoolingProfile poolingProfile)
     {
         super(objectFactory);
         this.poolingProfile = poolingProfile;
     }
 
-    public PooledJavaComponent(ObjectFactory objectFactory,
+    public PooledJavaWithBindingsComponent(ObjectFactory objectFactory,
                                PoolingProfile poolingProfile,
-            EntryPointResolverSet entryPointResolverSet)
+                               EntryPointResolverSet entryPointResolverSet,
+                               List<InterfaceBinding> bindings)
     {
-        super(objectFactory, entryPointResolverSet);
+        super(objectFactory, entryPointResolverSet, bindings);
         this.poolingProfile = poolingProfile;
     }
 

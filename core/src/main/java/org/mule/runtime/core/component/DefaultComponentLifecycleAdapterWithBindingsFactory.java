@@ -8,7 +8,7 @@ package org.mule.runtime.core.component;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.component.JavaWithBindingsComponent;
 import org.mule.runtime.core.api.component.LifecycleAdapter;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -22,19 +22,19 @@ import org.mule.runtime.core.api.model.EntryPointResolverSet;
  * @see org.mule.runtime.core.api.component.LifecycleAdapter
  * @see org.mule.runtime.core.api.component.LifecycleAdapterFactory
  * @see org.mule.runtime.core.component.DefaultComponentLifecycleAdapter
- * @see org.mule.runtime.core.component.DefaultComponentLifecycleAdapterFactory
+ * @see org.mule.runtime.core.component.DefaultComponentLifecycleAdapterWithBindingsFactory
  */
-public class DefaultComponentLifecycleAdapterFactory implements LifecycleAdapterFactory<JavaComponent>
+public class DefaultComponentLifecycleAdapterWithBindingsFactory implements LifecycleAdapterFactory<JavaWithBindingsComponent>
 {
 
     @Override
     public LifecycleAdapter create(Object pojoService,
-                                   JavaComponent component,
+                                   JavaWithBindingsComponent component,
                                    FlowConstruct flowConstruct,
                                    EntryPointResolverSet resolver,
                                    MuleContext muleContext) throws MuleException
     {
-        return new DefaultComponentLifecycleAdapter(pojoService, component, flowConstruct, resolver, muleContext);
+        return new DefaultComponentLifecycleAdapterWithBindings(pojoService, component, flowConstruct, resolver, muleContext);
     }
 
 }
