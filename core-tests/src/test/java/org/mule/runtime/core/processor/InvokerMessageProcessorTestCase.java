@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -130,6 +131,17 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
         invoker.setArgumentTypes(new Class[]{String.class, Integer.TYPE});
         invoker.initialise();
         assertEquals("12(string and int)", invoker.process(getTestEvent("")).getMessageAsString());
+
+    }
+
+    @Test
+    public void testMethodWithPrimitiveArgTypes() throws MuleException, Exception
+    {
+        invoker.setMethodName("testDuplicateNameMethod");
+        invoker.setArgumentTypes(new Class<?>[] {String.class, Integer.class});
+        invoker.setArguments(asList("some String", 42));
+        invoker.initialise();
+        assertEquals("some String42(string and int)", invoker.process(getTestEvent("")).getMessageAsString());
 
     }
 
