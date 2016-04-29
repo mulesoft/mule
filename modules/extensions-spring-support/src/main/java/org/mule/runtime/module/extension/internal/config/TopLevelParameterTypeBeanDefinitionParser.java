@@ -42,7 +42,7 @@ final class TopLevelParameterTypeBeanDefinitionParser extends BaseExtensionBeanD
     {
         if (StringUtils.isBlank(element.getAttribute("name")) && !element.getNamespaceURI().equals(MULE_NAMESPACE))
         {
-            throw new IllegalModelDefinitionException(String.format("Element %s must should have a [name] attribute", element.getTagName()));
+            throw new IllegalModelDefinitionException(String.format("Element %s must have a [name] attribute", element.getTagName()));
         }
         builder.addConstructorArgValue(parserDelegate.toElementDescriptorBeanDefinition(element));
         builder.addConstructorArgValue(metadataType);
