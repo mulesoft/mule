@@ -24,7 +24,7 @@
                        candidateDoors="candidateDoors"
                        firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
-                       moneyFunction="#[money]"
+                       weaponTypeFunction="#[weaponType]"
                        monthlyIncomes="monthlyIncomes"
                        literalExpressionWithoutDefault="#[money]">
         <heisenberg:enemies>
@@ -136,7 +136,7 @@
                        candidateDoors="#[app.registry.candidateDoors]"
                        firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
-                       moneyFunction="#[money]"
+                       weaponTypeFunction="#[weaponType]"
                        monthlyIncomes="#[[12000L, 500L]]"
                        deathsBySeasons="#[['s01':['emilio', 'domingo'], 's02':['tuco', 'tortuga']]]"
                        labeledRicin="#[app.registry.labeledRicins]"

@@ -32,6 +32,7 @@ import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
+import org.mule.test.heisenberg.extension.model.WeaponType;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -93,7 +94,7 @@ public class HeisenbergOperations
         return door.knock();
     }
 
-    public String killWithWeapon(Weapon weapon, Weapon.WeaponType type, Weapon.WeaponAttributes weaponAttributes)
+    public String killWithWeapon(Weapon weapon, WeaponType type, Weapon.WeaponAttributes weaponAttributes)
     {
         return String.format("Killed with: %s , Type %s and attribute %s", weapon.kill(), type.name(), weaponAttributes.getBrand());
     }

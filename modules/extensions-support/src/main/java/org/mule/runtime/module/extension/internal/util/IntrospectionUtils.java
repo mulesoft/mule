@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.metadata.java.JavaTypeLoader.JAVA;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
@@ -20,7 +21,17 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.AnyType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.NullType;
+import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -29,24 +40,17 @@ import org.mule.runtime.extension.api.annotation.param.Ignore;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataModelProperty;
 import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.AnyType;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.NullType;
-import org.mule.metadata.java.utils.JavaTypeUtils;
-import org.mule.runtime.core.util.ArrayUtils;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.CollectionUtils;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -63,6 +67,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang.StringUtils;
@@ -464,5 +470,48 @@ public final class IntrospectionUtils
             superClass = superClass.getSuperclass();
         }
         return annotation;
+    }
+
+    /**
+     * Traverses through all the {@link ParameterModel}s of the {@code extensionModel}
+     * and returns the {@link Class classes} that are modeled by each parameter's {@link ParameterModel#getType()}.
+     * <p>
+     * This includes every single {@link ParameterModel} in the model, including configs, providers,
+     * operations, etc.
+     *
+     * @param extensionModel a {@link ExtensionModel}
+     * @param filter         a {@link Predicate} used to filter out the classes which are not of interest
+     * @return a non {@code null} {@link Set}
+     */
+    public static Set<Class<?>> getParameterClasses(ExtensionModel extensionModel, Predicate<ParameterModel> filter)
+    {
+        ImmutableSet.Builder<Class<?>> parameterClasses = ImmutableSet.builder();
+
+        collectParameterClasses(parameterClasses,
+                                filter,
+                                extensionModel.getConnectionProviders(),
+                                extensionModel.getConfigurationModels(),
+                                extensionModel.getOperationModels(),
+                                extensionModel.getSourceModels());
+
+        extensionModel.getConfigurationModels().forEach(configuration ->
+                                                                collectParameterClasses(parameterClasses,
+                                                                                        filter,
+                                                                                        configuration.getConnectionProviders(),
+                                                                                        configuration.getOperationModels(),
+                                                                                        configuration.getSourceModels())
+        );
+
+        return parameterClasses.build();
+    }
+
+    private static void collectParameterClasses(ImmutableSet.Builder<Class<?>> parameterClasses,
+                                                Predicate<ParameterModel> filter,
+                                                Collection<? extends ParametrizedModel>... parametrizedModelsArray)
+    {
+        stream(parametrizedModelsArray).forEach(models -> models.stream().forEach(
+                model -> model.getParameterModels().stream()
+                        .filter(filter)
+                        .forEach(parameter -> parameterClasses.add(getType(parameter.getType())))));
     }
 }

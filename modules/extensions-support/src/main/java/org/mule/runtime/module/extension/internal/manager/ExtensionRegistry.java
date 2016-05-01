@@ -7,19 +7,23 @@
 package org.mule.runtime.module.extension.internal.manager;
 
 import static java.lang.String.format;
+import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
+import org.mule.runtime.core.transformer.simple.StringToEnum;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.core.util.collection.ImmutableSetCollector;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.ExpirableConfigurationProvider;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.core.util.collection.ImmutableSetCollector;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -30,6 +34,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,6 +66,7 @@ public final class ExtensionRegistry
     });
 
     private final Map<ExtensionEntityKey, RuntimeExtensionModel> extensions = new ConcurrentHashMap<>();
+    private final Set<Class<? extends Enum>> enumClasses = new HashSet<>();
     private final MuleRegistry registry;
 
     /**
@@ -83,6 +89,21 @@ public final class ExtensionRegistry
     void registerExtension(String name, String vendor, RuntimeExtensionModel extensionModel)
     {
         extensions.put(new ExtensionEntityKey(name, vendor), extensionModel);
+        getParameterClasses(extensionModel, parameter -> Enum.class.isAssignableFrom(getType(parameter.getType())))
+                .forEach(clazz -> {
+                    final Class<Enum> enumClass = (Class<Enum>) clazz;
+                    if (enumClasses.add(enumClass))
+                    {
+                        try
+                        {
+                            registry.registerTransformer(new StringToEnum(enumClass));
+                        }
+                        catch (MuleException e)
+                        {
+                            throw new MuleRuntimeException(createStaticMessage("Could not register transformer for enum " + enumClass.getName()), e);
+                        }
+                    }
+                });
     }
 
     /**

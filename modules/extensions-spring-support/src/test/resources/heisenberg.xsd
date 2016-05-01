@@ -143,7 +143,7 @@
                     <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
                     <xs:attribute type="mule:expressionDecimal" use="required" name="money"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="weapon"></xs:attribute>
-                    <xs:attribute type="mule:expressionObject" use="optional" name="moneyFunction"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="weaponTypeFunction"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="wildCardWeapons"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="wildCardList"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="wildCardWeaponMap"></xs:attribute>
@@ -537,7 +537,7 @@
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="required" name="weapon"></xs:attribute>
-                <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.WeaponWeaponTypeEnumType" use="required" name="type"></xs:attribute>
+                <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.WeaponTypeEnumType" use="required" name="type"></xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="weaponAttributes"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
@@ -717,7 +717,7 @@
             </xs:simpleType>
         </xs:union>
     </xs:simpleType>
-    <xs:simpleType name="org.mule.test.heisenberg.extension.model.WeaponWeaponTypeEnumType">
+    <xs:simpleType name="org.mule.test.heisenberg.extension.model.WeaponTypeEnumType">
         <xs:union>
             <xs:simpleType>
                 <xs:restriction base="xs:string">

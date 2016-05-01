@@ -24,12 +24,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DESCRIBER_ID;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.transformer.simple.StringToEnum;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
@@ -153,6 +156,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         when(extension1ConfigurationModel.getExtensionModel()).thenReturn(extensionModel1);
         when(extension1ConfigurationModel.getInterceptorFactories()).thenReturn(emptyList());
         when(extension1ConfigurationModel.getOperationModels()).thenReturn(ImmutableList.of());
+        when(extension1ConfigurationModel.getParameterModels()).thenReturn(ImmutableList.of());
         when(extension1ConfigurationModel.getModelProperty(any())).thenReturn(Optional.empty());
 
         when(extensionModel1.getConfigurationModel(EXTENSION1_CONFIG_NAME)).thenReturn(Optional.of(extension1ConfigurationModel));
@@ -314,7 +318,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         final String version = "4.0.0";
         ExtensionManifestBuilder builder = new ExtensionManifestBuilder()
                 .setName(HEISENBERG)
-                .setDescription(HeisenbergExtension.EXTENSION_DESCRIPTION)
+                .setDescription(EXTENSION_DESCRIPTION)
                 .setVersion(version);
         builder.withDescriber()
                 .setId(DESCRIBER_ID)
@@ -328,7 +332,25 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         final ExtensionModel registeredExtension = registered.iterator().next();
         assertThat(registeredExtension.getName(), is(HEISENBERG));
         assertThat(registeredExtension.getVersion(), is(version));
+    }
 
+    @Test
+    public void enumTransformer() throws Exception
+    {
+        DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
+        extensionsManager.setMuleContext(muleContext);
+        extensionsManager.initialise();
+
+        ParameterModel parameter = mock(ParameterModel.class);
+        when(parameter.getType()).thenReturn(toMetadataType(TimeUnit.class));
+
+        ParameterModel parameterOfRepeatedEnumType = mock(ParameterModel.class);
+        when(parameterOfRepeatedEnumType.getType()).thenReturn(toMetadataType(TimeUnit.class));
+
+        when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameter, parameterOfRepeatedEnumType));
+        extensionsManager.registerExtension(extensionModel1);
+
+        verify(muleContext.getRegistry()).registerTransformer(any(StringToEnum.class));
     }
 
     private void makeExtension1ConfigurationNotImplicit()

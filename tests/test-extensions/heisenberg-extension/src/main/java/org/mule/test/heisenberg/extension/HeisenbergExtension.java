@@ -38,6 +38,7 @@ import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
+import org.mule.test.heisenberg.extension.model.WeaponType;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -125,7 +126,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
 
     @Parameter
     @Optional
-    private Function<MuleEvent, Integer> moneyFunction;
+    private Function<MuleEvent, WeaponType> weaponTypeFunction;
 
     @Parameter
     @Optional
@@ -308,6 +309,11 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
         return literalExpressionWithoutDefault;
     }
 
+    public Function<MuleEvent, WeaponType> getWeaponTypeFunction()
+    {
+        return weaponTypeFunction;
+    }
+
     @Override
     public void setMuleContext(MuleContext context)
     {
@@ -317,11 +323,6 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     public MuleContext getMuleContext()
     {
         return muleContext;
-    }
-
-    public Function<MuleEvent, Integer> getMoneyFunction()
-    {
-        return moneyFunction;
     }
 
     public Weapon getWeapon()
