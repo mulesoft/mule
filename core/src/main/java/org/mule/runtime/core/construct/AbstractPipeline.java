@@ -28,7 +28,6 @@ import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.StageNameSource;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
-import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
@@ -292,10 +291,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
         boolean redeliveryHandlerConfigured = isRedeliveryPolicyConfigured();
 
-
-        boolean isCompatibleWithAsync = sourceCompatibleWithAsync.evaluate(messageSource)
-        ;
-
+        boolean isCompatibleWithAsync = sourceCompatibleWithAsync.evaluate(messageSource);
         if (userConfiguredAsyncProcessingStrategy
             && (!(messageSource == null || isCompatibleWithAsync) || redeliveryHandlerConfigured))
         {
