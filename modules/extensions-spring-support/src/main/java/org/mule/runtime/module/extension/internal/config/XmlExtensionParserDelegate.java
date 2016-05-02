@@ -10,6 +10,7 @@ import static org.mule.metadata.java.utils.JavaTypeUtils.getGenericTypeAt;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.pluralize;
@@ -67,7 +68,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -103,7 +103,8 @@ final class XmlExtensionParserDelegate
 
     private Map<Class<?>, Object> infrastructureParameters = new HashMap<>();
     private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-    private SubTypesMappingContainer subTypesMapping = new SubTypesMappingContainer(Collections.emptyMap());
+    private SubTypesMappingContainer subTypesMapping = new SubTypesMappingContainer(ImmutableMap.of());
+    private Map<MetadataType, MetadataType> importedTypes = ImmutableMap.of();
 
     /**
      * Parses the given {@code element} for an attribute named {@code name}. If not found,
@@ -150,34 +151,42 @@ final class XmlExtensionParserDelegate
      * {@code parameter}. It then returns a {@link ValueResolver} which will provide
      * the actual value extracted from the {@code element}
      *
-     * @param element        a {@link ElementDescriptor}
-     * @param parameterModel a {@link ParameterModel}
+     * @param componentRootElement the {@link ElementDescriptor} of the component that contains the {@code parameter}
+     * @param parameterModel       a {@link ParameterModel}
      * @return a {@link ValueResolver}
      */
-    ValueResolver parseParameter(ElementDescriptor element, ParameterModel parameterModel)
+    ValueResolver parseParameter(ElementDescriptor componentRootElement, ParameterModel parameterModel)
     {
         if (parameterModel.getExpressionSupport() == ExpressionSupport.LITERAL)
         {
-            return new StaticValueResolver<>(getAttributeValue(element, parameterModel.getName(), parameterModel.getDefaultValue()));
+            return new StaticValueResolver<>(getAttributeValue(componentRootElement, parameterModel.getName(), parameterModel.getDefaultValue()));
         }
 
-        if (!subTypesMapping.getSubTypes(parameterModel.getType()).isEmpty())
+        ElementDescriptor paramChildElement = componentRootElement.getChildByName(hyphenize(parameterModel.getName()));
+        if (paramChildElement != null)
         {
-            List<MetadataType> subtypes = subTypesMapping.getSubTypes(parameterModel.getType());
-            Optional<MetadataType> subTypeChildElement = subtypes.stream()
-                    .filter(s -> element.getChildByName(hyphenize(IntrospectionUtils.getAliasName(s))) != null)
+            if (importedTypes.get(parameterModel.getType()) != null)
+            {
+                return parseElement(paramChildElement, parameterModel.getName(),
+                                    hyphenize(getAliasName(parameterModel.getType())),
+                                    parameterModel.getType(),
+                                    parameterModel.getDefaultValue());
+            }
+
+            Optional<MetadataType> childElementType = subTypesMapping.getSubTypes(parameterModel.getType()).stream()
+                    .filter(s -> paramChildElement.getChildByName(hyphenize(getAliasName(s))) != null)
                     .findFirst();
 
-            if (subTypeChildElement.isPresent())
+            if (childElementType.isPresent())
             {
-                return parseElement(element, parameterModel.getName(),
-                                    hyphenize(IntrospectionUtils.getAliasName(subTypeChildElement.get())),
-                                    subTypeChildElement.get(),
+                return parseElement(paramChildElement, parameterModel.getName(),
+                                    hyphenize(getAliasName(childElementType.get())),
+                                    childElementType.get(),
                                     parameterModel.getDefaultValue());
             }
         }
 
-        return parseElement(element, parameterModel.getName(), hyphenize(parameterModel.getName()),
+        return parseElement(componentRootElement, parameterModel.getName(), hyphenize(parameterModel.getName()),
                             parameterModel.getType(), parameterModel.getDefaultValue());
     }
 
@@ -298,7 +307,7 @@ final class XmlExtensionParserDelegate
      */
     ResolverSet getResolverSet(ElementDescriptor element, List<ParameterModel> parameterModels) throws ConfigurationException
     {
-        return getResolverSet(element, parameterModels, ImmutableMap.<String, List<MessageProcessor>>of());
+        return getResolverSet(element, parameterModels, ImmutableMap.of());
     }
 
     /**
@@ -815,4 +824,10 @@ final class XmlExtensionParserDelegate
     {
         this.subTypesMapping = subTypesMapping;
     }
+
+    void setImportedTypes(Map<MetadataType, MetadataType> importedTypes)
+    {
+        this.importedTypes = importedTypes;
+    }
+
 }

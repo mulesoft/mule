@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.vegan.extension.VeganCookBook;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.subtypes.extension.CarDoor;
@@ -94,6 +95,9 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
 
         assertThat(payload.getDoorInterface(), instanceOf(CarDoor.class));
         assertThat(payload.getFinalPojo(), instanceOf(FinalPojo.class));
+
+        assertThat(payload.getRicin(), instanceOf(Ricin.class));
+        assertThat(payload.getTriangleAlias(), instanceOf(Triangle.class));
     }
 
 
@@ -137,7 +141,7 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
         assertThat(responseEvent.getMessage().getPayload(), notNullValue());
 
         List<Object> payload = (List<Object>) responseEvent.getMessage().getPayload();
-        assertThat(payload, hasSize(4));
+        assertThat(payload, hasSize(6));
 
         assertThat(payload.get(0), instanceOf(Square.class));
         assertThat(((Square) payload.get(0)).getSide(), is(3));
@@ -150,5 +154,14 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
         assertThat(((FinalPojo) payload.get(2)).getSomeString(), is("globalString"));
 
         assertThat(payload.get(3), instanceOf(VeganCookBook.class));
+
+        assertThat(payload.get(4), instanceOf(Square.class));
+        assertThat(((Square) payload.get(4)).getSide(), is(3));
+        assertThat(((Square) payload.get(4)).getArea(), is(9));
+
+        assertThat(payload.get(5), instanceOf(Triangle.class));
+        assertThat(((Triangle) payload.get(5)).getHeight(), is(6));
+        assertThat(((Triangle) payload.get(5)).getArea(), is(3));
+
     }
 }

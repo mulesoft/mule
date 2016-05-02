@@ -17,9 +17,13 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_NAMESPACE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
-import static org.mule.runtime.module.extension.internal.xml.XmlModelUtils.createXmlModelProperty;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isRequired;
+import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
+import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
@@ -30,8 +34,10 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MUL
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_SCHEMA_LOCATION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
@@ -41,14 +47,7 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SPR
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TLS_CONTEXT_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XML_NAMESPACE;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isRequired;
-import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
-import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
-import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
+import static org.mule.runtime.module.extension.internal.xml.XmlModelUtils.createXmlModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -76,6 +75,7 @@ import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
+import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
@@ -96,7 +96,6 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.No
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Restriction;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
-import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaTypeConversion;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
@@ -108,6 +107,7 @@ import org.mule.runtime.module.extension.internal.model.property.InfrastructureP
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.NameUtils;
+import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -909,7 +909,7 @@ public final class SchemaBuilder
                         List<MetadataType> subTypes = subTypesMapping.getSubTypes(parameterModel.getType());
                         if (!subTypes.isEmpty())
                         {
-                            registerPojoSubtypes(subTypes, all);
+                            registerPojoSubtypes(parameterModel, subTypes, all);
                         }
                     }
                 }
@@ -957,32 +957,52 @@ public final class SchemaBuilder
 
     private void addImportedTypeRef(Class<?> extensionType, ParameterModel parameterModel, ExplicitGroup all)
     {
+        TopLevelElement objectElement = createTopLevelElement(hyphenize(parameterModel.getName()), ZERO, "1");
+        objectElement.setComplexType(new LocalComplexType());
+        objectElement.setAnnotation(createDocAnnotation(parameterModel.getDescription()));
+
+        ExplicitGroup sequence = new ExplicitGroup();
+        sequence.setMinOccurs(ONE);
+        sequence.setMaxOccurs("1");
+
         XmlModelProperty xml = createXmlModelProperty(getAnnotation(extensionType, Xml.class),
                                                       getAnnotation(extensionType, Extension.class).name(), "");
 
         Import schemaImport = new Import();
         schemaImport.setNamespace(xml.getNamespaceUri());
         schemaImport.setSchemaLocation(xml.getSchemaLocation());
-
         schema.getIncludeOrImportOrRedefine().add(schemaImport);
 
         QName qName = new QName(xml.getNamespaceUri(), hyphenize(getAliasName(parameterModel.getType())), xml.getNamespace());
-        all.getParticle().add(objectFactory.createElement(createRefElement(qName, false)));
+        sequence.getParticle().add(objectFactory.createElement(createRefElement(qName, false)));
+
+        objectElement.getComplexType().setSequence(sequence);
+
+        all.getParticle().add(objectFactory.createElement(objectElement));
     }
 
-    private void registerPojoSubtypes(List<MetadataType> subTypes, ExplicitGroup all)
+    private void registerPojoSubtypes(ParameterModel parameterModel, List<MetadataType> subTypes, ExplicitGroup all)
     {
+
+
+        TopLevelElement objectElement = createTopLevelElement(hyphenize(parameterModel.getName()), ZERO, "1");
+        objectElement.setComplexType(new LocalComplexType());
+        objectElement.setAnnotation(createDocAnnotation(parameterModel.getDescription()));
+
         ExplicitGroup choice = new ExplicitGroup();
-        choice.setMinOccurs(ZERO);
+        choice.setMinOccurs(ONE);
         choice.setMaxOccurs("1");
 
         subTypes.forEach(subtype -> {
             registerPojoType((ObjectType) subtype, EMPTY);
-            TopLevelElement refElement = createRefElement(new QName(schema.getTargetNamespace(), hyphenize(getAliasName(subtype))), false);
+            String typeName = getAliasName(subtype);
+            TopLevelElement refElement = createRefElement(new QName(schema.getTargetNamespace(), hyphenize(typeName)), false);
             choice.getParticle().add(objectFactory.createElement(refElement));
         });
 
-        all.getParticle().add(objectFactory.createChoice(choice));
+        objectElement.getComplexType().setChoice(choice);
+
+        all.getParticle().add(objectFactory.createElement(objectElement));
     }
 
     private boolean isOperation(MetadataType type)
