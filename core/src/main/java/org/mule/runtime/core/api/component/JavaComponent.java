@@ -12,51 +12,34 @@ import org.mule.runtime.core.component.PooledJavaComponent;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 
-import java.util.List;
-
 /**
- * <code>JavaComponent</code> is a Java {@link Component} implementation used to
- * invoke Java component implementations. A <code>JavaComponent</code> uses an
- * {@link ObjectFactory} to specify the object instance's source and allows for
- * singleton and prototype implementations to be used along with other custom
- * {@link ObjectFactory} that allow component instances to be obtained from
- * containers such as Spring. A <code>JavaComponent</code> uses a customizable
- * {@link EntryPointResolverSet} in order to resolve which method should be used for
- * invocation and allows java bindings to be configure. Java Component bindings, if
- * implemented by the JavaComponent implementation, uses a component instance proxy
- * to implement interface methods using calls to outbound endpoints.
+ * <code>JavaComponent</code> is a Java {@link Component} implementation used to invoke Java component implementations.
+ * A <code>JavaComponent</code> uses an {@link ObjectFactory} to specify the object instance's source and allows for
+ * singleton and prototype implementations to be used along with other custom {@link ObjectFactory} that allow component
+ * instances to be obtained from containers such as Spring.
  */
 public interface JavaComponent extends Component
 {
 
     /**
-     * A {@link JavaComponent} can have a custom entry-point resolver for its own
-     * object. By default this is null. When set this resolver will override the
-     * resolver on the model
+     * A {@link JavaComponent} can have a custom entry-point resolver for its own object. By default this is null. When
+     * set this resolver will override the resolver on the model
      * 
-     * @return Null is a resolver set has not been set otherwise the resolver to use
-     *         on this service
+     * @return Null is a resolver set has not been set otherwise the resolver to use on this service
      */
     EntryPointResolverSet getEntryPointResolverSet();
 
     /**
-     * A {@link JavaComponent} can have a custom entry-point resolver for its own
-     * object. By default this is null. When set this resolver will override the
-     * resolver on the model
+     * A {@link JavaComponent} can have a custom entry-point resolver for its own object. By default this is null. When
+     * set this resolver will override the resolver on the model
      */
     void setEntryPointResolverSet(EntryPointResolverSet entryPointResolverSet);
 
-    List<InterfaceBinding> getInterfaceBindings();
-
-    void setInterfaceBindings(List<InterfaceBinding> bindgins);
-
     /**
-     * The object factory used to obtain the component object instance. Mule core
-     * provides two implementations: {@link SingletonObjectFactory} and
-     * {@link PrototypeObjectFactory}.<br/> The spring-config module provides an
-     * {@link ObjectFactory} implementation that delegates to spring. There is no
-     * PooledObjectFactory, the {@link PooledJavaComponent} should be used for
-     * pooling.
+     * The object factory used to obtain the component object instance. Mule core provides two implementations:
+     * {@link SingletonObjectFactory} and {@link PrototypeObjectFactory}.<br/>
+     * The spring-config module provides an {@link ObjectFactory} implementation that delegates to spring. There is no
+     * PooledObjectFactory, the {@link PooledJavaComponent} should be used for pooling.
      * 
      * @param objectFactory
      */

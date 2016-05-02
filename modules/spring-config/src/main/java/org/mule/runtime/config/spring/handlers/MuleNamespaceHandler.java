@@ -94,7 +94,9 @@ import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.component.DefaultInterfaceBinding;
 import org.mule.runtime.core.component.DefaultJavaComponent;
+import org.mule.runtime.core.component.DefaultJavaWithBindingComponent;
 import org.mule.runtime.core.component.PooledJavaComponent;
+import org.mule.runtime.core.component.PooledJavaWithBindingsComponent;
 import org.mule.runtime.core.component.SimpleCallableJavaComponent;
 import org.mule.runtime.core.component.simple.EchoComponent;
 import org.mule.runtime.core.component.simple.LogComponent;
@@ -447,6 +449,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("component", new ComponentDelegatingDefinitionParser(DefaultJavaComponent.class));
         registerBeanDefinitionParser("pooled-component", new ComponentDelegatingDefinitionParser(PooledJavaComponent.class));
 
+        registerBeanDefinitionParser("component-with-bindings", new ComponentDelegatingDefinitionParser(DefaultJavaWithBindingComponent.class));
+        registerBeanDefinitionParser("pooled-component-with-bindings", new ComponentDelegatingDefinitionParser(PooledJavaWithBindingsComponent.class));
         registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("interfaceBinding", DefaultInterfaceBinding.class));
 
         // Simple Components

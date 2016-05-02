@@ -14,13 +14,14 @@ import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 
-public class TestComponentLifecycleAdapterFactory implements LifecycleAdapterFactory
+public class TestComponentLifecycleAdapterFactory implements LifecycleAdapterFactory<JavaComponent>
 {
     public TestComponentLifecycleAdapterFactory()
     {
         super();
     }
 
+    @Override
     public LifecycleAdapter create(Object pojoService,
                                    JavaComponent service,
                                    FlowConstruct flowConstruct,

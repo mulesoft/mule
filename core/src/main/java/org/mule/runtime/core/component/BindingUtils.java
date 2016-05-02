@@ -8,7 +8,7 @@ package org.mule.runtime.core.component;
 
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.InterfaceBinding;
-import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.component.JavaWithBindingsComponent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.model.resolvers.NoSatisfiableMethodsException;
@@ -24,7 +24,7 @@ import java.util.Map;
 public class BindingUtils
 {
 
-    public static void configureBinding(JavaComponent component, Object componentObject) throws MuleException
+    public static void configureBinding(JavaWithBindingsComponent component, Object componentObject) throws MuleException
     {
         // Initialise the nested router and bind the endpoints to the methods using a
         // Proxy

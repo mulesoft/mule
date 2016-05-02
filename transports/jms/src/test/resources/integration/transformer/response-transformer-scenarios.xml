@@ -73,7 +73,7 @@
     <flow name="NestedRouterOutboundEndpointResponseTransformer">
         <inbound-endpoint address="vm://nestedRouterOutboundEndpointResponseTransformer"
                           exchange-pattern="request-response"/>
-        <component>
+        <component-with-bindings>
             <singleton-object class="org.mule.runtime.transport.jms.integration.transformer.BindingInterfaceComponent"/>
             <binding interface="org.mule.runtime.transport.jms.integration.transformer.BindingInterface" method="hello1">
                 <outbound-endpoint address="vm://echo" exchange-pattern="request-response"
@@ -83,7 +83,7 @@
                 <outbound-endpoint address="jms://echo" exchange-pattern="request-response"
                                    responseTransformer-refs="customResponse"/>
             </binding>
-        </component>
+        </component-with-bindings>
     </flow>
 
     <flow name="VmEchoService">

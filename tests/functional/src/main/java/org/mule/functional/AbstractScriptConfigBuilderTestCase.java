@@ -15,6 +15,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.InterfaceBinding;
 import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.component.JavaWithBindingsComponent;
 import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
@@ -159,7 +160,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
         assertNotNull(flow.getMessageProcessors().get(0));
         assertTrue((flow.getMessageProcessors().get(0) instanceof JavaComponent));
-        List<InterfaceBinding> bindings= ((JavaComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings();
+        List<InterfaceBinding> bindings = ((JavaWithBindingsComponent) flow.getMessageProcessors().get(0)).getInterfaceBindings();
         assertNotNull(bindings);
 
         assertEquals(2, bindings.size());

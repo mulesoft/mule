@@ -140,7 +140,7 @@
                 </mule:inbound-endpoint>
             </mule:composite-source>
 
-            <mule:component>
+            <mule:component-with-bindings>
                 <mule:logging-interceptor/>
                 <mule:interceptor-stack ref="testInterceptorStack"/>
                 <mule:timer-interceptor/>
@@ -154,7 +154,7 @@
                 <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
                     <mule:outbound-endpoint address="test://do.polish" exchange-pattern="one-way"/>
                 </mule:binding>
-            </mule:component>
+            </mule:component-with-bindings>
 
             <mule:request-reply timeout="10001">
                 <mule:outbound-endpoint ref="appleInEndpoint" exchange-pattern="one-way">

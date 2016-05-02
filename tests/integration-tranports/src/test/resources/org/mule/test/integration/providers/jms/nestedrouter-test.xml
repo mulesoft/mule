@@ -18,12 +18,12 @@
 
     <flow name="InvokerComponent">
         <inbound-endpoint address="jms://invoker.in" exchange-pattern="one-way"/>
-        <component>
+        <component-with-bindings>
             <singleton-object class="org.mule.runtime.transport.jms.integration.routing.Invoker"/>
             <binding interface="org.mule.runtime.transport.jms.integration.routing.HelloInterface">
                 <outbound-endpoint address="jms://hello.in" exchange-pattern="request-response"/>
             </binding>
-        </component>
+        </component-with-bindings>
         <outbound-endpoint address="jms://invoker.out" exchange-pattern="one-way"/>
     </flow>
 

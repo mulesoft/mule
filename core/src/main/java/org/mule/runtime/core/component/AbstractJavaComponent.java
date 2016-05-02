@@ -8,7 +8,6 @@ package org.mule.runtime.core.component;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.component.InterfaceBinding;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.component.LifecycleAdapter;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
@@ -22,19 +21,15 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.runtime.core.model.resolvers.LegacyEntryPointResolverSet;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
- * Abstract implementation of JavaComponent adds JavaComponent specifics like
- * {@link EntryPointResolverSet} and {@link ObjectFactory}.
+ * Abstract implementation of JavaComponent adds JavaComponent specifics like {@link EntryPointResolverSet} and
+ * {@link ObjectFactory}.
  */
 public abstract class AbstractJavaComponent extends AbstractComponent implements JavaComponent
 {
     protected EntryPointResolverSet entryPointResolverSet;
-
-    protected List<InterfaceBinding> bindings = new ArrayList<InterfaceBinding>();
 
     protected ObjectFactory objectFactory;
 
@@ -50,20 +45,15 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
 
     public AbstractJavaComponent(ObjectFactory objectFactory)
     {
-        this(objectFactory, null, null);
+        this(objectFactory, null);
     }
 
     public AbstractJavaComponent(ObjectFactory objectFactory,
-                                 EntryPointResolverSet entryPointResolverSet,
-                                 List<InterfaceBinding> bindings)
+                                 EntryPointResolverSet entryPointResolverSet)
     {
         super();
-        this.objectFactory = objectFactory;
         this.entryPointResolverSet = entryPointResolverSet;
-        if (bindings != null)
-        {
-            this.bindings = bindings;
-        }
+        this.objectFactory = objectFactory;
     }
 
     @Override
@@ -89,6 +79,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         }
     }
 
+    @Override
     public Class<?> getObjectType()
     {
         return objectFactory.getObjectClass();
@@ -166,24 +157,16 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         }
     }
 
+    @Override
     public EntryPointResolverSet getEntryPointResolverSet()
     {
         return entryPointResolverSet;
     }
 
-    public List<InterfaceBinding> getInterfaceBindings()
-    {
-        return bindings;
-    }
-
+    @Override
     public void setEntryPointResolverSet(EntryPointResolverSet entryPointResolverSet)
     {
         this.entryPointResolverSet = entryPointResolverSet;
-    }
-
-    public void setInterfaceBindings(List<InterfaceBinding> bindings)
-    {
-        this.bindings = bindings;
     }
 
     /**
@@ -205,22 +188,26 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         }
     }
 
+    @Override
     public ObjectFactory getObjectFactory()
     {
         return objectFactory;
     }
 
+    @Override
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
         injectService();
     }
 
+    @Override
     public LifecycleAdapterFactory getLifecycleAdapterFactory()
     {
         return lifecycleAdapterFactory;
     }
 
+    @Override
     public void setLifecycleAdapterFactory(LifecycleAdapterFactory lifecycleAdapterFactory)
     {
         this.lifecycleAdapterFactory = lifecycleAdapterFactory;

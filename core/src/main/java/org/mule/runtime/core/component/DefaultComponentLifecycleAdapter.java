@@ -106,7 +106,6 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         // save a ref for later disposal call
         this.muleContext = muleContext;
         setLifecycleFlags();
-        BindingUtils.configureBinding(component, componentObject);
     }
 
     public DefaultComponentLifecycleAdapter(Object componentObject,
