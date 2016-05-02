@@ -209,12 +209,12 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
         finally
         {
-            connector.closeQuietly(producer);
-        if (!delayedCleanup)
-        {
-            closeSession(session);
+            if (!delayedCleanup)
+            {
+                connector.closeQuietly(producer);
+                closeSession(session);
+            }
         }
-    }
     }
 
     private MuleMessage internalSend(MessageProducer producer, Message jmsMessage, boolean topic, long ttl, int priority, boolean persistent) throws Exception
@@ -284,8 +284,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
                 finally
                 {
-                    closeConsumer(session, consumer, replyTo);
-                    closeSession(session);
+                    cleanup(producer, session, consumer, replyTo);
                 }
             }
         };
@@ -305,8 +304,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
                 finally
                 {
-                    closeConsumer(session, consumer, replyTo);
-                    closeSession(session);
+                    cleanup(producer, session, consumer, replyTo);
                 }
             }
 
@@ -319,8 +317,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
                 finally
                 {
-                    closeConsumer(session, consumer, replyTo);
-                    closeSession(session);
+                    cleanup(producer, session, consumer, replyTo);
                 }
             }
 
@@ -329,6 +326,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         connector.scheduleTimeoutTask(closeConsumerTask, endpoint.getResponseTimeout());
     }
                                                                                  
+    private void cleanup(MessageProducer producer, Session session, MessageConsumer consumer, Destination replyTo)
+    {
+        closeProducer(producer);
+        closeConsumer(session, consumer, replyTo);
+        closeSession(session);
+    }
+
     private MessageProducer createProducer(Session session, boolean topic) throws JMSException
     {
         final Destination dest = connector.getJmsSupport().createDestination(session, endpoint);
@@ -373,6 +377,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 connector.closeQuietly((TemporaryTopic) replyTo);
             }
         }
+    }
+
+    private void closeProducer(MessageProducer producer)
+    {
+        connector.closeQuietly(producer);
     }
 
     private void closeSession(Session session)
