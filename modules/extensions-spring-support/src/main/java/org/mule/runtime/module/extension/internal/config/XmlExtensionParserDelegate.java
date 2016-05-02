@@ -173,15 +173,17 @@ final class XmlExtensionParserDelegate
                                     parameterModel.getDefaultValue());
             }
 
-            Optional<MetadataType> childElementType = subTypesMapping.getSubTypes(parameterModel.getType()).stream()
-                    .filter(s -> paramChildElement.getChildByName(hyphenize(getAliasName(s))) != null)
-                    .findFirst();
-
-            if (childElementType.isPresent())
+            if (!subTypesMapping.getSubTypes(parameterModel.getType()).isEmpty())
             {
+                Optional<MetadataType> childTypeFromSubtype = subTypesMapping.getSubTypes(parameterModel.getType()).stream()
+                        .filter(s -> paramChildElement.getChildByName(hyphenize(getAliasName(s))) != null)
+                        .findFirst();
+
+                MetadataType childType = childTypeFromSubtype.isPresent() ? childTypeFromSubtype.get() : parameterModel.getType();
+
                 return parseElement(paramChildElement, parameterModel.getName(),
-                                    hyphenize(getAliasName(childElementType.get())),
-                                    childElementType.get(),
+                                    hyphenize(getAliasName(childType)),
+                                    childType,
                                     parameterModel.getDefaultValue());
             }
         }

@@ -109,6 +109,7 @@ import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.NameUtils;
 import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.math.BigInteger;
@@ -899,15 +900,18 @@ public final class SchemaBuilder
                     List<MetadataType> subTypes = subTypesMapping.getSubTypes(parameterModel.getType());
                     if (!subTypes.isEmpty())
                     {
-                        registerPojoSubtypes(parameterModel, subTypes, all);
+                        registerPojoSubtypes(parameterModel, clazz, subTypes, all);
                     }
-                    else if (shouldGeneratePojoChildElements(clazz))
+                    else
                     {
-                        registerComplexTypeChildElement(all,
-                                                        parameterModel.getName(),
-                                                        parameterModel.getDescription(),
-                                                        objectType,
-                                                        false);
+                        if (shouldGeneratePojoChildElements(clazz))
+                        {
+                            registerComplexTypeChildElement(all,
+                                                            parameterModel.getName(),
+                                                            parameterModel.getDescription(),
+                                                            objectType,
+                                                            false);
+                        }
                     }
                 }
                 else
@@ -978,10 +982,8 @@ public final class SchemaBuilder
         all.getParticle().add(objectFactory.createElement(objectElement));
     }
 
-    private void registerPojoSubtypes(ParameterModel parameterModel, List<MetadataType> subTypes, ExplicitGroup all)
+    private void registerPojoSubtypes(ParameterModel parameterModel, Class<?> parameterClass, List<MetadataType> subTypes, ExplicitGroup all)
     {
-
-
         TopLevelElement objectElement = createTopLevelElement(hyphenize(parameterModel.getName()), ZERO, "1");
         objectElement.setComplexType(new LocalComplexType());
         objectElement.setAnnotation(createDocAnnotation(parameterModel.getDescription()));
@@ -990,15 +992,19 @@ public final class SchemaBuilder
         choice.setMinOccurs(ONE);
         choice.setMaxOccurs("1");
 
+
+        if (shouldGeneratePojoChildElements(parameterClass))
+        {
+            subTypes = ImmutableList.<MetadataType>builder().addAll(subTypes).add(parameterModel.getType()).build();
+        }
+
         subTypes.forEach(subtype -> {
             registerPojoType((ObjectType) subtype, EMPTY);
-            String typeName = getAliasName(subtype);
-            TopLevelElement refElement = createRefElement(new QName(schema.getTargetNamespace(), hyphenize(typeName)), false);
+            TopLevelElement refElement = createRefElement(new QName(schema.getTargetNamespace(), hyphenize(getAliasName(subtype))), false);
             choice.getParticle().add(objectFactory.createElement(refElement));
         });
 
         objectElement.getComplexType().setChoice(choice);
-
         all.getParticle().add(objectFactory.createElement(objectElement));
     }
 

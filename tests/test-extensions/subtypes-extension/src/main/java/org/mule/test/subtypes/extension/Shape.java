@@ -6,9 +6,8 @@
  */
 package org.mule.test.subtypes.extension;
 
-public abstract class Shape
+public class Shape
 {
-
     private Integer area;
 
     public Integer getArea()

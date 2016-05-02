@@ -62,14 +62,14 @@
     <flow name="subtypedAndConcreteParameters">
         <subtypes:subtyped-and-concrete-parameters>
             <subtypes:shape>
-                <subtypes:triangle-alias height="4" area="2"/>
+                <subtypes:shape area="2"/>
             </subtypes:shape>
             <subtypes:door>
                 <subtypes:house-door locked="false"/>
             </subtypes:door>
             <subtypes:final-pojo-param someString="asChild"/>
             <subtypes:cook-book>
-                <vegan:vegan-cook-book/>
+                <vegan:vegan-cook-book numberOfPages="1"/>
             </subtypes:cook-book>
             <subtypes:square>
                 <subtypes:square side="4" area="16"/>
@@ -82,16 +82,16 @@
 
     <subtypes:car-door name="global-car-door" color="white"/>
     <subtypes:house-door name="global-house-door" locked="true"/>
+    <subtypes:shape name="global-shape" area="9"/>
     <subtypes:square name="global-square" side="3" area="9"/>
     <subtypes:triangle-alias name="global-triangle" height="6" area="3"/>
     <subtypes:final-pojo name="global-final-pojo" someString="globalString"/>
-
     <vegan:vegan-cook-book name="global-cookbook" numberOfPages="10"/>
 
     <flow name="subtypedAndConcreteParametersAsAttributes">
         <subtypes:subtyped-and-concrete-parameters
                 door="global-car-door"
-                shape="global-square"
+                shape="global-shape"
                 square="global-square"
                 triangleAlias="global-triangle"
                 finalPojoParam="global-final-pojo"
