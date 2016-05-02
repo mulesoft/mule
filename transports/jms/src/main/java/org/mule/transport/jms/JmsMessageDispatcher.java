@@ -206,9 +206,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
         finally
         {
-            connector.closeQuietly(producer);
             if (!delayedCleanup)
             {
+                connector.closeQuietly(producer);
                 closeSession(session);
             }
         }
@@ -273,8 +273,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
                 finally
                 {
-                    closeConsumer(session, consumer, replyTo);
-                    closeSession(session);
+                    cleanup(producer, session, consumer, replyTo);
                 }
             }
         };
@@ -295,8 +294,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
                 finally
                 {
-                    closeConsumer(session, consumer, replyTo);
-                    closeSession(session);
+                    cleanup(producer, session, consumer, replyTo);
                 }
             }
 
@@ -309,13 +307,19 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
                 finally
                 {
-                    closeConsumer(session, consumer, replyTo);
-                    closeSession(session);
+                    cleanup(producer, session, consumer, replyTo);
                 }
             }
         }));
         connector.getJmsSupport().send(producer, jmsMessage, persistent, priority, ttl, topic, endpoint);
         connector.scheduleTimeoutTask(closeConsumerTask, endpoint.getResponseTimeout());
+    }
+
+    private void cleanup(MessageProducer producer, Session session, MessageConsumer consumer, Destination replyTo)
+    {
+        closeProducer(producer);
+        closeConsumer(session, consumer, replyTo);
+        closeSession(session);
     }
 
     private MessageProducer createProducer(Session session, boolean topic) throws JMSException
@@ -362,6 +366,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 connector.closeQuietly((TemporaryTopic) replyTo);
             }
         }
+    }
+
+    private void closeProducer(MessageProducer producer)
+    {
+        connector.closeQuietly(producer);
     }
 
     private void closeSession(Session session)
