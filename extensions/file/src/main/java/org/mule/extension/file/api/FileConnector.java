@@ -8,15 +8,17 @@ package org.mule.extension.file.api;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.extension.file.internal.LocalFilePredicateBuilder;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.extension.file.internal.FileListOperation;
 import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
+import org.mule.runtime.module.extension.file.api.FilePredicateBuilder;
 import org.mule.runtime.module.extension.file.api.StandardFileSystemOperations;
 
 import java.nio.file.Files;
@@ -33,7 +35,8 @@ import java.nio.file.Paths;
  * @since 4.0
  */
 @Extension(name = "File Connector", description = "Connector to manipulate files on a locally mounted file system")
-@Operations({StandardFileSystemOperations.class, FileListOperation.class})
+@Operations({StandardFileSystemOperations.class})
+@SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = LocalFilePredicateBuilder.class)
 @Providers(LocalFileConnectionProvider.class)
 public class FileConnector implements Initialisable, FileConnectorConfig
 {

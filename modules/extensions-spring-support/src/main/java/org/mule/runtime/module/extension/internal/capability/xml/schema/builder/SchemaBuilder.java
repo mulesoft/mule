@@ -896,21 +896,18 @@ public final class SchemaBuilder
 
                 if (ExpressionSupport.REQUIRED != parameterModel.getExpressionSupport())
                 {
-                    if (shouldGeneratePojoChildElements(clazz))
+                    List<MetadataType> subTypes = subTypesMapping.getSubTypes(parameterModel.getType());
+                    if (!subTypes.isEmpty())
+                    {
+                        registerPojoSubtypes(parameterModel, subTypes, all);
+                    }
+                    else if (shouldGeneratePojoChildElements(clazz))
                     {
                         registerComplexTypeChildElement(all,
                                                         parameterModel.getName(),
                                                         parameterModel.getDescription(),
                                                         objectType,
                                                         false);
-                    }
-                    else
-                    {
-                        List<MetadataType> subTypes = subTypesMapping.getSubTypes(parameterModel.getType());
-                        if (!subTypes.isEmpty())
-                        {
-                            registerPojoSubtypes(parameterModel, subTypes, all);
-                        }
                     }
                 }
                 else
