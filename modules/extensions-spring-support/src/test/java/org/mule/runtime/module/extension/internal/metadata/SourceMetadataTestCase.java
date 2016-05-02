@@ -6,15 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-
+import static org.mule.test.metadata.extension.MetadataConnection.CAR;
+import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
+import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.SourceId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.core.construct.Flow;
 
 import com.google.common.reflect.TypeToken;
 
@@ -43,7 +47,13 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase
         assertThat(metadataKeysResult.isSuccess(), is(true));
         final List<MetadataKey> metadataKeys = metadataKeysResult.get();
         assertThat(metadataKeys.size(), is(3));
-        assertThat(metadataKeys, contains(METADATA_KEYS.toArray()));
+        assertThat(metadataKeys.stream().map(MetadataKey::getId).collect(toList()), hasItems(PERSON, CAR, HOUSE));
+    }
+
+    @Test
+    public void injectComposedMetadataKeyIdInstanceInSource() throws Exception
+    {
+        ((Flow) getFlowConstruct(SOURCE_METADATA_WITH_MULTILEVEL)).start();
     }
 
     @Test

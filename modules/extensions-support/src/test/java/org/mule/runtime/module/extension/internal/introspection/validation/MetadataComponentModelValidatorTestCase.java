@@ -13,7 +13,6 @@ import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtil
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
-import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
@@ -51,14 +50,13 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
     private MetadataComponentModelValidator validator = new MetadataComponentModelValidator();
 
-    public static class SimpleOutputResolver implements MetadataOutputResolver
+    public static class SimpleOutputResolver implements MetadataOutputResolver<String>
     {
         @Override
-        public MetadataType getOutputMetadata(MetadataContext context, MetadataKey key) throws MetadataResolvingException, ConnectionException
+        public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
         {
             return null;
         }
-
     }
 
     @Before

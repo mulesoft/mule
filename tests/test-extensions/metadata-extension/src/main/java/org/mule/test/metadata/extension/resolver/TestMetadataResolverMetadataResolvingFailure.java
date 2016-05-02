@@ -17,7 +17,7 @@ import org.mule.metadata.api.model.MetadataType;
 
 import java.util.List;
 
-public class TestMetadataResolverMetadataResolvingFailure implements MetadataKeysResolver, MetadataContentResolver, MetadataOutputResolver
+public class TestMetadataResolverMetadataResolvingFailure implements MetadataKeysResolver, MetadataContentResolver<String>, MetadataOutputResolver<String>
 {
 
     public List<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException
@@ -25,12 +25,12 @@ public class TestMetadataResolverMetadataResolvingFailure implements MetadataKey
         throw new MetadataResolvingException("Failing keysResolver retriever", FailureCode.CONNECTION_FAILURE);
     }
 
-    public MetadataType getContentMetadata(MetadataContext context, MetadataKey key) throws MetadataResolvingException
+    public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException
     {
         throw new MetadataResolvingException("Failing keysResolver retriever", FailureCode.CONNECTION_FAILURE);
     }
 
-    public MetadataType getOutputMetadata(MetadataContext context, MetadataKey key) throws MetadataResolvingException
+    public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException
     {
         throw new MetadataResolvingException("Failing keysResolver retriever", FailureCode.CONNECTION_FAILURE);
     }

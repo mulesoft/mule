@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * An implementation of {@link ValueSetter} for parameter groups.
@@ -50,11 +51,11 @@ public final class GroupValueSetter implements ValueSetter
      */
     public static List<ValueSetter> settersFor(EnrichableModel model)
     {
-        ParameterGroupModelProperty parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class).orElse(null);
+        Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
 
-        if (parameterGroupModelProperty != null)
+        if (parameterGroupModelProperty.isPresent())
         {
-            return parameterGroupModelProperty.getGroups().stream()
+            return parameterGroupModelProperty.get().getGroups().stream()
                     .map(group -> new GroupValueSetter(group))
                     .collect(new ImmutableListCollector<>());
         }

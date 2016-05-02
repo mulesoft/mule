@@ -92,7 +92,7 @@ final class OperationBeanDefinitionParser extends BaseExtensionBeanDefinitionPar
                 {
                     if (isOperation(objectType))
                     {
-                        nestedOperations.put(parameterModel.getName(), parseNestedProcessor(element, parameterModel, parserContext));
+                        addNestedOperation();
                     }
                 }
 
@@ -101,8 +101,13 @@ final class OperationBeanDefinitionParser extends BaseExtensionBeanDefinitionPar
                 {
                     if (isOperation(arrayType.getType()))
                     {
-                        nestedOperations.put(parameterModel.getName(), parseNestedProcessor(element, parameterModel, parserContext));
+                        addNestedOperation();
                     }
+                }
+
+                private void addNestedOperation()
+                {
+                    nestedOperations.put(parameterModel.getName(), parseNestedProcessor(element, parameterModel, parserContext));
                 }
 
                 private boolean isOperation(MetadataType metadataType)

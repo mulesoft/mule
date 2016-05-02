@@ -7,7 +7,7 @@
 package org.mule.test.metadata.extension;
 
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyParam;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
@@ -21,7 +21,7 @@ import java.util.Map;
 public class MetadataSource extends Source<Map<String, Object>, String>
 {
 
-    @MetadataKeyParam
+    @MetadataKeyId
     @Parameter
     public String type;
 

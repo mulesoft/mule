@@ -7,7 +7,7 @@
 package org.mule.test.metadata.extension;
 
 import org.mule.runtime.extension.api.annotation.metadata.Content;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyParam;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.test.metadata.extension.resolver.TestContentResolverWithoutKeyResolver;
@@ -21,14 +21,14 @@ public class MetadataFailureOperations extends MetadataOperationsParent
     @MetadataScope( keysResolver = TestMetadataResolverMetadataResolvingFailure.class,
                     contentResolver = TestMetadataResolverMetadataResolvingFailure.class,
                     outputResolver = TestMetadataResolverMetadataResolvingFailure.class)
-    public Object failWithResolvingException(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
+    public Object failWithResolvingException(@Connection MetadataConnection connection, @MetadataKeyId String type, @Content Object content)
     {
         return null;
     }
 
     // With keysResolver resolver and without KeyParam
     @MetadataScope(contentResolver = TestContentResolverWithoutKeyResolver.class)
-    public void keyParamWithoutKeyResolver(@Connection MetadataConnection connection, @MetadataKeyParam String type)
+    public void keyIdWithoutKeyResolver(@Connection MetadataConnection connection, @MetadataKeyId String type)
     {
     }
 
@@ -37,7 +37,7 @@ public class MetadataFailureOperations extends MetadataOperationsParent
     @MetadataScope( keysResolver = TestMetadataResolverRuntimeExceptionFailure.class,
                     contentResolver = TestMetadataResolverRuntimeExceptionFailure.class,
                     outputResolver = TestMetadataResolverRuntimeExceptionFailure.class)
-    public Object failWithRuntimeException(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
+    public Object failWithRuntimeException(@Connection MetadataConnection connection, @MetadataKeyId String type, @Content Object content)
     {
         return null;
     }

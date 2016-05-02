@@ -8,12 +8,12 @@ package org.mule.runtime.core.internal.metadata;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
-import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 
 
 /**
@@ -28,7 +28,6 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
     private final MetadataOutputResolver metadataOutputResolver;
     private final MetadataContentResolver metadataContentResolver;
     private final MetadataKeysResolver metadataKeysResolver;
-
 
     public DefaultMetadataResolverFactory(Class<? extends MetadataKeysResolver> keyResolver,
                                           Class<? extends MetadataContentResolver> contentResolver,
@@ -56,7 +55,7 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
      * {@inheritDoc}
      */
     @Override
-    public MetadataContentResolver getContentResolver()
+    public <T> MetadataContentResolver<T> getContentResolver()
     {
         return metadataContentResolver;
     }
@@ -65,7 +64,7 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
      * {@inheritDoc}
      */
     @Override
-    public MetadataOutputResolver getOutputResolver()
+    public <T> MetadataOutputResolver<T> getOutputResolver()
     {
         return metadataOutputResolver;
     }

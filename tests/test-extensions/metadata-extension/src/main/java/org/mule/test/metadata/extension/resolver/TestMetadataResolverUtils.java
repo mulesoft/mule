@@ -39,11 +39,11 @@ public class TestMetadataResolverUtils
                 .collect(Collectors.toList());
     }
 
-    public static MetadataType getMetadata(MetadataKey key)
+    public static MetadataType getMetadata(String key)
     {
-        final ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(new MetadataFormat(key.getId(), key.getId(), APPLICATION_JAVA_MIME_TYPE)).objectType();
+        final ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(new MetadataFormat(key, key, APPLICATION_JAVA_MIME_TYPE)).objectType();
 
-        switch (key.getId())
+        switch (key)
         {
             case MetadataConnection.CAR:
                 objectBuilder.addField().key(TIRES).value().numberType();
