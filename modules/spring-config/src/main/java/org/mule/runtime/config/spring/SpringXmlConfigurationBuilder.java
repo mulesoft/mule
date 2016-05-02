@@ -15,6 +15,7 @@ import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +33,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 {
 
     public static final String MULE_DEFAULTS_CONFIG = "default-mule-config.xml";
+    public static final String MULE_DEFAULTS_ENDPOINT_CONFIG = "default-endpoint-mule-config.xml";
     public static final String MULE_SPRING_CONFIG = "mule-spring-config.xml";
     public static final String MULE_MINIMAL_CONFIG = "minimal-mule-config.xml";
     public static final String MULE_MINIMAL_SPRING_CONFIG = "minimal-mule-config-beans.xml";
@@ -82,7 +84,15 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
             allResources.add(new ConfigResource(MULE_MINIMAL_SPRING_CONFIG));
             allResources.add(new ConfigResource(MULE_MINIMAL_CONFIG));
             allResources.add(new ConfigResource(MULE_SPRING_CONFIG));
-            allResources.add( new ConfigResource(MULE_DEFAULTS_CONFIG));
+            allResources.add(new ConfigResource(MULE_DEFAULTS_CONFIG));
+            try
+            {
+                allResources.add(new ConfigResource(MULE_DEFAULTS_ENDPOINT_CONFIG));
+            }
+            catch (FileNotFoundException e)
+            {
+                logger.debug("Transports bundle not present.");
+            }
             allResources.addAll(Arrays.asList(configResources));
         }
         else

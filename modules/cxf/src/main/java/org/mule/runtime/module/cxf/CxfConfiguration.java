@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.cxf;
 
+import org.mule.runtime.config.spring.SpringRegistry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.spring.SpringRegistry;
 import org.mule.runtime.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.runtime.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.runtime.module.cxf.support.MuleProtocolHeadersOutInterceptor;
@@ -27,8 +27,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
+import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.springframework.context.ApplicationContext;
@@ -52,6 +52,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
     private MuleContext muleContext;
     private boolean enableMuleSoapHeaders = true;
 
+    @Override
     public void initialise() throws InitialisationException
     {
         BusFactory.setDefaultBus(null);
@@ -72,7 +73,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
             BusFactory.setDefaultBus(null);
         }
 
-        MuleUniversalTransport transport = new MuleUniversalTransport(this);
+        MuleUniversalTransport transport = new MuleUniversalTransport(this, muleContext.getRegistry().lookupObject("_muleUniversalConduitFacotry"));
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", transport);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", transport);
@@ -119,6 +120,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         }
     }
 
+    @Override
     public void dispose()
     {
         bus.shutdown(true);
@@ -170,6 +172,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         this.initializeStaticBusInstance = initializeStaticBusInstance;
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;

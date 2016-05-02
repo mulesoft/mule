@@ -57,7 +57,9 @@ public class MuleUniversalTransport extends AbstractTransportFactory
 
     private CxfConfiguration connector;
 
-    public MuleUniversalTransport(CxfConfiguration connector)
+    private MuleUniversalConduitFactory muleUniversalConduitFactory;
+
+    public MuleUniversalTransport(CxfConfiguration connector, MuleUniversalConduitFactory muleUniversalConduitFactory)
     {
         super();
 
@@ -66,6 +68,7 @@ public class MuleUniversalTransport extends AbstractTransportFactory
         setTransportIds(tids);
 
         this.connector = connector;
+        this.muleUniversalConduitFactory = muleUniversalConduitFactory == null ? new DefaultMuleUniversalConduitFactory() : muleUniversalConduitFactory;
     }
 
     @Override
@@ -103,13 +106,13 @@ public class MuleUniversalTransport extends AbstractTransportFactory
     @Override
     public Conduit getConduit(EndpointInfo ei) throws IOException
     {
-        return new MuleUniversalConduit(this, connector, ei, null);
+        return muleUniversalConduitFactory.create(this, connector, ei, null);
     }
 
     @Override
     public Conduit getConduit(EndpointInfo ei, EndpointReferenceType target) throws IOException
     {
-        return new MuleUniversalConduit(this, connector, ei, target);
+        return muleUniversalConduitFactory.create(this, connector, ei, target);
     }
 
     EndpointReferenceType createReference(EndpointInfo ei)
@@ -244,6 +247,18 @@ public class MuleUniversalTransport extends AbstractTransportFactory
         public void setLocationURI(String locationURI)
         {
             setLocation(locationURI);
+        }
+
+    }
+
+    private static class DefaultMuleUniversalConduitFactory implements MuleUniversalConduitFactory
+    {
+
+        @Override
+        public MuleUniversalConduit create(MuleUniversalTransport transport, CxfConfiguration configuration, EndpointInfo ei,
+                                           EndpointReferenceType t)
+        {
+            return new MuleUniversalConduit(transport, configuration, ei, t);
         }
 
     }

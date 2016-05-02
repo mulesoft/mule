@@ -40,7 +40,7 @@ public class VMTransaction extends AbstractSingleResourceTransaction
         if (!(key instanceof QueueManager) || !(resource instanceof QueueSession))
         {
             throw new IllegalTransactionStateException(
-                CoreMessages.transactionCanOnlyBindToResources("QueueManager/QueueSession"));
+                    CoreMessages.transactionCanOnlyBindToResources("QueueManager/QueueSession"));
         }
         super.bindResource(key, resource);
         try

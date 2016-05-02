@@ -32,9 +32,8 @@ import org.mule.runtime.core.config.ClusterConfiguration;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.connector.PollingController;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.runtime.core.util.SpiUtils;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -69,7 +68,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
     public void testClearExceptionHelperCacheForAppWhenDispose() throws Exception
     {
         URL baseUrl = DefaultMuleContextTestCase.class.getClassLoader().getResource(".");
-        File file = new File(baseUrl.getFile() + SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath()+ "/" + TEST_PROTOCOL + "-exception-mappings.properties");
+        File file = new File(baseUrl.getFile() + ExceptionHelper.SERVICE_ROOT + ServiceType.EXCEPTION.getPath() + "/" + TEST_PROTOCOL + "-exception-mappings.properties");
         createExceptionMappingFile(file, INITIAL_VALUE);
 
         MuleContext ctx = muleContextFactory.createMuleContext();

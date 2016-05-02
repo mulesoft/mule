@@ -22,7 +22,7 @@ import org.mule.functional.listener.SystemExceptionListener;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
@@ -57,7 +57,7 @@ public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCas
     public void singleTransactionIsCommittedOnFailure() throws Exception
     {
         getFunctionalTestComponent(SINGLE_TRANSACTION_BEHAVIOR_FLOW).setEventCallback(getFailureCallback());
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         ExceptionListener exceptionListener = new ExceptionListener(muleContext);
         exceptionListener.setTimeoutInMillis(TIMEOUT);
         client.dispatch(IN_1_JMS_ENDPOINT, MESSAGE, null);
@@ -71,7 +71,7 @@ public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCas
     public void singleTransactionIsCommittedOnFailureButCommitFails() throws Exception
     {
         getFunctionalTestComponent(SINGLE_TRANSACTION_BEHAVIOR_FLOW).setEventCallback(replaceTransactionWithMockAndFailComponent());
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         ExceptionListener exceptionListener = new ExceptionListener(muleContext);
         exceptionListener.setTimeoutInMillis(TIMEOUT);
         SystemExceptionListener systemExceptionListener = new SystemExceptionListener(muleContext).setTimeoutInMillis(TIMEOUT);
@@ -86,7 +86,7 @@ public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCas
     @Test
     public void xaTransactionIsCommittedOnFailure() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         ExceptionListener exceptionListener = new ExceptionListener(muleContext);
         exceptionListener.setTimeoutInMillis(TIMEOUT);
         client.dispatch(IN_2_JMS_ENDPOINT, MESSAGE, null);

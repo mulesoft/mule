@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.lifecycle.LifecycleObject;
 import org.mule.runtime.core.lifecycle.NotificationLifecycleObject;
@@ -65,7 +65,7 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase
         // Stop in the opposite order to start
         orderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         orderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        orderedObjects.add(new NotificationLifecycleObject(Connector.class));
+        orderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
         orderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
         orderedObjects.add(new NotificationLifecycleObject(Config.class));
         orderedObjects.add(new NotificationLifecycleObject(Disposable.class));

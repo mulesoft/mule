@@ -7,12 +7,13 @@
 package org.mule.runtime.transport.jms.redelivery;
 
 import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleEventEndpointUtils;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.transport.jms.i18n.JmsMessages;
 
-public class MessageRedeliveredException extends org.mule.runtime.core.api.exception.MessageRedeliveredException
+public class MessageRedeliveredException extends org.mule.runtime.core.api.exception.EndpointMessageRedeliveredException
 {
     public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint, FlowConstruct flow, MuleMessage muleMessage)
     {
@@ -23,7 +24,7 @@ public class MessageRedeliveredException extends org.mule.runtime.core.api.excep
     protected static DefaultMuleEvent buildEvent(InboundEndpoint endpoint, FlowConstruct flow, MuleMessage muleMessage)
     {
         final DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, flow);
-        event.populateFieldsFromInboundEndpoint(endpoint);
+        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
         return event;
     }
 

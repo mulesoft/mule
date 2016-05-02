@@ -4,11 +4,13 @@
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
@@ -17,7 +19,7 @@
     <jms:activemq-connector name="jmsConnector"/>
 
     <vm:connector name="default">
-        <service-overrides inboundTransformer="org.mule.runtime.core.transformer.simple.InboundAppendTransformer"
+        <transports:service-overrides inboundTransformer="org.mule.runtime.core.transformer.simple.InboundAppendTransformer"
                            outboundTransformer="org.mule.runtime.core.transformer.simple.OutboundAppendTransformer"
                            responseTransformer="org.mule.runtime.core.transformer.simple.ResponseAppendTransformer"/>
     </vm:connector>
@@ -29,70 +31,70 @@
     <custom-transformer class="org.mule.functional.functional.StringAppendTestTransformer" name="StringAppendTestTransformer"/>
 
     <flow name="VmSync">
-        <inbound-endpoint address="vm://sync" exchange-pattern="request-response"/>
+        <transports:inbound-endpoint address="vm://sync" exchange-pattern="request-response"/>
         <echo-component/>
     </flow>
 
     <flow name="VmSyncResponseTransformer">
-        <inbound-endpoint address="vm://syncResponseTransformer" exchange-pattern="request-response"
+        <transports:inbound-endpoint address="vm://syncResponseTransformer" exchange-pattern="request-response"
                           responseTransformer-refs="customResponse" disableTransportTransformer="true"/>
         <echo-component/>
     </flow>
 
     <flow name="VmSyncOutboundEndpointResponseTransformer">
-        <inbound-endpoint address="vm://syncOutboundEndpointResponseTransformer"
+        <transports:inbound-endpoint address="vm://syncOutboundEndpointResponseTransformer"
                           exchange-pattern="request-response"/>
         <echo-component/>
-        <outbound-endpoint address="vm://echo" exchange-pattern="request-response"
+        <transports:outbound-endpoint address="vm://echo" exchange-pattern="request-response"
                            responseTransformer-refs="customResponse"/>
     </flow>
 
     <flow name="JmsSync">
-        <inbound-endpoint address="vm://jmsSync" exchange-pattern="request-response"/>
-        <outbound-endpoint address="jms://echo" exchange-pattern="request-response"/>
+        <transports:inbound-endpoint address="vm://jmsSync" exchange-pattern="request-response"/>
+        <transports:outbound-endpoint address="jms://echo" exchange-pattern="request-response"/>
     </flow>
 
     <flow name="JmsSyncOutboundEndpointResponseTransformer">
-        <inbound-endpoint address="vm://jmsSyncOutboundEndpointResponseTransformer"
+        <transports:inbound-endpoint address="vm://jmsSyncOutboundEndpointResponseTransformer"
                           exchange-pattern="request-response"/>
-        <outbound-endpoint address="jms://echo" exchange-pattern="request-response"
+        <transports:outbound-endpoint address="jms://echo" exchange-pattern="request-response"
                            responseTransformer-refs="customResponse"/>
     </flow>
 
     <flow name="ChainedRouterOutboundEndpointResponseTransformer">
-        <inbound-endpoint address="vm://chainedRouterOutboundEndpointResponseTransformer"
+        <transports:inbound-endpoint address="vm://chainedRouterOutboundEndpointResponseTransformer"
                           exchange-pattern="request-response"/>
-        <outbound-endpoint address="vm://echo" exchange-pattern="request-response"/>
-        <outbound-endpoint address="jms://echo" exchange-pattern="request-response"/>
-        <outbound-endpoint address="vm://echo" exchange-pattern="request-response"
+        <transports:outbound-endpoint address="vm://echo" exchange-pattern="request-response"/>
+        <transports:outbound-endpoint address="jms://echo" exchange-pattern="request-response"/>
+        <transports:outbound-endpoint address="vm://echo" exchange-pattern="request-response"
                            responseTransformer-refs="customResponse"/>
-        <outbound-endpoint address="jms://echo" exchange-pattern="request-response"
+        <transports:outbound-endpoint address="jms://echo" exchange-pattern="request-response"
                            responseTransformer-refs="customResponse"/>
     </flow>
 
     <flow name="NestedRouterOutboundEndpointResponseTransformer">
-        <inbound-endpoint address="vm://nestedRouterOutboundEndpointResponseTransformer"
+        <transports:inbound-endpoint address="vm://nestedRouterOutboundEndpointResponseTransformer"
                           exchange-pattern="request-response"/>
-        <component-with-bindings>
+        <transports:component>
             <singleton-object class="org.mule.runtime.transport.jms.integration.transformer.BindingInterfaceComponent"/>
-            <binding interface="org.mule.runtime.transport.jms.integration.transformer.BindingInterface" method="hello1">
-                <outbound-endpoint address="vm://echo" exchange-pattern="request-response"
+            <transports:binding interface="org.mule.runtime.transport.jms.integration.transformer.BindingInterface" method="hello1">
+                <transports:outbound-endpoint address="vm://echo" exchange-pattern="request-response"
                                    responseTransformer-refs="customResponse"/>
-            </binding>
-            <binding interface="org.mule.runtime.transport.jms.integration.transformer.BindingInterface" method="hello2">
-                <outbound-endpoint address="jms://echo" exchange-pattern="request-response"
+            </transports:binding>
+            <transports:binding interface="org.mule.runtime.transport.jms.integration.transformer.BindingInterface" method="hello2">
+                <transports:outbound-endpoint address="jms://echo" exchange-pattern="request-response"
                                    responseTransformer-refs="customResponse"/>
-            </binding>
-        </component-with-bindings>
+            </transports:binding>
+        </transports:component>
     </flow>
 
     <flow name="VmEchoService">
-        <inbound-endpoint address="vm://echo" exchange-pattern="request-response"/>
+        <transports:inbound-endpoint address="vm://echo" exchange-pattern="request-response"/>
         <echo-component/>
     </flow>
 
     <flow name="JmsEchoService">
-        <inbound-endpoint address="jms://echo" exchange-pattern="request-response"/>
+        <transports:inbound-endpoint address="jms://echo" exchange-pattern="request-response"/>
         <echo-component/>
     </flow>
 

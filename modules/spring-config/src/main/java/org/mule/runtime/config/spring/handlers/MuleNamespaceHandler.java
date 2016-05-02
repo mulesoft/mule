@@ -12,9 +12,7 @@ import org.mule.runtime.config.spring.factories.CompositeMessageSourceFactoryBea
 import org.mule.runtime.config.spring.factories.DefaultMemoryQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.DefaultPersistentQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.FileQueueStoreFactoryBean;
-import org.mule.runtime.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
-import org.mule.runtime.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
@@ -27,6 +25,7 @@ import org.mule.runtime.config.spring.parsers.collection.ChildListEntryDefinitio
 import org.mule.runtime.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.ChildEmbeddedDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.NameTransferDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.NamedDefinitionParser;
@@ -38,7 +37,6 @@ import org.mule.runtime.config.spring.parsers.processors.CheckExclusiveAttribute
 import org.mule.runtime.config.spring.parsers.processors.CheckRequiredAttributesWhenNoChildren;
 import org.mule.runtime.config.spring.parsers.specific.AggregatorDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.AsyncMessageProcessorsDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.BindingDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ComponentDelegatingDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
@@ -75,7 +73,6 @@ import org.mule.runtime.config.spring.parsers.specific.RetryNotifierDefinitionPa
 import org.mule.runtime.config.spring.parsers.specific.RetryPolicyDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SimpleComponentDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SplitterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.StaticComponentDefinitionParser;
@@ -85,25 +82,19 @@ import org.mule.runtime.config.spring.parsers.specific.TransactionManagerDefinit
 import org.mule.runtime.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.TypedPropertyMapEntryDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.XaTransactionDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.component.DefaultInterfaceBinding;
 import org.mule.runtime.core.component.DefaultJavaComponent;
-import org.mule.runtime.core.component.DefaultJavaWithBindingComponent;
 import org.mule.runtime.core.component.PooledJavaComponent;
-import org.mule.runtime.core.component.PooledJavaWithBindingsComponent;
 import org.mule.runtime.core.component.SimpleCallableJavaComponent;
 import org.mule.runtime.core.component.simple.EchoComponent;
 import org.mule.runtime.core.component.simple.LogComponent;
 import org.mule.runtime.core.component.simple.NullComponent;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.el.ExpressionLanguageComponent;
-import org.mule.runtime.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.runtime.core.exception.CatchMessagingExceptionStrategy;
@@ -161,7 +152,6 @@ import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.filters.logic.AndFilter;
 import org.mule.runtime.core.routing.filters.logic.NotFilter;
 import org.mule.runtime.core.routing.filters.logic.OrFilter;
-import org.mule.runtime.core.routing.outbound.ExpressionRecipientList;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
@@ -279,12 +269,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("disable-notification", new NotificationDisableDefinitionParser());
         registerMuleBeanDefinitionParser("notification-listener", new ChildDefinitionParser("allListenerSubscriptionPair", ListenerSubscriptionPair.class)).addAlias("ref", "listener").addReference("listener");
 
-        //Connector elements
-        registerBeanDefinitionParser("dispatcher-threading-profile", new ThreadingProfileDefinitionParser("dispatcherThreadingProfile", MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
-        registerBeanDefinitionParser("receiver-threading-profile", new ThreadingProfileDefinitionParser("receiverThreadingProfile", MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
-        registerBeanDefinitionParser("service-overrides", new ServiceOverridesDefinitionParser());
-        registerBeanDefinitionParser("custom-connector", new MuleOrphanDefinitionParser(true));
-
         //Transformer elements
 
         registerMuleBeanDefinitionParser("transformer", new ParentDefinitionParser()).addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "messageProcessor");
@@ -351,10 +335,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("resin-transaction-manager", new TransactionManagerDefinitionParser(Resin3TransactionManagerLookupFactory.class));
         registerBeanDefinitionParser("websphere-transaction-manager", new TransactionManagerDefinitionParser(WebsphereTransactionManagerLookupFactory.class));
 
-        //Endpoint elements
-        registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
-        registerBeanDefinitionParser("inbound-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
-        registerBeanDefinitionParser("outbound-endpoint", new ChildEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("custom-transaction", new TransactionDefinitionParser());
         registerBeanDefinitionParser("xa-transaction", new XaTransactionDefinitionParser(XaTransactionFactory.class));
         registerBeanDefinitionParser("idempotent-redelivery-policy", new ChildDefinitionParser("redeliveryPolicy", IdempotentRedeliveryPolicy.class));
@@ -396,8 +376,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));
         registerBeanDefinitionParser("composite-source", new ChildDefinitionParser("messageSource", CompositeMessageSourceFactoryBean.class));
 
-
-        registerBeanDefinitionParser("poll", new ChildEndpointDefinitionParser(PollingMessageSourceFactoryBean.class));
+        registerBeanDefinitionParser("poll", new ChildEmbeddedDefinitionParser(PollingMessageSourceFactoryBean.class));
         registerBeanDefinitionParser("fixed-frequency-scheduler", new ChildDefinitionParser("schedulerFactory", FixedFrequencySchedulerFactory.class));
 
 
@@ -436,10 +415,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         // Components
         registerBeanDefinitionParser("component", new ComponentDelegatingDefinitionParser(DefaultJavaComponent.class));
         registerBeanDefinitionParser("pooled-component", new ComponentDelegatingDefinitionParser(PooledJavaComponent.class));
-
-        registerBeanDefinitionParser("component-with-bindings", new ComponentDelegatingDefinitionParser(DefaultJavaWithBindingComponent.class));
-        registerBeanDefinitionParser("pooled-component-with-bindings", new ComponentDelegatingDefinitionParser(PooledJavaWithBindingsComponent.class));
-        registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("interfaceBinding", DefaultInterfaceBinding.class));
 
         // Simple Components
         registerBeanDefinitionParser("log-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, LogComponent.class));
@@ -491,7 +466,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("all", new ChildDefinitionParser("messageProcessor", MulticastingRouter.class));
         registerBeanDefinitionParser("scatter-gather", new ChildDefinitionParser("messageProcessor", ScatterGatherRouterFactoryBean.class));
         registerBeanDefinitionParser("custom-aggregation-strategy", new AggregationStrategyDefinitionParser());
-        registerBeanDefinitionParser("recipient-list", new ChildDefinitionParser("messageProcessor", ExpressionRecipientList.class));
 
         registerBeanDefinitionParser("request-reply", new ChildDefinitionParser("messageProcessor", SimpleAsyncRequestReplyRequester.class));
         registerBeanDefinitionParser("first-successful", new ChildDefinitionParser("messageProcessor", FirstSuccessful.class));

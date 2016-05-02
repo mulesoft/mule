@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.api.transport.Connector;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.connector.EndpointConnectException;
 import org.mule.runtime.core.transaction.TransactionCollection;
 import org.mule.runtime.core.transport.AbstractMessageReceiver;
 import org.mule.runtime.core.transport.AbstractReceiverWorker;
@@ -430,7 +430,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             }
             catch (JMSException e)
             {
-                throw new ConnectException(e, MultiConsumerJmsMessageReceiver.this);
+                throw new EndpointConnectException(e, MultiConsumerJmsMessageReceiver.this);
             }
         }
 

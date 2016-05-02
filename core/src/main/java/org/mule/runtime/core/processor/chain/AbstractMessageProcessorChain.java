@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -27,7 +26,6 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
-import org.mule.runtime.core.endpoint.EndpointAware;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -46,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject
         implements NonBlockingMessageProcessor, MessageProcessorChain, Lifecycle, FlowConstructAware,
-    MuleContextAware, EndpointAware, MessageProcessorContainer, MessagingExceptionHandlerAware
+    MuleContextAware, MessageProcessorContainer, MessagingExceptionHandlerAware
 {
 
     protected final transient Log log = LogFactory.getLog(getClass());
@@ -189,22 +187,6 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         }
 
         return string.toString();
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    @Override
-    public void setEndpoint(ImmutableEndpoint endpoint)
-    {
-        for (MessageProcessor processor : processors)
-        {
-            if (processor instanceof EndpointAware)
-            {
-                ((EndpointAware) processor).setEndpoint(endpoint);
-            }
-        }
     }
 
     @Override

@@ -34,7 +34,7 @@ public interface RedeliveryHandler
     /**
      * Process the redelivered message. If the JMS receiver should process the
      * message, it should be returned. Otherwise the connector should throw a
-     * {@link MessageRedeliveredException} to indicate that the message should be
+     * {@link EndpointMessageRedeliveredException} to indicate that the message should be
      * handled by the connector's exception handler.
      *
      * @param message the redelivered message
@@ -42,7 +42,7 @@ public interface RedeliveryHandler
      * @param flow in which the exception occured, this is used to obtain the
      *            appropriate exception handler
      * @throws JMSException if properties cannot be read from the JMSMessage
-     * @throws MessageRedeliveredException should be thrown if the message should be
+     * @throws EndpointMessageRedeliveredException should be thrown if the message should be
      *             handled by the connection exception handler
      * @throws MuleException if there is a problem reading or proessing the message
      */

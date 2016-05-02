@@ -216,15 +216,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
                 ExceptionMessage msg = new ExceptionMessage(event, t, component, endpointUri);
                 MuleMessage exceptionMessage = new DefaultMuleMessage(msg, event.getMessage(), muleContext);
 
-                // Create an outbound router with all endpoints configured on the exception strategy
-                MulticastingRouter router = new MulticastingRouter()
-                {
-                    @Override
-                    protected void setMessageProperties(FlowConstruct session, MuleEvent event, MessageProcessor target)
-                    {
-                        // No reply-to or correlation for exception targets, at least for now anyway.
-                    }
-                };
+                MulticastingRouter router = buildRouter();
                 router.setRoutes(getMessageProcessors());
                 router.setMuleContext(muleContext);
 
@@ -238,6 +230,20 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         }
 
         processOutboundRouterStatistics(event.getFlowConstruct());
+    }
+
+    protected MulticastingRouter buildRouter()
+    {
+        // Create an outbound router with all endpoints configured on the exception strategy
+        MulticastingRouter router = new MulticastingRouter()
+        {
+            @Override
+            protected void setMessageProperties(FlowConstruct session, MuleEvent event, MessageProcessor target)
+            {
+                // No reply-to or correlation for exception targets, at least for now anyway.
+            }
+        };
+        return router;
     }
 
     protected void closeStream(MuleMessage message)

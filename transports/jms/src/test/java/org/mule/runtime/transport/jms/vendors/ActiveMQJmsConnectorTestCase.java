@@ -11,6 +11,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.transport.jms.DefaultJmsTopicResolver;
 import org.mule.runtime.transport.jms.JmsConnector;
@@ -40,7 +41,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
     @Test
     public void testConfigurationDefaults() throws Exception
     {
-        JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
         assertNotNull(c);
 
         assertFalse(c.isEagerConsumer());
@@ -57,7 +58,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
     @Test
     public void testDefaultActiveMqConnectorConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("activeMqJmsConnector");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("activeMqJmsConnector");
 
         assertNotNull(c);
         assertTrue(c instanceof ActiveMQJmsConnector);
@@ -84,7 +85,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
     @Test
     public void testCustomActiveMqConnectorConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("customActiveMqJmsConnector");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("customActiveMqJmsConnector");
 
         assertNotNull(c);
         assertTrue(c instanceof ActiveMQJmsConnector);
@@ -116,7 +117,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
     @Test
     public void testActiveMqConnectorWithUsernameAndPassword() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("activeMqJmsConnectorWithUsernameAndPassword");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("activeMqJmsConnectorWithUsernameAndPassword");
 
         assertTrue(c instanceof ActiveMQJmsConnector);
         assertTrue(c.isConnected());

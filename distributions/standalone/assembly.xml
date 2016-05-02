@@ -128,7 +128,6 @@
                 <include>org.mule.modules:mule-module-artifact</include>
                 <include>org.mule.modules:mule-module-launcher</include>
                 <include>org.mule.modules:mule-module-builders</include>
-                <include>org.mule.modules:mule-module-client</include>
                 <include>org.mule.modules:mule-module-cxf</include>
                 <include>org.mule.modules:mule-module-db</include>
                 <include>org.mule.modules:mule-module-extensions-support</include>
@@ -191,7 +190,6 @@
                 <exclude>org.mule.modules:mule-modules-all</exclude>
                 <exclude>org.mule.modules:mule-module-artifact</exclude>
                 <exclude>org.mule.modules:mule-module-builders</exclude>
-                <exclude>org.mule.modules:mule-module-client</exclude>
                 <exclude>org.mule.modules:mule-module-cxf</exclude>
                 <exclude>org.mule.modules:mule-module-db</exclude>
                 <exclude>org.mule.modules:mule-module-extensions-support</exclude>

@@ -15,7 +15,6 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -32,8 +31,6 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
     @Test
     public void testIdempotentReceiver() throws Exception
     {
-        InboundEndpoint endpoint1 = getTestInboundEndpoint("Test1Provider",
-                "test://Test1Provider?exchangePattern=one-way");
         Flow flow = getTestFlow();
 
         MuleSession session = mock(MuleSession.class);
@@ -46,8 +43,7 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
         ir.setMuleContext(muleContext);
 
         MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
-        event.populateFieldsFromInboundEndpoint(endpoint1);
+        MuleEvent event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
 
         // This one will process the event on the target endpoint
         MuleEvent processedEvent = ir.process(event);
@@ -56,14 +52,12 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
          // This will not process, because the message is a duplicate
         okMessage = new DefaultMuleMessage("OK", muleContext);
         event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
-        event.populateFieldsFromInboundEndpoint(endpoint1);
         processedEvent = ir.process(event);
         assertNull(processedEvent);
 
         // This will process, because the message  is not a duplicate
         okMessage = new DefaultMuleMessage("Not OK", muleContext);
         event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
-        event.populateFieldsFromInboundEndpoint(endpoint1);
         processedEvent = ir.process(event);
         assertNotNull(processedEvent);
     }

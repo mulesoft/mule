@@ -11,25 +11,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.config.PoolingProfile;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.component.AbstractComponent;
 import org.mule.runtime.core.component.PooledJavaComponent;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.interceptor.InterceptorStack;
 import org.mule.runtime.core.interceptor.LoggingInterceptor;
 import org.mule.runtime.core.interceptor.TimerInterceptor;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
-import org.mule.runtime.core.routing.filters.MessagePropertyFilter;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.transport.AbstractConnector;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 
 import org.junit.Test;
@@ -56,34 +45,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(muleContext.getTransactionManager());
     }
 
-    @Override
-    public void testGlobalEndpointConfig() throws MuleException
-    {
-        super.testGlobalEndpointConfig();
-        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("fruitBowlEndpoint");
-        assertNotNull(endpoint);
-        assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
-
-        MessagePropertyFilter filter = (MessagePropertyFilter) endpoint.getFilter();
-        assertNotNull(filter);
-        assertEquals("foo=bar", filter.getPattern());
-    }
-
-    @Override
-    public void testEndpointConfig() throws MuleException
-    {
-        super.testEndpointConfig();
-
-        // test that targets have been resolved on targets
-        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("waterMelonEndpoint");
-        assertNotNull(endpoint);
-        assertEquals("UTF-8-TEST", endpoint.getEncoding());
-        assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
-
-        FlowConstruct service = muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
-        assertNotNull(service);
-    }
-
     @Test
     public void testExceptionStrategy2()
     {
@@ -105,67 +66,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     }
 
     @Test
-    public void testThreadingConfig() throws DefaultMuleException
-    {
-        // expected default values from the configuration;
-        // these should differ from the programmatic values!
-
-        // globals
-        int defaultMaxBufferSize = 42;
-        int defaultMaxThreadsActive = 16;
-        int defaultMaxThreadsIdle = 3;
-        // WAIT is 0, RUN is 4
-        int defaultThreadPoolExhaustedAction = ThreadingProfile.WHEN_EXHAUSTED_WAIT;
-        int defaultThreadTTL = 60001;
-
-        // for the connector
-        int connectorMaxBufferSize = 2;
-
-        // for the service
-        int componentMaxBufferSize = 6;
-        int componentMaxThreadsActive = 12;
-        int componentMaxThreadsIdle = 6;
-        int componentThreadPoolExhaustedAction = ThreadingProfile.WHEN_EXHAUSTED_DISCARD;
-
-        // test default config
-        ThreadingProfile tp = muleContext.getDefaultThreadingProfile();
-        assertEquals(defaultMaxBufferSize, tp.getMaxBufferSize());
-        assertEquals(defaultMaxThreadsActive, tp.getMaxThreadsActive());
-        assertEquals(defaultMaxThreadsIdle, tp.getMaxThreadsIdle());
-        assertEquals(defaultThreadPoolExhaustedAction, tp.getPoolExhaustedAction());
-        assertEquals(defaultThreadTTL, tp.getThreadTTL());
-
-        // test service threading profile defaults
-        tp = muleContext.getDefaultServiceThreadingProfile();
-        assertEquals(defaultMaxBufferSize, tp.getMaxBufferSize());
-        assertEquals(defaultMaxThreadsActive, tp.getMaxThreadsActive());
-        assertEquals(defaultMaxThreadsIdle, tp.getMaxThreadsIdle());
-        assertEquals(defaultThreadPoolExhaustedAction, tp.getPoolExhaustedAction());
-        assertEquals(defaultThreadTTL, tp.getThreadTTL());
-
-        // test that unset values retain a default value
-        AbstractConnector c = (AbstractConnector) muleContext.getRegistry().lookupConnector("dummyConnector");
-        tp = c.getDispatcherThreadingProfile();
-        // this value is configured
-        assertEquals(connectorMaxBufferSize, tp.getMaxBufferSize());
-        // these values are inherited
-        assertEquals(defaultMaxThreadsActive, tp.getMaxThreadsActive());
-        assertEquals(defaultMaxThreadsIdle, tp.getMaxThreadsIdle());
-        assertEquals(defaultThreadPoolExhaustedAction, tp.getPoolExhaustedAction());
-        assertEquals(defaultThreadTTL, tp.getThreadTTL());
-
-        // test per-service values
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
-        AsynchronousProcessingStrategy processingStrategy = (AsynchronousProcessingStrategy) flow.getProcessingStrategy();
-        // these values are configured
-        assertEquals(componentMaxBufferSize, processingStrategy.getMaxBufferSize().intValue());
-        assertEquals(componentMaxThreadsActive, processingStrategy.getMaxThreads().intValue());
-        assertEquals(componentThreadPoolExhaustedAction, processingStrategy.getPoolExhaustedAction().intValue());
-        // this value is inherited
-        assertEquals(defaultThreadTTL, tp.getThreadTTL());
-    }
-
-    @Test
     public void testPoolingConfig()
     {
         // test per-descriptor overrides
@@ -177,17 +77,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(4002, pp.getMaxWait());
         assertEquals(PoolingProfile.WHEN_EXHAUSTED_FAIL, pp.getExhaustedAction());
         assertEquals(PoolingProfile.INITIALISE_ALL, pp.getInitialisationPolicy());
-    }
-
-    @Test
-    public void testEndpointProperties() throws Exception
-    {
-        // test transaction config
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
-        InboundEndpoint inEndpoint = (InboundEndpoint) ((CompositeMessageSource) flow.getMessageSource()).getSources().get(1);
-        assertNotNull(inEndpoint);
-        assertNotNull(inEndpoint.getProperties());
-        assertEquals("Prop1", inEndpoint.getProperties().get("testEndpointProperty"));
     }
 
     @Test
@@ -216,17 +105,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(LoggingInterceptor.class, interceptorStack.getInterceptors().get(0).getClass());
         assertEquals(TimerInterceptor.class, interceptorStack.getInterceptors().get(1).getClass());
         assertEquals(LoggingInterceptor.class, interceptorStack.getInterceptors().get(2).getClass());
-    }
-
-    @Test
-    public void testInterceptors()
-    {
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
-        AbstractComponent component = (AbstractComponent) flow.getMessageProcessors().get(0);
-        assertEquals(3, component.getInterceptors().size());
-        assertEquals(LoggingInterceptor.class, component.getInterceptors().get(0).getClass());
-        assertEquals(InterceptorStack.class, component.getInterceptors().get(1).getClass());
-        assertEquals(TimerInterceptor.class, component.getInterceptors().get(2).getClass());
     }
 
 }

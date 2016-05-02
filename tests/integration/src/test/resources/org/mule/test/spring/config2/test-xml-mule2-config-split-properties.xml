@@ -10,9 +10,6 @@
 
 
     <flow name="testPropertiesComponent">
-        <inbound-endpoint
-                address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"
-                exchange-pattern="one-way"/>
         <component>
             <spring-object bean="prop-test-ref"/>
         </component>

@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.lifecycle.StopException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transport.Connector;
 import org.mule.runtime.core.api.transport.MessageReceiver;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.connector.EndpointConnectException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.transport.AbstractMessageReceiver;
 import org.mule.runtime.core.util.ClassUtils;
@@ -131,7 +131,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
         catch (JMSException e)
         {
-            throw new ConnectException(e, this);
+            throw new EndpointConnectException(e, this);
         }
     }
 

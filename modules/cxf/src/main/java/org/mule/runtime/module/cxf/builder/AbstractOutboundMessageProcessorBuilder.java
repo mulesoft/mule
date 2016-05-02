@@ -10,14 +10,10 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.endpoint.EndpointBuilder;
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.module.cxf.CxfConfiguration;
-import org.mule.runtime.module.cxf.CxfInboundMessageProcessor;
 import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.runtime.module.cxf.CxfPayloadToArguments;
 import org.mule.runtime.module.cxf.config.WsSecurity;
@@ -25,7 +21,6 @@ import org.mule.runtime.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.runtime.module.cxf.support.MuleHeadersOutInterceptor;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,25 +120,6 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         processor.setOperation(operation);
         configureMessageProcessor(processor);
         processor.setPayloadToArguments(payloadToArguments);
-
-        if (decoupledEndpoint != null)
-        {
-            processor.setDecoupledEndpoint(decoupledEndpoint);
-
-            CxfInboundMessageProcessor cxfInboundMP = new CxfInboundMessageProcessor();
-            cxfInboundMP.setMuleContext(muleContext);
-            cxfInboundMP.setBus(getBus());
-
-            List<MessageProcessor> mps = new ArrayList<MessageProcessor>();
-            mps.add(cxfInboundMP);
-
-            EndpointBuilder ep = muleContext.getEndpointFactory().getEndpointBuilder(decoupledEndpoint);
-
-            Flow flow = new Flow("decoupled-" + ep.toString(), muleContext);
-            flow.setMessageProcessors(mps);
-            flow.setMessageSource(ep.buildInboundEndpoint());
-            muleContext.getRegistry().registerObject(flow.getName(), flow);
-        }
 
         processor.setMimeType(getMimeType());
         

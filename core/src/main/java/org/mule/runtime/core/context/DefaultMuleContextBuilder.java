@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.context.notification.RegistryNotificationListen
 import org.mule.runtime.core.api.context.notification.RoutingNotificationListener;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
@@ -97,6 +98,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     /**
      * {@inheritDoc}
      */
+    @Override
     public MuleContext buildMuleContext()
     {
         logger.debug("Building new DefaultMuleContext instance with MuleContextBuilder: " + this);
@@ -115,7 +117,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         muleContext.setInjector(new RegistryDelegatingInjector(muleRegistry));
 
         muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContext));
-        muleContext.setExceptionListener(new DefaultSystemExceptionStrategy(muleContext));
+        muleContext.setExceptionListener(createExceptionListener(muleContext));
         muleContext.setExecutionClassLoader(Thread.currentThread().getContextClassLoader());
         muleContext.setBootstrapServiceDiscoverer(injectMuleContextIfRequired(getBootstrapPropertiesServiceDiscoverer(), muleContext));
 
@@ -126,26 +128,40 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         return muleContext;
     }
 
+    protected SystemExceptionHandler createExceptionListener(DefaultMuleContext muleContext)
+    {
+        SystemExceptionHandler systemExceptionHandler = muleContext.getRegistry().get("_exceptionListenerFactory");
+        if (systemExceptionHandler == null)
+        {
+            systemExceptionHandler = new DefaultSystemExceptionStrategy();
+        }
+        return systemExceptionHandler;
+    }
+
     protected DefaultMuleContext createDefaultMuleContext()
     {
         return new DefaultMuleContext();
     }
 
+    @Override
     public void setMuleConfiguration(MuleConfiguration config)
     {
         this.config = config;
     }
 
+    @Override
     public void setWorkManager(WorkManager workManager)
     {
         this.workManager = workManager;
     }
 
+    @Override
     public void setWorkListener(WorkListener workListener)
     {
         this.workListener = workListener;
     }
 
+    @Override
     public void setNotificationManager(ServerNotificationManager notificationManager)
     {
         this.notificationManager = notificationManager;
@@ -184,6 +200,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         }
     }
 
+    @Override
     public void setLifecycleManager(LifecycleManager manager)
     {
         if (!(manager instanceof MuleContextLifecycleManager))

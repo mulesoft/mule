@@ -9,6 +9,8 @@ package org.mule.test.integration.client;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
+
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -16,12 +18,11 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.TimeUnit;
 
@@ -98,7 +99,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestC
         eventPropagated = true;
         isSameMessage = true;
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.send(getUrl(endpoint), getTestMuleMessage("Original Message"));
 
         boolean innerFlowCalled = innerFlowLatch.await(3, TimeUnit.SECONDS);

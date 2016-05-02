@@ -9,10 +9,7 @@ package org.mule.runtime.config.spring.parsers.specific;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.endpoint.EndpointBuilder;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.processor.NullMessageProcessor;
 
 import org.junit.Test;
 
@@ -36,19 +33,6 @@ public class CompositeMessageProcessorDefinitionParserTestCase extends Functiona
     {
         MessageProcessor composite = muleContext.getRegistry().lookupObject("composite2");
         assertEquals("01abc2", composite.process(getTestEvent("0")).getMessageAsString());
-    }
-
-    @Test
-    public void testInterceptingCompositeOnEndpoint() throws Exception
-    {
-        EndpointBuilder endpointBuilder = muleContext.getRegistry().lookupEndpointBuilder("endpoint");
-        InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
-        assertEquals(2, endpoint.getMessageProcessors().size());
-
-        MessageProcessor endpointProcessor = endpoint.getMessageProcessorsFactory()
-            .createInboundMessageProcessorChain(endpoint, null, new NullMessageProcessor());
-
-        assertEquals("01231abc2", endpointProcessor.process(getTestEvent("0")).getMessageAsString());
     }
 
 }

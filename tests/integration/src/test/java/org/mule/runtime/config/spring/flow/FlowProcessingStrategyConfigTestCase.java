@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.flow;
+package org.mule.runtime.config.spring.flow;
 
 import static org.junit.Assert.assertEquals;
 
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
@@ -19,7 +20,6 @@ import org.mule.runtime.core.processor.strategy.AbstractThreadingProfileProcessi
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.List;
 

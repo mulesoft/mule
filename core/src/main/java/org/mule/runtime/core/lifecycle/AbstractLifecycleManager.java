@@ -15,9 +15,9 @@ import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.runtime.core.transport.AbstractConnector;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -143,7 +143,7 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
         // In the case of a connection exception, trigger the reconnection strategy.
         catch (ConnectException ce)
         {
-            MuleContext muleContext = ((AbstractConnector) ce.getFailed()).getMuleContext();
+            MuleContext muleContext = ((LegacyConnector) ce.getFailed()).getMuleContext();
             muleContext.getExceptionListener().handleException(ce);
         }
         catch (LifecycleException le)

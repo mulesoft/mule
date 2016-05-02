@@ -14,7 +14,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
@@ -62,7 +62,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
     public void testAlwaysRollback() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
             @Override
             public void onNotification(ExceptionNotification notification)
@@ -81,7 +81,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
     public void testAlwaysRollbackJmsNoTransaction() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
             @Override
             public void onNotification(ExceptionNotification notification)
@@ -102,7 +102,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
         final MutableInt deliveredTimes = new MutableInt(0);
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
         {
             @Override
@@ -127,7 +127,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
 	public void testRollbackWithComponent() throws Exception
 	{
 	    final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
-	    LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
 	    muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
 	        @Override
 	        public void onNotification(ExceptionNotification notification)
@@ -148,7 +148,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFullyDefinedRollbackExceptionStrategyWithComponent() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage result = null;
         for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++)
         {
@@ -167,7 +167,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
         final MutableInt deliveredTimes = new MutableInt(0);
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
             @Override
             public void onNotification(ExceptionNotification notification)
@@ -251,7 +251,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFullyDefinedRollbackExceptionStrategy() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage result = null;
         for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++)
         {
@@ -271,7 +271,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
         final MutableInt deliveredTimes = new MutableInt(0);
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
             @Override
             public void onNotification(ExceptionNotification notification)
@@ -294,7 +294,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
     {
         final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
         final MutableInt deliveredTimes = new MutableInt(0);
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
             @Override
             public void onNotification(ExceptionNotification notification)
@@ -314,7 +314,7 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testRollbackExceptionStrategyCatchMessageRedeliveryDespiteChoiceConfiguration() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://in7","some message",null);
         if (!CallMessageProcessor.latch.await(TIMEOUT, TimeUnit.MILLISECONDS))
         {
@@ -333,5 +333,4 @@ public class RollbackExceptionStrategyTestCase extends FunctionalTestCase
             return event;
         }
     }
-
 }

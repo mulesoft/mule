@@ -9,7 +9,6 @@ package org.mule.runtime.core.connector;
 import org.mule.runtime.core.api.LocatedMuleException;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.transport.AbstractTransportMessageHandler;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -26,31 +25,28 @@ public class ConnectException extends LocatedMuleException
 
     /** Resource which has disconnected */
     private transient Connectable failed;
-    
+
     public ConnectException(Message message, Connectable failed)
     {
         super(message, failed);
         // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
-        this.failed = failed instanceof AbstractTransportMessageHandler ? ((AbstractTransportMessageHandler) failed).getConnector() : failed;
-        ;
+        this.failed = failed;
     }
 
     public ConnectException(Message message, Throwable cause, Connectable failed)
     {
         super(message, cause, failed);
         // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
-        this.failed = failed instanceof AbstractTransportMessageHandler ? ((AbstractTransportMessageHandler) failed).getConnector() : failed;
-        ;
+        this.failed = failed;
     }
 
     public ConnectException(Throwable cause, Connectable failed)
     {
         super(cause, failed);
         // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
-        this.failed = failed instanceof AbstractTransportMessageHandler ? ((AbstractTransportMessageHandler) failed).getConnector() : failed;
-        ;
+        this.failed = failed;
     }
-    
+
     public Connectable getFailed()
     {
         return failed;
@@ -79,5 +75,10 @@ public class ConnectException extends LocatedMuleException
         {
             this.failed = (Connectable) in.readObject();
         }
+    }
+
+    public void handleReconnection()
+    {
+        // TODO See MULE-9307 - read reconnection behaviour for configs and sources
     }
 }

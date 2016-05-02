@@ -9,8 +9,11 @@ package org.mule.runtime.transport.vm.config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
 
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.config.MuleEndpointProperties;
+import org.mule.runtime.core.api.endpoint.EndpointFactory;
 import org.mule.runtime.core.api.endpoint.EndpointURI;
 import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -36,7 +39,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testDefaults() throws Exception
     {
-        VMConnector c = (VMConnector)muleContext.getRegistry().lookupConnector("vmConnectorDefaults");
+        VMConnector c = (VMConnector) muleContext.getRegistry().lookupObject("vmConnectorDefaults");
         assertNotNull(c);
         
         assertEquals(muleContext.getConfiguration().getDefaultQueueTimeout(), c.getQueueTimeout());
@@ -50,7 +53,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testDefaultQueueProfile() throws Exception
     {
-        VMConnector c = (VMConnector)muleContext.getRegistry().lookupConnector("vmConnector1");
+        VMConnector c = (VMConnector) muleContext.getRegistry().lookupObject("vmConnector1");
         assertNotNull(c);
         
         assertEquals(muleContext.getConfiguration().getDefaultQueueTimeout(), c.getQueueTimeout());
@@ -65,7 +68,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testConfig() throws Exception
     {
-        VMConnector c = (VMConnector)muleContext.getRegistry().lookupConnector("vmConnector2");
+        VMConnector c = (VMConnector) muleContext.getRegistry().lookupObject("vmConnector2");
         assertNotNull(c);
         
         assertEquals(5000, c.getQueueTimeout());
@@ -81,7 +84,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testGlobalEndpoint() throws Exception
     {
-        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("vmEndpoint");
+        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("vmEndpoint");
         assertNotNull(endpoint);
         EndpointURI uri = endpoint.getEndpointURI();
         assertNotNull(uri);
@@ -92,7 +95,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testVmTransaction() throws Exception
     {
-        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("globalWithTx");
+        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("globalWithTx");
         assertNotNull(endpoint);
         
         TransactionConfig txConfig = endpoint.getTransactionConfig();
@@ -104,7 +107,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testCustomTransaction() throws Exception
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointBuilder("customTx").buildInboundEndpoint();
+        ImmutableEndpoint endpoint = lookupEndpointBuilder(muleContext.getRegistry(), "customTx").buildInboundEndpoint();
         assertNotNull(endpoint);
         
         TransactionConfig txConfig = endpoint.getTransactionConfig();
@@ -118,13 +121,18 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testXaTransaction() throws Exception
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointBuilder("xaTx").buildInboundEndpoint();
+        ImmutableEndpoint endpoint = lookupEndpointBuilder(muleContext.getRegistry(), "xaTx").buildInboundEndpoint();
         assertNotNull(endpoint);
         
         TransactionConfig txConfig = endpoint.getTransactionConfig();
         assertNotNull(txConfig);
         assertEquals(TransactionConfig.ACTION_ALWAYS_JOIN, txConfig.getAction());
         assertEquals(XaTransactionFactory.class, txConfig.getFactory().getClass());
+    }
+
+    public EndpointFactory getEndpointFactory()
+    {
+        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 
 }

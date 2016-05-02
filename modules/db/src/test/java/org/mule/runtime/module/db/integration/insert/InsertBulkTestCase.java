@@ -12,10 +12,11 @@ import static org.hamcrest.core.AnyOf.anyOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.runtime.module.db.integration.TestDbConfig;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
@@ -51,7 +52,7 @@ public class InsertBulkTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void insertsInBulkMode() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         List<String> planetNames = new ArrayList<String>();
         planetNames.add("Pluto");
         planetNames.add("Saturn");

@@ -14,7 +14,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -62,11 +61,6 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
      * the transformer is used
      */
     protected String name = null;
-
-    /**
-     * The endpoint that this transformer instance is configured on
-     */
-    protected ImmutableEndpoint endpoint = null;
 
     /**
      * A list of supported Class types that the source payload passed into this transformer
@@ -319,7 +313,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
             else
             {
                 Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(),
-                        endpoint, payload.getClass());
+                        payload.getClass());
                 /// FIXME
                 throw new TransformerException(msg, this);
             }
@@ -368,11 +362,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
             enc = ((MuleMessage) src).getEncoding();
         }
 
-        if (enc == null && endpoint != null)
-        {
-            enc = endpoint.getEncoding();
-        }
-        else if (enc == null)
+        if (enc == null)
         {
             enc = SystemUtils.getDefaultEncoding(muleContext);
         }
@@ -382,26 +372,6 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     protected boolean isConsumed(Class<?> srcCls)
     {
         return InputStream.class.isAssignableFrom(srcCls) || StreamSource.class.isAssignableFrom(srcCls);
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    @Override
-    public ImmutableEndpoint getEndpoint()
-    {
-        return endpoint;
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    @Override
-    public void setEndpoint(ImmutableEndpoint endpoint)
-    {
-        this.endpoint = endpoint;
     }
 
     protected abstract Object doTransform(Object src, String enc) throws TransformerException;

@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.processor;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 
 /**
  * Processes {@link MuleEvent}'s. Implementations that do not mutate the
@@ -26,4 +27,14 @@ public interface MessageProcessor
      * @throws MuleException
      */
     MuleEvent process(MuleEvent event) throws MuleException;
+
+    default boolean mayReturnVoidEvent()
+    {
+        return true;
+    }
+
+    default boolean filterAccepts(MuleMessage message)
+    {
+        return true;
+    }
 }

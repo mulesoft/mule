@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/vm"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
             targetNamespace="http://www.mulesoft.org/schema/mule/vm"
             elementFormDefault="qualified"
@@ -9,9 +10,11 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.8/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd" />
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/transports"
+                schemaLocation="http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.8/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/current/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -31,7 +34,7 @@
     <xsd:element name="connector" type="vmConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:complexType name="vmConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:transactedConnectorType">
+            <xsd:extension base="transports:transactedConnectorType">
                 <xsd:sequence>
                     <xsd:element name="queueProfile" type="mule:queueProfileType" minOccurs="0">
                         <xsd:annotation>
@@ -57,7 +60,7 @@
         </xsd:complexContent>
    </xsd:complexType>
  
-    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="transports:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
                 The endpoint on which this connector receives messages from the transport.
@@ -66,13 +69,13 @@
     </xsd:element>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointWithXaType">
+            <xsd:extension base="transports:inboundEndpointWithXaType">
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint">
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="transports:abstract-outbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
                 The endpoint to which this connector sends messages.
@@ -81,7 +84,7 @@
     </xsd:element>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:outboundEndpointWithXaType">
+            <xsd:extension base="transports:outboundEndpointWithXaType">
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -96,7 +99,7 @@
     </xsd:element>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:globalEndpointWithXaType">
+            <xsd:extension base="transports:globalEndpointWithXaType">
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>

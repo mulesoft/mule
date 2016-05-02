@@ -10,17 +10,13 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.endpoint.EndpointBuilder;
-import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transport.Connector;
 import org.mule.runtime.core.util.Predicate;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard
@@ -55,24 +51,6 @@ public interface MuleRegistry extends LifecycleRegistry
     // Lookup methods - these should NOT create a new object, only return existing ones
     // /////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    Connector lookupConnector(String name);
-
-    /**
-     * Looks-up endpoint builders which can be used to repeatably create endpoints with the same configuration. These
-     * endpoint builder are either global endpoints or they are builders used to create named endpoints configured on
-     * routers and exception strategies.
-     *
-     * @param name the name of the endpointBuilder to find
-     * @return An endpointBuilder with the name specified or null if there is no endpoint builder with that name
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    EndpointBuilder lookupEndpointBuilder(String name);
-
     Transformer lookupTransformer(String name);
 
     FlowConstruct lookupFlowConstruct(String name);
@@ -106,25 +84,6 @@ public interface MuleRegistry extends LifecycleRegistry
     // /////////////////////////////////////////////////////////////////////////
     // Registration methods
     // /////////////////////////////////////////////////////////////////////////
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    void registerConnector(Connector connector) throws MuleException;
-
-    // TODO MULE-2494
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    void registerEndpoint(ImmutableEndpoint endpoint) throws MuleException;
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    void registerEndpointBuilder(String name, EndpointBuilder builder) throws MuleException;
 
     void registerTransformer(Transformer transformer) throws MuleException;
 
@@ -167,16 +126,4 @@ public interface MuleRegistry extends LifecycleRegistry
      */
     Object applyProcessors(Object object) throws MuleException;
 
-    // /////////////////////////////////////////////////////////////////////////
-    // Creation methods
-    // /////////////////////////////////////////////////////////////////////////
-
-    // TODO These methods are a mess (they blur lookup with creation, uris with names). Need to clean this up.
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    ServiceDescriptor lookupServiceDescriptor(ServiceType type, String name, Properties overrides)
-            throws ServiceException;
 }

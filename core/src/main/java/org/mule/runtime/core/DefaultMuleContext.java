@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.ThreadingProfile;
@@ -27,7 +27,6 @@ import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
-import org.mule.runtime.core.api.endpoint.EndpointFactory;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -160,7 +159,7 @@ public class DefaultMuleContext implements MuleContext
 
     private ClassLoader executionClassLoader;
 
-    protected LocalMuleClient localMuleClient;
+    protected MuleClient localMuleClient;
 
     /**
      * Global exception handler which handles "system" exceptions (i.e., when no message is involved).
@@ -229,7 +228,7 @@ public class DefaultMuleContext implements MuleContext
         registryBroker = createRegistryBroker();
         muleRegistryHelper = createRegistryHelper(registryBroker);
         localMuleClient = new DefaultLocalMuleClient(this);
-        exceptionListener = new DefaultSystemExceptionStrategy(this);
+        exceptionListener = new DefaultSystemExceptionStrategy();
         transformationService = new TransformationService(this);
     }
 
@@ -874,7 +873,7 @@ public class DefaultMuleContext implements MuleContext
     }
 
     @Override
-    public LocalMuleClient getClient()
+    public MuleClient getClient()
     {
         return localMuleClient;
     }
@@ -901,16 +900,6 @@ public class DefaultMuleContext implements MuleContext
     public void setExceptionListener(SystemExceptionHandler exceptionListener)
     {
         this.exceptionListener = exceptionListener;
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    @Override
-    public EndpointFactory getEndpointFactory()
-    {
-        return (EndpointFactory) registryBroker.lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 
     @Override

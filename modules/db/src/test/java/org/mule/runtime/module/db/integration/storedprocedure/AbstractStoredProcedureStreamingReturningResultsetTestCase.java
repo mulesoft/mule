@@ -14,12 +14,10 @@ import static org.mule.runtime.module.db.integration.TestRecordUtil.getAllPlanet
 import static org.mule.runtime.module.db.integration.model.Planet.EARTH;
 import static org.mule.runtime.module.db.integration.model.Planet.MARS;
 import static org.mule.runtime.module.db.integration.model.Planet.VENUS;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.MessageExchangePattern;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.runtime.module.db.integration.matcher.ContainsMessage;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
@@ -44,7 +42,7 @@ public abstract class AbstractStoredProcedureStreamingReturningResultsetTestCase
     {
         flowRunner("messagePerRecordOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         List<MuleMessage> responses = new LinkedList<MuleMessage>();
         MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
         responses.add(response);

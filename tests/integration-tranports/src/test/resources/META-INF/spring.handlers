@@ -1,0 +1,1 @@
+http\://www.mulesoft.org/schema/mule/transports-parsers-test=org.mule.runtime.config.spring.parsers.EndpointParsersTestNamespaceHandler

@@ -11,6 +11,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +35,7 @@ public class ReplyToChainIntegration5TestCase extends FunctionalTestCase
     @Test
     public void testReplyToIsHonoredInFlowUsingAsyncBlock() throws Exception
     {
-        org.mule.runtime.core.api.client.LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         final org.mule.runtime.core.util.concurrent.Latch flowExecutedLatch = new org.mule.runtime.core.util.concurrent.Latch();
         FunctionalTestComponent ftc = getFunctionalTestComponent("replierService");
         ftc.setEventCallback(new EventCallback()

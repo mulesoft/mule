@@ -7,6 +7,7 @@
 package org.mule.runtime.core.transformer.encryption;
 
 import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -23,7 +24,7 @@ import java.io.InputStream;
  * into an encrypted array of bytes
  *
  */
-public abstract class AbstractEncryptionTransformer extends AbstractTransformer
+public abstract class AbstractEncryptionTransformer extends AbstractTransformer implements MuleContextAware
 {
     private EncryptionStrategy strategy = null;
     private String strategyName = null;
@@ -89,7 +90,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
     {
         if (strategyName != null)
         {
-            if (endpoint.getMuleContext().getSecurityManager() == null)
+            if (muleContext.getSecurityManager() == null)
             {
                 if (strategy == null)
                 {
@@ -98,7 +99,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
             }
             else
             {
-                strategy = endpoint.getMuleContext().getSecurityManager().getEncryptionStrategy(strategyName);
+                strategy = muleContext.getSecurityManager().getEncryptionStrategy(strategyName);
             }
         }
         if (strategy == null)

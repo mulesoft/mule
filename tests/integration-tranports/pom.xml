@@ -31,11 +31,15 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.mule</groupId>
-			<artifactId>mule-core</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-core</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-module-support</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.mule</groupId>
 			<artifactId>mule-core-tests</artifactId>
@@ -46,6 +50,18 @@
 		<dependency>
 			<groupId>org.mule.tests</groupId>
 			<artifactId>mule-tests-functional</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.tests</groupId>
+			<artifactId>mule-tests-unit-transports</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.tests</groupId>
+			<artifactId>mule-tests-functional-transports</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

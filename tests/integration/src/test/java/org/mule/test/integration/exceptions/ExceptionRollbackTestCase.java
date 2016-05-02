@@ -14,9 +14,9 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
+import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
-import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import java.io.FileNotFoundException;
 
@@ -30,7 +30,7 @@ public class ExceptionRollbackTestCase extends AbstractMuleContextTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        strategy = new DefaultSystemExceptionStrategy(muleContext);
+        strategy = new DefaultSystemExceptionStrategy();
         strategy.setCommitTxFilter(new WildcardFilter("java.io.*"));
         strategy.setRollbackTxFilter(new WildcardFilter("org.mule.*, javax.*"));
 

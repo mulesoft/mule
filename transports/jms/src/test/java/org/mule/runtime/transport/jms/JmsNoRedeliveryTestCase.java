@@ -36,7 +36,7 @@ public class JmsNoRedeliveryTestCase extends AbstractJmsRedeliveryTestCase
         client.dispatch(JMS_INPUT_QUEUE, TEST_MESSAGE, null);
 
         assertTrue(messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS));
-        assertEquals("MessageRedeliveredException never fired.", 0, messageRedeliveryExceptionFired.getCount());
+        assertEquals("EndpointMessageRedeliveredException never fired.", 0, messageRedeliveryExceptionFired.getCount());
         assertEquals("Wrong number of delivery attempts", 1, callback.getCallbackCount());
 
         assertMessageInDlq();
@@ -48,7 +48,7 @@ public class JmsNoRedeliveryTestCase extends AbstractJmsRedeliveryTestCase
         client.dispatch(JMS_INPUT_QUEUE2, TEST_MESSAGE, null);
 
         assertTrue(messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS));
-        assertEquals("MessageRedeliveredException never fired.", 0, messageRedeliveryExceptionFired.getCount());
+        assertEquals("EndpointMessageRedeliveredException never fired.", 0, messageRedeliveryExceptionFired.getCount());
         assertEquals("Wrong number of delivery attempts", 1, callback.getCallbackCount());
 
         assertMessageInDlqRollbackEs();

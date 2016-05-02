@@ -8,9 +8,9 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
@@ -31,7 +31,7 @@ public class ExceptionStrategyFlowRefTestCase extends FunctionalTestCase
     public void testExceptionInFlowCalledWithFlowRef() throws Exception
     {
         flowRunner("exceptionHandlingBlock").runExpectingException();
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://dlq", RECEIVE_TIMEOUT);
         assertThat(response, IsNull.<Object>notNullValue());
         assertThat(response.<String>getOutboundProperty("mainEs"), Is.is("yes"));

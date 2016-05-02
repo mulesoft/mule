@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.core.util.StringUtils;
@@ -38,7 +38,7 @@ public class WSConsumerConfig implements MuleContextAware
     private String service;
     private String port;
     private String serviceAddress;
-    private Connector connector;
+    private LegacyConnector connector;
     private HttpRequesterConfig connectorConfig;
     private WSSecurity security;
 
@@ -148,12 +148,12 @@ public class WSConsumerConfig implements MuleContextAware
         this.serviceAddress = serviceAddress;
     }
 
-    public Connector getConnector()
+    public LegacyConnector getConnector()
     {
         return connector;
     }
 
-    public void setConnector(Connector connector)
+    public void setConnector(LegacyConnector connector)
     {
         this.connector = connector;
     }

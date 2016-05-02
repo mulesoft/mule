@@ -22,7 +22,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -48,7 +47,6 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -78,18 +76,18 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     private final MuleSession session;
     private transient FlowConstruct flowConstruct;
 
-    private Credentials credentials;
-    private String encoding;
-    private MessageExchangePattern exchangePattern;
-    private URI messageSourceURI;
-    private String messageSourceName;
+    protected Credentials credentials;
+    protected String encoding;
+    protected MessageExchangePattern exchangePattern;
+    protected URI messageSourceURI;
+    protected String messageSourceName;
     private final ReplyToHandler replyToHandler;
-    private boolean transacted;
-    private boolean synchronous;
+    protected boolean transacted;
+    protected boolean synchronous;
 
     /** Mutable MuleEvent state **/
     private boolean stopFurtherProcessing = false;
-    private int timeout = TIMEOUT_NOT_SET_VALUE;
+    protected int timeout = TIMEOUT_NOT_SET_VALUE;
     private transient OutputStream outputStream;
     private final ProcessingTime processingTime;
     private Object replyToDestination;
@@ -103,7 +101,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     private FlowCallStack flowCallStack = new DefaultFlowCallStack();
     private ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
-    private boolean nonBlocking;
+    protected boolean nonBlocking;
 
     // Constructors
 
@@ -297,25 +295,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.transacted = false;
 
         this.synchronous = resolveEventSynchronicity();
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    public void populateFieldsFromInboundEndpoint(InboundEndpoint endpoint)
-    {
-        this.credentials = extractCredentials(endpoint);
-        this.encoding = endpoint.getEncoding();
-        this.exchangePattern = endpoint.getExchangePattern();
-        this.messageSourceName = endpoint.getName();
-        this.messageSourceURI = endpoint.getEndpointURI().getUri();
-        this.timeout = endpoint.getResponseTimeout();
-        this.transacted = endpoint.getTransactionConfig().isTransacted();
-        fillProperties(endpoint);
-
-        this.synchronous = resolveEventSynchronicity();
-        this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
     }
 
     // Constructors to copy MuleEvent
@@ -561,33 +540,10 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                 .isSynchronous();
     }
 
-    private boolean isFlowConstructNonBlockingProcessingStrategy()
+    protected boolean isFlowConstructNonBlockingProcessingStrategy()
     {
         return (flowConstruct instanceof Pipeline) && ((Pipeline) flowConstruct).getProcessingStrategy() instanceof
                 NonBlockingProcessingStrategy;
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    protected void fillProperties(InboundEndpoint endpoint)
-    {
-        if (endpoint != null && endpoint.getProperties() != null)
-        {
-            for (Iterator<?> iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
-            {
-                String prop = (String) iterator.next();
-
-                // don't overwrite property on the message
-                if (!ignoreProperty(prop))
-                {
-                    // inbound endpoint flowVariables are in the invocation scope
-                    Object value = endpoint.getProperties().get(prop);
-                    setFlowVariable(prop, value);
-                }
-            }
-        }
     }
 
     /**
@@ -618,25 +574,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         }
 
         return null != message.getOutboundProperty(key);
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    protected Credentials extractCredentials(InboundEndpoint endpoint)
-    {
-        if (null != endpoint && null != endpoint.getEndpointURI()
-            && null != endpoint.getEndpointURI().getUserInfo())
-        {
-            final String userName = endpoint.getEndpointURI().getUser();
-            final String password = endpoint.getEndpointURI().getPassword();
-            if (password != null && userName != null)
-            {
-                return new MuleCredentials(userName, password.toCharArray());
-            }
-        }
-        return null;
     }
 
     @Override

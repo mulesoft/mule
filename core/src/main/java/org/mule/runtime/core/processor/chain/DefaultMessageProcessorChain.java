@@ -6,23 +6,18 @@
  */
 package org.mule.runtime.core.processor.chain;
 
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.RequestReplyReplierMessageProcessor;
-import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
-import org.mule.runtime.core.routing.MessageFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -108,7 +103,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
                 nextProcessor = processorIterator.next();
             }
 
-            if (flowConstruct instanceof Flow && nextProcessor != null && processorMayReturnNull(processor))
+            if (flowConstruct instanceof Flow && nextProcessor != null && processor.mayReturnVoidEvent())
             {
                 copy = OptimizedRequestContext.criticalSetEvent(currentEvent);
             }
@@ -158,27 +153,6 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
             processor = nextProcessor;
         }
         return currentEvent;
-    }
-
-    protected boolean processorMayReturnNull(MessageProcessor processor)
-    {
-        if (processor instanceof OutboundEndpoint)
-        {
-            MessageExchangePattern exchangePattern = ((OutboundEndpoint) processor).getExchangePattern();
-            return exchangePattern == null ? true : !exchangePattern.hasResponse();
-        }
-
-        // TODO See MULE-9307 - previously there was an if checking if the endpoint was request response or one-way.
-        // Rethink if we should re add that condition for new connectors
-        else if (processor instanceof Component || processor instanceof Transformer
-                 || processor instanceof MessageFilter)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
     }
 
     @Override

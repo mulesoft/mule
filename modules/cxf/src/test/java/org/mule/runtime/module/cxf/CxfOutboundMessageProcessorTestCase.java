@@ -8,7 +8,6 @@ package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.simple.EchoService;
@@ -70,7 +69,7 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
         };
         processor.setListener(messageProcessor);
         
-        MuleEvent event = getTestEvent("hello", getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent("hello");
         MuleEvent response = processor.process(event);
         assertThat(processor.getClient().getRequestContext().isEmpty(), Is.is(true));
         assertThat(processor.getClient().getResponseContext().isEmpty(), Is.is(true));

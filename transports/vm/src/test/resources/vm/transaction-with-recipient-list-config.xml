@@ -4,11 +4,13 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <spring:bean name="txFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory">
         <spring:property name="value" value="foo"/>
@@ -21,15 +23,15 @@
         </vm:inbound-endpoint>
         <echo-component/>
         <transactional action="BEGIN_OR_JOIN">
-            <recipient-list expression="['vm://output?exchangePattern=request-response']"/>
+            <transports:recipient-list expression="['vm://output?exchangePattern=request-response']"/>
         </transactional>
     </flow>
 
     <flow name="OutputService">
-        <inbound-endpoint address="vm://output" exchange-pattern="request-response">
+        <transports:inbound-endpoint address="vm://output" exchange-pattern="request-response">
             <custom-transaction factory-class="org.mule.runtime.transport.vm.VMTransactionFactory"
                                 action="ALWAYS_JOIN"/>
-        </inbound-endpoint>
+        </transports:inbound-endpoint>
         <test:component appendString=" Received"/>
     </flow>
 

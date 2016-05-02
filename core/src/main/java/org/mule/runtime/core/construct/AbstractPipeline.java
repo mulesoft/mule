@@ -17,7 +17,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
@@ -30,7 +29,6 @@ import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.StageNameSource;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
-import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -270,7 +268,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         boolean redeliveryHandlerConfigured = isRedeliveryPolicyConfigured();
 
         if (userConfiguredAsyncProcessingStrategy
-            && (!isMessageSourceCompatibleWithAsync(messageSource) || (redeliveryHandlerConfigured)))
+            && (!(messageSource == null || messageSource.isCompatibleWithAsync()) || redeliveryHandlerConfigured))
         {
             throw new FlowConstructInvalidException(
                     CoreMessages.createStaticMessage("One of the message sources configured on this Flow is not " +
@@ -320,33 +318,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             }
         }
         return isRedeliveredPolicyConfigured;
-    }
-
-    private boolean isMessageSourceCompatibleWithAsync(MessageSource source)
-    {
-        // TODO See MULE-9307 - check conditions over sources to define if it supports async processing strategies or
-        // not
-        if (source instanceof InboundEndpoint)
-        {
-            InboundEndpoint endpoint = ((InboundEndpoint) source);
-            return !endpoint.getExchangePattern().hasResponse()
-                   && !endpoint.getTransactionConfig().isConfigured();
-        }
-        else if (messageSource instanceof CompositeMessageSource)
-        {
-            for (MessageSource childSource : ((CompositeMessageSource) source).getSources())
-            {
-                if (!isMessageSourceCompatibleWithAsync(childSource))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-        else
-        {
-            return true;
-        }
     }
 
     @Override

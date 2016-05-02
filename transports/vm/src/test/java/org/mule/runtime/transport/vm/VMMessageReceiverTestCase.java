@@ -30,6 +30,6 @@ public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     @Override
     public InboundEndpoint getEndpoint() throws Exception
     {
-        return muleContext.getEndpointFactory().getInboundEndpoint("vm://test");
+        return getEndpointFactory().getInboundEndpoint("vm://test");
     }
 }

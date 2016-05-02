@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ public class DynamicEndpointWithConnectorTestCase extends FunctionalTestCase
     @Test
     public void testDynamicEndpointAcceptsConnectorRef() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
 
         MuleMessage message = getTestMuleMessage();
         message.setProperty("queueName", "test.out", PropertyScope.OUTBOUND);

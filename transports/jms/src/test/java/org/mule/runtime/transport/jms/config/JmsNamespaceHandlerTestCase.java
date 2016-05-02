@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
@@ -22,6 +23,7 @@ import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.registry.MuleRegistryTransportHelper;
 import org.mule.runtime.core.routing.filters.logic.NotFilter;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
@@ -57,7 +59,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testDefaultConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnectorDefaults");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnectorDefaults");
         assertNotNull(c);
 
         assertNotNull(c.getConnectionFactory());
@@ -84,7 +86,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testConnectorConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector1");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector1");
         assertNotNull(c);
 
         assertNotNull(c.getConnectionFactory());
@@ -115,7 +117,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testCustomConnectorConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector2");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector2");
         assertNotNull(c);
 
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should
@@ -125,7 +127,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testTestConnectorConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector3");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector3");
         assertNotNull(c);
 
         assertNotNull(c.getConnectionFactory());
@@ -151,8 +153,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testEndpointConfig() throws MuleException
     {
-        ImmutableEndpoint endpoint1 = muleContext.getRegistry()
-            .lookupEndpointBuilder("endpoint1")
+        ImmutableEndpoint endpoint1 = MuleRegistryTransportHelper.lookupEndpointBuilder(muleContext.getRegistry(), "endpoint1")
             .buildInboundEndpoint();
         assertNotNull(endpoint1);
         Filter filter1 = endpoint1.getFilter();
@@ -161,9 +162,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(1, endpoint1.getProperties().size());
         assertEquals("true", endpoint1.getProperty(JmsConstants.DISABLE_TEMP_DESTINATIONS_PROPERTY));
 
-        ImmutableEndpoint endpoint2 = muleContext.getRegistry()
-            .lookupEndpointBuilder("endpoint2")
-            .buildOutboundEndpoint();
+        ImmutableEndpoint endpoint2 = lookupEndpointBuilder(muleContext.getRegistry(), "endpoint2").buildOutboundEndpoint();
         assertNotNull(endpoint2);
         Filter filter2 = endpoint2.getFilter();
         assertNotNull(filter2);
@@ -183,9 +182,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testCustomTransactions() throws EndpointException, InitialisationException
     {
-        ImmutableEndpoint endpoint3 = muleContext.getRegistry()
-            .lookupEndpointBuilder("endpoint3")
-            .buildInboundEndpoint();
+        ImmutableEndpoint endpoint3 = lookupEndpointBuilder(muleContext.getRegistry(), "endpoint3").buildOutboundEndpoint();
         assertNotNull(endpoint3);
         TestTransactionFactory factory = (TestTransactionFactory) endpoint3.getTransactionConfig()
             .getFactory();
@@ -196,9 +193,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testXaTransactions() throws Exception
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry()
-            .lookupEndpointBuilder("endpoint4")
-            .buildInboundEndpoint();
+        ImmutableEndpoint endpoint = lookupEndpointBuilder(muleContext.getRegistry(), "endpoint4").buildOutboundEndpoint();
         assertNotNull(endpoint);
         assertEquals(XaTransactionFactory.class, endpoint.getTransactionConfig().getFactory().getClass());
         assertEquals(MuleTransactionConfig.ACTION_ALWAYS_JOIN, endpoint.getTransactionConfig().getAction());
@@ -207,7 +202,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testJndiConnectorAtributes() throws Exception
     {
-        JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsJndiConnector");
+        JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupObject("jmsJndiConnector");
         assertThat("connection factory must be created only after connect so reconnection works when JNDI context is not yet available during start", connector.getConnectionFactory(), nullValue());
         connector.connect();
         assertNotNull(connector);
@@ -229,12 +224,12 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testActiveMqConnectorConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsActiveMqConnector");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsActiveMqConnector");
         assertNotNull(c);
 
         assertEquals(1, c.getNumberOfConsumers());
 
-        c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsActiveMqConnectorXa");
+        c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsActiveMqConnectorXa");
         assertNotNull(c);
 
         assertEquals(1, c.getNumberOfConsumers());

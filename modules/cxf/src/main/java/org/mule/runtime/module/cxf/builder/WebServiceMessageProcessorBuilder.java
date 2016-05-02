@@ -9,10 +9,7 @@ package org.mule.runtime.module.cxf.builder;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.module.cxf.CxfConstants;
 import org.mule.runtime.module.cxf.CxfInboundMessageProcessor;
 import org.mule.runtime.module.cxf.MuleJAXWSInvoker;
@@ -43,7 +40,7 @@ public class WebServiceMessageProcessorBuilder
 
     private DataBinding databinding;
     private String frontend = CxfConstants.JAX_WS_FRONTEND;
-    private FlowConstruct flowConstruct;
+    protected FlowConstruct flowConstruct;
     private Class<?> serviceClass;
     
     @Override
@@ -101,15 +98,6 @@ public class WebServiceMessageProcessorBuilder
     @Override
     protected String getAddress()
     {
-        if (flowConstruct != null)
-        {
-            MessageSource source = ((Pipeline) flowConstruct).getMessageSource();
-
-            if (source instanceof InboundEndpoint)
-            {
-                return ((InboundEndpoint) source).getEndpointURI().toString();
-            }
-        }
         return "http://internalMuleCxfRegistry/" + hashCode();
     }
 

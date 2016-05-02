@@ -8,7 +8,7 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.core.DataTypeConversionResolver;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
-import org.mule.runtime.core.api.endpoint.EndpointFactory;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -269,16 +268,6 @@ public interface MuleContext extends Lifecycle
      */
     ExpressionManager getExpressionManager();
 
-    /**
-     * Returns the EndpointFactory configured for this instance of Mule
-     * 
-     * @return the EndpointFactory configured for this instance of Mule
-     * @see EndpointFactory
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    EndpointFactory getEndpointFactory();
-
     void setExecutionClassLoader(ClassLoader cl);
 
     ClassLoader getExecutionClassLoader();
@@ -289,7 +278,7 @@ public interface MuleContext extends Lifecycle
 
     boolean isStarting();
 
-    LocalMuleClient getClient();
+    MuleClient getClient();
 
     SystemExceptionHandler getExceptionListener();
 

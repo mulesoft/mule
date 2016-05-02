@@ -7,7 +7,7 @@
 package org.mule.runtime.transport.jms.activemq;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.connector.EndpointConnectException;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.proxy.TargetInvocationHandler;
 import org.mule.runtime.transport.jms.JmsConnector;
@@ -146,7 +146,7 @@ public class ActiveMQJmsConnector extends JmsConnector
         }
         catch (Exception e)
         {
-            throw new ConnectException(e, this);
+            throw new EndpointConnectException(e, this);
         }
         finally
         {

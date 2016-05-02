@@ -22,10 +22,4 @@
         </processor-chain>
         <append-string-transformer message="2" />
     </processor-chain>
-
-    <endpoint name="endpoint" address="test://test">
-        <processor ref="composite1" />
-        <processor ref="composite2" />
-    </endpoint>
-
 </mule>

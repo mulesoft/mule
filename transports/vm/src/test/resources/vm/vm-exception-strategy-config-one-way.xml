@@ -3,10 +3,12 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <vm:connector name="vmConnector"/>
 
@@ -30,10 +32,10 @@
 
     <flow name="dlqExceptionInboundEndpointResponse">
         <vm:inbound-endpoint path="in2" exchange-pattern="request-response">
-            <response>
+            <transports:response>
                 <custom-transformer
                         class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$FailingTransformer"/>
-            </response>
+            </transports:response>
             <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
         <test:component/>

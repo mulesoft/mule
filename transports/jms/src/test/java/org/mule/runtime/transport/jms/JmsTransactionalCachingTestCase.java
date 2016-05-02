@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -41,7 +41,7 @@ public class JmsTransactionalCachingTestCase extends FunctionalTestCase
     @Test
     public void cachesSession() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
 
         MuleMessage response = client.send("vm://testInput", TEST_MESSAGE_1, null);
         assertThat(TEST_MESSAGE_1, equalTo(getPayloadAsString(response)));

@@ -10,13 +10,13 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -103,20 +103,6 @@ public class TransformerChain extends AbstractMessageTransformer
         }
     }
 
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    @Override
-    public void setEndpoint(ImmutableEndpoint endpoint)
-    {
-        super.setEndpoint(endpoint);
-        for (Transformer transformer : transformers)
-        {
-            transformer.setEndpoint(endpoint);
-        }
-    }
-
     @Override
     protected String generateTransformerName()
     {
@@ -135,4 +121,8 @@ public class TransformerChain extends AbstractMessageTransformer
         return name;
     }
 
+    public List<Transformer> getTransformers()
+    {
+        return Collections.unmodifiableList(transformers);
+    }
 }

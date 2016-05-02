@@ -7,6 +7,7 @@
 package org.mule.runtime.transport.jms;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+import static org.mule.runtime.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -439,7 +440,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     }
                     else
                     {
-                        EndpointBuilder epb = event.getMuleContext().getRegistry().lookupEndpointBuilder(tempReplyTo.toString());
+                        EndpointBuilder epb = lookupEndpointBuilder(event.getMuleContext().getRegistry(), tempReplyTo.toString());
                         if (epb != null)
                         {
                             tempReplyTo = epb.buildOutboundEndpoint().getEndpointURI().getAddress();

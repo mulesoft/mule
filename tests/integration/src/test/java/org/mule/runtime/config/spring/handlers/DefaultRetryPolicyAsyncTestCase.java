@@ -14,8 +14,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.api.transport.Connector;
 import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 
@@ -36,20 +34,5 @@ public class DefaultRetryPolicyAsyncTestCase extends FunctionalTestCase
         assertThat(obj, not(nullValue()));
         assertThat(obj, instanceOf(AsynchronousRetryTemplate.class));
         assertThat(((SimpleRetryPolicyTemplate) ((AsynchronousRetryTemplate) obj).getDelegate()).getCount(), is(3));
-    }
-
-    @Test
-    public void testConnectorPolicy() throws Exception
-    {
-        Connector c = muleContext.getRegistry().lookupConnector("testConnector");
-        assertThat(c, not(nullValue()));
-
-        RetryPolicyTemplate rpf = c.getRetryPolicyTemplate();
-        assertThat(rpf, not(nullValue()));
-        assertThat(rpf, instanceOf(AsynchronousRetryTemplate.class));
-        assertThat(((SimpleRetryPolicyTemplate) ((AsynchronousRetryTemplate) rpf).getDelegate()).getCount(), is(3));
-        
-        assertThat(c.isConnected(), is(true));
-        assertThat(c.isStarted(), is(true));
     }
 }

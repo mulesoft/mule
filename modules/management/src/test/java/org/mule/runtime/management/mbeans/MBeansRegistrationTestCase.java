@@ -12,8 +12,6 @@ import static org.junit.Assert.assertTrue;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.module.management.agent.JmxApplicationAgent;
 import org.mule.runtime.module.management.agent.JmxServerNotificationAgent;
-import org.mule.runtime.module.management.mbean.ConnectorService;
-import org.mule.runtime.module.management.mbean.EndpointService;
 import org.mule.runtime.module.management.mbean.FlowConstructService;
 import org.mule.runtime.module.management.mbean.FlowConstructStats;
 import org.mule.runtime.module.management.mbean.MuleConfigurationService;
@@ -86,12 +84,8 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
     {
         List<String> mbeanClasses = getMBeanClasses();
 
-        assertTrue(mbeanClasses.contains(ConnectorService.class.getName()));
-
         assertTrue(mbeanClasses.contains(FlowConstructService.class.getName()));
         assertTrue(mbeanClasses.contains(FlowConstructStats.class.getName()));
-
-        assertTrue(mbeanClasses.contains(EndpointService.class.getName()));
     }
 
     /**

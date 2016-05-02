@@ -7,7 +7,7 @@
 package org.mule.runtime.transport.vm.config;
 
 import org.mule.runtime.config.spring.factories.QueueProfileFactoryBean;
-import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.handlers.AbstractMuleTransportsNamespaceHandler;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.TransactionDefinitionParser;
 import org.mule.runtime.core.endpoint.URIBuilder;
@@ -18,7 +18,7 @@ import org.mule.runtime.transport.vm.VMTransactionFactory;
  * Reigsters a Bean Definition Parser for handling <code><vm:connector></code> elements.
  *
  */
-public class VmNamespaceHandler extends AbstractMuleNamespaceHandler
+public class VmNamespaceHandler extends AbstractMuleTransportsNamespaceHandler
 {
     @Override
     public void init()

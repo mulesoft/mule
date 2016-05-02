@@ -19,4 +19,6 @@ public interface OperationOptions
      */
     Long getResponseTimeout();
 
+    boolean isOutbound();
+
 }

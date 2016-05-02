@@ -28,4 +28,10 @@ public interface Component extends MessageProcessor, FlowConstructAware
      */
     ComponentStatistics getStatistics();
 
+    @Override
+    default boolean mayReturnVoidEvent()
+    {
+        return false;
+    }
+
 }

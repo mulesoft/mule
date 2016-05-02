@@ -8,11 +8,13 @@ package org.mule.runtime.transport.jms.transformers;
 
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transport.Connector;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.connector.EndpointConnectException;
+import org.mule.runtime.core.endpoint.EndpointAware;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.ClassUtils;
@@ -34,9 +36,14 @@ import javax.jms.Session;
  * object. It provides services for compressing and uncompressing messages.
  */
 
-public abstract class AbstractJmsTransformer extends AbstractMessageTransformer implements DiscoverableTransformer
+public abstract class AbstractJmsTransformer extends AbstractMessageTransformer implements DiscoverableTransformer, EndpointAware
 {
     private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+
+    /**
+     * The endpoint that this transformer instance is configured on
+     */
+    protected ImmutableEndpoint endpoint = null;
 
     public AbstractJmsTransformer()
     {
@@ -73,7 +80,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
             if (e instanceof EOFException)
             {
                 // Trigger reconnection on certain exception types
-                e = new ConnectException(e, getEndpoint().getConnector());
+                e = new EndpointConnectException(e, getEndpoint().getConnector());
             }
             throw new TransformerException(this, e);
         }
@@ -208,4 +215,25 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
     {
         this.priorityWeighting = priorityWeighting;
     }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    @Override
+    public ImmutableEndpoint getEndpoint()
+    {
+        return endpoint;
+    }
+
+    /**
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    @Override
+    public void setEndpoint(ImmutableEndpoint endpoint)
+    {
+        this.endpoint = endpoint;
+    }
+
 }

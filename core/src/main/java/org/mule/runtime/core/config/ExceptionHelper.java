@@ -18,7 +18,6 @@ import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.MapUtils;
 import org.mule.runtime.core.util.PropertiesUtils;
-import org.mule.runtime.core.util.SpiUtils;
 import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.InputStream;
@@ -44,6 +43,8 @@ import org.apache.commons.logging.LogFactory;
 
 public final class ExceptionHelper
 {
+    public static final String SERVICE_ROOT = "META-INF/services/";
+
     private static final String MULE_PACKAGE_REGEXP = "(?:org|com)\\.mule(?:soft)?\\.(?!mvel2)(?!el).*";
 
     /**
@@ -112,7 +113,7 @@ public final class ExceptionHelper
             registerExceptionReader(new NamingExceptionReader());
             J2SE_VERSION = System.getProperty("java.specification.version");
 
-            String name = SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath()
+            String name = SERVICE_ROOT + ServiceType.EXCEPTION.getPath()
                     + "/mule-exception-codes.properties";
             InputStream in = ExceptionHelper.class.getClassLoader().getResourceAsStream(name);
             if (in == null)
@@ -124,7 +125,7 @@ public final class ExceptionHelper
 
             reverseErrorCodes = MapUtils.invertMap(errorCodes);
 
-            name = SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath()
+            name = SERVICE_ROOT + ServiceType.EXCEPTION.getPath()
                     + "/mule-exception-config.properties";
             in = ExceptionHelper.class.getClassLoader().getResourceAsStream(name);
             if (in == null)
@@ -185,7 +186,7 @@ public final class ExceptionHelper
         }
         else
         {
-            String name = SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath() + "/" + protocol + "-exception-mappings.properties";
+            String name = SERVICE_ROOT + ServiceType.EXCEPTION.getPath() + "/" + protocol + "-exception-mappings.properties";
             Properties p = PropertiesUtils.loadAllProperties(name, muleContext.getExecutionClassLoader());
             errorMappings.put(getErrorMappingCacheKey(protocol, muleContext), p);
             registerAppDisposeListener(muleContext);

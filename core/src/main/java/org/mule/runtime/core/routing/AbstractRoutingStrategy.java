@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -74,36 +73,6 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
                                           final MessageProcessor route,
                                           boolean awaitResponse) throws MuleException
     {
-        if (logger.isDebugEnabled())
-        {
-            if (route instanceof OutboundEndpoint)
-            {
-                logger.debug("Message being sent to: " + ((OutboundEndpoint) route).getEndpointURI());
-            }
-            logger.debug(message);
-        }
-
-        if (logger.isTraceEnabled())
-        {
-            try
-            {
-                logger.trace("Request payload: \n"
-                             + StringMessageUtils.truncate(muleContext.getTransformationService().getPayloadForLogging(message), 100, false));
-                if (route instanceof OutboundEndpoint)
-                {
-                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
-                }
-            }
-            catch (Exception e)
-            {
-                logger.trace("Request payload: \n(unable to retrieve payload: " + e.getMessage());
-                if (route instanceof OutboundEndpoint)
-                {
-                    logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getMessageProcessors());
-                }
-            }
-        }
-
         MuleEvent result;
         try
         {

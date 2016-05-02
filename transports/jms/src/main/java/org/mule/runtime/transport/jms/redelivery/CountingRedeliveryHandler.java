@@ -45,7 +45,7 @@ public class CountingRedeliveryHandler extends AbstractRedeliveryHandler
     /**
      * process the redelivered message. If the Jms receiver should process the
      * message, it should be returned. Otherwise the connector should throw a
-     * <code>MessageRedeliveredException</code> to indicate that the message should
+     * <code>EndpointMessageRedeliveredException</code> to indicate that the message should
      * be handled by the connector Exception Handler.
      * 
      */

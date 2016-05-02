@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -132,7 +132,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testInOutAppendFlow() throws Exception
     {
         flowRunner("inout-append").withPayload(getTestMuleMessage("0")).run();
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         assertEquals("0inout", getPayloadAsString(client.request("test://inout-append-out", RECEIVE_TIMEOUT)));
     }
 
@@ -211,7 +211,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
         flowRunner("split-aggregate-singleton-list").withPayload(getTestMuleMessage(fruitBowl.getFruit())).run();
 
-        final LocalMuleClient client = muleContext.getClient();
+        final MuleClient client = muleContext.getClient();
         final MuleMessage result = client.request("test://split-aggregate-singleton-list-out", RECEIVE_TIMEOUT);
 
         assertNotNull(result);
@@ -305,7 +305,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
         flowRunner("split-filter-aggregate").withPayload(getTestMuleMessage(fruitBowl)).run();
 
-        final LocalMuleClient client = muleContext.getClient();
+        final MuleClient client = muleContext.getClient();
         final MuleMessage result = client.request("test://split-filter-aggregate-out", RECEIVE_TIMEOUT);
 
         assertNotNull(result);
@@ -330,7 +330,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
         flowRunner("message-chunk-split-aggregate").withPayload(getTestMuleMessage(payload)).run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         final MuleMessage result = client.request("test://message-chunk-split-aggregate-out", RECEIVE_TIMEOUT);
 
         assertNotNull(result);
@@ -352,7 +352,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         flowRunner("wiretap").withPayload(getTestMuleMessage(TEST_MESSAGE)).run();
 
-        final LocalMuleClient client = muleContext.getClient();
+        final MuleClient client = muleContext.getClient();
         final MuleMessage result = client.request("test://wiretap-out", RECEIVE_TIMEOUT);
         final MuleMessage tapResult = client.request("test://wiretap-tap", RECEIVE_TIMEOUT);
 
@@ -376,7 +376,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testAsyncOneWayEndpoint() throws Exception
     {
         flowRunner("async-oneway").withPayload(getTestMuleMessage("0")).run();
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         final MuleMessage result = client.request("test://async-oneway-out", RECEIVE_TIMEOUT);
         final MuleMessage asyncResult = client.request("test://async-async-oneway-out", RECEIVE_TIMEOUT);
 
@@ -390,7 +390,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     public void testAsyncRequestResponseEndpoint() throws Exception
     {
         flowRunner("async-requestresponse").withPayload(getTestMuleMessage("0")).run();
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         final MuleMessage result = client.request("test://async-requestresponse-out", RECEIVE_TIMEOUT);
         final MuleMessage asyncResult = client.request("test://async-async-requestresponse-out", RECEIVE_TIMEOUT);
 
@@ -411,7 +411,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertThat(e, instanceOf(MessagingException.class));
         assertThat(e.getMessage(), containsString("The <async> element cannot be used with transactions"));
 
-        final LocalMuleClient client = muleContext.getClient();
+        final MuleClient client = muleContext.getClient();
         final MuleMessage result = client.request("test://async-requestresponse-out", RECEIVE_TIMEOUT);
         final MuleMessage asyncResult = client.request("test://async-async-oneway-out", RECEIVE_TIMEOUT);
 
@@ -424,7 +424,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         flowRunner("multicaster").withPayload(getTestMuleMessage(TEST_MESSAGE)).run();
 
-        final LocalMuleClient client = muleContext.getClient();
+        final MuleClient client = muleContext.getClient();
         final MuleMessage result1 = client.request("test://multicaster-out1", RECEIVE_TIMEOUT);
         final MuleMessage result2 = client.request("test://multicaster-out2", RECEIVE_TIMEOUT);
         final MuleMessage result3 = client.request("test://multicaster-out3", RECEIVE_TIMEOUT);

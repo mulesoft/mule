@@ -8,6 +8,7 @@ package org.mule.test.integration.transport;
 
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.runtime.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
@@ -15,7 +16,7 @@ import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.endpoint.EndpointBuilder;
 import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.transport.Connector;
-import org.mule.runtime.core.connector.DefaultReplyToHandler;
+import org.mule.runtime.core.connector.EndpointReplyToHandler;
 import org.mule.runtime.core.transport.AbstractConnector;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -44,31 +45,31 @@ public class ReplyToSerializationTestCase extends FunctionalTestCase
     @Ignore("MULE-9307 - add behaviour to store config name to be used for reply to destination")
     public void testSerialization() throws Exception
     {
-        EndpointBuilder jmsEndpointBuilder = muleContext.getRegistry().lookupEndpointBuilder("jmsEndpoint");
-        EndpointBuilder vmEndpointBuilder = muleContext.getRegistry().lookupEndpointBuilder("vmEndpoint");
+        EndpointBuilder jmsEndpointBuilder = lookupEndpointBuilder(muleContext.getRegistry(), "jmsEndpoint");
+        EndpointBuilder vmEndpointBuilder = lookupEndpointBuilder(muleContext.getRegistry(), "vmEndpoint");
 
         InboundEndpoint jmsEndpoint = jmsEndpointBuilder.buildInboundEndpoint();
         Connector jmsConnector = jmsEndpoint.getConnector();
         InboundEndpoint vmEndpoint = vmEndpointBuilder.buildInboundEndpoint();
         Connector vmConnector = vmEndpoint.getConnector();
 
-        DefaultReplyToHandler jmsHandler = (DefaultReplyToHandler) ((AbstractConnector)jmsConnector).getReplyToHandler(jmsEndpoint);
-        DefaultReplyToHandler vmHandler = (DefaultReplyToHandler) ((AbstractConnector)vmConnector).getReplyToHandler(vmEndpoint);
+        EndpointReplyToHandler jmsHandler = (EndpointReplyToHandler) ((AbstractConnector) jmsConnector).getReplyToHandler(jmsEndpoint);
+        EndpointReplyToHandler vmHandler = (EndpointReplyToHandler) ((AbstractConnector) vmConnector).getReplyToHandler(vmEndpoint);
 
-        DefaultReplyToHandler jmsHandler2 = serialize(jmsHandler);
-        DefaultReplyToHandler vmHandler2 = serialize(vmHandler);
+        EndpointReplyToHandler jmsHandler2 = serialize(jmsHandler);
+        EndpointReplyToHandler vmHandler2 = serialize(vmHandler);
 
         assertEquals(jmsHandler.getConnector(), jmsHandler2.getConnector());
         assertEquals(vmHandler.getConnector(), vmHandler2.getConnector());
     }
 
-    private DefaultReplyToHandler serialize(ReplyToHandler handler) throws IOException, ClassNotFoundException, MuleException
+    private EndpointReplyToHandler serialize(ReplyToHandler handler) throws IOException, ClassNotFoundException, MuleException
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         oos.writeObject(handler);
         oos.flush();
-        DefaultReplyToHandler serialized = (DefaultReplyToHandler) new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
+        EndpointReplyToHandler serialized = (EndpointReplyToHandler) new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
         serialized.initAfterDeserialisation(muleContext);
         return serialized;
     }

@@ -16,14 +16,22 @@ public abstract class AbstractBaseOptionsBuilder<BuilderType extends AbstractBas
 {
 
     private Long responseTimeout;
+    private boolean outbound = false;
 
     protected AbstractBaseOptionsBuilder()
     {
     }
 
+    @Override
     public BuilderType responseTimeout(final long timeout)
     {
         this.responseTimeout = timeout;
+        return (BuilderType) this;
+    }
+
+    public BuilderType outbound()
+    {
+        this.outbound = true;
         return (BuilderType) this;
     }
 
@@ -38,5 +46,10 @@ public abstract class AbstractBaseOptionsBuilder<BuilderType extends AbstractBas
     protected Long getResponseTimeout()
     {
         return responseTimeout;
+    }
+
+    public boolean isOutbound()
+    {
+        return outbound;
     }
 }

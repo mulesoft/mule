@@ -44,7 +44,7 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
     public void testActiveMqDefault() throws Exception
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry()
-            .lookupConnector("activeMqConnectorDefaults");
+                                                   .lookupObject("activeMqConnectorDefaults");
         c.connect();
         assertNotNull(c);
         assertTrue(c instanceof ActiveMQJmsConnector);
@@ -58,7 +58,7 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testActiveMqBrokerURL() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("activeMqConnectorBroker");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("activeMqConnectorBroker");
         try
         {
             c.connect();
@@ -79,7 +79,7 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testWeblogicDefaultConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("weblogicConnector");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("weblogicConnector");
         assertNotNull(c);
         assertTrue(c instanceof WeblogicJmsConnector);
     }
@@ -87,7 +87,7 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testWebsphereDefaultConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("websphereConnector");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("websphereConnector");
         assertNotNull(c);
         assertTrue(c instanceof WebsphereJmsConnector);
     }
@@ -95,7 +95,7 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testMuleMQDefaultConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("muleMqConnector");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("muleMqConnector");
         assertNotNull(c);
         assertTrue(c instanceof MuleMQJmsConnector);
         assertEquals("nsp://localhost:9000", ((MuleMQJmsConnector) c).getRealmURL());
@@ -105,7 +105,7 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testMuleMQBrokerURL() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("muleMqConnectorBroker");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("muleMqConnectorBroker");
         assertNotNull(c);
         assertTrue(c instanceof MuleMQJmsConnector);
         assertEquals("nsp://localhost:1234", ((MuleMQJmsConnector) c).getRealmURL());
@@ -114,7 +114,7 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testMuleMQXaDefaultConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("muleMqXaConnector");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("muleMqXaConnector");
         assertNotNull(c);
         assertTrue(c instanceof MuleMQXAJmsConnector);
         assertEquals("nsp://localhost:9000", ((MuleMQXAJmsConnector) c).getRealmURL());
@@ -123,7 +123,7 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
     @Test
     public void testMuleMQXaBrokerURL() throws Exception
     {
-        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("muleMqXaConnectorBroker");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("muleMqXaConnectorBroker");
         assertNotNull(c);
         assertTrue(c instanceof MuleMQXAJmsConnector);
         assertEquals("nsp://localhost:1234", ((MuleMQJmsConnector) c).getRealmURL());

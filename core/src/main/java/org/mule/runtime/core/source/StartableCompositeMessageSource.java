@@ -58,6 +58,7 @@ public class StartableCompositeMessageSource
     private final MessageProcessor internalListener = new InternalMessageProcessor();
     protected MuleContext muleContext;
 
+    @Override
     public void addSource(MessageSource source) throws MuleException
     {
         MessageSource messageSource = source;
@@ -98,6 +99,7 @@ public class StartableCompositeMessageSource
         }
     }
 
+    @Override
     public void removeSource(MessageSource source) throws MuleException
     {
         if (started.get())
@@ -126,6 +128,7 @@ public class StartableCompositeMessageSource
         }
     }
     
+    @Override
     public void initialise() throws InitialisationException
     {
         if (listener == null)
@@ -142,6 +145,7 @@ public class StartableCompositeMessageSource
         initialised.set(true);
     }
 
+    @Override
     public void start() throws MuleException
     {
         if (listener == null)
@@ -165,6 +169,7 @@ public class StartableCompositeMessageSource
         }
     }
 
+    @Override
     public void stop() throws MuleException
     {
         synchronized (sources)
@@ -181,6 +186,7 @@ public class StartableCompositeMessageSource
         }
     }
     
+    @Override
     public void dispose()
     {
         synchronized (sources)
@@ -195,11 +201,13 @@ public class StartableCompositeMessageSource
         }
     }
 
+    @Override
     public void setListener(MessageProcessor listener)
     {
         this.listener = listener;
     }
 
+    @Override
     public void setFlowConstruct(FlowConstruct pattern)
     {
         this.flowConstruct = pattern;
@@ -232,6 +240,7 @@ public class StartableCompositeMessageSource
             super();
         }
 
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             if (started.get() || starting.get())
@@ -252,5 +261,18 @@ public class StartableCompositeMessageSource
         {
             return ObjectUtils.toString(this);
         }
+    }
+
+    @Override
+    public boolean isCompatibleWithAsync()
+    {
+        for (MessageSource childSource : getSources())
+        {
+            if (!childSource.isCompatibleWithAsync())
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }
