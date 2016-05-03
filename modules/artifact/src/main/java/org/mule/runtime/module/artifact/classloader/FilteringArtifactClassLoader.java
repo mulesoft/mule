@@ -54,7 +54,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     {
         if (filter.exportsResource(name))
         {
-            return pluginClassLoader.getClassLoader().getResource(name);
+            return pluginClassLoader.findResource(name);
         }
         else
         {
@@ -69,7 +69,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 
         if (filter.exportsResource(name))
         {
-            Enumeration<URL> resources = pluginClassLoader.getClassLoader().getResources(name);
+            Enumeration<URL> resources = pluginClassLoader.findResources(name);
 
             while (resources.hasMoreElements())
             {
