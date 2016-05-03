@@ -98,7 +98,7 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
         assertThat(payload.getFinalPojo(), instanceOf(FinalPojo.class));
 
         assertThat(payload.getRicin(), instanceOf(Ricin.class));
-        assertThat(payload.getTriangleAlias(), instanceOf(Triangle.class));
+        assertThat(payload.getTriangle(), instanceOf(Triangle.class));
     }
 
 

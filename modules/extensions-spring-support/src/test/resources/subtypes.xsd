@@ -20,9 +20,9 @@
                         <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
                             <xs:complexType>
                                 <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                                     <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
                                     <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
-                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                                 </xs:choice>
                             </xs:complexType>
                         </xs:element>
@@ -55,12 +55,12 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="triangle-alias">
+                        <xs:element minOccurs="0" maxOccurs="1" name="triangle">
                             <xs:complexType>
                                 <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                                     <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
                                     <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
-                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                                 </xs:choice>
                             </xs:complexType>
                         </xs:element>
@@ -71,41 +71,7 @@
                     <xs:attribute type="mule:expressionObject" use="optional" name="explicitSquare"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="finalPojo"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="importedRicin"></xs:attribute>
-                    <xs:attribute type="mule:expressionObject" use="optional" name="triangleAlias"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:complexType name="org.mule.test.subtypes.extension.Square">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionInt" use="optional" name="area"></xs:attribute>
-                <xs:attribute type="mule:expressionInt" use="optional" name="side"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="square">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Square">
-                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:complexType name="org.mule.test.subtypes.extension.Triangle">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionInt" use="optional" name="area"></xs:attribute>
-                <xs:attribute type="mule:expressionInt" use="optional" name="height"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="triangle-alias">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Triangle">
-                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="triangle"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -126,10 +92,56 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.Square">
+        <xs:complexContent>
+            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Shape">
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="side"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="square">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Square">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.Triangle">
+        <xs:complexContent>
+            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Shape">
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="height"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="triangle-alias">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Triangle">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.Door">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="door">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Door">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.HouseDoor">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionBoolean" use="optional" name="locked"></xs:attribute>
+            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Door">
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionBoolean" use="optional" name="locked"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -144,8 +156,8 @@
     </xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.CarDoor">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionString" use="optional" name="color"></xs:attribute>
+            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Door">
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" name="color"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -244,9 +256,9 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="shape">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                                 <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
                                 <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
-                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                             </xs:choice>
                         </xs:complexType>
                     </xs:element>
@@ -270,12 +282,12 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
                 <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="shape">
+                    <xs:element minOccurs="0" maxOccurs="1" name="base-shape">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                                 <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
                                 <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
-                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                             </xs:choice>
                         </xs:complexType>
                     </xs:element>
@@ -301,21 +313,21 @@
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" name="square">
+                    <xs:element minOccurs="0" maxOccurs="1" name="square-shape">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                                 <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
                                 <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
-                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                             </xs:choice>
                         </xs:complexType>
                     </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" name="triangle-alias">
+                    <xs:element minOccurs="0" maxOccurs="1" name="triangle">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                                 <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
                                 <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
-                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                             </xs:choice>
                         </xs:complexType>
                     </xs:element>
@@ -325,12 +337,12 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionObject" use="optional" name="shape"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="baseShape"></xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="door"></xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="finalPojoParam"></xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="cookBook"></xs:attribute>
-                <xs:attribute type="mule:expressionObject" use="optional" name="square"></xs:attribute>
-                <xs:attribute type="mule:expressionObject" use="optional" name="triangleAlias"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="squareShape"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="triangle"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -349,9 +361,9 @@
                         <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
                             <xs:complexType>
                                 <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                                     <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
                                     <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
-                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
                                 </xs:choice>
                             </xs:complexType>
                         </xs:element>

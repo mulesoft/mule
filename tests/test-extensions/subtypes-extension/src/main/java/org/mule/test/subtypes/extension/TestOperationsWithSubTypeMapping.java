@@ -37,9 +37,9 @@ public class TestOperationsWithSubTypeMapping
         return connection;
     }
 
-    public List<Object> subtypedAndConcreteParameters(Shape shape, Door door, FinalPojo finalPojoParam,
-                                                      VeganCookBook cookBook, Shape square, Shape triangleAlias)
+    public List<Object> subtypedAndConcreteParameters(Shape baseShape, Door door, FinalPojo finalPojoParam,
+                                                      VeganCookBook cookBook, Shape squareShape, Shape triangle)
     {
-        return Arrays.asList(shape, door, finalPojoParam, cookBook, square, triangleAlias);
+        return Arrays.asList(baseShape, door, finalPojoParam, cookBook, squareShape, triangle);
     }
 }

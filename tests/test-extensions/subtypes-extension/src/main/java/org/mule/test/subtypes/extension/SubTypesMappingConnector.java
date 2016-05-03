@@ -45,7 +45,7 @@ public class SubTypesMappingConnector
     private Ricin importedRicin;
 
     @Parameter
-    private Shape triangleAlias;
+    private Shape triangle;
 
     public Shape getAbstractShape()
     {
@@ -67,9 +67,9 @@ public class SubTypesMappingConnector
         return finalPojo;
     }
 
-    public Shape getTriangleAlias()
+    public Shape getTriangle()
     {
-        return triangleAlias;
+        return triangle;
     }
 
     public Ricin getRicin()

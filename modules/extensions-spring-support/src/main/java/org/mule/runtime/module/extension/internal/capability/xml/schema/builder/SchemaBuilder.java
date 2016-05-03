@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
@@ -325,6 +326,11 @@ public final class SchemaBuilder
         return sortedParameters;
     }
 
+    private String registerPojoType(ObjectType metadataType, String description)
+    {
+        return registerPojoType(metadataType, null, description);
+    }
+
     /**
      * Registers a pojo type creating a base complex type and a substitutable
      * top level type while assigning it a name. This method will not register
@@ -334,7 +340,7 @@ public final class SchemaBuilder
      * @param description  the type's description
      * @return the reference name of the complexType
      */
-    private String registerPojoType(ObjectType metadataType, String description)
+    private String registerPojoType(ObjectType metadataType, ObjectType baseType, String description)
     {
         ComplexTypeHolder alreadyRegisteredType = registeredComplexTypesHolders.get(getType(metadataType));
         if (alreadyRegisteredType != null)
@@ -342,7 +348,7 @@ public final class SchemaBuilder
             return alreadyRegisteredType.getComplexType().getName();
         }
 
-        registerBasePojoType(metadataType, description);
+        registerBasePojoType(metadataType, baseType, description);
         registerPojoGlobalElement(metadataType, description);
 
         return getBaseTypeName(metadataType);
@@ -353,10 +359,21 @@ public final class SchemaBuilder
         return NameUtils.sanitizeName(getType(type).getName());
     }
 
-    private TopLevelComplexType registerBasePojoType(ObjectType metadataType, String description)
+    private ComplexType registerBasePojoType(ObjectType metadataType, ObjectType baseType, String description)
     {
-        final TopLevelComplexType complexType = new TopLevelComplexType();
         final Class<?> clazz = getType(metadataType);
+        if (registeredComplexTypesHolders.get(clazz) != null)
+        {
+            return registeredComplexTypesHolders.get(clazz).getComplexType();
+        }
+
+        if (baseType != null && registeredComplexTypesHolders.get(getType(baseType)) == null)
+        {
+            throw new IllegalArgumentException(
+                    String.format("Base type [%s] is not registered as a Pojo type", getType(baseType).getSimpleName()));
+        }
+
+        final TopLevelComplexType complexType = new TopLevelComplexType();
         registeredComplexTypesHolders.put(clazz, new ComplexTypeHolder(complexType, metadataType));
 
         complexType.setName(NameUtils.sanitizeName(clazz.getName()));
@@ -366,11 +383,15 @@ public final class SchemaBuilder
         complexType.setComplexContent(complexContent);
 
         final ExtensionType extension = new ExtensionType();
-        extension.setBase(MULE_ABSTRACT_EXTENSION_TYPE);
+        extension.setBase(baseType == null ? MULE_ABSTRACT_EXTENSION_TYPE :
+                          new QName(schema.getTargetNamespace(), NameUtils.sanitizeName(getType(baseType).getName())));
+
         complexContent.setExtension(extension);
 
+        Collection<ObjectFieldType> fields = baseType == null ? metadataType.getFields() :
+                                             metadataType.getFields().stream().filter(f -> !baseType.getFields().contains(f)).collect(toList());
 
-        for (ObjectFieldType field : metadataType.getFields())
+        for (ObjectFieldType field : fields)
         {
             final String name = field.getKey().getName().getLocalPart();
             final MetadataType fieldType = field.getValue();
@@ -992,14 +1013,15 @@ public final class SchemaBuilder
         choice.setMinOccurs(ONE);
         choice.setMaxOccurs("1");
 
-
+        registerPojoType((ObjectType) parameterModel.getType(), EMPTY);
         if (shouldGeneratePojoChildElements(parameterClass))
         {
-            subTypes = ImmutableList.<MetadataType>builder().addAll(subTypes).add(parameterModel.getType()).build();
+            TopLevelElement refElement = createRefElement(new QName(schema.getTargetNamespace(), hyphenize(getAliasName(parameterModel.getType()))), false);
+            choice.getParticle().add(objectFactory.createElement(refElement));
         }
 
         subTypes.forEach(subtype -> {
-            registerPojoType((ObjectType) subtype, EMPTY);
+            registerPojoType((ObjectType) subtype, (ObjectType) parameterModel.getType(), EMPTY);
             TopLevelElement refElement = createRefElement(new QName(schema.getTargetNamespace(), hyphenize(getAliasName(subtype))), false);
             choice.getParticle().add(objectFactory.createElement(refElement));
         });

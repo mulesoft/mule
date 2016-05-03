@@ -30,9 +30,9 @@
         <subtypes:imported-ricin>
             <heisenberg:ricin microgramsPerKilo="2"/>
         </subtypes:imported-ricin>
-        <subtypes:triangle-alias>
+        <subtypes:triangle>
             <subtypes:triangle-alias height="4" area="2"/>
-        </subtypes:triangle-alias>
+        </subtypes:triangle>
     </subtypes:config>
 
     <flow name="shapeRetriever">
@@ -61,9 +61,9 @@
 
     <flow name="subtypedAndConcreteParameters">
         <subtypes:subtyped-and-concrete-parameters>
-            <subtypes:shape>
+            <subtypes:base-shape>
                 <subtypes:shape area="2"/>
-            </subtypes:shape>
+            </subtypes:base-shape>
             <subtypes:door>
                 <subtypes:house-door locked="false"/>
             </subtypes:door>
@@ -71,12 +71,12 @@
             <subtypes:cook-book>
                 <vegan:vegan-cook-book numberOfPages="1"/>
             </subtypes:cook-book>
-            <subtypes:square>
+            <subtypes:square-shape>
                 <subtypes:square side="4" area="16"/>
-            </subtypes:square>
-            <subtypes:triangle-alias>
+            </subtypes:square-shape>
+            <subtypes:triangle>
                 <subtypes:triangle-alias height="4" area="2"/>
-            </subtypes:triangle-alias>
+            </subtypes:triangle>
         </subtypes:subtyped-and-concrete-parameters>
     </flow>
 
@@ -91,9 +91,9 @@
     <flow name="subtypedAndConcreteParametersAsAttributes">
         <subtypes:subtyped-and-concrete-parameters
                 door="global-car-door"
-                shape="global-shape"
-                square="global-square"
-                triangleAlias="global-triangle"
+                baseShape="global-shape"
+                squareShape="global-square"
+                triangle="global-triangle"
                 finalPojoParam="global-final-pojo"
                 cookBook="global-cookbook"
         />
