@@ -66,9 +66,9 @@ public class HeisenbergSource extends Source<Void, Serializable>
         executor.scheduleAtFixedRate(() -> sourceContext.getMessageHandler().handle(makeMessage(sourceContext), completionHandler()), 0, 100, TimeUnit.MILLISECONDS);
     }
 
-    private CompletionHandler<MuleMessage<Void, Serializable>, Exception> completionHandler()
+    private CompletionHandler<MuleMessage<?, ? extends Serializable>, Exception> completionHandler()
     {
-        return new CompletionHandler<MuleMessage<Void, Serializable>, Exception>()
+        return new CompletionHandler<MuleMessage<?, ? extends Serializable>, Exception>()
         {
             @Override
             public void onCompletion(MuleMessage message)

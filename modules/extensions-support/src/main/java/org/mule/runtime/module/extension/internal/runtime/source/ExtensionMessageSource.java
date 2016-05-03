@@ -107,7 +107,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     private MessageProcessingManager messageProcessingManager;
 
     @Override
-    public void handle(MuleMessage<Object, Serializable> message, CompletionHandler<MuleMessage<Object, Serializable>, Exception> completionHandler)
+    public void handle(MuleMessage<Object, Serializable> message, CompletionHandler<MuleMessage<?, ? extends Serializable>, Exception> completionHandler)
     {
         MuleEvent event = new DefaultMuleEvent((org.mule.runtime.core.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
         messageProcessingManager.processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, completionHandler), createProcessingContext());
