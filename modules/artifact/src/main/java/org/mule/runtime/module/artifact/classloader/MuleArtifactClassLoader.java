@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 public class MuleArtifactClassLoader extends FineGrainedControlClassLoader implements ArtifactClassLoader
 {
 
-    private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION = "/org/mule/module/artifact/classloader/DefaultResourceReleaser.class";
+    private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION = "/org/mule/runtime/module/artifact/classloader/DefaultResourceReleaser.class";
     private final String name;
 
     protected Log logger = LogFactory.getLog(getClass());
