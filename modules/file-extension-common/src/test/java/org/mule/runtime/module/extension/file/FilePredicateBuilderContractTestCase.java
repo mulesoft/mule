@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class FilePredicateBuilderTestCase<T extends FilePredicateBuilder, Attributes extends FileAttributes> extends AbstractMuleTestCase
+public class FilePredicateBuilderContractTestCase<T extends FilePredicateBuilder, Attributes extends FileAttributes> extends AbstractMuleTestCase
 {
 
     private static final String FILENAME = "Mule.java";
@@ -41,9 +41,14 @@ public class FilePredicateBuilderTestCase<T extends FilePredicateBuilder, Attrib
         when(attributes.isDirectory()).thenReturn(false);
     }
 
+    private class TestFilePredicateBuilder extends FilePredicateBuilder
+    {
+
+    }
+
     protected T createPredicateBuilder()
     {
-        return (T) new FilePredicateBuilder();
+        return (T) new TestFilePredicateBuilder();
     }
 
     protected Class<Attributes> getFileAttributesClass()

@@ -26,9 +26,17 @@ import org.mule.runtime.module.extension.internal.introspection.DefaultExtension
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.introspection.enricher.XmlModelEnricher;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
+import org.mule.runtime.module.extension.internal.runtime.connector.basic.GlobalInnerPojoConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.basic.GlobalPojoConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.basic.ListConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.basic.MapConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.basic.StringListConnector;
+import org.mule.runtime.module.extension.internal.runtime.connector.basic.TestConnector;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
+import org.mule.test.vegan.extension.VeganExtension;
 
 import java.io.File;
 import java.util.Arrays;
@@ -57,14 +65,14 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
     public static Collection<Object[]> data()
     {
         return Arrays.asList(new Object[][] {
-                //{HeisenbergExtension.class, "heisenberg.xsd"},
-                //{TestConnector.class, "basic.xsd"},
-                //{GlobalPojoConnector.class, "global-pojo.xsd"},
-                //{GlobalInnerPojoConnector.class, "global-inner-pojo.xsd"},
-                //{MapConnector.class, "map.xsd"},
-                //{ListConnector.class, "list.xsd"},
-                //{StringListConnector.class, "string-list.xsd"},
-                //{VeganExtension.class, "vegan.xsd"},
+                {HeisenbergExtension.class, "heisenberg.xsd"},
+                {TestConnector.class, "basic.xsd"},
+                {GlobalPojoConnector.class, "global-pojo.xsd"},
+                {GlobalInnerPojoConnector.class, "global-inner-pojo.xsd"},
+                {MapConnector.class, "map.xsd"},
+                {ListConnector.class, "list.xsd"},
+                {StringListConnector.class, "string-list.xsd"},
+                {VeganExtension.class, "vegan.xsd"},
                 {SubTypesMappingConnector.class, "subtypes.xsd"}
         });
     }

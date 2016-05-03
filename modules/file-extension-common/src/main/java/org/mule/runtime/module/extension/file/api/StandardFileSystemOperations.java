@@ -45,7 +45,7 @@ public class StandardFileSystemOperations
      * @param directoryPath the path to the directory to be listed
      * @param recursive     whether to include the contents of sub-directories. Defaults to {@code false}
      * @param message       the {@link MuleMessage} on which this operation was triggered
-     * @param matcher       a matcher used to filter the output list
+     * @param matchWith     a matcher used to filter the output list
      * @return a {@link TreeNode} object representing the listed directory
      * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
      */
@@ -53,9 +53,9 @@ public class StandardFileSystemOperations
                          @Optional String directoryPath,
                          @Optional(defaultValue = "false") boolean recursive,
                          MuleMessage<?, ?> message,
-                         @Optional FilePredicateBuilder matcher)
+                         @Optional FilePredicateBuilder matchWith)
     {
-        return fileSystem.list(directoryPath, recursive, message, getPredicate(matcher));
+        return fileSystem.list(directoryPath, recursive, message, getPredicate(matchWith));
     }
 
     /**
