@@ -16,7 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -69,14 +69,12 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void loadsExportedResource() throws ClassNotFoundException, MalformedURLException
+    public void loadsExportedResource() throws ClassNotFoundException, IOException
     {
-        TestClassLoader classLoader = new TestClassLoader();
         URL expectedResource = new URL("file:///app.txt");
-        classLoader.addResource(RESOURCE_NAME, expectedResource);
 
         when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
-        when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+        when(artifactClassLoader.findResource(RESOURCE_NAME)).thenReturn(expectedResource);
 
         filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, artifactClassLoader, filter);
 
@@ -103,12 +101,10 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
     @Test
     public void getsExportedResources() throws Exception
     {
-        TestClassLoader classLoader = new TestClassLoader();
         URL resource = new URL("file:/app.txt");
-        classLoader.addResource(RESOURCE_NAME, resource);
 
         when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
-        when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+        when(artifactClassLoader.findResources(RESOURCE_NAME)).thenReturn(new EnumerationAdapter<>(Collections.singleton(resource)));
 
         filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, artifactClassLoader, filter);
 
