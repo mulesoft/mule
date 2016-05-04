@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <file:config name="file" baseDir="${baseDir}"/>
+    <file:matcher name="matcher" filenamePattern="matchme.txt" />
+
+    <flow name="listenWithoutMatcher">
+        <file:directory-listener directory="matcherless" recursive="true" />
+        <flow-ref name="onEvent"/>
+    </flow>
+
+    <flow name="listenTxtOnly">
+        <file:directory-listener directory="withMatcher" recursive="true" matchWith="matcher" />
+        <set-payload value="Dr. Manhattan" />
+        <flow-ref name="onEvent"/>
+    </flow>
+
+    <sub-flow name="onEvent">
+        <expression-component>org.mule.extension.file.DirectoryListenerTestCase.onMessage(message)</expression-component>
+    </sub-flow>
+</mule>

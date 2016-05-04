@@ -32,7 +32,6 @@ import javax.activation.MimetypesFileTypeMap;
 public class StandardFileSystemOperations
 {
 
-
     /**
      * Lists all the files in the {@code directoryPath} which match the given {@code matcher}.
      * <p>
@@ -319,5 +318,4 @@ public class StandardFileSystemOperations
     {
         return builder != null ? builder.build() : new NullFilePayloadPredicate();
     }
-
 }

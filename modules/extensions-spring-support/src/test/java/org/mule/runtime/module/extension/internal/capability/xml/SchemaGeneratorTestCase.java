@@ -34,6 +34,7 @@ import org.mule.runtime.module.extension.internal.runtime.connector.basic.TestCo
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
 import org.mule.test.vegan.extension.VeganExtension;
 
@@ -71,7 +72,8 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
                 {ListConnector.class, "list.xsd"},
                 {StringListConnector.class, "string-list.xsd"},
                 {VeganExtension.class, "vegan.xsd"},
-                {SubTypesMappingConnector.class, "subtypes.xsd"}
+                {SubTypesMappingConnector.class, "subtypes.xsd"},
+                {PetStoreConnector.class, "petstore.xsd"}
         });
     }
 

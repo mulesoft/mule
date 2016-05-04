@@ -8,12 +8,14 @@ package org.mule.extension.file.api;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.extension.file.internal.DirectoryListener;
 import org.mule.extension.file.internal.LocalFilePredicateBuilder;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -38,6 +40,7 @@ import java.nio.file.Paths;
 @Operations({StandardFileSystemOperations.class})
 @SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = LocalFilePredicateBuilder.class)
 @Providers(LocalFileConnectionProvider.class)
+@Sources(DirectoryListener.class)
 public class FileConnector implements Initialisable, FileConnectorConfig
 {
 
