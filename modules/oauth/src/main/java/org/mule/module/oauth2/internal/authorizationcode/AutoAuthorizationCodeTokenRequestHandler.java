@@ -39,6 +39,7 @@ import org.mule.module.oauth2.internal.StateDecoder;
 import org.mule.module.oauth2.internal.TokenNotFoundException;
 import org.mule.module.oauth2.internal.TokenResponseProcessor;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
+import org.mule.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -132,8 +133,8 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
                 }
                 catch (TokenNotFoundException e)
                 {
-                    logger.error(String.format("Could not extract access token or refresh token from token URL. Access token is %s, Refresh token is %s",
-                                               e.getTokenResponseProcessor().getAccessToken(), e.getTokenResponseProcessor().getRefreshToken()));
+                    logger.error(String.format("Could not extract access token from token URL. Access token is %s, Refresh token is %s",
+                                               e.getTokenResponseProcessor().getAccessToken(), StringUtils.isBlank(e.getTokenResponseProcessor().getRefreshToken()) ? "(Not issued)" : e.getTokenResponseProcessor().getRefreshToken()));
                     muleEventLogger.logContent(e.getTokenUrlResponse());
                     authorizationStatus = TOKEN_NOT_FOUND_STATUS;
                     statusCodeToReturn = INTERNAL_SERVER_ERROR.getStatusCode();
@@ -179,7 +180,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
 
     private boolean tokenResponseContentIsValid(TokenResponseProcessor tokenResponseProcessor)
     {
-        return tokenResponseProcessor.getAccessToken() != null && tokenResponseProcessor.getRefreshToken() != null;
+        return tokenResponseProcessor.getAccessToken() != null;
     }
 
     private void setMapPayloadWithTokenRequestParameters(final MuleEvent event, final String authorizationCode)
@@ -256,7 +257,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("New OAuth State for resourceOwnerId %s is: accessToken(%s), refreshToken(%s), expiresIn(%s), state(%s)", resourceOwnerOAuthContext.getResourceOwnerId(), resourceOwnerOAuthContext.getAccessToken(), resourceOwnerOAuthContext.getRefreshToken(), resourceOwnerOAuthContext.getExpiresIn(), resourceOwnerOAuthContext.getState());
+            logger.debug("New OAuth State for resourceOwnerId %s is: accessToken(%s), refreshToken(%s), expiresIn(%s), state(%s)", resourceOwnerOAuthContext.getResourceOwnerId(), resourceOwnerOAuthContext.getAccessToken(), StringUtils.isBlank(resourceOwnerOAuthContext.getRefreshToken()) ? "Not issued" : resourceOwnerOAuthContext.getRefreshToken(), resourceOwnerOAuthContext.getExpiresIn(), resourceOwnerOAuthContext.getState());
         }
     }
 
@@ -287,7 +288,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
         }
         catch (TokenNotFoundException e)
         {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage("Access token or refresh token were not found from the refresh token oauth call"), e);
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage("Access token was not found from the refresh token oauth call"), e);
         }
         catch (Exception e)
         {
