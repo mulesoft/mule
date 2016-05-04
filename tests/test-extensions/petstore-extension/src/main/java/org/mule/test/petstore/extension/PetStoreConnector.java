@@ -35,6 +35,10 @@ public class PetStoreConnector
     @Optional
     private ThreadingProfile threadingProfile;
 
+    @Parameter
+    @Optional
+    private PetCage cage;
+
     public List<String> getPets()
     {
         return pets;
@@ -48,5 +52,10 @@ public class PetStoreConnector
     public ThreadingProfile getThreadingProfile()
     {
         return threadingProfile;
+    }
+
+    public PetCage getCage()
+    {
+        return cage;
     }
 }

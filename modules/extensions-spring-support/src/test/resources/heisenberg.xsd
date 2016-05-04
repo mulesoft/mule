@@ -175,6 +175,7 @@
                     </xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="previous"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="victim"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
@@ -200,6 +201,7 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
+                <xs:attribute type="mule:expressionObject" use="optional" name="destination"></xs:attribute>
                 <xs:attribute type="mule:expressionLong" use="optional" name="microgramsPerKilo"></xs:attribute>
             </xs:extension>
         </xs:complexContent>

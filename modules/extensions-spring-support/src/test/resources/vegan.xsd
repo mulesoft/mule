@@ -43,6 +43,7 @@
                     </xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:expressionInt" use="optional" name="numberOfPages"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="optional" name="recipes"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
