@@ -8,10 +8,7 @@ package org.mule.runtime.module.oauth2.internal;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.expression.ExpressionManager;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +26,7 @@ public class TokenResponseProcessor
     protected Logger logger = LoggerFactory.getLogger(getClass());
     private final TokenResponseConfiguration tokenResponseConfiguration;
     private final ExpressionManager expressionManager;
-    private final boolean retrieveRefreshToken;
+    private final boolean retrieveRefreshTokenIfPresent;
     private String accessToken;
     private String refreshToken;
     private String expiresIn;
@@ -45,33 +42,28 @@ public class TokenResponseProcessor
         return new TokenResponseProcessor(tokenResponseConfiguration, expressionManager, false);
     }
 
-    private TokenResponseProcessor(final TokenResponseConfiguration tokenResponseConfiguration, final ExpressionManager expressionManager, boolean retrieveRefreshToken)
+    private TokenResponseProcessor(final TokenResponseConfiguration tokenResponseConfiguration, final ExpressionManager expressionManager, boolean retrieveRefreshTokenIfPresent)
     {
         this.tokenResponseConfiguration = tokenResponseConfiguration;
         this.expressionManager = expressionManager;
-        this.retrieveRefreshToken = retrieveRefreshToken;
+        this.retrieveRefreshTokenIfPresent = retrieveRefreshTokenIfPresent;
     }
 
-    public void process(final MuleEvent muleEvent) throws TransformerException
+    public void process(final MuleEvent muleEvent)
     {
-        if (ClassUtils.isConsumable(muleEvent.getMessage().getPayload().getClass()))
-        {
-            muleEvent.setMessage(muleEvent.getMuleContext().getTransformationService().transform(muleEvent.getMessage(),
-                                                                                                 DataTypeFactory.STRING));
-        }
         accessToken = expressionManager.parse(tokenResponseConfiguration.getAccessToken(), muleEvent);
         accessToken = isEmpty(accessToken) ? null : accessToken;
         if (accessToken == null)
         {
             logger.error("Could not extract access token from token URL. Expressions used to retrieve access token was " + tokenResponseConfiguration.getAccessToken());
         }
-        if (retrieveRefreshToken)
+        if (retrieveRefreshTokenIfPresent)
         {
             refreshToken = expressionManager.parse(tokenResponseConfiguration.getRefreshToken(), muleEvent);
             refreshToken = isEmpty(refreshToken) ? null : refreshToken;
             if (refreshToken == null)
             {
-                logger.error("Could not extract refresh token from token URL. Expressions used to retrieve refresh token was " + tokenResponseConfiguration.getRefreshToken());
+                logger.warn("Could not extract refresh token from token URL or not issued by the OAuth server. Expressions used to retrieve refresh token was " + tokenResponseConfiguration.getRefreshToken() + ", it will not be possible to refresh the access token once it is expired");
             }
         }
         expiresIn = expressionManager.parse(tokenResponseConfiguration.getExpiresIn(), muleEvent);
