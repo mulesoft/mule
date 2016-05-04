@@ -181,7 +181,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
     }
 
     @Override
-    public boolean shouldRetry(final MuleEvent firstAttemptResponseEvent)
+    public boolean shouldRetry(final MuleEvent firstAttemptResponseEvent) throws MuleException
     {
         if (!StringUtils.isBlank(getRefreshTokenWhen()))
         {
@@ -190,16 +190,25 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
             {
                 throw new MuleRuntimeException(createStaticMessage("Expression %s should return a boolean but return %s", getRefreshTokenWhen(), value));
             }
-            final Boolean shouldRetryRequest = (Boolean) value;
+            Boolean shouldRetryRequest = (Boolean) value;
             if (shouldRetryRequest)
             {
-                try
+                final String resourceId = resourceOwnerIdEvaluator.resolveStringValue(firstAttemptResponseEvent);
+                final Boolean refreshTokenIssuedByServer = !StringUtils.isBlank(this.getConfigOAuthContext().getContextForResourceOwner(resourceId).getRefreshToken());
+                if (refreshTokenIssuedByServer)
                 {
-                    refreshToken(firstAttemptResponseEvent, resourceOwnerIdEvaluator.resolveStringValue(firstAttemptResponseEvent));
+                    try
+                    {
+                        refreshToken(firstAttemptResponseEvent, resourceId);
+                    }
+                    catch (MuleException e)
+                    {
+                        throw new MuleRuntimeException(e);
+                    }
                 }
-                catch (MuleException e)
+                else
                 {
-                    throw new MuleRuntimeException(e);
+                    throw new RequestAuthenticationException(createStaticMessage(String.format("Cannot do a refresh token to get a new access token for the %s user due to OAuth server did not issued a refresh_token. You would have to re-authenticate the user before trying to execute an operation to the API.", resourceId)));
                 }
             }
             return shouldRetryRequest;
