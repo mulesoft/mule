@@ -6,14 +6,16 @@
  */
 package org.mule.extension.ftp.api;
 
+import org.mule.extension.ftp.internal.FtpFilePredicateBuilder;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.extension.ftp.internal.FtpListOperation;
 import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
+import org.mule.runtime.module.extension.file.api.FilePredicateBuilder;
 import org.mule.runtime.module.extension.file.api.StandardFileSystemOperations;
 
 import java.util.concurrent.TimeUnit;
@@ -29,8 +31,9 @@ import javax.inject.Inject;
  * @since 4.0
  */
 @Extension(name = "Ftp Connector", description = "Connector to manipulate Files on a FTP/SFTP server")
-@Operations({StandardFileSystemOperations.class, FtpListOperation.class})
+@Operations({StandardFileSystemOperations.class})
 @Providers({FtpConnectionProvider.class})
+@SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = FtpFilePredicateBuilder.class)
 public class FtpConnector implements FileConnectorConfig
 {
 

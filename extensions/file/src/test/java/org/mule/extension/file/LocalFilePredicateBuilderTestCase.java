@@ -9,14 +9,14 @@ package org.mule.extension.file;
 import static org.mockito.Mockito.when;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.internal.LocalFilePredicateBuilder;
-import org.mule.runtime.module.extension.file.FilePredicateBuilderTestCase;
+import org.mule.runtime.module.extension.file.FilePredicateBuilderContractTestCase;
 
 import java.time.LocalDateTime;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class LocalFilePredicateBuilderTestCase extends FilePredicateBuilderTestCase<LocalFilePredicateBuilder, LocalFileAttributes>
+public class LocalFilePredicateBuilderTestCase extends FilePredicateBuilderContractTestCase<LocalFilePredicateBuilder, LocalFileAttributes>
 {
 
     private static final LocalDateTime CREATION_TIME = LocalDateTime.of(1983, 4, 20, 21, 15);

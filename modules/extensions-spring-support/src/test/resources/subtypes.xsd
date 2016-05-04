@@ -17,38 +17,23 @@
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
-                        <xs:choice minOccurs="0" maxOccurs="1">
-                            <xs:element minOccurs="0" maxOccurs="1" name="square">
-                                <xs:complexType>
-                                    <xs:complexContent>
-                                        <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Square"></xs:extension>
-                                    </xs:complexContent>
-                                </xs:complexType>
-                            </xs:element>
-                            <xs:element minOccurs="0" maxOccurs="1" name="triangle-alias">
-                                <xs:complexType>
-                                    <xs:complexContent>
-                                        <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Triangle"></xs:extension>
-                                    </xs:complexContent>
-                                </xs:complexType>
-                            </xs:element>
-                        </xs:choice>
-                        <xs:choice minOccurs="0" maxOccurs="1">
-                            <xs:element minOccurs="0" maxOccurs="1" name="house-door">
-                                <xs:complexType>
-                                    <xs:complexContent>
-                                        <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.HouseDoor"></xs:extension>
-                                    </xs:complexContent>
-                                </xs:complexType>
-                            </xs:element>
-                            <xs:element minOccurs="0" maxOccurs="1" name="car-door">
-                                <xs:complexType>
-                                    <xs:complexContent>
-                                        <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.CarDoor"></xs:extension>
-                                    </xs:complexContent>
-                                </xs:complexType>
-                            </xs:element>
-                        </xs:choice>
+                        <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
+                            <xs:complexType>
+                                <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="door-interface">
+                            <xs:complexType>
+                                <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="house-door"></xs:element>
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="car-door"></xs:element>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="explicit-square">
                             <xs:complexType>
                                 <xs:complexContent>
@@ -63,23 +48,54 @@
                                 </xs:complexContent>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:ricin"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="imported-ricin">
+                            <xs:complexType>
+                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:ricin"></xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="triangle">
+                            <xs:complexType>
+                                <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="abstractShape"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="doorInterface"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="explicitSquare"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="finalPojo"></xs:attribute>
-                    <xs:attribute type="mule:expressionObject" use="optional" name="ricin"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="importedRicin"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="triangle"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.Shape">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionInt" use="optional" name="area"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="shape">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Shape">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.Square">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionInt" use="optional" name="area"></xs:attribute>
-                <xs:attribute type="mule:expressionInt" use="optional" name="side"></xs:attribute>
+            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Shape">
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="side"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -94,9 +110,8 @@
     </xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.Triangle">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionInt" use="optional" name="area"></xs:attribute>
-                <xs:attribute type="mule:expressionInt" use="optional" name="height"></xs:attribute>
+            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Shape">
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="height"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -109,10 +124,24 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.Door">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="door">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Door">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.HouseDoor">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionBoolean" use="optional" name="locked"></xs:attribute>
+            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Door">
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionBoolean" use="optional" name="locked"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -127,8 +156,8 @@
     </xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.CarDoor">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionString" use="optional" name="color"></xs:attribute>
+            <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Door">
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" name="color"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -196,22 +225,14 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
                 <xs:sequence>
-                    <xs:choice minOccurs="0" maxOccurs="1">
-                        <xs:element minOccurs="0" maxOccurs="1" name="house-door">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.HouseDoor"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="car-door">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.CarDoor"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:choice>
+                    <xs:element minOccurs="0" maxOccurs="1" name="door">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="house-door"></xs:element>
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="car-door"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
@@ -232,22 +253,15 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
                 <xs:sequence>
-                    <xs:choice minOccurs="0" maxOccurs="1">
-                        <xs:element minOccurs="0" maxOccurs="1" name="square">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Square"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="triangle-alias">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Triangle"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:choice>
+                    <xs:element minOccurs="0" maxOccurs="1" name="shape">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
@@ -268,38 +282,23 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
                 <xs:sequence>
-                    <xs:choice minOccurs="0" maxOccurs="1">
-                        <xs:element minOccurs="0" maxOccurs="1" name="square">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Square"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="triangle-alias">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Triangle"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:choice>
-                    <xs:choice minOccurs="0" maxOccurs="1">
-                        <xs:element minOccurs="0" maxOccurs="1" name="house-door">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.HouseDoor"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="car-door">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.CarDoor"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:choice>
+                    <xs:element minOccurs="0" maxOccurs="1" name="base-shape">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="door">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="house-door"></xs:element>
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="car-door"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
                     <xs:element minOccurs="0" maxOccurs="1" name="final-pojo-param">
                         <xs:complexType>
                             <xs:complexContent>
@@ -307,17 +306,43 @@
                             </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
-                    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="0" maxOccurs="1" ref="vegan:vegan-cook-book"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="cook-book">
+                        <xs:complexType>
+                            <xs:sequence minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="0" maxOccurs="1" ref="vegan:vegan-cook-book"></xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="square-shape">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="triangle">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
+                                <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionObject" use="optional" name="shapeParam"></xs:attribute>
-                <xs:attribute type="mule:expressionObject" use="optional" name="doorParam"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="baseShape"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="door"></xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="finalPojoParam"></xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="cookBook"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="squareShape"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="triangle"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -333,38 +358,23 @@
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
-                        <xs:choice minOccurs="0" maxOccurs="1">
-                            <xs:element minOccurs="0" maxOccurs="1" name="square">
-                                <xs:complexType>
-                                    <xs:complexContent>
-                                        <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Square"></xs:extension>
-                                    </xs:complexContent>
-                                </xs:complexType>
-                            </xs:element>
-                            <xs:element minOccurs="0" maxOccurs="1" name="triangle-alias">
-                                <xs:complexType>
-                                    <xs:complexContent>
-                                        <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.Triangle"></xs:extension>
-                                    </xs:complexContent>
-                                </xs:complexType>
-                            </xs:element>
-                        </xs:choice>
-                        <xs:choice minOccurs="0" maxOccurs="1">
-                            <xs:element minOccurs="0" maxOccurs="1" name="house-door">
-                                <xs:complexType>
-                                    <xs:complexContent>
-                                        <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.HouseDoor"></xs:extension>
-                                    </xs:complexContent>
-                                </xs:complexType>
-                            </xs:element>
-                            <xs:element minOccurs="0" maxOccurs="1" name="car-door">
-                                <xs:complexType>
-                                    <xs:complexContent>
-                                        <xs:extension xmlns="http://www.mulesoft.org/schema/mule/subtypes" base="org.mule.test.subtypes.extension.CarDoor"></xs:extension>
-                                    </xs:complexContent>
-                                </xs:complexType>
-                            </xs:element>
-                        </xs:choice>
+                        <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
+                            <xs:complexType>
+                                <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="shape"></xs:element>
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="square"></xs:element>
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="triangle-alias"></xs:element>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="door-interface">
+                            <xs:complexType>
+                                <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="house-door"></xs:element>
+                                    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="car-door"></xs:element>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                     <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" name="disableValidation"></xs:attribute>
                     <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionObject" use="optional" name="abstractShape"></xs:attribute>

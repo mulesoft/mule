@@ -9,14 +9,14 @@ package org.mule.extension.ftp;
 import static org.mockito.Mockito.when;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.internal.FtpFilePredicateBuilder;
-import org.mule.runtime.module.extension.file.FilePredicateBuilderTestCase;
+import org.mule.runtime.module.extension.file.FilePredicateBuilderContractTestCase;
 
 import java.time.LocalDateTime;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class FtpFilePredicateBuilderTestCase extends FilePredicateBuilderTestCase<FtpFilePredicateBuilder, FtpFileAttributes>
+public class FtpFilePredicateBuilderTestCase extends FilePredicateBuilderContractTestCase<FtpFilePredicateBuilder, FtpFileAttributes>
 {
     private static final LocalDateTime TIMESTAMP = LocalDateTime.of(1983, 4, 20, 21, 15);
 

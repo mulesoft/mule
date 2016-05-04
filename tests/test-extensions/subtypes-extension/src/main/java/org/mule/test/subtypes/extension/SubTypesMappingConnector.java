@@ -6,8 +6,8 @@
  */
 package org.mule.test.subtypes.extension;
 
-import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
@@ -42,7 +42,10 @@ public class SubTypesMappingConnector
     private FinalPojo finalPojo;
 
     @Parameter
-    private Ricin ricin;
+    private Ricin importedRicin;
+
+    @Parameter
+    private Shape triangle;
 
     public Shape getAbstractShape()
     {
@@ -63,4 +66,15 @@ public class SubTypesMappingConnector
     {
         return finalPojo;
     }
+
+    public Shape getTriangle()
+    {
+        return triangle;
+    }
+
+    public Ricin getRicin()
+    {
+        return importedRicin;
+    }
+
 }

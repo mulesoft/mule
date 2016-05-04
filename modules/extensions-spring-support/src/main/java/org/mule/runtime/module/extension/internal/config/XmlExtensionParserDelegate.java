@@ -6,29 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.config;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getGenericTypeAt;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.pluralize;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.singularize;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
 import static org.springframework.util.xml.DomUtils.getChildElements;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
-import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -39,6 +29,21 @@ import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.annotation.GenericTypesAnnotation;
+import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.NestedProcessor;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.TemplateParser;
+import org.mule.runtime.core.util.ValueHolder;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.module.extension.internal.introspection.BasicTypeMetadataVisitor;
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 import org.mule.runtime.module.extension.internal.runtime.DefaultObjectBuilder;
@@ -55,9 +60,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpre
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.NameUtils;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.TemplateParser;
-import org.mule.runtime.core.util.ValueHolder;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -66,7 +68,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -102,7 +103,8 @@ final class XmlExtensionParserDelegate
 
     private Map<Class<?>, Object> infrastructureParameters = new HashMap<>();
     private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-    private SubTypesMappingContainer subTypesMapping = new SubTypesMappingContainer(Collections.emptyMap());
+    private SubTypesMappingContainer subTypesMapping = new SubTypesMappingContainer(ImmutableMap.of());
+    private Map<MetadataType, MetadataType> importedTypes = ImmutableMap.of();
 
     /**
      * Parses the given {@code element} for an attribute named {@code name}. If not found,
@@ -149,34 +151,44 @@ final class XmlExtensionParserDelegate
      * {@code parameter}. It then returns a {@link ValueResolver} which will provide
      * the actual value extracted from the {@code element}
      *
-     * @param element        a {@link ElementDescriptor}
-     * @param parameterModel a {@link ParameterModel}
+     * @param componentRootElement the {@link ElementDescriptor} of the component that contains the {@code parameter}
+     * @param parameterModel       a {@link ParameterModel}
      * @return a {@link ValueResolver}
      */
-    ValueResolver parseParameter(ElementDescriptor element, ParameterModel parameterModel)
+    ValueResolver parseParameter(ElementDescriptor componentRootElement, ParameterModel parameterModel)
     {
         if (parameterModel.getExpressionSupport() == ExpressionSupport.LITERAL)
         {
-            return new StaticValueResolver<>(getAttributeValue(element, parameterModel.getName(), parameterModel.getDefaultValue()));
+            return new StaticValueResolver<>(getAttributeValue(componentRootElement, parameterModel.getName(), parameterModel.getDefaultValue()));
         }
 
-        if (!subTypesMapping.getSubTypes(parameterModel.getType()).isEmpty())
+        ElementDescriptor paramChildElement = componentRootElement.getChildByName(hyphenize(parameterModel.getName()));
+        if (paramChildElement != null)
         {
-            List<MetadataType> subtypes = subTypesMapping.getSubTypes(parameterModel.getType());
-            Optional<MetadataType> subTypeChildElement = subtypes.stream()
-                    .filter(s -> element.getChildByName(hyphenize(IntrospectionUtils.getAliasName(s))) != null)
-                    .findFirst();
-
-            if (subTypeChildElement.isPresent())
+            if (importedTypes.get(parameterModel.getType()) != null)
             {
-                return parseElement(element, parameterModel.getName(),
-                                    hyphenize(IntrospectionUtils.getAliasName(subTypeChildElement.get())),
-                                    subTypeChildElement.get(),
+                return parseElement(paramChildElement, parameterModel.getName(),
+                                    hyphenize(getAliasName(parameterModel.getType())),
+                                    parameterModel.getType(),
+                                    parameterModel.getDefaultValue());
+            }
+
+            if (!subTypesMapping.getSubTypes(parameterModel.getType()).isEmpty())
+            {
+                Optional<MetadataType> childTypeFromSubtype = subTypesMapping.getSubTypes(parameterModel.getType()).stream()
+                        .filter(s -> paramChildElement.getChildByName(hyphenize(getAliasName(s))) != null)
+                        .findFirst();
+
+                MetadataType childType = childTypeFromSubtype.isPresent() ? childTypeFromSubtype.get() : parameterModel.getType();
+
+                return parseElement(paramChildElement, parameterModel.getName(),
+                                    hyphenize(getAliasName(childType)),
+                                    childType,
                                     parameterModel.getDefaultValue());
             }
         }
 
-        return parseElement(element, parameterModel.getName(), hyphenize(parameterModel.getName()),
+        return parseElement(componentRootElement, parameterModel.getName(), hyphenize(parameterModel.getName()),
                             parameterModel.getType(), parameterModel.getDefaultValue());
     }
 
@@ -297,7 +309,7 @@ final class XmlExtensionParserDelegate
      */
     ResolverSet getResolverSet(ElementDescriptor element, List<ParameterModel> parameterModels) throws ConfigurationException
     {
-        return getResolverSet(element, parameterModels, ImmutableMap.<String, List<MessageProcessor>>of());
+        return getResolverSet(element, parameterModels, ImmutableMap.of());
     }
 
     /**
@@ -635,6 +647,11 @@ final class XmlExtensionParserDelegate
 
         if (childElement != null)
         {
+            if (!StringUtils.isBlank(childElement.getAttribute("name")))
+            {
+                throw new IllegalModelDefinitionException(String.format("Element %s is not allowed to have a [name] attribute", childElement.getName()));
+            }
+
             return getPojoValueResolver(pojoType, childElement);
         }
 
@@ -809,4 +826,10 @@ final class XmlExtensionParserDelegate
     {
         this.subTypesMapping = subTypesMapping;
     }
+
+    void setImportedTypes(Map<MetadataType, MetadataType> importedTypes)
+    {
+        this.importedTypes = importedTypes;
+    }
+
 }

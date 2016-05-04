@@ -35,7 +35,7 @@ import java.util.function.Predicate;
  * @param <Attributes> The concrete implementation of {@link FileAttributes} that this builder uses to assert the file properties
  * @since 4.0
  */
-public class FilePredicateBuilder<T extends FilePredicateBuilder, Attributes extends FileAttributes>
+public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attributes extends FileAttributes>
 {
 
     protected static final TimeUntilFunction FILE_TIME_UNTIL = new TimeUntilFunction();

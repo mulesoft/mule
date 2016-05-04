@@ -11,26 +11,43 @@
 
     <subtypes:config name="config">
         <subtypes:connection>
-            <subtypes:triangle-alias height="2" area="1"/>
-            <subtypes:house-door locked="true"/>
+            <subtypes:abstract-shape>
+                <subtypes:triangle-alias height="2" area="1"/>
+            </subtypes:abstract-shape>
+            <subtypes:door-interface>
+                <subtypes:house-door locked="true"/>
+            </subtypes:door-interface>
         </subtypes:connection>
 
-        <subtypes:square side="1" area="1"/>
-        <subtypes:car-door color="red"/>
+        <subtypes:abstract-shape>
+            <subtypes:square side="1" area="1"/>
+        </subtypes:abstract-shape>
+        <subtypes:door-interface>
+            <subtypes:car-door color="red"/>
+        </subtypes:door-interface>
         <subtypes:explicit-square side="2" area="4"/>
         <subtypes:final-pojo someString="message"/>
-        <heisenberg:ricin microgramsPerKilo="2"/>
+        <subtypes:imported-ricin>
+            <heisenberg:ricin microgramsPerKilo="2"/>
+        </subtypes:imported-ricin>
+        <subtypes:triangle>
+            <subtypes:triangle-alias height="4" area="2"/>
+        </subtypes:triangle>
     </subtypes:config>
 
     <flow name="shapeRetriever">
         <subtypes:shape-retriever>
-            <subtypes:square side="4" area="16"/>
+            <subtypes:shape>
+                <subtypes:square side="4" area="16"/>
+            </subtypes:shape>
         </subtypes:shape-retriever>
     </flow>
 
     <flow name="doorRetriever">
         <subtypes:door-retriever>
-            <subtypes:car-door color="blue"/>
+            <subtypes:door>
+                <subtypes:car-door color="blue"/>
+            </subtypes:door>
         </subtypes:door-retriever>
     </flow>
 
@@ -44,24 +61,39 @@
 
     <flow name="subtypedAndConcreteParameters">
         <subtypes:subtyped-and-concrete-parameters>
-            <subtypes:triangle-alias height="4" area="2"/>
-            <subtypes:house-door locked="false"/>
+            <subtypes:base-shape>
+                <subtypes:shape area="2"/>
+            </subtypes:base-shape>
+            <subtypes:door>
+                <subtypes:house-door locked="false"/>
+            </subtypes:door>
             <subtypes:final-pojo-param someString="asChild"/>
+            <subtypes:cook-book>
+                <vegan:vegan-cook-book numberOfPages="1"/>
+            </subtypes:cook-book>
+            <subtypes:square-shape>
+                <subtypes:square side="4" area="16"/>
+            </subtypes:square-shape>
+            <subtypes:triangle>
+                <subtypes:triangle-alias height="4" area="2"/>
+            </subtypes:triangle>
         </subtypes:subtyped-and-concrete-parameters>
     </flow>
 
     <subtypes:car-door name="global-car-door" color="white"/>
     <subtypes:house-door name="global-house-door" locked="true"/>
+    <subtypes:shape name="global-shape" area="9"/>
     <subtypes:square name="global-square" side="3" area="9"/>
     <subtypes:triangle-alias name="global-triangle" height="6" area="3"/>
     <subtypes:final-pojo name="global-final-pojo" someString="globalString"/>
-
     <vegan:vegan-cook-book name="global-cookbook" numberOfPages="10"/>
 
     <flow name="subtypedAndConcreteParametersAsAttributes">
         <subtypes:subtyped-and-concrete-parameters
-                doorParam="global-car-door"
-                shapeParam="global-square"
+                door="global-car-door"
+                baseShape="global-shape"
+                squareShape="global-square"
+                triangle="global-triangle"
                 finalPojoParam="global-final-pojo"
                 cookBook="global-cookbook"
         />

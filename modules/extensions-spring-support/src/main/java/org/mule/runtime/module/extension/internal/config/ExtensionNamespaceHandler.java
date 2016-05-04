@@ -189,15 +189,10 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
         SubTypesMappingContainer typeMapping = new SubTypesMappingContainer(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : Collections.emptyMap());
 
         parameterModels.forEach(parameterModel -> {
-            List<MetadataType> parameterSubTypes = typeMapping.getSubTypes(parameterModel.getType());
-            if (parameterSubTypes.isEmpty())
-            {
-                registerTopLevelParameter(extensionModel, parameterModel.getType());
-            }
-            else
-            {
-                parameterSubTypes.forEach(subtype -> registerTopLevelParameter(extensionModel, subtype));
-            }
+            typeMapping.getSubTypes(parameterModel.getType())
+                    .forEach(subtype -> registerTopLevelParameter(extensionModel, subtype));
+
+            registerTopLevelParameter(extensionModel, parameterModel.getType());
         });
     }
 

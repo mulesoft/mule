@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.config;
 
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 
@@ -33,10 +34,19 @@ abstract class ExtensionComponentFactoryBean<T> implements FactoryBean<T>, HasEx
     {
         this.parserDelegate = parserDelegate;
 
-        if (extensionModel != null && extensionModel.getModelProperty(SubTypesModelProperty.class).isPresent())
+        if (extensionModel != null)
         {
-            this.parserDelegate.setSubTypesMapping(
-                    new SubTypesMappingContainer(extensionModel.getModelProperty(SubTypesModelProperty.class).get().getSubTypesMapping()));
+            if (extensionModel.getModelProperty(SubTypesModelProperty.class).isPresent())
+            {
+                this.parserDelegate.setSubTypesMapping(
+                        new SubTypesMappingContainer(extensionModel.getModelProperty(SubTypesModelProperty.class).get().getSubTypesMapping()));
+            }
+
+            if (extensionModel.getModelProperty(ImportedTypesModelProperty.class).isPresent())
+            {
+                this.parserDelegate.setImportedTypes(extensionModel.getModelProperty(ImportedTypesModelProperty.class)
+                                                             .map(ImportedTypesModelProperty::getImportedTypes).get());
+            }
         }
     }
 

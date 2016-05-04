@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
 
@@ -29,7 +29,6 @@ import com.google.common.collect.ListMultimap;
  */
 public final class ConfigurationModelValidator implements ModelValidator
 {
-
 
     @Override
     public void validate(ExtensionModel model) throws IllegalModelDefinitionException

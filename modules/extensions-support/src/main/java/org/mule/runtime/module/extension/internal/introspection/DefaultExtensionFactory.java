@@ -50,6 +50,7 @@ import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.SubtypesModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.MetadataComponentModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.NameClashModelValidator;
@@ -95,6 +96,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
     {
         modelEnrichers = ImmutableList.copyOf(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader));
         modelValidators = ImmutableList.<ModelValidator>builder()
+                .add(new SubtypesModelValidator())
                 .add(new NameClashModelValidator())
                 .add(new ParameterModelValidator())
                 .add(new ConnectionProviderModelValidator())

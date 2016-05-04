@@ -13,6 +13,7 @@ import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtil
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -50,6 +51,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase
     {
         when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
         when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
+        when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
         when(operationModel.getName()).thenReturn("dummyOperation");
     }
 
