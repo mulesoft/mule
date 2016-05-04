@@ -413,7 +413,13 @@ public final class IntrospectionUtils
     public static String getAliasName(MetadataType metadataType)
     {
         Class<?> type = JavaTypeUtils.getType(metadataType);
-        return getAliasName(type.getSimpleName(), type.getAnnotation(Alias.class));
+        return getAliasName(metadataType, type.getSimpleName());
+    }
+
+    public static String getAliasName(MetadataType metadataType, String defaultName)
+    {
+        Class<?> type = JavaTypeUtils.getType(metadataType);
+        return getAliasName(defaultName, type.getAnnotation(Alias.class));
     }
 
     public static String getAliasName(String defaultName, Alias aliasAnnotation)

@@ -11,7 +11,13 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.introspection.parameter.ParameterModel.RESERVED_NAMES;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectFieldType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.Described;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -26,9 +32,11 @@ import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingC
 
 import com.google.common.collect.ImmutableMap;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Validates that all {@link ParameterModel parameters} provided by the {@link ConfigurationModel configurations},
@@ -38,6 +46,7 @@ import java.util.Optional;
  * <li>The name must not be one of the reserved ones</li>
  * <li>The {@link MetadataType metadataType} must be provided</li>
  * <li>If required, cannot provide a default value</li>
+ * <li>The {@link Class} of the parameter must be valid too, that implies that the class shouldn't contain any field with a reserved name.
  * </ul>
  *
  * @since 4.0
@@ -55,6 +64,49 @@ public final class ParameterModelValidator implements ModelValidator
     @Override
     public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
     {
+        MetadataTypeVisitor visitor = new MetadataTypeVisitor()
+        {
+            private Set<Class<?>> visitedClasses = new HashSet<>();
+
+            @Override
+            public void visitDictionary(DictionaryType dictionaryType)
+            {
+                dictionaryType.getKeyType().accept(this);
+                dictionaryType.getValueType().accept(this);
+            }
+
+            @Override
+            public void visitArrayType(ArrayType arrayType)
+            {
+                arrayType.getType().accept(this);
+            }
+
+            @Override
+            public void visitObject(ObjectType objectType)
+            {
+                Class<?> type = getType(objectType);
+
+                if (visitedClasses.add(type) && isInstantiable(type))
+                {
+                    for (ObjectFieldType objectFieldType : objectType.getFields())
+                    {
+                        Class<?> fieldType = getType(objectFieldType.getValue());
+
+                        String fieldName = getAliasName(objectFieldType, objectFieldType.getKey().getName().getLocalPart());
+                        if (RESERVED_NAMES.contains(fieldName))
+                        {
+                            throw new IllegalParameterModelDefinitionException(
+                                    String.format("The field named '%s' [%s] from class [%s] cannot have that name since it is a reserved one",
+                                                  fieldName, fieldType.getName(), type.getName()));
+                        }
+                        else
+                        {
+                            objectFieldType.getValue().accept(this);
+                        }
+                    }
+                }
+            }
+        };
 
         Optional<SubTypesMappingContainer> typesMapping = extensionModel.getModelProperty(SubTypesModelProperty.class)
                 .map(p -> new SubTypesMappingContainer(p.getSubTypesMapping()));
@@ -65,38 +117,38 @@ public final class ParameterModelValidator implements ModelValidator
         importedTypes = typeImports.isPresent() ? typeImports.get() : ImmutableMap.of();
 
         extensionModel.getConfigurationModels().stream()
-                .forEach(config -> validateParameters(config.getParameterModels(), config.getName(),
+                .forEach(config -> validateParameters(config.getParameterModels(), visitor, config.getName(),
                                                       CONFIGURATION, extensionModel.getName()));
 
-        validateOperations(extensionModel, extensionModel.getOperationModels());
-        extensionModel.getConfigurationModels().forEach(config -> validateOperations(extensionModel, config.getOperationModels()));
+        validateOperations(extensionModel, extensionModel.getOperationModels(), visitor);
+        extensionModel.getConfigurationModels().forEach(config -> validateOperations(extensionModel, config.getOperationModels(), visitor));
 
-        validateConnectionProviders(extensionModel, extensionModel.getConnectionProviders());
-        extensionModel.getConfigurationModels().forEach(config -> validateConnectionProviders(extensionModel, config.getConnectionProviders()));
+        validateConnectionProviders(extensionModel, extensionModel.getConnectionProviders(), visitor);
+        extensionModel.getConfigurationModels().forEach(config -> validateConnectionProviders(extensionModel, config.getConnectionProviders(), visitor));
     }
 
-    private void validateConnectionProviders(ExtensionModel extensionModel, List<ConnectionProviderModel> providers)
+    private void validateConnectionProviders(ExtensionModel extensionModel, List<ConnectionProviderModel> providers, MetadataTypeVisitor visitor)
     {
-        providers.forEach(provider -> validateParameters(provider.getParameterModels(), provider.getName(),
+        providers.forEach(provider -> validateParameters(provider.getParameterModels(), visitor, provider.getName(),
                                                          CONNECTION_PROVIDER, extensionModel.getName()));
     }
 
-    private void validateOperations(ExtensionModel extensionModel, List<OperationModel> operations)
+    private void validateOperations(ExtensionModel extensionModel, List<OperationModel> operations, MetadataTypeVisitor visitor)
     {
-        operations.forEach(operation -> validateParameters(operation.getParameterModels(), operation.getName(),
+        operations.forEach(operation -> validateParameters(operation.getParameterModels(), visitor, operation.getName(),
                                                            OPERATION, extensionModel.getName()));
     }
 
-    private void validateParameters(List<ParameterModel> parameters, String ownerName, String ownerModelType, String extensionName)
+    private void validateParameters(List<ParameterModel> parameters, MetadataTypeVisitor visitor, String ownerName, String ownerModelType, String extensionName)
     {
         parameters.stream().forEach(parameterModel -> {
-            validateParameter(parameterModel, ownerName, ownerModelType, extensionName);
+            validateParameter(parameterModel, visitor, ownerName, ownerModelType, extensionName);
             validateNameCollisionWithTypes(parameterModel, ownerName, ownerModelType, extensionName,
                                            parameters.stream().map(Described::getName).collect(toList()));
         });
     }
 
-    private void validateParameter(ParameterModel parameterModel, String ownerName, String ownerModelType, String extensionName)
+    private void validateParameter(ParameterModel parameterModel, MetadataTypeVisitor visitor, String ownerName, String ownerModelType, String extensionName)
     {
         if (RESERVED_NAMES.contains(parameterModel.getName()))
         {
@@ -112,6 +164,8 @@ public final class ParameterModelValidator implements ModelValidator
         {
             throw new IllegalParameterModelDefinitionException(String.format("The parameter [%s] in the %s [%s] from the extension [%s] is required, and must not provide a default value", parameterModel.getName(), ownerModelType, ownerName, extensionName));
         }
+
+        parameterModel.getType().accept(visitor);
     }
 
     private void validateNameCollisionWithTypes(ParameterModel parameterModel, String ownerName, String ownerModelType, String extensionName, List<String> parameterNames)
