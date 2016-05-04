@@ -49,7 +49,7 @@ import org.junit.Test;
 
 
 @SmallTest
-public class    ComplexExtensionDeclarationTestCase extends BaseExtensionDeclarationTestCase
+public class ComplexExtensionDeclarationTestCase extends BaseExtensionDeclarationTestCase
 {
 
     private final TestHttpConnectorDeclarer reference = new TestHttpConnectorDeclarer();
