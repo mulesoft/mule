@@ -6,14 +6,21 @@
  */
 package org.mule.module.oauth2.internal.authorizationcode.functional;
 
+import org.mule.api.MessagingException;
+import org.mule.module.oauth2.api.RequestAuthenticationException;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 
+import org.hamcrest.Matchers;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class AuthorizationCodeRefreshTokenConfigTestCase extends AbstractAuthorizationCodeRefreshTokenConfigTestCase
 {
 
     public static final String SINGLE_TENANT_OAUTH_CONFIG = "oauthConfig";
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
     protected String getConfigFile()
@@ -27,4 +34,16 @@ public class AuthorizationCodeRefreshTokenConfigTestCase extends AbstractAuthori
         executeRefreshToken("testFlow", SINGLE_TENANT_OAUTH_CONFIG, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID, 403);
     }
 
+    /**
+     * Refresh token is optional therefore this test will validate an scenario where if the access_token is invalid and refresh_token
+     * has not been provided in last refreshToken operation either token operation an {@link RequestAuthenticationException} should be thrown.
+     * @throws Exception
+     */
+    @Test
+    public void afterFailureWithRefreshTokenNotIssuedThrowAuthenticationException() throws Exception
+    {
+        expectedException.expect(MessagingException.class);
+        expectedException.expectCause(Matchers.<Throwable>instanceOf(RequestAuthenticationException.class));
+        executeRefreshTokenNotIssuedOnTokenCall("testFlow", SINGLE_TENANT_OAUTH_CONFIG, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID, 403);
+    }
 }
