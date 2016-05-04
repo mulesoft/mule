@@ -193,7 +193,7 @@ public class DirectoryListenerTestCase extends FileConnectorTestCase
         if (payload instanceof InputStream)
         {
             payload = IOUtils.toString((InputStream) payload);
-            assertThat((String) payload, not((containsString(DR_MANHATTAN))));
+            assertThat((String) payload, not(containsString(DR_MANHATTAN)));
         }
 
         assertThat(payload, equalTo(expectedContent));
