@@ -87,14 +87,6 @@
         <test:assert expression="#[assertPayload()]"/>
     </flow>
 
-    <flow name="childQueuedAsyncFlow">
-        <flow-ref name="childQueuedAsyncFlowChild"/>
-    </flow>
-    <flow name="childQueuedAsyncFlowChild" processingStrategy="queued-asynchronous">
-        <test:non-blocking-processor/>
-        <test:assert expression="#[assertPayload()]"/>
-    </flow>
-
     <flow name="processorChain">
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <processor-chain>

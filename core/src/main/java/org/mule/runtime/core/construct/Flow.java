@@ -39,7 +39,6 @@ import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
 
 /**
@@ -233,10 +232,6 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
         else
         {
             statistics = new FlowConstructStatistics(getConstructType(), name);
-        }
-        if (processingStrategy instanceof QueuedAsynchronousProcessingStrategy)
-        {
-            ((QueuedAsynchronousProcessingStrategy) processingStrategy).setQueueStatistics(statistics);
         }
         statistics.setEnabled(muleContext.getStatistics().isEnabled());
         muleContext.getStatistics().add(statistics);

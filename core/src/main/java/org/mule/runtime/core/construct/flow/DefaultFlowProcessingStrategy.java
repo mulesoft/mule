@@ -8,32 +8,25 @@ package org.mule.runtime.core.construct.flow;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.config.QueueProfile;
+import org.mule.runtime.core.api.processor.StageNameSource;
 import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
-import org.mule.runtime.core.processor.LaxSedaStageInterceptingMessageProcessor;
-import org.mule.runtime.core.processor.strategy.QueuedAsynchronousProcessingStrategy;
+import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 
 /**
- * This processing strategy uses the 'queued-asynchronous' strategy where possible, but if an event is
+ * This processing strategy uses the 'asynchronous' strategy where possible, but if an event is
  * synchronous it processes it synchronously rather than failing.
  */
-public class DefaultFlowProcessingStrategy extends QueuedAsynchronousProcessingStrategy
+public class DefaultFlowProcessingStrategy extends AsynchronousProcessingStrategy
 {
 
     @Override
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(org.mule.runtime.core.api.processor.StageNameSource nameSource,
-                                                                            MuleContext muleContext)
+    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(StageNameSource nameSource, MuleContext muleContext)
     {
-        Integer timeout = queueTimeout != null ? queueTimeout : muleContext.getConfiguration()
-            .getDefaultQueueTimeout();
-
-        initQueueStore(muleContext);
-
-        QueueProfile queueProfile = new QueueProfile(maxQueueSize, queueStore);
         ThreadingProfile threadingProfile = createThreadingProfile(muleContext);
         String stageName = nameSource.getName();
-        return new LaxSedaStageInterceptingMessageProcessor(getThreadPoolName(stageName, muleContext),
-            stageName, queueProfile, timeout, threadingProfile, queueStatistics, muleContext);
+        return new LaxAsyncInterceptingMessageProcessor(threadingProfile, getThreadPoolName(stageName, muleContext),
+                                                        muleContext.getConfiguration().getShutdownTimeout());
     }
 
 }

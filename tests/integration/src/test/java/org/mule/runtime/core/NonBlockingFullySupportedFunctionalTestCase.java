@@ -80,14 +80,6 @@ public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestC
         verify("childAsyncFlowChild");
     }
 
-    @Test(expected = MessagingException.class)
-    public void childQueuedAsyncFlow() throws Exception
-    {
-        flowRunner("childQueuedAsyncFlow").withPayload(TEST_MESSAGE).nonBlocking().withExchangePAttern
-                (getMessageExchnagePattern()).run();
-        verify("childQueuedAsyncFlowChild");
-    }
-
     @Test
     public void processorChain() throws Exception
     {

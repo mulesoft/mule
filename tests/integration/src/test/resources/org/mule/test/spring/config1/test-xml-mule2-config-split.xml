@@ -10,10 +10,8 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd">
 
-    <queued-asynchronous-processing-strategy name="customStrategy" maxBufferSize="6" maxThreads="12"
-                                             poolExhaustedAction="DISCARD" maxQueueSize="102">
-        <default-persistent-queue-store/>
-    </queued-asynchronous-processing-strategy>
+    <asynchronous-processing-strategy name="customStrategy" maxBufferSize="6" maxThreads="12"
+                                             poolExhaustedAction="DISCARD"/>
 
     <flow name="appleComponent2" processingStrategy="customStrategy">
         <composite-source>

@@ -10,7 +10,7 @@
         </static-component>
     </flow>
 
-    <flow name="pollfoo" processingStrategy="queued-asynchronous">
+    <flow name="pollfoo" processingStrategy="asynchronous">
         <poll>
             <fixed-frequency-scheduler frequency="1000" timeUnit="MILLISECONDS"/>
             <flow-ref name="echo"/>

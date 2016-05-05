@@ -35,8 +35,8 @@ public abstract class AbstractMuleEventWork implements Work
 
     /**
      * Constructor allowing event copying to be disabled.  This is used when a copy has already been made previously
-     * e.g.  if the event is queued before being processed asynchronously like with {@link org.mule.runtime.core.processor
-     * .SedaStageInterceptingMessageProcessor}
+     * e.g.  if the event is queued before being processed asynchronously like with
+     * {@link org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor}
      */
     public AbstractMuleEventWork(MuleEvent event, boolean copyEvent)
     {

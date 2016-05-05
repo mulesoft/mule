@@ -1217,11 +1217,6 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 273, what);
     }
 
-    public static Message stopPausedSedaStageNonPeristentQueueMessageLoss(int num, String name)
-    {
-        return factory.createMessage(BUNDLE_PATH, 274, num, name);
-    }
-
     public static Message splitMessageNoEndpointMatch(List<?> endpoints, Object messagePart)
     {
         return factory.createMessage(BUNDLE_PATH, 275, StringMessageUtils.toString(endpoints), messagePart);

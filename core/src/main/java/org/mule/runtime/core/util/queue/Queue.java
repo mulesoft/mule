@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.store.ObjectStoreException;
 import java.io.Serializable;
 
 /**
- * Interface for mule queues used for SEDA and VM.
+ * Interface for mule queues used for VM.
  */
 public interface Queue extends NamedObject
 {

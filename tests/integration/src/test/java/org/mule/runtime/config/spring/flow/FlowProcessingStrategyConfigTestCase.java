@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.flow;
+package org.mule.config.spring.flow;
 
 import static org.junit.Assert.assertEquals;
 
@@ -18,7 +18,6 @@ import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.strategy.AbstractThreadingProfileProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.QueuedAsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.functional.junit4.FunctionalTestCase;
 
@@ -56,13 +55,6 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testQueuedAsynchronous() throws Exception
-    {
-        assertEquals(QueuedAsynchronousProcessingStrategy.class,
-            getFlowProcessingStrategy("queuedAsynchronousFlow").getClass());
-    }
-
-    @Test
     public void testNonBlocking() throws Exception
     {
         assertEquals(NonBlockingProcessingStrategy.class,
@@ -90,22 +82,6 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testCustomQueuedAsynchronous() throws Exception
-    {
-        ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customQueuedAsynchronousFlow");
-
-        assertEquals(QueuedAsynchronousProcessingStrategy.class, processingStrategy.getClass());
-
-        assertAsynchronousStrategyConfig((AsynchronousProcessingStrategy) processingStrategy);
-
-        assertEquals(100, ((QueuedAsynchronousProcessingStrategy) processingStrategy).getQueueTimeout()
-            .intValue());
-        assertEquals(10, ((QueuedAsynchronousProcessingStrategy) processingStrategy).getMaxQueueSize()
-            .intValue());
-
-    }
-
-    @Test
     public void testCustom() throws Exception
     {
         ProcessingStrategy processingStrategy = getFlowProcessingStrategy("customProcessingStrategyFlow");
@@ -117,7 +93,7 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
     @Test
     public void testDefaultAsync() throws Exception
     {
-        assertEquals(QueuedAsynchronousProcessingStrategy.class,
+        assertEquals(AsynchronousProcessingStrategy.class,
             getAsyncProcessingStrategy("defaultAsync").getClass());
     }
 
@@ -129,13 +105,6 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testQueuedAsynchronousAsync() throws Exception
-    {
-        assertEquals(QueuedAsynchronousProcessingStrategy.class,
-            getAsyncProcessingStrategy("queuedAsynchronousAsync").getClass());
-    }
-
-    @Test
     public void testCustomAsynchronousAsync() throws Exception
     {
         ProcessingStrategy processingStrategy = getAsyncProcessingStrategy("customAsynchronousAsync");
@@ -143,21 +112,6 @@ public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
         assertEquals(AsynchronousProcessingStrategy.class, processingStrategy.getClass());
 
         assertAsynchronousStrategyConfig((AsynchronousProcessingStrategy) processingStrategy);
-    }
-
-    @Test
-    public void testCustomQueuedAsynchronousAsync() throws Exception
-    {
-        ProcessingStrategy processingStrategy = getAsyncProcessingStrategy("customQueuedAsynchronousAsync");
-
-        assertEquals(QueuedAsynchronousProcessingStrategy.class, processingStrategy.getClass());
-
-        assertAsynchronousStrategyConfig((AsynchronousProcessingStrategy) processingStrategy);
-
-        assertEquals(100, ((QueuedAsynchronousProcessingStrategy) processingStrategy).getQueueTimeout()
-            .intValue());
-        assertEquals(10, ((QueuedAsynchronousProcessingStrategy) processingStrategy).getMaxQueueSize()
-            .intValue());
     }
 
     @Test

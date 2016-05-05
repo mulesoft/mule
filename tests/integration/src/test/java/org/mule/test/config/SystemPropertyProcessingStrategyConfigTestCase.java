@@ -10,12 +10,11 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
-import static org.mule.runtime.config.spring.util.ProcessingStrategyUtils.QUEUED_THREAD_PER_PROCESSOR_PROCESSING_STRATEGY;
-import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
-import org.mule.runtime.core.processor.strategy.QueuedAsynchronousProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.QueuedThreadPerProcessorProcessingStrategy;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
+import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Arrays;
@@ -34,8 +33,8 @@ public class SystemPropertyProcessingStrategyConfigTestCase extends FunctionalTe
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {"Container level system property", new String[] {}, QueuedThreadPerProcessorProcessingStrategy.class},
-                {"Configuration overrides system property", new String[] {"configuration-processing-strategy-config.xml"}, QueuedAsynchronousProcessingStrategy.class}
+                {"Container level system property", new String[] {}, SynchronousProcessingStrategy.class},
+                {"Configuration overrides system property", new String[] {"configuration-processing-strategy-config.xml"}, NonBlockingProcessingStrategy.class}
         });
     }
 
@@ -43,10 +42,10 @@ public class SystemPropertyProcessingStrategyConfigTestCase extends FunctionalTe
     private Class<? extends ProcessingStrategy> expectedStrategyType;
 
     @Rule
-    public SystemProperty globalProcessingStrategy = new SystemProperty(MULE_DEFAULT_PROCESSING_STRATEGY, QUEUED_THREAD_PER_PROCESSOR_PROCESSING_STRATEGY);
+    public SystemProperty globalProcessingStrategy = new SystemProperty(MULE_DEFAULT_PROCESSING_STRATEGY, ProcessingStrategyUtils.SYNC_PROCESSING_STRATEGY);
 
     @Rule
-    public SystemProperty localProcessingStrategy = new SystemProperty("processingStrategy", ProcessingStrategyUtils.QUEUED_ASYNC_PROCESSING_STRATEGY);
+    public SystemProperty localProcessingStrategy = new SystemProperty("processingStrategy", ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY);
 
     public SystemPropertyProcessingStrategyConfigTestCase(String name, String[] configFiles, Class<? extends ProcessingStrategy> expectedStrategyType)
     {

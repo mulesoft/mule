@@ -67,13 +67,6 @@ public class NonBlockingFullySupportedOneWayFunctionalTestCase extends Functiona
         verify("childAsyncFlowChild");
     }
 
-    @Test(expected = MessagingException.class)
-    public void childQueuedAsyncFlow() throws Exception
-    {
-        assertThat(flowRunner("childQueuedAsyncFlow").withPayload(TEST_MESSAGE).asynchronously().run(), instanceOf(DefaultMuleEvent.class));
-        verify("childQueuedAsyncFlowChild");
-    }
-
     @Test
     public void processorChain() throws Exception
     {

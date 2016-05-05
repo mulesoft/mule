@@ -95,33 +95,10 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testFlowQueuedAsynchronous() throws Exception
-    {
-        flowRunner("queuedAsynchronousFlow").withPayload(getTestMuleMessage("0")).asynchronously().run();
-        MuleMessage message = muleContext.getClient()
-                .request("test://queued-asynchronous-out", RECEIVE_TIMEOUT);
-        assertNotNull(message);
-        Thread thread = (Thread) message.getPayload();
-        assertNotNull(thread);
-        assertNotSame(Thread.currentThread(), thread);
-    }
-
-    @Test
     public void testAsyncAsynchronous() throws Exception
     {
         flowRunner("asynchronousAsync").withPayload(getTestMuleMessage("0")).asynchronously().run();
         MuleMessage message = muleContext.getClient().request("test://asynchronous-async-out", RECEIVE_TIMEOUT);
-        assertNotNull(message);
-        Thread thread = (Thread) message.getPayload();
-        assertNotNull(thread);
-        assertNotSame(Thread.currentThread(), thread);
-    }
-
-    @Test
-    public void testAsyncQueuedAsynchronous() throws Exception
-    {
-        flowRunner("queuedAsynchronousAsync").withPayload(getTestMuleMessage("0")).asynchronously().run();
-        MuleMessage message = muleContext.getClient().request("test://queued-asynchronous-async-out", RECEIVE_TIMEOUT);
         assertNotNull(message);
         Thread thread = (Thread) message.getPayload();
         assertNotNull(thread);
@@ -402,20 +379,6 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
         final MuleMessage result = client.request("test://async-oneway-out", RECEIVE_TIMEOUT);
         final MuleMessage asyncResult = client.request("test://async-async-oneway-out", RECEIVE_TIMEOUT);
-
-        assertNotNull(result);
-        assertNotNull(asyncResult);
-        assertEquals("0ac", getPayloadAsString(result));
-        assertEquals("0ab", getPayloadAsString(asyncResult));
-    }
-
-    @Test
-    public void testAsyncSedaOneWayEndpoint() throws Exception
-    {
-        flowRunner("async-seda-oneway").withPayload(getTestMuleMessage("0")).run();
-        LocalMuleClient client = muleContext.getClient();
-        final MuleMessage result = client.request("test://async-seda-oneway-out", RECEIVE_TIMEOUT);
-        final MuleMessage asyncResult = client.request("test://async-async-seda-oneway-out", RECEIVE_TIMEOUT);
 
         assertNotNull(result);
         assertNotNull(asyncResult);

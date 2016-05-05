@@ -94,16 +94,6 @@
         <http:request config-ref="requestConfig" path="echo" method="POST"/>
     </flow>
 
-    <flow name="NonBlockingToQueuedAsyncFlow1" processingStrategy="non-blocking">
-        <http:listener config-ref="listenerConfig" path="nonBlockingFlowRefToQueuedAsyncFlow"/>
-        <processor ref="NonBlockingToQueuedAsyncFlow1SensingProcessor" />
-        <flow-ref name="NonBlockingToQueuedAsyncFlow2"/>
-    </flow>
-    <flow name="NonBlockingToQueuedAsyncFlow2" processingStrategy="queued-asynchronous">
-        <processor ref="NonBlockingToQueuedAsyncFlow2SensingProcessor"/>
-        <http:request config-ref="requestConfig" path="echo" method="POST"/>
-    </flow>
-
     <flow name="NonBlockingToAsyncFlow1" processingStrategy="non-blocking">
         <http:listener config-ref="listenerConfig" path="nonBlockingFlowRefToAsyncFlow"/>
         <processor ref="NonBlockingToAsyncFlow1SensingProcessor" />

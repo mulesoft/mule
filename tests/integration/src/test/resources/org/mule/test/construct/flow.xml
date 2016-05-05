@@ -48,22 +48,10 @@
         <test:queue name="asynchronous-out"/>
     </flow>    
 
-    <flow name="queuedAsynchronousFlow" processingStrategy="queued-asynchronous">
-        <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
-        <test:queue name="queued-asynchronous-out"/>
-    </flow>    
-
     <flow name="asynchronousAsync" processingStrategy="synchronous">
         <async processingStrategy="asynchronous">
             <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
             <test:queue name="asynchronous-async-out"/>
-        </async>
-    </flow>    
-
-    <flow name="queuedAsynchronousAsync" processingStrategy="synchronous">
-        <async processingStrategy="queued-asynchronous">
-            <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
-            <test:queue name="queued-asynchronous-async-out"/>
         </async>
     </flow>    
 
