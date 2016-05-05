@@ -25,7 +25,6 @@ import static org.mule.runtime.core.transformer.types.MimeTypes.ANY;
 import static org.mule.runtime.core.transformer.types.MimeTypes.APPLICATION_XML;
 import static org.mule.tck.MuleTestUtils.getTestEvent;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
@@ -190,6 +189,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         DataType outputDataType = DataTypeFactory.create(Integer.class, ANY);
         outputDataType.setEncoding(null);
         when(transformer.getReturnDataType()).thenReturn(outputDataType);
+        when(transformer.transform(anyObject())).thenReturn(1);
 
         MuleEvent muleEvent = mock(MuleEvent.class);
 
@@ -210,6 +210,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         DataType outputDataType = DataTypeFactory.create(Integer.class, null);
         outputDataType.setEncoding(CUSTOM_ENCODING);
         when(transformer.getReturnDataType()).thenReturn(outputDataType);
+        when(transformer.transform(anyObject())).thenReturn(Integer.valueOf(1));
 
         MuleEvent muleEvent = mock(MuleEvent.class);
 
@@ -217,6 +218,48 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
                                                                                    Collections.singletonList(transformer));
 
         assertDataType(result, Integer.class, APPLICATION_XML, CUSTOM_ENCODING);
+    }
+
+    @Test
+    public void maintainsDataTypeSubClassTypeTransformation() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(new ClassCastException(TEST), muleContext);
+        DataType originalDataType = DataTypeFactory.create(RuntimeException.class, ANY);
+        muleMessage.setDataType(originalDataType);
+
+        Transformer transformer = mock(Transformer.class);
+        DataType outputDataType = DataTypeFactory.create(Object.class, ANY);
+        when(transformer.getReturnDataType()).thenReturn(outputDataType);
+        when(transformer.isSourceDataTypeSupported(DataTypeFactory.create(muleMessage.getPayload().getClass()))).thenReturn(true);
+        when(transformer.transform(anyObject())).thenReturn(new ArithmeticException(TEST));
+
+        MuleEvent muleEvent = mock(MuleEvent.class);
+
+        MuleMessage result = transformationService.applyTransformers(muleMessage, muleEvent,
+                                                                     Collections.singletonList(transformer));
+
+        assertThat(result.getDataType().getType(), Matchers.<Class<?>>equalTo(RuntimeException.class));
+    }
+
+    @Test
+    public void doesNotmaintainDataTypeDueToNotAssignableTransformation() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(new ClassCastException(TEST), muleContext);
+        DataType originalDataType = DataTypeFactory.create(RuntimeException.class, ANY);
+        muleMessage.setDataType(originalDataType);
+
+        Transformer transformer = mock(Transformer.class);
+        DataType outputDataType = DataTypeFactory.create(Object.class, ANY);
+        when(transformer.getReturnDataType()).thenReturn(outputDataType);
+        when(transformer.isSourceDataTypeSupported(DataTypeFactory.create(muleMessage.getPayload().getClass()))).thenReturn(true);
+        when(transformer.transform(anyObject())).thenReturn(new AssertionError(TEST));
+
+        MuleEvent muleEvent = mock(MuleEvent.class);
+
+        MuleMessage result = transformationService.applyTransformers(muleMessage, muleEvent,
+                                                                     Collections.singletonList(transformer));
+
+        assertThat(result.getDataType().getType(), Matchers.<Class<?>>equalTo(Object.class));
     }
 
     @Test
