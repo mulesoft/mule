@@ -25,6 +25,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
@@ -36,6 +37,7 @@ import org.mule.transformer.types.TypedValue;
 import org.mule.transport.NullPayload;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -195,6 +197,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         DataType outputDataType = DataTypeFactory.create(Integer.class, ANY);
         outputDataType.setEncoding(null);
         when(transformer.getReturnDataType()).thenReturn(outputDataType);
+        when(transformer.transform(anyObject())).thenReturn(1);
 
         MuleEvent muleEvent = mock(MuleEvent.class);
 
@@ -214,6 +217,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         DataType outputDataType = DataTypeFactory.create(Integer.class, null);
         outputDataType.setEncoding(CUSTOM_ENCODING);
         when(transformer.getReturnDataType()).thenReturn(outputDataType);
+        when(transformer.transform(anyObject())).thenReturn(Integer.valueOf(1));
 
         MuleEvent muleEvent = mock(MuleEvent.class);
 
@@ -234,6 +238,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         DataType outputDataType = DataTypeFactory.create(Integer.class, APPLICATION_XML);
         outputDataType.setEncoding(null);
         when(transformer.getReturnDataType()).thenReturn(outputDataType);
+        when(transformer.transform(anyObject())).thenReturn(1);
 
         MuleEvent muleEvent = mock(MuleEvent.class);
 
@@ -290,6 +295,42 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
         assertThat(muleMessage.getDataType().getMimeType(), equalTo(APPLICATION_XML));
         assertThat(muleMessage.getDataType().getEncoding(), equalTo(CUSTOM_ENCODING));
+    }
+
+    @Test
+    public void maintainsDataTypeSubClassTypeTransformation() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(new ClassCastException(TEST), muleContext);
+        DataType originalDataType = DataTypeFactory.create(RuntimeException.class, ANY);
+        muleMessage.setDataType(originalDataType);
+
+        Transformer transformer = mock(Transformer.class);
+        DataType outputDataType = DataTypeFactory.create(Object.class, ANY);
+        when(transformer.getReturnDataType()).thenReturn(outputDataType);
+        when(transformer.isSourceDataTypeSupported(DataTypeFactory.create(muleMessage.getPayload().getClass()))).thenReturn(true);
+        when(transformer.transform(anyObject())).thenReturn(new ArithmeticException(TEST));
+
+        muleMessage.applyAllTransformers(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mock(FlowConstruct.class)), Arrays.asList(transformer));
+
+        assertThat(muleMessage.getDataType().getType(), Matchers.<Class<?>>equalTo(RuntimeException.class));
+    }
+
+    @Test
+    public void doesNotmaintainDataTypeDueToNotAssignableTransformation() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(new ClassCastException(TEST), muleContext);
+        DataType originalDataType = DataTypeFactory.create(RuntimeException.class, ANY);
+        muleMessage.setDataType(originalDataType);
+
+        Transformer transformer = mock(Transformer.class);
+        DataType outputDataType = DataTypeFactory.create(Object.class, ANY);
+        when(transformer.getReturnDataType()).thenReturn(outputDataType);
+        when(transformer.isSourceDataTypeSupported(DataTypeFactory.create(muleMessage.getPayload().getClass()))).thenReturn(true);
+        when(transformer.transform(anyObject())).thenReturn(new AssertionError(TEST));
+
+        muleMessage.applyAllTransformers(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mock(FlowConstruct.class)), Arrays.asList(transformer));
+
+        assertThat(muleMessage.getDataType().getType(), Matchers.<Class<?>>equalTo(Object.class));
     }
 
     @Test

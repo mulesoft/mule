@@ -1610,16 +1610,17 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         else
         {
-            final DataType<?> mergedDataType = mergeDataType(dataType, transformer.getReturnDataType());
+            final DataType<?> mergedDataType = mergeDataType(dataType, transformer.getReturnDataType(), result != null ? result.getClass() : null);
             setPayload(result, mergedDataType);
         }
     }
 
-    private DataType<?> mergeDataType(DataType<?> original, DataType<?> transformed)
+    private DataType<?> mergeDataType(DataType<?> original, DataType<?> transformed, Class<?> payloadTransformedClass)
     {
         String mimeType = transformed.getMimeType() == null || MimeTypes.ANY.equals(transformed.getMimeType()) ? original.getMimeType() : transformed.getMimeType();
         String encoding = transformed.getEncoding() == null ? this.getEncoding() : transformed.getEncoding();
-        Class<?> type = transformed.getType() == Object.class ? original.getType() : transformed.getType();
+        // In case if the transformed dataType is an Object type we could keep the original type if it is compatible/assignable (String->Object we want to keep String as transformed DataType)
+        Class<?> type = payloadTransformedClass != null && transformed.getType() == Object.class && original.isCompatibleWith(DataTypeFactory.create(payloadTransformedClass, mimeType)) ? original.getType() : transformed.getType();
 
         DataType mergedDataType = DataTypeFactory.create(type, mimeType);
         mergedDataType.setEncoding(encoding);
