@@ -40,7 +40,7 @@ import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.java.annotation.GenericTypesAnnotation;
-import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.config.MuleManifest;

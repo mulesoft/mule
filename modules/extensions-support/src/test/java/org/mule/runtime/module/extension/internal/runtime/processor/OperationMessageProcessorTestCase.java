@@ -29,7 +29,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;

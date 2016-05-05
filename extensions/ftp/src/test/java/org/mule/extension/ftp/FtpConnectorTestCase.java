@@ -8,7 +8,7 @@ package org.mule.extension.ftp;
 
 import static org.junit.rules.ExpectedException.none;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;

@@ -30,7 +30,7 @@ import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;

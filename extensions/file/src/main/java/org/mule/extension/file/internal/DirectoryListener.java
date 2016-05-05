@@ -26,7 +26,7 @@ import org.mule.extension.file.api.FileInputStream;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;

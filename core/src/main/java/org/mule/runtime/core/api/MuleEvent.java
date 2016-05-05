@@ -6,34 +6,34 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.security.Credentials;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.net.URI;
 import java.util.Set;
 
 /**
- * <code>MuleEvent</code> represents any data event occurring in the Mule environment. All data sent or
- * received within the mule environment will be passed between components as an MuleEvent.
+ * Legacy implementation of {@link org.mule.runtime.api.message.MuleEvent}
  * <p/>
- * <p/>
- * The MuleEvent holds a MuleMessage payload and provides helper methods for obtaining the data in a format
+ * Holds a MuleMessage payload and provides helper methods for obtaining the data in a format
  * that the receiving Mule component understands. The event can also maintain any number of properties that
  * can be set and retrieved by Mule components.
- * 
+ *
+ * @see org.mule.runtime.api.message.MuleEvent
  * @see MuleMessage
+ * @deprecated Use {@link org.mule.runtime.api.message.MuleEvent} instead
  */
-public interface MuleEvent extends Serializable
+@Deprecated
+public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent
 {
     int TIMEOUT_WAIT_FOREVER = 0;
     int TIMEOUT_NOT_SET_VALUE = Integer.MIN_VALUE;
@@ -104,13 +104,6 @@ public interface MuleEvent extends Serializable
      * @throws MuleException if the message cannot be converted into a string
      */
     String getMessageAsString(String encoding) throws MuleException;
-
-    /**
-     * Every event in the system is assigned a universally unique id (UUID).
-     * 
-     * @return the unique identifier for the event
-     */
-    String getId();
 
     /**
      * Retrieves the service session for the current event
@@ -231,34 +224,13 @@ public interface MuleEvent extends Serializable
 
     void setMessage(MuleMessage message);
 
-    <T> T getFlowVariable(String key);
-
     /**
      * Gets the data type for a given flow variable
      *
-     * @param name the name or key of the variable. This must be non-null.
+     * @param key the name or key of the variable. This must be non-null.
      * @return the property data type or null if the flow variable does not exist
      */
     DataType<?> getFlowVariableDataType(String key);
-
-    /**
-     * Sets a session variable value with a default data type
-     *
-     * @param key the name or key of the variable. This must be non-null.
-     ** @param value value for the variable
-     */
-    void setFlowVariable(String key, Object value);
-
-    /**
-     * Sets a flow variable value with a given data type
-     *
-     * @param key the name or key of the variable. This must be non-null.
-     * @param value value for the variable
-     * @param dataType value's dataType. Not null.
-     */
-    void setFlowVariable(String key, Object value, DataType dataType);
-
-    void removeFlowVariable(String key);
 
     Set<String> getFlowVariableNames();
 

@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.file.api;
 import static java.lang.String.format;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand;
 import org.mule.runtime.module.extension.file.api.command.DeleteCommand;
