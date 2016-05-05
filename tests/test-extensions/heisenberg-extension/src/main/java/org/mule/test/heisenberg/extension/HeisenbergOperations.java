@@ -7,7 +7,7 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.util.stream.Collectors.toList;
-import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.NestedProcessor;

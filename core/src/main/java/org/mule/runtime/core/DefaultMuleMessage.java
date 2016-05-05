@@ -1468,9 +1468,9 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     }
 
     @Override
-    public <Payload, Attributes extends Serializable> org.mule.runtime.api.temporary.MuleMessage<Payload, Attributes> asNewMessage()
+    public <Payload, Attributes extends Serializable> org.mule.runtime.api.message.MuleMessage<Payload, Attributes> asNewMessage()
     {
-        return (org.mule.runtime.api.temporary.MuleMessage<Payload, Attributes>) this;
+        return (org.mule.runtime.api.message.MuleMessage<Payload, Attributes>) this;
     }
 
     /**

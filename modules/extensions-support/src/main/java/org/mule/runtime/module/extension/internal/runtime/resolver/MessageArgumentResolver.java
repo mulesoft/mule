@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.extension.api.runtime.OperationContext;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 

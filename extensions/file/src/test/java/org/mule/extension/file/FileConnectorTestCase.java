@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;

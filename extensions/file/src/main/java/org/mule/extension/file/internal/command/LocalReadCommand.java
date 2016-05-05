@@ -7,7 +7,7 @@
 package org.mule.extension.file.internal.command;
 
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.FileInputStream;
 import org.mule.extension.file.api.LocalFileAttributes;

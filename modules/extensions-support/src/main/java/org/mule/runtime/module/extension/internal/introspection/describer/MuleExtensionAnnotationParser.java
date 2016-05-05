@@ -12,7 +12,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
-import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -67,7 +67,7 @@ public final class MuleExtensionAnnotationParser
 
     private static final Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()
             .add(MuleEvent.class)
-            .add(org.mule.runtime.api.temporary.MuleMessage.class)
+            .add(MuleMessage.class)
             .add(MuleMessage.class)
             .build();
 

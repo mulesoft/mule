@@ -8,7 +8,7 @@ package org.mule.test.heisenberg.extension;
 
 import static org.mule.runtime.api.metadata.DataType.STRING_DATA_TYPE;
 import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Alias;

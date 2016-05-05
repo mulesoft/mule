@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.file.api;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.temporary.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.module.extension.file.api.lock.PathLock;
 import org.mule.runtime.api.message.NullPayload;

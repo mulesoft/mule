@@ -19,7 +19,7 @@ import javax.activation.DataHandler;
  * @deprecated use org.mule.runtime.core.api.temp.MuleMessage whenever possible. This class should have dissapeared by the time the mule-api is frozen.
  */
 @Deprecated
-public interface MuleMessage extends org.mule.runtime.api.temporary.MuleMessage<Object, Serializable>
+public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage<Object, Serializable>
 {
 
     /**
@@ -424,10 +424,10 @@ public interface MuleMessage extends org.mule.runtime.api.temporary.MuleMessage<
     void clearAttachments();
 
     /**
-     * Temporary method used to get {@code this} same instance as the new {@link org.mule.runtime.api.temporary.MuleMessage} API,
+     * Temporary method used to get {@code this} same instance as the new {@link org.mule.runtime.api.message.MuleMessage} API,
      * supporting generics. This is a temporal, transitional method which will not
      * survive the immutability refactor
      */
     @Deprecated
-    <Payload, Attributes extends Serializable> org.mule.runtime.api.temporary.MuleMessage<Payload, Attributes> asNewMessage();
+    <Payload, Attributes extends Serializable> org.mule.runtime.api.message.MuleMessage<Payload, Attributes> asNewMessage();
 }
