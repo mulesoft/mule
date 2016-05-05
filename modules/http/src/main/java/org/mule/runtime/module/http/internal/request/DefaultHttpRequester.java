@@ -10,7 +10,8 @@ import static java.lang.Integer.MAX_VALUE;
 import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
-
+import org.mule.runtime.api.execution.BlockingCompletionHandler;
+import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.RequestContext;
@@ -26,7 +27,6 @@ import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.debug.DebugInfoProvider;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.runtime.core.api.debug.FieldDebugInfoFactory;
-import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
@@ -34,6 +34,9 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
+import org.mule.runtime.core.processor.AbstractNonBlockingMessageProcessor;
+import org.mule.runtime.core.util.AttributeEvaluator;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.HttpAuthentication;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -42,9 +45,6 @@ import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
-import org.mule.runtime.core.processor.AbstractNonBlockingMessageProcessor;
-import org.mule.runtime.core.util.AttributeEvaluator;
-import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.collect.Lists;
 
@@ -220,21 +220,19 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     }
 
     @Override
-    protected void processNonBlocking(final MuleEvent muleEvent, final CompletionHandler completionHandler) throws
-                                                                                                            MuleException
+    protected void processNonBlocking(final MuleEvent muleEvent, final CompletionHandler completionHandler) throws MuleException
     {
         innerProcessNonBlocking(muleEvent, completionHandler, true);
     }
 
-    protected void innerProcessNonBlocking(final MuleEvent muleEvent, final CompletionHandler completionHandler,
-                                           final boolean checkRetry) throws MuleException
+    protected void innerProcessNonBlocking(final MuleEvent muleEvent, final CompletionHandler completionHandler, final boolean checkRetry) throws MuleException
     {
         final HttpAuthentication authentication = requestConfig.getAuthentication();
         final HttpRequest httpRequest = createHttpRequest(muleEvent, authentication);
 
         notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_BEGIN);
         getHttpClient().send(httpRequest, resolveResponseTimeout(muleEvent), followRedirects.resolveBooleanValue(muleEvent), resolveAuthentication(muleEvent),
-                             new CompletionHandler<HttpResponse, Exception>()
+                             new BlockingCompletionHandler<HttpResponse, Exception, Void>()
                              {
                                  @Override
                                  public void onFailure(Exception exception)
@@ -248,7 +246,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                  }
 
                                  @Override
-                                 public void onCompletion(HttpResponse httpResponse)
+                                 protected void doOnCompletion(HttpResponse httpResponse)
                                  {
                                      try
                                      {
@@ -267,7 +265,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                          else
                                          {
                                              validateResponse(muleEvent);
-                                             completionHandler.onCompletion(muleEvent);
+                                             completionHandler.onCompletion(muleEvent, createCompletionExceptionCallback(muleEvent));
                                          }
                                      }
                                      catch (MessagingException messagingException)

@@ -7,6 +7,7 @@
 package org.mule.test.heisenberg.extension;
 
 import static org.mule.runtime.api.metadata.DataType.STRING_DATA_TYPE;
+import org.mule.runtime.api.execution.BlockingCompletionHandler;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
@@ -67,12 +68,12 @@ public class HeisenbergSource extends Source<Void, Serializable>
         executor.scheduleAtFixedRate(() -> sourceContext.getMessageHandler().handle(makeMessage(sourceContext), completionHandler()), 0, 100, TimeUnit.MILLISECONDS);
     }
 
-    private CompletionHandler<MuleEvent, Exception> completionHandler()
+    private CompletionHandler<MuleEvent, Exception, MuleEvent> completionHandler()
     {
-        return new CompletionHandler<MuleEvent, Exception>()
+        return new BlockingCompletionHandler<MuleEvent, Exception, MuleEvent>()
         {
             @Override
-            public void onCompletion(MuleEvent event)
+            protected void doOnCompletion(MuleEvent event)
             {
                 Long payment = (Long) ((org.mule.runtime.core.api.MuleEvent) event).getMessage().getPayload();
                 heisenberg.setMoney(heisenberg.getMoney().add(BigDecimal.valueOf(payment)));

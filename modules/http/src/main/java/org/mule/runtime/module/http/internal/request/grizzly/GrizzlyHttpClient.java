@@ -9,13 +9,17 @@ package org.mule.runtime.module.http.internal.request.grizzly;
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
+import org.mule.runtime.api.execution.CompletionHandler;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
-import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
@@ -31,21 +35,6 @@ import org.mule.runtime.module.http.internal.request.HttpClient;
 import org.mule.runtime.module.http.internal.request.HttpClientConfiguration;
 import org.mule.runtime.module.http.internal.request.NtlmProxyConfig;
 import org.mule.runtime.module.socket.api.TcpClientSocketProperties;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-
-import javax.net.ssl.SSLContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -60,6 +49,17 @@ import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.multipart.ByteArrayPart;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
+import javax.net.ssl.SSLContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GrizzlyHttpClient implements HttpClient
 {
@@ -276,7 +276,7 @@ public class GrizzlyHttpClient implements HttpClient
 
     @Override
     public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication
-            authentication, final CompletionHandler<HttpResponse, Exception> completionHandler, WorkManager workManager)
+            authentication, final CompletionHandler<HttpResponse, Exception, Void> completionHandler, WorkManager workManager)
     {
         try
         {
@@ -292,11 +292,10 @@ public class GrizzlyHttpClient implements HttpClient
     private class WorkManagerSourceAsyncCompletionHandler extends AsyncCompletionHandler<Response> implements WorkManagerSource
     {
 
-        private CompletionHandler<HttpResponse, Exception> completionHandler;
+        private CompletionHandler<HttpResponse, Exception, Void> completionHandler;
         private WorkManager workManager;
 
-        WorkManagerSourceAsyncCompletionHandler(CompletionHandler<HttpResponse, Exception> completionHandler,
-                                                WorkManager workManager)
+        WorkManagerSourceAsyncCompletionHandler(CompletionHandler<HttpResponse, Exception, Void> completionHandler, WorkManager workManager)
         {
             this.completionHandler = completionHandler;
             this.workManager = workManager;
@@ -305,7 +304,10 @@ public class GrizzlyHttpClient implements HttpClient
         @Override
         public Response onCompleted(Response response) throws Exception
         {
-            completionHandler.onCompletion(createMuleResponse(response));
+            completionHandler.onCompletion(createMuleResponse(response), exception -> {
+                onThrowable(exception);
+                return null;
+            });
             return null;
         }
 

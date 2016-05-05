@@ -33,12 +33,13 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
+import org.mule.runtime.core.execution.NullCompletionHandler;
 import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.ExceptionCallback;
+import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.extension.api.runtime.MessageHandler;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceContext;
@@ -63,13 +64,13 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This class implements the {@link Lifecycle} interface and propagates all of its events to
  * the underlying {@link Source}. It will also perform dependency injection on it and will
- * responsible for properly invokin {@link Source#setSourceContext(SourceContext)}
+ * responsible for properly invoking {@link Source#setSourceContext(SourceContext)}
  *
  * @since 4.0
  */
 public class ExtensionMessageSource extends ExtensionComponent implements MessageSource,
         MessageHandler<Object, Serializable>,
-        ExceptionCallback<Throwable>,
+        ExceptionCallback<Void, Throwable>,
         Lifecycle
 {
 
@@ -106,7 +107,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     private MessageProcessingManager messageProcessingManager;
 
     @Override
-    public void handle(MuleMessage<Object, Serializable> message, CompletionHandler<org.mule.runtime.api.message.MuleEvent, Exception> completionHandler)
+    public void handle(MuleMessage<Object, Serializable> message, CompletionHandler<org.mule.runtime.api.message.MuleEvent, Exception, org.mule.runtime.api.message.MuleEvent> completionHandler)
     {
         MuleEvent event = new DefaultMuleEvent((org.mule.runtime.core.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
         messageProcessingManager.processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, downCast(completionHandler)), createProcessingContext());
@@ -120,7 +121,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     }
 
     @Override
-    public void onException(Throwable exception)
+    public Void onException(Throwable exception)
     {
         exception = exceptionEnricherManager.processException(exception);
         Optional<ConnectionException> connectionException = ExceptionUtils.extractRootConnectionException(exception);
@@ -142,6 +143,8 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
         {
             notifyExceptionAndShutDown(exception);
         }
+
+        return null;
     }
 
     @Override
@@ -387,7 +390,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
         }
     }
 
-    private CompletionHandler downCast(CompletionHandler<org.mule.runtime.api.message.MuleEvent, Exception> handler)
+    private CompletionHandler downCast(CompletionHandler<org.mule.runtime.api.message.MuleEvent, Exception, org.mule.runtime.api.message.MuleEvent> handler)
     {
         return handler;
     }

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ExceptionCallback;
 import org.mule.runtime.extension.api.runtime.MessageHandler;
 import org.mule.runtime.extension.api.runtime.source.SourceContext;
 
@@ -15,10 +15,10 @@ final class ImmutableSourceContext implements SourceContext
 {
 
     private final MessageHandler messageHandler;
-    private final ExceptionCallback<Throwable> exceptionCallback;
+    private final ExceptionCallback<Void, Throwable> exceptionCallback;
     private final ConfigurationInstance<Object> configurationInstance;
 
-    ImmutableSourceContext(MessageHandler messageHandler, ExceptionCallback<Throwable> exceptionCallback, ConfigurationInstance<Object> configurationInstance)
+    ImmutableSourceContext(MessageHandler messageHandler, ExceptionCallback<Void, Throwable> exceptionCallback, ConfigurationInstance<Object> configurationInstance)
     {
         this.messageHandler = messageHandler;
         this.exceptionCallback = exceptionCallback;
@@ -32,7 +32,7 @@ final class ImmutableSourceContext implements SourceContext
     }
 
     @Override
-    public ExceptionCallback<Throwable> getExceptionCallback()
+    public ExceptionCallback<Void, Throwable> getExceptionCallback()
     {
         return exceptionCallback;
     }

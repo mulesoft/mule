@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.core.processor;
 
+import org.mule.runtime.api.execution.CompletionHandler;
+import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.RequestContext;
-import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.construct.Flow;
 
 /**
@@ -59,12 +60,20 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
 
     abstract protected MuleEvent processBlocking(MuleEvent event) throws MuleException;
 
+    protected ExceptionCallback<Void, ? extends Exception> createCompletionExceptionCallback(MuleEvent event)
+    {
+        return (ExceptionCallback<Void, Exception>) exception -> {
+            messagingExceptionHandler.handleException(exception, event);
+            return null;
+        };
+    }
+
     private NonBlockingCompletionHandler createNonBlockingCompletionHandler(MuleEvent event)
     {
         return new NonBlockingCompletionHandler(event);
     }
 
-    class NonBlockingCompletionHandler implements CompletionHandler<MuleEvent, MessagingException>
+    class NonBlockingCompletionHandler implements CompletionHandler<MuleEvent, MessagingException, Void>
     {
 
         final private MuleEvent event;
@@ -83,7 +92,7 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
         }
 
         @Override
-        public void onCompletion(MuleEvent event)
+        public void onCompletion(MuleEvent result, ExceptionCallback<Void, Exception> exceptionCallback)
         {
             try
             {
@@ -91,7 +100,7 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
             }
             catch (Exception e)
             {
-                messagingExceptionHandler.handleException(e, event);
+                exceptionCallback.onException(e);
             }
         }
     }
