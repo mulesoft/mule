@@ -13,12 +13,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -39,13 +37,10 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
     private MuleEvent event;
 
     @Mock
-    private MuleMessage message;
-
-    @Mock
     private MessageProcessor messageProcessor;
 
     @Mock
-    private CompletionHandler<MuleMessage, Exception> completionHandler;
+    private CompletionHandler completionHandler;
 
     @Mock
     private ResponseCompletionCallback responseCompletionCallback;
@@ -60,7 +55,6 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
     @Before
     public void before()
     {
-        when(event.getMessage()).thenReturn(message);
         template = new ExtensionFlowProcessingTemplate(event, messageProcessor, completionHandler);
     }
 
@@ -81,14 +75,14 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
     public void sendResponseToClient() throws MuleException
     {
         template.sendResponseToClient(event, responseCompletionCallback);
-        verify(completionHandler).onCompletion(message);
+        verify(completionHandler).onCompletion(event);
         verify(responseCompletionCallback).responseSentSuccessfully();
     }
 
     @Test
     public void failedToSendResponseToClient() throws MuleException
     {
-        doThrow(runtimeException).when(completionHandler).onCompletion(message);
+        doThrow(runtimeException).when(completionHandler).onCompletion(event);
         template.sendResponseToClient(event, responseCompletionCallback);
 
         verify(completionHandler, never()).onFailure(any(Exception.class));

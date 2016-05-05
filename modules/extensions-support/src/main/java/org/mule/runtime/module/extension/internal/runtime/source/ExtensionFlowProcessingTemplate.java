@@ -6,27 +6,24 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.execution.AsyncResponseFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 
-import java.io.Serializable;
-
-final class ExtensionFlowProcessingTemplate<Payload, Attributes extends Serializable> implements AsyncResponseFlowProcessingPhaseTemplate
+final class ExtensionFlowProcessingTemplate implements AsyncResponseFlowProcessingPhaseTemplate
 {
 
-    private final MuleEvent event;
+    private final org.mule.runtime.api.message.MuleEvent event;
     private final MessageProcessor messageProcessor;
-    private final CompletionHandler<MuleMessage<Payload, Attributes>, MessagingException> completionHandler;
+    private final CompletionHandler<org.mule.runtime.api.message.MuleEvent, MessagingException> completionHandler;
 
     ExtensionFlowProcessingTemplate(MuleEvent event,
                                     MessageProcessor messageProcessor,
-                                    CompletionHandler<MuleMessage<Payload, Attributes>, MessagingException> completionHandler)
+                                    CompletionHandler<org.mule.runtime.api.message.MuleEvent, MessagingException> completionHandler)
     {
         this.event = event;
         this.messageProcessor = messageProcessor;
@@ -36,7 +33,7 @@ final class ExtensionFlowProcessingTemplate<Payload, Attributes extends Serializ
     @Override
     public MuleEvent getMuleEvent() throws MuleException
     {
-        return event;
+        return (MuleEvent) event;
     }
 
     @Override
@@ -48,7 +45,7 @@ final class ExtensionFlowProcessingTemplate<Payload, Attributes extends Serializ
     @Override
     public void sendResponseToClient(MuleEvent muleEvent, ResponseCompletionCallback responseCompletionCallback) throws MuleException
     {
-        runAndNotify(() -> completionHandler.onCompletion((MuleMessage<Payload, Attributes>) muleEvent.getMessage()), event, responseCompletionCallback);
+        runAndNotify(() -> completionHandler.onCompletion(muleEvent), event, responseCompletionCallback);
     }
 
     @Override
@@ -57,7 +54,7 @@ final class ExtensionFlowProcessingTemplate<Payload, Attributes extends Serializ
         runAndNotify(() -> completionHandler.onFailure(messagingException), event, responseCompletionCallback);
     }
 
-    private void runAndNotify(Runnable runnable, MuleEvent event, ResponseCompletionCallback responseCompletionCallback)
+    private void runAndNotify(Runnable runnable, org.mule.runtime.api.message.MuleEvent event, ResponseCompletionCallback responseCompletionCallback)
     {
         try
         {
@@ -66,7 +63,7 @@ final class ExtensionFlowProcessingTemplate<Payload, Attributes extends Serializ
         }
         catch (Exception e)
         {
-            responseCompletionCallback.responseSentWithFailure(e, event);
+            responseCompletionCallback.responseSentWithFailure(e, (MuleEvent) event);
         }
     }
 }
