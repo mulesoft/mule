@@ -123,4 +123,8 @@
         <metadata:metadata-source-with-multilevel config-ref="config" continent="AMERICA" country="ARGENTINA" city="BA"/>
         <logger/>
     </flow>
+
+    <flow name="typeWithDeclaredSubtypesMetadata">
+        <metadata:type-with-declared-subtypes-metadata config-ref="config" shape="#[new org.mule.test.metadata.extension.model.Circle()]" count="1"/>
+    </flow>
 </mule>

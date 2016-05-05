@@ -64,6 +64,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected static final String SHOULD_INHERIT_EXTENSION_RESOLVERS = "shouldInheritExtensionResolvers";
     protected static final String SHOULD_INHERIT_OPERATION_PARENT_RESOLVERS = "shouldInheritOperationParentResolvers";
     protected static final String SIMPLE_MULTILEVEL_KEY_RESOLVER = "simpleMultiLevelKeyResolver";
+    protected static final String TYPE_WITH_DECLARED_SUBTYPES_METADATA = "typeWithDeclaredSubtypesMetadata";
 
 
     protected final NullMetadataKey nullMetadataKey = new NullMetadataKey();
@@ -173,5 +174,4 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
         }
         assertThat(param.getType(), is(type));
     }
-
 }

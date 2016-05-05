@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.typeDescriptor;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.mergeResults;
@@ -15,6 +16,9 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isNullType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.builder.UnionTypeBuilder;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataAware;
@@ -35,11 +39,15 @@ import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
+import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
+import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,13 +71,17 @@ public class MetadataMediator
     private final MetadataResolverFactory resolverFactory;
     private final Optional<ParameterModel> contentParameter;
     private final List<ParameterModel> metadataKeyParts;
+    private final SubTypesMappingContainer subTypesMappingContainer;
 
-    public MetadataMediator(RuntimeComponentModel componentModel)
+    public MetadataMediator(RuntimeExtensionModel extensionModel, RuntimeComponentModel componentModel)
     {
         this.componentModel = componentModel;
         this.resolverFactory = componentModel.getMetadataResolverFactory();
         this.contentParameter = getContentParameter(componentModel);
         this.metadataKeyParts = getMetadataKeyParts(componentModel);
+        Optional<SubTypesModelProperty> subTypesModelProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
+        this.subTypesMappingContainer = new SubTypesMappingContainer(subTypesModelProperty.isPresent() ? subTypesModelProperty.get().getSubTypesMapping()
+                                                                                                       : ImmutableMap.of());
     }
 
     /**
@@ -180,8 +192,27 @@ public class MetadataMediator
         }
 
         return parameters
-                .map(p -> MetadataDescriptorBuilder.typeDescriptor(p.getName()).withType(p.getType()).build())
+                .map(this::buildParameterTypeMetadataDescriptor)
                 .collect(new ImmutableListCollector<>());
+    }
+
+    /**
+     * Builds a {@link TypeMetadataDescriptor} from the given {@link ParameterModel}
+     * an its subtypes if have any.
+     *
+     * @param parameterModel the {@link ParameterModel} to build the {@link TypeMetadataDescriptor}
+     * @return the {@link TypeMetadataDescriptor} for the {@link ParameterModel}
+     */
+    private TypeMetadataDescriptor buildParameterTypeMetadataDescriptor(ParameterModel parameterModel)
+    {
+        List<MetadataType> subTypes = subTypesMappingContainer.getSubTypes(parameterModel.getType());
+        if (!subTypes.isEmpty())
+        {
+            UnionTypeBuilder<?> unionTypeBuilder = BaseTypeBuilder.create(MetadataFormat.JAVA).unionType();
+            subTypes.forEach(unionTypeBuilder::of);
+            return typeDescriptor(parameterModel.getName()).withType(unionTypeBuilder.build()).build();
+        }
+        return typeDescriptor(parameterModel.getName()).withType(parameterModel.getType()).build();
     }
 
     /**
@@ -190,9 +221,9 @@ public class MetadataMediator
      */
     private Optional<TypeMetadataDescriptor> getContentMetadataDescriptor()
     {
-        return contentParameter.isPresent() ? Optional.of(MetadataDescriptorBuilder.typeDescriptor(contentParameter.get().getName())
-                                                                  .withType(contentParameter.get().getType())
-                                                                  .build())
+        return contentParameter.isPresent() ? Optional.of(typeDescriptor(contentParameter.get().getName())
+                                                         .withType(contentParameter.get().getType())
+                                                         .build())
                                             : Optional.empty();
     }
 
@@ -216,8 +247,8 @@ public class MetadataMediator
         }
 
         MetadataResult<MetadataType> contentMetadataResult = getContentMetadata(context, key);
-        TypeMetadataDescriptor descriptor = MetadataDescriptorBuilder
-                .typeDescriptor(contentParameter.get().getName())
+        TypeMetadataDescriptor descriptor =
+                typeDescriptor(contentParameter.get().getName())
                 .withType(contentMetadataResult.get())
                 .build();
 

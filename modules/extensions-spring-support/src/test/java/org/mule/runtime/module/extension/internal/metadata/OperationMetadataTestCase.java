@@ -18,6 +18,7 @@ import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.AGE;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.NAME;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.BRAND;
@@ -29,17 +30,22 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.impl.DefaultUnionType;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataManager;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.metadata.extension.LocationKey;
+import org.mule.test.metadata.extension.model.Circle;
+import org.mule.test.metadata.extension.model.Square;
 
 import java.io.IOException;
 import java.util.List;
@@ -422,4 +428,19 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
         assertThat(alternativeConfigCache.get(BRAND).get(), is(BRAND_VALUE));
     }
 
+    @Test
+    public void unionTypeMetadataWithSubtypes()
+    {
+        componentId = new ProcessorId(TYPE_WITH_DECLARED_SUBTYPES_METADATA, FIRST_PROCESSOR_INDEX);
+        MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId);
+        assertThat(metadata.isSuccess(), is(true));
+
+        TypeMetadataDescriptor shapeMetadata = metadata.get().getParametersMetadata().get(0);
+        assertThat(shapeMetadata.getName(), is("shape"));
+
+        MetadataType shapeType = shapeMetadata.getType();
+        assertThat(shapeType, is(instanceOf(DefaultUnionType.class)));
+        assertThat(((DefaultUnionType) shapeType).getTypes(), hasSize(2));
+        assertThat(((DefaultUnionType) shapeType).getTypes(), hasItems(toMetadataType(Circle.class), toMetadataType(Square.class)));
+    }
 }

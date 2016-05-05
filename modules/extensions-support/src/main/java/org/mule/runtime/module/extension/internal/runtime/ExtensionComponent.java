@@ -70,7 +70,7 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
         this.extensionModel = extensionModel;
         this.configurationProviderName = configurationProviderName;
         this.extensionManager = extensionManager;
-        this.metadataMediator = new MetadataMediator(componentModel);
+        this.metadataMediator = new MetadataMediator(extensionModel, componentModel);
     }
 
     /**
