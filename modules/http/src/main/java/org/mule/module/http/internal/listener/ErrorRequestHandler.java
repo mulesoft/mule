@@ -22,23 +22,24 @@ public class ErrorRequestHandler implements RequestHandler
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     private int statusCode;
-    private String reasonPhraseFormat;
-    private String entity;
+    private String reasonPhrase;
+    private String entityFormat;
 
-    public ErrorRequestHandler(int statusCode, String reasonPhraseFormat, String entity)
+    public ErrorRequestHandler(int statusCode, String reasonPhrase, String entityFormat)
     {
         this.statusCode = statusCode;
-        this.reasonPhraseFormat = reasonPhraseFormat;
-        this.entity = entity;
+        this.reasonPhrase = reasonPhrase;
+        this.entityFormat = entityFormat;
     }
 
     @Override
     public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback)
     {
+        String resolvedEntity = String.format(entityFormat, requestContext.getRequest().getUri());
         responseCallback.responseReady(new org.mule.module.http.internal.domain.response.HttpResponseBuilder()
                                                .setStatusCode(statusCode)
-                                               .setReasonPhrase(String.format(reasonPhraseFormat, requestContext.getRequest().getUri()))
-                                               .setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(entity.getBytes())))
+                                               .setReasonPhrase(reasonPhrase)
+                                               .setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(resolvedEntity.getBytes())))
                                                .build(), new ResponseStatusCallback()
         {
             @Override
