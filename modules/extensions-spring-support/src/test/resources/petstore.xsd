@@ -29,15 +29,82 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="cage">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/petstore" base="org.mule.test.petstore.extension.PetCage"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="threadingProfile"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="pets"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="cage"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+    <xs:complexType name="org.mule.test.petstore.extension.PetCage">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="birds">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="bird">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                                        <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="ammenities">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="ammenity">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionMap" use="optional" name="birds"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="optional" name="ammenities"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="pet-cage">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/petstore" base="org.mule.test.petstore.extension.PetCage">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetCageType" substitutionGroup="mule:abstract-message-processor" name="get-cage"></xs:element>
+    <xs:complexType name="GetCageType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetClientType" substitutionGroup="mule:abstract-message-processor" name="get-client"></xs:element>
     <xs:complexType name="GetClientType">
         <xs:complexContent>

@@ -22,7 +22,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isRequired;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
@@ -106,11 +105,9 @@ import org.mule.runtime.module.extension.internal.exception.IllegalParameterMode
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.NameUtils;
 import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.math.BigInteger;
@@ -393,60 +390,13 @@ public final class SchemaBuilder
 
         for (ObjectFieldType field : fields)
         {
-            final String name = field.getKey().getName().getLocalPart();
-            final MetadataType fieldType = field.getValue();
-            final Class<?> fieldClass = getType(field);
-            final String defaultValue = MetadataTypeUtils.getDefaultValue(metadataType).orElse(null);
-            final ExpressionSupport expressionSupport = TypeUtils.getExpressionSupport(field);
+            final ExplicitGroup all = getOrCreateSequenceGroup(extension);
+            field.getValue().accept(getParameterDeclarationVisitor(extension, all, field));
 
-            fieldType.accept(new MetadataTypeVisitor()
+            if (all.getParticle().isEmpty())
             {
-                @Override
-                public void visitArrayType(ArrayType arrayType)
-                {
-                    final ExplicitGroup all = getOrCreateSequenceGroup(extension);
-                    generateCollectionElement(all, name, EMPTY, arrayType, field.isRequired());
-                }
-
-                @Override
-                public void visitDictionary(DictionaryType dictionaryType)
-                {
-                    final ExplicitGroup all = getOrCreateSequenceGroup(extension);
-                    generateMapElement(all, name, EMPTY, dictionaryType, field.isRequired());
-                }
-
-                @Override
-                public void visitObject(ObjectType objectType)
-                {
-                    if (TlsContextFactory.class.isAssignableFrom(fieldClass))
-                    {
-                        final ExplicitGroup all = getOrCreateSequenceGroup(extension);
-                        addTlsSupport(extension, all);
-                        return;
-                    }
-
-                    if (shouldGeneratePojoChildElements(fieldClass))
-                    {
-                        if (ExpressionSupport.REQUIRED != expressionSupport)
-                        {
-                            final ExplicitGroup all = getOrCreateSequenceGroup(extension);
-                            registerComplexTypeChildElement(all, name, EMPTY, objectType, false);
-                        }
-                        else
-                        {
-                            defaultVisit(objectType);
-                            registerPojoType(objectType, EMPTY);
-                        }
-                    }
-                }
-
-                @Override
-                protected void defaultVisit(MetadataType metadataType)
-                {
-                    Attribute attribute = createAttribute(name, EMPTY, fieldType, defaultValue, field.isRequired(), expressionSupport);
-                    extension.getAttributeOrAttributeGroup().add(attribute);
-                }
-            });
+                extension.setSequence(null);
+            }
         }
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
@@ -556,16 +506,6 @@ public final class SchemaBuilder
         return objectComplexType;
     }
 
-    private Attribute createAttribute(ParameterModel parameterModel, boolean required)
-    {
-        return createAttribute(parameterModel.getName(),
-                               parameterModel.getDescription(),
-                               parameterModel.getType(),
-                               parameterModel.getDefaultValue(),
-                               required,
-                               parameterModel.getExpressionSupport());
-    }
-
     Attribute createAttribute(String name, MetadataType type, boolean required, ExpressionSupport expressionSupport)
     {
         return createAttribute(name, EMPTY, type, null, required, expressionSupport);
@@ -628,12 +568,6 @@ public final class SchemaBuilder
         return attribute;
     }
 
-    private void generateCollectionElement(ExplicitGroup all, ParameterModel parameterModel, boolean forceOptional)
-    {
-        boolean required = isRequired(parameterModel, forceOptional);
-        generateCollectionElement(all, parameterModel.getName(), parameterModel.getDescription(), (ArrayType) parameterModel.getType(), required);
-    }
-
     private void generateCollectionElement(ExplicitGroup all, String name, String description, ArrayType metadataType, boolean required)
     {
         name = hyphenize(name);
@@ -681,11 +615,6 @@ public final class SchemaBuilder
         return collectionComplexType;
     }
 
-    private void generateMapElement(ExplicitGroup all, ParameterModel parameterModel, boolean forceOptional)
-    {
-        boolean required = isRequired(parameterModel, forceOptional);
-        generateMapElement(all, parameterModel.getName(), parameterModel.getDescription(), (DictionaryType) parameterModel.getType(), required);
-    }
 
     private void generateMapElement(ExplicitGroup all, String name, String description, DictionaryType metadataType, boolean required)
     {
@@ -847,7 +776,7 @@ public final class SchemaBuilder
             }
         }
 
-        if (all.getParticle().size() == 0)
+        if (all.getParticle().isEmpty())
         {
             complexContentExtension.setSequence(null);
         }
@@ -857,7 +786,29 @@ public final class SchemaBuilder
         return complexContentExtension;
     }
 
-    private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all, final ParameterModel parameterModel)
+    private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType,
+                                                               final ExplicitGroup all, final ParameterModel parameterModel)
+    {
+        return getParameterDeclarationVisitor(extensionType, all, parameterModel.getName(), parameterModel.getDescription(),
+                                              parameterModel.getType(), parameterModel.getExpressionSupport(),
+                                              parameterModel.isRequired(), parameterModel.getDefaultValue());
+    }
+
+    private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType,
+                                                               final ExplicitGroup all, final ObjectFieldType field)
+    {
+        final String name = field.getKey().getName().getLocalPart();
+        final MetadataType fieldType = field.getValue();
+        final String defaultValue = MetadataTypeUtils.getDefaultValue(fieldType).orElse(null);
+        final ExpressionSupport expressionSupport = TypeUtils.getExpressionSupport(field);
+
+        return getParameterDeclarationVisitor(extensionType, all, name, EMPTY, fieldType,
+                                              expressionSupport, field.isRequired(), defaultValue);
+    }
+
+    private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all,
+                                                               final String name, final String description, final MetadataType metadataType,
+                                                               ExpressionSupport expressionSupport, boolean required, Object defaultValue)
     {
         return new MetadataTypeVisitor()
         {
@@ -870,9 +821,9 @@ public final class SchemaBuilder
                 forceOptional = shouldForceOptional(getType(genericType));
 
                 defaultVisit(arrayType);
-                if (shouldGenerateDataTypeChildElements(genericType, parameterModel))
+                if (shouldGenerateDataTypeChildElements(genericType, expressionSupport))
                 {
-                    generateCollectionElement(all, parameterModel, true);
+                    generateCollectionElement(all, name, description, arrayType, isRequired(true, required));
                 }
             }
 
@@ -883,10 +834,10 @@ public final class SchemaBuilder
                 forceOptional = shouldForceOptional(getType(keyType));
 
                 defaultVisit(dictionaryType);
-
-                if (shouldGenerateDataTypeChildElements(keyType, parameterModel))
+                if (shouldGenerateDataTypeChildElements(keyType, expressionSupport))
                 {
-                    generateMapElement(all, parameterModel, true);
+                    generateMapElement(all, name, description, dictionaryType, isRequired(true, required));
+
                 }
             }
 
@@ -912,24 +863,24 @@ public final class SchemaBuilder
 
                 if (importedTypes.get(objectType) != null)
                 {
-                    addImportedTypeRef(getType(importedTypes.get(objectType)), parameterModel, all);
+                    addImportedTypeRef(getType(importedTypes.get(objectType)), name, description, objectType, all);
                     return;
                 }
 
-                if (ExpressionSupport.REQUIRED != parameterModel.getExpressionSupport())
+                if (ExpressionSupport.REQUIRED != expressionSupport)
                 {
-                    List<MetadataType> subTypes = subTypesMapping.getSubTypes(parameterModel.getType());
+                    List<MetadataType> subTypes = subTypesMapping.getSubTypes(objectType);
                     if (!subTypes.isEmpty())
                     {
-                        registerPojoSubtypes(parameterModel, clazz, subTypes, all);
+                        registerPojoSubtypes(name, description, objectType, clazz, subTypes, all);
                     }
                     else
                     {
                         if (shouldGeneratePojoChildElements(clazz))
                         {
                             registerComplexTypeChildElement(all,
-                                                            parameterModel.getName(),
-                                                            parameterModel.getDescription(),
+                                                            name,
+                                                            description,
                                                             objectType,
                                                             false);
                         }
@@ -938,24 +889,24 @@ public final class SchemaBuilder
                 else
                 {
                     //We need to register the type, just in case people want to use it as global elements
-                    registerPojoType(objectType, parameterModel.getDescription());
+                    registerPojoType(objectType, description);
                 }
             }
 
             @Override
             protected void defaultVisit(MetadataType metadataType)
             {
-                extensionType.getAttributeOrAttributeGroup().add(createAttribute(parameterModel, isRequired(parameterModel, forceOptional)));
+                extensionType.getAttributeOrAttributeGroup().add(createAttribute(name, description, metadataType, defaultValue, isRequired(forceOptional, required), expressionSupport));
             }
 
-            private boolean shouldGenerateDataTypeChildElements(MetadataType metadataType, ParameterModel parameterModel)
+            private boolean shouldGenerateDataTypeChildElements(MetadataType metadataType, ExpressionSupport expressionSupport)
             {
                 if (metadataType == null)
                 {
                     return false;
                 }
 
-                boolean isExpressionRequired = ExpressionSupport.REQUIRED == parameterModel.getExpressionSupport();
+                boolean isExpressionRequired = ExpressionSupport.REQUIRED == expressionSupport;
                 boolean isPojo = metadataType instanceof ObjectType;
                 Class<?> clazz = getType(metadataType);
                 boolean isPrimitive = clazz.isPrimitive() || ClassUtils.isPrimitiveWrapper(clazz);
@@ -965,23 +916,33 @@ public final class SchemaBuilder
 
             private boolean shouldGeneratePojoChildElements(Class<?> type)
             {
-                return IntrospectionUtils.isInstantiable(type) && !getExposedFields(type).isEmpty();
+                return isInstantiable(type) && !getExposedFields(type).isEmpty();
             }
 
             private boolean shouldForceOptional(Class<?> type)
             {
-                return !parameterModel.isRequired() ||
-                       !subTypesMapping.getSubTypes(parameterModel.getType()).isEmpty() ||
-                       (IntrospectionUtils.isInstantiable(type) && ExpressionSupport.REQUIRED != parameterModel.getExpressionSupport());
+                return !required ||
+                       !subTypesMapping.getSubTypes(metadataType).isEmpty() ||
+                       (isInstantiable(type) && ExpressionSupport.REQUIRED != expressionSupport);
+            }
+
+            private boolean isRequired(boolean forceOptional, boolean required)
+            {
+                return !forceOptional && required;
             }
         };
     }
 
     private void addImportedTypeRef(Class<?> extensionType, ParameterModel parameterModel, ExplicitGroup all)
     {
-        TopLevelElement objectElement = createTopLevelElement(hyphenize(parameterModel.getName()), ZERO, "1");
+        addImportedTypeRef(extensionType, parameterModel.getName(), parameterModel.getDescription(), parameterModel.getType(), all);
+    }
+
+    private void addImportedTypeRef(Class<?> extensionType, String name, String description, MetadataType metadataType, ExplicitGroup all)
+    {
+        TopLevelElement objectElement = createTopLevelElement(hyphenize(name), ZERO, "1");
         objectElement.setComplexType(new LocalComplexType());
-        objectElement.setAnnotation(createDocAnnotation(parameterModel.getDescription()));
+        objectElement.setAnnotation(createDocAnnotation(description));
 
         ExplicitGroup sequence = new ExplicitGroup();
         sequence.setMinOccurs(ONE);
@@ -995,7 +956,7 @@ public final class SchemaBuilder
         schemaImport.setSchemaLocation(xml.getSchemaLocation());
         schema.getIncludeOrImportOrRedefine().add(schemaImport);
 
-        QName qName = new QName(xml.getNamespaceUri(), hyphenize(getAliasName(parameterModel.getType())), xml.getNamespace());
+        QName qName = new QName(xml.getNamespaceUri(), hyphenize(getAliasName(metadataType)), xml.getNamespace());
         sequence.getParticle().add(objectFactory.createElement(createRefElement(qName, false)));
 
         objectElement.getComplexType().setSequence(sequence);
@@ -1003,25 +964,25 @@ public final class SchemaBuilder
         all.getParticle().add(objectFactory.createElement(objectElement));
     }
 
-    private void registerPojoSubtypes(ParameterModel parameterModel, Class<?> parameterClass, List<MetadataType> subTypes, ExplicitGroup all)
+    private void registerPojoSubtypes(String name, String description, MetadataType metadataType, Class<?> parameterClass, List<MetadataType> subTypes, ExplicitGroup all)
     {
-        TopLevelElement objectElement = createTopLevelElement(hyphenize(parameterModel.getName()), ZERO, "1");
+        TopLevelElement objectElement = createTopLevelElement(hyphenize(name), ZERO, "1");
         objectElement.setComplexType(new LocalComplexType());
-        objectElement.setAnnotation(createDocAnnotation(parameterModel.getDescription()));
+        objectElement.setAnnotation(createDocAnnotation(description));
 
         ExplicitGroup choice = new ExplicitGroup();
         choice.setMinOccurs(ONE);
         choice.setMaxOccurs("1");
 
-        registerPojoType((ObjectType) parameterModel.getType(), EMPTY);
+        registerPojoType((ObjectType) metadataType, EMPTY);
         if (shouldGeneratePojoChildElements(parameterClass))
         {
-            TopLevelElement refElement = createRefElement(new QName(schema.getTargetNamespace(), hyphenize(getAliasName(parameterModel.getType()))), false);
+            TopLevelElement refElement = createRefElement(new QName(schema.getTargetNamespace(), hyphenize(getAliasName(metadataType))), false);
             choice.getParticle().add(objectFactory.createElement(refElement));
         }
 
         subTypes.forEach(subtype -> {
-            registerPojoType((ObjectType) subtype, (ObjectType) parameterModel.getType(), EMPTY);
+            registerPojoType((ObjectType) subtype, (ObjectType) metadataType, EMPTY);
             TopLevelElement refElement = createRefElement(new QName(schema.getTargetNamespace(), hyphenize(getAliasName(subtype))), false);
             choice.getParticle().add(objectFactory.createElement(refElement));
         });
@@ -1087,7 +1048,7 @@ public final class SchemaBuilder
 
     private boolean shouldGeneratePojoChildElements(Class<?> type)
     {
-        return IntrospectionUtils.isInstantiable(type) && !getExposedFields(type).isEmpty();
+        return isInstantiable(type) && !getExposedFields(type).isEmpty();
     }
 
     private void generateNestedProcessorElement(ExplicitGroup all, ParameterModel parameterModel, String maxOccurs)

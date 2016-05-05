@@ -39,4 +39,9 @@ public class PetStoreOperations
         latch.await();
         return client;
     }
+
+    public PetCage getCage(@UseConfig PetStoreConnector config)
+    {
+        return config.getCage();
+    }
 }
