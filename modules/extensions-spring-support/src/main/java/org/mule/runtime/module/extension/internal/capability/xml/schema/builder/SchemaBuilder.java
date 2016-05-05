@@ -105,7 +105,6 @@ import org.mule.runtime.module.extension.internal.exception.IllegalParameterMode
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.NameUtils;
 import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 
@@ -394,7 +393,7 @@ public final class SchemaBuilder
             final ExplicitGroup all = getOrCreateSequenceGroup(extension);
             field.getValue().accept(getParameterDeclarationVisitor(extension, all, field));
 
-            if (all.getParticle().size() == 0)
+            if (all.getParticle().isEmpty())
             {
                 extension.setSequence(null);
             }
@@ -777,7 +776,7 @@ public final class SchemaBuilder
             }
         }
 
-        if (all.getParticle().size() == 0)
+        if (all.getParticle().isEmpty())
         {
             complexContentExtension.setSequence(null);
         }
@@ -787,19 +786,24 @@ public final class SchemaBuilder
         return complexContentExtension;
     }
 
-    private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all, final ParameterModel parameterModel)
+    private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType,
+                                                               final ExplicitGroup all, final ParameterModel parameterModel)
     {
-        return getParameterDeclarationVisitor(extensionType, all, parameterModel.getName(), parameterModel.getDescription(), parameterModel.getType(), parameterModel.getExpressionSupport(), parameterModel.isRequired(), parameterModel.getDefaultValue());
+        return getParameterDeclarationVisitor(extensionType, all, parameterModel.getName(), parameterModel.getDescription(),
+                                              parameterModel.getType(), parameterModel.getExpressionSupport(),
+                                              parameterModel.isRequired(), parameterModel.getDefaultValue());
     }
 
-    private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all, final ObjectFieldType field)
+    private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType,
+                                                               final ExplicitGroup all, final ObjectFieldType field)
     {
         final String name = field.getKey().getName().getLocalPart();
         final MetadataType fieldType = field.getValue();
         final String defaultValue = MetadataTypeUtils.getDefaultValue(fieldType).orElse(null);
         final ExpressionSupport expressionSupport = TypeUtils.getExpressionSupport(field);
 
-        return getParameterDeclarationVisitor(extensionType, all, name, EMPTY, fieldType, expressionSupport, field.isRequired(), defaultValue);
+        return getParameterDeclarationVisitor(extensionType, all, name, EMPTY, fieldType,
+                                              expressionSupport, field.isRequired(), defaultValue);
     }
 
     private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all,
@@ -912,14 +916,14 @@ public final class SchemaBuilder
 
             private boolean shouldGeneratePojoChildElements(Class<?> type)
             {
-                return IntrospectionUtils.isInstantiable(type) && !getExposedFields(type).isEmpty();
+                return isInstantiable(type) && !getExposedFields(type).isEmpty();
             }
 
             private boolean shouldForceOptional(Class<?> type)
             {
                 return !required ||
                        !subTypesMapping.getSubTypes(metadataType).isEmpty() ||
-                       (IntrospectionUtils.isInstantiable(type) && ExpressionSupport.REQUIRED != expressionSupport);
+                       (isInstantiable(type) && ExpressionSupport.REQUIRED != expressionSupport);
             }
 
             private boolean isRequired(boolean forceOptional, boolean required)
@@ -1044,7 +1048,7 @@ public final class SchemaBuilder
 
     private boolean shouldGeneratePojoChildElements(Class<?> type)
     {
-        return IntrospectionUtils.isInstantiable(type) && !getExposedFields(type).isEmpty();
+        return isInstantiable(type) && !getExposedFields(type).isEmpty();
     }
 
     private void generateNestedProcessorElement(ExplicitGroup all, ParameterModel parameterModel, String maxOccurs)
