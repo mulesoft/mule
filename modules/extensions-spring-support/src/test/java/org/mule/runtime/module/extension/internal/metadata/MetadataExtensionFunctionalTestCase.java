@@ -9,7 +9,9 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
@@ -20,14 +22,12 @@ import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
-import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
+import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.metadata.extension.MetadataConnection;
 import org.mule.test.metadata.extension.MetadataExtension;
-import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils;
 
 import java.io.IOException;
@@ -38,29 +38,32 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 
+
 public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunctionalTestCase
 {
 
     protected static final String FIRST_PROCESSOR_INDEX = "0";
 
-    protected static final String CONTENT_METADATA_WITH_KEY_PARAM = "contentMetadataWithKeyParam";
-    protected static final String OUTPUT_METADATA_WITH_KEY_PARAM = "outputMetadataWithKeyParam";
-    protected static final String CONTENT_AND_OUTPUT_METADATA_WITH_KEY_PARAM = "contentAndOutputMetadataWithKeyParam";
+    protected static final String CONTENT_METADATA_WITH_KEY_ID = "contentMetadataWithKeyId";
+    protected static final String OUTPUT_METADATA_WITH_KEY_ID = "outputMetadataWithKeyId";
+    protected static final String CONTENT_AND_OUTPUT_METADATA_WITH_KEY_ID = "contentAndOutputMetadataWithKeyId";
     protected static final String OUTPUT_ONLY_WITHOUT_CONTENT_PARAM = "outputOnlyWithoutContentParam";
     protected static final String CONTENT_ONLY_IGNORES_OUTPUT = "contentOnlyIgnoresOutput";
-    protected static final String CONTENT_METADATA_WITHOUT_KEY_PARAM = "contentMetadataWithoutKeyParam";
-    protected static final String OUTPUT_METADATA_WITHOUT_KEY_PARAM = "outputMetadataWithoutKeyParam";
-    protected static final String CONTENT_AND_OUTPUT_METADATA_WITHOUT_KEY_PARAM = "contentAndOutputMetadataWithoutKeyParam";
-    protected static final String CONTENT_METADATA_WITHOUT_KEYS_WITH_KEY_PARAM = "contentMetadataWithoutKeysWithKeyParam";
-    protected static final String OUTPUT_METADATA_WITHOUT_KEYS_WITH_KEY_PARAM = "outputMetadataWithoutKeysWithKeyParam";
+    protected static final String CONTENT_METADATA_WITHOUT_KEY_ID = "contentMetadataWithoutKeyId";
+    protected static final String OUTPUT_METADATA_WITHOUT_KEY_PARAM = "outputMetadataWithoutKeyId";
+    protected static final String CONTENT_AND_OUTPUT_METADATA_WITHOUT_KEY_ID = "contentAndOutputMetadataWithoutKeyId";
+    protected static final String CONTENT_METADATA_WITHOUT_KEYS_WITH_KEY_ID = "contentMetadataWithoutKeysWithKeyId";
+    protected static final String OUTPUT_METADATA_WITHOUT_KEYS_WITH_KEY_ID = "outputMetadataWithoutKeysWithKeyId";
     protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER = "contentAndOutputWithCacheResolver";
     protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG = "contentAndOutputWithCacheResolverWithSpecificConfig";
     protected static final String CONTENT_ONLY_CACHE_RESOLVER = "contentOnlyCacheResolver";
     protected static final String OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER = "outputAndMetadataKeyCacheResolver";
     protected static final String SOURCE_METADATA = "sourceMetadata";
+    protected static final String SOURCE_METADATA_WITH_MULTILEVEL = "sourceMetadataWithMultilevel";
     protected static final String SHOULD_INHERIT_OPERATION_RESOLVERS = "shouldInheritOperationResolvers";
     protected static final String SHOULD_INHERIT_EXTENSION_RESOLVERS = "shouldInheritExtensionResolvers";
     protected static final String SHOULD_INHERIT_OPERATION_PARENT_RESOLVERS = "shouldInheritOperationParentResolvers";
+    protected static final String SIMPLE_MULTILEVEL_KEY_RESOLVER = "simpleMultiLevelKeyResolver";
 
 
     protected final NullMetadataKey nullMetadataKey = new NullMetadataKey();
@@ -100,7 +103,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     {
         typeLoader = ExtensionsTestUtils.TYPE_LOADER;
         personKey = MetadataKeyBuilder.newKey(MetadataConnection.PERSON).build();
-        personType = TestMetadataResolverUtils.getMetadata(personKey);
+        personType = TestMetadataResolverUtils.getMetadata(personKey.getId());
     }
 
     protected ComponentMetadataDescriptor getComponentDynamicMetadata()

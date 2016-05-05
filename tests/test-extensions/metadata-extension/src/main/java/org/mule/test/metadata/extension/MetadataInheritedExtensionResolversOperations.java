@@ -7,12 +7,12 @@
 package org.mule.test.metadata.extension;
 
 import org.mule.runtime.extension.api.annotation.metadata.Content;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyParam;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 
 public class MetadataInheritedExtensionResolversOperations
 {
-    public void shouldInheritExtensionResolvers(@Connection MetadataConnection connection, @MetadataKeyParam String type, @Content Object content)
+    public void shouldInheritExtensionResolvers(@Connection MetadataConnection connection, @MetadataKeyId String type, @Content Object content)
     {
     }
 }

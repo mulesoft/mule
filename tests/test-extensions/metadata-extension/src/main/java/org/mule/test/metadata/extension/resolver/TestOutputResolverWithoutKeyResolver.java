@@ -9,16 +9,15 @@ package org.mule.test.metadata.extension.resolver;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
-import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 
-public class TestOutputResolverWithoutKeyResolver implements MetadataOutputResolver
+public class TestOutputResolverWithoutKeyResolver implements MetadataOutputResolver<String>
 {
 
     @Override
-    public MetadataType getOutputMetadata(MetadataContext context, MetadataKey key) throws MetadataResolvingException, ConnectionException
+    public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
     {
-        return TestMetadataResolverUtils.getMetadata(TestMetadataResolverUtils.getKeys(context).get(0));
+        return TestMetadataResolverUtils.getMetadata(TestMetadataResolverUtils.getKeys(context).get(0).getId());
     }
 }

@@ -36,6 +36,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Ignore;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -45,7 +46,8 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Parameter
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
-import org.mule.runtime.extension.api.introspection.property.MetadataModelProperty;
+import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
+import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.runtime.source.Source;
 
 import com.google.common.base.Predicates;
@@ -345,13 +347,15 @@ public final class IntrospectionUtils
 
     public static Collection<Field> getParameterFields(Class<?> extensionType)
     {
-
         return getAnnotatedFields(extensionType, Parameter.class);
     }
 
     public static Collection<Field> getParameterGroupFields(Class<?> extensionType)
     {
-        return getAnnotatedFields(extensionType, ParameterGroup.class);
+        ImmutableList.Builder<Field> listFieldsBuilder = ImmutableList.builder();
+        return listFieldsBuilder.addAll(getAnnotatedFields(extensionType, ParameterGroup.class))
+                .addAll(getAnnotatedFields(extensionType, MetadataKeyId.class))
+                .build();
     }
 
     public static Collection<Method> getOperationMethods(Class<?> declaringClass)
@@ -359,7 +363,7 @@ public final class IntrospectionUtils
         return getAllMethods(declaringClass, withModifier(Modifier.PUBLIC), Predicates.not(withAnnotation(Ignore.class)));
     }
 
-    private static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation> annotationType)
+    public static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation> annotationType)
     {
         return getDescendingHierarchy(clazz).stream()
                 .flatMap(type -> Arrays.stream(type.getDeclaredFields()))
@@ -449,17 +453,15 @@ public final class IntrospectionUtils
     public static java.util.Optional<ParameterModel> getContentParameter(ComponentModel component)
     {
         return component.getParameterModels().stream()
-                .filter(p -> p.getModelProperty(MetadataModelProperty.class).isPresent() &&
-                             p.getModelProperty(MetadataModelProperty.class).get().isContent())
+                .filter(p -> p.getModelProperty(MetadataContentModelProperty.class).isPresent())
                 .findFirst();
     }
 
-    public static java.util.Optional<ParameterModel> getMetadataKeyParam(ComponentModel component)
+    public static List<ParameterModel> getMetadataKeyParts(ComponentModel component)
     {
         return component.getParameterModels().stream()
-                .filter(p -> p.getModelProperty(MetadataModelProperty.class).isPresent() &&
-                             p.getModelProperty(MetadataModelProperty.class).get().isMetadataKeyParam())
-                .findFirst();
+                .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
+                .collect(toList());
     }
 
     /**

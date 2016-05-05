@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TestNoConfigMetadataResolver implements MetadataKeysResolver, MetadataOutputResolver, MetadataContentResolver
+public class TestNoConfigMetadataResolver implements MetadataKeysResolver, MetadataOutputResolver<Object>, MetadataContentResolver<Object>
 {
 
     public List<MetadataKey> getMetadataKeys(MetadataContext context)
@@ -31,7 +31,7 @@ public class TestNoConfigMetadataResolver implements MetadataKeysResolver, Metad
                 .collect(Collectors.toList());
     }
 
-    public MetadataType getContentMetadata(MetadataContext context, MetadataKey key)
+    public MetadataType getContentMetadata(MetadataContext context, Object key)
     {
         if (key instanceof NullMetadataKey)
         {
@@ -41,7 +41,7 @@ public class TestNoConfigMetadataResolver implements MetadataKeysResolver, Metad
         return BaseTypeBuilder.create(JAVA).stringType().build();
     }
 
-    public MetadataType getOutputMetadata(MetadataContext context, MetadataKey key)
+    public MetadataType getOutputMetadata(MetadataContext context, Object key)
     {
         if (key instanceof NullMetadataKey)
         {

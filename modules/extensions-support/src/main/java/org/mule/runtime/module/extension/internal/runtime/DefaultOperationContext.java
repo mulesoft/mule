@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
@@ -48,7 +48,12 @@ public class DefaultOperationContext implements OperationContextAdapter
 
         Map<ParameterModel, Object> parameterMap = parameters.asMap();
         this.parameters = new HashMap<>(parameterMap.size());
-        parameters.asMap().entrySet().forEach(parameter -> this.parameters.put(parameter.getKey().getName(), parameter.getValue()));
+        parameters.asMap().entrySet().forEach(parameter -> setParameter(parameter));
+    }
+
+    private void setParameter(Map.Entry<ParameterModel, Object> parameter)
+    {
+        this.parameters.put(parameter.getKey().getName(), parameter.getValue());
     }
 
     /**

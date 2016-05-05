@@ -17,7 +17,7 @@ import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWit
 @Extension(name = "Metadata")
 @Operations({MetadataOperations.class, MetadataFailureOperations.class, MetadataInheritedExtensionResolversOperations.class, MetadataInheritedOperationResolversOperations.class})
 @Providers(MetadataConnectionProvider.class)
-@Sources(MetadataSource.class)
+@Sources({MetadataSource.class, MetadataSourceWithMultilevel.class})
 @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/metadata", namespace = "metadata")
 @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
         contentResolver = TestContentAndOutputResolverWithKeyResolver.class,

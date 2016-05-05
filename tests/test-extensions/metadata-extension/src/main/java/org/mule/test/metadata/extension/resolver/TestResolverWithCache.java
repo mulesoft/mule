@@ -28,7 +28,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-public class TestResolverWithCache implements MetadataContentResolver, MetadataOutputResolver, MetadataKeysResolver
+public class TestResolverWithCache implements MetadataContentResolver<String>, MetadataOutputResolver<String>, MetadataKeysResolver
 {
 
     public static final String MISSING_ELEMENT_ERROR_MESSAGE = "Missing element in the cache. There was no element in the cache for the key: " + BRAND;
@@ -37,7 +37,7 @@ public class TestResolverWithCache implements MetadataContentResolver, MetadataO
     public static final String BRAND_VALUE = "Nikdidas";
 
     @Override
-    public MetadataType getContentMetadata(MetadataContext context, MetadataKey key) throws MetadataResolvingException, ConnectionException
+    public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
     {
         MetadataCache cache = context.getCache();
         Optional<? extends Serializable> element = cache.get(BRAND);
@@ -50,7 +50,7 @@ public class TestResolverWithCache implements MetadataContentResolver, MetadataO
     }
 
     @Override
-    public MetadataType getOutputMetadata(MetadataContext context, MetadataKey key) throws MetadataResolvingException, ConnectionException
+    public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
     {
         MetadataCache cache = context.getCache();
         Optional<String> brand = cache.get(BRAND);

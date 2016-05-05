@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.empty;
@@ -66,7 +67,8 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDec
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
-import org.mule.runtime.extension.api.introspection.property.MetadataModelProperty;
+import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
+import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
@@ -166,9 +168,9 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         ExtensionDeclarer declarer = getDescriber().describe(new DefaultDescribingContext(MetadataExtension.class.getClassLoader()));
         ExtensionDeclaration declaration = declarer.getDeclaration();
 
-        List<ParameterDeclaration> parameters = getOperation(declaration, "contentMetadataWithKeyParam").getParameters();
+        List<ParameterDeclaration> parameters = getOperation(declaration, "contentMetadataWithKeyId").getParameters();
 
-        assertParameterIsMetadataKeyParam(findParameter(parameters, "type"));
+        assertParameterIsMetadataKeyId(findParameter(parameters, "type"));
         assertParameterIsMetadataContent(findParameter(parameters, "content"));
     }
 
@@ -562,18 +564,16 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(display.getDisplayName(), is(displayName));
     }
 
-    private void assertParameterIsMetadataKeyParam(ParameterDeclaration param)
+    private void assertParameterIsMetadataKeyId(ParameterDeclaration param)
     {
-        MetadataModelProperty metadata = param.getModelProperty(MetadataModelProperty.class).get();
-        assertThat(metadata.isMetadataKeyParam(), is(true));
-        assertThat(metadata.isContent(), is(false));
+        java.util.Optional<MetadataKeyPartModelProperty> metadata = param.getModelProperty(MetadataKeyPartModelProperty.class);
+        assertThat(metadata.isPresent(), is(true));
     }
 
     private void assertParameterIsMetadataContent(ParameterDeclaration param)
     {
-        MetadataModelProperty metadata = param.getModelProperty(MetadataModelProperty.class).get();
-        assertThat(metadata.isContent(), is(true));
-        assertThat(metadata.isMetadataKeyParam(), is(false));
+        MetadataContentModelProperty metadata = param.getModelProperty(MetadataContentModelProperty.class).get();
+        assertThat(metadata, is(not(nullValue())));
     }
 
     private ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name)

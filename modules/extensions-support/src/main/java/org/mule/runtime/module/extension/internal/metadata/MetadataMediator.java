@@ -6,10 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.mergeResults;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContentParameter;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isNullType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataAware;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -24,15 +30,14 @@ import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyParam;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 
 import com.google.common.collect.ImmutableList;
 
@@ -57,21 +62,21 @@ public class MetadataMediator
     private final RuntimeComponentModel componentModel;
     private final MetadataResolverFactory resolverFactory;
     private final Optional<ParameterModel> contentParameter;
-    private final Optional<ParameterModel> metadataKeyParam;
+    private final List<ParameterModel> metadataKeyParts;
 
     public MetadataMediator(RuntimeComponentModel componentModel)
     {
         this.componentModel = componentModel;
         this.resolverFactory = componentModel.getMetadataResolverFactory();
-        this.contentParameter = IntrospectionUtils.getContentParameter(componentModel);
-        this.metadataKeyParam = IntrospectionUtils.getMetadataKeyParam(componentModel);
+        this.contentParameter = getContentParameter(componentModel);
+        this.metadataKeyParts = getMetadataKeyParts(componentModel);
     }
 
     /**
      * Resolves the list of types available for the Content or Output of the associated {@link MetadataAware} Component,
      * representing them as a list of {@link MetadataKey}.
      * <p>
-     * If no {@link MetadataKeyParam} is present in the component's input parameters, then a {@link NullMetadataKey} is
+     * If no {@link MetadataKeyId} is present in the component's input parameters, then a {@link NullMetadataKey} is
      * returned. Otherwise, the {@link MetadataKeysResolver#getMetadataKeys} associated with the current Component will
      * be invoked to obtain the keys
      *
@@ -81,14 +86,16 @@ public class MetadataMediator
      */
     public MetadataResult<List<MetadataKey>> getMetadataKeys(MetadataContext context)
     {
-        if (!metadataKeyParam.isPresent())
+        if (metadataKeyParts.isEmpty())
         {
             return success(ImmutableList.of(new NullMetadataKey()));
         }
-
         try
         {
-            return success(resolverFactory.getKeyResolver().getMetadataKeys(context));
+            return success(resolverFactory.getKeyResolver()
+                                   .getMetadataKeys(context)
+                                   .stream()
+                                   .collect(toList()));
         }
         catch (Exception e)
         {
@@ -184,8 +191,8 @@ public class MetadataMediator
     private Optional<TypeMetadataDescriptor> getContentMetadataDescriptor()
     {
         return contentParameter.isPresent() ? Optional.of(MetadataDescriptorBuilder.typeDescriptor(contentParameter.get().getName())
-                                                         .withType(contentParameter.get().getType())
-                                                         .build())
+                                                                  .withType(contentParameter.get().getType())
+                                                                  .build())
                                             : Optional.empty();
     }
 
@@ -268,7 +275,7 @@ public class MetadataMediator
         }
 
         return resolveMetadataType(contentParameter.get().getType(),
-                                   () -> resolverFactory.getContentResolver().getContentMetadata(context, key));
+                                   () -> resolverFactory.getContentResolver().getContentMetadata(context, getKeyId(key)));
     }
 
     /**
@@ -282,13 +289,13 @@ public class MetadataMediator
      */
     private MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final MetadataKey key)
     {
-        if (IntrospectionUtils.isVoid(componentModel))
+        if (isVoid(componentModel))
         {
             return success(componentModel.getReturnType());
         }
 
         return resolveMetadataType(componentModel.getReturnType(),
-                                   () -> resolverFactory.getOutputResolver().getOutputMetadata(context, key));
+                                   () -> resolverFactory.getOutputResolver().getOutputMetadata(context, getKeyId(key)));
     }
 
     /**
@@ -306,7 +313,7 @@ public class MetadataMediator
         try
         {
             MetadataType dynamicType = delegate.resolve();
-            return success((dynamicType == null || IntrospectionUtils.isNullType(dynamicType)) ? staticType : dynamicType);
+            return success((dynamicType == null || isNullType(dynamicType)) ? staticType : dynamicType);
         }
         catch (Exception e)
         {
@@ -314,10 +321,23 @@ public class MetadataMediator
         }
     }
 
+    /**
+     * Given a {@link MetadataKey} instanciates the assosiated {@link MetadataKeyId} parameter
+     * this could be a simple {@link String} if the key contains only one level
+     * or a complex type with {@link MetadataKeyPart} annotated fields for a multilevel key
+     *
+     * @param key the key assosiated to the {@link MetadataKeyId} parameter.
+     * @return the instance of the {@link MetadataKeyId} parameter.
+     */
+    private Object getKeyId(MetadataKey key) throws MetadataResolvingException
+    {
+        return metadataKeyParts.size() > 1 ? new MetadataKeyIdObjectResolver(componentModel, key).resolve() : key.getId();
+    }
+
     private interface MetadataDelegate
     {
 
         MetadataType resolve() throws MetadataResolvingException, ConnectionException;
-
     }
+
 }

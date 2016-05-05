@@ -6,19 +6,18 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
-import org.mule.runtime.api.connection .ConnectionException;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
-import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
-import org.mule.metadata.api.model.MetadataType;
 
-public class TestContentResolverWithoutKeyResolver implements MetadataContentResolver
+public class TestContentResolverWithoutKeyResolver implements MetadataContentResolver<String>
 {
 
     @Override
-    public MetadataType getContentMetadata(MetadataContext context, MetadataKey key) throws MetadataResolvingException, ConnectionException
+    public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
     {
-        return TestMetadataResolverUtils.getMetadata(TestMetadataResolverUtils.getKeys(context).get(0));
+        return TestMetadataResolverUtils.getMetadata(TestMetadataResolverUtils.getKeys(context).get(0).getId());
     }
 }
