@@ -9,7 +9,6 @@ package org.mule.extension.file;
 import static org.apache.commons.io.FileUtils.write;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.file.api.FileEventType.CREATE;
@@ -24,6 +23,7 @@ import org.mule.runtime.api.temporary.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.el.context.MessageContext;
+import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -32,7 +32,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Stack;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -51,7 +52,7 @@ public class DirectoryListenerTestCase extends FileConnectorTestCase
     private static final int TIMEOUT_MILLIS = 5000;
     private static final int POLL_DELAY_MILLIS = 100;
 
-    private static Stack<MuleMessage<?, ListenerFileAttributes>> receivedMessages;
+    private static List<MuleMessage<?, ListenerFileAttributes>> receivedMessages;
 
     private File matcherLessFolder;
     private File withMatcherFolder;
@@ -72,7 +73,7 @@ public class DirectoryListenerTestCase extends FileConnectorTestCase
         listenerFolder = Paths.get(temporaryFolder.getRoot().getAbsolutePath(), MATCHERLESS_LISTENER_FOLDER_NAME).toString();
         matcherLessFolder = new File(listenerFolder, CREATED_FOLDER_NAME);
         withMatcherFolder = Paths.get(temporaryFolder.getRoot().getAbsolutePath(), WITH_MATCHER_FOLDER_NAME).toFile();
-        receivedMessages = new Stack<>();
+        receivedMessages = new CopyOnWriteArrayList<>();
     }
 
     @Override
@@ -85,7 +86,7 @@ public class DirectoryListenerTestCase extends FileConnectorTestCase
     public void onFileCreated() throws Exception
     {
         write(new File(listenerFolder, WATCH_FILE), WATCH_CONTENT);
-        assertEvent(listen(), CREATE, WATCH_CONTENT, WATCH_FILE);
+        assertEvent(listen(CREATE, WATCH_FILE), WATCH_CONTENT);
     }
 
     @Test
@@ -95,7 +96,7 @@ public class DirectoryListenerTestCase extends FileConnectorTestCase
 
         final String appendedContent = "\nNOBODY";
         write(new File(listenerFolder, WATCH_FILE), appendedContent, true);
-        assertEvent(listen(), UPDATE, WATCH_CONTENT + appendedContent, WATCH_FILE);
+        assertEvent(listen(UPDATE, WATCH_FILE), WATCH_CONTENT + appendedContent);
     }
 
     @Test
@@ -104,14 +105,14 @@ public class DirectoryListenerTestCase extends FileConnectorTestCase
         onFileCreated();
 
         new File(listenerFolder, WATCH_FILE).delete();
-        assertEvent(listen(), DELETE, NullPayload.getInstance(), WATCH_FILE);
+        assertEvent(listen(DELETE, WATCH_FILE), NullPayload.getInstance());
     }
 
     @Test
     public void onDirectoryCreated() throws Exception
     {
         matcherLessFolder.mkdir();
-        assertEvent(listen(), CREATE, NullPayload.getInstance(), CREATED_FOLDER_NAME);
+        assertEvent(listen(CREATE, CREATED_FOLDER_NAME), NullPayload.getInstance());
     }
 
     @Test
@@ -119,7 +120,7 @@ public class DirectoryListenerTestCase extends FileConnectorTestCase
     {
         onDirectoryCreated();
         deleteTree(matcherLessFolder);
-        assertEvent(listen(), DELETE, NullPayload.getInstance(), CREATED_FOLDER_NAME);
+        assertEvent(listen(DELETE, CREATED_FOLDER_NAME), NullPayload.getInstance());
     }
 
     @Test
@@ -129,16 +130,8 @@ public class DirectoryListenerTestCase extends FileConnectorTestCase
         final String updatedName = CREATED_FOLDER_NAME + "twist";
 
         Files.move(matcherLessFolder.toPath(), new File(listenerFolder, updatedName).toPath());
-        assertEvent(listen(), DELETE, NullPayload.getInstance(), CREATED_FOLDER_NAME);
-        assertEvent(listen(), CREATE, NullPayload.getInstance(), updatedName);
-    }
-
-    @Test
-    public void onCreateFileAtSubfolder() throws Exception
-    {
-        onDirectoryCreated();
-        write(new File(matcherLessFolder, SUBFOLDER_CHILD_FILE), WATCH_CONTENT);
-        assertEvent(listen(), UPDATE, NullPayload.getInstance(), CREATED_FOLDER_NAME);
+        assertEvent(listen(DELETE, CREATED_FOLDER_NAME), NullPayload.getInstance());
+        assertEvent(listen(CREATE, updatedName), NullPayload.getInstance());
     }
 
     @Test
@@ -146,17 +139,16 @@ public class DirectoryListenerTestCase extends FileConnectorTestCase
     {
         onDirectoryCreated();
         deleteTree(matcherLessFolder);
-        assertEvent(listen(), DELETE, NullPayload.getInstance(), CREATED_FOLDER_NAME);
+        assertEvent(listen(DELETE, CREATED_FOLDER_NAME), NullPayload.getInstance());
     }
 
     @Test
     public void matcher() throws Exception
     {
         write(new File(withMatcherFolder, MATCH_FILE), "");
-        MuleMessage<?, ListenerFileAttributes> message = listen();
+        MuleMessage<?, ListenerFileAttributes> message = listen(CREATE, MATCH_FILE);
 
         assertThat(message.getPayload(), equalTo(DR_MANHATTAN));
-        assertFileName(MATCH_FILE, message.getAttributes());
     }
 
     @Test
@@ -187,7 +179,7 @@ public class DirectoryListenerTestCase extends FileConnectorTestCase
         }, "source did not stop"));
     }
 
-    private void assertEvent(MuleMessage<?, ListenerFileAttributes> message, FileEventType type, Object expectedContent, String fileName) throws Exception
+    private void assertEvent(MuleMessage<?, ListenerFileAttributes> message, Object expectedContent) throws Exception
     {
         Object payload = message.getPayload();
         if (payload instanceof InputStream)
@@ -197,28 +189,32 @@ public class DirectoryListenerTestCase extends FileConnectorTestCase
         }
 
         assertThat(payload, equalTo(expectedContent));
-        ListenerFileAttributes attributes = message.getAttributes();
-
-        assertFileName(fileName, attributes);
-        assertThat(attributes.getEventType(), is(type));
     }
 
-    private void assertFileName(String fileName, ListenerFileAttributes attributes)
-    {
-        assertThat(attributes.getPath().endsWith("/" + fileName), is(true));
-    }
-
-    private MuleMessage<?, ListenerFileAttributes> listen()
+    private MuleMessage<?, ListenerFileAttributes> listen(FileEventType type, String fileName)
     {
         PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-        prober.check(new JUnitLambdaProbe(() -> receivedMessages.peek() != null, "Event was not received"));
+        ValueHolder<MuleMessage<?, ListenerFileAttributes>> messageHolder = new ValueHolder<>();
+        prober.check(new JUnitLambdaProbe(() -> {
+            for (MuleMessage<?, ListenerFileAttributes> message : receivedMessages)
+            {
+                ListenerFileAttributes attributes = message.getAttributes();
+                if (attributes.getPath().endsWith("/" + fileName) && attributes.getEventType() == type)
+                {
+                    messageHolder.set(message);
+                    return true;
+                }
+            }
 
-        return receivedMessages.pop();
+            return false;
+        }));
+
+        return messageHolder.get();
     }
 
     public static void onMessage(MessageContext messageContext)
     {
         MuleMessage message = new DefaultMuleMessage(messageContext.getPayload(), (DataType<Object>) messageContext.getDataType(), messageContext.getAttributes());
-        receivedMessages.push(message);
+        receivedMessages.add(message);
     }
 }
