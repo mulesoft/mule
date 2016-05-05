@@ -49,11 +49,19 @@ public class PetStoreComplexParameterTestCase extends ExtensionFunctionalTestCas
         assertAmmenities(cage.getAmmenities());
     }
 
+    @Test
+    public void configWithConfigChildElements() throws Exception
+    {
+        PetCage cage = (PetCage) flowRunner("getCageWithChildElements").run().getMessage().getPayload();
+        assertBirds(cage.getBirds());
+        assertAmmenities(cage.getAmmenities());
+    }
+
     private void assertBirds(Map<String, Integer> birds)
     {
         assertNotNull(birds);
-        assertThat(birds.get("mockingjay"), equalTo("15"));
-        assertThat(birds.get("mockingbird"), equalTo("10"));
+        assertThat(birds.get("mockingjay"), equalTo(15));
+        assertThat(birds.get("mockingbird"), equalTo(10));
     }
 
     private void assertAmmenities(List<String> ammenities)

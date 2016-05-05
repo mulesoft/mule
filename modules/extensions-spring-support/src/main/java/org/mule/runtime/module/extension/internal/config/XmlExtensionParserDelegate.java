@@ -674,20 +674,19 @@ final class XmlExtensionParserDelegate
     {
         final Class<Object> objectClass = getType(objectType);
         final ObjectBuilder builder = new DefaultObjectBuilder(objectClass);
-
         for (ObjectFieldType objectField : objectType.getFields())
         {
             final MetadataType fieldType = objectField.getValue();
             final String parameterName = objectField.getKey().getName().getLocalPart();
 
             ValueResolver resolver = getResolverFromAttribute(element, parameterName, fieldType, null);
-            if (resolver == null && fieldType instanceof ObjectType)
+            if (resolver == null)
             {
                 ElementDescriptor childElement = element.getChildByName(hyphenize(parameterName));
                 if (childElement != null)
                 {
-                    ObjectBuilder childBuilder = createObjectBuilder((ObjectType) fieldType, childElement);
-                    resolver = new ObjectBuilderValueResolver(childBuilder);
+                    // recursive parsing for object fields
+                    resolver = parseElement(element, parameterName, childElement.getName(), fieldType, null);
                 }
             }
 

@@ -10,7 +10,7 @@
                http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
     <spring:beans>
-        <util:map id="birds">
+        <util:map id="birds" value-type="java.lang.Integer" >
             <spring:entry key="mockingjay" value="15"/>
             <spring:entry key="mockingbird" value="10"/>
         </util:map>
@@ -29,8 +29,23 @@
     <petstore:config name="configWithMELReferences">
         <petstore:connection username="john" password="doe"/>
         <petstore:cage ammenities="#[['spinning wheel', 'food can']]"
-                       birds="#[['mockingjay':'15', 'mockingbird': '10']]"/>
+                       birds="#[['mockingjay':15, 'mockingbird': 10]]"/>
     </petstore:config>
+
+    <petstore:config name="configWithChildElements">
+        <petstore:connection username="john" password="doe"/>
+        <petstore:cage>
+            <petstore:birds>
+                <petstore:bird key="mockingjay" value="15"/>
+                <petstore:bird key="mockingbird" value="10"/>
+            </petstore:birds>
+            <petstore:ammenities>
+                <petstore:ammenity value="spinning wheel"/>
+                <petstore:ammenity value="food can"/>
+            </petstore:ammenities>
+        </petstore:cage>
+    </petstore:config>
+
 
     <flow name="getCageWithReferences">
         <petstore:get-cage config-ref="configWithReferences"/>
@@ -38,6 +53,10 @@
 
     <flow name="getCageWithMELReferences">
         <petstore:get-cage config-ref="configWithMELReferences"/>
+    </flow>
+
+    <flow name="getCageWithChildElements">
+        <petstore:get-cage config-ref="configWithChildElements"/>
     </flow>
 
 </mule>
