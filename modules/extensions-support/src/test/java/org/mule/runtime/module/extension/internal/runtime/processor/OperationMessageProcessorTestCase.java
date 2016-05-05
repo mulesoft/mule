@@ -50,6 +50,7 @@ import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationMo
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.OperationContext;
@@ -210,6 +211,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         connectionManager.initialise();
         when(connectionProviderWrapper.getRetryPolicyTemplate()).thenReturn(connectionManager.getDefaultRetryPolicyTemplate());
 
+        when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
         when(extensionManager.getConfiguration(anyString(), anyObject())).thenReturn(configurationInstance);
         when(extensionManager.getConfiguration(extensionModel, event)).thenReturn(configurationInstance);
         when(extensionManager.getConfigurationProvider(extensionModel)).thenReturn(Optional.of(configurationProvider));

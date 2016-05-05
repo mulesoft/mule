@@ -11,6 +11,7 @@ import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.test.metadata.extension.model.Shape;
 import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithoutKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestContentResolverWithKeyResolver;
@@ -123,5 +124,10 @@ public class MetadataOperations extends MetadataOperationsParent
     public MuleMessage<Object, String> messageAttributesPersonTypeMetadata()
     {
         return null;
+    }
+
+    public boolean typeWithDeclaredSubtypesMetadata(Shape shape, int count)
+    {
+        return shape.getColor().length() > count;
     }
 }
