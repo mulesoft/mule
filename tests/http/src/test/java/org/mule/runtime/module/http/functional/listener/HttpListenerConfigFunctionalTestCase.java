@@ -6,22 +6,24 @@
  */
 package org.mule.runtime.module.http.functional.listener;
 
-import static org.apache.http.HttpStatus.SC_METHOD_NOT_ALLOWED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
-import static org.mule.runtime.module.http.internal.listener.NoListenerRequestHandler.RESOURCE_NOT_FOUND;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
+import static org.mule.runtime.module.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
 import static org.mule.runtime.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.runtime.module.http.api.HttpConstants.HttpStatus;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,16 +104,16 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
     public void noListenerConfig() throws Exception
     {
         final String url = String.format("http://localhost:%s/noListener", noListenerConfigPort.getNumber());
-        final HttpResponse httpResponse = callAndAssertStatus(url, SC_NOT_FOUND);
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(RESOURCE_NOT_FOUND));
+        final HttpResponse httpResponse = callAndAssertStatus(url, NOT_FOUND);
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), containsString("No listener for endpoint"));
     }
 
     @Test
     public void fullConfigWrongMethod() throws Exception
     {
         final String url = String.format("http://localhost:%s/%s/%s", fullConfigPort.getNumber(), basePath.getValue(), "post");
-        final HttpResponse httpResponse = callAndAssertStatus(url, SC_METHOD_NOT_ALLOWED);
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(METHOD_NOT_ALLOWED.getReasonPhrase()));
+        final HttpResponse httpResponse = callAndAssertStatus(url, METHOD_NOT_ALLOWED);
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), containsString("Method not allowed for endpoint"));
     }
     @Test
     public void useSlashInPathAndBasePath() throws Exception
@@ -136,6 +138,13 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
         final Response response = Request.Get(url).connectTimeout(TIMEOUT).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse, hasStatusCode(expectedStatus));
+        return httpResponse;
+    }
+
+    private HttpResponse callAndAssertStatus(String url, HttpStatus expectedStatus) throws IOException
+    {
+        HttpResponse httpResponse = callAndAssertStatus(url, expectedStatus.getStatusCode());
+        assertThat(httpResponse, hasReasonPhrase(expectedStatus.getReasonPhrase()));
         return httpResponse;
     }
 

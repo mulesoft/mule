@@ -20,7 +20,7 @@ public class NoListenerRequestHandler extends ErrorRequestHandler
 
     private NoListenerRequestHandler()
     {
-        super(NOT_FOUND.getStatusCode(), "No listener for endpoint: %s", RESOURCE_NOT_FOUND);
+        super(NOT_FOUND.getStatusCode(), NOT_FOUND.getReasonPhrase(), "No listener for endpoint: %s");
     }
 
     public static NoListenerRequestHandler getInstance()

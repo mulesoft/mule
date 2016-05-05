@@ -15,7 +15,7 @@ public class NoMethodRequestHandler extends ErrorRequestHandler
 
     private NoMethodRequestHandler()
     {
-        super(METHOD_NOT_ALLOWED.getStatusCode(), "Method not allowed for endpoint: %s", METHOD_NOT_ALLOWED.getReasonPhrase());
+        super(METHOD_NOT_ALLOWED.getStatusCode(), METHOD_NOT_ALLOWED.getReasonPhrase(), "Method not allowed for endpoint: %s");
     }
 
     public static NoMethodRequestHandler getInstance()
