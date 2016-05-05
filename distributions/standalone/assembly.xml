@@ -175,6 +175,10 @@
                 <include>org.mule.modules:mule-module-ws</include>
                 <include>org.mule.modules:mule-module-xml</include>
                 <include>org.mule.patterns:mule-pattern-core</include>
+                <!-- APIKit -->
+                <include>org.mule.modules:mule-module-apikit</include>
+                <include>org.mule.modules:mule-module-apikit-spi</include>
+                <include>org.mule.modules:mule-module-cors</include>
 
                 <!-- Tools -->
                 <include>org.mule.tools:mule-tools-anttasks</include>
@@ -261,6 +265,10 @@
                 <exclude>org.mule.patterns:mule-patterns-all</exclude>
                 <exclude>org.mule.patterns:mule-pattern-core</exclude>
                 <exclude>org.mule.tools:mule-tools-anttasks</exclude>
+                <!-- APIKit -->
+                <exclude>org.mule.modules:mule-module-apikit</exclude>
+                <exclude>org.mule.modules:mule-module-apikit-spi</exclude>
+                <exclude>org.mule.modules:mule-module-cors</exclude>
 
                 <!-- mule-tests-functional dependencies -->
                 <exclude>org.apache.ftpserver:ftpserver-core</exclude>
