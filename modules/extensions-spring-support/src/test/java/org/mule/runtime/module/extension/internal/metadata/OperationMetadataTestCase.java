@@ -44,8 +44,10 @@ import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.metadata.extension.LocationKey;
-import org.mule.test.metadata.extension.model.Circle;
-import org.mule.test.metadata.extension.model.Square;
+import org.mule.test.metadata.extension.model.animals.Bear;
+import org.mule.test.metadata.extension.model.shapes.Circle;
+import org.mule.test.metadata.extension.model.shapes.Rectangle;
+import org.mule.test.metadata.extension.model.shapes.Square;
 
 import java.io.IOException;
 import java.util.List;
@@ -429,7 +431,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     }
 
     @Test
-    public void unionTypeMetadataWithSubtypes()
+    public void abstractClassWithSubtypesMetadataType()
     {
         componentId = new ProcessorId(TYPE_WITH_DECLARED_SUBTYPES_METADATA, FIRST_PROCESSOR_INDEX);
         MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId);
@@ -441,6 +443,34 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
         MetadataType shapeType = shapeMetadata.getType();
         assertThat(shapeType, is(instanceOf(DefaultUnionType.class)));
         assertThat(((DefaultUnionType) shapeType).getTypes(), hasSize(2));
-        assertThat(((DefaultUnionType) shapeType).getTypes(), hasItems(toMetadataType(Circle.class), toMetadataType(Square.class)));
+        assertThat(((DefaultUnionType) shapeType).getTypes(), hasItems(toMetadataType(Circle.class), toMetadataType(Rectangle.class)));
+    }
+
+    @Test
+    public void instantiableClassWithSubtypesMetadataType()
+    {
+        componentId = new ProcessorId(TYPE_WITH_DECLARED_SUBTYPES_METADATA, FIRST_PROCESSOR_INDEX);
+        MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId);
+        assertThat(metadata.isSuccess(), is(true));
+
+        TypeMetadataDescriptor rectangleMetadata = metadata.get().getParametersMetadata().get(1);
+        assertThat(rectangleMetadata.getName(), is("rectangle"));
+
+        MetadataType shapeType = rectangleMetadata.getType();
+        assertThat(shapeType, is(instanceOf(DefaultUnionType.class)));
+        assertThat(((DefaultUnionType) shapeType).getTypes(), hasSize(2));
+        assertThat(((DefaultUnionType) shapeType).getTypes(), hasItems(toMetadataType(Rectangle.class), toMetadataType(Square.class)));
+    }
+
+    @Test
+    public void interfaceWithSubtypesMetadataType()
+    {
+        componentId = new ProcessorId(TYPE_WITH_DECLARED_SUBTYPES_METADATA, FIRST_PROCESSOR_INDEX);
+        MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId);
+        assertThat(metadata.isSuccess(), is(true));
+
+        TypeMetadataDescriptor animalMetadata = metadata.get().getParametersMetadata().get(2);
+        assertThat(animalMetadata.getName(), is("animal"));
+        assertThat(animalMetadata.getType(), is(toMetadataType(Bear.class)));
     }
 }

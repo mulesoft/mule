@@ -11,7 +11,9 @@ import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.test.metadata.extension.model.Shape;
+import org.mule.test.metadata.extension.model.animals.Animal;
+import org.mule.test.metadata.extension.model.shapes.Rectangle;
+import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithoutKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestContentResolverWithKeyResolver;
@@ -126,8 +128,8 @@ public class MetadataOperations extends MetadataOperationsParent
         return null;
     }
 
-    public boolean typeWithDeclaredSubtypesMetadata(Shape shape, int count)
+    public boolean typeWithDeclaredSubtypesMetadata(Shape shape, Rectangle rectangle, Animal animal)
     {
-        return shape.getColor().length() > count;
+        return false;
     }
 }

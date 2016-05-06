@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.metadata.extension.model;
+package org.mule.test.metadata.extension.model.shapes;
 
 public abstract class Shape
 {
