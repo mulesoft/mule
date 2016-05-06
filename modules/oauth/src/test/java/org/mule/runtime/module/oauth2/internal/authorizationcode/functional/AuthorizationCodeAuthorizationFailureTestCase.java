@@ -11,6 +11,7 @@ import static java.lang.String.valueOf;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.apache.http.client.fluent.Request.Get;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -22,9 +23,11 @@ import static org.mule.runtime.module.oauth2.internal.authorizationcode.AutoAuth
 import static org.mule.runtime.module.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.TOKEN_URL_CALL_FAILED_STATUS;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
-import org.mule.runtime.module.oauth2.internal.StateEncoder;
-import org.mule.tck.MuleTestUtils;
 import org.mule.functional.functional.FlowAssert;
+import org.mule.runtime.module.oauth2.internal.StateEncoder;
+import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.module.oauth2.internal.tokenmanager.TokenManagerConfig;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -38,6 +41,7 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
 {
 
     private static final String EXPECTED_STATUS_CODE_SYSTEM_PROPERTY = "expectedStatusCode";
+    public static final String REFRESHED_ACCESS_TOKEN = "rbBQLgJXBEYo83K4Fqs4guasdfsdfa";
 
     @Rule
     public DynamicPort onCompleteUrlPort = new DynamicPort("onCompleteUrlPort");
@@ -109,7 +113,7 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
     }
 
     @Test
-    public void callToTokenUrlSuccessButNoAccessTokenRetrieved() throws Exception
+    public void callToTokenUrlSuccessButNoAccessTokenRetrievedEmptyResponse() throws Exception
     {
         configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(EMPTY);
 
@@ -117,9 +121,9 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
     }
 
     @Test
-    public void callToTokenUrlSuccessButNoRefreshTokenRetrieved() throws Exception
+    public void callToTokenUrlSuccessButNoAccessTokenRetrieved() throws Exception
     {
-        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(ACCESS_TOKEN, null);
+        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(null, null);
 
         testWithSystemProperty(EXPECTED_STATUS_CODE_SYSTEM_PROPERTY, valueOf(TOKEN_NOT_FOUND_STATUS), new MuleTestUtils.TestCallback()
         {
@@ -135,6 +139,53 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
             }
         });
 
+    }
+
+    @Test
+    public void callToTokenUrlSuccessButNoRefreshTokenRetrieved() throws Exception
+    {
+        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(ACCESS_TOKEN, null);
+        Get(getRedirectUrlWithOnCompleteUrlAndCodeQueryParams())
+                .connectTimeout(REQUEST_TIMEOUT)
+                .socketTimeout(REQUEST_TIMEOUT)
+                .execute();
+        final TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().lookupObject(TokenManagerConfig.class);
+        final ResourceOwnerOAuthContext oauthContext = tokenManagerConfig.getConfigOAuthContext().getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+
+        assertThat(oauthContext.getAccessToken(), is(ACCESS_TOKEN));
+        assertThat(oauthContext.getRefreshToken(), is(nullValue()));
+    }
+
+    @Test
+    public void callToTokenUrlSuccessButNoRefreshTokenRetrievedOnSubsequentRefreshOperation() throws Exception
+    {
+        // During the initial call to token url it returns an access_token and refresh_token
+        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(ACCESS_TOKEN, REFRESH_TOKEN);
+        Get(getRedirectUrlWithOnCompleteUrlAndCodeQueryParams())
+                .connectTimeout(REQUEST_TIMEOUT)
+                .socketTimeout(REQUEST_TIMEOUT)
+                .execute();
+
+        final TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().lookupObject(TokenManagerConfig.class);
+        ResourceOwnerOAuthContext oauthContext = tokenManagerConfig.getConfigOAuthContext().getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+
+        // Validates that the oauth context has both tokens
+        assertThat(oauthContext.getAccessToken(), is(ACCESS_TOKEN));
+        assertThat(oauthContext.getRefreshToken(), is(REFRESH_TOKEN));
+
+        // In order to validate that oauth context is updated (due to it is persisted with OS) we now do another call but only returning the REFRESHED_ACCESS_TOKEN without
+        // a refresh token.
+        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(REFRESHED_ACCESS_TOKEN, null);
+        Get(getRedirectUrlWithOnCompleteUrlAndCodeQueryParams())
+                .connectTimeout(REQUEST_TIMEOUT)
+                .socketTimeout(REQUEST_TIMEOUT)
+                .execute();
+
+        // We need to retrieve the oauth context again to get it updated...
+        oauthContext = tokenManagerConfig.getConfigOAuthContext().getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+
+        assertThat(oauthContext.getAccessToken(), is(REFRESHED_ACCESS_TOKEN));
+        assertThat(oauthContext.getRefreshToken(), is(nullValue()));
     }
 
     private void verifyCallToRedirectUrlFails() throws IOException

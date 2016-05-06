@@ -58,6 +58,44 @@ public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends Abstrac
 
     protected void executeRefreshToken(String flowName, String oauthConfigName, String userId, int failureStatusCode) throws Exception
     {
+        configureResourceResponsesForRefreshToken(oauthConfigName, userId, failureStatusCode);
+
+        final MuleEvent result = flowRunner(flowName).withPayload("message")
+                .withFlowVariable("userId", userId)
+                .run();
+        assertThat(getPayloadAsString(result.getMessage()), is(RESOURCE_RESULT));
+
+        wireMockRule.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))
+                                    .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "=" + URLEncoder.encode(clientId.getValue(), StandardCharsets.UTF_8.name())))
+                                    .withRequestBody(containing(OAuthConstants.REFRESH_TOKEN_PARAMETER + "=" + URLEncoder.encode(REFRESH_TOKEN, StandardCharsets.UTF_8.name())))
+                                    .withRequestBody(containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "=" + URLEncoder.encode(clientSecret.getValue(), StandardCharsets.UTF_8.name())))
+                                    .withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "=" + URLEncoder.encode(OAuthConstants.GRANT_TYPE_REFRESH_TOKEN, StandardCharsets.UTF_8.name()))));
+    }
+
+    protected void executeRefreshTokenNotIssuedOnTokenCall(String flowName, String oauthConfigName, String userId, int failureStatusCode) throws Exception
+    {
+        configureResourceResponsesForRefreshToken(oauthConfigName, userId, failureStatusCode);
+
+        // Override the refresh token to be null
+        final ConfigOAuthContext configOAuthContext = muleContext.getRegistry().<TokenManagerConfig>lookupObject(oauthConfigName).getConfigOAuthContext();
+        final ResourceOwnerOAuthContext resourceOwnerOauthContext = configOAuthContext.getContextForResourceOwner(userId);
+        resourceOwnerOauthContext.setAccessToken(ACCESS_TOKEN);
+        resourceOwnerOauthContext.setRefreshToken(null);
+        configOAuthContext.updateResourceOwnerOAuthContext(resourceOwnerOauthContext);
+
+        runFlow(flowName, userId);
+    }
+
+    private MuleEvent runFlow(String flowName, String userId) throws Exception
+    {
+        final MuleEvent result = flowRunner(flowName).withPayload("message")
+                .withFlowVariable("userId", userId)
+                .run();
+        return result;
+    }
+
+    private void configureResourceResponsesForRefreshToken(String oauthConfigName, String userId, int failureStatusCode)
+    {
         configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(REFRESHED_ACCESS_TOKEN);
 
         wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH))
@@ -78,17 +116,6 @@ public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends Abstrac
         resourceOwnerOauthContext.setAccessToken(ACCESS_TOKEN);
         resourceOwnerOauthContext.setRefreshToken(REFRESH_TOKEN);
         configOAuthContext.updateResourceOwnerOAuthContext(resourceOwnerOauthContext);
-
-        final MuleEvent result = flowRunner(flowName).withPayload("message")
-                                                     .withFlowVariable("userId", userId)
-                                                     .run();
-        assertThat(getPayloadAsString(result.getMessage()), is(RESOURCE_RESULT));
-
-        wireMockRule.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))
-                                    .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "=" + URLEncoder.encode(clientId.getValue(), StandardCharsets.UTF_8.name())))
-                                    .withRequestBody(containing(OAuthConstants.REFRESH_TOKEN_PARAMETER + "=" + URLEncoder.encode(REFRESH_TOKEN, StandardCharsets.UTF_8.name())))
-                                    .withRequestBody(containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "=" + URLEncoder.encode(clientSecret.getValue(), StandardCharsets.UTF_8.name())))
-                                    .withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "=" + URLEncoder.encode(OAuthConstants.GRANT_TYPE_REFRESH_TOKEN, StandardCharsets.UTF_8.name()))));
     }
 
 }
