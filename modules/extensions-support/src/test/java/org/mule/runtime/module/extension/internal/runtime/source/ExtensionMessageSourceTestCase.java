@@ -29,6 +29,7 @@ import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
+import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -186,7 +187,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
 
         MuleEvent event = eventCaptor.getValue();
         assertThat(event.getMessage(), is(sameInstance(muleMessage)));
-        verify(completionHandler).onCompletion(any(MuleMessage.class));
+        verify(completionHandler).onCompletion(any(MuleMessage.class), any(ExceptionCallback.class));
     }
 
     @Test

@@ -14,6 +14,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import org.mule.runtime.api.execution.CompletionHandler;
+import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -46,6 +47,9 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
     private ResponseCompletionCallback responseCompletionCallback;
 
     @Mock
+    private ExceptionCallback<org.mule.runtime.api.message.MuleEvent, Exception> exceptionCallback;
+
+    @Mock
     private MessagingException messagingException;
 
     private RuntimeException runtimeException = new RuntimeException();
@@ -75,14 +79,14 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
     public void sendResponseToClient() throws MuleException
     {
         template.sendResponseToClient(event, responseCompletionCallback);
-        verify(completionHandler).onCompletion(event);
+        verify(completionHandler).onCompletion(event, exceptionCallback);
         verify(responseCompletionCallback).responseSentSuccessfully();
     }
 
     @Test
     public void failedToSendResponseToClient() throws MuleException
     {
-        doThrow(runtimeException).when(completionHandler).onCompletion(event);
+        doThrow(runtimeException).when(completionHandler).onCompletion(event, exceptionCallback);
         template.sendResponseToClient(event, responseCompletionCallback);
 
         verify(completionHandler, never()).onFailure(any(Exception.class));
