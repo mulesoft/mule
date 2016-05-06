@@ -8,8 +8,12 @@ package org.mule.runtime.module.launcher;
 
 import static org.mule.runtime.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.launcher.application.Application;
 import org.mule.runtime.module.launcher.application.CompositeApplicationClassLoaderFactory;
@@ -27,7 +31,6 @@ import org.mule.runtime.module.launcher.nativelib.DefaultNativeLibraryFinderFact
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory;
 import org.mule.runtime.module.launcher.util.DebuggableReentrantLock;
 import org.mule.runtime.module.launcher.util.ObservableList;
-import org.mule.runtime.core.util.Preconditions;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -81,14 +84,13 @@ public class MuleDeploymentService implements DeploymentService
 
     public MuleDeploymentService(ServerPluginClassLoaderManager serverPluginClassLoaderManager)
     {
-        final MuleClassLoaderLookupPolicy containerLookupPolicy = new MuleClassLoaderLookupPolicy(Collections.emptyMap(), SYSTEM_PACKAGES);
-
-        ArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory = new DomainClassLoaderFactory(containerLookupPolicy);
+        final FilteringArtifactClassLoader apiClassLoader = createContainerFilteringClassLoader();
+        ArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory = new DomainClassLoaderFactory(apiClassLoader);
 
         ArtifactClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory());
         applicationClassLoaderFactory = new CompositeApplicationClassLoaderFactory(applicationClassLoaderFactory, serverPluginClassLoaderManager);
 
-        DefaultDomainFactory domainFactory = new DefaultDomainFactory(domainClassLoaderFactory, domainManager);
+        DefaultDomainFactory domainFactory = new DefaultDomainFactory(domainClassLoaderFactory, domainManager, apiClassLoader);
         domainFactory.setDeploymentListener(domainDeploymentListener);
 
         final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory()));
@@ -106,6 +108,15 @@ public class MuleDeploymentService implements DeploymentService
                 applicationDeployer, this);
         this.domainDeployer.setDeploymentListener(domainDeploymentListener);
         this.deploymentDirectoryWatcher = new DeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, deploymentLock);
+    }
+
+    private FilteringArtifactClassLoader createContainerFilteringClassLoader()
+    {
+        final MuleClassLoaderLookupPolicy containerLookupPolicy = new MuleClassLoaderLookupPolicy(Collections.emptyMap(), SYSTEM_PACKAGES);
+        final ArtifactClassLoader containerClassLoader = new MuleArtifactClassLoader("mule", new URL[0], getClass().getClassLoader(), containerLookupPolicy);
+
+        //TODO(pablo.kraan): NullClassLoaderFilter is used until MULE-9430 is implemented
+        return new FilteringContainerClassLoader(containerClassLoader, new PassThroughClassLoaderFilter());
     }
 
     @Override
@@ -298,4 +309,5 @@ public class MuleDeploymentService implements DeploymentService
     {
         domainDeployer.undeployArtifact(domain.getArtifactName());
     }
+
 }

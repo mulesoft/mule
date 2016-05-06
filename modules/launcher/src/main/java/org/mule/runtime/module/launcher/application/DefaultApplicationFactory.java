@@ -121,7 +121,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application>
 
         for (ApplicationPlugin plugin : applicationPlugins)
         {
-            final FilteringArtifactClassLoader filteringPluginClassLoader = new FilteringArtifactClassLoader(plugin.getArtifactName(), plugin.getArtifactClassLoader(), plugin.getDescriptor().getClassLoaderFilter());
+            final FilteringArtifactClassLoader filteringPluginClassLoader = new FilteringArtifactClassLoader(plugin.getArtifactClassLoader(), plugin.getDescriptor().getClassLoaderFilter());
 
             classLoaders.add(filteringPluginClassLoader);
         }

@@ -50,19 +50,19 @@ import org.apache.commons.logging.LogFactory;
 public class DomainClassLoaderFactory implements ArtifactClassLoaderFactory<DomainDescriptor>
 {
     protected static final Log logger = LogFactory.getLog(DomainClassLoaderFactory.class);
+    private final ClassLoader parentClassLoader;
 
-    private final ClassLoaderLookupPolicy containerLookupPolicy;
     private Map<String, ArtifactClassLoader> domainArtifactClassLoaders = new HashMap<>();
     private PackageDiscoverer packageDiscoverer = new FilePackageDiscoverer();
 
     /**
-     * Creates new instance
+     * Creates a new instance
      *
-     * @param containerLookupPolicy policy used to customize the classloading process for this classloader.
+     * @param parentClassLoader parent classLoader of the created instance. Can be null.
      */
-    public DomainClassLoaderFactory(ClassLoaderLookupPolicy containerLookupPolicy)
+    public DomainClassLoaderFactory(ClassLoader parentClassLoader)
     {
-        this.containerLookupPolicy = containerLookupPolicy;
+        this.parentClassLoader = parentClassLoader;
     }
 
     public void setPackageDiscoverer(PackageDiscoverer packageDiscoverer)
@@ -90,11 +90,11 @@ public class DomainClassLoaderFactory implements ArtifactClassLoaderFactory<Doma
                 {
                     if (domain.equals(DEFAULT_DOMAIN_NAME))
                     {
-                        domainClassLoader = getDefaultDomainClassLoader();
+                        domainClassLoader = getDefaultDomainClassLoader(parent.getClassLoaderLookupPolicy());
                     }
                     else
                     {
-                        domainClassLoader = getCustomDomainClassLoader(domain);
+                        domainClassLoader = getCustomDomainClassLoader(parent.getClassLoaderLookupPolicy(), domain);
                     }
 
                     domainArtifactClassLoaders.put(domain, domainClassLoader);
@@ -105,14 +105,14 @@ public class DomainClassLoaderFactory implements ArtifactClassLoaderFactory<Doma
         return domainClassLoader;
     }
 
-    private ArtifactClassLoader getCustomDomainClassLoader(String domain)
+    private ArtifactClassLoader getCustomDomainClassLoader(ClassLoaderLookupPolicy containerLookupPolicy, String domain)
     {
         validateDomain(domain);
         final List<URL> urls = getDomainUrls(domain);
         final Map<String, ClassLoaderLookupStrategy> domainLookStrategies = getLookStrategiesFrom(urls);
         final ClassLoaderLookupPolicy domainLookupPolicy = containerLookupPolicy.extend(domainLookStrategies);
 
-        ArtifactClassLoader classLoader = new MuleSharedDomainClassLoader(domain, getClass().getClassLoader(), domainLookupPolicy, urls);
+        ArtifactClassLoader classLoader = new MuleSharedDomainClassLoader(domain, parentClassLoader, domainLookupPolicy, urls);
 
         return createClassLoaderUnregisterWrapper(classLoader);
     }
@@ -175,9 +175,9 @@ public class DomainClassLoaderFactory implements ArtifactClassLoaderFactory<Doma
         }
     }
 
-    private ArtifactClassLoader getDefaultDomainClassLoader()
+    private ArtifactClassLoader getDefaultDomainClassLoader(ClassLoaderLookupPolicy containerLookupPolicy)
     {
-        return new MuleSharedDomainClassLoader(DEFAULT_DOMAIN_NAME, getClass().getClassLoader(), containerLookupPolicy.extend(emptyMap()), emptyList());
+        return new MuleSharedDomainClassLoader(DEFAULT_DOMAIN_NAME, parentClassLoader, containerLookupPolicy.extend(emptyMap()), emptyList());
     }
 
     private void validateDomain(String domain)

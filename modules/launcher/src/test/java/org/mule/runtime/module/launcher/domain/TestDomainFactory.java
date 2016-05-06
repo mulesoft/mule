@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.domain;
 
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
 
@@ -17,9 +18,9 @@ public class TestDomainFactory extends DefaultDomainFactory
     private boolean failOnStop;
     private boolean failOnDispose;
 
-    public TestDomainFactory(ArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory)
+    public TestDomainFactory(ArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory, ArtifactClassLoader containerClassLoader)
     {
-        super(domainClassLoaderFactory, new DefaultDomainManager());
+        super(domainClassLoaderFactory, new DefaultDomainManager(), containerClassLoader);
     }
 
     @Override
