@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.metadata.extension.model;
+package org.mule.test.metadata.extension.model.shapes;
 
-public class Square extends Shape
+public class Rectangle extends Shape
 {
     private int height;
     private int width;

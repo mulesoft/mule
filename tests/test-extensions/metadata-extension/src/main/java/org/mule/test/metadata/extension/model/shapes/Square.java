@@ -4,19 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.metadata.extension.model;
+package org.mule.test.metadata.extension.model.shapes;
 
-public class Circle extends Shape
+public class Square extends Rectangle
 {
-    private int diameter;
-
-    public int getDiameter()
-    {
-        return diameter;
-    }
-
-    public void setDiameter(int diameter)
-    {
-        this.diameter = diameter;
-    }
 }

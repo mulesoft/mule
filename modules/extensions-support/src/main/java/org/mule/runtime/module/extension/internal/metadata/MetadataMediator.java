@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.typeDescriptor;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
@@ -14,6 +15,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.mergeResult
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContentParameter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isNullType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -30,6 +32,7 @@ import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.builder.ComponentMetadataDescriptorBuilder;
 import org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder;
+import org.mule.runtime.api.metadata.descriptor.builder.TypeMetadataDescriptorBuilder;
 import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
@@ -205,14 +208,28 @@ public class MetadataMediator
      */
     private TypeMetadataDescriptor buildParameterTypeMetadataDescriptor(ParameterModel parameterModel)
     {
-        List<MetadataType> subTypes = subTypesMappingContainer.getSubTypes(parameterModel.getType());
-        if (!subTypes.isEmpty())
+        MetadataType parameterType = parameterModel.getType();
+        TypeMetadataDescriptorBuilder typeDescriptorBuilder = typeDescriptor(parameterModel.getName());
+
+        List<MetadataType> subTypes = subTypesMappingContainer.getSubTypes(parameterType);
+        if (subTypes.isEmpty())
         {
-            UnionTypeBuilder<?> unionTypeBuilder = BaseTypeBuilder.create(MetadataFormat.JAVA).unionType();
-            subTypes.forEach(unionTypeBuilder::of);
-            return typeDescriptor(parameterModel.getName()).withType(unionTypeBuilder.build()).build();
+            return typeDescriptorBuilder.withType(parameterType).build();
         }
-        return typeDescriptor(parameterModel.getName()).withType(parameterModel.getType()).build();
+
+        boolean isInstantiable = isInstantiable(getType(parameterType));
+        if (subTypes.size() == 1 && !isInstantiable)
+        {
+            return typeDescriptorBuilder.withType(subTypes.get(0)).build();
+        }
+
+        UnionTypeBuilder<?> unionTypeBuilder = BaseTypeBuilder.create(MetadataFormat.JAVA).unionType();
+        if (isInstantiable)
+        {
+            unionTypeBuilder.of(parameterType);
+        }
+        subTypes.forEach(unionTypeBuilder::of);
+        return typeDescriptorBuilder.withType(unionTypeBuilder.build()).build();
     }
 
     /**

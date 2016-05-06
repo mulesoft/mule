@@ -13,16 +13,21 @@ import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
-import org.mule.test.metadata.extension.model.Circle;
-import org.mule.test.metadata.extension.model.Shape;
-import org.mule.test.metadata.extension.model.Square;
+import org.mule.test.metadata.extension.model.animals.Animal;
+import org.mule.test.metadata.extension.model.animals.Bear;
+import org.mule.test.metadata.extension.model.shapes.Circle;
+import org.mule.test.metadata.extension.model.shapes.Rectangle;
+import org.mule.test.metadata.extension.model.shapes.Shape;
+import org.mule.test.metadata.extension.model.shapes.Square;
 import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 
 @Extension(name = "Metadata")
 @Operations({MetadataOperations.class, MetadataFailureOperations.class, MetadataInheritedExtensionResolversOperations.class, MetadataInheritedOperationResolversOperations.class})
 @Providers(MetadataConnectionProvider.class)
 @Sources({MetadataSource.class, MetadataSourceWithMultilevel.class})
-@SubTypeMapping(baseType = Shape.class, subTypes = {Circle.class, Square.class})
+@SubTypeMapping(baseType = Animal.class, subTypes = Bear.class)
+@SubTypeMapping(baseType = Shape.class, subTypes = {Circle.class, Rectangle.class})
+@SubTypeMapping(baseType = Rectangle.class, subTypes = {Square.class})
 @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/metadata", namespace = "metadata")
 @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
         contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
