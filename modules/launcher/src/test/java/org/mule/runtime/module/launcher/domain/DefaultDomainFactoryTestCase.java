@@ -28,7 +28,7 @@ import org.junit.Test;
 
 public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase
 {
-    private DomainFactory domainFactory = new DefaultDomainFactory(new DomainClassLoaderFactory(lookupPolicy), new DefaultDomainManager());
+    private DomainFactory domainFactory = new DefaultDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()), new DefaultDomainManager(), containerClassLoader);
 
     public DefaultDomainFactoryTestCase() throws IOException
     {

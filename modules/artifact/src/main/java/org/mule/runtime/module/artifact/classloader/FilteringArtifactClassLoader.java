@@ -7,11 +7,12 @@
 
 package org.mule.runtime.module.artifact.classloader;
 
+import static java.util.Collections.emptyList;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,14 +26,21 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 
     protected static final Log logger = LogFactory.getLog(FilteringArtifactClassLoader.class);
 
-    private String artifactName;
-    private final ArtifactClassLoader pluginClassLoader;
+    private final ArtifactClassLoader artifactClassLoader;
     private final ClassLoaderFilter filter;
 
-    public FilteringArtifactClassLoader(String artifactName, ArtifactClassLoader pluginClassLoader, ClassLoaderFilter filter)
+    /**
+     * Creates a new filtering classLoader
+     *
+     * @param artifactClassLoader artifact classLoader to filter. Non null
+     * @param filter filters access to classes and resources from the artifact classLoader. Non null
+     */
+    public FilteringArtifactClassLoader(ArtifactClassLoader artifactClassLoader, ClassLoaderFilter filter)
     {
-        this.artifactName = artifactName;
-        this.pluginClassLoader = pluginClassLoader;
+        checkArgument(artifactClassLoader != null, "ArtifactClassLoader cannot be null");
+        checkArgument(filter!= null, "Filter cannot be null");
+
+        this.artifactClassLoader = artifactClassLoader;
         this.filter = filter;
     }
 
@@ -41,7 +49,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     {
         if (filter.exportsClass(name))
         {
-            return pluginClassLoader.getClassLoader().loadClass(name);
+            return artifactClassLoader.getClassLoader().loadClass(name);
         }
         else
         {
@@ -54,7 +62,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     {
         if (filter.exportsResource(name))
         {
-            return pluginClassLoader.findResource(name);
+            return getResourceFromDelegate(artifactClassLoader, name);
         }
         else
         {
@@ -62,48 +70,53 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
         }
     }
 
+    protected URL getResourceFromDelegate(ArtifactClassLoader artifactClassLoader, String name)
+    {
+        return artifactClassLoader.findResource(name);
+    }
+
     @Override
     public Enumeration<URL> getResources(String name) throws IOException
     {
-        List<URL> filteredResources = new LinkedList<>();
-
         if (filter.exportsResource(name))
         {
-            Enumeration<URL> resources = pluginClassLoader.findResources(name);
-
-            while (resources.hasMoreElements())
-            {
-                filteredResources.add(resources.nextElement());
-            }
+            return getResourcesFromDelegate(artifactClassLoader, name);
         }
+        else
+        {
+            return new EnumerationAdapter<>(emptyList());
+        }
+    }
 
-        return new EnumerationAdapter<>(filteredResources);
+    protected Enumeration<URL> getResourcesFromDelegate(ArtifactClassLoader artifactClassLoader, String name) throws IOException
+    {
+        return artifactClassLoader.findResources(name);
     }
 
     @Override
     public URL findResource(String name)
     {
-        return pluginClassLoader.findResource(name);
+        return artifactClassLoader.findResource(name);
     }
 
     @Override
     public Enumeration<URL> findResources(String name) throws IOException
     {
-        return pluginClassLoader.findResources(name);
+        return artifactClassLoader.findResources(name);
     }
 
     @Override
     public String toString()
     {
         return String.format("%s[%s]@%s", getClass().getName(),
-                             artifactName,
+                             artifactClassLoader.getArtifactName(),
                              Integer.toHexString(System.identityHashCode(this)));
     }
 
     @Override
     public String getArtifactName()
     {
-        return pluginClassLoader.getArtifactName();
+        return artifactClassLoader.getArtifactName();
     }
 
     @Override
@@ -115,13 +128,13 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     @Override
     public void addShutdownListener(ShutdownListener listener)
     {
-        pluginClassLoader.addShutdownListener(listener);
+        artifactClassLoader.addShutdownListener(listener);
     }
 
     @Override
     public ClassLoaderLookupPolicy getClassLoaderLookupPolicy()
     {
-        return pluginClassLoader.getClassLoaderLookupPolicy();
+        return artifactClassLoader.getClassLoaderLookupPolicy();
     }
 
     @Override
@@ -133,6 +146,6 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     @Override
     public URL findLocalResource(String resourceName)
     {
-        return pluginClassLoader.findLocalResource(resourceName);
+        return artifactClassLoader.findLocalResource(resourceName);
     }
 }

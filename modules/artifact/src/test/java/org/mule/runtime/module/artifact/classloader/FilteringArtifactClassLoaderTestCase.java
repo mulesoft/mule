@@ -28,19 +28,23 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
 
     public static final String CLASS_NAME = "java.lang.Object";
     public static final String RESOURCE_NAME = "dummy.txt";
-    public static final String PLUGIN_NAME = "DUMMY_PLUGIN";
 
-    private FilteringArtifactClassLoader filteringArtifactClassLoader;
-    private final ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
-    private final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
+    protected FilteringArtifactClassLoader filteringArtifactClassLoader;
+    protected final ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
+    protected final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
 
     @Test(expected = ClassNotFoundException.class)
     public void throwClassNotFoundErrorWhenClassIsNotExported() throws ClassNotFoundException
     {
         when(filter.exportsClass(CLASS_NAME)).thenReturn(false);
-        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, null, filter);
+        filteringArtifactClassLoader = doCreateClassLoader();
 
         filteringArtifactClassLoader.loadClass(CLASS_NAME);
+    }
+
+    protected FilteringArtifactClassLoader doCreateClassLoader()
+    {
+        return new FilteringArtifactClassLoader(artifactClassLoader, filter);
     }
 
     @Test
@@ -53,7 +57,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
         when(filter.exportsClass(CLASS_NAME)).thenReturn(true);
         when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
-        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, artifactClassLoader, filter);
+        filteringArtifactClassLoader = doCreateClassLoader();
         Class<?> aClass = filteringArtifactClassLoader.loadClass(CLASS_NAME);
         assertThat(aClass, equalTo(expectedClass));
     }
@@ -62,7 +66,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
     public void filtersResourceWhenNotExported() throws ClassNotFoundException
     {
         when(filter.exportsClass(RESOURCE_NAME)).thenReturn(false);
-        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, null, filter);
+        filteringArtifactClassLoader = doCreateClassLoader();
 
         URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
         assertThat(resource, equalTo(null));
@@ -76,7 +80,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
         when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
         when(artifactClassLoader.findResource(RESOURCE_NAME)).thenReturn(expectedResource);
 
-        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, artifactClassLoader, filter);
+        filteringArtifactClassLoader = doCreateClassLoader();
 
         URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
         assertThat(resource, equalTo(expectedResource));
@@ -92,7 +96,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
         when(filter.exportsResource(RESOURCE_NAME)).thenReturn(false);
         when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
-        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, artifactClassLoader, filter);
+        filteringArtifactClassLoader = doCreateClassLoader();
 
         Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
         assertThat(resources, EnumerationMatcher.equalTo(Collections.EMPTY_LIST));
@@ -106,7 +110,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
         when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
         when(artifactClassLoader.findResources(RESOURCE_NAME)).thenReturn(new EnumerationAdapter<>(Collections.singleton(resource)));
 
-        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, artifactClassLoader, filter);
+        filteringArtifactClassLoader = doCreateClassLoader();
 
         Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
         assertThat(resources, EnumerationMatcher.equalTo(Collections.singletonList(resource)));
@@ -115,7 +119,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
     @Test
     public void returnsCorrectClassLoader() throws Exception
     {
-        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, artifactClassLoader, filter);
+        filteringArtifactClassLoader = doCreateClassLoader();
 
         final ClassLoader classLoader = filteringArtifactClassLoader.getClassLoader();
 
@@ -125,7 +129,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase
     @Test
     public void doesNotDisposesFilteredClassLoader() throws Exception
     {
-        filteringArtifactClassLoader = new FilteringArtifactClassLoader(PLUGIN_NAME, artifactClassLoader, filter);
+        filteringArtifactClassLoader = doCreateClassLoader();
 
         filteringArtifactClassLoader.dispose();
 

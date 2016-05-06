@@ -11,6 +11,7 @@ import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.launcher.DeploymentListener;
 import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
@@ -29,10 +30,13 @@ public class DefaultDomainFactory implements DomainFactory
     private final DomainDescriptorParser domainDescriptorParser;
 
     protected DeploymentListener deploymentListener;
+    private final ArtifactClassLoader containerClassLoader;
 
-    public DefaultDomainFactory(ArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory, DomainManager domainManager)
+    public DefaultDomainFactory(ArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory, DomainManager domainManager, ArtifactClassLoader containerClassLoader)
     {
         checkArgument(domainManager != null, "Domain manager cannot be null");
+        checkArgument(containerClassLoader != null, "Container classLoader cannot be null");
+        this.containerClassLoader = containerClassLoader;
         this.domainClassLoaderFactory = domainClassLoaderFactory;
         this.domainManager = domainManager;
         this.domainDescriptorParser = new DomainDescriptorParser();
@@ -56,7 +60,7 @@ public class DefaultDomainFactory implements DomainFactory
             throw new IllegalArgumentException("Mule domain name may not contain spaces: " + artifactName);
         }
         DomainDescriptor descriptor = findDomain(artifactName);
-        DefaultMuleDomain defaultMuleDomain = new DefaultMuleDomain(descriptor, domainClassLoaderFactory.create(null, descriptor));
+        DefaultMuleDomain defaultMuleDomain = new DefaultMuleDomain(descriptor, domainClassLoaderFactory.create(containerClassLoader, descriptor));
         defaultMuleDomain.setDeploymentListener(deploymentListener);
         DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
         domainManager.addDomain(domainWrapper);

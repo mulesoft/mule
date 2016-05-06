@@ -11,13 +11,15 @@ import static java.util.Collections.emptySet;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleClassLoaderLookupPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -30,7 +32,7 @@ public class AbstractDomainTestCase extends AbstractMuleTestCase
     @Rule
     public final SystemProperty muleHomeSystemProperty = new SystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, temporaryFolder.getRoot().getCanonicalPath());
     protected final File muleHomeFolder;
-    protected final ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), emptySet());
+    protected final ArtifactClassLoader containerClassLoader = new MuleArtifactClassLoader("mule", new URL[0], getClass().getClassLoader(), new MuleClassLoaderLookupPolicy(emptyMap(), emptySet()));
 
     public AbstractDomainTestCase() throws IOException
     {
