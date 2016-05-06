@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -79,14 +80,14 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
     public void sendResponseToClient() throws MuleException
     {
         template.sendResponseToClient(event, responseCompletionCallback);
-        verify(completionHandler).onCompletion(event, exceptionCallback);
+        verify(completionHandler).onCompletion(same(event), any(ExtensionSourceExceptionCallback.class));
         verify(responseCompletionCallback).responseSentSuccessfully();
     }
 
     @Test
     public void failedToSendResponseToClient() throws MuleException
     {
-        doThrow(runtimeException).when(completionHandler).onCompletion(event, exceptionCallback);
+        doThrow(runtimeException).when(completionHandler).onCompletion(same(event), any(ExtensionSourceExceptionCallback.class));
         template.sendResponseToClient(event, responseCompletionCallback);
 
         verify(completionHandler, never()).onFailure(any(Exception.class));
