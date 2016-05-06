@@ -11,7 +11,7 @@ import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 
 @Extension(name = VeganExtension.VEGAN)
-@Configurations({AppleConfig.class, BananaConfig.class, KiwiConfig.class})
+@Configurations({AppleConfig.class, BananaConfig.class, KiwiConfig.class, KiwiOperationlessConfig.class})
 public class VeganExtension
 {
     public static final String VEGAN = "vegan";

@@ -12,15 +12,19 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
+
+import org.mule.mvel2.util.ExecutionStack;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.Described;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -35,8 +39,11 @@ import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
+import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
+import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.Interceptor;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
+import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
@@ -47,6 +54,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -126,10 +134,35 @@ public class MuleExtensionUtils
         return operations;
     }
 
+    public static List<SourceModel> getConnectedSources(RuntimeConfigurationModel configurationModel)
+    {
+        List<SourceModel> sources = new LinkedList<>();
+        sources.addAll(collectConnectedSources(configurationModel.getExtensionModel()));
+        sources.addAll(collectConnectedSources(configurationModel));
+
+        return sources;
+    }
+
+    public static List<ComponentModel> getConnectedComponents(RuntimeConfigurationModel configurationModel)
+    {
+        List<ComponentModel> components = new LinkedList<>();
+        components.addAll(getConnectedOperations(configurationModel));
+        components.addAll(getConnectedSources(configurationModel));
+
+        return components;
+    }
+
     private static List<OperationModel> collectConnectedOperations(HasOperationModels hasOperationModels)
     {
         return hasOperationModels.getOperationModels().stream()
-                .filter(o -> o.getModelProperty(ConnectionTypeModelProperty.class).isPresent())
+                .filter(MuleExtensionUtils::isConnected)
+                .collect(toList());
+    }
+
+    private static List<SourceModel> collectConnectedSources(HasSourceModels hasSourceModels)
+    {
+        return hasSourceModels.getSourceModels().stream()
+                .filter(MuleExtensionUtils::isConnected)
                 .collect(toList());
     }
 
@@ -334,5 +367,10 @@ public class MuleExtensionUtils
         {
             return o1.getName().compareTo(o2.getName());
         }
+    }
+
+    private static boolean isConnected(EnrichableModel o)
+    {
+        return o.getModelProperty(ConnectionTypeModelProperty.class).isPresent();
     }
 }
