@@ -212,24 +212,24 @@ public class MetadataMediator
         TypeMetadataDescriptorBuilder typeDescriptorBuilder = typeDescriptor(parameterModel.getName());
 
         List<MetadataType> subTypes = subTypesMappingContainer.getSubTypes(parameterType);
-        if (!subTypes.isEmpty())
+        if (subTypes.isEmpty())
         {
-            boolean isIntantiable = isInstantiable(getType(parameterType));
-            if (subTypes.size() == 1 && !isIntantiable)
-            {
-                return typeDescriptorBuilder.withType(subTypes.get(0)).build();
-            }
-
-            UnionTypeBuilder<?> unionTypeBuilder = BaseTypeBuilder.create(MetadataFormat.JAVA).unionType();
-            if (isIntantiable)
-            {
-                unionTypeBuilder.of(parameterType);
-            }
-            subTypes.forEach(unionTypeBuilder::of);
-            return typeDescriptorBuilder.withType(unionTypeBuilder.build()).build();
-
+            return typeDescriptorBuilder.withType(parameterType).build();
         }
-        return typeDescriptorBuilder.withType(parameterType).build();
+
+        boolean isInstantiable = isInstantiable(getType(parameterType));
+        if (subTypes.size() == 1 && !isInstantiable)
+        {
+            return typeDescriptorBuilder.withType(subTypes.get(0)).build();
+        }
+
+        UnionTypeBuilder<?> unionTypeBuilder = BaseTypeBuilder.create(MetadataFormat.JAVA).unionType();
+        if (isInstantiable)
+        {
+            unionTypeBuilder.of(parameterType);
+        }
+        subTypes.forEach(unionTypeBuilder::of);
+        return typeDescriptorBuilder.withType(unionTypeBuilder.build()).build();
     }
 
     /**
