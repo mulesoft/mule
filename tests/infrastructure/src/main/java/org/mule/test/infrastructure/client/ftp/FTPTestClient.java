@@ -19,6 +19,7 @@ import org.apache.commons.net.ftp.FTPFile;
  */
 public class FTPTestClient
 {
+
     private static final int TIMEOUT = 5000;
 
     private FTPClient client = null;
@@ -106,16 +107,15 @@ public class FTPTestClient
     /**
      * Upload a file to the ftp server
      *
-     * @param fileName  The file to upload
-     * @param targetDir The directory on which to store the file
-     * @param content   the file's content
+     * @param path    the path to write in
+     * @param content the file's content
      * @return true if successful, false if not
      * @throws IOException
      */
-    public boolean putFile(String fileName, String targetDir, String content) throws IOException
+    public boolean putFile(String path, String content) throws IOException
     {
         connect();
-        return client.storeFile(String.format("%s/%s", targetDir, fileName), new ByteArrayInputStream(content.getBytes()));
+        return client.storeFile(path, new ByteArrayInputStream(content.getBytes()));
     }
 
     /**

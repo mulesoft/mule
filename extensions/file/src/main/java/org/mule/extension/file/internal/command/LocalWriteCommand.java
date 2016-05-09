@@ -10,17 +10,17 @@ import static java.lang.String.format;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
-import org.mule.runtime.module.extension.file.api.FileWriteMode;
-import org.mule.runtime.module.extension.file.api.lock.PathLock;
-import org.mule.runtime.module.extension.file.api.command.WriteCommand;
+import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.file.api.FileContentWrapper;
+import org.mule.runtime.module.extension.file.api.FileWriteMode;
 import org.mule.runtime.module.extension.file.api.FileWriterVisitor;
+import org.mule.runtime.module.extension.file.api.command.WriteCommand;
 import org.mule.runtime.module.extension.file.api.lock.NullPathLock;
+import org.mule.runtime.module.extension.file.api.lock.PathLock;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.FileAlreadyExistsException;
@@ -37,12 +37,15 @@ import java.nio.file.StandardOpenOption;
 public final class LocalWriteCommand extends LocalFileCommand implements WriteCommand
 {
 
+    private final MuleContext muleContext;
+
     /**
      * {@inheritDoc}
      */
-    public LocalWriteCommand(LocalFileSystem fileSystem, FileConnector config)
+    public LocalWriteCommand(LocalFileSystem fileSystem, FileConnector config, MuleContext muleContext)
     {
         super(fileSystem, config);
+        this.muleContext = muleContext;
     }
 
     /**
@@ -59,7 +62,7 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
 
         try (OutputStream out = getOutputStream(path, openOptions, mode))
         {
-            new FileContentWrapper(content, event).accept(new FileWriterVisitor(out, event));
+            new FileContentWrapper(content, event, muleContext).accept(new FileWriterVisitor(out, event, muleContext));
         }
         catch (Exception e)
         {
@@ -98,26 +101,5 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
         }
 
         throw new IllegalArgumentException("Unsupported write mode " + mode);
-    }
-
-    private void assureParentFolderExists(Path path, boolean createParentFolder)
-    {
-        if (Files.exists(path))
-        {
-            return;
-        }
-
-        File parentFolder = path.getParent().toFile();
-        if (!parentFolder.exists())
-        {
-            if (createParentFolder)
-            {
-                createDirectory(parentFolder);
-            }
-            else
-            {
-                throw new IllegalArgumentException(format("Cannot write to file '%s' because path to it doesn't exist. Consider setting the 'createParentFolder' attribute to 'true'", path));
-            }
-        }
     }
 }

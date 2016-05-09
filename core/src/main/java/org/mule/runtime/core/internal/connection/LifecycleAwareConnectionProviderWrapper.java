@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import org.mule.runtime.api.config.HasPoolingProfile;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -32,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * @param <Connection> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0
  */
-public class LifecycleAwareConnectionProviderWrapper<Config, Connection> extends ConnectionProviderWrapper<Config, Connection> implements HasPoolingProfile
+public class LifecycleAwareConnectionProviderWrapper<Config, Connection> extends ConnectionProviderWrapper<Config, Connection>
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareConnectionProviderWrapper.class);

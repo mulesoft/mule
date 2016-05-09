@@ -6,84 +6,20 @@
  */
 package org.mule.extension.ftp.api;
 
-import org.mule.runtime.module.extension.file.api.AbstractFileAttributes;
+import org.mule.runtime.module.extension.file.api.FileAttributes;
 
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 
-import org.apache.commons.net.ftp.FTPFile;
-
 /**
- * Implementation of {@link AbstractFileAttributes} for files
- * read from a FTP server.
+ * Specialization of {@link FileAttributes} which adds FTP specific information
  *
  * @since 4.0
  */
-//TODO: MULE-9232
-public class FtpFileAttributes extends AbstractFileAttributes
+public interface FtpFileAttributes extends FileAttributes
 {
 
-    private final FTPFile ftpFile;
-
     /**
-     * Creates a new instance
-     *
-     * @param path    the file's {@link Path}
-     * @param ftpFile the {@link FTPFile} which represents the file on the FTP server
+     * @return The last time the file was modified
      */
-    public FtpFileAttributes(Path path, FTPFile ftpFile)
-    {
-        super(path);
-        this.ftpFile = ftpFile;
-    }
-
-    public LocalDateTime getTimestamp()
-    {
-        return asDateTime(ftpFile.getTimestamp().toInstant());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName()
-    {
-        return ftpFile.getName();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getSize()
-    {
-        return ftpFile.getSize();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isRegularFile()
-    {
-        return ftpFile.isFile();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isDirectory()
-    {
-        return ftpFile.isDirectory();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isSymbolicLink()
-    {
-        return ftpFile.isSymbolicLink();
-    }
+    LocalDateTime getTimestamp();
 }

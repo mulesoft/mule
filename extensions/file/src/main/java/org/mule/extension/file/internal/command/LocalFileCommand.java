@@ -52,12 +52,15 @@ abstract class LocalFileCommand extends FileCommand<FileConnector, LocalFileSyst
     }
 
     /**
-     * Invokes {@link File#mkdirs()} on the provided {@code target}
+     * Transforms the {@code directoryPath} to a {@link} {@link File}
+     * and invokes {@link File#mkdirs()} on it
      *
-     * @param target a {@link File} pointing to the directory you want to create
+     * @param directoryPath a {@link Path} pointing to the directory you want to create
      */
-    protected void createDirectory(File target)
+    @Override
+    protected void doMkDirs(Path directoryPath)
     {
+        File target = directoryPath.toFile();
         try
         {
             if (!target.mkdirs())

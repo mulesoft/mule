@@ -9,6 +9,7 @@ package org.mule.extension.ftp;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import org.mule.extension.FtpTestHarness;
 import org.mule.functional.junit4.FlowRunner;
 
 import org.junit.Test;
@@ -17,6 +18,11 @@ public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase
 {
 
     private static final String DIRECTORY = "a/b/c";
+
+    public FtpCreateDirectoryTestCase(String name, FtpTestHarness testHarness)
+    {
+        super(name, testHarness);
+    }
 
     @Override
     protected String getConfigFile()
@@ -28,15 +34,15 @@ public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase
     public void createDirectory() throws Exception
     {
         doCreateDirectory(null, DIRECTORY);
-        assertThat(ftpClient.dirExists(DIRECTORY), is(true));
+        assertThat(testHarness.dirExists(DIRECTORY), is(true));
     }
 
     @Test
     public void createExistingDirectory() throws Exception
     {
         final String directory = "washerefirst";
-        ftpClient.makeDir(directory);
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        testHarness.makeDir(directory);
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
 
         doCreateDirectory(null, directory);
     }
@@ -44,10 +50,10 @@ public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase
     @Test
     public void createDirectoryWithCustomBasePath() throws Exception
     {
-        final String base = ftpClient.getWorkingDirectory();
+        final String base = testHarness.getWorkingDirectory();
         doCreateDirectory(base, DIRECTORY);
 
-        assertThat(ftpClient.dirExists(DIRECTORY), is(true));
+        assertThat(testHarness.dirExists(DIRECTORY), is(true));
     }
 
     private void doCreateDirectory(String basePath, String directory) throws Exception

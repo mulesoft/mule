@@ -10,9 +10,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.APPEND;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.CREATE_NEW;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.OVERWRITE;
+import org.mule.extension.FtpTestHarness;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;
 
@@ -24,6 +26,11 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
 {
 
     private static final String TEMP_DIRECTORY = "files";
+
+    public FtpWriteTestCase(String name, FtpTestHarness testHarness)
+    {
+        super(name, testHarness);
+    }
 
     @Override
     protected String getConfigFile()
@@ -47,7 +54,7 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
     public void createNewOnNotExistingFile() throws Exception
     {
 
-        doWriteOnNotExistingFile(FileWriteMode.CREATE_NEW);
+        doWriteOnNotExistingFile(CREATE_NEW);
     }
 
     @Test
@@ -67,28 +74,28 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
     @Test
     public void createNewOnExistingFile() throws Exception
     {
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
         doWriteOnExistingFile(CREATE_NEW);
     }
 
     @Test
     public void appendOnNotExistingParentWithoutCreateFolder() throws Exception
     {
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
         doWriteOnNotExistingParentWithoutCreateFolder(APPEND);
     }
 
     @Test
     public void overwriteOnNotExistingParentWithoutCreateFolder() throws Exception
     {
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
         doWriteOnNotExistingParentWithoutCreateFolder(OVERWRITE);
     }
 
     @Test
     public void createNewOnNotExistingParentWithoutCreateFolder() throws Exception
     {
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
         doWriteOnNotExistingParentWithoutCreateFolder(CREATE_NEW);
     }
 
@@ -115,7 +122,7 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
     {
         final String filePath = "file";
 
-        ftpClient.putFile(filePath, ".", "overwrite me!");
+        testHarness.write(filePath, "overwrite me!");
 
         MuleEvent event = flowRunner("readAndWrite")
                 .withFlowVariable("path", filePath)
@@ -126,8 +133,8 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
 
     private void doWriteNotExistingFileWithCreatedParent(FileWriteMode mode) throws Exception
     {
-        ftpClient.makeDir(TEMP_DIRECTORY);
-        String path = Paths.get(ftpClient.getWorkingDirectory(), TEMP_DIRECTORY, "a/b/test.txt").toString();
+        testHarness.makeDir(TEMP_DIRECTORY);
+        String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "a/b/test.txt").toString();
 
         doWrite(path, HELLO_WORLD, mode, true);
 
@@ -138,8 +145,8 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
 
     private void doWriteOnNotExistingFile(FileWriteMode mode) throws Exception
     {
-        ftpClient.makeDir(TEMP_DIRECTORY);
-        String path = Paths.get(ftpClient.getWorkingDirectory(), TEMP_DIRECTORY, "test.txt").toString();
+        testHarness.makeDir(TEMP_DIRECTORY);
+        String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "test.txt").toString();
         doWrite(path, HELLO_WORLD, mode, false);
 
         String content = getPayloadAsString(readPath(path));
@@ -148,15 +155,15 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
 
     private void doWriteOnNotExistingParentWithoutCreateFolder(FileWriteMode mode) throws Exception
     {
-        ftpClient.makeDir(TEMP_DIRECTORY);
-        String path = Paths.get(ftpClient.getWorkingDirectory(), TEMP_DIRECTORY, "a/b/test.txt").toString();
+        testHarness.makeDir(TEMP_DIRECTORY);
+        String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "a/b/test.txt").toString();
         doWrite(path, HELLO_WORLD, mode, false);
     }
 
     private String doWriteOnExistingFile(FileWriteMode mode) throws Exception
     {
         final String filePath = "file";
-        ftpClient.putFile(filePath, ".", HELLO_WORLD);
+        testHarness.write(filePath, HELLO_WORLD);
 
         doWrite(filePath, HELLO_WORLD, mode, false);
         return getPayloadAsString(readPath(filePath));

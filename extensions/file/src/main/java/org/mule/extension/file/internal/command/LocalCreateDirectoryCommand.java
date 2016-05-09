@@ -51,6 +51,6 @@ public final class LocalCreateDirectoryCommand extends LocalFileCommand implemen
             throw new IllegalArgumentException(format("Directory '%s' already exists", target));
         }
 
-        createDirectory(target.toFile());
+        mkdirs(target);
     }
 }

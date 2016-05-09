@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ftp.internal.command;
+package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
 import org.mule.extension.ftp.api.FtpConnector;
-import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.extension.ftp.api.FtpFileSystem;
+import org.mule.extension.ftp.internal.ftp.ClassicFtpFileAttributes;
+import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.command.DeleteCommand;
 
@@ -22,7 +22,7 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class FtpDeleteCommand extends FtpCommand implements DeleteCommand
+public final class FtpDeleteCommand extends ClassicFtpCommand implements DeleteCommand
 {
 
     private static Logger LOGGER = LoggerFactory.getLogger(FtpDeleteCommand.class);
@@ -30,7 +30,7 @@ public final class FtpDeleteCommand extends FtpCommand implements DeleteCommand
     /**
      * {@inheritDoc}
      */
-    public FtpDeleteCommand(FtpFileSystem fileSystem, FtpConnector config, FTPClient client)
+    public FtpDeleteCommand(ClassicFtpFileSystem fileSystem, FtpConnector config, FTPClient client)
     {
         super(fileSystem, config, client);
     }
@@ -40,11 +40,6 @@ public final class FtpDeleteCommand extends FtpCommand implements DeleteCommand
      */
     @Override
     public void delete(String filePath)
-    {
-        performDelete(filePath);
-    }
-
-    private void performDelete(String filePath)
     {
         FileAttributes fileAttributes = getExistingFile(filePath);
         boolean isDirectory = fileAttributes.isDirectory();
@@ -98,7 +93,7 @@ public final class FtpDeleteCommand extends FtpCommand implements DeleteCommand
                 continue;
             }
 
-            FileAttributes fileAttributes = new FtpFileAttributes(path.resolve(file.getName()), file);
+            FileAttributes fileAttributes = new ClassicFtpFileAttributes(path.resolve(file.getName()), file);
 
             final Path filePath = Paths.get(fileAttributes.getPath());
             if (fileAttributes.isDirectory())

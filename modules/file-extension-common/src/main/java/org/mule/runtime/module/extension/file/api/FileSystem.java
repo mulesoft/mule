@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.module.extension.file.api;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.module.extension.file.api.lock.PathLock;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.concurrent.locks.Lock;
 import java.util.function.Predicate;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -105,11 +106,11 @@ public interface FileSystem
      * {@code lock} argument, but following the same rules and considerations
      * as described in the {@link #read(MuleMessage, String, boolean)} method
      *
-     * @param filePath              the path of the file to be written
-     * @param content               the content to be written into the file
-     * @param mode                  a {@link FileWriteMode}
-     * @param event                 the {@link MuleEvent} which processing triggers this operation
-     * @param lock                  whether or not to lock the file
+     * @param filePath                the path of the file to be written
+     * @param content                 the content to be written into the file
+     * @param mode                    a {@link FileWriteMode}
+     * @param event                   the {@link MuleEvent} which processing triggers this operation
+     * @param lock                    whether or not to lock the file
      * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
@@ -141,11 +142,11 @@ public interface FileSystem
      * As for the {@code sourcePath}, it can either be a file or a directory.
      * If it points to a directory, then it will be copied recursively
      *
-     * @param sourcePath            the path to the file to be copied
-     * @param targetPath            the target directory
-     * @param overwrite             whether or not overwrite the file if the target destination already exists.
+     * @param sourcePath              the path to the file to be copied
+     * @param targetPath              the target directory
+     * @param overwrite               whether or not overwrite the file if the target destination already exists.
      * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
-     * @param event                 whether or not to attempt creating the parent directory if it doesn't exists.
+     * @param event                   whether or not to attempt creating the parent directory if it doesn't exists.
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
     void copy(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories, MuleEvent event);
@@ -171,9 +172,9 @@ public interface FileSystem
      * As for the {@code sourcePath}, it can either be a file or a directory.
      * If it points to a directory, then it will be moved recursively
      *
-     * @param sourcePath            the path to the file to be copied
-     * @param targetPath            the target directory
-     * @param overwrite             whether or not overwrite the file if the target destination already exists.
+     * @param sourcePath              the path to the file to be copied
+     * @param targetPath              the target directory
+     * @param overwrite               whether or not overwrite the file if the target destination already exists.
      * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
@@ -218,6 +219,8 @@ public interface FileSystem
      * @throws IllegalArgumentException if a lock could not be acquired
      */
     PathLock lock(Path path, Object... params);
+
+    Lock createMuleLock(String id);
 
     /**
      * Creates a new {@link DataType} to be associated with a {@link MuleMessage} which payload
