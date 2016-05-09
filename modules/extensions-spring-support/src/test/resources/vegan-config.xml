@@ -28,7 +28,6 @@
 
     <flow name="peachOk">
         <vegan:harvest-peaches config-ref="peach"/>
-        <!-- intentionally left without operations-->
         <logger/>
     </flow>
 

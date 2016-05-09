@@ -28,6 +28,13 @@ public class SourceWithoutConnectedOperationTestCase extends ExtensionFunctional
         return new Class<?>[] {VeganExtension.class};
     }
 
+    @Override
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
+    {
+        HarvestPeachesSource.isConnected = false;
+        super.doSetUpBeforeMuleContextCreation();
+    }
+
     @Test
     public void testSourceIsConnected() throws Exception
     {
