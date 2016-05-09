@@ -351,7 +351,6 @@ public final class IntrospectionUtils
         return getAnnotatedFields(extensionType, Parameter.class);
     }
 
-
     public static Collection<Field> getParameterGroupFields(Class<?> extensionType)
     {
         ImmutableList.Builder<Field> listFieldsBuilder = ImmutableList.builder();

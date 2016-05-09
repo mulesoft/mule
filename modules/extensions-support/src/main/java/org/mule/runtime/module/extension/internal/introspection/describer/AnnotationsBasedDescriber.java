@@ -337,8 +337,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 .withMetadataResolverFactory(getMetadataResolverFactoryFromClass(extensionType, sourceType));
 
         declareMetadataKeyId(sourceType, source);
-        declareSingleParameters(getParameterFields(sourceType), source,
-                                MuleExtensionAnnotationParser::parseMetadataAnnotations);
+        declareSingleParameters(getParameterFields(sourceType), source, MuleExtensionAnnotationParser::parseMetadataAnnotations);
 
         getAnnotatedFields(sourceType, Connection.class).stream().forEach(f -> parseConnectionAnnotation(f.getDeclaringClass(), source));
         getAnnotatedFields(sourceType, UseConfig.class).stream().forEach(f -> parseUseConfigAnnotation(f.getDeclaringClass(), source));

@@ -129,6 +129,15 @@ public class MuleExtensionUtils
         return operations;
     }
 
+    /**
+     * Returns a {@link List} with all the {@link SourceModel} available to the {@code configurationModel}
+     * which requires a connection. This will include sources defined at both the
+     * {@link ExtensionModel#getSourceModels()} and {@link ConfigurationModel#getSourceModels()}
+     * level.
+     *
+     * @param configurationModel a {@link RuntimeConfigurationModel}
+     * @return a {@link List} of {@link SourceModel}. It might be empty but will never be {@code null}
+     */
     public static List<SourceModel> getConnectedSources(RuntimeConfigurationModel configurationModel)
     {
         List<SourceModel> sources = new LinkedList<>();
@@ -138,6 +147,13 @@ public class MuleExtensionUtils
         return sources;
     }
 
+    /**
+     * Returns a {@link List} with all the {@link ComponentModel} available to the {@code configurationModel}
+     * which requires a connection. This includes both {@link SourceModel} and {@link OperationModel}.
+     *
+     * @param configurationModel a {@link RuntimeConfigurationModel}
+     * @return a {@link List} of {@link ComponentModel}. It might be empty but will never be {@code null}
+     */
     public static List<ComponentModel> getConnectedComponents(RuntimeConfigurationModel configurationModel)
     {
         List<ComponentModel> components = new LinkedList<>();
