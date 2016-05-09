@@ -7,15 +7,15 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectedOperations;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectedComponents;
 import static org.springframework.util.ReflectionUtils.setField;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
@@ -60,7 +60,7 @@ public final class ConfigurationInstanceFactory<T>
     {
         this.configurationModel = configurationModel;
         configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
-        requiresConnection = !getConnectedOperations(configurationModel).isEmpty();
+        requiresConnection = !getConnectedComponents(configurationModel).isEmpty();
     }
 
     /**

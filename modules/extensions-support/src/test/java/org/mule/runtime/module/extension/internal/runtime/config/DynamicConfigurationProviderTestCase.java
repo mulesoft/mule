@@ -64,6 +64,8 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
         when(configurationModel.getModelProperty(any())).thenReturn(Optional.empty());
         when(configurationModel.getInterceptorFactories()).thenReturn(ImmutableList.of());
         when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
+        when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
+        when(configurationModel.getExtensionModel().getSourceModels()).thenReturn(ImmutableList.of());
         when(configurationModel.getExtensionModel().getOperationModels()).thenReturn(ImmutableList.of());
 
         when(resolverSet.resolve(event)).thenReturn(resolverSetResult);

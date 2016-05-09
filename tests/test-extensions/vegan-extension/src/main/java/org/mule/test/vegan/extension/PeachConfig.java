@@ -6,13 +6,16 @@
  */
 package org.mule.test.vegan.extension;
 
-import static org.mule.test.vegan.extension.VeganExtension.KIWI;
+import static org.mule.test.vegan.extension.VeganExtension.PEACH;
 import org.mule.runtime.extension.api.annotation.Configuration;
+import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 
-@Configuration(name = KIWI)
-@Providers(VeganKiwiConnectionProvider.class)
-public class KiwiOperationlessConfig
+@Configuration(name = PEACH)
+// No operations defined on purpose
+@Providers(VeganPeachConnectionProvider.class)
+@Sources({HarvestPeachesSource.class})
+public class PeachConfig
 {
 
 }

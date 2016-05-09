@@ -16,15 +16,17 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.Interceptable;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.Interceptor;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
@@ -63,6 +65,12 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
     private OperationModel operationModel;
 
     @Mock
+    private SourceModel sourceModel;
+
+    @Mock
+    private ComponentModel componentModel;
+
+    @Mock
     private Interceptor interceptor1;
 
     @Mock
@@ -81,8 +89,11 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         when(configurationModel.getModelProperty(any())).thenReturn(Optional.empty());
         when(configurationModel.getInterceptorFactories()).thenReturn(asList(() -> interceptor1, () -> interceptor2));
         when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
+        when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
         when(configurationModel.getExtensionModel().getOperationModels()).thenReturn(asList(operationModel));
+        when(configurationModel.getExtensionModel().getSourceModels()).thenReturn(asList(sourceModel));
         when(operationModel.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.of(new ConnectionTypeModelProperty(Banana.class)));
+        when(sourceModel.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.of(new ConnectionTypeModelProperty(Banana.class)));
 
         resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
         factory = new ConfigurationInstanceFactory<>(configurationModel, resolverSet);

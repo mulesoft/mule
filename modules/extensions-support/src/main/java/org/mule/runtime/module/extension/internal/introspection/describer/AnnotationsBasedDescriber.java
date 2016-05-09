@@ -94,8 +94,6 @@ import org.mule.runtime.module.extension.internal.exception.IllegalOperationMode
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.introspection.version.VersionResolver;
-import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
@@ -339,7 +337,6 @@ public final class AnnotationsBasedDescriber implements Describer
                 .withMetadataResolverFactory(getMetadataResolverFactoryFromClass(extensionType, sourceType));
 
         declareMetadataKeyId(sourceType, source);
-        declareSingleParameters(getParameterFields(sourceType), source);
         declareSingleParameters(getParameterFields(sourceType), source,
                                 MuleExtensionAnnotationParser::parseMetadataAnnotations);
 
@@ -660,13 +657,13 @@ public final class AnnotationsBasedDescriber implements Describer
             Connection connectionAnnotation = parsedParameter.getAnnotation(Connection.class);
             if (connectionAnnotation != null)
             {
-                operation.withModelProperty(new ConnectionTypeModelProperty(parameterType));
+                parseConnectionAnnotation(parameterType, operation);
             }
 
             UseConfig useConfig = parsedParameter.getAnnotation(UseConfig.class);
             if (useConfig != null)
             {
-                operation.withModelProperty(new ConfigTypeModelProperty(parameterType));
+                parseUseConfigAnnotation(parameterType, operation);
             }
         }
     }

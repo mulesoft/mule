@@ -70,6 +70,7 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
         when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
         when(configurationModel.getInterceptorFactories()).thenReturn(ImmutableList.of());
         when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
+        when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
 
         when(operationContext.getEvent()).thenReturn(event);
 

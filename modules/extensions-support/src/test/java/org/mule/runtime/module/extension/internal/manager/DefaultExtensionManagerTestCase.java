@@ -156,6 +156,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         when(extension1ConfigurationModel.getExtensionModel()).thenReturn(extensionModel1);
         when(extension1ConfigurationModel.getInterceptorFactories()).thenReturn(emptyList());
         when(extension1ConfigurationModel.getOperationModels()).thenReturn(ImmutableList.of());
+        when(extension1ConfigurationModel.getSourceModels()).thenReturn(ImmutableList.of());
         when(extension1ConfigurationModel.getParameterModels()).thenReturn(ImmutableList.of());
         when(extension1ConfigurationModel.getModelProperty(any())).thenReturn(Optional.empty());
 
