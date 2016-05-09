@@ -15,6 +15,10 @@
     <name>Full Distribution</name>
     <description>Includes the Mule server with all of its modules and transports.</description>
 
+    <properties>
+        <apikit.version>3.8.0-SNAPSHOT</apikit.version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -176,6 +180,31 @@
             <artifactId>mule-transports-all</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
+        </dependency>
+
+        <!-- Include APIKit -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-apikit</artifactId>
+            <version>${apikit.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>wsdl4j</groupId>
+                    <artifactId>wsdl4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!--
