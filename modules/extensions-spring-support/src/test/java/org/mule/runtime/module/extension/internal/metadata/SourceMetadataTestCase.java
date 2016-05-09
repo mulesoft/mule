@@ -34,6 +34,12 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase
 
     private static final String TYPE_PARAMETER_NAME = "type";
 
+    @Override
+    protected String getConfigFile()
+    {
+        return METADATA_TEST;
+    }
+
     @Before
     public void setUp()
     {

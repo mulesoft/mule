@@ -38,9 +38,8 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConfigurationFactory;
-import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationFactory;
-import org.mule.runtime.module.extension.internal.runtime.config.StaticConfigurationProvider;
+import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConfigurationProviderFactory;
+import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationProviderFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,7 +71,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
 
     private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
-    private final ImplicitConfigurationFactory implicitConfigurationFactory = new DefaultImplicitConfigurationFactory();
+    private final ImplicitConfigurationProviderFactory implicitConfigurationProviderFactory = new DefaultImplicitConfigurationProviderFactory();
     private final DescriberResolver describerResolver = new DescriberResolver();
 
     private MuleContext muleContext;
@@ -185,13 +184,8 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
             return provider.get().get(muleEvent);
         }
 
-        if (attemptToCreateImplicitConfiguration(extensionModel, (MuleEvent) muleEvent))
-        {
-            return getConfiguration(extensionModel, muleEvent);
-        }
-
-        throw new IllegalStateException(String.format("No config-ref was specified for operation of extension '%s' and no implicit configuration could be inferred. Please define one.",
-                                                      extensionModel.getName()));
+        createImplicitConfiguration(extensionModel, (MuleEvent) muleEvent);
+        return getConfiguration(extensionModel, muleEvent);
     }
 
     public <C> Optional<ConfigurationProvider<C>> getConfigurationProvider(ExtensionModel extensionModel)
@@ -220,25 +214,15 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         return extensionRegistry.getConfigurationProvider(configurationProviderName);
     }
 
-    private boolean attemptToCreateImplicitConfiguration(ExtensionModel extensionModel, MuleEvent muleEvent)
+    private void createImplicitConfiguration(ExtensionModel extensionModel, MuleEvent muleEvent)
     {
         synchronized (extensionModel)
         {
             //check that another thread didn't beat us to create the instance
-            if (!extensionRegistry.getConfigurationProviders(extensionModel).isEmpty())
+            if (extensionRegistry.getConfigurationProviders(extensionModel).isEmpty())
             {
-                return true;
+                registerConfigurationProvider(implicitConfigurationProviderFactory.createImplicitConfigurationProvider(extensionModel, muleEvent));
             }
-            ConfigurationInstance<Object> configurationInstance = implicitConfigurationFactory.createImplicitConfigurationInstance(extensionModel, muleEvent);
-            if (configurationInstance != null)
-            {
-                ConfigurationProvider<Object> configurationProvider = new StaticConfigurationProvider<>(configurationInstance.getName(), configurationInstance.getModel(), configurationInstance);
-                registerConfigurationProvider(configurationProvider);
-
-                return true;
-            }
-
-            return false;
         }
     }
 

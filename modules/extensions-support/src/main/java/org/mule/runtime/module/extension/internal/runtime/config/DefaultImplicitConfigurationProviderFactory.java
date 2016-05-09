@@ -11,27 +11,30 @@ import static org.mule.runtime.module.extension.internal.introspection.utils.Imp
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
+import org.mule.runtime.core.time.TimeSupplier;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.module.extension.internal.runtime.ImmutableExpirationPolicy;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
- * Default implementation of {@link ImplicitConfigurationFactory}.
+ * Default implementation of {@link ImplicitConfigurationProviderFactory}.
  * Implicit configurations are created from {@link ConfigurationModel configurations} which have all
  * parameters that are either not required or have a default value defined that's not {@code null}.
  *
  * @since 3.8.0
  */
-public final class DefaultImplicitConfigurationFactory implements ImplicitConfigurationFactory
+public final class DefaultImplicitConfigurationProviderFactory implements ImplicitConfigurationProviderFactory
 {
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public <C> ConfigurationInstance<C> createImplicitConfigurationInstance(ExtensionModel extensionModel, MuleEvent event)
+    public <C> ConfigurationProvider<C> createImplicitConfigurationProvider(ExtensionModel extensionModel, MuleEvent event)
     {
         RuntimeConfigurationModel implicitConfigurationModel = (RuntimeConfigurationModel) getFirstImplicit(extensionModel.getConfigurationModels());
 
@@ -44,7 +47,19 @@ public final class DefaultImplicitConfigurationFactory implements ImplicitConfig
         final ResolverSet resolverSet = buildImplicitResolverSet(implicitConfigurationModel, event.getMuleContext().getExpressionManager());
         try
         {
-            return new ConfigurationInstanceFactory<C>(implicitConfigurationModel, resolverSet).createConfiguration(providerName, event);
+            ConfigurationInstance<C> configurationInstance = new ConfigurationInstanceFactory<C>(implicitConfigurationModel, resolverSet).createConfiguration(providerName, event);
+            String configName = configurationInstance.getName();
+            RuntimeConfigurationModel configurationModel = configurationInstance.getModel();
+
+            if (resolverSet.isDynamic())
+            {
+                return new DynamicConfigurationProvider<>(configName, configurationModel, resolverSet,
+                                                          new ImplicitConnectionProviderValueResolver(configName, configurationModel),
+                                                          ImmutableExpirationPolicy.getDefault(new TimeSupplier()));
+            }
+
+            return new StaticConfigurationProvider<>(configName, configurationModel, configurationInstance);
+
         }
         catch (MuleException e)
         {

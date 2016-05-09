@@ -63,6 +63,12 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     private static final String CONFIG = "config";
     private static final String ALTERNATIVE_CONFIG = "alternative-config";
 
+    @Override
+    protected String getConfigFile()
+    {
+        return METADATA_TEST;
+    }
+
     @Test
     public void getMetadataKeysWithKeyId() throws Exception
     {

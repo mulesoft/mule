@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/metadata http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd">
+
+    <flow name="contentMetadataWithKeyId">
+        <metadata:content-metadata-with-key-id type="Person"/>
+    </flow>
+</mule>

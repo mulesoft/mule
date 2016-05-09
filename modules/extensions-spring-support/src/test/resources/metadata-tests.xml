@@ -5,11 +5,15 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/metadata http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd">
 
-    <metadata:config name="config">
+    <metadata:config name="config" dataWithDefault="staticOverride">
         <metadata:connection/>
     </metadata:config>
 
-    <metadata:config name="alternative-config">
+    <metadata:config name="alternative-config" dataWithDefault="staticOverride">
+        <metadata:connection/>
+    </metadata:config>
+
+    <metadata:config name="dynamic-config" data="#['dynamic']">
         <metadata:connection/>
     </metadata:config>
 
@@ -129,4 +133,9 @@
                                                        rectangleSubtype="#[new org.mule.test.metadata.extension.model.shapes.Rectangle()]"
                                                        animal="#[new org.mule.test.metadata.extension.model.animals.Bear()"/>
     </flow>
+
+    <flow name="resolverWithDynamicConfig">
+        <metadata:simple-multi-level-key-resolver config-ref="dynamic-config" continent="AMERICA" country="USA" city="SFO"/>
+    </flow>
+
 </mule>

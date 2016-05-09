@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.MISSING_ELEMENT_ERROR_MESSAGE;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
@@ -30,6 +34,12 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     private static final String LOGGER_FLOW = "loggerFlow";
     private static final String SOURCE_NOT_FOUND = "Flow doesn't contain a message source";
     private static final String FLOW_WITHOUT_SOURCE = "flowWithoutSource";
+
+    @Override
+    protected String getConfigFile()
+    {
+        return METADATA_TEST;
+    }
 
     @Test
     public void getOperationMetadataWithResolvingException() throws Exception
@@ -101,5 +111,14 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
         final MetadataResult<List<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(notExistingSource);
 
         assertFailure(metadataKeysResult, SOURCE_NOT_FOUND, FailureCode.UNKNOWN, InvalidComponentIdException.class.getName());
+    }
+
+    @Test
+    public void failWithDynamicConfigurationWhenRetrievingMetadata() throws IOException
+    {
+        componentId = new ProcessorId(RESOLVER_WITH_DYNAMIC_CONFIG, FIRST_PROCESSOR_INDEX);
+        MetadataKey key = newKey(AMERICA).withChild(newKey(USA).withChild(newKey(SAN_FRANCISCO))).build();
+        MetadataResult<ComponentMetadataDescriptor> result = metadataManager.getMetadata(componentId, key);
+        assertFailure(result, "Configuration used for Metadata fetch cannot be dynamic", FailureCode.INVALID_CONFIGURATION, MetadataResolvingException.class.getName());
     }
 }
