@@ -66,7 +66,7 @@ final class ConfigurationBeanDefinitionParser extends BaseExtensionBeanDefinitio
 
     private void parseConfigurationProvider(String configName, Element element, BeanDefinitionBuilder builder, ParserContext parserContext)
     {
-        if (MuleExtensionUtils.getConnectedOperations(configurationModel).isEmpty())
+        if (MuleExtensionUtils.getConnectedComponents(configurationModel).isEmpty())
         {
             builder.addConstructorArgValue(new StaticValueResolver<>(null));
             return;

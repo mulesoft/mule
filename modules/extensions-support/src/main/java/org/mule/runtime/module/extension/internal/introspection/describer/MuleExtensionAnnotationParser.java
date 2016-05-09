@@ -12,6 +12,7 @@ import static org.mule.runtime.core.util.Preconditions.checkState;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodArgumentTypes;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -42,6 +43,8 @@ import org.mule.runtime.extension.api.introspection.property.DisplayModelPropert
 import org.mule.runtime.extension.api.introspection.property.DisplayModelPropertyBuilder;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
@@ -166,7 +169,7 @@ public final class MuleExtensionAnnotationParser
                              }
                              else
                              {
-                                 ParsedParameter parsedParameter = doParseParameter(field.getName(),getFieldMetadataType(field, typeLoader),
+                                 ParsedParameter parsedParameter = doParseParameter(field.getName(), getFieldMetadataType(field, typeLoader),
                                                                                     toMap(field.getAnnotations()), typeLoader.getClassLoader());
                                  if (parsedParameter != null)
                                  {
@@ -326,5 +329,15 @@ public final class MuleExtensionAnnotationParser
     private static boolean isParameterFieldContainer(Set<Class<? extends Annotation>> annotations, MetadataType parameterType)
     {
         return (annotations.contains(ParameterGroup.class) || annotations.contains(MetadataKeyId.class)) && parameterType instanceof ObjectType;
+    }
+
+    static void parseConnectionAnnotation(Class<?> annotatedFieldClass, HasModelProperties parameter)
+    {
+        parameter.withModelProperty(new ConnectionTypeModelProperty(annotatedFieldClass));
+    }
+
+    static void parseUseConfigAnnotation(Class<?> annotatedFieldClass, HasModelProperties parameter)
+    {
+        parameter.withModelProperty(new ConfigTypeModelProperty(annotatedFieldClass));
     }
 }

@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.Described;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -35,6 +36,8 @@ import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
+import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
+import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.Interceptor;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
@@ -126,10 +129,51 @@ public class MuleExtensionUtils
         return operations;
     }
 
+    /**
+     * Returns a {@link List} with all the {@link SourceModel} available to the {@code configurationModel}
+     * which requires a connection. This will include sources defined at both the
+     * {@link ExtensionModel#getSourceModels()} and {@link ConfigurationModel#getSourceModels()}
+     * level.
+     *
+     * @param configurationModel a {@link RuntimeConfigurationModel}
+     * @return a {@link List} of {@link SourceModel}. It might be empty but will never be {@code null}
+     */
+    public static List<SourceModel> getConnectedSources(RuntimeConfigurationModel configurationModel)
+    {
+        List<SourceModel> sources = new LinkedList<>();
+        sources.addAll(collectConnectedSources(configurationModel.getExtensionModel()));
+        sources.addAll(collectConnectedSources(configurationModel));
+
+        return sources;
+    }
+
+    /**
+     * Returns a {@link List} with all the {@link ComponentModel} available to the {@code configurationModel}
+     * which requires a connection. This includes both {@link SourceModel} and {@link OperationModel}.
+     *
+     * @param configurationModel a {@link RuntimeConfigurationModel}
+     * @return a {@link List} of {@link ComponentModel}. It might be empty but will never be {@code null}
+     */
+    public static List<ComponentModel> getConnectedComponents(RuntimeConfigurationModel configurationModel)
+    {
+        List<ComponentModel> components = new LinkedList<>();
+        components.addAll(getConnectedOperations(configurationModel));
+        components.addAll(getConnectedSources(configurationModel));
+
+        return components;
+    }
+
     private static List<OperationModel> collectConnectedOperations(HasOperationModels hasOperationModels)
     {
         return hasOperationModels.getOperationModels().stream()
-                .filter(o -> o.getModelProperty(ConnectionTypeModelProperty.class).isPresent())
+                .filter(MuleExtensionUtils::isConnected)
+                .collect(toList());
+    }
+
+    private static List<SourceModel> collectConnectedSources(HasSourceModels hasSourceModels)
+    {
+        return hasSourceModels.getSourceModels().stream()
+                .filter(MuleExtensionUtils::isConnected)
                 .collect(toList());
     }
 
@@ -334,5 +378,10 @@ public class MuleExtensionUtils
         {
             return o1.getName().compareTo(o2.getName());
         }
+    }
+
+    private static boolean isConnected(EnrichableModel o)
+    {
+        return o.getModelProperty(ConnectionTypeModelProperty.class).isPresent();
     }
 }

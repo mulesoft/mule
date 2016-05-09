@@ -15,10 +15,12 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.THR
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseConnectionAnnotation;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseMetadataAnnotations;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseParameters;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseUseConfigAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
@@ -51,6 +53,7 @@ import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.ImportedTypes;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.SubTypesMapping;
@@ -91,8 +94,6 @@ import org.mule.runtime.module.extension.internal.exception.IllegalOperationMode
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.introspection.version.VersionResolver;
-import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
@@ -336,7 +337,10 @@ public final class AnnotationsBasedDescriber implements Describer
                 .withMetadataResolverFactory(getMetadataResolverFactoryFromClass(extensionType, sourceType));
 
         declareMetadataKeyId(sourceType, source);
-        declareSingleParameters(getParameterFields(sourceType), source);
+        declareSingleParameters(getParameterFields(sourceType), source, MuleExtensionAnnotationParser::parseMetadataAnnotations);
+
+        getAnnotatedFields(sourceType, Connection.class).stream().forEach(f -> parseConnectionAnnotation(f.getDeclaringClass(), source));
+        getAnnotatedFields(sourceType, UseConfig.class).stream().forEach(f -> parseUseConfigAnnotation(f.getDeclaringClass(), source));
         declareParameterGroups(sourceType, source);
     }
 
@@ -350,7 +354,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareAnnotatedParameters(Class<?> annotatedType, ParameterizedDeclarer parameterDeclarer)
     {
-        declareSingleParameters(getParameterFields(annotatedType), parameterDeclarer);
+        declareSingleParameters(getAnnotatedFields(annotatedType, Parameter.class), parameterDeclarer);
         declareParameterGroups(annotatedType, parameterDeclarer);
     }
 
@@ -652,13 +656,13 @@ public final class AnnotationsBasedDescriber implements Describer
             Connection connectionAnnotation = parsedParameter.getAnnotation(Connection.class);
             if (connectionAnnotation != null)
             {
-                operation.withModelProperty(new ConnectionTypeModelProperty(parameterType));
+                parseConnectionAnnotation(parameterType, operation);
             }
 
             UseConfig useConfig = parsedParameter.getAnnotation(UseConfig.class);
             if (useConfig != null)
             {
-                operation.withModelProperty(new ConfigTypeModelProperty(parameterType));
+                parseUseConfigAnnotation(parameterType, operation);
             }
         }
     }

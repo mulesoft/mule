@@ -74,6 +74,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.xmlbeans.impl.tool.Extension;
 import org.springframework.core.ResolvableType;
 
 /**
@@ -385,7 +386,7 @@ public final class IntrospectionUtils
 
     public static Collection<Field> getExposedFields(Class<?> extensionType)
     {
-        Collection<Field> allFields = getParameterFields(extensionType);
+        Collection<Field> allFields = getAnnotatedFields(extensionType, Parameter.class);
         if (!allFields.isEmpty())
         {
             return allFields;

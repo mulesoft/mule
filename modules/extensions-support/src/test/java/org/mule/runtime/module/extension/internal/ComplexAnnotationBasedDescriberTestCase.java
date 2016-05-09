@@ -38,7 +38,7 @@ public class ComplexAnnotationBasedDescriberTestCase extends AbstractAnnotations
     public void extension()
     {
         assertThat(extensionDeclaration.getName(), is(VEGAN));
-        assertThat(extensionDeclaration.getConfigurations(), hasSize(3));
+        assertThat(extensionDeclaration.getConfigurations(), hasSize(4));
         assertOperation(APPLE, "eatApple");
         assertOperation(BANANA, "eatBanana");
         assertOperation(KIWI, "eatKiwi");
