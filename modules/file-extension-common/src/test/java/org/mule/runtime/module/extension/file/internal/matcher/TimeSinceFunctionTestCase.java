@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.file.internal.matcher;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.module.extension.file.api.matcher.TimeSinceFunction;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
