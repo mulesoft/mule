@@ -187,10 +187,6 @@ public class DefaultJmxSupportAgent extends AbstractAgent
             }
             return lookupObject;
         }
-        // else
-        // {
-        // return registry.lookupObject(AbstractJmxAgent.class);
-        // }
     }
 
     protected void registerAgent(Agent agent, MuleRegistry registry) throws MuleException

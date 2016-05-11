@@ -148,11 +148,4 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
     {
        this.exceptionHandler = messagingExceptionHandler;
     }
-
-    @Override
-    public boolean mayReturnVoidEvent()
-    {
-        MessageExchangePattern exchangePattern = getExchangePattern();
-        return exchangePattern == null ? true : !exchangePattern.hasResponse();
-    }
 }

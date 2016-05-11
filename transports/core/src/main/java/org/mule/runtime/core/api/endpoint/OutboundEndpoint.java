@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.api.endpoint;
 
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.transport.LegacyOutboundEndpoint;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface OutboundEndpoint extends ImmutableEndpoint, MessageProcessor, MessagingExceptionHandlerAware
+public interface OutboundEndpoint extends ImmutableEndpoint, MessageProcessor, MessagingExceptionHandlerAware, LegacyOutboundEndpoint
 {    
     /**
      * @return a list of properties which should be carried over from the request message to the response message
@@ -28,12 +28,6 @@ public interface OutboundEndpoint extends ImmutableEndpoint, MessageProcessor, M
      * @return true if the destination is compute in every request, false if the destination is always the same.
      */
     boolean isDynamic();
-
-    @Override
-    default boolean filterAccepts(MuleMessage message)
-    {
-        return getFilter() == null || (getFilter() != null && getFilter().accept(message));
-    }
 }
 
 

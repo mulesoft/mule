@@ -343,11 +343,4 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint
     {
         this.exceptionHandler = messagingExceptionHandler;
     }
-
-    @Override
-    public boolean mayReturnVoidEvent()
-    {
-        MessageExchangePattern exchangePattern = getExchangePattern();
-        return exchangePattern == null ? true : !exchangePattern.hasResponse();
-    }
 }

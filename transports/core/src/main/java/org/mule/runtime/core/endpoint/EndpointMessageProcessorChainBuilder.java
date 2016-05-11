@@ -194,18 +194,6 @@ public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessor
         }
 
         @Override
-        public boolean isCompatibleWithAsync()
-        {
-            return sfmp.isCompatibleWithAsync();
-        }
-
-        @Override
-        public boolean mayReturnVoidEvent()
-        {
-            return sfmp.mayReturnVoidEvent();
-        }
-
-        @Override
         public void setAnnotations(Map<QName, Object> newAnnotations)
         {
             sfmp.setAnnotations(newAnnotations);

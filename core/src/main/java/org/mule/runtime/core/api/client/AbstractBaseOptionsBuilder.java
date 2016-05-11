@@ -29,6 +29,7 @@ public abstract class AbstractBaseOptionsBuilder<BuilderType extends AbstractBas
         return (BuilderType) this;
     }
 
+    // TODO MULE-9690 remove
     public BuilderType outbound()
     {
         this.outbound = true;
@@ -48,6 +49,7 @@ public abstract class AbstractBaseOptionsBuilder<BuilderType extends AbstractBas
         return responseTimeout;
     }
 
+    // TODO MULE-9690 remove
     public boolean isOutbound()
     {
         return outbound;

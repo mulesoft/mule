@@ -262,17 +262,4 @@ public class StartableCompositeMessageSource
             return ObjectUtils.toString(this);
         }
     }
-
-    @Override
-    public boolean isCompatibleWithAsync()
-    {
-        for (MessageSource childSource : getSources())
-        {
-            if (!childSource.isCompatibleWithAsync())
-            {
-                return false;
-            }
-        }
-        return true;
-    }
 }

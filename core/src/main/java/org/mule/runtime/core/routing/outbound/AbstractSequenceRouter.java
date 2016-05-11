@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.api.transport.LegacyOutboundEndpoint;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.routing.AbstractRoutingStrategy;
 import org.mule.runtime.core.routing.CorrelationMode;
@@ -61,7 +62,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter
             {
                 MessageProcessor mp = getRoute(i, event);
 
-                if (mp.filterAccepts(message))
+                if (!(mp instanceof LegacyOutboundEndpoint) || ((LegacyOutboundEndpoint) mp).filterAccepts(message))
                 {
                     AbstractRoutingStrategy.validateMessageIsNotConsumable(event, message);
                     MuleMessage clonedMessage = cloneMessage(event, message);

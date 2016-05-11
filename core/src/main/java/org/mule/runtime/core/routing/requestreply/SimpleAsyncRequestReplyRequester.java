@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 
 public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyRequester
     implements Startable, Stoppable
@@ -44,7 +45,7 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
     protected String getReplyTo()
     {
         //TODO See MULE-9307 - re-add logic to get reply to destination for request-reply
-        return replyMessageSource.getCanonicalURI();
+        return replyMessageSource instanceof LegacyInboundEndpoint ? ((LegacyInboundEndpoint) replyMessageSource).getCanonicalURI() : null;
     }
 
     public void setMessageProcessor(MessageProcessor processor)

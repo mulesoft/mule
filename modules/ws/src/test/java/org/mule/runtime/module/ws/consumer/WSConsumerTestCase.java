@@ -83,22 +83,4 @@ public class WSConsumerTestCase extends AbstractMuleContextTestCase
 
         return wsConsumer;
     }
-
-    // private class TestEndpointFactory extends DefaultEndpointFactory
-    // {
-    //
-    // private DefaultOutboundEndpoint createdEndpoint = mock(DefaultOutboundEndpoint.class);
-    //
-    // @Override
-    // public OutboundEndpoint getOutboundEndpoint(EndpointBuilder builder) throws MuleException
-    // {
-    // return createdEndpoint;
-    // }
-    //
-    // public DefaultOutboundEndpoint getCreatedEndpoint()
-    // {
-    // return createdEndpoint;
-    // }
-    //
-    // }
 }

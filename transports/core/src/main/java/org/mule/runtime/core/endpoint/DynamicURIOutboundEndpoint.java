@@ -298,11 +298,4 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     {
         endpoint.setMessagingExceptionHandler(messagingExceptionHandler);
     }
-
-    @Override
-    public boolean mayReturnVoidEvent()
-    {
-        MessageExchangePattern exchangePattern = getExchangePattern();
-        return exchangePattern == null ? true : !exchangePattern.hasResponse();
-    }
 }

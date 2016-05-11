@@ -12,12 +12,16 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.RequestReplyReplierMessageProcessor;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transport.LegacyOutboundEndpoint;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
+import org.mule.runtime.core.routing.MessageFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,7 +107,9 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
                 nextProcessor = processorIterator.next();
             }
 
-            if (flowConstruct instanceof Flow && nextProcessor != null && processor.mayReturnVoidEvent())
+            if (flowConstruct instanceof Flow && nextProcessor != null
+                && !(processor instanceof Transformer || processor instanceof MessageFilter || processor instanceof Component
+                     || (processor instanceof LegacyOutboundEndpoint && !((LegacyOutboundEndpoint) processor).mayReturnVoidEvent())))
             {
                 copy = OptimizedRequestContext.criticalSetEvent(currentEvent);
             }

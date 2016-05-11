@@ -108,10 +108,4 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
      * Return the encoding returned by the transformer (if any).
      */
     String getEncoding();
-
-    @Override
-    default boolean mayReturnVoidEvent()
-    {
-        return false;
-    }
 }

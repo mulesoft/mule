@@ -188,10 +188,4 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
 
         LifecycleUtils.disposeIfNeeded(filter, LOGGER);
     }
-
-    @Override
-    public boolean mayReturnVoidEvent()
-    {
-        return false;
-    }
 }
