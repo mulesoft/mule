@@ -56,7 +56,7 @@
     <transports:endpoint name="testEPWithCS" address="test://test.queue2" exchange-pattern="one-way"/>
 
     <transports:endpoint name="endpointWithProps" address="test://endpointWithProps" exchange-pattern="one-way">
-        <spring:properties>
+        <properties>
             <spring:entry key="brand" value="Juicy Baby!"/>
             <spring:entry key="segments" value="9"/>
             <spring:entry key="radius" value="4.21"/>
@@ -80,7 +80,7 @@
                     <spring:value>prop6</spring:value>
                 </spring:list>
             </spring:entry>
-        </spring:properties>
+        </properties>
     </transports:endpoint>
 
     <spring:bean name="apple" class="org.mule.tck.testmodels.fruit.Apple"/>
@@ -114,7 +114,7 @@
     <flow name="msgInfoMappingTestComponent">
         <component class="org.mule.tck.testmodels.fruit.Apple"/>
         <transports:outbound-endpoint address="test://msgInfoMappingTestComponent"
-                                exchange-pattern="one-way" name="msgInfoMappingTestComponent-Out"/>
+                                exchange-pattern="one-way"/>
         <expression-message-info-mapping messageIdExpression="#[message.outboundProperties.id]"
                                               correlationIdExpression="#[message.outboundProperties.correlation]"/>
     </flow>
@@ -142,7 +142,7 @@
         </component>
         <choice>
             <when>
-                <transports:outbound-endpoint address="test://appleQ2" name="TestApple-Out" exchange-pattern="one-way">
+                <transports:outbound-endpoint address="test://appleQ2" exchange-pattern="one-way">
                     <transformer ref="TestCompressionTransformer"/>
                 </transports:outbound-endpoint>
                 <payload-type-filter expectedType="java.lang.String"/>

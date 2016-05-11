@@ -32,7 +32,7 @@
         <spring:constructor-arg>
             <spring:map>
                 <spring:entry key="test1" value="test1"/>
-                <spring: key="test2" value="test2"/>
+                <spring:entry key="test2" value="test2"/>
                 <spring:entry key="containerObject" value-ref="anApple"/>
                 <spring:entry key="osVersion" value="${os.version}"/>
                 <!-- no defaults -->
