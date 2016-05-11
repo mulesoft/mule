@@ -19,7 +19,7 @@
 
     <flow name="simpleTextFileStore">
         <idempotent-message-filter>
-            <simple-text-file-store name="the-store" directory="${java.io.tmpdir}" entryTTL="1000"
+            <simple-text-file-store directory="${java.io.tmpdir}" entryTTL="1000"
                 expirationInterval="2000" maxEntries="3000"/>
         </idempotent-message-filter>
     </flow>

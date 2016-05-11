@@ -33,7 +33,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
     public static final String MULE_DEFAULTS_CONFIG = "default-mule-config.xml";
     public static final String MULE_SPRING_CONFIG = "mule-spring-config.xml";
-    public static final String MULE_MINIMAL_SPRING_CONFIG = "minimal-mule-config.xml";
+    public static final String MULE_MINIMAL_CONFIG = "minimal-mule-config.xml";
+    public static final String MULE_MINIMAL_SPRING_CONFIG = "minimal-mule-config-beans.xml";
     public static final String MULE_REGISTRY_BOOTSTRAP_SPRING_CONFIG = "registry-bootstrap-mule-config.xml";
     public static final String MULE_DOMAIN_REGISTRY_BOOTSTRAP_SPRING_CONFIG = "registry-bootstrap-mule-domain-config.xml";
 
@@ -71,6 +72,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         {
             allResources.add(new ConfigResource(MULE_DOMAIN_REGISTRY_BOOTSTRAP_SPRING_CONFIG));
             allResources.add(new ConfigResource(MULE_MINIMAL_SPRING_CONFIG));
+            allResources.add(new ConfigResource(MULE_MINIMAL_CONFIG));
             allResources.add(new ConfigResource(MULE_SPRING_CONFIG));
             allResources.addAll(Arrays.asList(configResources));
         }
@@ -78,6 +80,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         {
             allResources.add(new ConfigResource(MULE_REGISTRY_BOOTSTRAP_SPRING_CONFIG));
             allResources.add(new ConfigResource(MULE_MINIMAL_SPRING_CONFIG));
+            allResources.add(new ConfigResource(MULE_MINIMAL_CONFIG));
             allResources.add(new ConfigResource(MULE_SPRING_CONFIG));
             allResources.add( new ConfigResource(MULE_DEFAULTS_CONFIG));
             allResources.addAll(Arrays.asList(configResources));

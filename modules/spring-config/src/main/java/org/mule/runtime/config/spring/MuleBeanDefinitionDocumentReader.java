@@ -6,6 +6,20 @@
  */
 package org.mule.runtime.config.spring;
 
+import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser.*;
+import org.mule.runtime.config.spring.dsl.processor.ApplicationConfig;
+import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
+import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
+import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
+import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
+import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
+import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.runtime.core.api.MuleRuntimeException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.DefaultBeanDefinitionDocumentReader;
 import org.springframework.beans.factory.xml.XmlReaderContext;
@@ -19,6 +33,16 @@ import org.w3c.dom.Element;
 public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocumentReader
 {
 
+    private final BeanDefinitionFactory beanDefinitionFactory;
+    private final XmlApplicationParser xmlApplicationParser = new XmlApplicationParser();
+    //This same instance is called several time to parse different XML files so a stack is needed to save previous state.
+    private final Stack<ApplicationModel> applicationModelStack = new Stack<>();
+
+    public MuleBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory)
+    {
+        this.beanDefinitionFactory = beanDefinitionFactory;
+    }
+
     @Override
     protected BeanDefinitionParserDelegate createDelegate(XmlReaderContext readerContext, Element root, BeanDefinitionParserDelegate parentDelegate)
     {
@@ -29,15 +53,12 @@ public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocum
 
     protected MuleHierarchicalBeanDefinitionParserDelegate createBeanDefinitionParserDelegate(XmlReaderContext readerContext)
     {
-        return new MuleHierarchicalBeanDefinitionParserDelegate(readerContext, this);
+        return new MuleHierarchicalBeanDefinitionParserDelegate(readerContext, this, () -> { return applicationModelStack.peek();}, beanDefinitionFactory, getElementsValidator());
     }
 
-    /* Keep backward compatibility with spring 3.0 */
-    protected BeanDefinitionParserDelegate createHelper(XmlReaderContext readerContext, Element root)
+    protected ElementValidator[] getElementsValidator()
     {
-        BeanDefinitionParserDelegate delegate = createBeanDefinitionParserDelegate(readerContext);
-        delegate.initDefaults(root);
-        return delegate;
+        return new ElementValidator[0];
     }
 
     /**
@@ -55,6 +76,28 @@ public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocum
         {
             super.parseBeanDefinitions(root, delegate);
         }
+    }
+
+    @Override
+    protected void preProcessXml(Element root)
+    {
+        try
+        {
+            List<ConfigLine> configLines = new ArrayList<>();
+            configLines.add(xmlApplicationParser.parse(root).get());
+            ApplicationConfig applicationConfig = new ApplicationConfig.Builder().addConfigFile(new ConfigFile(getConfigFileIdentifier(getReaderContext().getResource()), configLines)).build();
+            applicationModelStack.push(new ApplicationModel(applicationConfig));
+        }
+        catch (Exception e)
+        {
+            throw new MuleRuntimeException(e);
+        }
+    }
+
+    @Override
+    protected void postProcessXml(Element root)
+    {
+        applicationModelStack.pop();
     }
 
 }

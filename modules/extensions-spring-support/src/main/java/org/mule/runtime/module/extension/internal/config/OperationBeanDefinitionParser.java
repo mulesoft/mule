@@ -74,7 +74,6 @@ final class OperationBeanDefinitionParser extends BaseExtensionBeanDefinitionPar
                     .addConstructorArgValue(parseNestedOperations(element, parserContext))
                     .addConstructorArgReference(OBJECT_MULE_CONTEXT);
 
-            attachProcessorDefinition(parserContext, builder.getBeanDefinition());
         });
     }
 
@@ -152,35 +151,4 @@ final class OperationBeanDefinitionParser extends BaseExtensionBeanDefinitionPar
         return processors;
     }
 
-    private void attachProcessorDefinition(ParserContext parserContext, BeanDefinition definition)
-    {
-        MutablePropertyValues propertyValues = parserContext.getContainingBeanDefinition()
-                .getPropertyValues();
-        if (parserContext.getContainingBeanDefinition()
-                .getBeanClassName()
-                .equals(PollingMessageSourceFactoryBean.class.getName()))
-        {
-
-            propertyValues.addPropertyValue("messageProcessor", definition);
-        }
-        else
-        {
-            if (parserContext.getContainingBeanDefinition()
-                    .getBeanClassName()
-                    .equals(MessageEnricher.class.getName()))
-            {
-                propertyValues.addPropertyValue("enrichmentMessageProcessor", definition);
-            }
-            else
-            {
-                PropertyValue messageProcessors = propertyValues.getPropertyValue("messageProcessors");
-                if ((messageProcessors == null) || (messageProcessors.getValue() == null))
-                {
-                    propertyValues.addPropertyValue("messageProcessors", new ManagedList());
-                }
-                List listMessageProcessors = ((List) propertyValues.getPropertyValue("messageProcessors").getValue());
-                listMessageProcessors.add(definition);
-            }
-        }
-    }
 }

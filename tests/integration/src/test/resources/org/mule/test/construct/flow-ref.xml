@@ -50,7 +50,7 @@
     </flow>
 
     <sub-flow name="sub-flow-A">
-        <append-string-transformer name="t_sub-flow-A" message="A" />
+        <append-string-transformer message="A" />
     </sub-flow>
 
     <sub-flow name="sub-flow-B">

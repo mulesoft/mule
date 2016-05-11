@@ -2,10 +2,10 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:sec="http://www.springframework.org/schema/security"
+      xmlns:ss="http://www.springframework.org/schema/security"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
-      xmlns:spring-sec="http://www.mulesoft.org/schema/mule/spring-security"
+      xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
@@ -23,19 +23,19 @@
     <http:listener-config name="httpConfig" host="localhost" port="${port1}"/>
 
     <spring:beans>
-        <sec:authentication-manager alias="authenticationManager">
-            <sec:authentication-provider>
-                <sec:user-service id="userService">
-                    <sec:user name="ross" password="ross" authorities="ROLE_ADMIN" />
-                    <sec:user name="anon" password="anon" authorities="ROLE_ANONYMOUS" />
-                </sec:user-service>
-            </sec:authentication-provider>
-        </sec:authentication-manager>
+        <ss:authentication-manager alias="authenticationManager">
+            <ss:authentication-provider>
+                <ss:user-service id="userService">
+                    <ss:user name="ross" password="ross" authorities="ROLE_ADMIN" />
+                    <ss:user name="anon" password="anon" authorities="ROLE_ANONYMOUS" />
+                </ss:user-service>
+            </ss:authentication-provider>
+        </ss:authentication-manager>
     </spring:beans>
 
-    <spring-sec:security-manager>
-        <spring-sec:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
-    </spring-sec:security-manager>
+    <mule-ss:security-manager>
+        <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
+    </mule-ss:security-manager>
 
     <flow name="SecureUMO">
         <http:listener config-ref="httpsConfig" path="services/Echo/*" allowedMethods="GET, POST"/>

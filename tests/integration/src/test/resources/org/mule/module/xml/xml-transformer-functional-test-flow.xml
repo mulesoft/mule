@@ -60,7 +60,7 @@
                 <test:queue name="xml-xslt-out-string"/>
             </processor-chain>
             <processor-chain>
-                <transformer ref="xmlToDom "/>
+                <transformer ref="xmlToDom"/>
                 <test:queue name="xml-dom-out"/>
             </processor-chain>
             <flow-ref name="dom to xml"/>

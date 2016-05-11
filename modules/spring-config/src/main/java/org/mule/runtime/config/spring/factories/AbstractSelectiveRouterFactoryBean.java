@@ -7,6 +7,8 @@
 package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.routing.AbstractSelectiveRouter;
 import org.mule.runtime.core.routing.MessageProcessorFilterPair;
@@ -15,10 +17,11 @@ import java.util.Collection;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotatedObject implements FactoryBean
+public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotatedObject implements FactoryBean, MuleContextAware
 {
     private MessageProcessor defaultProcessor;
     private Collection<MessageProcessorFilterPair> conditionalMessageProcessors;
+    private MuleContext muleContext;
 
     public AbstractSelectiveRouterFactoryBean()
     {
@@ -40,6 +43,7 @@ public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotat
         final AbstractSelectiveRouter router = newAbstractSelectiveRouter();
         router.setAnnotations(getAnnotations());
         router.setDefaultRoute(defaultProcessor);
+        router.setMuleContext(muleContext);
 
         for (final MessageProcessorFilterPair mpfp : conditionalMessageProcessors)
         {
@@ -54,5 +58,11 @@ public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotat
     public boolean isSingleton()
     {
         return true;
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 }

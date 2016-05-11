@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class RedeliveryExceeded implements MessageProcessor, FlowConstructAware, Initialisable
+public class RedeliveryExceeded implements FlowConstructAware, Initialisable
 {
     private List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList<MessageProcessor>();
     private MessageProcessorChain configuredMessageProcessors;
@@ -59,7 +59,6 @@ public class RedeliveryExceeded implements MessageProcessor, FlowConstructAware,
         }
     }
 
-    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleEvent result = event;

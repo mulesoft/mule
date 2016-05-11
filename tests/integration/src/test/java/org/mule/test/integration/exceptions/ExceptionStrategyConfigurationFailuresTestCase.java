@@ -115,12 +115,6 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     }
 
     @Test(expected = ConfigurationException.class)
-    public void testChoiceExceptionStrategyWithMultipleHandleRedeliveryExceptionStrategiesWithGlobalAndDefault() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/choice-exception-strategy-multiple-rollback-global.xml");
-    }
-
-    @Test(expected = ConfigurationException.class)
     public void testCatchExceptionStrategyWithWhenWithoutChoice() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/when-without-choice-in-catch-es.xml");

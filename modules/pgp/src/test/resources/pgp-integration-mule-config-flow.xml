@@ -33,8 +33,8 @@
 
 
     <flow name="pgpEncryptProcessor">
-        <encrypt-transformer name="pgpEncrypt" strategy-ref="keyBasedEncryptionStrategy" />
-        <decrypt-transformer name="pgpDecrypt" strategy-ref="keyBasedEncryptionStrategy" />
+        <encrypt-transformer strategy-ref="keyBasedEncryptionStrategy" />
+        <decrypt-transformer strategy-ref="keyBasedEncryptionStrategy" />
         <test:queue name="out"/>
     </flow>
 

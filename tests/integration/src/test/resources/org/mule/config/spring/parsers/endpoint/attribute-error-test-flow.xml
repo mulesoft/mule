@@ -11,7 +11,7 @@
     <spring:bean name="bar" class="java.lang.Object"/>
 
     <flow name="service">
-        <parsers-test:addressed-child-endpoint address="foo" ref="bar" name="error"/>
+        <parsers-test:addressed-child-endpoint address="foo" ref="bar"/>
         <echo-component/>
     </flow>   
 

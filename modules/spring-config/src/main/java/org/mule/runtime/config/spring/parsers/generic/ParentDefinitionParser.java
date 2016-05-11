@@ -14,6 +14,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.w3c.dom.Element;
 
@@ -68,7 +69,7 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
     }
 
     @Override
-    protected void processMetadataAnnotations(Element element, ParserContext context, BeanDefinitionBuilder builder)
+    protected void processMetadataAnnotations(Element element, String configFileIdentifier, BeanDefinitionBuilder builder)
     {
         // Nothing to do
         // We don't want annotations from inner elements to override the annotations from its parent element.

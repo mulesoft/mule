@@ -7,7 +7,7 @@
 
     <flow name="EchoService">
         <echo-component />
-        <custom-transformer name="LifecycleTrackerTransformer"
+        <custom-transformer
             class="org.mule.test.integration.transformer.LifecycleTrackerTransformer">
             <spring:property name="property" value="ltt" />
         </custom-transformer>

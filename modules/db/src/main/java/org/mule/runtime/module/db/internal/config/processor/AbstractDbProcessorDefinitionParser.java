@@ -17,6 +17,7 @@ import org.mule.runtime.core.util.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.core.io.Resource;
 import org.w3c.dom.Element;
 
 public abstract class AbstractDbProcessorDefinitionParser extends AbstractHierarchicalDefinitionParser
@@ -40,7 +41,8 @@ public abstract class AbstractDbProcessorDefinitionParser extends AbstractHierar
         doParseElement(element, context, builder);
 
         BeanAssembler assembler = getBeanAssembler(element, builder);
-        processMetadataAnnotations(element, context, builder);
+        Resource resource = context.getReaderContext().getResource();
+        processMetadataAnnotations(element, getConfigFileIdentifier(resource), builder);
         assembler.insertBeanInTarget("messageProcessor");
     }
 

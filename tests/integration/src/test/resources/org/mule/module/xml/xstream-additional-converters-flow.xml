@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <mxml:xml-to-object-transformer name="XmlToObject">
-        <mxml:alias name="test-bean" class="org.mule.runtime.module.xml.functional.XStreamAdditionalConvertersTestCase$TestBean"/>
-        <mxml:converter class="com.thoughtworks.xstream.converters.extended.ISO8601DateConverter"/>
-    </mxml:xml-to-object-transformer>
+    <mulexml:xml-to-object-transformer name="XmlToObject">
+        <mulexml:alias name="test-bean" class="org.mule.runtime.module.xml.functional.XStreamAdditionalConvertersTestCase$TestBean"/>
+        <mulexml:converter class="com.thoughtworks.xstream.converters.extended.ISO8601DateConverter"/>
+    </mulexml:xml-to-object-transformer>
 
 
     <flow name="ObjectToXml">
