@@ -10,16 +10,16 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerHeadersTestCase extends FunctionalTestCase
+public class HttpListenerHeadersTestCase extends AbstractHttpTestCase
 {
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");

@@ -7,10 +7,9 @@
 package org.mule.extension.http.internal.request;
 
 import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 
@@ -20,8 +19,8 @@ public class HttpRequestBuilder
     private String path;
     private String uri;
     private String method;
-    private Map<String, String> headers;
-    private Map<String, String> queryParams;
+    private ParameterMap headers;
+    private ParameterMap queryParams;
     private HttpEntity entity;
 
     public HttpRequestBuilder setUri(String uri)
@@ -37,7 +36,7 @@ public class HttpRequestBuilder
         return this;
     }
 
-    public HttpRequestBuilder setHeaders(Map headers)
+    public HttpRequestBuilder setHeaders(ParameterMap headers)
     {
         this.headers = headers;
         return this;
@@ -61,7 +60,7 @@ public class HttpRequestBuilder
         return headers;
     }
 
-    public HttpRequestBuilder setQueryParams(Map queryParams)
+    public HttpRequestBuilder setQueryParams(ParameterMap queryParams)
     {
         this.queryParams = queryParams;
         return this;
@@ -75,7 +74,7 @@ public class HttpRequestBuilder
 
     public HttpRequest build()
     {
-        return new DefaultHttpRequest(uri, path, method, (headers == null) ? null : ImmutableMap.copyOf(headers), queryParams == null ? queryParams : ImmutableMap.copyOf(queryParams), entity);
+        return new DefaultHttpRequest(uri, path, method, (headers == null) ? null : headers.toImmutableParameterMap(), queryParams == null ? queryParams : queryParams.toImmutableParameterMap(), entity);
 
     }
 

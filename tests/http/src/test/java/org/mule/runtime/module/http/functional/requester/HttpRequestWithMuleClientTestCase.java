@@ -15,21 +15,21 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.runtime.module.http.api.requester.HttpStreamingType.NEVER;
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfigBuilder;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
 import java.util.concurrent.TimeoutException;
@@ -41,7 +41,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class HttpRequestWithMuleClientTestCase extends FunctionalTestCase
+@Ignore("MULE-9817")
+public class HttpRequestWithMuleClientTestCase extends AbstractHttpTestCase
 {
 
     public static final String PUT_HTTP_METHOD = "PUT";

@@ -40,6 +40,8 @@ import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -58,6 +60,7 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
     private HttpListenerRegistry httpListenerRegistry = new HttpListenerRegistry();
     private ThreadingProfile workerThreadingProfile;
     private HttpServerManager httpServerManager;
+    private List<WorkManager> workManagers = new LinkedList<>();
 
     private MuleContext muleContext;
     private AtomicBoolean initialized = new AtomicBoolean(false);
@@ -101,6 +104,7 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
     @Override
     public synchronized void dispose()
     {
+        workManagers.forEach(workManager -> workManager.dispose());
         httpServerManager.dispose();
     }
 
@@ -129,6 +133,7 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
         try
         {
             workManager.start();
+            workManagers.add(workManager);
         }
         catch (MuleException e)
         {

@@ -8,6 +8,7 @@ package org.mule.extension.http.api.listener.builder;
 
 import static org.mule.extension.http.api.HttpStreamingType.ALWAYS;
 import static org.mule.extension.http.api.HttpStreamingType.AUTO;
+import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
@@ -18,7 +19,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.transformer.types.MimeTypes;
@@ -43,6 +43,7 @@ import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,13 +63,13 @@ public class HttpResponseBuilder extends HttpMessageBuilder
      */
     @Parameter
     @Optional
-    private Integer statusCode;
+    private Function<MuleEvent, Integer> statusCode;
     /**
      * HTTP reason phrase the response should have.
      */
     @Parameter
     @Optional
-    private String reasonPhrase;
+    private Function<MuleEvent, String> reasonPhrase;
 
     private HttpStreamingType responseStreaming = AUTO;
     private boolean multipartEntityWithNoMultipartContentyTypeWarned;
@@ -79,12 +80,12 @@ public class HttpResponseBuilder extends HttpMessageBuilder
     {
         final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
 
-        if (httpResponseHeaderBuilder.getHeader(MuleProperties.CONTENT_TYPE_PROPERTY) != null)
+        if (!headers.containsKey(CONTENT_TYPE_PROPERTY))
         {
             DataType<?> dataType = event.getMessage().getDataType();
             if (!MimeTypes.ANY.equals(dataType.getMimeType()))
             {
-                httpResponseHeaderBuilder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
+                httpResponseHeaderBuilder.addHeader(CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
             }
         }
 
@@ -184,11 +185,11 @@ public class HttpResponseBuilder extends HttpMessageBuilder
 
         if (statusCode != null)
         {
-            httpResponseBuilder.setStatusCode(statusCode);
+            httpResponseBuilder.setStatusCode(statusCode.apply(event));
         }
         if (reasonPhrase != null)
         {
-            httpResponseBuilder.setReasonPhrase(reasonPhrase);
+            httpResponseBuilder.setReasonPhrase(reasonPhrase.apply(event));
         }
         httpResponseBuilder.setEntity(httpEntity);
         return httpResponseBuilder.build();

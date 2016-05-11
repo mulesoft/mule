@@ -6,14 +6,17 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
@@ -33,6 +36,9 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Component that transforms an HTTP request to a proper {@link MuleMessage}.
  *
@@ -40,10 +46,41 @@ import javax.activation.DataHandler;
  */
 public class HttpRequestToMuleMessage
 {
+    private static Logger logger = LoggerFactory.getLogger(HttpRequestToMuleMessage.class);
 
     public static MuleMessage transform(final HttpRequestContext requestContext, final MuleContext muleContext, Boolean parseRequest, ListenerPath listenerPath) throws HttpRequestParsingException
     {
         final HttpRequest request = requestContext.getRequest();
+        DataType dataType = DataTypeFactory.create(Object.class);
+        final String contentTypeValue = request.getHeaderValueIgnoreCase(CONTENT_TYPE);
+        MediaType mediaType = null;
+        String encoding = null;
+        if (contentTypeValue != null)
+        {
+            try
+            {
+                mediaType = MediaType.parse(contentTypeValue);
+                encoding = mediaType.charset().isPresent() ? mediaType.charset().get().name() : Charset.defaultCharset().name();
+                dataType.setMimeType(mediaType.toString());
+                dataType.setEncoding(encoding);
+            }
+            catch (IllegalArgumentException e)
+            {
+                //need to support invalid Content-Types
+                if (Boolean.parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType")))
+                {
+                    throw e;
+                }
+                else
+                {
+                    encoding = Charset.defaultCharset().name();
+                    logger.warn(String.format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), contentTypeValue, e.getMessage()));
+                    logger.warn(String.format("Using default encoding: %s", encoding));
+                    dataType.setEncoding(encoding);
+                }
+            }
+        }
+
         final Map<String, DataHandler> parts = new HashMap<>();
         Object payload = NullPayload.getInstance();
         if (parseRequest)
@@ -57,11 +94,8 @@ public class HttpRequestToMuleMessage
                 }
                 else
                 {
-                    final String contentTypeValue = request.getHeaderValueIgnoreCase(CONTENT_TYPE);
                     if (contentTypeValue != null)
                     {
-                        final MediaType mediaType = MediaType.parse(contentTypeValue);
-                        String encoding = mediaType.charset().isPresent() ? mediaType.charset().get().name() : Charset.defaultCharset().name();
                         if ((mediaType.type() + "/" + mediaType.subtype()).equals(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
                         {
                             try
@@ -97,6 +131,6 @@ public class HttpRequestToMuleMessage
         HttpRequestAttributes attributes = new HttpRequestAttributesBuilder().setRequestContext(requestContext)
                 .setListenerPath(listenerPath).setParts(parts).build();
 
-        return new DefaultMuleMessage(payload, null, attributes, muleContext);
+        return new DefaultMuleMessage(payload, dataType, attributes, muleContext);
     }
 }

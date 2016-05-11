@@ -28,9 +28,11 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("Currently not supported.")
 public class HttpListenerGlobalResponseBuilderTestCase extends FunctionalTestCase
 {
 

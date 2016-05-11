@@ -8,7 +8,7 @@ package org.mule.runtime.module.http.functional.listener;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpAllInterfacesTestCase extends FunctionalTestCase
+public class HttpAllInterfacesTestCase extends AbstractHttpTestCase
 {
 
     private static final String PATH = "flowA";

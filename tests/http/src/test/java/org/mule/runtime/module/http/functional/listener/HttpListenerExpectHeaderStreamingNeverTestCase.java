@@ -15,10 +15,10 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CONTINUE;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class HttpListenerExpectHeaderStreamingNeverTestCase extends FunctionalTestCase
+public class HttpListenerExpectHeaderStreamingNeverTestCase extends AbstractHttpTestCase
 {
 
     private static final String HTTP_11 = "HTTP/1.1";

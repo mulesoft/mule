@@ -11,11 +11,11 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.api.listener.HttpListener;
-import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
+import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationProvider;
+import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -24,11 +24,12 @@ import java.net.ConnectException;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class HttpListenerLifecycleTestCase extends FunctionalTestCase
+public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase
 {
 
     @Rule
@@ -47,7 +48,7 @@ public class HttpListenerLifecycleTestCase extends FunctionalTestCase
     @Test
     public void stoppedListenerReturns503() throws Exception
     {
-        HttpListener httpListener = (HttpListener) ((Flow) getFlowConstruct("testPathFlow")).getMessageSource();
+        ExtensionMessageSource httpListener = (ExtensionMessageSource) ((Flow) getFlowConstruct("testPathFlow")).getMessageSource();
         httpListener.stop();
         final Response response = Request.Get(getLifecycleConfigUrl("/path/subpath")).execute();
         final HttpResponse returnResponse = response.returnResponse();
@@ -65,54 +66,59 @@ public class HttpListenerLifecycleTestCase extends FunctionalTestCase
     @Test
     public void stopOneListenerDoesNotAffectAnother() throws Exception
     {
-        HttpListener httpListener = (HttpListener) ((Flow) getFlowConstruct("testPathFlow")).getMessageSource();
+        ExtensionMessageSource httpListener = (ExtensionMessageSource) ((Flow) getFlowConstruct("testPathFlow")).getMessageSource();
         httpListener.stop();
-        callAndAssertResponseFromUnaffectedListener();
+        callAndAssertResponseFromUnaffectedListener(getLifecycleConfigUrl("/path/catch"), "catchAll");
+        httpListener.start();
     }
 
     @Test
     public void restartListener() throws Exception
     {
-        HttpListener httpListener = (HttpListener) ((Flow) getFlowConstruct("testPathFlow")).getMessageSource();
+        ExtensionMessageSource httpListener = (ExtensionMessageSource) ((Flow) getFlowConstruct("testPathFlow")).getMessageSource();
         httpListener.stop();
         httpListener.start();
         final Response response = Request.Get(getLifecycleConfigUrl("/path/subpath")).execute();
-        final HttpResponse httoResponse = response.returnResponse();
-        assertThat(httoResponse.getStatusLine().getStatusCode(), is(200));
-        assertThat(IOUtils.toString(httoResponse.getEntity().getContent()), is("ok"));
+        final HttpResponse httpResponse = response.returnResponse();
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("ok"));
     }
 
     @Test
     public void disposeListenerReturns404() throws Exception
     {
-        HttpListener httpListener = (HttpListener) ((Flow) getFlowConstruct("catchAllWithinTestPathFlow")).getMessageSource();
+        ExtensionMessageSource httpListener = (ExtensionMessageSource) ((Flow) getFlowConstruct("catchAllWithinTestPathFlow")).getMessageSource();
         httpListener.dispose();
         final Response response = Request.Get(getLifecycleConfigUrl("/path/somepath")).execute();
-        final HttpResponse httoResponse = response.returnResponse();
-        assertThat(httoResponse.getStatusLine().getStatusCode(), is(404));
+        final HttpResponse httpResponse = response.returnResponse();
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(404));
     }
 
+    @Ignore("MULE-9878")
     @Test
     public void stoppedListenerConfigDoNotListen() throws Exception
     {
-        HttpListenerConfig httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
+        LifecycleAwareConfigurationProvider httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
         httpListenerConfig.stop();
         expectedException.expect(ConnectException.class);
         Request.Get(getLifecycleConfigUrl("/path/subpath")).execute();
+        httpListenerConfig.start();
     }
 
+    @Ignore("MULE-9878")
     @Test
     public void stopOneListenerConfigDoesNotAffectAnother() throws Exception
     {
-        HttpListenerConfig httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
+        LifecycleAwareConfigurationProvider httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
         httpListenerConfig.stop();
-        callAndAssertResponseFromUnaffectedListener();
+        callAndAssertResponseFromUnaffectedListener(getUnchangedConfigUrl(), "works");
     }
 
+    @Ignore("MULE-9878")
     @Test
     public void restartListenerConfig() throws Exception
     {
-        HttpListenerConfig httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
+        LifecycleAwareConfigurationProvider httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
         httpListenerConfig.stop();
         httpListenerConfig.start();
         final Response response = Request.Get(getLifecycleConfigUrl("/path/anotherPath")).execute();
@@ -121,12 +127,12 @@ public class HttpListenerLifecycleTestCase extends FunctionalTestCase
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("catchAll"));
     }
 
-    private void callAndAssertResponseFromUnaffectedListener() throws IOException
+    private void callAndAssertResponseFromUnaffectedListener(String url, String expectedResponse) throws IOException
     {
-        final Response response = Request.Get(getUnchangedConfigUrl()).execute();
+        final Response response = Request.Get(url).execute();
         final HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("works"));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(expectedResponse));
     }
 
     private String getLifecycleConfigUrl(String path)

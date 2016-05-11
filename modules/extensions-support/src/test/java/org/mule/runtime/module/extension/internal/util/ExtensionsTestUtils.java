@@ -31,6 +31,7 @@ import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsT
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.Collection;
@@ -137,8 +138,13 @@ public abstract class ExtensionsTestUtils
 
     public static <C> C getConfigurationFromRegistry(String key, MuleEvent muleEvent) throws Exception
     {
+        return (C) getConfigurationInstanceFromRegistry(key, muleEvent).getValue();
+    }
+
+    public static ConfigurationInstance getConfigurationInstanceFromRegistry(String key, MuleEvent muleEvent) throws Exception
+    {
         ExtensionManager extensionManager = muleEvent.getMuleContext().getExtensionManager();
-        return (C) extensionManager.getConfiguration(key, muleEvent).getValue();
+        return extensionManager.getConfiguration(key, muleEvent);
     }
 
     /**

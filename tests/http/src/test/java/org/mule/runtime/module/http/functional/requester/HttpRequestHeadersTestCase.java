@@ -18,7 +18,6 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
-
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Arrays;
@@ -27,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -70,6 +70,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
         assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
     }
 
+    @Ignore("Not currently supported.")
     @Test
     public void overridesHeaders() throws Exception
     {
@@ -82,20 +83,6 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
 
         final Collection<String> values = headers.get("testName1");
         assertThat(values, Matchers.containsInAnyOrder(Arrays.asList("testValue1", "testValueNew").toArray(new String[2])));
-        assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
-    }
-
-    @Test
-    public void sendsOutboundPropertiesAsHeaders() throws Exception
-    {
-        Map<String, String> params = new HashMap<>();
-        params.put("testName1", "testValue1");
-        flowRunner("headerMap").withPayload(TEST_MESSAGE)
-                               .withFlowVariable("headers", params)
-                               .withOutboundProperty("testName2", "testValue2")
-                               .run();
-
-        assertThat(getFirstReceivedHeader("testName1"), equalTo("testValue1"));
         assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
     }
 

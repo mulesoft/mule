@@ -9,21 +9,18 @@ package org.mule.runtime.module.http.functional.listener;
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
-import org.mule.functional.functional.EventCallback;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayInputStream;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.InputStreamEntity;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerRequestStreamingTestCase extends FunctionalTestCase
+public class HttpListenerRequestStreamingTestCase extends AbstractHttpTestCase
 {
 
     private static final String LARGE_MESSAGE = RandomStringUtils.randomAlphanumeric(100 * 1024);
@@ -42,14 +39,7 @@ public class HttpListenerRequestStreamingTestCase extends FunctionalTestCase
     public void listenerReceivedChunkedRequest() throws Exception
     {
         String url = format("http://localhost:%s/", listenPort.getNumber());
-        getFunctionalTestComponent("defaultFlow").setEventCallback(new EventCallback()
-        {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                flowReceivedMessage = context.getMessageAsString();
-            }
-        });
+        getFunctionalTestComponent("defaultFlow").setEventCallback((context, component) -> flowReceivedMessage = context.getMessageAsString());
         testChunkedRequestContentAndResponse(url);
         //We check twice to verify that the chunked request is consumed completely. Otherwise second request would fail
         testChunkedRequestContentAndResponse(url);
@@ -57,8 +47,7 @@ public class HttpListenerRequestStreamingTestCase extends FunctionalTestCase
 
     private void testChunkedRequestContentAndResponse(String url) throws Exception
     {
-        final HttpRequestOptions requestOptions = newOptions().method(POST.name()).build();
-        muleContext.getClient().send(url, getTestMuleMessage(new ByteArrayInputStream(LARGE_MESSAGE.getBytes())), requestOptions);
+        Request.Post(url).body(new InputStreamEntity(new ByteArrayInputStream(LARGE_MESSAGE.getBytes()))).connectTimeout(1000).execute();
         assertThat(flowReceivedMessage, is(LARGE_MESSAGE));
     }
 

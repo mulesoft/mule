@@ -1,33 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn" xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:request-config name="ntlmConfigWithDomain" host="localhost" port="${httpPort}">
-        <http:ntlm-authentication username="Zaphod" password="Beeblebrox" domain="Ursa-Minor"/>
-    </http:request-config>
+    <httpn:request-config name="ntlmConfigWithDomain">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+        <httpn:authentication>
+            <httpn:ntlm-authentication username="Zaphod" password="Beeblebrox" domain="Ursa-Minor"/>
+        </httpn:authentication>
+    </httpn:request-config>
 
     <flow name="ntlmAuthRequestWithDomain">
-        <http:request config-ref="ntlmConfigWithDomain" path="" method="GET"/>
+        <httpn:request config-ref="ntlmConfigWithDomain" path="/" method="GET" key="ANY"/>
     </flow>
 
-    <http:request-config name="ntlmConfigWithoutDomain" host="localhost" port="${httpPort}">
-        <http:ntlm-authentication username="Zaphod" password="Beeblebrox"/>
-    </http:request-config>
+    <httpn:request-config name="ntlmConfigWithoutDomain">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+        <httpn:authentication>
+            <httpn:ntlm-authentication username="Zaphod" password="Beeblebrox"/>
+        </httpn:authentication>
+    </httpn:request-config>
 
     <flow name="ntlmAuthRequestWithoutDomain">
-        <http:request config-ref="ntlmConfigWithoutDomain" path="" method="GET"/>
+        <httpn:request config-ref="ntlmConfigWithoutDomain" path="/" method="GET" key="ANY"/>
     </flow>
 
-    <http:request-config name="ntlmConfigWithWorkstation" host="localhost" port="${httpPort}">
-        <http:ntlm-authentication username="Zaphod" password="Beeblebrox" domain="Ursa-Minor" workstation="LightCity"/>
-    </http:request-config>
+    <httpn:request-config name="ntlmConfigWithWorkstation">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+        <httpn:authentication>
+            <httpn:ntlm-authentication username="Zaphod" password="Beeblebrox" domain="Ursa-Minor" workstation="LightCity"/>
+        </httpn:authentication>
+    </httpn:request-config>
 
     <flow name="ntlmAuthRequestWithWorkstation">
-        <http:request config-ref="ntlmConfigWithWorkstation" path="" method="GET"/>
+        <httpn:request config-ref="ntlmConfigWithWorkstation" path="/" method="GET" key="ANY"/>
     </flow>
 
 </mule>

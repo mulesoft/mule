@@ -1,37 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:request-config name="requestConfig" host="localhost" port="${httpPort}" />
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
 
     <flow name="default">
-        <http:request config-ref="requestConfig" path="status">
-            <http:request-builder>
-                <http:query-param paramName="code" value="#[code]" />
-            </http:request-builder>
-        </http:request>
+        <httpn:request config-ref="requestConfig" path="status" key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder>
+                    <httpn:query-params>
+                        <httpn:query-param key="code" value="#[code]" />
+                    </httpn:query-params>
+                </httpn:requester-request-builder>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 
     <flow name="success">
-        <http:request config-ref="requestConfig" path="status">
-            <http:request-builder>
-                <http:query-param paramName="code" value="#[code]" />
-            </http:request-builder>
-            <http:success-status-code-validator values="409" />
-        </http:request>
+        <httpn:request config-ref="requestConfig" path="status" key="ANY">
+            <httpn:response-validator>
+                <httpn:success-status-code-validator values="409" />
+            </httpn:response-validator>
+            <httpn:request-builder>
+                <httpn:requester-request-builder>
+                    <httpn:query-params>
+                        <httpn:query-param key="code" value="#[code]" />
+                    </httpn:query-params>
+                </httpn:requester-request-builder>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 
     <flow name="failure">
-        <http:request config-ref="requestConfig" path="status">
-            <http:request-builder>
-                <http:query-param paramName="code" value="#[code]" />
-            </http:request-builder>
-            <http:failure-status-code-validator values="201" />
-        </http:request>
+        <httpn:request config-ref="requestConfig" path="status" key="ANY">
+            <httpn:response-validator>
+                <httpn:failure-status-code-validator values="201" />
+            </httpn:response-validator>
+            <httpn:request-builder>
+                <httpn:requester-request-builder>
+                    <httpn:query-params>
+                        <httpn:query-param key="code" value="#[code]" />
+                    </httpn:query-params>
+                </httpn:requester-request-builder>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 
 

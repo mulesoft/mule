@@ -16,12 +16,11 @@ import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
-
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -34,7 +33,7 @@ import org.apache.http.entity.StringEntity;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerContentTypeTestCase extends FunctionalTestCase
+public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase
 {
 
     private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=UTF-8";
@@ -65,7 +64,7 @@ public class HttpListenerContentTypeTestCase extends FunctionalTestCase
     public void rejectsInvalidContentTypeWithoutBody() throws Exception
     {
         Request request = Request.Post(getUrl()).addHeader(CONTENT_TYPE, "application");
-        testRejectContentType(request, "Invalid Content-Type");
+        testRejectContentType(request, "Could not parse");
     }
 
     @Test

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase
@@ -44,6 +45,7 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase
         assertThat(uri, equalTo("/testPath?testName1=testValue1&testName2=testValue2"));
     }
 
+    @Ignore("Not currently supported.")
     @Test
     public void queryParamsOverride() throws Exception
     {

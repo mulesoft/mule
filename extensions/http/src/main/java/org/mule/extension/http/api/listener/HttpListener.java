@@ -7,7 +7,6 @@
 package org.mule.extension.http.api.listener;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
@@ -23,12 +22,12 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -71,7 +70,7 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 @Alias("listener")
-public class HttpListener extends Source<Object, HttpRequestAttributes> implements Initialisable
+public class HttpListener extends Source<Object, HttpRequestAttributes> implements Initialisable, Disposable
 {
     private static final Logger logger = LoggerFactory.getLogger(HttpListener.class);
     private static final String SERVER_PROBLEM = "Server encountered a problem";
@@ -108,7 +107,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
      * no parsing will be done, and the payload will always contain the raw contents of the HTTP request.
      */
     @Parameter
-    @Expression(NOT_SUPPORTED)
+    @Optional
     private Boolean parseRequest;
 
     @Parameter
@@ -128,7 +127,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
     private MuleContext muleContext;
 
     @Override
-    public void initialise() throws InitialisationException
+    public synchronized void initialise() throws InitialisationException
     {
         if (allowedMethods != null)
         {
@@ -150,12 +149,6 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
 
         initialiseIfNeeded(errorResponseBuilder);
 
-    }
-
-    @Override
-    public void start()
-    {
-        //TODO: MULE-9733 Move this back to the initialise method
         path = HttpParser.sanitizePathWithStartSlash(path);
         listenerPath = config.getFullListenerPath(path);
         path = listenerPath.getResolvedPath();
@@ -169,18 +162,29 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e);
+            throw new InitialisationException(e, this);
         }
+    }
+
+    @Override
+    public synchronized void start()
+    {
         requestHandlerManager.start();
     }
 
     @Override
-    public void stop()
+    public synchronized void stop()
     {
         if (requestHandlerManager != null)
         {
             requestHandlerManager.stop();
         }
+    }
+
+    @Override
+    public void dispose()
+    {
+        requestHandlerManager.dispose();
     }
 
     private RequestHandler getRequestHandler()

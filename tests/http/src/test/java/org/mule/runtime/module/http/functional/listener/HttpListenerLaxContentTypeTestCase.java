@@ -9,29 +9,25 @@ package org.mule.runtime.module.http.functional.listener;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.equalToIgnoringCase;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
-
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerLaxContentTypeTestCase extends FunctionalTestCase
+public class HttpListenerLaxContentTypeTestCase extends AbstractHttpTestCase
 {
 
     @Rule
@@ -53,11 +49,8 @@ public class HttpListenerLaxContentTypeTestCase extends FunctionalTestCase
     @Test
     public void returnsInvalidContentTypeInResponse() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send(getUrlForIvalid(), TEST_MESSAGE, null);
-
-        assertInvalidContentTypeProperty(response);
+        HttpResponse response = Request.Post(getUrlForInvalid()).execute().returnResponse();
+        assertInvalidContentTypeHeader(response);
     }
 
     private void testIgnoreInvalidContentType(Request request, String expectedMessage) throws IOException
@@ -74,14 +67,15 @@ public class HttpListenerLaxContentTypeTestCase extends FunctionalTestCase
         return String.format("http://localhost:%s/testInput", httpPort.getValue());
     }
 
-    private String getUrlForIvalid()
+    private String getUrlForInvalid()
     {
         return String.format("http://localhost:%s/testInputInvalid", httpPort.getValue());
     }
 
-    private void assertInvalidContentTypeProperty(MuleMessage response)
+    private void assertInvalidContentTypeHeader(HttpResponse response)
     {
-        assertThat(response.getInboundPropertyNames(), hasItem(equalToIgnoringCase(MuleProperties.CONTENT_TYPE_PROPERTY)));
-        assertThat((String) response.getInboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY), equalTo("invalidMimeType"));
+        Header contentTypeHeader = response.getFirstHeader(CONTENT_TYPE_PROPERTY);
+        assertThat(contentTypeHeader, is(notNullValue()));
+        assertThat(contentTypeHeader.getValue(), is("invalidMimeType"));
     }
 }

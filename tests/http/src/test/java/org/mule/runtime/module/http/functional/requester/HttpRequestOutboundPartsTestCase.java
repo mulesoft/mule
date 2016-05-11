@@ -10,24 +10,24 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.core.transformer.types.MimeTypes.HTML;
 import static org.mule.runtime.core.transformer.types.MimeTypes.TEXT;
-
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.runtime.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
+import org.mule.extension.http.api.HttpPart;
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.message.ds.ByteArrayDataSource;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,10 +38,12 @@ import org.eclipse.jetty.util.MultiPartInputStreamParser;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestTestCase
+public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCase
 {
+
     private static final String TEST_FILE_NAME = "auth/realm.properties";
     private static final String TEST_PART_NAME = "partName";
+    public static final String PARTS = "parts";
 
     @Rule
     public SystemProperty sendBufferSize = new SystemProperty("sendBufferSize", "128");
@@ -49,10 +51,11 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     @Override
     protected String getConfigFile()
     {
-        return "http-request-outbound-attachments-config.xml";
+        return "http-request-outbound-parts-config.xml";
     }
 
     private Collection<Part> parts;
+    private List<HttpPart> partsToSend = new LinkedList<>();
     private String requestContentType;
 
     @Override
@@ -62,44 +65,62 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     }
 
     @Test
-    public void payloadIsIgnoredWhenSendingOutboundAttachments() throws Exception
+    public void payloadIsIgnoredWhenSendingParts() throws Exception
     {
+        addPartToSend("part1", "Contents 1", TEXT);
+        addPartToSend("part2", "Contents 2", HTML);
+
         flowRunner("requestFlow").withPayload(TEST_MESSAGE)
-                                 .withOutboundAttachment("attachment1", "Contents 1", TEXT)
-                                 .withOutboundAttachment("attachment2", "Contents 2", HTML)
+                                 .withFlowVariable(PARTS, partsToSend)
                                  .run();
 
         assertThat(requestContentType, startsWith("multipart/form-data; boundary="));
         assertThat(parts.size(), equalTo(2));
 
-        assertPart("attachment1", TEXT, "Contents 1");
-        assertPart("attachment2", HTML, "Contents 2");
+        assertPart("part1", TEXT, "Contents 1");
+        assertPart("part2", HTML, "Contents 2");
     }
 
     @Test
-    public void outboundAttachmentsCustomContentType() throws Exception
+    public void partsAreSent() throws Exception
     {
+        flowRunner("requestPartFlow").withPayload(TEST_MESSAGE)
+                .run();
+
+        assertThat(requestContentType, startsWith("multipart/form-data; boundary="));
+        assertThat(parts.size(), equalTo(2));
+
+        assertPart("part1", TEXT, "content 1");
+        assertPart("part2", TEXT, "content 2");
+        assertFormDataContentDisposition(getPart("part2"), "part2", "myPart.txt");
+    }
+
+    @Test
+    public void partsCustomContentType() throws Exception
+    {
+        addPartToSend("part1", "Contents 1", TEXT);
+        addPartToSend("part2", "Contents 2", HTML);
+
         flowRunner("requestFlow").withPayload(TEST_MESSAGE)
-                                 .withOutboundAttachment("attachment1", "Contents 1", TEXT)
-                                 .withOutboundAttachment("attachment2", "Contents 2", HTML)
+                                 .withFlowVariable(PARTS, partsToSend)
                                  .withOutboundProperty("Content-Type", "multipart/form-data2")
                                  .run();
 
         assertThat(requestContentType, startsWith("multipart/form-data2; boundary="));
         assertThat(parts.size(), equalTo(2));
 
-        assertPart("attachment1", TEXT, "Contents 1");
-        assertPart("attachment2", HTML, "Contents 2");
+        assertPart("part1", TEXT, "Contents 1");
+        assertPart("part2", HTML, "Contents 2");
     }
 
     @Test
-    public void fileOutboundAttachmentSetsContentDispositionWithFileName() throws Exception
+    public void filePartSetsContentDispositionWithFileName() throws Exception
     {
         File file = new File(IOUtils.getResourceAsUrl(TEST_FILE_NAME, getClass()).getPath());
-        DataHandler dataHandler = new DataHandler(new FileDataSource(file));
+        addPartToSend(TEST_PART_NAME, file);
 
         flowRunner("requestFlow").withPayload(TEST_MESSAGE)
-                                 .withOutboundAttachment(TEST_PART_NAME, dataHandler)
+                                 .withFlowVariable(PARTS, partsToSend)
                                  .run();
 
         Part part = getPart(TEST_PART_NAME);
@@ -107,12 +128,12 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     }
 
     @Test
-    public void byteArrayOutboundAttachmentSetsContentDispositionWithFileName() throws Exception
+    public void byteArrayPartSetsContentDispositionWithFileName() throws Exception
     {
-        DataHandler dataHandler = new DataHandler(new ByteArrayDataSource(TEST_MESSAGE.getBytes(), TEXT, TEST_FILE_NAME));
+        addPartToSend(TEST_PART_NAME, TEST_MESSAGE.getBytes(), TEXT, TEST_FILE_NAME);
 
         flowRunner("requestFlow").withPayload(TEST_MESSAGE)
-                                 .withOutboundAttachment(TEST_PART_NAME, dataHandler)
+                                 .withFlowVariable(PARTS, partsToSend)
                                  .run();
 
         Part part = getPart(TEST_PART_NAME);
@@ -120,10 +141,12 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     }
 
     @Test
-    public void stringOutboundAttachmentSetsContentDispositionWithoutFileName() throws Exception
+    public void stringPartSetsContentDispositionWithoutFileName() throws Exception
     {
+        addPartToSend(TEST_PART_NAME, TEST_MESSAGE, TEXT);
+
         flowRunner("requestFlow").withPayload(TEST_MESSAGE)
-                                 .withOutboundAttachment(TEST_PART_NAME, TEST_MESSAGE, TEXT)
+                                 .withFlowVariable(PARTS, partsToSend)
                                  .run();
 
         Part part = getPart(TEST_PART_NAME);
@@ -135,13 +158,29 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     {
         // Grizzly defines the maxAsyncWriteQueueSize as 4 times the sendBufferSize (org.glassfish.grizzly.nio.transport.TCPNIOConnection).
         int maxAsyncWriteQueueSize = Integer.valueOf(sendBufferSize.getValue()) * 4;
+        // Set a part bigger than the queue size.
+        addPartToSend(TEST_PART_NAME, new byte[maxAsyncWriteQueueSize * 2], TEXT);
 
         MuleEvent response = flowRunner("requestFlowTls").withPayload(TEST_MESSAGE)
-                                                         // Set an attachment bigger than the queue size.
-                                                         .withOutboundAttachment(TEST_PART_NAME, new byte[maxAsyncWriteQueueSize * 2], TEXT)
+                                                         .withFlowVariable(PARTS, partsToSend)
                                                          .run();
-        
-        assertThat((Integer) response.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(OK.getStatusCode()));
+
+        assertThat((HttpResponseAttributes) response.getMessage().getAttributes(), hasStatusCode(OK.getStatusCode()));
+    }
+
+    private void addPartToSend(String name, Object content) throws Exception
+    {
+        addPartToSend(name, content, null, null);
+    }
+
+    private void addPartToSend(String name, Object content, String contentType) throws Exception
+    {
+        addPartToSend(name, content, contentType, null);
+    }
+
+    private void addPartToSend(String name, Object content, String contentType, String fileName) throws Exception
+    {
+        partsToSend.add(new HttpPart(name, content, contentType, fileName));
     }
 
     private void assertPart(String name, String expectedContentType, String expectedBody) throws Exception

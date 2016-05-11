@@ -8,10 +8,9 @@ package org.mule.runtime.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
-
+import org.mule.extension.http.api.request.validator.ResponseValidatorException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.module.http.internal.request.ResponseValidatorException;
 
 import java.io.IOException;
 
@@ -78,7 +77,7 @@ public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase
         MessagingException e = flowRunner(flowName).withPayload(TEST_MESSAGE).withFlowVariable("code", statusCode).runExpectingException();
 
         MuleMessage response = e.getEvent().getMessage();
-        assertThat(response.getExceptionPayload().getException(), instanceOf(ResponseValidatorException.class));
+        assertThat(response.getExceptionPayload().getException().getCause(), instanceOf(ResponseValidatorException.class));
     }
 
 

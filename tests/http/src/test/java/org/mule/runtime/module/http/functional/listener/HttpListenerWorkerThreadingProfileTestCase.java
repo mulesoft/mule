@@ -35,10 +35,12 @@ import org.apache.http.client.fluent.Response;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+@Ignore("Not currently supported.")
 public class HttpListenerWorkerThreadingProfileTestCase extends FunctionalTestCase
 {
 

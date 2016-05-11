@@ -12,13 +12,13 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.IOException;
 
@@ -31,7 +31,7 @@ import org.junit.rules.ExpectedException;
  * Sets up some HTTPS servers and clients with different protocols and ciphers.
  * Verifies only matching configurations are successful interacting with each other.
  */
-public class HttpRestrictedCiphersAndProtocolsTestCase extends FunctionalTestCase
+public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");

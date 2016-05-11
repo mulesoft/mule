@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:request-config name="configWithBasePath" host="localhost" port="${httpPort}" basePath="#[basePath]" />
-    <http:request-config name="configWithoutBasePath" host="localhost" port="${httpPort}" />
+    <httpn:request-config name="configWithBasePath" basePath="#[basePath]">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
+    <httpn:request-config name="configWithoutBasePath">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
 
     <flow name="requestWithBasePath">
-        <http:request config-ref="configWithBasePath" path="#[requestPath]" />
+        <httpn:request config-ref="configWithBasePath" path="#[requestPath]" key="InputStream"/>
     </flow>
 
     <flow name="requestWithoutBasePath">
-        <http:request config-ref="configWithoutBasePath" host="localhost" port="${httpPort}" path="#[requestPath]" />
+        <httpn:request config-ref="configWithoutBasePath" host="localhost" port="${httpPort}" path="#[requestPath]" key="InputStream"/>
     </flow>
 
 </mule>

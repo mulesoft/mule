@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.integration.http;
+package org.mule.runtime.module.http.functional;
 
 public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends AbstractServerTlsRestrictedProtocolsAndCiphersTestCase
 {

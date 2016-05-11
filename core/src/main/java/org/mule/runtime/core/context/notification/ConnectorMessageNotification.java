@@ -8,6 +8,7 @@ package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 
 import org.apache.commons.logging.Log;
@@ -16,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Used to notify that a message was received or sent through a Connector
  */
-public class ConnectorMessageNotification extends ServerNotification
+public class ConnectorMessageNotification extends ServerNotification implements BlockingServerEvent
 {
 
     /**

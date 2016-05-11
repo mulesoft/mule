@@ -1,59 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
 
-    <http:listener-config name="httpsListenerConfig" host="localhost" protocol="HTTPS" port="${httpsPort}">
-        <tls:context>
-            <tls:key-store path="tls/serverKeystore" password="mulepassword" keyPassword="mulepassword"/>
-        </tls:context>
-    </http:listener-config>
+    <httpn:listener-config name="httpsListenerConfig">
+        <httpn:listener-connection  host="localhost" protocol="HTTPS" port="${httpsPort}">
+            <tls:context>
+                <tls:key-store path="tls/serverKeystore" password="mulepassword" keyPassword="mulepassword"/>
+            </tls:context>
+        </httpn:listener-connection>
+    </httpn:listener-config>
 
-    <http:request-config name="requestConfig" followRedirects="false"/>
+    <httpn:request-config name="requestConfig" followRedirects="false"/>
 
     <tls:context name="tlsContext">
         <tls:trust-store password="mulepassword" path="tls/trustStore" />
     </tls:context>
 
     <flow name="echoFlow">
-        <http:listener path="path" config-ref="listenerConfig" />
+        <httpn:listener path="path" config-ref="listenerConfig" />
         <object-to-string-transformer/>
         <copy-properties propertyName="*"/>
         <test:queue name="out"/>
     </flow>
 
     <flow name="redirectFlow">
-        <http:listener path="redirectPath" config-ref="listenerConfig">
-            <http:response-builder statusCode="302">
-                <http:header headerName="Location" value="http://localhost:${port}/path"/>
-            </http:response-builder>
-        </http:listener>
+        <httpn:listener path="redirectPath" config-ref="listenerConfig">
+            <httpn:response-builder>
+                <httpn:http-response-builder statusCode="302">
+                    <httpn:headers>
+                        <httpn:header key="Location" value="http://localhost:${port}/path"/>
+                    </httpn:headers>
+                </httpn:http-response-builder>
+            </httpn:response-builder>
+        </httpn:listener>
         <set-payload value="test-response"/>
     </flow>
 
     <flow name="timeoutFlow">
-        <http:listener path="timeoutPath" config-ref="listenerConfig"/>
+        <httpn:listener path="timeoutPath" config-ref="listenerConfig"/>
         <custom-processor class="org.mule.runtime.module.http.functional.requester.HttpRequestWithMuleClientTestCase$LatchMessageProcessor"/>
     </flow>
 
     <flow name="failureStatusCodeFlow">
-        <http:listener path="failurePath" config-ref="listenerConfig">
-            <http:response-builder statusCode="500" />
-        </http:listener>
+        <httpn:listener path="failurePath" config-ref="listenerConfig">
+            <httpn:response-builder>
+                <httpn:http-response-builder statusCode="500"/>
+            </httpn:response-builder>
+        </httpn:listener>
         <set-payload value="test-response"/>
     </flow>
 
     <flow name="httpsFlow">
-        <http:listener path="/" config-ref="httpsListenerConfig"/>
+        <httpn:listener path="/" config-ref="httpsListenerConfig"/>
         <set-payload value="test-response"/>
     </flow>
 

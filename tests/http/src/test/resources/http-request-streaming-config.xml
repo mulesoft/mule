@@ -1,29 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:request-config name="requestConfig" host="localhost" port="${httpPort}" />
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
 
     <flow name="streamingAuto">
-        <http:request config-ref="requestConfig"  method="POST" path="path" />
+        <httpn:request config-ref="requestConfig"  method="POST" path="path"  key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder headers="#[headers]"/>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 
-    <flow name="streamingAutoHeader">
-        <http:request config-ref="requestConfig"  method="POST" path="path">
-            <http:request-builder>
-                <http:header headerName="Transfer-Encoding" value="chunked" />
-            </http:request-builder>
-        </http:request>
+    <flow name="streamingAutoBothHeaders">
+        <httpn:request config-ref="requestConfig"  method="POST" path="path" key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder>
+                    <httpn:headers>
+                        <httpn:header key="Transfer-Encoding" value="chunked" />
+                        <httpn:header key="Content-Length" value="12" />
+                    </httpn:headers>
+                </httpn:requester-request-builder>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 
     <flow name="streamingAlways">
-        <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="ALWAYS" />
+        <httpn:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="ALWAYS"  key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder headers="#[headers]"/>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 
     <flow name="streamingNever">
-        <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="NEVER" />
+        <httpn:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="NEVER"  key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder headers="#[headers]"/>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 </mule>

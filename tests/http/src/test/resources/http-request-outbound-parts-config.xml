@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
+
+    <flow name="requestFlow">
+        <httpn:request config-ref="requestConfig" path="path" method="POST"  key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder parts="#[parts]"/>
+            </httpn:request-builder>
+        </httpn:request>
+    </flow>
+
+    <flow name="requestPartFlow">
+        <httpn:request config-ref="requestConfig" path="path" method="POST"  key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder>
+                    <httpn:parts>
+                        <httpn:part id="part1" data="#['content 1']" contentType="text/plain"/>
+                        <httpn:part id="part2" data="#['content 2'.getBytes()]" contentType="text/plain" filename="myPart.txt"/>
+                    </httpn:parts>
+                </httpn:requester-request-builder>
+            </httpn:request-builder>
+        </httpn:request>
+    </flow>
+
+    <!-- Requester with TLS and a small send buffer size to test that big attachments work over HTTPS -->
+
+    <sockets:client-socket-properties name="requesterSocketPropertiesTls" sendBufferSize="${sendBufferSize}" />
+
+    <tls:context name="tlsContext" >
+        <tls:trust-store path="tls/trustStore" password="mulepassword"/>
+        <tls:key-store path="tls/clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
+    </tls:context>
+
+    <httpn:request-config name="requestConfigTls">
+        <httpn:request-connection host="localhost" port="${httpsPort}" protocol="HTTPS"
+                                    tlsContext="tlsContext" clientSocketProperties="requesterSocketPropertiesTls"/>
+    </httpn:request-config>
+
+    <flow name="requestFlowTls">
+        <httpn:request config-ref="requestConfigTls" path="path" method="POST" responseTimeout="5000"  key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder parts="#[parts]"/>
+            </httpn:request-builder>
+        </httpn:request>
+    </flow>
+
+</mule>

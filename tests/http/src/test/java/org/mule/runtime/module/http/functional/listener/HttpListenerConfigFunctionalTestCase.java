@@ -15,13 +15,13 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.METHOD_N
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.runtime.module.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
 import static org.mule.runtime.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpConstants.HttpStatus;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -40,7 +40,7 @@ import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
+public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase
 {
 
     private static final Pattern IPADDRESS_PATTERN = Pattern.compile(

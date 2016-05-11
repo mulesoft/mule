@@ -9,12 +9,14 @@ package org.mule.extension.http.api;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
+import org.mule.runtime.core.message.ds.InputStreamDataSource;
 import org.mule.runtime.core.message.ds.StringDataSource;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -112,6 +114,10 @@ public class HttpMessageBuilder
         else if (object instanceof byte[] && contentType != null)
         {
             dh = new DataHandler(new ByteArrayDataSource((byte[]) object, contentType, name));
+        }
+        else if (object instanceof InputStream && contentType != null)
+        {
+            dh = new DataHandler(new InputStreamDataSource((InputStream) object, contentType, name));
         }
         else
         {

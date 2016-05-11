@@ -1,32 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
-    <http:request-config name="requestConfig" host="localhost" port="${port}" />
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${port}"/>
+    </httpn:request-config>
 
     <flow name="server">
-        <http:listener path="test" config-ref="listenerConfig">
-            <http:response-builder statusCode="200">
-                <http:header headerName="Content-Type" value="application/x-www-form-urlencoded"/>
-                <http:header headerName="customname1" value="customValue"/>
-            </http:response-builder>
-        </http:listener>
-        <set-payload value="key=value" />
-        <set-property propertyName="CusTomName2" value="#[message.inboundProperties['CusTomName2']]"/>
-        <set-property propertyName="User-Agent" value="Mule 3.9.0"/>
+        <httpn:listener path="test" config-ref="listenerConfig">
+            <httpn:response-builder>
+                <httpn:http-response-builder statusCode="200">
+                    <httpn:headers>
+                        <httpn:header key="Content-Type" value="application/x-www-form-urlencoded"/>
+                        <httpn:header key="customname1" value="customValue"/>
+                    </httpn:headers>
+                </httpn:http-response-builder>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[message.getAttributes().getHeaders().get('CusTomName2')]=value" />
     </flow>
 
     <flow name="client">
-        <http:request path="test" config-ref="requestConfig">
-            <http:request-builder>
-                <http:header headerName="CusTomName2" value="CustomValue"/>
-            </http:request-builder>
-        </http:request>
+        <httpn:request path="test" config-ref="requestConfig" key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder>
+                    <httpn:headers>
+                        <httpn:header key="CusTomName2" value="CustomValue"/>
+                    </httpn:headers>
+                </httpn:requester-request-builder>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 
 </mule>

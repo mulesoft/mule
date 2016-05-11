@@ -17,20 +17,20 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.multipart.HttpPart;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -53,10 +53,12 @@ import org.apache.http.impl.client.HttpClients;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
+@Ignore("MULE-9864: Support expression in HTTP response builder")
+public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
 {
 
     private static final String TEXT_BODY_FIELD_NAME = "field1";
