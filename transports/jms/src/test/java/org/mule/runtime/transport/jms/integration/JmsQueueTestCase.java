@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.transport.jms.integration;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Message is sent to and received from simple queue.
  */
+@Ignore("MULE-9628")
 public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
 {
     @Override

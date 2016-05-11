@@ -11,8 +11,9 @@ import static org.junit.Assert.assertFalse;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.NameableObject;
-import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.chain.InterceptingChainLifecycleWrapper;
 
 import java.util.Iterator;
@@ -32,7 +33,8 @@ public class ResponseTransformerTestCase extends FunctionalTestCase
     @Test
     public void testTransformers()
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupObject("endpoint");
+        Flow flowService = muleContext.getRegistry().lookupObject("service");
+        InboundEndpoint endpoint = (InboundEndpoint) flowService.getMessageSource();
         assertFalse(endpoint.getMessageProcessors().isEmpty());
         assertEquals(2, endpoint.getMessageProcessors().size());
         checkNames("normal", endpoint.getMessageProcessors());

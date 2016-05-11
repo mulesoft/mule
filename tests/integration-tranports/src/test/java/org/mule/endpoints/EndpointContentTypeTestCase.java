@@ -13,6 +13,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.endpoint.EndpointBuilder;
 import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 
@@ -29,10 +30,11 @@ public class EndpointContentTypeTestCase  extends FunctionalTestCase
     @Test
     public void testContentType()  throws Exception
     {
-        InboundEndpoint inbound = muleContext.getRegistry().lookupObject("inbound");
+        Flow flowService = muleContext.getRegistry().lookupObject("service");
+        InboundEndpoint inbound = (InboundEndpoint) flowService.getMessageSource();
         assertEquals("text/xml", inbound.getMimeType());
         assertEquals("utf-8", inbound.getEncoding());
-        OutboundEndpoint outbound = muleContext.getRegistry().lookupObject("outbound");
+        OutboundEndpoint outbound = (OutboundEndpoint) flowService.getMessageProcessors().get(0);
         assertEquals("application/json", outbound.getMimeType());
         assertEquals("iso-8859-2", outbound.getEncoding());
         EndpointBuilder global = lookupEndpointBuilder(muleContext.getRegistry(), "global");

@@ -119,7 +119,7 @@
 
     <flow name="orangeComponent">
         <composite-source>
-            <transports:inbound-endpoint name="Orange" address="test://orange/" exchange-pattern="one-way">
+            <transports:inbound-endpoint address="test://orange/" exchange-pattern="one-way">
                 <transformer ref="TestCompressionTransformer"/>
                 <transports:response>
                     <transformer ref="TestCompressionTransformer"/>
@@ -182,7 +182,7 @@
         </component>
         <choice>
             <when>
-                <transports:outbound-endpoint address="test://appleQ2" name="TestApple-Out" exchange-pattern="one-way">
+                <transports:outbound-endpoint address="test://appleQ2" exchange-pattern="one-way">
                     <transformer ref="TestCompressionTransformer"/>
                 </transports:outbound-endpoint>
                 <payload-type-filter expectedType="java.lang.String"/>

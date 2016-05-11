@@ -14,7 +14,7 @@
     
         <flow name="service">
             
-                <transports:inbound-endpoint name="endpoint" address="test://foo" exchange-pattern="one-way">
+                <transports:inbound-endpoint address="test://foo" exchange-pattern="one-way">
                     <transformer ref="normal1"/>
                     <string-to-byte-array-transformer name="normal2"/>
                     <transports:response>

@@ -17,9 +17,9 @@
 
     <flow name="appleComponent2" processingStrategy="customStrategy">
         <composite-source>
-            <transports:inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"
+            <transports:inbound-endpoint address="test://endpoint.in3"
                               exchange-pattern="one-way"/>
-            <transports:inbound-endpoint name="transactedInboundEndpoint" address="test://endpoint.in2"
+            <transports:inbound-endpoint address="test://endpoint.in2"
                               exchange-pattern="one-way">
                 <property key="testEndpointProperty" value="Prop1"/>
             </transports:inbound-endpoint>
@@ -28,7 +28,7 @@
             <pooling-profile maxActive="9" maxIdle="6" maxWait="4002"
                              exhaustedAction="WHEN_EXHAUSTED_FAIL" initialisationPolicy="INITIALISE_ALL"/>
         </pooled-component>
-        <transports:outbound-endpoint name="transactedOutboundEndpoint" address="test://endpoint.out"
+        <transports:outbound-endpoint address="test://endpoint.out"
                            exchange-pattern="one-way"/>
     </flow>
 
