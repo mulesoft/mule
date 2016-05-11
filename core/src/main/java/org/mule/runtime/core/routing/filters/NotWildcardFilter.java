@@ -8,6 +8,11 @@ package org.mule.runtime.core.routing.filters;
 
 import org.mule.runtime.core.api.MuleMessage;
 
+/**
+ * Negative version of {@link org.mule.runtime.core.routing.filters.WildcardFilter}
+ *
+ * @since 4.0
+ */
 public class NotWildcardFilter extends WildcardFilter
 {
 

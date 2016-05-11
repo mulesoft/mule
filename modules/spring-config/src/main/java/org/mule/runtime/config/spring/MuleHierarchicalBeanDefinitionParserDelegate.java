@@ -258,6 +258,16 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         }
     }
 
+    /**
+     * Determines if the {@code element} must be parsed using the new mechanism or the old one.
+     *
+     * It will use the new mechanism if it's not a root element or if the parent has not been parsed
+     * with the old mechanism or if there's not a {@code org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition}
+     * defined for the {@code element}.
+     *
+     * @param element xml element from the XML configuration file.
+     * @return true if the parsing should be done with the new mechanism, false otherwise.
+     */
     private boolean shouldUseNewMechanism(Element element)
     {
         if (element.getLocalName().equals(MULE_ROOT_ELEMENT) || element.getLocalName().equals(MULE_DOMAIN_ROOT_ELEMENT)) {

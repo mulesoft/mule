@@ -48,8 +48,7 @@ public class TransactionalMessageProcessor extends TransactionalInterceptingMess
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         builder.setName("'transaction' child processor chain");
-        TransactionalInterceptingMessageProcessor txProcessor =
-            new TransactionalInterceptingMessageProcessor();
+        TransactionalInterceptingMessageProcessor txProcessor = new TransactionalInterceptingMessageProcessor();
         txProcessor.setExceptionListener(this.exceptionListener);
         MuleTransactionConfig transactionConfig = createTransactionConfig(this.action);
         txProcessor.setTransactionConfig(transactionConfig);

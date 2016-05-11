@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.api;
 
+import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.config.spring.dsl.processor.TypeDefinition;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.core.util.Preconditions;
@@ -219,9 +220,9 @@ public class ComponentBuildingDefinition
          */
         public ComponentBuildingDefinition build()
         {
-            Preconditions.checkState(definition.typeDefinition != null, "You must specify the type");
-            Preconditions.checkState(identifier != null, "You must specify the identifier");
-            Preconditions.checkState(namespace != null, "You must specify the namespace");
+            checkState(definition.typeDefinition != null, "You must specify the type");
+            checkState(identifier != null, "You must specify the identifier");
+            checkState(namespace != null, "You must specify the namespace");
             definition.componentIdentifier = new ComponentIdentifier.Builder().withName(identifier).withNamespace(namespace).build();
             return definition;
         }

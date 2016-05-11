@@ -16,6 +16,13 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.beans.factory.xml.XmlReaderContext;
 import org.w3c.dom.Document;
 
+/**
+ * Customized version of {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader} in order to hook into spring and use the mule version of
+ * {@link org.springframework.beans.factory.xml.BeanDefinitionDocumentReader} which allow us to parse the XML file
+ * using the new parsing mechanism.
+ *
+ * @since 4.0
+ */
 public class MuleXmlBeanDefinitionReader extends XmlBeanDefinitionReader implements BeanDefinitionDocumentReader
 {
 

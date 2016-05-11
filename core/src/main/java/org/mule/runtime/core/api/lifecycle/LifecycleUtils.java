@@ -59,13 +59,13 @@ public class LifecycleUtils
     }
 
     /**
-     * The same as {@link #initialiseIfNeeded(Object)}, only that before checking
-     * for {@code object} being {@link Initialisable}, it also checks if it implements
-     * {@link MuleContextAware}, in which case it will invoke {@link MuleContextAware#setMuleContext(MuleContext)}
-     * with the given {@code muleContext}
+     * The same as {@link #initialiseIfNeeded(Object, MuleContext)}, only that it also checks if it implements
+     * {@link FlowConstructAware}, in which case it will invoke {@link FlowConstructAware#setFlowConstruct(FlowConstruct)}
+     * with the given {@code flowConstruct}
      *
      * @param object      the object you're trying to initialise
      * @param muleContext a {@link MuleContext}
+     * @param flowConstruct the {@link org.mule.runtime.core.api.construct.FlowConstruct} in which the object is defined.
      * @throws InitialisationException
      */
     public static void initialiseIfNeeded(Object object, MuleContext muleContext, FlowConstruct flowConstruct) throws InitialisationException
