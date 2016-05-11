@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:https="http://www.mulesoft.org/schema/mule/https"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <https:connector name="httpConnector" connectionTimeout="1"/>
+
+    <flow name="testConnectionTimeout">
+        <vm:inbound-endpoint path="testInput" exchange-pattern="request-response"/>
+
+        <!-- Uses a big responseTimeout so it' clear that the connection timeout is caused by the connectionTimeout attribute -->
+        <https:outbound-endpoint address="https://1.2.3.4:9003" exchange-pattern="request-response" responseTimeout="50000"/>
+    </flow>
+</mule>

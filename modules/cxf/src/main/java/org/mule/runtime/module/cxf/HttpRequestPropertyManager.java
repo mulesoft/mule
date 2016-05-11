@@ -8,28 +8,23 @@ package org.mule.runtime.module.cxf;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.module.http.api.HttpConstants;
 
 public class HttpRequestPropertyManager
 {
 
-    public static String getRequestPath(MuleMessage message)
+    public String getRequestPath(MuleMessage message)
     {
         return message.getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_URI, StringUtils.EMPTY);
     }
 
-    public static String getScheme(MuleEvent event)
+    public String getScheme(MuleEvent event)
     {
-        String scheme = event.getMessageSourceURI().getScheme();
-        if (scheme == null)
-        {
-            scheme = event.getMessage().getInboundProperty(HttpConstants.RequestProperties.HTTP_SCHEME);
-        }
-        return scheme;
+        return event.getMessage().getInboundProperty(HttpConstants.RequestProperties.HTTP_SCHEME);
     }
 
-    public static String getBasePath(MuleMessage message)
+    public String getBasePath(MuleMessage message)
     {
         String listenerPath = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_LISTENER_PATH);
         String requestPath = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY);

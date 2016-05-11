@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <flow name="flow_test" >
+        <http:inbound-endpoint address="http://localhost:${httpPort}/testInput"/>
+
+        <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
+    </flow>
+
+    <flow name="requesterContentTypeClient" >
+        <http:inbound-endpoint address="http://localhost:${httpPort}/requestClient"/>
+
+        <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
+
+        <http:outbound-endpoint address="http://localhost:${httpPort}/requestServer" exchange-pattern="request-response" />
+    </flow>
+
+    <flow name="requesterContentTypeServer" >
+        <http:inbound-endpoint address="http://localhost:${httpPort}/requestServer"/>
+
+        <set-payload value="#[message.inboundProperties['Content-Type']]"/>
+    </flow>
+
+</mule>

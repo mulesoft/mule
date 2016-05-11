@@ -1,0 +1,3 @@
+# Don't remove ASCII string at the end of lines to avoid JDK 1.5 or earlier bug. 
+# See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6173388 for more details.
+HttpEncodingNonAsciiFunctionalTestCase.getMessage=日本語 This is to avoid JDK bug.

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <context:property-placeholder location="proxy.properties"/>
+
+    <http:connector name="httpConnector"
+                    clientSoTimeout="1234"
+                    cookieSpec="netscape"
+                    proxyHostname="${proxyHostname}"
+                    proxyPassword="${proxyPassword}"
+                    proxyPort="${proxyPort}"
+                    proxyUsername="${proxyUsername}"
+                    receiveBacklog="34"
+                    receiveBufferSize="4567"
+                    sendBufferSize="5678"
+                    socketSoLinger="6789"
+                    serverSoTimeout="7890"
+                    enableCookies="true"
+                    keepAlive="${keepAlive}"
+                    keepSendSocketOpen="true"
+                    sendTcpNoDelay="true"
+                    validateConnections="false"
+                    connectionTimeout="4000"
+    />
+    
+</mule>

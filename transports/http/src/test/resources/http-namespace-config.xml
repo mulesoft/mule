@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:connector name="httpConnector"
+                    clientSoTimeout="1234"
+                    cookieSpec="netscape"
+                    proxyHostname="bcd"
+                    proxyPassword="cde"
+                    proxyPort="2345"
+                    proxyUsername="def"
+                    receiveBacklog="34"
+                    receiveBufferSize="4567"
+                    sendBufferSize="5678"
+                    socketSoLinger="6789"
+                    serverSoTimeout="7890"
+                    enableCookies="true"
+                    keepAlive="true"
+                    keepSendSocketOpen="true"
+                    sendTcpNoDelay="true"
+                    validateConnections="false"
+                    connectionTimeout="4000"/>
+
+    <http:polling-connector name="polling" checkEtag="false" pollingFrequency="3456" discardEmptyContent="false"/>
+    
+    <endpoint name="ep1" address="test://ep1" exchange-pattern="one-way">
+        <http:http-response-to-object-transformer ignoreBadInput="true" name="test1" returnClass="java.lang.Object"/>
+    </endpoint>
+    
+    <endpoint name="ep2" address="test://ep2" exchange-pattern="one-way">
+        <http:http-response-to-string-transformer ignoreBadInput="true" name="test2" returnClass="java.lang.Object"/>
+    </endpoint>
+
+    <endpoint name="ep3" address="test://ep3" exchange-pattern="one-way">
+        <http:message-to-http-response-transformer ignoreBadInput="true" name="test3" returnClass="java.lang.Object"/>
+    </endpoint>
+
+    <endpoint name="ep4" address="test://ep4" exchange-pattern="one-way">
+        <http:object-to-http-request-transformer ignoreBadInput="true" name="test4" returnClass="java.lang.Object"/>
+    </endpoint>
+    
+    <endpoint name="ep5" address="test://ep5" exchange-pattern="one-way">
+        <http:request-wildcard-filter pattern="foo*"/>
+    </endpoint>
+</mule>

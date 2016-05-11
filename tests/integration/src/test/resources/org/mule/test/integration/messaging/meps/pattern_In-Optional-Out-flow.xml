@@ -22,11 +22,11 @@
     </description>
 
     <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
-
+    
     <flow name="In-Optional-Out-Service">
-
+        
         <http:listener config-ref="listenerConfig" path="*" />
-
+        
         <script:component>
             <script:script engine="groovy">
                 if (message.getProperty("foo", org.mule.runtime.core.PropertyScope.INBOUND))

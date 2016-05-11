@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
+    <http:connector name="httpConnector" keepAlive="false" />
+
+    <flow name="mycomponent1">
+
+        <inbound-endpoint address="http://localhost:${port1}/mycomponent1"
+            exchange-pattern="request-response" name="inMyComponent1" />
+
+        <test:component>
+            <test:return-data>mycomponent1</test:return-data>
+        </test:component>
+
+    </flow>
+
+    <flow name="mycomponent2">
+
+        <inbound-endpoint address="http://localhost:${port1}/mycomponent2"
+            exchange-pattern="request-response" name="inMyComponent2" />
+
+        <test:component>
+            <test:return-data>mycomponent2</test:return-data>
+        </test:component>
+    </flow>
+
+</mule>

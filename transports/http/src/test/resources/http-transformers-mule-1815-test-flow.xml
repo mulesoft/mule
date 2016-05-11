@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+        xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:endpoint name="base" host="localhost" port="${port1}" exchange-pattern="request-response"/>
+    <http:endpoint name="adapted" host="localhost" port="${port2}" exchange-pattern="request-response"/>
+    <http:endpoint name="ignored" address="http://localhost:${port3}" exchange-pattern="request-response"/>
+    <endpoint name="inbound" address="http://localhost:${port4}" exchange-pattern="request-response"/>
+
+    <custom-transformer name="appendString" class="org.mule.tck.functional.StringAppendTestTransformer"/>
+
+    <custom-transformer name="appendString2" class="org.mule.tck.functional.StringAppendTestTransformer">
+        <spring:property name="message" value=" transformed 2"/>
+    </custom-transformer>
+
+    <!-- first, the simple two flows we use in all cases, with no additional
+         transformers -->
+    <flow name="baseService1">
+        <http:inbound-endpoint ref="base"/>
+        <outbound-endpoint address="vm://echo1" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="baseService2">
+        <inbound-endpoint address="vm://echo1" exchange-pattern="request-response"/>
+        <test:component doInboundTransform="false" appendString=" Received"/>
+    </flow>
+
+    <!-- next, the same flows but with adapted components that call getMessage() rather than getTransformedMessage() -->
+    <flow name="adaptedService1">
+        <inbound-endpoint ref="adapted"/>
+        <component class="org.mule.transport.http.issues.NoTransformPassThroughComponent"/>
+        <outbound-endpoint address="vm://echo2" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="adaptedService2">
+        <inbound-endpoint address="vm://echo2" exchange-pattern="request-response"/>
+        <test:component doInboundTransform="false" appendString=" Received"/>
+    </flow>
+
+    <!-- now we add transformers to the adapted flows - they should have no effect -->
+    <!-- Specifies an explicit entry-point-resolver because the default one (property-entry-point-resolver) will make the 
+        test fail because it applies the transformation before reaching the component. Behavior changed after fixing MULE-4874. -->
+    <flow name="ignoredService1">
+        <http:inbound-endpoint ref="ignored">
+            <transformer ref="appendString"/>
+        </http:inbound-endpoint>
+        <component class="org.mule.transport.http.issues.NoTransformPassThroughComponent">
+            <callable-entry-point-resolver/>
+        </component>
+        <outbound-endpoint address="vm://echo3" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="ignoredService2">
+        <inbound-endpoint address="vm://echo3" exchange-pattern="request-response">
+            <transformer ref="appendString2"/>
+        </inbound-endpoint>
+        <test:component doInboundTransform="false" appendString=" Received"/>
+    </flow>
+    
+    <flow name="inboundService1">
+        <inbound-endpoint ref="inbound">
+            <object-to-string-transformer/>
+            <transformer ref="appendString"/>
+        </inbound-endpoint>
+        <outbound-endpoint address="vm://echo4" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="inboundService2">
+        <inbound-endpoint address="vm://echo4" exchange-pattern="request-response">
+            <object-to-string-transformer/>
+            <transformer ref="appendString2"/>
+        </inbound-endpoint>
+        <test:component appendString=" Received"/>
+    </flow>
+
+</mule>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/https"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:http="http://www.mulesoft.org/schema/mule/http"
+            xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
+            targetNamespace="http://www.mulesoft.org/schema/mule/https"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd" />
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/http"
+                schemaLocation="http://www.mulesoft.org/schema/mule/http/3.7/mule-http.xsd"/>
+    <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
+
+    <xsd:annotation>
+        <xsd:documentation>
+            The Secure HTTP transport provides support for exposing services over HTTP and making HTTP client requests from Mule services to external services as part of service event flows. Mule supports secure inbound, secure outbound, and secure polling HTTP endpoints. These endpoints support all common features of the HTTP spec, such as ETag processing, cookies, and keepalive. Both HTTP 1.0 and 1.1 are supported.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>HTTPS</schemadoc:short-name>
+            <schemadoc:page-title>HTTPS Transport</schemadoc:page-title>
+            <schemadoc:artifact-name>http</schemadoc:artifact-name>
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
+                                          requestEvents="true"
+                                          transactions="false" streaming="true">
+                <schemadoc:MEPs supported="one-way, request-response" default="request-response"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
+
+    <xsd:element name="connector" type="httpsConnectorType" substitutionGroup="mule:abstract-shared-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                This connector provides Secure HTTP connectivity on top of what is already provided with the Mule [HTTP Transport].
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+     <xsd:element name="polling-connector" type="httpsPollingConnectorType" substitutionGroup="mule:abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allows Mule to poll an external HTTP server and generate events from the result. This is useful for pull-only web services. This connector provides a secure version of the PollingHttpConnector.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="httpsConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="http:httpConnectorType">
+                <xsd:sequence minOccurs="1" maxOccurs="1">
+                    <xsd:element minOccurs="0" maxOccurs="1" name="tls-client" type="mule:tlsClientKeyStoreType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Configures the client key store with the following attributes:
+                                * path: The location (which will be resolved relative to the current classpath and file system, if possible) of the keystore that contains public certificates and private keys for identification
+                                * storePassword: The password used to protect the keystore
+                                * class: The type of keystore used (a Java class name)
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="tls-key-store" type="mule:tlsKeyStoreType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Configures the direct key store with the following attributes:
+                                * path: The location (which will be resolved relative to the current classpath and file system, if possible) of the keystore that contains public certificates and private keys for identification
+                                * class: The type of keystore used (a Java class name)
+                                * keyPassword: The password used to protect the private key
+                                * storePassword: The password used to protect the keystore
+                                * algorithm: The algorithm used by the keystore
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="tls-server" type="mule:tlsServerTrustStoreType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Configures the trust store. The attributes are:
+                                * path: The location (which will be resolved relative to the current classpath and file system, if possible) of the trust store that contains public certificates of trusted servers
+                                * storePassword: The password used to protect the trust store
+                                * class: The type of trust store used (a Java class name)
+                                * algorithm: The algorithm used by the trust store
+                                * factory-ref: Reference to the trust manager factory
+                                * explicitOnly: Whether this is an explicit trust store
+                                * requireClientAuthentication: Whether client authentication is required
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="tls-protocol-handler" type="mule:tlsProtocolHandler">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Configures the global Java protocol handler. It has one attribute, property, which specifies the java.protocol.handler.pkgs system property.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="httpsPollingConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="httpsConnectorType">
+                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
+                    <xsd:annotation>
+                        <xsd:documentation>The time in milliseconds to wait between each request to the remote http server.
+                    </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="checkEtag" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>Whether the ETag header from the remote server is processed if the header is present.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="discardEmptyContent" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>Whether Mule should discard any messages from the remote server that have a zero content length. For many services, a zero length would mean there was no data to return. If the remote HTTP server does return content to say that the request is empty, users can configure a content filter on the endpoint to filter these messages out.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>
+                An inbound HTTPS endpoint exposes a service securely over HTTPS, essentially making it an HTTP server. If polling of a remote HTTP service is required, this endpoint should be configured with a polling HTTPS connector.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="http:inboundEndpointType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>
+                The HTTPS outbound endpoint allows Mule to send requests securely using SSL to external servers or Mule inbound HTTP endpoints using HTTP over SSL protocol.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="http:outboundEndpointType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configures a global HTTPS endpoint that can be referenced by services. Services can augment the configuration defined in the global endpoint with local configuration elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="globalEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="http:globalEndpointType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="static-resource-handler" type="staticResourceHandlerType" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Serves up static content for use with http. (Since Mule 3.2)
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="staticResourceHandlerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractInterceptingMessageProcessorType">
+                <xsd:attribute name="resourceBase" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The resource base for where documents are served up from.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="defaultFile" type="xsd:string" use="optional" default="index.html">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The default file to sever when a directory is specified. The default value is 'index.html'.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>

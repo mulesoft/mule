@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+	      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		  http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <http:connector name="NullSessionConnector">
+        <service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
+    </http:connector>
+
+    <flow name="inputFlow">
+        <vm:inbound-endpoint path="testInput" exchange-pattern="one-way"/>
+        
+        <http:outbound-endpoint address="http://localhost:${httpPort}" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="mainTestFlow">
+        <http:inbound-endpoint  address="http://localhost:${httpPort}" exchange-pattern="request-response">
+            <expression-filter evaluator="header" expression="inbound:MULE_SESSION=null"/>
+        </http:inbound-endpoint>
+        
+        <vm:outbound-endpoint path="testOut" exchange-pattern="one-way"/>
+    </flow>
+</mule>

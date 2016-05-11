@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:https="http://www.mulesoft.org/schema/mule/https"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd">
+
+    <https:connector name="httpsConnector" clientSoTimeout="1234" cookieSpec="netscape" proxyHostname="bcd"
+                     proxyPassword="cde" proxyPort="2345" proxyUsername="def" receiveBacklog="34"
+                     receiveBufferSize="4567" sendBufferSize="5678" socketSoLinger="6789" serverSoTimeout="7890"
+                     enableCookies="true" keepAlive="true" keepSendSocketOpen="true" sendTcpNoDelay="true"
+                     validateConnections="false" connectionTimeout="4000">
+        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <https:tls-key-store keyAlias="muleserver" keyPassword="mulepassword" path="serverKeystore" storePassword="mulepassword"/>
+        <https:tls-server path="trustStore" storePassword="mulepassword" explicitOnly="true"
+                          requireClientAuthentication="true"/>
+        <https:tls-protocol-handler property="foo"/>
+    </https:connector>
+
+    <https:polling-connector name="polling" checkEtag="false" pollingFrequency="3456" discardEmptyContent="false">
+        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <https:tls-key-store keyPassword="mulepassword" path="serverKeystore" storePassword="mulepassword"/>
+        <https:tls-server path="trustStore" storePassword="mulepassword" explicitOnly="true"
+                          requireClientAuthentication="true"/>    
+    </https:polling-connector>
+
+
+</mule>

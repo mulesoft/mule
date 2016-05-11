@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:https="http://www.mulesoft.org/schema/mule/https"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd">
+
+    <https:connector name="httpsConnector">
+        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <https:tls-server path="trustStore" storePassword="mulepassword"/>
+    </https:connector>
+
+    <flow name="main-http">
+        <http:inbound-endpoint address="http://localhost:${port1}/static"/>
+
+        <http:static-resource-handler resourceBase="${test.root}/dummy-docroot" defaultFile="index.html"/>
+    </flow>
+
+    <flow name="main-https">
+        <https:inbound-endpoint address="https://localhost:${port2}/static" connector-ref="httpsConnector"/>
+
+        <https:static-resource-handler resourceBase="${test.root}/dummy-docroot"/>
+    </flow>
+
+    <flow name="main-http-root">
+        <http:inbound-endpoint address="http://localhost:${port3}"/>
+
+        <http:static-resource-handler resourceBase="${test.root}/dummy-docroot" defaultFile="index.html"/>
+    </flow>
+
+    <!-- these services test that we can have flows bound on the same http
+         port but with a different path -->
+    <flow name="main-http-echo">
+        <http:inbound-endpoint address="http://localhost:${port1}/echo"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="main-https-echo">
+        <https:inbound-endpoint address="https://localhost:${port2}/echo" connector-ref="httpsConnector"/>
+        <echo-component/>
+    </flow>
+</mule>

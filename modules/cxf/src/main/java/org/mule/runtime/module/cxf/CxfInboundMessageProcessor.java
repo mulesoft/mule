@@ -7,12 +7,10 @@
 package org.mule.runtime.module.cxf;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
-import static org.mule.runtime.module.cxf.HttpRequestPropertyManager.getBasePath;
-import static org.mule.runtime.module.cxf.HttpRequestPropertyManager.getRequestPath;
-import static org.mule.runtime.module.cxf.HttpRequestPropertyManager.getScheme;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -87,6 +85,8 @@ import org.w3c.dom.Node;
 public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle, NonBlockingSupported
 {
 
+    private static final String HTTP_REQUEST_PROPERTY_MANAGER_KEY = "_cxfHttpRequestPropertyManager";
+
     public static final String JMS_TRANSPORT = "jms";
 
     /**
@@ -107,7 +107,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
     private String mimeType;
 
-    private final HttpRequestPropertyManager requestPropertyManager = new HttpRequestPropertyManager();
+    private HttpRequestPropertyManager requestPropertyManager;
 
     @Override
     public void initialise() throws InitialisationException
@@ -118,6 +118,9 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                 MessageFactory.createStaticMessage("No CXF bus instance, this component has not been initialized properly."),
                 this);
         }
+
+        final HttpRequestPropertyManager httpRequestPropertyManager = muleContext.getRegistry().get(HTTP_REQUEST_PROPERTY_MANAGER_KEY);
+        requestPropertyManager = httpRequestPropertyManager != null ? httpRequestPropertyManager : new HttpRequestPropertyManager();
     }
 
     @Override
@@ -149,7 +152,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         // if http request
-        String requestPath = parseHttpRequestProperty(getRequestPath(event.getMessage()));
+        String requestPath = parseHttpRequestProperty(requestPropertyManager.getRequestPath(event.getMessage()));
         try
         {
             if (requestPath.indexOf('?') > -1)
@@ -235,9 +238,9 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
     private String getUri(MuleEvent event)
     {
-        String scheme = getScheme(event);
+        String scheme = requestPropertyManager.getScheme(event);
         String host = event.getMessage().getInboundProperty("Host");
-        String ctx = getRequestPath(event.getMessage());
+        String ctx = requestPropertyManager.getRequestPath(event.getMessage());
 
         return scheme + "://" + host + ctx;
     }
@@ -332,7 +335,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         {
             m.put(Message.HTTP_REQUEST_METHOD, method);
             m.put(Message.PATH_INFO, path);
-            String basePath = getBasePath(muleReqMsg);
+            String basePath = requestPropertyManager.getBasePath(muleReqMsg);
             m.put(Message.BASE_PATH, basePath);
 
             method = method.toUpperCase();

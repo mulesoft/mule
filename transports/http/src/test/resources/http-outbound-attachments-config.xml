@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <flow name="stringAttachment">
+        <vm:inbound-endpoint path="inString" exchange-pattern="request-response"/>
+        <set-attachment attachmentName="file" value="#[payload]" contentType="text/plain"/>
+        <http:outbound-endpoint host="localhost" port="${port}" path="upload" method="POST"/>
+    </flow>
+
+    <flow name="byteArrayAttachment">
+        <vm:inbound-endpoint path="inByteArray" exchange-pattern="request-response"/>
+        <string-to-byte-array-transformer />
+        <set-attachment attachmentName="file" value="#[payload]" contentType="application/zip"/>
+        <http:outbound-endpoint host="localhost" port="${port}" path="upload" method="POST"/>
+    </flow>
+
+    <flow name="server">
+        <http:inbound-endpoint host="localhost" port="${port}" path="upload"/>
+        <set-payload value="#[message.inboundAttachments['file'].content]"/>
+    </flow>
+</mule>

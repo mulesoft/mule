@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <spring:bean id="property-test" class="org.mule.tck.property.SessionPropertiesValidatorComponent">
+        <spring:property name="expectedProperties">
+            <spring:map>
+                <spring:entry key="initialPayload" value="TEST"/>
+            </spring:map>
+        </spring:property>
+    </spring:bean>
+
+   <flow name="main">
+        <vm:inbound-endpoint path="inVM" exchange-pattern="request-response"/>
+        <message-properties-transformer name="InitVar" scope="session">
+            <add-message-property key="initialPayload" value="TEST" />
+        </message-properties-transformer>
+        <vm:outbound-endpoint path="secondVM" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="secondFlow">
+    	<vm:inbound-endpoint path="secondVM" exchange-pattern="request-response"/>
+        <component>
+            <spring-object bean="property-test"/>
+        </component>
+        <collection-splitter  />
+    	<collection-aggregator />
+    	<vm:outbound-endpoint path="thirdVM" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="thirdFlow">
+    	<vm:inbound-endpoint path="thirdVM" exchange-pattern="request-response"/>
+        <component>
+            <spring-object bean="property-test"/>
+        </component>
+    </flow>
+
+    <flow name="httpFlow">
+    	<http:inbound-endpoint address="http://localhost:${port1}/test" exchange-pattern="request-response" />
+    	<component class="org.mule.transport.http.functional.SessionPropertiesWithMessageCollectionTestCase$TestSplitterComponent" />
+    	<vm:outbound-endpoint path="inVM" exchange-pattern="request-response" />
+    </flow>
+
+    <flow name="synchronousCollectionAggregatorFlow">
+        <set-session-variable value="#[new java.util.ArrayList()]" variableName="recordsToUpdate" />
+        <collection-splitter enableCorrelation="ALWAYS"/>
+        <expression-component>#[sessionVars.get('recordsToUpdate').add(payload)]</expression-component>
+        <collection-aggregator failOnTimeout="true" persistentStores="true"/>
+    </flow>
+
+</mule>

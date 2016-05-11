@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
+    <flow name="testProperties" processingStrategy="synchronous">
+        <http:inbound-endpoint address="http://localhost:${port1}/resources" exchange-pattern="request-response"/>
+        <set-property propertyName="http.relative.path" value="#[message.inboundProperties['http.relative.path']]"/>
+        <set-property propertyName="http.context.uri" value="#[message.inboundProperties['http.context.uri']]"/>
+
+        <choice>
+            <when evaluator="groovy" expression="message.getInboundProperty('http.relative.path') == 'client'">
+                <choice>
+                    <when evaluator="groovy" expression="message.getInboundProperty('http.method') == 'GET'">
+                        <expression-transformer>
+                            <return-argument evaluator="groovy" expression="'Retrieving client with id = ' + message.getInboundProperty('http.query.params')['id']"/>
+                        </expression-transformer>
+                    </when>
+                    <when evaluator="groovy" expression="message.getInboundProperty('http.method') == 'POST'">
+                        <http:body-to-parameter-map-transformer/>
+                        <expression-transformer>
+                            <return-argument evaluator="groovy" expression="'Storing client with name = ' + payload['name'] + ' and lastname = ' + payload['lastname']"/>
+                        </expression-transformer>
+                    </when>
+                    <otherwise>
+                        <expression-transformer>
+                            <return-argument evaluator="groovy" expression="'Unknown HTTP method: ' + message.getInboundProperty('http.method')"/>
+                        </expression-transformer>
+                    </otherwise>
+                </choice>
+            </when>
+            <otherwise>
+                <expression-transformer>
+                    <return-argument evaluator="groovy" expression="'Unknown resource: ' + message.getInboundProperty('http.relative.path')"/>
+                </expression-transformer>
+            </otherwise>
+        </choice>
+        <echo-component/>
+    </flow>
+
+    <flow name="testRedirect" processingStrategy="synchronous">
+        <http:inbound-endpoint address="http://localhost:${port1}/redirect" exchange-pattern="request-response"/>
+        <http:outbound-endpoint address="http://localhost:${port1}/newSite/#[header:inbound:http.relative.path]?#[header:inbound:http.query.string]" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="testRedirection" processingStrategy="synchronous">
+        <http:inbound-endpoint address="http://localhost:${port1}/newSite" exchange-pattern="request-response"/>
+        <expression-transformer>
+            <return-argument evaluator="groovy" expression="'Successfully redirected: ' + message.getInboundProperty('http.relative.path') + '?' + message.getInboundProperty('http.query.string')"/>
+        </expression-transformer>
+    </flow>
+</mule>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:https="http://www.mulesoft.org/schema/mule/https"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd">
+
+    <https:connector name="httpsConnector">
+        <https:tls-client path="clientKeystore" storePassword="mulepassword" class="jks" type="jks"/>
+        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <https:tls-server path="trustStore" storePassword="mulepassword"/>
+    </https:connector>
+
+</mule>

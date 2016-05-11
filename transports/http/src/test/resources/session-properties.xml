@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <description>Test session properties propagates between flows</description>
+
+    <http:connector name="httpConnector" enableCookies="true"/>
+
+    <spring:bean id="property-f1p1" class="org.mule.tck.property.SessionPropertiesValidatorComponent">
+        <spring:property name="expectedProperties">
+            <spring:map>
+                <spring:entry key="flow1-p1" value="flow1-p1-value"/>
+            </spring:map>
+        </spring:property>
+    </spring:bean>
+
+    <spring:bean id="property-f1p1-f2p1" class="org.mule.tck.property.SessionPropertiesValidatorComponent">
+        <spring:property name="expectedProperties">
+            <spring:map>
+                <spring:entry key="flow1-p1" value="flow1-p1-value"/>
+                <spring:entry key="flow2-p1" value="flow2-p1-value"/>
+            </spring:map>
+        </spring:property>
+    </spring:bean>
+
+    <spring:bean id="property-f1p1-f2p1-f1p2" class="org.mule.tck.property.SessionPropertiesValidatorComponent">
+        <spring:property name="expectedProperties">
+            <spring:map>
+                <spring:entry key="flow1-p1" value="flow1-p1-value"/>
+                <spring:entry key="flow2-p1" value="flow2-p1-value"/>
+                <spring:entry key="flow1-p2" value="flow1-p2-value"/>
+            </spring:map>
+        </spring:property>
+    </spring:bean>
+
+    <spring:bean id="property-f1p1-f2p1-f3p1" class="org.mule.tck.property.SessionPropertiesValidatorComponent">
+        <spring:property name="expectedProperties">
+            <spring:map>
+                <spring:entry key="flow1-p1" value="flow1-p1-value"/>
+                <spring:entry key="flow2-p1" value="flow2-p1-value"/>
+                <spring:entry key="flow3-p1" value="flow3-p1-value"/>
+            </spring:map>
+        </spring:property>
+    </spring:bean>
+
+    <spring:bean id="property-f1p1-f2p1-f1p2-f3p1" class="org.mule.tck.property.SessionPropertiesValidatorComponent">
+        <spring:property name="expectedProperties">
+            <spring:map>
+                <spring:entry key="flow1-p1" value="flow1-p1-value"/>
+                <spring:entry key="flow2-p1" value="flow2-p1-value"/>
+                <spring:entry key="flow1-p2" value="flow1-p2-value"/>
+                <spring:entry key="flow3-p1" value="flow3-p1-value"/>
+            </spring:map>
+        </spring:property>
+    </spring:bean>
+
+    <!-- F1 call F2, F2 call F3 scenario >>> -->
+
+    <flow name="Flow1s1">
+
+        <http:inbound-endpoint connector-ref="httpConnector" name="Flow1s1i"
+                               host="localhost" port="${port1}" path="Flow1s1">
+        </http:inbound-endpoint>
+
+        <message-properties-transformer scope="session">
+            <add-message-property key="flow1-p1" value="flow1-p1-value"/>
+        </message-properties-transformer>
+
+        <component><spring-object bean="property-f1p1"/></component>
+
+        <http:outbound-endpoint name="Flow2s1o" connector-ref="httpConnector"
+                              path="Flow2s1" exchange-pattern="request-response"
+                              host="localhost" port="${port2}">
+        </http:outbound-endpoint>
+
+        <component><spring-object bean="property-f1p1-f2p1-f3p1"/></component>
+
+        <message-properties-transformer scope="session">
+            <add-message-property key="flow1-p2" value="flow1-p2-value"/>
+        </message-properties-transformer>
+
+        <component><spring-object bean="property-f1p1-f2p1-f1p2-f3p1"/></component>
+
+    </flow>
+
+    <flow name="Flow2s1">
+
+        <http:inbound-endpoint connector-ref="httpConnector" name="Flow2s1i"
+                               host="localhost" port="${port2}" path="Flow2s1">
+        </http:inbound-endpoint>
+
+        <component><spring-object bean="property-f1p1"/></component>
+
+        <message-properties-transformer scope="session">
+            <add-message-property key="flow2-p1" value="flow2-p1-value"/>
+        </message-properties-transformer>
+
+        <component><spring-object bean="property-f1p1-f2p1"/></component>
+
+        <http:outbound-endpoint name="Flow3s1o" connector-ref="httpConnector"
+                              path="Flow3s1" exchange-pattern="request-response"
+                              host="localhost" port="${port3}">
+        </http:outbound-endpoint>
+
+        <component><spring-object bean="property-f1p1-f2p1-f3p1"/></component>
+
+    </flow>
+
+    <flow name="Flow3s1">
+
+        <http:inbound-endpoint connector-ref="httpConnector" name="Flow3s1i"
+                               host="localhost" port="${port3}" path="Flow3s1">
+        </http:inbound-endpoint>
+
+        <component><spring-object bean="property-f1p1-f2p1"/></component>
+
+        <message-properties-transformer scope="session">
+            <add-message-property key="flow3-p1" value="flow3-p1-value"/>
+        </message-properties-transformer>
+
+        <component><spring-object bean="property-f1p1-f2p1-f3p1"/></component>
+
+    </flow>
+
+    <!-- F1 call F2, F2 call F3 scenario <<< -->
+
+    <!-- F1 call F2 , F1 call F3 scenario >>> -->
+
+    <flow name="Flow1s2">
+
+        <http:inbound-endpoint connector-ref="httpConnector" name="Flow1s2i"
+                               host="localhost" port="${port4}" path="Flow1s2">
+        </http:inbound-endpoint>
+
+        <message-properties-transformer scope="session">
+            <add-message-property key="flow1-p1" value="flow1-p1-value"/>
+        </message-properties-transformer>
+
+        <component><spring-object bean="property-f1p1"/></component>
+
+        <http:outbound-endpoint name="Flow2s2o" connector-ref="httpConnector"
+                              path="Flow2s2" exchange-pattern="request-response"
+                              host="localhost" port="${port5}">
+        </http:outbound-endpoint>
+
+        <component><spring-object bean="property-f1p1-f2p1"/></component>
+
+        <message-properties-transformer scope="session">
+            <add-message-property key="flow1-p2" value="flow1-p2-value"/>
+        </message-properties-transformer>
+
+        <http:outbound-endpoint name="Flow3s2o" connector-ref="httpConnector"
+                              path="Flow3s2" exchange-pattern="request-response"
+                              host="localhost" port="${port6}">
+        </http:outbound-endpoint>
+
+        <component><spring-object bean="property-f1p1-f2p1-f1p2-f3p1"/></component>
+
+    </flow>
+
+    <flow name="Flow2s2">
+
+        <http:inbound-endpoint connector-ref="httpConnector" name="Flow2s2i"
+                               host="localhost" port="${port5}" path="Flow2s2">
+        </http:inbound-endpoint>
+
+        <component><spring-object bean="property-f1p1"/></component>
+
+        <message-properties-transformer scope="session">
+            <add-message-property key="flow2-p1" value="flow2-p1-value"/>
+        </message-properties-transformer>
+
+        <component><spring-object bean="property-f1p1-f2p1"/></component>
+
+    </flow>
+
+    <flow name="Flow3s2">
+
+        <http:inbound-endpoint connector-ref="httpConnector" name="Flow3s2i"
+                               host="localhost" port="${port6}" path="Flow3s2">
+        </http:inbound-endpoint>
+
+        <component><spring-object bean="property-f1p1-f2p1"/></component>
+
+        <message-properties-transformer scope="session">
+            <add-message-property key="flow3-p1" value="flow3-p1-value"/>
+        </message-properties-transformer>
+
+        <component><spring-object bean="property-f1p1-f2p1-f1p2-f3p1"/></component>
+
+    </flow>
+
+    <!-- F1 call F2 , F1 call F3 scenario <<< -->
+
+
+</mule>

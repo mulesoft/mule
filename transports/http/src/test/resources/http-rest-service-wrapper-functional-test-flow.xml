@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <byte-array-to-string-transformer name="ByteArrayToString"/>
+
+    <http:endpoint name="serverEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response">
+        <transformer ref="ByteArrayToString"/>
+    </http:endpoint>
+
+    <vm:endpoint name="restServiceEndpoint" path="restservice" exchange-pattern="one-way"/>
+    <vm:endpoint name="restServiceEndpoint2" path="restservice2" exchange-pattern="one-way"/>
+    <vm:endpoint name="restServiceEndpoint3" path="restservice3" exchange-pattern="one-way"/>
+
+    <flow name="HTTPPostSample">
+        <inbound-endpoint ref="restServiceEndpoint" exchange-pattern="request-response"/>
+        <http:rest-service-component serviceUrl="http://localhost:${port1}" httpMethod="POST">
+            <http:error-filter>
+                <regex-filter pattern="echo(.*)"/>
+            </http:error-filter>
+            <http:payloadParameterName value="echo"/>
+        </http:rest-service-component>
+        <!-- do not log any exceptions, the test makes sure error cases are handled appropriately -->
+        <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
+    </flow>
+
+    <flow name="HTTPPostSample2">
+        <inbound-endpoint ref="restServiceEndpoint2" exchange-pattern="request-response"/>
+        <http:rest-service-component serviceUrl="http://localhost:${port1}" httpMethod="POST">
+            <http:error-filter>
+                <regex-filter pattern="test(.*)"/>
+            </http:error-filter>
+            <http:payloadParameterName value="echo"/>
+        </http:rest-service-component>
+        <!-- do not log any exceptions, the test makes sure error cases are handled appropriately -->
+        <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
+    </flow>
+
+    <flow name="HTTPPostSample3">
+        <inbound-endpoint ref="restServiceEndpoint3" exchange-pattern="request-response"/>
+        <!-- Test using expressions and literal values -->
+        <http:rest-service-component serviceUrl="http://localhost:${port1}" httpMethod="POST">
+            <http:requiredParameter key="foo" value="boo"/>
+            <http:requiredParameter key="faz" value="#[header:INBOUND:baz-header]"/>
+            <http:optionalParameter key="far" value="#[header:INBOUND:bar-optional-header]"/>
+        </http:rest-service-component>
+        <!-- do not log any exceptions, the test makes sure error cases are handled appropriately -->
+        <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
+    </flow>
+
+    <flow name="EchoService">
+        <inbound-endpoint ref="serverEndpoint"/>
+        <echo-component/>
+        <!-- do not log any exceptions, the test makes sure error cases are handled appropriately -->
+        <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
+    </flow>
+
+    <flow name="flow">
+        <vm:inbound-endpoint path="toFlow" exchange-pattern="request-response"/>
+        <http:rest-service-component serviceUrl="http://localhost:${port1}" httpMethod="POST">
+            <http:payloadParameterName value="echo"/>
+        </http:rest-service-component>
+    </flow>
+
+    <flow name="PreserveRequestContentTypeHeader">
+        <vm:inbound-endpoint name="restServiceEndpoint4" path="restservice4" exchange-pattern="request-response"/>
+        <message-properties-transformer>
+            <add-message-property key="Content-Type" value="foo/bar"/>
+        </message-properties-transformer>
+        <!-- Tests that the content type is not overwritten by RestServiceWrapper -->
+        <http:rest-service-component serviceUrl="http://localhost:${port2}/echo" httpMethod="POST"/>
+    </flow>
+
+    <flow name="SendBackContentType">
+        <http:inbound-endpoint address="http://localhost:${port2}/echo"/>
+        <component class="org.mule.transport.http.components.RestServiceWrapperFunctionalTestCase$CopyContentTypeFromRequest"/>
+    </flow>
+</mule>

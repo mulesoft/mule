@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <flow name="NoException">
+        <http:inbound-endpoint address="http://localhost:${port1}/noException" />
+        <test:component>
+        	<test:return-data>Here you go</test:return-data>
+        </test:component>
+    </flow>
+    <flow name="TransformerException">
+        <http:inbound-endpoint address="http://localhost:${port1}/transformerException" />
+        <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
+        <test:component>
+        	<test:return-data>Here you go</test:return-data>
+        </test:component>
+    </flow>
+    <flow name="RouterException">
+        <http:inbound-endpoint address="http://localhost:${port1}/routerException" />
+        <custom-processor class="org.mule.tck.testmodels.mule.FailingRouter" />
+        <test:component>
+        	<test:return-data>Here you go</test:return-data>
+        </test:component>
+    </flow>
+    <flow name="ComponentException">
+        <http:inbound-endpoint address="http://localhost:${port1}/componentException" />
+        <test:component throwException="true">
+            <test:return-data>Here you go</test:return-data>
+        </test:component>
+    </flow>
+    <flow name="HandledTransformerException">
+        <http:inbound-endpoint address="http://localhost:${port1}/handledTransformerException" />
+        <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
+        <test:component>
+            <test:return-data>Here you go</test:return-data>
+        </test:component>
+        <custom-exception-strategy
+                class="org.mule.transport.http.reliability.InboundMessageLossTestCase$Handler"/>
+    </flow>
+
+    <flow name="FailToHandledTransformerException">
+        <http:inbound-endpoint address="http://localhost:${port1}/notHandledTransformerException" />
+        <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
+        <test:component>
+            <test:return-data>Here you go</test:return-data>
+        </test:component>
+        <custom-exception-strategy
+                class="org.mule.transport.http.reliability.InboundMessageLossTestCase$BadHandler"/>
+    </flow>
+</mule>

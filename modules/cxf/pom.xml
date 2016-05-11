@@ -611,8 +611,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-http</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -707,6 +707,15 @@
             <scope>test</scope>
         </dependency>
 
+        <!--  Used for the security test -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+
         <!-- for integration tests -->
         <!-- Maven classpath gets messed up and WsdlCallTestCase doesn't pass unless this is here -->
         <dependency>
@@ -762,11 +771,6 @@
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-broker</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

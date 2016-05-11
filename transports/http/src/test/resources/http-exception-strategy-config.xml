@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xsi:schemaLocation="
+    http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
+
+
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
+    <flow name="flowWithoutExceptionStrategySync">
+        <http:inbound-endpoint name="httpInSync" port="${port1}" host="localhost" path="flowWithoutExceptionStrategySync" exchange-pattern="request-response"/>
+        <test:component throwException="true"/>
+    </flow>
+
+    <flow name="flowWithtCESAndStatusCode">
+        <http:inbound-endpoint port="${port1}" host="localhost" path="flowWithtCESAndStatusCode" exchange-pattern="request-response"/>
+        <test:component throwException="true"/>
+        <custom-exception-strategy class="org.mule.transport.http.functional.HttpExceptionStrategyTestCase$CustomExceptionStrategy"/>
+    </flow>
+
+</mule>

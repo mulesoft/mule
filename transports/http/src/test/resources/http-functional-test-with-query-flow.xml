@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:endpoint name="clientEndpoint1" host="localhost" port="${port1}" 
+        path="test1/?foo=boo&amp;far=bar" exchange-pattern="request-response"/>
+
+    <!-- tests that encoded expressions are decoded, Note that you don't need to decode them -->
+    <http:endpoint name="clientEndpoint2" host="localhost" port="${port1}" 
+        path="test1/?foo=#[header:foo]&amp;far=#[header:far]" exchange-pattern="request-response"/>
+
+    <http:endpoint name="serverEndpoint1" host="localhost" port="${port1}" path="test1" exchange-pattern="request-response">
+        <expression-transformer>
+            <return-argument evaluator="header" expression="INBOUND:foo"/>
+            <return-argument evaluator="header" expression="INBOUND:far"/>
+        </expression-transformer>
+    </http:endpoint>
+
+    <flow name="testComponent">
+        <inbound-endpoint ref="serverEndpoint1"/>
+        <component class="org.mule.tck.services.MultiParamComponent"/>
+    </flow>
+    
+</mule>

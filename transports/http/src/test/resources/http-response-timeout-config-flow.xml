@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+    
+    <configuration defaultResponseTimeout="2000"/>
+
+    <flow name="TestDecreaseTimeout">
+        <vm:inbound-endpoint path="decreaseTimeoutRequest" exchange-pattern="request-response"/>
+        <http:outbound-endpoint address="http://localhost:${port1}/DelayService"
+                                exchange-pattern="request-response" responseTimeout="1000"/>
+    </flow>
+
+    <flow name="TestIncreaseTimeout">
+        <vm:inbound-endpoint path="increaseTimeoutRequest" exchange-pattern="request-response"/>
+        <http:outbound-endpoint address="http://localhost:${port1}/DelayService"
+                                exchange-pattern="request-response" responseTimeout="3000"/>
+    </flow>
+
+    <flow name="DelayService">
+        <http:inbound-endpoint address="http://localhost:${port1}/DelayService" exchange-pattern="request-response"
+                               name="inDelayService"/>
+        <test:component waitTime="2500" appendString=" processed"/>
+    </flow>       
+    
+</mule>

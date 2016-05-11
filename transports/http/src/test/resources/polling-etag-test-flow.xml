@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/current/mule-stdio.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:polling-connector name="PollingHttpConnector" pollingFrequency="2000"/>
+
+    <http:connector name="HttpConnector"/>
+
+    <!-- singleton for easier testing only -->
+    <flow name="Test">
+        <http:inbound-endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
+                               address="http://localhost:${port1}/TestServer" exchange-pattern="one-way"/>
+        <test:component/>
+        <outbound-endpoint address="stdio://System.out" exchange-pattern="one-way"/>
+    </flow>
+
+    <flow name="TestServer">
+        <inbound-endpoint address="http://localhost:${port1}" exchange-pattern="request-response"
+                          connector-ref="HttpConnector"/>
+        <component>
+            <singleton-object class="org.mule.transport.http.functional.ETagComponent"/>
+        </component>
+    </flow>
+
+</mule>

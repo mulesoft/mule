@@ -1,0 +1,19 @@
+http\://www.mulesoft.org/schema/mule/http/3.1/mule-http.xsd=META-INF/mule-http.xsd
+http\://www.mulesoft.org/schema/mule/https/3.1/mule-https.xsd=META-INF/mule-https.xsd
+http\://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd=META-INF/mule-http.xsd
+http\://www.mulesoft.org/schema/mule/https/3.2/mule-https.xsd=META-INF/mule-https.xsd
+http\://www.mulesoft.org/schema/mule/http/3.3/mule-http.xsd=META-INF/mule-http.xsd
+http\://www.mulesoft.org/schema/mule/https/3.3/mule-https.xsd=META-INF/mule-https.xsd
+http\://www.mulesoft.org/schema/mule/http/3.4/mule-http.xsd=META-INF/mule-http.xsd
+http\://www.mulesoft.org/schema/mule/https/3.4/mule-https.xsd=META-INF/mule-https.xsd
+http\://www.mulesoft.org/schema/mule/http/3.5/mule-http.xsd=META-INF/mule-http.xsd
+http\://www.mulesoft.org/schema/mule/https/3.5/mule-https.xsd=META-INF/mule-https.xsd
+http\://www.mulesoft.org/schema/mule/http/3.6/mule-http.xsd=META-INF/mule-http.xsd
+http\://www.mulesoft.org/schema/mule/https/3.6/mule-https.xsd=META-INF/mule-https.xsd
+http\://www.mulesoft.org/schema/mule/http/3.7/mule-http.xsd=META-INF/mule-http.xsd
+http\://www.mulesoft.org/schema/mule/https/3.7/mule-https.xsd=META-INF/mule-https.xsd
+http\://www.mulesoft.org/schema/mule/http/current/mule-http.xsd=META-INF/mule-http.xsd
+http\://www.mulesoft.org/schema/mule/https/current/mule-https.xsd=META-INF/mule-https.xsd
+
+# We need to define a schemaLocation for the new HTTP connector schema, so that it can be included from mule-http.xsd
+http\://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd=META-INF/mule-httpn.xsd

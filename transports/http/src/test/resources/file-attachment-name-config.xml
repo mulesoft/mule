@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
+    <flow name="main">
+        <http:inbound-endpoint address="http://localhost:${httpPort}/testInput" exchange-pattern="request-response" method="POST"/>
+
+        <copy-attachments attachmentName="*"/>
+
+        <http:outbound-endpoint address="http://localhost:${httpPort}/backend" exchange-pattern="request-response" method="POST"/>
+    </flow>
+
+    <flow name="backend">
+        <http:inbound-endpoint address="http://localhost:${httpPort}/backend" exchange-pattern="request-response" method="POST"/>
+
+        <set-variable variableName="attachment" value="#[message.inboundAttachments.get('testAttachment')]"/>
+        <set-variable variableName="attachmentName" value="#[attachment.getDataSource().getPart().getName()]"/>
+        <set-variable variableName="attachmentFileName" value="#[attachment.getDataSource().getPart().getContentDispositionFilename()]"/>
+
+        <set-payload value="#[attachmentName]:#[attachmentFileName]"/>
+    </flow>
+</mule>

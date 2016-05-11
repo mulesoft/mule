@@ -73,6 +73,11 @@ public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("pooled-component", new ComponentDelegatingDefinitionParser(PooledJavaWithBindingsComponent.class));
         registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("interfaceBinding", DefaultInterfaceBinding.class));
 
+        // Security
+        SecurityFilterDefinitionParser securityFilterDefinitionParser = new SecurityFilterDefinitionParser(HttpBasicAuthenticationFilter.class);
+        securityFilterDefinitionParser.addAlias("securityManager-ref", "securityManager");
+        registerBeanDefinitionParser("http-security-filter", securityFilterDefinitionParser);
+
         // CXF
         MessageProcessorDefinitionParser jsParser = new MessageProcessorDefinitionParser(WebServiceMessageProcessorWithInboundEndpointBuilder.class);
         jsParser.registerPreProcessor(new AddAttribute("frontend", CxfConstants.JAX_WS_FRONTEND));

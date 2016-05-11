@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
+    <flow name="testResponseError" processingStrategy="synchronous">
+        <http:inbound-endpoint address="http://localhost:${port1}/resources/error" exchange-pattern="request-response"/>
+        <http:response-builder status="500" contentType="text/html">
+            <parse-template location="error.html" />
+        </http:response-builder>
+        <echo-component/>
+    </flow>
+
+    <flow name="testResponseMove" processingStrategy="synchronous">
+        <http:inbound-endpoint address="http://localhost:${port1}/resources/move" exchange-pattern="request-response"/>
+        <http:response-builder status="301">
+            <http:location value="http://localhost:9090/resources/moved"/>
+        </http:response-builder>
+        <echo-component/>
+    </flow>
+
+    <flow name="testResponseAll" processingStrategy="synchronous">
+        <http:inbound-endpoint address="http://localhost:${port1}/resources/all" exchange-pattern="request-response"/>
+        <http:response-builder status="404" contentType="text/html">
+            <http:cache-control directive="public" noCache="true" mustRevalidate="true" maxAge="3600"/>
+            <http:expires value="Thu, 01 Dec 2014 16:00:00 GMT" />
+            <http:location value="http://localhost:9090"/>
+            <http:set-cookie name="cookie1" value="value1" domain="localhost" path="/" expiryDate="Fri, 12 Dec 2014 17:00:00 GMT" secure="true"/>
+            <http:set-cookie name="cookie2" value="value2" maxAge="1000"/>
+            <http:header name="Cache-Control" value="no-transform"/>
+            <http:header name="header1" value="value1"/>
+            <http:header name="header2" value="value2"/>
+            <custom-transformer class="org.mule.transformer.simple.SetPayloadTransformer">
+                <spring:property name="value" value="Custom body"/>
+            </custom-transformer>
+        </http:response-builder>
+        <echo-component/>
+    </flow>
+
+     <flow name="testResponseAllExpressions" processingStrategy="synchronous">
+        <http:inbound-endpoint address="http://localhost:${port1}/resources/allExpressions" exchange-pattern="request-response"/>
+        <http:response-builder status="#[header:inbound:status]" contentType="#[header:inbound:contentType]">
+            <http:cache-control maxAge="#[header:inbound:cacheControl]"/>
+            <http:expires value="Thu, 01 Dec 2014 16:00:00 GMT" />
+            <http:location value="http://localhost:9090"/>
+            <http:set-cookie name="#[header:inbound:cookie1]" value="#[header:inbound:value1]" domain="#[header:inbound:domain]" path="#[header:inbound:path]" expiryDate="#[header:inbound:expiryDate]" secure="#[header:inbound:secure]"/>
+            <http:set-cookie name="#[header:inbound:cookie2]" value="#[header:inbound:value2]" maxAge="#[header:inbound:maxAge]"/>
+            <http:header name="#[header:inbound:header1]" value="#[header:inbound:value1]"/>
+            <http:header name="#[header:inbound:header2]" value="#[header:inbound:value2]"/>
+        </http:response-builder>
+        <echo-component/>
+    </flow>
+
+
+    <!-- Flow that uses the header element inside the response-builder element of the HTTP module to check
+         that there is no conflict with the header of the response-builder of the transport when parsing. -->
+
+    <http:listener-config name="httpConfig" host="localhost" port="${port2}" />
+
+    <flow name="httpListenerFlowNestedBuilder">
+        <http:listener config-ref="httpConfig" path="/nested">
+            <http:response-builder>
+                <http:header headerName="testHeader" value="testValue" />
+            </http:response-builder>
+        </http:listener>
+        <echo-component />
+    </flow>
+
+    <flow name="httpListenerFlowNestedErrorBuilder">
+        <http:listener config-ref="httpConfig" path="/nestedError">
+            <http:error-response-builder statusCode="200">
+                <http:header headerName="testHeader" value="testValue" />
+            </http:error-response-builder>
+        </http:listener>
+        <test:component throwException="true" />
+    </flow>
+
+    <http:response-builder name="globalResponseBuilder">
+        <http:header headerName="testHeader" value="testValue" />
+    </http:response-builder>
+
+    <flow name="httpListenerFlowGlobalBuilder">
+        <http:listener config-ref="httpConfig" path="/global">
+            <http:response-builder>
+                <http:builder ref="globalResponseBuilder" />
+            </http:response-builder>
+        </http:listener>
+        <echo-component />
+    </flow>
+
+    <flow name="httpListenerFlowGlobalErrorBuilder">
+        <http:listener config-ref="httpConfig" path="/globalError">
+            <http:error-response-builder statusCode="200">
+                <http:builder ref="globalResponseBuilder" />
+            </http:error-response-builder>
+        </http:listener>
+        <test:component throwException="true" />
+    </flow>
+
+
+</mule>

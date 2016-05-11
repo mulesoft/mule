@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:polling-connector name="PollingHttpConnector"
+        pollingFrequency="30000" reuseAddress="true" />
+
+    <http:connector name="HttpConnector" />
+
+    <vm:connector name="vmQueue" />
+
+
+    <flow name="polling">
+
+        <http:inbound-endpoint user="marie"
+            password="marie" host="localhost" port="${port1}"
+            connector-ref="PollingHttpConnector" exchange-pattern="one-way">
+            <property key="Accept" value="application/xml" />
+        </http:inbound-endpoint>
+
+        <test:component />
+
+        <outbound-endpoint address="vm://toclient"
+            exchange-pattern="one-way" />
+
+    </flow>
+
+    <flow name="polled">
+
+        <inbound-endpoint address="http://localhost:${port1}"
+            exchange-pattern="request-response" connector-ref="HttpConnector" />
+
+        <test:component>
+            <test:return-data>foo</test:return-data>
+        </test:component>
+    </flow>
+
+</mule>

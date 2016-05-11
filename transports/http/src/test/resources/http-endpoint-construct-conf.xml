@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <configuration>
+        <http:config useTransportForUris="true"/>
+    </configuration>
+
+    <flow name="testA">
+        <http:inbound-endpoint host="localhost" port="${port1}" path="/testA" exchange-pattern="request-response"/>
+        <http:outbound-endpoint host="localhost" port="${port1}" path="/testB" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="testB">
+        <http:inbound-endpoint host="localhost" port="${port1}" path="testB" exchange-pattern="request-response"/>
+        <echo-component/>
+    </flow>
+
+</mule>

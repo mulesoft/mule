@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <!-- HTTP method CONNECT is missing here because it's not supported by the HttpClientMessageDispatcher -->
+
+    <flow name="OutboundDelete">
+        <vm:inbound-endpoint path="doDelete" exchange-pattern="one-way" />
+        <http:outbound-endpoint address="http://localhost:${port1}/" method="DELETE" exchange-pattern="one-way" />
+    </flow>
+
+    <flow name="OutboundGet">
+        <vm:inbound-endpoint path="doGet" exchange-pattern="one-way" />
+        <http:outbound-endpoint address="http://localhost:${port1}/" method="GET" exchange-pattern="one-way" />
+    </flow>
+
+    <flow name="OutboundHead">
+        <vm:inbound-endpoint path="doHead" exchange-pattern="one-way" />
+        <http:outbound-endpoint address="http://localhost:${port1}/" method="HEAD" exchange-pattern="one-way" />
+    </flow>
+
+    <flow name="OutboundOptions">
+        <vm:inbound-endpoint path="doOptions" exchange-pattern="one-way" />
+        <http:outbound-endpoint address="http://localhost:${port1}/" method="OPTIONS" exchange-pattern="one-way" />
+    </flow>
+
+    <flow name="OutboundPost">
+        <vm:inbound-endpoint path="doPost" exchange-pattern="one-way" />
+        <http:outbound-endpoint address="http://localhost:${port1}/" method="POST" exchange-pattern="one-way" />
+    </flow>
+
+    <flow name="OutboundPut">
+        <vm:inbound-endpoint path="doPut" exchange-pattern="one-way" />
+        <http:outbound-endpoint address="http://localhost:${port1}/" method="PUT" exchange-pattern="one-way" />
+    </flow>
+
+    <flow name="OutboundTrace">
+        <vm:inbound-endpoint path="doTrace" exchange-pattern="one-way" />
+        <http:outbound-endpoint address="http://localhost:${port1}/" method="TRACE" exchange-pattern="one-way" />
+    </flow>
+
+    <flow name="OutboundPatch">
+        <vm:inbound-endpoint path="doPatch" exchange-pattern="one-way" />
+        <http:outbound-endpoint address="http://localhost:${port1}/" method="PATCH" exchange-pattern="one-way" />
+    </flow>
+</mule>

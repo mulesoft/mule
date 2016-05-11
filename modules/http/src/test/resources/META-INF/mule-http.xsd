@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/http"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.mulesoft.org/schema/mule/http"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <!--
+    We include all the elements defined in the schema of the new HTTP connector into this namespace.
+    -->
+    <xsd:include schemaLocation="http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd" />
+
+</xsd:schema>

@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
@@ -60,6 +59,7 @@ public class WSConsumerConfig implements MuleContextAware
             throw new ConfigurationException(CoreMessages.createStaticMessage("Cannot set both connector-config and connector-ref attributes. Set either one of them, or none for default behavior."));
         }
 
+        // MULE-9694 Reintroduce endpoint lookup capabilites for http and ws modules
         return createHttpRequester();
     }
 
@@ -91,11 +91,6 @@ public class WSConsumerConfig implements MuleContextAware
                 return requestOptions;
             }
         };
-    }
-
-    private boolean isHttp()
-    {
-        return serviceAddress.startsWith(HttpConstants.Protocols.HTTP.getScheme());
     }
 
     public String getName()
