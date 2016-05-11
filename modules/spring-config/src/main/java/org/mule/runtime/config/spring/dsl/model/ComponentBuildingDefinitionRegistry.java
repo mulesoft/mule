@@ -14,7 +14,7 @@ import java.util.Optional;
 
 /**
  * Registry with all {@link ComponentBuildingDefinition} that where discovered in the classpath.
- *
+ * <p/>
  * {@code ComponentBuildingDefinition}s are located using SPI class {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider}.
  *
  * @since 4.0
@@ -29,7 +29,8 @@ public class ComponentBuildingDefinitionRegistry
      *
      * @param builderDefinition definition to be added in the registry
      */
-    public void register(ComponentBuildingDefinition builderDefinition) {
+    public void register(ComponentBuildingDefinition builderDefinition)
+    {
         builderDefinitionsMap.put(builderDefinition.getComponentIdentifier(), builderDefinition);
     }
 

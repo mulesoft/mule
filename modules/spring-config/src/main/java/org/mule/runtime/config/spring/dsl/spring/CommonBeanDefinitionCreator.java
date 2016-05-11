@@ -50,6 +50,8 @@ import org.w3c.dom.Node;
  * {@code ComponentBuildingDefinition}.
  *
  * @since 4.0
+ *
+ * TODO MULE-9638 set visibility to package
  */
 public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
 {

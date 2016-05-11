@@ -85,41 +85,41 @@ import java.util.List;
 public class CoreComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider
 {
 
-    public static final String MESSAGE_PROCESSORS = "messageProcessors";
-    public static final String NAME = "name";
-    public static final String EXCEPTION_STRATEGY = "exception-strategy";
-    public static final String CATCH_EXCEPTION_STRATEGY = "catch-exception-strategy";
-    public static final String WHEN = "when";
-    public static final String ROLLBACK_EXCEPTION_STRATEGY = "rollback-exception-strategy";
-    public static final String DEFAULT_EXCEPTION_STRATEGY = "default-exception-strategy";
-    public static final String NAME_EXCEPTION_STRATEGY_ATTRIBUTE = "globalName";
-    public static final String CUSTOM_EXCEPTION_STRATEGY = "custom-exception-strategy";
-    public static final String CHOICE_EXCEPTION_STRATEGY = "choice-exception-strategy";
-    public static final String SET_PAYLOAD = "set-payload";
-    public static final String PROCESSOR_CHAIN = "processor-chain";
-    public static final String PROCESSOR = "processor";
-    public static final String TRANSFORMER = "transformer";
-    public static final String FILTER = "filter";
-    public static final String CUSTOM_PROCESSOR = "custom-processor";
-    public static final String CLASS_ATTRIBUTE = "class";
-    public static final String SUB_FLOW = "sub-flow";
-    public static final String RESPONSE = "response";
-    public static final String MESSAGE_FILTER = "message-filter";
-    public static final String FLOW = "flow";
-    public static final String EXCEPTION_LISTENER_ATTRIBUTE = "exceptionListener";
-    public static final String SCATTER_GATHER = "scatter-gather";
-    public static final String WIRE_TAP = "wire-tap";
-    public static final String ENRICHER = "enricher";
-    public static final String ASYNC = "async";
-    public static final String TRANSACTIONAL = "transactional";
-    public static final String UNTIL_SUCCESSFUL = "until-successful";
-    public static final String FOREACH = "foreach";
-    public static final String FIRST_SUCCESSFUL = "first-successful";
-    public static final String ROUND_ROBIN = "round-robin";
-    public static final String CHOICE = "choice";
-    public static final String OTHERWISE = "otherwise";
-    public static final String ALL = "all";
-    public static final String POLL = "poll";
+    private static final String MESSAGE_PROCESSORS = "messageProcessors";
+    private static final String NAME = "name";
+    private static final String EXCEPTION_STRATEGY = "exception-strategy";
+    private static final String CATCH_EXCEPTION_STRATEGY = "catch-exception-strategy";
+    private static final String WHEN = "when";
+    private static final String ROLLBACK_EXCEPTION_STRATEGY = "rollback-exception-strategy";
+    private static final String DEFAULT_EXCEPTION_STRATEGY = "default-exception-strategy";
+    private static final String NAME_EXCEPTION_STRATEGY_ATTRIBUTE = "globalName";
+    private static final String CUSTOM_EXCEPTION_STRATEGY = "custom-exception-strategy";
+    private static final String CHOICE_EXCEPTION_STRATEGY = "choice-exception-strategy";
+    private static final String SET_PAYLOAD = "set-payload";
+    private static final String PROCESSOR_CHAIN = "processor-chain";
+    private static final String PROCESSOR = "processor";
+    private static final String TRANSFORMER = "transformer";
+    private static final String FILTER = "filter";
+    private static final String CUSTOM_PROCESSOR = "custom-processor";
+    private static final String CLASS_ATTRIBUTE = "class";
+    private static final String SUB_FLOW = "sub-flow";
+    private static final String RESPONSE = "response";
+    private static final String MESSAGE_FILTER = "message-filter";
+    private static final String FLOW = "flow";
+    private static final String EXCEPTION_LISTENER_ATTRIBUTE = "exceptionListener";
+    private static final String SCATTER_GATHER = "scatter-gather";
+    private static final String WIRE_TAP = "wire-tap";
+    private static final String ENRICHER = "enricher";
+    private static final String ASYNC = "async";
+    private static final String TRANSACTIONAL = "transactional";
+    private static final String UNTIL_SUCCESSFUL = "until-successful";
+    private static final String FOREACH = "foreach";
+    private static final String FIRST_SUCCESSFUL = "first-successful";
+    private static final String ROUND_ROBIN = "round-robin";
+    private static final String CHOICE = "choice";
+    private static final String OTHERWISE = "otherwise";
+    private static final String ALL = "all";
+    private static final String POLL = "poll";
 
     private ComponentBuildingDefinition.Builder baseDefinition;
     private ComponentBuildingDefinition.Builder transactionManagerBaseDefinition;
@@ -136,7 +136,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     {
 
         LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions = new LinkedList<>();
-
 
         AttributeDefinition messageProcessorListAttributeDefinition = fromChildListConfiguration(MessageProcessor.class).build();
         ComponentBuildingDefinition.Builder exceptionStrategyBaseBuilder = baseDefinition.copy()

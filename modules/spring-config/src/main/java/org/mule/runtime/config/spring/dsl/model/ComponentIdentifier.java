@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.core.util.Preconditions;
 
 /**
@@ -27,19 +28,22 @@ public class ComponentIdentifier
     /**
      * @return the unique identifier namespace
      */
-    public String getNamespace() {
+    public String getNamespace()
+    {
         return namespace;
     }
 
     /**
      * @return the unique identifier configuration name
      */
-    public String getName() {
+    public String getName()
+    {
         return identifier;
     }
 
     public static class Builder
     {
+
         private ComponentIdentifier componentIdentifier = new ComponentIdentifier();
 
         /**
@@ -64,26 +68,37 @@ public class ComponentIdentifier
 
         public ComponentIdentifier build()
         {
-            Preconditions.checkState(componentIdentifier.namespace != null, "Namespace must be not null");
-            Preconditions.checkState(componentIdentifier.identifier != null, "Name must be not null");
+            checkState(componentIdentifier.namespace != null, "Namespace must be not null");
+            checkState(componentIdentifier.identifier != null, "Name must be not null");
             return componentIdentifier;
         }
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
 
         ComponentIdentifier that = (ComponentIdentifier) o;
 
-        if (!namespace.equals(that.namespace)) return false;
+        if (!namespace.equals(that.namespace))
+        {
+            return false;
+        }
         return identifier.equals(that.identifier);
 
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         int result = namespace.hashCode();
         result = 31 * result + identifier.hashCode();
         return result;

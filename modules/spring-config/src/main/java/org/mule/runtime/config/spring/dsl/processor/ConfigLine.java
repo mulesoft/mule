@@ -6,11 +6,16 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
+import static com.google.common.collect.ImmutableMap.copyOf;
+import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.core.util.Preconditions;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,8 +55,9 @@ public class ConfigLine
     /**
      * Config lines embedded inside this config line
      */
-    private List<ConfigLine> childrenConfigLines = new ArrayList<>();
-    //TODO remove once we don't need the old parsing mechanism anymore.
+    private List<ConfigLine> childrenConfigLines = new LinkedList<>();
+
+    //TODO MULE-9638 remove once we don't need the old parsing mechanism anymore.
     private Node node;
     private String textContent;
 
@@ -68,7 +74,7 @@ public class ConfigLine
     }
 
     public Map<String, SimpleConfigAttribute> getConfigAttributes() {
-        return Collections.unmodifiableMap(configAttributes);
+        return copyOf(configAttributes);
     }
 
     public Map<String, Object> getCustomAttributes()
@@ -120,54 +126,47 @@ public class ConfigLine
         return result;
     }
 
-    //TODO remove, this should be immutable
-    public void addChild(ConfigLine configLine)
-    {
-        this.childrenConfigLines.add(configLine);
-    }
-
     public static class Builder
     {
         private ConfigLine configLine = new ConfigLine();
         private boolean alreadyBuild;
-        private Node node;
 
         public Builder setNamespace(String namespace) {
-            Preconditions.checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
+            checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
             configLine.namespace = namespace;
             return this;
         }
 
         public Builder setIdentifier(String operation) {
-            Preconditions.checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
+            checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
             configLine.identifier = operation;
             return this;
         }
 
         public Builder addConfigAttribute(String name, String value)
         {
-            Preconditions.checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
+            checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
             configLine.configAttributes.put(name, new SimpleConfigAttribute(name, value));
             return this;
         }
 
         public Builder addCustomAttribute(String name, Object value)
         {
-            Preconditions.checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
+            checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
             configLine.customAttributes.put(name, value);
             return this;
         }
 
         public Builder addChild(ConfigLine line)
         {
-            Preconditions.checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
+            checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
             configLine.childrenConfigLines.add(line);
             return this;
         }
 
         public Builder setParent(ConfigLineProvider parent)
         {
-            Preconditions.checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
+            checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
             configLine.parent = parent;
             return this;
         }

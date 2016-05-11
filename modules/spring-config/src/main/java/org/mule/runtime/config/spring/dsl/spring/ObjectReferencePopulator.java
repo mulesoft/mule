@@ -24,7 +24,7 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-public class ObjectReferencePopulator
+class ObjectReferencePopulator
 {
 
     //TODO MULE-9682: Load this list dynamically and define the whole set of objects that can be injected.

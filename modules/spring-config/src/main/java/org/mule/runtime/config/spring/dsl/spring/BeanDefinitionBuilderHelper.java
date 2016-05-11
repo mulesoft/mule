@@ -18,7 +18,7 @@ import org.springframework.beans.factory.support.ManagedMap;
  *
  * @since 4.0
  */
-public class BeanDefinitionBuilderHelper
+class BeanDefinitionBuilderHelper
 {
 
     public BeanDefinitionBuilder beanDefinitionBuilder;

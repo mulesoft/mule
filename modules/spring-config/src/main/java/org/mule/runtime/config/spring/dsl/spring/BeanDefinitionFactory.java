@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
+import static java.lang.String.format;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
@@ -112,7 +114,9 @@ public class BeanDefinitionFactory
     private void resolveComponentBeanDefinition(ComponentModel parentComponentModel, ComponentModel componentModel)
     {
         ComponentBuildingDefinition componentBuildingDefinition = componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier()).orElseThrow(() -> {
-            return new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("No component building definition for element %s. It may be that there's a dependency missing to the project that handle that extension.", componentModel.getIdentifier())));
+            return new MuleRuntimeException(createStaticMessage(format("No component building definition for element %s. It may be that there's a dependency " +
+                                                                       "missing to the project that handle that extension.",
+                                                                       componentModel.getIdentifier())));
         });
         this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(parentComponentModel, componentModel, componentBuildingDefinition));
     }
@@ -135,10 +139,10 @@ public class BeanDefinitionFactory
         ExceptionStrategyRefBeanDefinitionCreator exceptionStrategyRefBeanDefinitionCreator = new ExceptionStrategyRefBeanDefinitionCreator();
         FilterReferenceBeanDefinitionCreator filterReferenceBeanDefinitionCreator = new FilterReferenceBeanDefinitionCreator();
         CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator();
-        referenceProcessorBeanDefinitionCreator.setSuccessor(exceptionStrategyRefBeanDefinitionCreator);
-        exceptionStrategyRefBeanDefinitionCreator.setSuccessor(exceptionStrategyRefBeanDefinitionCreator);
-        exceptionStrategyRefBeanDefinitionCreator.setSuccessor(filterReferenceBeanDefinitionCreator);
-        filterReferenceBeanDefinitionCreator.setSuccessor(commonComponentModelProcessor);
+        referenceProcessorBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
+        exceptionStrategyRefBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
+        exceptionStrategyRefBeanDefinitionCreator.setNext(filterReferenceBeanDefinitionCreator);
+        filterReferenceBeanDefinitionCreator.setNext(commonComponentModelProcessor);
         return referenceProcessorBeanDefinitionCreator;
     }
 

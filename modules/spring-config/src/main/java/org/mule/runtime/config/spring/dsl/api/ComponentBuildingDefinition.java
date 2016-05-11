@@ -98,6 +98,8 @@ public class ComponentBuildingDefinition
 
     /**
      * Builder for {@code ComponentBuildingDefinition}
+     *
+     * TODO MULE-9693 Improve builder so the copy is not required to reuse the namespace value.
      */
     public static class Builder
     {

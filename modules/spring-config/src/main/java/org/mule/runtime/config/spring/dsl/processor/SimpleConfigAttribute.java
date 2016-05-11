@@ -13,8 +13,8 @@ package org.mule.runtime.config.spring.dsl.processor;
  */
 public class SimpleConfigAttribute
 {
-    private String name;
-    private String value;
+    private final String name;
+    private final String value;
 
     /**
      * @param name configuration attribute name as it appears in the configuration file.

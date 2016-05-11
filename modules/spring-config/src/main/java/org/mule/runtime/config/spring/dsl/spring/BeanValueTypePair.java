@@ -15,11 +15,11 @@ package org.mule.runtime.config.spring.dsl.spring;
  *
  * @since 4.0
  */
-public class BeanValueTypePair
+class BeanValueTypePair
 {
 
-    private Class<?> type;
-    private Object bean;
+    private final Class<?> type;
+    private final Object bean;
 
     /**
      * @param type the type of the object to be created

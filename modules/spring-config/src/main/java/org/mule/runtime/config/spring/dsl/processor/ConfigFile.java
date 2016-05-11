@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
+import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.core.util.Preconditions;
 
 import java.util.List;
@@ -26,8 +27,8 @@ public class ConfigFile implements Comparable<ConfigFile> {
     private List<ConfigLine> configLines;
 
     public ConfigFile(String filename, List<ConfigLine> configLines) {
-        Preconditions.checkState(filename != null, "A config file must have a name");
-        Preconditions.checkState(configLines != null, "A config file cannot have config lines");
+        checkState(filename != null, "A config file must have a name");
+        checkState(configLines != null, "A config file cannot have config lines");
         this.filename = filename;
         this.configLines = configLines;
     }

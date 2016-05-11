@@ -43,6 +43,7 @@ import org.w3c.dom.Node;
 public class ApplicationModel
 {
 
+    //TODO MULE-9692 move this logic elsewhere. This are here just for the language rules and those should be processed elsewhere.
     public static final String MULE_ROOT_ELEMENT = "mule";
     public static final String MULE_DOMAIN_ROOT_ELEMENT = "mule-domain";
     public static final String DESCRIPTION_ELEMENT = "description";

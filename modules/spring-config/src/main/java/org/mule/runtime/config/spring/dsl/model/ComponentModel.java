@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
+import static com.google.common.collect.ImmutableMap.copyOf;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.util.Preconditions;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,14 +25,14 @@ import org.springframework.beans.factory.config.BeanReference;
 /**
  * An {@code ComponentModel} represents the user configuration of a component (flow, config, message processor, etc) defined
  * in an artifact configuration file.
- *
+ * <p/>
  * Every {@code ComponentModel} represents the configuration of a core configuration or an extension configuration. Which configuration
  * element this object represents is identified by a {@link org.mule.runtime.config.spring.dsl.model.ComponentIdentifier} that can be retrieved
  * using {@code #getIdentifier}.
- *
+ * <p/>
  * It may have simple configuration parameters which are retrieve by using {@code #getParameters} or complex parameters which are
  * retrieved using {@code #getInnerComponents}.
- *
+ * <p/>
  * There's a set of configuration attributes or custom attributes that may not be mapped directly to the object that runs on runtime
  * but may be hold by a {@code ComponentModel}. Those attributes are retrieved by using {@code #getCustomAttributes}.
  *
@@ -53,7 +56,8 @@ public class ComponentModel
     /**
      * @return the configuration identifier.
      */
-    public ComponentIdentifier getIdentifier() {
+    public ComponentIdentifier getIdentifier()
+    {
         return identifier;
     }
 
@@ -68,63 +72,73 @@ public class ComponentModel
     /**
      * @return a {@code java.util.List} of all the child {@code ComponentModel}s
      */
-    public List<ComponentModel> getInnerComponents() {
+    public List<ComponentModel> getInnerComponents()
+    {
         return innerComponents;
     }
 
     /**
      * @return a {@code java.util.Map} with all the custom attributes.
      */
-    public Map<String, Object> getCustomAttributes() {
-        return Collections.unmodifiableMap(customAttributes);
+    public Map<String, Object> getCustomAttributes()
+    {
+        return copyOf(customAttributes);
     }
 
     /**
      * @return true if the {@code ComponentModel} is a top level configuration element, false otherwise.
      */
-    public boolean isRoot() {
+    public boolean isRoot()
+    {
         return root;
     }
 
     /**
      * @param beanDefinition the {@code BeanDefinition} created based on the {@code ComponentModel} values.
      */
-    public void setBeanDefinition(BeanDefinition beanDefinition) {
+    public void setBeanDefinition(BeanDefinition beanDefinition)
+    {
         this.beanDefinition = beanDefinition;
     }
 
     /**
      * @return the {@code BeanDefinition} created based on the {@code ComponentModel} values.
      */
-    public BeanDefinition getBeanDefinition() {
+    public BeanDefinition getBeanDefinition()
+    {
         return beanDefinition;
     }
 
     /**
      * @return the type of the object to be created when processing this {@code ComponentModel}.
      */
-    public Class<?> getType() {
+    public Class<?> getType()
+    {
         return type;
     }
 
     /**
      * @param type the type of the object to be created when processing this {@code ComponentModel}.
      */
-    public void setType(Class<?> type) {
+    public void setType(Class<?> type)
+    {
         this.type = type;
     }
 
     /**
      * @return the value of the name attribute.
      */
-    public String getNameAttribute() {
+    public String getNameAttribute()
+    {
         return parameters.get(NAME_ATTRIBUTE);
     }
 
     /**
      * @return true if this {@code ComponentModel} represents a {@code org.mule.runtime.core.api.processor.MessageProcessor} scope.
      */
-    public boolean isScope() {
+    public boolean isScope()
+    {
+        //TODO MULE-9691 : Define a clear mechanism to realize if the object to be build is an scope. For now this works.
         return MessageRouter.class.isAssignableFrom(type);
     }
 
@@ -164,17 +178,19 @@ public class ComponentModel
          * @param identifier identifier for the configuration element this object represents.
          * @return the builder.
          */
-        public Builder setIdentifier(ComponentIdentifier identifier) {
+        public Builder setIdentifier(ComponentIdentifier identifier)
+        {
             this.model.identifier = identifier;
             return this;
         }
 
         /**
          * @param parameterName name of the configuration parameter.
-         * @param value value contained by the configuration parameter.
+         * @param value         value contained by the configuration parameter.
          * @return the builder.
          */
-        public Builder addParameter(String parameterName, String value) {
+        public Builder addParameter(String parameterName, String value)
+        {
             this.model.parameters.put(parameterName, value);
             return this;
         }
@@ -185,7 +201,8 @@ public class ComponentModel
          * @param componentModel child {@code ComponentModel} declared in the configuration.
          * @return the builder.
          */
-        public Builder addChildComponentModel(ComponentModel componentModel) {
+        public Builder addChildComponentModel(ComponentModel componentModel)
+        {
             this.model.innerComponents.add(componentModel);
             return this;
         }
@@ -219,7 +236,7 @@ public class ComponentModel
          * is meant to hold metadata of the configuration and not to be used to instantiate
          * the runtime object that corresponds to this configuration.
          *
-         * @param name custom attribute name.
+         * @param name  custom attribute name.
          * @param value custom attribute value.
          * @return the builder.
          */
@@ -241,21 +258,38 @@ public class ComponentModel
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
 
         ComponentModel that = (ComponentModel) o;
 
-        if (root != that.root) return false;
-        if (!identifier.equals(that.identifier)) return false;
-        if (!parameters.equals(that.parameters)) return false;
+        if (root != that.root)
+        {
+            return false;
+        }
+        if (!identifier.equals(that.identifier))
+        {
+            return false;
+        }
+        if (!parameters.equals(that.parameters))
+        {
+            return false;
+        }
         return innerComponents.equals(that.innerComponents);
 
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         int result = (root ? 1 : 0);
         result = 31 * result + identifier.hashCode();
         result = 31 * result + parameters.hashCode();

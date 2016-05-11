@@ -19,7 +19,7 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
  *
  * @since 4.0
  */
-public class ExceptionStrategyRefBeanDefinitionCreator extends BeanDefinitionCreator
+class ExceptionStrategyRefBeanDefinitionCreator extends BeanDefinitionCreator
 {
 
     @Override

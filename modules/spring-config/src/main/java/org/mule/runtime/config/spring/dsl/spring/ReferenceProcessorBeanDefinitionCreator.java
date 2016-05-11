@@ -22,7 +22,7 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
  *
  * @since 4.0
  */
-public class ReferenceProcessorBeanDefinitionCreator extends BeanDefinitionCreator
+class ReferenceProcessorBeanDefinitionCreator extends BeanDefinitionCreator
 {
     private static final ComponentIdentifier PROCESSOR_REF_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(PROCESSOR_REFERENCE_ELEMENT).build();
     private static final ComponentIdentifier TRANSFORMER_REF_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMER_REFERENCE_ELEMENT).build();

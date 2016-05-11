@@ -12,17 +12,17 @@ package org.mule.runtime.config.spring.dsl.spring;
  *
  * @since 4.0
  */
-public abstract class BeanDefinitionCreator
+abstract class BeanDefinitionCreator
 {
 
-    private BeanDefinitionCreator successor;
+    private BeanDefinitionCreator next;
 
     /**
      * @param nextBeanDefinitionCreator next processor in the chain.
      */
-    public void setSuccessor(BeanDefinitionCreator nextBeanDefinitionCreator)
+    public void setNext(BeanDefinitionCreator nextBeanDefinitionCreator)
     {
-        this.successor = nextBeanDefinitionCreator;
+        this.next = nextBeanDefinitionCreator;
     }
 
     /**
@@ -37,9 +37,9 @@ public abstract class BeanDefinitionCreator
         {
             return;
         }
-        if (successor != null)
+        if (next != null)
         {
-            successor.processRequest(request);
+            next.processRequest(request);
         }
     }
 

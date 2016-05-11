@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.routing.MessageFilter;
 
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
 /**
  * Processor of the chain of responsibility that knows how to create the {@link org.springframework.beans.factory.config.BeanDefinition}
@@ -25,7 +26,7 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
  *
  * @since 4.0
  */
-public class FilterReferenceBeanDefinitionCreator extends BeanDefinitionCreator
+class FilterReferenceBeanDefinitionCreator extends BeanDefinitionCreator
 {
     private static final ComponentIdentifier FILTER_REFERENCE_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(FILTER_REFERENCE_ELEMENT).build();
 
@@ -43,7 +44,7 @@ public class FilterReferenceBeanDefinitionCreator extends BeanDefinitionCreator
             else
             {
                 componentModel.setType(MessageProcessor.class);
-                org.springframework.beans.factory.support.BeanDefinitionBuilder beanDefinitionBuilder = org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition(MessageFilter.class);
+                BeanDefinitionBuilder beanDefinitionBuilder = org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition(MessageFilter.class);
                 beanDefinitionBuilder.addConstructorArgReference(componentModel.getParameters().get(REFERENCE_ATTRIBUTE));
                 componentModel.setBeanDefinition(beanDefinitionBuilder.getBeanDefinition());
             }

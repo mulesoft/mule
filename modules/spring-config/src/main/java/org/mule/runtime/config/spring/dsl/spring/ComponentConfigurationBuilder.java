@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.spring.util.ProcessingStrategyUtils.parseProcessingStrategy;
@@ -31,7 +32,7 @@ import org.springframework.beans.factory.support.ManagedList;
  *
  * @since 4.0
  */
-public class ComponentConfigurationBuilder
+class ComponentConfigurationBuilder
 {
 
     private final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper;
@@ -96,7 +97,7 @@ public class ComponentConfigurationBuilder
             return new BeanValueTypePair(beanDefinitionType, bean);
         }).filter(beanDefinitionTypePair -> {
             return beanDefinitionTypePair != null;
-        }).collect(Collectors.toList());
+        }).collect(toList());
     }
 
     private ConfigurableAttributeDefinitionVisitor constructorVisitor()
@@ -182,7 +183,7 @@ public class ComponentConfigurationBuilder
         {
             List<BeanValueTypePair> matchingBeanValueTypePairs = complexParameters.stream().filter(beanDefinitionTypePair -> {
                 return areMatchingTypes(type, beanDefinitionTypePair.getType());
-            }).collect(Collectors.toList());
+            }).collect(toList());
 
             matchingBeanValueTypePairs.stream().forEach(beanDefinitionTypePair -> {
                 complexParameters.remove(beanDefinitionTypePair);
@@ -222,7 +223,7 @@ public class ComponentConfigurationBuilder
     {
         return undefinedComplexParameters.stream().map(beanDefinitionTypePair -> {
             return beanDefinitionTypePair.getBean();
-        }).collect(Collectors.toList());
+        }).collect(toList());
     }
 
 }

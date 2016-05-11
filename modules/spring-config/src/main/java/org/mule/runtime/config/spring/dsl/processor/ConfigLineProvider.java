@@ -12,6 +12,7 @@ package org.mule.runtime.config.spring.dsl.processor;
  *
  * @since 4.0
  */
+@FunctionalInterface
 public interface ConfigLineProvider
 {
 

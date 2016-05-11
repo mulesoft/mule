@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -44,7 +45,9 @@ public class ObjectTypeVisitor implements TypeDefinitionVisitor
         }
         catch (ClassNotFoundException e)
         {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage("Error while trying to locate Class definition for type %s on element %s", componentModel.getParameters().get(attributeName), componentModel.getIdentifier()), e);
+            throw new MuleRuntimeException(createStaticMessage("Error while trying to locate Class definition for type %s on element %s",
+                                                               componentModel.getParameters().get(attributeName),
+                                                               componentModel.getIdentifier()), e);
         }
     }
 
