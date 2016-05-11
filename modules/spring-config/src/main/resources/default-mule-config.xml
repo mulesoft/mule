@@ -1,44 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <spring:beans>
+    <bean name="_muleSecurityManager" class="org.mule.runtime.core.security.MuleSecurityManager"/>
 
-        <spring:bean name="_muleSecurityManager" class="org.mule.runtime.core.security.MuleSecurityManager"/>
+    <bean name="_muleMessageProcessingManager" class="org.mule.runtime.core.execution.MuleMessageProcessingManager"/>
 
-        <spring:bean name="_muleMessageProcessingManager" class="org.mule.runtime.core.execution.MuleMessageProcessingManager"/>
+    <bean name="_muleEndpointFactory" class="org.mule.runtime.core.endpoint.DefaultEndpointFactory"/>
 
-        <spring:bean name="_muleEndpointFactory" class="org.mule.runtime.core.endpoint.DefaultEndpointFactory"/>
+    <bean name="_muleStreamCloserService" class="org.mule.runtime.core.util.DefaultStreamCloserService"/>
 
-        <spring:bean name="_muleStreamCloserService" class="org.mule.runtime.core.util.DefaultStreamCloserService"/>
+    <bean name="_defaultThreadingProfile" class="org.mule.runtime.core.config.ChainedThreadingProfile"/>
 
-        <spring:bean name="_defaultThreadingProfile" class="org.mule.runtime.core.config.ChainedThreadingProfile"/>
+    <bean name="_converterResolver" class="org.mule.runtime.core.DynamicDataTypeConversionResolver">
+        <constructor-arg ref="_muleContext"/>
+    </bean>
 
-        <spring:bean name="_converterResolver" class="org.mule.runtime.core.DynamicDataTypeConversionResolver">
-            <spring:constructor-arg ref="_muleContext"/>
-        </spring:bean>
+    <bean name="_defaultRetryPolicyTemplate" class="org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate"/>
 
-        <spring:bean name="_defaultRetryPolicyTemplate" class="org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate"/>
+    <bean name="_muleLockFactory" class="org.mule.runtime.core.util.lock.MuleLockFactory"/>
 
-        <spring:bean name="_muleLockFactory" class="org.mule.runtime.core.util.lock.MuleLockFactory"/>
+    <bean name="_muleLockProvider" class="org.mule.runtime.core.util.lock.SingleServerLockProvider"/>
 
-        <spring:bean name="_muleLockProvider" class="org.mule.runtime.core.util.lock.SingleServerLockProvider"/>
+    <bean name="_muleProcessingTimeWatcher" class="org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher"/>
 
-        <spring:bean name="_muleProcessingTimeWatcher" class="org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher"/>
+    <bean name="_muleConnectorMessageProcessorLocator" class="org.mule.runtime.core.connector.MuleConnectorOperationLocator"/>
 
-        <spring:bean name="_muleConnectorMessageProcessorLocator" class="org.mule.runtime.core.connector.MuleConnectorOperationLocator"/>
+    <bean name="_muleExceptionLocationProvider" class="org.mule.runtime.core.exception.MessagingExceptionLocationProvider"/>
 
-        <spring:bean name="_muleExceptionLocationProvider" class="org.mule.runtime.core.exception.MessagingExceptionLocationProvider"/>
-
-        <spring:bean name="_muleMessageProcessingFlowTraceManager" class="org.mule.runtime.core.context.notification.MessageProcessingFlowTraceManager"/>
-
-    </spring:beans>
+    <bean name="_muleMessageProcessingFlowTraceManager" class="org.mule.runtime.core.context.notification.MessageProcessingFlowTraceManager"/>
 
     <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
     the transformers will be available even when using the TransientRegistry only -->
 
-</mule>
+</beans>

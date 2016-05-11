@@ -36,8 +36,8 @@
     </pgp:security-manager>
 
     <flow name="pgpEncryptProcessor">
-        <encrypt-transformer name="pgpEncrypt" strategy-ref="keyBasedEncryptionStrategy" />
-        <decrypt-transformer name="pgpDecrypt" strategy-ref="keyBasedEncryptionStrategy" />
+        <encrypt-transformer strategy-ref="keyBasedEncryptionStrategy" />
+        <decrypt-transformer strategy-ref="keyBasedEncryptionStrategy" />
         <test:queue name="out"/>
         <catch-exception-strategy>
             <custom-processor class="org.mule.runtime.module.pgp.PGPExpiredIntegrationTestCase$ExceptionSaver"/>

@@ -6,13 +6,23 @@
  */
 package org.mule.runtime.config.spring;
 
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
+import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
+import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
+import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
+import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.collect.ImmutableList;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -20,9 +30,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
@@ -33,6 +45,7 @@ import org.springframework.beans.factory.xml.XmlReaderContext;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
@@ -53,16 +66,21 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     public static final String MULE_FORCE_RECURSE = "org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_FORCE_RECURSE";
     public static final String MULE_NO_REGISTRATION = "org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION";
     public static final String MULE_POST_CHILDREN = "org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_POST_CHILDREN";
-    private DefaultBeanDefinitionDocumentReader spring;
+    private final Supplier<ApplicationModel> applicationModelSupplier;
     private final List<ElementValidator> elementValidators;
+    private final DefaultBeanDefinitionDocumentReader beanDefinitionDocumentReader;
+
+    private BeanDefinitionFactory beanDefinitionFactory;
 
     protected static final Log logger = LogFactory.getLog(MuleHierarchicalBeanDefinitionParserDelegate.class);
 
     public MuleHierarchicalBeanDefinitionParserDelegate(XmlReaderContext readerContext,
-                                                        DefaultBeanDefinitionDocumentReader spring, ElementValidator... elementValidators)
+                                                        DefaultBeanDefinitionDocumentReader beanDefinitionDocumentReader, Supplier<ApplicationModel> applicationModelSupplier, BeanDefinitionFactory beanDefinitionFactory, ElementValidator... elementValidators)
     {
         super(readerContext);
-        this.spring = spring;
+        this.beanDefinitionDocumentReader = beanDefinitionDocumentReader;
+        this.applicationModelSupplier = applicationModelSupplier;
+        this.beanDefinitionFactory = beanDefinitionFactory;
         this.elementValidators = ArrayUtils.isEmpty(elementValidators) ? ImmutableList.<ElementValidator>of() : ImmutableList.copyOf(elementValidators);
     }
 
@@ -91,12 +109,50 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
             boolean noRecurse = false;
             boolean forceRecurse = false;
-            BeanDefinition finalChild;
+            BeanDefinition finalChild = null;
+            BeanDefinition currentDefinition = null;
 
             do {
-                ParserContext parserContext = new ParserContext(getReaderContext(), this, parent);
-                finalChild = handler.parse(element, parserContext);
-                registerBean(element, finalChild);
+                ComponentModel componentModel = applicationModelSupplier.get().findComponentDefinitionModel(element);
+
+                if (shouldUseNewMechanism(element))
+                {
+                    ComponentModel parentComponentModel = applicationModelSupplier.get().findComponentDefinitionModel((Element) element.getParentNode());
+                    beanDefinitionFactory.resolveComponentRecursively(parentComponentModel, componentModel, getReaderContext().getRegistry(), (resolvedComponent, registry) -> {
+                        if (resolvedComponent.isRoot())
+                        {
+                            String name = resolvedComponent.getNameAttribute();
+                            if (name == null)
+                            {
+                                name = resolvedComponent.getIdentifier().toString();
+                            }
+                            BeanDefinitionFactory.checkElementNameUnique(registry, element);
+                            registry.registerBeanDefinition(name, resolvedComponent.getBeanDefinition());
+                        }
+                    }, (mpElement, beanDefinition) -> {
+                        //We don't want the bean definition to be automatically injected in the parent bean in this cases since the parent is using the new parsing mechanism.
+                        //Here it will always be a nested element. We use a fake bean definition so it does not try to validate the ID if it thinks is a global element
+                        return parseCustomElement(mpElement, BeanDefinitionBuilder.genericBeanDefinition().getBeanDefinition());
+                    });
+                    //Do not iterate since this iteration is done iside the resolve component going through childrens
+                    return null;
+                }
+                else
+                {
+                    if (!element.getLocalName().equals(MULE_ROOT_ELEMENT) && !element.getLocalName().equals(MULE_DOMAIN_ROOT_ELEMENT))
+                    {
+                        ParserContext parserContext = new ParserContext(getReaderContext(), this, parent);
+                        finalChild = handler.parse(element, parserContext);
+                        currentDefinition = finalChild;
+                        ComponentModel parentComponentModel = applicationModelSupplier.get().findComponentDefinitionModel((Element) element.getParentNode());
+                        if (parentComponentModel != null)
+                        {
+                            finalChild = adaptFilterBeanDefinitions(parentComponentModel, (org.springframework.beans.factory.support.AbstractBeanDefinition) finalChild);
+                        }
+                        registerBean(element, currentDefinition);
+                        setComponentModelTypeFromBeanDefinition(finalChild, componentModel);
+                    }
+                }
                 noRecurse = noRecurse || testFlag(finalChild, MULE_NO_RECURSE);
                 forceRecurse = forceRecurse || testFlag(finalChild, MULE_FORCE_RECURSE);
             } while (null != finalChild && testFlag(finalChild, MULE_REPEAT_PARSE));
@@ -137,7 +193,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                 {
                     if (list.item(i) instanceof Element)
                     {
-                        parseCustomElement((Element) list.item(i), finalChild);
+                        parseCustomElement((Element) list.item(i), currentDefinition);
                     }
                 }
             }
@@ -152,6 +208,93 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
             return finalChild;
         }
+    }
+
+    //TODO MULE-9638 Remove this ugly code since it's not going to be needed anymore.
+    private void setComponentModelTypeFromBeanDefinition(BeanDefinition finalChild, ComponentModel componentModel)
+    {
+        if (componentModel != null) //This condition is needed when we are parsing something unrelated to mule. See ReferenceTestCase
+        {
+            if (finalChild != null)
+            {
+                try
+                {
+                    Class<?> type = Class.forName(finalChild.getBeanClassName());
+                    if (FactoryBean.class.isAssignableFrom(type))
+                    {
+                        try
+                        {
+                            //When the FactoryBean implementation implements the FactoryBean directly.
+                            type = (Class<?>) ((ParameterizedType) Class.forName(finalChild.getBeanClassName()).getGenericInterfaces()[0]).getActualTypeArguments()[0];
+                        }
+                        catch (Exception e2)
+                        {
+                            try
+                            {
+                                //When the FactoryBean implementation extends a Class that implements FactoryBean.
+                                type = (Class<?>) ((ParameterizedType) Class.forName(finalChild.getBeanClassName()).getGenericSuperclass()).getActualTypeArguments()[0];
+                            }
+                            catch(Exception e3)
+                            {
+                                try
+                                {
+                                    //We get the type directly from a FactoryBean instance if it has a default constructor.
+                                    type = ((FactoryBean)type.newInstance()).getObjectType();
+                                }
+                                catch (InstantiationException e)
+                                {
+                                    type = Object.class;
+                                }
+                            }
+                        }
+                    }
+                    componentModel.setType(type);
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Determines if the {@code element} must be parsed using the new mechanism or the old one.
+     *
+     * It will use the new mechanism if it's not a root element or if the parent has not been parsed
+     * with the old mechanism or if there's not a {@code org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition}
+     * defined for the {@code element}.
+     *
+     * @param element xml element from the XML configuration file.
+     * @return true if the parsing should be done with the new mechanism, false otherwise.
+     */
+    private boolean shouldUseNewMechanism(Element element)
+    {
+        if (element.getLocalName().equals(MULE_ROOT_ELEMENT) || element.getLocalName().equals(MULE_DOMAIN_ROOT_ELEMENT)) {
+            return false;
+        }
+        Node parentNode = element;
+        while ((parentNode = parentNode.getParentNode()) != null)
+        {
+            String parentNodeNamespace = getNamespace(parentNode);
+            String parentNodeName = parentNode.getLocalName();
+            if (parentNode.getNodeName().equals(MULE_ROOT_ELEMENT))
+            {
+                break;
+            }
+            if (!beanDefinitionFactory.hasDefinition(new ComponentIdentifier.Builder().withNamespace(parentNodeNamespace).withName(parentNodeName).build()))
+            {
+                return false;
+            }
+        }
+        String namespace = getNamespace(element);
+        String nodeName = element.getLocalName();
+        return beanDefinitionFactory.hasDefinition(new ComponentIdentifier.Builder().withNamespace(namespace).withName(nodeName).build());
+    }
+
+    private String getNamespace(Node parentNode)
+    {
+        return parentNode.getPrefix() != null ? parentNode.getPrefix() : CORE_NAMESPACE_NAME;
     }
 
     private void validate(Element element)
@@ -177,7 +320,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             {
                 Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
                 doc.appendChild(doc.importNode(element, true));
-                spring.registerBeanDefinitions(doc, getReaderContext());
+                beanDefinitionDocumentReader.registerBeanDefinitions(doc, getReaderContext());
             }
             catch (ParserConfigurationException e)
             {
@@ -237,7 +380,8 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             String name =  generateChildBeanName(ele);
             logger.debug("register " + name + ": " + bd.getBeanClassName());
-            registerBeanDefinitionHolder(new BeanDefinitionHolder(bd, name));
+            BeanDefinitionHolder beanDefinitionHolder = new BeanDefinitionHolder(bd, name);
+            registerBeanDefinitionHolder(beanDefinitionHolder);
         }
     }
 

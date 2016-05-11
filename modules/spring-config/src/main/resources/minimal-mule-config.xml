@@ -1,131 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
+    <!-- Default configuration attributes are configured via default values in mule-core schema mule.xsd.
+         Configuration element is required here so that spring creates a MuleConfiguration instance and
+         populates it with defaults from schema
+    -->
+    <configuration />
 
-    <spring:beans>
-
-        <spring:bean name="_muleNotificationManager" class="org.mule.runtime.config.spring.ServerNotificationManagerConfigurator"/>
-
-        <spring:bean name="_muleConfiguration" class="org.mule.runtime.config.spring.MuleConfigurationConfigurator"/>
-
-        <spring:bean name="_muleDefaultObjectSerializer" class="org.mule.runtime.config.spring.DefaultObjectSerializerFactoryBean" depends-on="_muleConfiguration">
-            <spring:constructor-arg ref="_muleContext" />
-        </spring:bean>
-
-        <spring:bean name="_muleTransactionManager" class="org.mule.runtime.config.spring.factories.TransactionManagerFactoryBean"/>
-
-        <spring:bean name="_defaultInMemoryQueueStore,_simpleMemoryQueueStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryQueueStore"/>
-
-        <spring:bean name="_defaultPersistentQueueStore,_fileQueueStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentQueueStore"/>
-
-        <!--=================================-->
-        <!--BEGINNING OF LOCAL/CLUSTER SECTION-->
-        <!--=================================-->
-
-        <!--The following section contains beans which implementation is replaced when the cluster core extension is active.-->
-        <!--However, non cluster aware components such as Batch still need the local version of those components-->
-        <!--to be available. Such components are defined in this section. Notice that the FixedFactoryBean is used-->
-        <!--instead of a simple spring alias to allow the core extension to replace the default implementation-->
-        <!--while keeping the local version intact. When the cluster core extension is not active, both-->
-        <!--the default and local beans resolve to the same instance-->
-
-        <spring:bean name="_defaultInMemoryObjectStore" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
-            <spring:constructor-arg ref="_localInMemoryObjectStore"/>
-        </spring:bean>
-
-        <spring:bean name="_localInMemoryObjectStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryObjectStore"/>
-
-        <spring:bean name="_defaultPersistentObjectStore" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
-            <spring:constructor-arg ref="_localPersistentObjectStore"/>
-        </spring:bean>
-
-        <spring:bean name="_localPersistentObjectStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentObjectStore"/>
-
-        <spring:bean name="_defaultUserObjectStore" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
-            <spring:constructor-arg ref="_localUserObjectStore"/>
-        </spring:bean>
-
-        <spring:bean name="_localUserObjectStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserObjectStore"/>
-
-        <spring:bean name="_defaultTransientUserObjectStore" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
-            <spring:constructor-arg ref="_localTransientUserObjectStore"/>
-        </spring:bean>
-
-        <spring:bean name="_localTransientUserObjectStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserTransientObjectStore"/>
-
-        <spring:bean name="_muleQueueManager" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
-            <spring:constructor-arg ref="_localQueueManager"/>
-        </spring:bean>
-
-        <spring:bean name="_localQueueManager" class="org.mule.runtime.core.util.queue.DelegateQueueManager"/>
-
-        <!--object store manager needs to be initialised by spring to keep backwards compatibility with-->
-        <!--beans using it as factory method (i.e: cache)-->
-        <spring:bean name="_muleObjectStoreManager" class="org.mule.runtime.core.util.store.MuleObjectStoreManager" init-method="initialise"/>
-
-        <spring:alias name="_muleObjectStoreManager" alias="_localObjectStoreManager" />
-
-        <!--============================-->
-        <!--END OF LOCAL/CLUSTER SECTION-->
-        <!--============================-->
-
-        <spring:bean name="_defaultThreadingProfile" class="org.mule.runtime.core.config.ChainedThreadingProfile"/>
-
-        <spring:bean name="_defaultMessageDispatcherThreadingProfile" class="org.mule.runtime.core.config.ChainedThreadingProfile">
-            <spring:constructor-arg  ref="_defaultThreadingProfile"/>
-        </spring:bean>
-
-        <spring:bean name="_defaultMessageRequesterThreadingProfile" class="org.mule.runtime.core.config.ChainedThreadingProfile">
-            <spring:constructor-arg  ref="_defaultThreadingProfile"/>
-        </spring:bean>
-
-        <spring:bean name="_defaultMessageReceiverThreadingProfile" class="org.mule.runtime.core.config.ChainedThreadingProfile">
-            <spring:constructor-arg  ref="_defaultThreadingProfile"/>
-        </spring:bean>
-
-        <spring:bean name="_defaultServiceThreadingProfile" class="org.mule.runtime.core.config.ChainedThreadingProfile">
-            <spring:constructor-arg  ref="_defaultThreadingProfile"/>
-        </spring:bean>
-
-        <spring:bean name="_defaultRetryPolicyTemplate" class="org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate"/>
-
-        <spring:bean name="_muleExpressionLanguage" class="org.mule.runtime.core.el.mvel.MVELExpressionLanguageWrapper">
-            <spring:constructor-arg  ref="_muleContext"/>
-        </spring:bean>
-
-        <spring:bean name="_muleExtensionManager" class="org.mule.runtime.config.spring.factories.ExtensionManagerFactoryBean">
-            <spring:constructor-arg  ref="_muleContext"/>
-        </spring:bean>
-
-        <spring:bean name="_muleTimeSupplier" class="org.mule.runtime.core.time.TimeSupplier" />
-
-        <spring:bean name="_muleConnectionManager" class="org.mule.runtime.core.internal.connection.DefaultConnectionManager" />
-
-        <spring:bean name="_muleMetadataManager" class="org.mule.runtime.core.internal.metadata.MuleMetadataManager" />
-
-        <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
-        the transformers will be available even when using the TransientRegistry only -->
-
-    </spring:beans>
-
-        <!-- Default configuration attributes are configured via default values in mule-core schema mule.xsd.
-             Configuration element is required here so that spring creates a MuleConfiguration instance and
-             populates it with defaults from schema
-        -->
-        <configuration />
-
-        <notifications>
-            <notification event="CONTEXT"/>
-            <notification event="SECURITY"/>
-            <notification event="MANAGEMENT"/>
-            <notification event="CONNECTION"/>
-            <notification event="REGISTRY"/>
-            <notification event="CUSTOM"/>
-            <notification event="EXCEPTION"/>
-            <notification event="TRANSACTION"/>
-        </notifications>
+    <notifications>
+        <notification event="CONTEXT"/>
+        <notification event="SECURITY"/>
+        <notification event="MANAGEMENT"/>
+        <notification event="CONNECTION"/>
+        <notification event="REGISTRY"/>
+        <notification event="CUSTOM"/>
+        <notification event="EXCEPTION"/>
+        <notification event="TRANSACTION"/>
+    </notifications>
 </mule>

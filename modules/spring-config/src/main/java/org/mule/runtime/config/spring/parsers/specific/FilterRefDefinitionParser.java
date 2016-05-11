@@ -84,8 +84,12 @@ public class FilterRefDefinitionParser extends ParentDefinitionParser
         @Override
         public void copyBeanToTarget()
         {
+            if (target == null)
+            {
+                //TODO MULE-9638 - This is possible when the parent node is parsed by the new mechanism
+                return;
+            }
             String oldName = "messageProcessor";
-            assertTargetPresent();
             String newName = bestGuessName(targetConfig, oldName, target.getBeanClassName());
             MutablePropertyValues targetProperties = target.getPropertyValues();
             MutablePropertyValues beanProperties = bean.getBeanDefinition().getPropertyValues();

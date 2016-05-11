@@ -8,13 +8,12 @@ package org.mule.runtime.core.transformers.simple;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.util.ArrayList;
@@ -49,8 +48,8 @@ public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
     public void testLifecycleInFlowInSpring() throws Exception
     {
         Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("flow");
-        TransformerLifecycleTracker transformer = (TransformerLifecycleTracker) flow.getMessageProcessors()
-            .get(0);
+        TransformerLifecycleTracker transformer = (TransformerLifecycleTracker) flow.getMessageProcessors().get(0);
+
         assertNotNull(transformer);
 
         muleContext.dispose();

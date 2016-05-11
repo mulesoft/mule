@@ -122,7 +122,11 @@ public class WrappingChildDefinitionParser extends ChildDefinitionParser
 
         public void insertBeanInTarget(String oldName)
         {
-            assertTargetPresent();
+            if (target == null)
+            {
+                //TODO MULE-9638 - This is possible when the parent node is parsed by the new mechanism
+                return;
+            }
             String newName = bestGuessName(targetConfig, oldName, target.getBeanClassName());
             MutablePropertyValues targetProperties = target.getPropertyValues();
             PropertyValue pv = targetProperties.getPropertyValue(newName);

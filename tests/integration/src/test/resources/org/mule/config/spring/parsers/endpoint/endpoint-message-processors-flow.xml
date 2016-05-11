@@ -46,7 +46,7 @@
     </flow>
 
     <flow name="localEndpoints">
-        <inbound-endpoint name="ep3" address="test://ep3">
+        <inbound-endpoint address="test://ep3">
             <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                 <spring:property name="label" value="A"/>
             </custom-processor>
@@ -62,7 +62,7 @@
                 </custom-processor>
             </response>
         </inbound-endpoint>
-        <outbound-endpoint name="ep4" address="test://ep4">
+        <outbound-endpoint address="test://ep4">
             <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                 <spring:property name="label" value="E"/>
             </custom-processor>

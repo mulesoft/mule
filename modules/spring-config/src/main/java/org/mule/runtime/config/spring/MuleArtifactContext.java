@@ -11,8 +11,9 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-
+import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.editors.MulePropertyEditorRegistrar;
+import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.processors.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.spring.processors.LifecycleStatePostProcessor;
 import org.mule.runtime.config.spring.processors.MuleInjectorProcessor;
@@ -20,10 +21,12 @@ import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProc
 import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.config.ConfigResource;
+import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
+import java.util.ServiceLoader;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
@@ -35,7 +38,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
 import org.springframework.context.support.AbstractXmlApplicationContext;
@@ -52,9 +54,12 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 {
     private static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<>();
 
+    private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry = new ComponentBuildingDefinitionRegistry();
+    private final OptionalObjectsController optionalObjectsController;
     private MuleContext muleContext;
     private Resource[] springResources;
-    private final OptionalObjectsController optionalObjectsController;
+    private BeanDefinitionFactory beanDefinitionFactory;
+    private MuleXmlBeanDefinitionReader beanDefinitionReader;
 
     /**
      * Parses configuration files creating a spring ApplicationContext which is used
@@ -110,6 +115,16 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         this.muleContext = muleContext;
         this.springResources = springResources;
         this.optionalObjectsController = optionalObjectsController;
+
+        ServiceLoader<ComponentBuildingDefinitionProvider> serviceLoader = ServiceLoader.load(ComponentBuildingDefinitionProvider.class);
+        serviceLoader.forEach(componentBuildingDefinitionProvider -> {
+            componentBuildingDefinitionProvider.init(muleContext);
+            componentBuildingDefinitionProvider.getComponentBuildingDefinitions().stream().forEach(componentBuildingDefinition -> {
+                this.componentBuildingDefinitionRegistry.register(componentBuildingDefinition);
+            });
+        });
+
+        this.beanDefinitionFactory = new BeanDefinitionFactory(componentBuildingDefinitionRegistry);
     }
 
     @Override
@@ -194,7 +209,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 
     protected BeanDefinitionReader createBeanDefinitionReader(DefaultListableBeanFactory beanFactory)
     {
-        XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+        beanDefinitionReader = new MuleXmlBeanDefinitionReader(beanFactory, beanDefinitionFactory);
         // annotate parsed elements with metadata
         beanDefinitionReader.setDocumentLoader(createLoader());
         // hook in our custom hierarchical reader

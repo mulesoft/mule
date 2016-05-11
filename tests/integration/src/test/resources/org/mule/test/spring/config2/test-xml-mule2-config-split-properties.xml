@@ -1,62 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:test="http://www.mulesoft.org/schema/mule/test"
-       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+       xmlns="http://www.mulesoft.org/schema/mule/core"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <mule:mule>
 
-        <mule:flow name="testPropertiesComponent">
-            <mule:inbound-endpoint
-                    address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"
-                    exchange-pattern="one-way"/>
-            <mule:component>
-                <mule:spring-object bean="prop-test-ref"/>
-            </mule:component>
-        </mule:flow>
+    <flow name="testPropertiesComponent">
+        <inbound-endpoint
+                address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"
+                exchange-pattern="one-way"/>
+        <component>
+            <spring-object bean="prop-test-ref"/>
+        </component>
+    </flow>
 
-    </mule:mule>
 
-    <bean name="anApple" class="org.mule.tck.testmodels.fruit.Apple"/>
+    <spring:bean name="anApple" class="org.mule.tck.testmodels.fruit.Apple"/>
 
-    <bean name="prop-test-ref" class="org.mule.tck.testmodels.fruit.Apple">
-        <property name="bitten" value="true"/>
-        <property name="washed" value="true"/>
-    </bean>
+    <spring:bean name="prop-test-ref" class="org.mule.tck.testmodels.fruit.Apple">
+        <spring:property name="bitten" value="true"/>
+        <spring:property name="washed" value="true"/>
+    </spring:bean>
 
-    <bean name="factory-test" class="org.mule.tck.testmodels.mule.TestDependentObject"/>
+    <spring:bean name="factory-test" class="org.mule.tck.testmodels.mule.TestDependentObject"/>
 
-    <bean name="factoryObject" factory-bean="factory-test" factory-method="create">
-        <constructor-arg>
-            <map>
-                <entry key="test1" value="test1"/>
-                <entry key="test2" value="test2"/>
-                <entry key="containerObject" value-ref="anApple"/>
-                <entry key="osVersion" value="${os.version}"/>
+    <spring:bean name="factoryObject" factory-bean="factory-test" factory-method="create">
+        <spring:constructor-arg>
+            <spring:map>
+                <spring:entry key="test1" value="test1"/>
+                <spring:entry key="test2" value="test2"/>
+                <spring:entry key="containerObject" value-ref="anApple"/>
+                <spring:entry key="osVersion" value="${os.version}"/>
                 <!-- no defaults -->
-                <entry key="propertiesMap">
-                    <map>
-                        <entry key="test1" value="test1"/>
-                        <entry key="test2" value="test2"/>
-                        <entry key="containerObject" value-ref="anApple"/>
-                        <entry key="osVersion" value="${os.version}"/>
+                <spring:entry key="propertiesMap">
+                    <spring:map>
+                        <spring:entry key="test1" value="test1"/>
+                        <spring:entry key="test2" value="test2"/>
+                        <spring:entry key="containerObject" value-ref="anApple"/>
+                        <spring:entry key="osVersion" value="${os.version}"/>
                         <!-- no nested factory (could repeat, but life is short...) -->
-                    </map>
-                </entry>
-                <entry key="propertiesList">
-                    <list>
-                        <value>test1</value>
-                        <value>test2</value>
-                        <ref bean="anApple"/>
-                        <value>${os.version}</value>
-                    </list>
-                </entry>
-            </map>
-        </constructor-arg>
-    </bean>
+                    </spring:map>
+                </spring:entry>
+                <spring:entry key="propertiesList">
+                    <spring:list>
+                        <spring:value>test1</spring:value>
+                        <spring:value>test2</spring:value>
+                        <spring:ref bean="anApple"/>
+                        <spring:value>${os.version}</spring:value>
+                    </spring:list>
+                </spring:entry>
+            </spring:map>
+        </spring:constructor-arg>
+    </spring:bean>
 
-</beans>
+</mule>

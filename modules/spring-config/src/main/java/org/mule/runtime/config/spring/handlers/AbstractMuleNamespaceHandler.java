@@ -307,6 +307,11 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             {
                 DefaultBeanAssembler assembler = (DefaultBeanAssembler) beanAssembler;
 
+                if (assembler.getTarget() == null)
+                {
+                    //TODO MULE-9638 - This is possible when the parent node is parsed by the new mechanism
+                    return;
+                }
                 if (assembler.isAnnotationsPropertyAvailable(assembler.getTarget().getBeanClassName()))
                 {
                     for (Node node = element.getFirstChild(); node != null; node = node.getNextSibling())

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd"
+       default-init-method="initialise" >
+
+
+    <bean name="_muleNotificationManager" class="org.mule.runtime.config.spring.ServerNotificationManagerConfigurator"/>
+
+    <bean name="_muleConfiguration" class="org.mule.runtime.config.spring.MuleConfigurationConfigurator"/>
+
+    <bean name="_muleDefaultObjectSerializer" class="org.mule.runtime.config.spring.DefaultObjectSerializerFactoryBean" depends-on="_muleConfiguration">
+        <constructor-arg ref="_muleContext" />
+    </bean>
+
+    <bean name="_muleTransactionManager" class="org.mule.runtime.config.spring.factories.TransactionManagerFactoryBean"/>
+
+    <bean name="_defaultInMemoryQueueStore,_simpleMemoryQueueStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryQueueStore"/>
+
+    <bean name="_defaultPersistentQueueStore,_fileQueueStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentQueueStore"/>
+
+    <!--=================================-->
+    <!--BEGINNING OF LOCAL/CLUSTER SECTION-->
+    <!--=================================-->
+
+    <!--The following section contains beans which implementation is replaced when the cluster core extension is active.-->
+    <!--However, non cluster aware components such as Batch still need the local version of those components-->
+    <!--to be available. Such components are defined in this section. Notice that the FixedFactoryBean is used-->
+    <!--instead of a simple spring alias to allow the core extension to replace the default implementation-->
+    <!--while keeping the local version intact. When the cluster core extension is not active, both-->
+    <!--the default and local beans resolve to the same instance-->
+
+    <bean name="_defaultInMemoryObjectStore" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
+        <constructor-arg ref="_localInMemoryObjectStore"/>
+    </bean>
+
+    <bean name="_localInMemoryObjectStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryObjectStore"/>
+
+    <bean name="_defaultPersistentObjectStore" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
+        <constructor-arg ref="_localPersistentObjectStore"/>
+    </bean>
+
+    <bean name="_localPersistentObjectStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultPersistentObjectStore"/>
+
+    <bean name="_defaultUserObjectStore" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
+        <constructor-arg ref="_localUserObjectStore"/>
+    </bean>
+
+    <bean name="_localUserObjectStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserObjectStore"/>
+
+    <bean name="_defaultTransientUserObjectStore" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
+        <constructor-arg ref="_localTransientUserObjectStore"/>
+    </bean>
+
+    <bean name="_localTransientUserObjectStore" class="org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultUserTransientObjectStore"/>
+
+    <bean name="_muleQueueManager" class="org.mule.runtime.config.spring.factories.ConstantFactoryBean">
+        <constructor-arg ref="_localQueueManager"/>
+    </bean>
+
+    <bean name="_localQueueManager" class="org.mule.runtime.core.util.queue.DelegateQueueManager"/>
+
+    <!--object store manager needs to be initialised by spring to keep backwards compatibility with-->
+    <!--beans using it as factory method (i.e: cache)-->
+    <bean name="_muleObjectStoreManager" class="org.mule.runtime.core.util.store.MuleObjectStoreManager" init-method="initialise"/>
+
+    <alias name="_muleObjectStoreManager" alias="_localObjectStoreManager" />
+
+    <!--============================-->
+    <!--END OF LOCAL/CLUSTER SECTION-->
+    <!--============================-->
+
+    <bean name="_defaultThreadingProfile" class="org.mule.runtime.core.config.ChainedThreadingProfile"/>
+
+    <bean name="_defaultMessageDispatcherThreadingProfile" class="org.mule.runtime.core.config.ChainedThreadingProfile">
+        <constructor-arg  ref="_defaultThreadingProfile"/>
+    </bean>
+
+    <bean name="_defaultMessageRequesterThreadingProfile" class="org.mule.runtime.core.config.ChainedThreadingProfile">
+        <constructor-arg  ref="_defaultThreadingProfile"/>
+    </bean>
+
+    <bean name="_defaultMessageReceiverThreadingProfile" class="org.mule.runtime.core.config.ChainedThreadingProfile">
+        <constructor-arg  ref="_defaultThreadingProfile"/>
+    </bean>
+
+    <bean name="_defaultServiceThreadingProfile" class="org.mule.runtime.core.config.ChainedThreadingProfile">
+        <constructor-arg  ref="_defaultThreadingProfile"/>
+    </bean>
+
+    <bean name="_defaultRetryPolicyTemplate" class="org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate"/>
+
+    <bean name="_muleExpressionLanguage" class="org.mule.runtime.core.el.mvel.MVELExpressionLanguageWrapper">
+        <constructor-arg  ref="_muleContext"/>
+    </bean>
+
+    <bean name="_muleExtensionManager" class="org.mule.runtime.config.spring.factories.ExtensionManagerFactoryBean">
+        <constructor-arg  ref="_muleContext"/>
+    </bean>
+
+    <bean name="_muleTimeSupplier" class="org.mule.runtime.core.time.TimeSupplier" />
+
+    <bean name="_muleConnectionManager" class="org.mule.runtime.core.internal.connection.DefaultConnectionManager" />
+
+    <bean name="_muleMetadataManager" class="org.mule.runtime.core.internal.metadata.MuleMetadataManager" />
+
+    <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
+    the transformers will be available even when using the TransientRegistry only -->
+
+</beans>
+

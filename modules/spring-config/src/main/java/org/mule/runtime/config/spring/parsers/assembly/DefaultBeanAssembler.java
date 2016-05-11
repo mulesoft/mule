@@ -234,6 +234,11 @@ public class DefaultBeanAssembler implements BeanAssembler
      */
     public void insertBeanInTarget(String oldName)
     {
+        if (target == null)
+        {
+            //TODO MULE-9638 - This is possible when the parent node is parsed by the new mechanism
+            return;
+        }
         logger.debug("insert " + bean.getBeanDefinition().getBeanClassName() + " -> " + target.getBeanClassName());
         assertTargetPresent();
         String beanClass = bean.getBeanDefinition().getBeanClassName();
@@ -313,6 +318,11 @@ public class DefaultBeanAssembler implements BeanAssembler
     
     public void insertSingletonBeanInTarget(String propertyName, String singletonName)
     {
+        if (target == null)
+        {
+            //TODO MULE-9638 - This is possible when the parent node is parsed by the new mechanism
+            return;
+        }
         String newName = bestGuessName(targetConfig, propertyName, target.getBeanClassName());
 
         MutablePropertyValues targetProperties = target.getPropertyValues();
@@ -400,6 +410,11 @@ public class DefaultBeanAssembler implements BeanAssembler
      */
     public void copyBeanToTarget()
     {
+        if (target == null)
+        {
+            //TODO MULE-9638 - This is possible when the parent node is parsed by the new mechanism
+            return;
+        }
         logger.debug("copy " + bean.getBeanDefinition().getBeanClassName() + " -> " + target.getBeanClassName());
         assertTargetPresent();
         MutablePropertyValues targetProperties = target.getPropertyValues();

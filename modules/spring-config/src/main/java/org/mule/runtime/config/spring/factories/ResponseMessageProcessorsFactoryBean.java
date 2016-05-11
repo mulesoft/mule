@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.config.spring.factories;
 
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
@@ -15,10 +19,11 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class ResponseMessageProcessorsFactoryBean implements FactoryBean
+public class ResponseMessageProcessorsFactoryBean implements FactoryBean, MuleContextAware
 {
 
     protected List messageProcessors;
+    private MuleContext muleContext;
 
     public Class getObjectType()
     {
@@ -52,12 +57,19 @@ public class ResponseMessageProcessorsFactoryBean implements FactoryBean
         }
         ResponseMessageProcessorAdapter responseAdapter = new ResponseMessageProcessorAdapter();
         responseAdapter.setProcessor(builder.build());
+        responseAdapter.setMuleContext(muleContext);
         return responseAdapter;
     }
 
     public boolean isSingleton()
     {
         return false;
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 
 }

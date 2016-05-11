@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.spring.factories;
 
-import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.source.StartableCompositeMessageSource;
@@ -23,7 +22,7 @@ public class CompositeMessageSourceFactoryBean implements FactoryBean
 
     public Class getObjectType()
     {
-        return MessageProcessor.class;
+        return MessageSource.class;
     }
 
     public void setMessageSources(List<MessageSource> sources)

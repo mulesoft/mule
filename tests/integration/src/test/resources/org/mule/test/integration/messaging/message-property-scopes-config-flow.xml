@@ -20,7 +20,7 @@
     </flow>
 
     <flow name="ResponseService">
-        <custom-transformer name="RetrieveProperty" class="org.mule.test.integration.message.RetrievePropertyTransformer">
+        <custom-transformer class="org.mule.test.integration.message.RetrievePropertyTransformer">
             <spring:property name="property" value="testProperty"/>
         </custom-transformer>
         <echo-component/>

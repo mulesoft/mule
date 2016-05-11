@@ -71,9 +71,8 @@ public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
 
     public static class PreservePayloadExceptionStrategy extends AbstractMessagingExceptionStrategy
     {
-        public PreservePayloadExceptionStrategy(MuleContext muleContext)
+        public PreservePayloadExceptionStrategy()
         {
-            super(muleContext);
         }
 
         @Override

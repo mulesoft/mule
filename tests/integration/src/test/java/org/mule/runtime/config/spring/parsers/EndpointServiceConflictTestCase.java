@@ -20,7 +20,7 @@ public class EndpointServiceConflictTestCase extends AbstractBadConfigTestCase
     @Test
     public void testBeanError() throws Exception
     {
-        assertErrorContains("A service named LenderService already exists");
+        assertErrorContains("Two configuration elements have been defined with the same global name. Global name must be unique");
     }
 
 }

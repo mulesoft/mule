@@ -13,6 +13,7 @@ import org.mule.runtime.config.spring.parsers.assembly.configuration.TempWrapper
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
 import org.mule.runtime.core.util.StringUtils;
 
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -61,11 +62,15 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
         else
         {
             String parentBean = getParentBeanName(element);
-            if (StringUtils.isBlank(parentBean))
+            try
             {
-                throw new IllegalStateException("No parent for " + SpringXMLUtils.elementToString(element));
+                return getRegistry().getBeanDefinition(parentBean);
             }
-            return getRegistry().getBeanDefinition(parentBean);
+            catch (NoSuchBeanDefinitionException e)
+            {
+                //TODO MULE-9638: Do nothing since this is possible due to new parsing model.
+                return null;
+            }
         }
     }
 

@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring.parsers;
 import static org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
 import static org.mule.runtime.core.api.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
 import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
@@ -313,14 +314,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
 
     protected void checkElementNameUnique(Element element)
     {
-        if (null != element.getAttributeNode(ATTRIBUTE_NAME))
-        {
-            String name = element.getAttribute(ATTRIBUTE_NAME);
-            if (getRegistry().containsBeanDefinition(name))
-            {
-                throw new IllegalArgumentException("A service named " + name + " already exists.");
-            }
-        }
+        BeanDefinitionFactory.checkElementNameUnique(getRegistry(), element);
     }
 
     protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class<?> beanClass)
@@ -412,7 +406,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     {
         BeanAssembler assembler = getBeanAssembler(element, builder);
 
-        processMetadataAnnotations(element, context, builder);
+        processMetadataAnnotations(element, getConfigFileIdentifier(context.getReaderContext().getResource()), builder);
 
         NamedNodeMap attributes = element.getAttributes();
         for (int x = 0; x < attributes.getLength(); x++)
@@ -424,22 +418,31 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         postProcess(getParserContext(), assembler, element);
     }
 
-    protected void processMetadataAnnotations(Element element, ParserContext context, BeanDefinitionBuilder builder)
+    protected void processMetadataAnnotations(Element element, String configFileIdentifier, BeanDefinitionBuilder builder)
     {
+        processMetadataAnnotationsHelper(element, configFileIdentifier, builder);
+    }
+
+    public static String getConfigFileIdentifier(Resource resource)
+    {
+        return resource.getFilename() != null ? resource.getFilename() : resource.getDescription();
+    }
+
+    public static Map<QName, Object> processMetadataAnnotationsHelper(Element element, String configFileIdentifier, BeanDefinitionBuilder builder)
+    {
+        Map<QName, Object> annotations = new HashMap<>();
         // Ensure we have a placeholder for internally generated annotations, even if the XML config doesn't have any
         // defined for this element.
         if (AnnotatedObject.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass()))
         {
-            Map<QName, Object> annotations = new HashMap<QName, Object>();
-
-            Resource readerResource = context.getReaderContext().getResource();
 
             XmlMetadataAnnotations elementMetadata = (XmlMetadataAnnotations) element.getUserData(METADATA_ANNOTATIONS_KEY);
-            addMetadataAnnotationsFromXml(annotations, readerResource.getFilename() != null ? readerResource.getFilename() : readerResource.getDescription(),
+            addMetadataAnnotationsFromXml(annotations, configFileIdentifier,
                     elementMetadata.getLineNumber(), elementMetadata.getElementString());
 
             builder.getBeanDefinition().getPropertyValues().addPropertyValue(AnnotatedObject.PROPERTY_NAME, annotations);
         }
+        return annotations;
     }
 
     @Override
