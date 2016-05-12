@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+		http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
+		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd ">
+
+    <flow name="testFlow">
+        <vm:inbound-endpoint path="testIn" exchange-pattern="request-response"/>
+
+        <tcp:outbound-endpoint address="tcp://localhost:${tcpPort}" exchange-pattern="request-response" responseTimeout="100"/>
+    </flow>
+
+    <flow name="mockServer">
+        <tcp:inbound-endpoint host="localhost" port="${tcpPort}" exchange-pattern="request-response" />
+        <test:component waitTime="5000"/>
+    </flow>
+</mule>

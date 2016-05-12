@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp" xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <global-property name="test.endpoint" value="tcp://localhost:${port1}" />
+
+    <tcp:connector name="tcpConnector" clientSoTimeout="60000"
+        serverSoTimeout="60000">
+        <tcp:length-protocol payloadOnly="true" />
+    </tcp:connector>
+
+    <!-- what is this for? -->
+    <tcp:endpoint name="clientEndpoint" address="${test.endpoint}" />
+
+
+    <flow name="service">
+
+        <tcp:inbound-endpoint address="${test.endpoint}"
+            exchange-pattern="request-response" name="inService" />
+
+        <echo-component />
+    </flow>
+
+</mule>

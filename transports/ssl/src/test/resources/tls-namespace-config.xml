@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+
+    <tls:connector name="sslConnector" sendBufferSize="1024" receiveBufferSize="2048" keepAlive="true">
+        <tls:client
+                path="clientKeystore"
+                storePassword="mulepassword"/>
+        <tls:key-store
+                keyAlias="muleserver"
+                keyPassword="mulepassword"
+                path="serverKeystore"
+                storePassword="mulepassword"/>
+        <tls:server
+                path="trustStore"
+                storePassword="mulepassword"
+                explicitOnly="true"
+                requireClientAuthentication="true"/>
+        <tls:protocol-handler property="foo"/>
+    </tls:connector>
+
+
+    <tls:context name="tlsContext" >
+        <tls:trust-store path="trustStore" password="testTrustStorePassword"
+                         type="testTrustStoreType" algorithm="testTrustStoreAlgorithm"/>
+
+        <tls:key-store path="serverKeystore" keyPassword="testKeyPassword" password="testKeyStorePassword"
+                       algorithm="testKeyStoreAlgorithm" alias="testKeyStoreAlias" type="testKeyStoreType"/>
+    </tls:context>
+
+
+</mule>

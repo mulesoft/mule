@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd">
+
+    <tcp:connector name="tcpConnector"
+                   keepAlive="true"
+                   receiveBufferSize="1024"
+                   sendBufferSize="2048"
+                   receiveBacklog="50"
+                   reuseAddress="false"
+                   clientSoTimeout="3000"
+                   socketSoLinger="1234"
+                   socketMaxWait="3000">
+        <tcp:direct-protocol payloadOnly="true"/>
+    </tcp:connector>
+
+    <tcp:connector name="separateTimeouts"
+                   connectionTimeout="2000"
+                   clientSoTimeout="3000"
+                   serverSoTimeout="4000"/>
+                   
+    <tcp:connector name="connectorWithProtocolClass">
+        <tcp:custom-protocol class="org.mule.transport.tcp.TcpNamespaceHandlerTestCase$MockTcpProtocol"/>
+    </tcp:connector>
+                   
+    <tcp:polling-connector name="pollingConnector"
+                   clientSoTimeout="3000"
+                   pollingFrequency="4000"/>
+    
+    <spring:bean name="tcpProtocol" class="org.mule.transport.tcp.TcpNamespaceHandlerTestCase$MockTcpProtocol"/>
+
+    <tcp:connector name="connectorWithProtocolRef">
+        <tcp:custom-protocol ref="tcpProtocol"/>
+    </tcp:connector>    
+
+    <spring:bean id="classLoader" class="org.mule.transport.tcp.TcpNamespaceHandlerTestCase$FakeClassLoader"/>
+
+    <tcp:connector name="custom-class-loading-protocol-connector">
+        <tcp:custom-class-loading-protocol payloadOnly="true" classLoader-ref="classLoader" rethrowExceptionOnRead="true"/>
+    </tcp:connector>
+    
+    <spring:bean id="messageDispatcherFactory" class="org.mule.transport.tcp.LocalSocketTcpMessageDispatcherFactory"/>
+    
+    <tcp:connector name="messageDispatcherFactoryConnector" dispatcherFactory-ref="messageDispatcherFactory" >
+    </tcp:connector>
+
+    <tcp:server-socket-properties name="defaultServerSocketProperties" />
+
+    <tcp:server-socket-properties name="serverSocketProperties" keepAlive="true" receiveBacklog="200"
+                                  receiveBufferSize="1024" reuseAddress="true" sendBufferSize="2048"
+                                  sendTcpNoDelay="true" serverTimeout="600" timeout="800" linger="700" />
+
+    <tcp:client-socket-properties name="defaultClientSocketProperties" />
+
+    <tcp:client-socket-properties name="clientSocketProperties" connectionTimeout="500" keepAlive="true"
+                                  receiveBufferSize="1024" sendBufferSize="2048"
+                                  sendTcpNoDelay="true" timeout="600" linger="700" />
+
+</mule>

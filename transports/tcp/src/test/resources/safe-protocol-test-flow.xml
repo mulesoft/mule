@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd">
+
+    <tcp:connector name="safe">
+        <!-- we set a maximum length here because we are mixing protocols, 
+            which can cause an error - see discussion in SafeProtocolMule2227TestCase -->
+        <tcp:safe-protocol payloadOnly="true"
+            maxMessageLength="200" />
+    </tcp:connector>
+
+    <tcp:connector name="unsafe">
+        <tcp:direct-protocol payloadOnly="true" />
+    </tcp:connector>
+
+    <flow name="service">
+        <composite-source>
+        
+            <!-- legacy style -->
+            <inbound-endpoint address="tcp://localhost:${port1}"
+                connector-ref="safe" exchange-pattern="request-response" />
+            <tcp:inbound-endpoint host="localhost"
+                port="${port2}" connector-ref="unsafe" exchange-pattern="request-response" />
+                
+        </composite-source>
+        
+        <test:component appendString=" Received" />
+    </flow>
+
+</mule>

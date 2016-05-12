@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:test="http://www.mulesoft.org/schema/mule/test"
+        xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+
+        xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <configuration defaultResponseTimeout="10">
+        <default-threading-profile maxThreadsActive="30"/>
+    </configuration>
+
+    <tcp:connector name="tcpConnector1" clientSoTimeout="100" serverSoTimeout="100" keepAlive="true">
+        <tcp:direct-protocol payloadOnly="true"/>
+    </tcp:connector>
+
+    <tcp:connector name="tcpConnector2" clientSoTimeout="0" serverSoTimeout="0" keepAlive="true">
+        <tcp:direct-protocol payloadOnly="true"/>
+    </tcp:connector>
+
+    <!-- testServerSocketAndResponseTimeoutSet -->
+    <flow name="Test1Flow1">
+        <vm:inbound-endpoint path="inboundTest1" exchange-pattern="request-response"/>
+        <tcp:outbound-endpoint connector-ref="tcpConnector1" address="tcp://localhost:${port1}"
+                               exchange-pattern="request-response" responseTimeout="5000"/>
+    </flow>
+
+    <flow name="Test1Flow2">
+        <tcp:inbound-endpoint connector-ref="tcpConnector1" host="localhost" port="${port1}"
+                              exchange-pattern="request-response"/>
+        <test:component throwException="false" waitTime="200" logMessageDetails="false" enableMessageHistory="false">
+        </test:component>
+    </flow>
+
+    <!-- testSocketCreationServerSocketTimeout -->
+    <flow name="Test2Flow1">
+        <vm:inbound-endpoint path="inboundTest2" exchange-pattern="request-response"/>
+        <tcp:outbound-endpoint connector-ref="tcpConnector2" address="tcp://1.2.3.4:9003"
+                               exchange-pattern="request-response" responseTimeout="10"/>
+    </flow>
+
+</mule>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+       xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd">
+
+    <tcp:connector name="safe-connector">
+        <tcp:safe-protocol payloadOnly="true" maxMessageLength="10"/>
+    </tcp:connector>
+
+    <tcp:connector name="length-connector">
+        <tcp:length-protocol payloadOnly="true" maxMessageLength="10"/>
+    </tcp:connector>
+    
+    <tcp:endpoint name="safe" host="localhost" port="${port1}" connector-ref="safe-connector" 
+                  exchange-pattern="request-response"/>
+                          
+    <endpoint name="length" address="tcp://localhost:${port2}" connector-ref="length-connector" 
+              exchange-pattern="request-response"/>
+
+    <flow name="service">
+        <composite-source>
+            <tcp:inbound-endpoint ref="safe"/>
+            <!-- legacy style -->
+            <inbound-endpoint ref="length"/>
+        </composite-source>
+        <test:component/>
+    </flow>  
+
+</mule>

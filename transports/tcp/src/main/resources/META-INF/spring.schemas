@@ -1,0 +1,8 @@
+http\://www.mulesoft.org/schema/mule/tcp/3.1/mule-tcp.xsd=META-INF/mule-tcp.xsd
+http\://www.mulesoft.org/schema/mule/tcp/3.2/mule-tcp.xsd=META-INF/mule-tcp.xsd
+http\://www.mulesoft.org/schema/mule/tcp/3.3/mule-tcp.xsd=META-INF/mule-tcp.xsd
+http\://www.mulesoft.org/schema/mule/tcp/3.4/mule-tcp.xsd=META-INF/mule-tcp.xsd
+http\://www.mulesoft.org/schema/mule/tcp/3.5/mule-tcp.xsd=META-INF/mule-tcp.xsd
+http\://www.mulesoft.org/schema/mule/tcp/3.6/mule-tcp.xsd=META-INF/mule-tcp.xsd
+http\://www.mulesoft.org/schema/mule/tcp/3.7/mule-tcp.xsd=META-INF/mule-tcp.xsd
+http\://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd=META-INF/mule-tcp.xsd

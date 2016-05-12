@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ssl="http://www.mulesoft.org/schema/mule/ssl" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/ssl http://www.mulesoft.org/schema/mule/ssl/current/mule-ssl.xsd">
+
+    <ssl:connector name="SslConnector">
+        <ssl:client path="clientKeyStore" storePassword="mulepassword" />
+        <ssl:key-store path="serverKeystore"
+            storePassword="mulepassword" keyPassword="mulepassword" />
+        <ssl:server path="trustStore" storePassword="mulepassword" />
+    </ssl:connector>
+
+    <ssl:endpoint name="in" host="localhost" port="${port1}"
+        exchange-pattern="request-response" />
+
+
+    <flow name="service">
+
+        <ssl:inbound-endpoint ref="in" />
+
+        <test:component appendString=" Received">
+            <test:callback
+                class="org.mule.transport.ssl.SaveCertificatesCallback" />
+        </test:component>
+    </flow>
+
+</mule>

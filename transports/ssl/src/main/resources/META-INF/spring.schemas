@@ -1,0 +1,16 @@
+http\://www.mulesoft.org/schema/mule/ssl/3.1/mule-ssl.xsd=META-INF/mule-ssl.xsd
+http\://www.mulesoft.org/schema/mule/tls/3.1/mule-tls.xsd=META-INF/mule-tls.xsd
+http\://www.mulesoft.org/schema/mule/ssl/3.2/mule-ssl.xsd=META-INF/mule-ssl.xsd
+http\://www.mulesoft.org/schema/mule/tls/3.2/mule-tls.xsd=META-INF/mule-tls.xsd
+http\://www.mulesoft.org/schema/mule/ssl/3.3/mule-ssl.xsd=META-INF/mule-ssl.xsd
+http\://www.mulesoft.org/schema/mule/tls/3.3/mule-tls.xsd=META-INF/mule-tls.xsd
+http\://www.mulesoft.org/schema/mule/ssl/3.4/mule-ssl.xsd=META-INF/mule-ssl.xsd
+http\://www.mulesoft.org/schema/mule/tls/3.4/mule-tls.xsd=META-INF/mule-tls.xsd
+http\://www.mulesoft.org/schema/mule/ssl/3.5/mule-ssl.xsd=META-INF/mule-ssl.xsd
+http\://www.mulesoft.org/schema/mule/tls/3.5/mule-tls.xsd=META-INF/mule-tls.xsd
+http\://www.mulesoft.org/schema/mule/ssl/3.6/mule-ssl.xsd=META-INF/mule-ssl.xsd
+http\://www.mulesoft.org/schema/mule/tls/3.6/mule-tls.xsd=META-INF/mule-tls.xsd
+http\://www.mulesoft.org/schema/mule/ssl/3.7/mule-ssl.xsd=META-INF/mule-ssl.xsd
+http\://www.mulesoft.org/schema/mule/tls/3.7/mule-tls.xsd=META-INF/mule-tls.xsd
+http\://www.mulesoft.org/schema/mule/ssl/current/mule-ssl.xsd=META-INF/mule-ssl.xsd
+http\://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd=META-INF/mule-tls.xsd
